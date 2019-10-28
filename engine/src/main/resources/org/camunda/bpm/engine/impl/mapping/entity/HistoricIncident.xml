@@ -315,6 +315,13 @@
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+        and RES.PROC_DEF_KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="causeIncidentId != null">
         and RES.CAUSE_INCIDENT_ID_ = #{causeIncidentId}
       </if>

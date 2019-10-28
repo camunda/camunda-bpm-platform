@@ -48,6 +48,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -69,6 +70,9 @@ public class IncidentQueryTest {
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   private List<String> processInstanceIds;
 
@@ -156,6 +160,7 @@ public class IncidentQueryTest {
     assertNull(incident);
   }
 
+  @Test
   public void testQueryByProcessDefinitionId() {
     String processDefinitionId = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult().getId();
 
@@ -180,6 +185,58 @@ public class IncidentQueryTest {
     assertNull(incident);
   }
 
+  @Test
+  public void testQueryByProcessDefinitionKey() {
+    // given
+    // 4 failed instances of "process"
+
+    // one incident of each of the following processes
+    testHelper.deploy(Bpmn.createExecutableProcess("proc1").startEvent().userTask().endEvent().done());
+    ProcessInstance instance5 = runtimeService.startProcessInstanceByKey("proc1");
+    Incident incident5 = runtimeService.createIncident("foo", instance5.getId(), "a");
+
+    testHelper.deploy(Bpmn.createExecutableProcess("proc2").startEvent().userTask().endEvent().done());
+    ProcessInstance instance6 = runtimeService.startProcessInstanceByKey("proc2");
+    Incident incident6 = runtimeService.createIncident("foo", instance6.getId(), "b");
+
+    // when
+    List<Incident> incidents = runtimeService.createIncidentQuery()
+        .processDefinitionKeyIn("proc1", "proc2")
+        .orderByConfiguration()
+        .asc()
+        .list();
+
+    // then
+    assertThat(incidents).hasSize(2);
+    assertThat(incidents.get(0).getId()).isEqualTo(incident5.getId());
+    assertThat(incidents.get(1).getId()).isEqualTo(incident6.getId());
+  }
+
+  @Test
+  public void testQueryByInvalidProcessDefinitionKeys() {
+    // given
+    IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
+
+    // then
+    exception.expect(ProcessEngineException.class);
+
+    // then
+    incidentQuery.processDefinitionKeyIn((String[]) null);
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKey() {
+    // given
+    IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
+
+    // then
+    exception.expect(ProcessEngineException.class);
+
+    // then
+    incidentQuery.processDefinitionKeyIn((String) null);
+  }
+
+  @Test
   public void testQueryByProcessInstanceId() {
     IncidentQuery query = runtimeService.createIncidentQuery().processInstanceId(processInstanceIds.get(0));
 
@@ -233,6 +290,7 @@ public class IncidentQueryTest {
     assertNull(incident);
   }
 
+  @Test
   public void testQueryByExecutionId() {
     Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
     assertNotNull(execution);
@@ -259,8 +317,9 @@ public class IncidentQueryTest {
     assertNull(incident);
   }
 
+  @Test
   public void testQueryByActivityId() {
-    IncidentQuery query = runtimeService.createIncidentQuery().activityId("theServiceTask");
+    IncidentQuery query = runtimeService.createIncidentQuery().activityId("task");
     assertEquals(4, query.count());
 
     List<Incident> incidents = query.list();

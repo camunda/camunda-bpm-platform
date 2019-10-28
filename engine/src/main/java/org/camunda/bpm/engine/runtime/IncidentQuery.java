@@ -35,6 +35,9 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   /** Only select incidents which have the given process definition id. **/
   IncidentQuery processDefinitionId(String processDefinitionId);
 
+  /** Only select incidents which have one of the given process definition keys. **/
+  IncidentQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
   /** Only select incidents which have the given process instance id. **/
   IncidentQuery processInstanceId(String processInstanceId);
 
