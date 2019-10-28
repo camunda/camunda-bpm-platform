@@ -279,8 +279,8 @@ public class TopicSubscriptionIT {
 
     List<ExternalTask> handledTasks = handler.getHandledTasks();
     assertThat(handledTasks.size()).isEqualTo(2);
-    assertThat(handledTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
-    assertThat(handledTasks.get(1).getProcessDefinitionVersionTag()).isEqualTo(null);
+    assertThat(handledTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo(null);
+    assertThat(handledTasks.get(1).getProcessDefinitionVersionTag()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
   }
 
   @Test
