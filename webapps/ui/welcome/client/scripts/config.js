@@ -48,5 +48,6 @@ window.camWelcomeConf = {
   //     description: 'News for nerds, stuff that matter'
   //   }
   // ],
-  // csrfCookieName: 'XSRF-TOKEN'
+  // csrfCookieName: 'XSRF-TOKEN',
+  // disableWelcomeMessage: false
 };

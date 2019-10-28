@@ -52,7 +52,8 @@ var defaultConfig = {
   batchOperation: {
     mode: 'filter'
   },
-  csrfCookieName: 'XSRF-TOKEN'
+  csrfCookieName: 'XSRF-TOKEN',
+  disableWelcomeMessage: false
 };
 
 module.exports = function(config, app) {
@@ -159,6 +160,11 @@ module.exports = function(config, app) {
 
       this.getCsrfCookieName = function() {
         var param = 'csrfCookieName';
+        return config[param] || defaultConfig[param];
+      };
+
+      this.getDisableWelcomeMessage = function() {
+        var param = 'disableWelcomeMessage';
         return config[param] || defaultConfig[param];
       };
 
