@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwError;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -82,8 +84,9 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testThrowErrorWithoutErrorCode.bpmn20.xml")
         .deploy();
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", re.getMessage());
+    } catch (ParseException e) {
+      assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", e.getMessage());
+      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("theEnd");
     }
   }
 
@@ -93,8 +96,9 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testThrowErrorWithEmptyErrorCode.bpmn20.xml")
         .deploy();
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", re.getMessage());
+    } catch (ParseException e) {
+      assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", e.getMessage());
+      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("theEnd");
     }
   }
 

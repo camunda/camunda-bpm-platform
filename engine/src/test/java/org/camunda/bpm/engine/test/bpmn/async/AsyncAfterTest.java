@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -54,8 +55,9 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncAfterTest.testTransitionIdRequired.bpmn20.xml")
         .deploy();
       fail("Exception expected");
-    } catch ( ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresent("Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.", e.getMessage());
+      assertThat(e.getErrors().get(0).getBpmnElementIds()).containsExactly("service");
     }
 
   }

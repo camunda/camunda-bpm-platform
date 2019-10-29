@@ -20,6 +20,8 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -1304,6 +1306,36 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
       .post(CREATE_DEPLOYMENT_URL);
   }
 
+
+  @Test
+  public void testCreateDeploymentThrowsParseException() {
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+    String message = "expected exception";
+    List<Problem> mockErrors = mockProblems(EXAMPLE_PROBLEM_COLUMN, EXAMPLE_PROBLEM_LINE, message, EXAMPLE_PROBLEM_ELEMENT_ID);
+    List<Problem> mockWarnings = mockProblems(EXAMPLE_PROBLEM_COLUMN_2, EXAMPLE_PROBLEM_LINE_2, EXAMPLE_EXCEPTION_MESSAGE, EXAMPLE_PROBLEM_ELEMENT_ID_2);
+    ParseException mockParseException = createMockParseException(mockErrors, mockWarnings, message);
+    when(mockDeploymentBuilder.deployWithResult()).thenThrow(mockParseException);
+
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(ParseException.class.getSimpleName()))
+      .body("message", is(message))
+      .body("errors[0].column", is(EXAMPLE_PROBLEM_COLUMN))
+      .body("errors[0].line", is(EXAMPLE_PROBLEM_LINE))
+      .body("errors[0].errorMessage", is(message))
+      .body("errors[0].mainBpmnElementId", is(EXAMPLE_PROBLEM_ELEMENT_ID))
+      .body("errors[0].bpmnElementIds", is(EXAMPLE_ELEMENT_IDS))
+      .body("warnings[0].column", is(EXAMPLE_PROBLEM_COLUMN_2))
+      .body("warnings[0].line", is(EXAMPLE_PROBLEM_LINE_2))
+      .body("warnings[0].errorMessage", is(EXAMPLE_EXCEPTION_MESSAGE))
+      .body("warnings[0].mainBpmnElementId", is(EXAMPLE_PROBLEM_ELEMENT_ID_2))
+      .body("warnings[0].bpmnElementIds", is(EXAMPLE_ELEMENT_IDS))
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+  }
+
   @Test
   public void testDeleteDeployment() {
 
@@ -1997,6 +2029,27 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     assertEquals(mockDeploymentResource.getId(), returnedId);
     assertEquals(mockDeploymentResource.getName(), returnedName);
     assertEquals(mockDeploymentResource.getDeploymentId(), returnedDeploymentId);
+  }
+
+  private List<Problem> mockProblems(int column, int line, String message, String elementId) {
+    Problem mockProblem = mock(Problem.class);
+    when(mockProblem.getColumn()).thenReturn(column);
+    when(mockProblem.getLine()).thenReturn(line);
+    when(mockProblem.getErrorMessage()).thenReturn(message);
+    when(mockProblem.getMainBpmnElementId()).thenReturn(elementId);
+    when(mockProblem.getBpmnElementIds()).thenReturn(EXAMPLE_ELEMENT_IDS);
+    List<Problem> mockProblems = new ArrayList<>();
+    mockProblems.add(mockProblem);
+    return mockProblems;
+  }
+
+  private ParseException createMockParseException(List<Problem> mockErrors,
+      List<Problem> mockWarnings, String message) {
+    ParseException mockParseException = mock(ParseException.class);
+    when(mockParseException.getMessage()).thenReturn(message);
+    when(mockParseException.getErrors()).thenReturn(mockErrors);
+    when(mockParseException.getWarnings()).thenReturn(mockWarnings);
+    return mockParseException;
   }
 
 }

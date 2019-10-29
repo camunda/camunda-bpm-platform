@@ -16,11 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -169,7 +172,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals("Input is more than one", task.getName());
   }
 
-  public void testInvalidProcessDefinition() {
+  public void testFlowWithoutConditionNoDefaultFlow() {
     String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
             "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
@@ -191,10 +194,13 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", flowWithoutConditionNoDefaultFlow).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ProcessEngineException ex) {
-      assertTrue( ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' without condition which is not the default flow."));
+    catch (ParseException ex) {
+      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' without condition which is not the default flow."));
+      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
     }
+  }
 
+  public void testDefaultFlowWithCondition() {
     String defaultFlowWithCondition = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
             "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
@@ -217,10 +223,13 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ProcessEngineException ex) {
-      assertTrue( ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' which is the default flow but has a condition too."));
+    catch (ParseException ex) {
+      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' which is the default flow but has a condition too."));
+      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
     }
+  }
 
+  public void testNoOutgoingFlow() {
     String noOutgoingFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
             "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
@@ -233,9 +242,9 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", noOutgoingFlow).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ProcessEngineException ex) {
-      ex.printStackTrace();
-      assertTrue( ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has no outgoing sequence flows."));
+    catch (ParseException ex) {
+      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has no outgoing sequence flows."));
+      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
     }
 
   }

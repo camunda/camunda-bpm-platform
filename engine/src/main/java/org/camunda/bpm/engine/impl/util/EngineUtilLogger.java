@@ -20,7 +20,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
+
 import org.camunda.bpm.engine.ClassLoadingException;
+import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -58,11 +62,13 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "Warnings during parsing: {}", formattedMessage);
   }
 
-  public ProcessEngineException exceptionDuringParsing(String string) {
-    return new ProcessEngineException(exceptionMessage(
+  public ProcessEngineException exceptionDuringParsing(String string, List<Problem> errors, List<Problem> warnings) {
+    return new ParseException(exceptionMessage(
         "005",
         "Could not parse BPMN process. Errors: {}",
-        string));
+        string),
+        errors,
+        warnings);
   }
 
 

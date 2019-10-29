@@ -8,14 +8,10 @@
 
 		<startEvent id="start" />
 		
-		<sequenceFlow sourceRef="start"	targetRef="task" />	
+		<sequenceFlow id="SequenceFlow_1" sourceRef="start"	targetRef="task" />	
 		
         <!-- compensation handler should not have an incoming sequence flow -->
 		<userTask id="task" isForCompensation="true" />
-		
-		<sequenceFlow sourceRef="task" targetRef="end" />
-		
-		<endEvent id="end" />
     
 	</process>
 

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -461,15 +463,17 @@ public class ConditionalStartEventTest {
 
   @Test
   public void testDeploymentOfTwoEqualConditionalStartEvent() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot have more than one conditional event subscription with the same condition '${variable == 1}'");
-
-    // when
-    testRule.deploy(TWO_EQUAL_CONDITIONAL_START_EVENT_XML);
-
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    assertEquals(0, eventSubscriptions.size());
+    try {
+      // when
+      testRule.deploy(TWO_EQUAL_CONDITIONAL_START_EVENT_XML);
+      fail("Expected exception");
+    } catch (ParseException e) {
+      // then
+      assertThat(e.getMessage()).contains("Cannot have more than one conditional event subscription with the same condition '${variable == 1}'");
+      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("StartEvent_2");
+      List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+      assertEquals(0, eventSubscriptions.size());
+    }
   }
 
   @Test

@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.external;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +41,10 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
     try {
       deploymentBuilder.deploy();
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
+      assertThat(e.getErrors().size()).isEqualTo(1);
+      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("externalTask");
     }
   }
 

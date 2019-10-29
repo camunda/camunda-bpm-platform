@@ -61,9 +61,9 @@
 		
 		<endEvent id="end" />
 		
-		<association associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
-		<association associationDirection="One" sourceRef="compensateBookHotelEvt2" targetRef="undoBookHotel2" />
-		<association associationDirection="One" sourceRef="compensateBookFlightEvt" targetRef="undoBookFlight" />
+		<association id="Association_1" associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
+		<association id="Association_2" associationDirection="One" sourceRef="compensateBookHotelEvt2" targetRef="undoBookHotel2" />
+		<association id="Association_3" associationDirection="One" sourceRef="compensateBookFlightEvt" targetRef="undoBookFlight" />
 	</process>
 
 </definitions>

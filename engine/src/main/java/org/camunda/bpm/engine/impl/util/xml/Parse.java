@@ -27,6 +27,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
 import org.camunda.bpm.engine.impl.util.io.StringStreamSource;
 import org.camunda.bpm.engine.impl.util.io.UrlStreamSource;
+import org.camunda.bpm.engine.impl.xml.ProblemImpl;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -159,6 +161,7 @@ public class Parse extends DefaultHandler {
       }
       saxParser.parse(inputStream, new ParseHandler(this));
     } catch (Exception e) {
+//      addError(e.getMessage(), null);
       throw LOG.parsingFailureException(name, e);
     }
 
@@ -191,15 +194,27 @@ public class Parse extends DefaultHandler {
   }
 
   public void addError(SAXParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e, name));
   }
 
   public void addError(String errorMessage, Element element) {
-    errors.add(new Problem(errorMessage, name, element));
+    errors.add(new ProblemImpl(errorMessage, name, element));
   }
 
+  public void addError(String errorMessage, Element element, String elementId) {
+    errors.add(new ProblemImpl(errorMessage, name, element, elementId));
+  }
+
+  public void addError(String errorMessage, String... elementIds) {
+    errors.add(new ProblemImpl(errorMessage, name, null, elementIds));
+  }
+  
   public void addError(BpmnParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e, name));
+  }
+
+  public void addError(BpmnParseException e, String elementId) {
+    errors.add(new ProblemImpl(e, name, elementId));
   }
 
   public boolean hasErrors() {
@@ -207,11 +222,15 @@ public class Parse extends DefaultHandler {
   }
 
   public void addWarning(SAXParseException e) {
-    warnings.add(new Problem(e, name));
+    warnings.add(new ProblemImpl(e, name));
   }
 
   public void addWarning(String errorMessage, Element element) {
-    warnings.add(new Problem(errorMessage, name, element));
+    warnings.add(new ProblemImpl(errorMessage, name, element));
+  }
+
+  public void addWarning(String errorMessage, Element element, String... elementIds) {
+    warnings.add(new ProblemImpl(errorMessage, name, element, elementIds));
   }
 
   public boolean hasWarnings() {
@@ -233,7 +252,7 @@ public class Parse extends DefaultHandler {
       strb.append("\n* ");
       strb.append(error.toString());
     }
-    throw LOG.exceptionDuringParsing(strb.toString());
+    throw LOG.exceptionDuringParsing(strb.toString(), errors, warnings);
   }
 
   public void setSchemaResource(String schemaResource) {

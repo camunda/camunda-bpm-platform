@@ -18,10 +18,15 @@ package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import junit.framework.AssertionFailedError;
+
+import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -46,16 +51,16 @@ public class CompensationEventParseInvalidProcessTest {
   @Parameters(name = "{index}: process definition = {0}, expected error message = {1}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        { "CompensationEventParseInvalidProcessTest.illegalCompensateActivityRefParentScope.bpmn20.xml", "Invalid attribute value for 'activityRef': no activity with id 'someServiceInMainProcess' in scope 'subProcess'" },
-        { "CompensationEventParseInvalidProcessTest.illegalCompensateActivityRefNestedScope.bpmn20.xml", "Invalid attribute value for 'activityRef': no activity with id 'someServiceInNestedScope' in scope 'subProcess'" },
-        { "CompensationEventParseInvalidProcessTest.invalidActivityRefFails.bpmn20.xml", "Invalid attribute value for 'activityRef':" },
-        { "CompensationEventParseInvalidProcessTest.multipleCompensationCatchEventsCompensationAttributeMissingFails.bpmn20.xml", "compensation boundary catch must be connected to element with isForCompensation=true" },
-        { "CompensationEventParseInvalidProcessTest.multipleCompensationCatchEventsFails.bpmn20.xml", "multiple boundary events with compensateEventDefinition not supported on same activity"},
-        { "CompensationEventParseInvalidProcessTest.multipleCompensationEventSubProcesses.bpmn20.xml", "multiple event subprocesses with compensation start event are not supported on the same scope" },
-        { "CompensationEventParseInvalidProcessTest.compensationEventSubProcessesAtProcessLevel.bpmn20.xml", "event subprocess with compensation start event is only supported for embedded subprocess" },
-        { "CompensationEventParseInvalidProcessTest.compensationEventSubprocessAndBoundaryEvent.bpmn20.xml", "compensation boundary event and event subprocess with compensation start event are not supported on the same scope" },
-        { "CompensationEventParseInvalidProcessTest.invalidOutgoingSequenceflow.bpmn20.xml", "Invalid outgoing sequence flow of compensation activity 'undoTask'. A compensation activity should not have an incoming or outgoing sequence flow." },
-        { "CompensationEventParseInvalidProcessTest.invalidIncomingSequenceflow.bpmn20.xml", "Invalid incoming sequence flow of compensation activity 'task'. A compensation activity should not have an incoming or outgoing sequence flow." }
+        { "CompensationEventParseInvalidProcessTest.illegalCompensateActivityRefParentScope.bpmn20.xml", "Invalid attribute value for 'activityRef': no activity with id 'someServiceInMainProcess' in scope 'subProcess'", new String[] { "throwCompensate" } },
+        { "CompensationEventParseInvalidProcessTest.illegalCompensateActivityRefNestedScope.bpmn20.xml", "Invalid attribute value for 'activityRef': no activity with id 'someServiceInNestedScope' in scope 'subProcess'", new String[] { "throwCompensate" } },
+        { "CompensationEventParseInvalidProcessTest.invalidActivityRefFails.bpmn20.xml", "Invalid attribute value for 'activityRef':", new String[]{"throwCompensate"} },
+        { "CompensationEventParseInvalidProcessTest.multipleCompensationCatchEventsCompensationAttributeMissingFails.bpmn20.xml", "compensation boundary catch must be connected to element with isForCompensation=true", new String[] { "compensateBookHotelEvt", "undoBookHotel" } },
+        { "CompensationEventParseInvalidProcessTest.multipleCompensationCatchEventsFails.bpmn20.xml", "multiple boundary events with compensateEventDefinition not supported on same activity", new String[] { "compensateBookHotelEvt2" } },
+        { "CompensationEventParseInvalidProcessTest.multipleCompensationEventSubProcesses.bpmn20.xml", "multiple event subprocesses with compensation start event are not supported on the same scope", new String[] { "startInCompensationScope2" } },
+        { "CompensationEventParseInvalidProcessTest.compensationEventSubProcessesAtProcessLevel.bpmn20.xml", "event subprocess with compensation start event is only supported for embedded subprocess", new String[] { "startInCompensationScope" } },
+        { "CompensationEventParseInvalidProcessTest.compensationEventSubprocessAndBoundaryEvent.bpmn20.xml", "compensation boundary event and event subprocess with compensation start event are not supported on the same scope", new String[] { "subprocess", "compensateSubProcess" } },
+        { "CompensationEventParseInvalidProcessTest.invalidOutgoingSequenceflow.bpmn20.xml", "Invalid outgoing sequence flow of compensation activity 'undoTask'. A compensation activity should not have an incoming or outgoing sequence flow.", new String[] { "undoTask" } },
+        { "CompensationEventParseInvalidProcessTest.invalidIncomingSequenceflow.bpmn20.xml", "Invalid incoming sequence flow of compensation activity 'task'. A compensation activity should not have an incoming or outgoing sequence flow.", new String[] { "task" } }
     });
   }
 
@@ -64,6 +69,9 @@ public class CompensationEventParseInvalidProcessTest {
 
   @Parameter(1)
   public String expectedErrorMessage;
+
+  @Parameter(2)
+  public String[] bpmnElementIds;
 
   @Rule
   public ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -83,8 +91,14 @@ public class CompensationEventParseInvalidProcessTest {
         .deploy();
 
       fail("exception expected: " + expectedErrorMessage);
-    } catch (Exception e) {
+    } catch (ParseException e) {
       assertExceptionMessageContainsText(e, expectedErrorMessage);
+      List<Problem> errors = e.getErrors();
+      assertThat(errors.size()).isEqualTo(1);
+      assertThat(errors.get(0).getMainBpmnElementId()).isEqualTo(bpmnElementIds[0]);
+      if (bpmnElementIds.length == 2) {
+        assertThat(errors.get(0).getBpmnElementIds()).containsExactly(bpmnElementIds);
+      }
     }
   }
 

@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.link;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -89,8 +91,9 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testInvalidEventLinkMultipleTargets.bpmn20.xml").deploy();
       fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
     }
-    catch (Exception ex) {
+    catch (ParseException ex) {
       assertTrue(ex.getMessage().contains("Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
+      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 
@@ -99,8 +102,9 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testCatchLinkEventAfterEventBasedGatewayNotAllowed.bpmn20.xml").deploy();
       fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
     }
-    catch (Exception ex) {
+    catch (ParseException ex) {
       assertTrue(ex.getMessage().contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
+      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 }

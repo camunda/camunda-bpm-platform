@@ -25,13 +25,7 @@
 				<compensateEventDefinition />
 			</boundaryEvent>	
 			
-			<!-- not supported -->
-			<boundaryEvent id="compensateBookHotelEvt2" name="Boundary event" attachedToRef="bookHotel">
-				<compensateEventDefinition />
-			</boundaryEvent>	
-			
 			<serviceTask id="undoBookHotel" camunda:expression="${true}" />
-			<serviceTask id="undoBookHotel2" camunda:expression="${true}" />
 			
 			
 			<serviceTask id="bookFlight" camunda:expression="${true}">
@@ -44,7 +38,7 @@
 				<compensateEventDefinition  />
 			</boundaryEvent>		
 			
-			<serviceTask id="undoBookFlight" camunda:expression="${true}" />
+			<serviceTask id="undoBookFlight" isForCompensation="true" camunda:expression="${true}" />
 			
 			<parallelGateway id="join" />
 
@@ -61,9 +55,8 @@
 		
 		<endEvent id="end" />
 		
-		<association associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
-		<association associationDirection="One" sourceRef="compensateBookHotelEvt2" targetRef="undoBookHotel2" />
-		<association associationDirection="One" sourceRef="compensateBookFlightEvt" targetRef="undoBookFlight" />
+		<association id="Association_1" associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
+		<association id="Association_3" associationDirection="One" sourceRef="compensateBookFlightEvt" targetRef="undoBookFlight" />
 	</process>
 
 </definitions>

@@ -19,10 +19,10 @@
   
    <subProcess id="subProcess">
     <startEvent id="startSubProcess">
-      <timerEventDefinition>
+      <timerEventDefinition id="TimerEventDefinition_1">
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
-      <messageEventDefinition messageRef="newMessage" />
+      <messageEventDefinition id="MessageEventDefinition_1" messageRef="newMessage" />
     </startEvent>
     <sequenceFlow id="flow_4" sourceRef="startSubProcess" targetRef="mySubProcessUserTask" />
     <userTask id="mySubProcessUserTask" />
@@ -40,10 +40,10 @@
   
    <subProcess id="eventSubProcess" triggeredByEvent="true">
     <startEvent id="startEventSubProcess">
-      <timerEventDefinition>
+      <timerEventDefinition  id="TimerEventDefinition_2">
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
-      <messageEventDefinition messageRef="newMessage" />
+      <messageEventDefinition id="MessageEventDefinition_2" messageRef="newMessage" />
     </startEvent>
     
     <sequenceFlow id="flow_6" sourceRef="startEventSubProcess" targetRef="myEventSubProcessUserTask" />

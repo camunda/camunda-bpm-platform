@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.job;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -189,9 +191,10 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/job/invalidPrioProcess.bpmn20.xml")
         .deploy();
       fail("deploying a process with malformed priority should not succeed");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresentIgnoreCase("value 'thisIsNotANumber' for attribute 'jobPriority' "
           + "is not a valid number", e.getMessage());
+      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("task2");
     }
   }
 
