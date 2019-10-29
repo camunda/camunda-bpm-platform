@@ -25,6 +25,7 @@
   <properties>
     <jackson.version>2.10.0</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
+    <commons.version>1.8.2</commons.version>
     <spin.version.old>1.7.2</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
@@ -36,7 +37,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.8.0</version>
+        <version>${commons.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
