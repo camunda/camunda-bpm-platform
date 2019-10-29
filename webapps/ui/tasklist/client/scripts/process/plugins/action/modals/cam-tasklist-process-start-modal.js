@@ -30,6 +30,7 @@ module.exports = [
   'assignNotification',
   '$location',
   'search',
+  'camAPI',
   function(
     $rootScope,
     $scope,
@@ -40,7 +41,8 @@ module.exports = [
     processData,
     assignNotification,
     $location,
-    search
+    search,
+    camAPI
   ) {
     function errorNotification(src, err) {
       $translate(src)
@@ -180,7 +182,7 @@ module.exports = [
         deploymentId: deploymentId
       };
 
-      search.updateSilently({processStart: processDefinitionId});
+      search.updateSilently({processStart: processDefinitionKey});
 
       processStartData.set('currentProcessDefinitionId', {
         id: processDefinitionId
@@ -189,13 +191,23 @@ module.exports = [
 
     var processToStart = $location.search()['processStart'];
     if (processToStart && typeof processToStart === 'string') {
-      processStartData.set('currentProcessDefinitionId', {
-        id: $location.search()['processStart']
-      });
-      $scope.params = {
-        processDefinitionId: processToStart
-      };
-      $scope.PROCESS_TO_START_SELECTED = true;
+      camAPI.resource('process-definition').list(
+        {
+          key: processToStart,
+          latest: true,
+          active: true,
+          startableInTasklist: true,
+          startablePermissionCheck: true,
+          maxResults: 1
+        },
+        function(err, res) {
+          if (err || res.items.length === 0) {
+            return err;
+          }
+
+          $scope.selectProcessDefinition(res.items[0]);
+        }
+      );
     }
 
     // start a process view /////////////////////////////////////////////////////////////////
