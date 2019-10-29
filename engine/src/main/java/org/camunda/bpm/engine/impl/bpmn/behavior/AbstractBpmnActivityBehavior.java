@@ -89,7 +89,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     try {
       toExecute.call();
     } catch (Exception ex) {
-      if (activityInstanceId.equals(execution.getActivityInstanceId())) {
+      if (activityInstanceId != null && activityInstanceId.equals(execution.getActivityInstanceId())) {
 
         try {
           BpmnExceptionHandler.propagateException(execution, ex);
