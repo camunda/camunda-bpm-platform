@@ -35,6 +35,8 @@ public final class CsrfConstants {
 
   public static final Pattern CSRF_NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
 
+  public static final Pattern CSRF_DEFAULT_ENTRY_URL_PATTERN = Pattern.compile("^/api/admin/auth/user/.+/login/(cockpit|tasklist|admin|welcome)$");
+
   public static final String CSRF_SET_COOKIE_HEADER_NAME = "Set-Cookie";
 
   public static final String CSRF_SAME_SITE_FIELD_NAME = ";SameSite=";

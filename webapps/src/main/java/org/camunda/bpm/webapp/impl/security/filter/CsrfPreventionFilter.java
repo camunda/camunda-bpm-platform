@@ -367,6 +367,7 @@ public class CsrfPreventionFilter implements Filter {
    * */
   protected boolean isNonModifyingRequest(HttpServletRequest request) {
     return CsrfConstants.CSRF_NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
+      || CsrfConstants.CSRF_DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
       || entryPoints.contains(getRequestedPath(request));
   }
 
