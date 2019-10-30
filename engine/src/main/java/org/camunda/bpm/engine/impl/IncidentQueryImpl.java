@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author roman.smirnov
@@ -40,6 +41,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String activityId;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String[] processDefinitionKeys;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -85,6 +87,12 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
 
   public IncidentQuery processDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public IncidentQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("processDefinitionKeys", (Object[]) processDefinitionKeys);
+    this.processDefinitionKeys = processDefinitionKeys;
     return this;
   }
 
@@ -192,6 +200,10 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return commandContext
       .getIncidentManager()
       .findIncidentByQueryCriteria(this, page);
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
   }
 
 }

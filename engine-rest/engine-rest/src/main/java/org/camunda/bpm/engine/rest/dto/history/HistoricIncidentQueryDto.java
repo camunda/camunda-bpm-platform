@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,6 +78,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected String incidentType;
   protected String incidentMessage;
   protected String processDefinitionId;
+  protected String[] processDefinitionKeyIn;
   protected String processInstanceId;
   protected String executionId;
   protected String activityId;
@@ -115,6 +117,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringArrayConverter.class)
+  public void setProcessDefinitionKeyIn(String[] processDefinitionKeyIn) {
+    this.processDefinitionKeyIn = processDefinitionKeyIn;
   }
 
   @CamundaQueryParam("processInstanceId")
@@ -200,6 +207,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
+    }
+    if (processDefinitionKeyIn != null && processDefinitionKeyIn.length > 0) {
+      query.processDefinitionKeyIn(processDefinitionKeyIn);
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);

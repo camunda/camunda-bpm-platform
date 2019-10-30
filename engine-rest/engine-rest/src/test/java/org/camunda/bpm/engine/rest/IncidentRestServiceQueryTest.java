@@ -418,6 +418,22 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testQueryByProcessDefinitionKey() {
+    String key1 = "foo";
+    String key2 = "bar";
+
+    given()
+      .queryParam("processDefinitionKeyIn", key1 + "," + key2)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(INCIDENT_QUERY_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+
+    inOrder.verify(mockedQuery).processDefinitionKeyIn("foo", "bar");
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryByProcessInstanceId() {
     String processInstanceId = MockProvider.EXAMPLE_INCIDENT_PROC_INST_ID;
 
