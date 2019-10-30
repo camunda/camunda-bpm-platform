@@ -186,7 +186,7 @@ public class IncidentQueryTest {
   }
 
   @Test
-  public void testQueryByProcessDefinitionKey() {
+  public void testQueryByProcessDefinitionKeys() {
     // given
     // 4 failed instances of "process"
 
