@@ -71,7 +71,8 @@ module.exports = [
           groupResource.list(
             {
               firstResult: groupPages.size * (groupPages.current - 1),
-              maxResults: groupPages.size
+              maxResults: groupPages.size,
+              member: $scope.user.id
             },
             function(err, groups) {
               if (err) {
