@@ -21,8 +21,9 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.rules.ExternalResource;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author Tassilo Weidner
@@ -33,7 +34,7 @@ public class HeaderRule extends ExternalResource {
 
   protected Server server = new Server(SERVER_PORT);
   protected WebAppContext webAppContext = new WebAppContext();
-  protected URLConnection connection = null;
+  protected HttpURLConnection connection = null;
 
   protected void before() {
     try {
@@ -70,14 +71,32 @@ public class HeaderRule extends ExternalResource {
   }
 
   public void performRequest() {
-    performRequestWithHeader(null, null);
+    performRequestWithHeader(null, null, "", null);
+  }
+
+  public void performPostRequest(String path) {
+    performRequestWithHeader(null, null, path, "POST");
   }
 
   public void performRequestWithHeader(String name, String value) {
+    performRequestWithHeader(name, value, "", null);
+  }
+
+  public void performRequestWithHeader(String name, String value, String path, String method) {
     try {
-      connection = new URL("http://localhost:" + SERVER_PORT + "/camunda").openConnection();
+      connection =
+        (HttpURLConnection) new URL("http://localhost:" + SERVER_PORT + "/camunda" + path)
+          .openConnection();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+
+    if ("POST".equals(method)) {
+      try {
+        connection.setRequestMethod("POST");
+      } catch (ProtocolException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (name != null && value != null) {
@@ -111,6 +130,14 @@ public class HeaderRule extends ExternalResource {
     }
 
     return false;
+  }
+
+  public String getResponseBody() {
+    try {
+      return connection.getResponseMessage();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }
