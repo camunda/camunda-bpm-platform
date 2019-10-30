@@ -19,6 +19,8 @@ package org.camunda.bpm.spring.boot.starter.webapp.filter.util;
 import org.junit.rules.ExternalResource;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -30,7 +32,7 @@ public class HeaderRule extends ExternalResource {
   public static final String WEBAPP_URL = "http://localhost:" + PORT_PLACEHOLDER_WEBAPP_URL + "/app/tasklist/default";
 
   protected Integer port = null;
-  protected URLConnection connection = null;
+  protected HttpURLConnection connection = null;
 
   public HeaderRule() {
   }
@@ -46,14 +48,36 @@ public class HeaderRule extends ExternalResource {
   }
 
   public URLConnection performRequest() {
-    return performRequest(WEBAPP_URL.replace(PORT_PLACEHOLDER_WEBAPP_URL, String.valueOf(port)));
+    return performRequest(WEBAPP_URL.replace(PORT_PLACEHOLDER_WEBAPP_URL, String.valueOf(port)), null, null, null);
   }
 
   public URLConnection performRequest(String url) {
+    return performRequest(url, null, null, null);
+  }
+
+  public URLConnection performPostRequest(String url, String headerName, String headerValue) {
+    return performRequest(url, "POST", headerName, headerValue);
+  }
+
+  public URLConnection performRequest(String url, String method, String headerName, String headerValue) {
     try {
-      connection = new URL(url).openConnection();
+      connection =
+        (HttpURLConnection) new URL(url)
+          .openConnection();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+
+    if ("POST".equals(method)) {
+      try {
+        connection.setRequestMethod("POST");
+      } catch (ProtocolException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    if (headerName != null && headerValue != null) {
+      connection.setRequestProperty(headerName, headerValue);
     }
 
     try {
