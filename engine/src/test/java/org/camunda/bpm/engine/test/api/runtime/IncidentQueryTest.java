@@ -220,7 +220,7 @@ public class IncidentQueryTest {
     // then
     exception.expect(ProcessEngineException.class);
 
-    // then
+    // when
     incidentQuery.processDefinitionKeyIn((String[]) null);
   }
 
