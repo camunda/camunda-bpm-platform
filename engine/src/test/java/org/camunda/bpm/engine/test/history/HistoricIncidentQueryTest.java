@@ -232,7 +232,7 @@ public class HistoricIncidentQueryTest {
     // then
     exception.expect(ProcessEngineException.class);
 
-    // then
+    // when
     incidentQuery.processDefinitionKeyIn((String[]) null);
   }
 
