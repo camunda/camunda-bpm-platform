@@ -29,3 +29,6 @@ ALTER TABLE ACT_RU_JOB
 -- https://app.camunda.com/jira/browse/CAM-10672
 ALTER TABLE ACT_HI_INCIDENT
   ADD HISTORY_CONFIGURATION_ varchar(255);
+
+-- https://app.camunda.com/jira/browse/CAM-10600
+create index ACT_IDX_HI_DETAIL_VAR_INST_ID on ACT_HI_DETAIL(VAR_INST_ID_);
