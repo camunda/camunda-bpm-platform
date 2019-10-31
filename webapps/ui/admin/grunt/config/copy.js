@@ -73,7 +73,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/',
-        src: ['index.html', 'camunda-admin-bootstrap.js'],
+        src: ['index.html', 'camunda-admin-bootstrap.js', 'csrf-token.html'],
         dest: '<%= pkg.gruntConfig.adminBuildTarget %>/'
       }
     ]
