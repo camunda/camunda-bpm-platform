@@ -44,6 +44,7 @@ public enum Resources implements Resource {
   REPORT(EntityTypes.REPORT, 15),
   DASHBOARD(EntityTypes.DASHBOARD, 16),
   OPERATION_LOG_CATEGORY(EntityTypes.OPERATION_LOG_CATEGORY, 17),
+  @Deprecated
   OPTIMIZE(EntityTypes.OPTIMIZE, 18);
 
   String name;
