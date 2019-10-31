@@ -186,15 +186,15 @@
                   <include>**/*IT.*</include>
                 </includes>
 
-                <!-- [Google Chrome is missing]
-                     See https://app.camunda.com/jira/browse/CAM-10604
-                 -->
                 <excludes>
-                  <exclude>**/DashboardIT.*</exclude>
-                  <exclude>**/TasklistIT.*</exclude>
+                  <!-- [Google Chrome is missing]
+                     See https://app.camunda.com/jira/browse/CAM-10604
+                  -->
+                  <exclude>**/LoginIT.*</exclude>
+                  <!-- [/Google Chrome is missing] -->
+
                   <exclude>**/ErrorPageIT.*</exclude>
                 </excludes>
-                <!-- [/Google Chrome is missing] -->
               </configuration>
             </execution>
           </executions>
