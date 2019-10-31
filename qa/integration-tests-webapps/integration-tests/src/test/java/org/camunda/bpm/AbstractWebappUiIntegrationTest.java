@@ -75,6 +75,17 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
 
   }
 
+  public static ExpectedCondition<Boolean> containsCurrentUrl(final String url) {
+
+    return new ExpectedCondition<Boolean>() {
+      @Override
+      public Boolean apply(WebDriver webDriver) {
+        return webDriver.getCurrentUrl().contains(url);
+      }
+    };
+
+  }
+
   @Before
   public void createClient() throws Exception {
     preventRaceConditions();
