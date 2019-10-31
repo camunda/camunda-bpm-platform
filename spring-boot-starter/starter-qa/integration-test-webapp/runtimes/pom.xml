@@ -35,6 +35,12 @@
   </modules>
 
   <dependencies>
+    <!-- REST API -->
+    <dependency>
+      <groupId>org.camunda.bpm.springboot</groupId>
+      <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.qa</groupId>
