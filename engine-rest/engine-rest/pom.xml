@@ -496,6 +496,10 @@
 
     <profile>
       <id>wink</id>
+      <properties>
+        <version.slf4j>1.5.11</version.slf4j>
+        <version.logback>0.9.20</version.logback>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -511,7 +515,19 @@
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <version>1.5.11</version>
+          <version>${version.slf4j}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+          <version>${version.slf4j}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>${version.logback}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
