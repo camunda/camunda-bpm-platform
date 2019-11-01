@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0g0lbss" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.4.0">
+  <bpmn:process id="NFT_BUSINESS_SUB_PROCESS" isExecutable="true">
+    <bpmn:startEvent id="StartBusinessStep" name="Start  Business Step">
+      <bpmn:outgoing>SequenceFlow_0ti0mm6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ti0mm6" sourceRef="StartBusinessStep" targetRef="Business_Step_Task1" />
+    <bpmn:endEvent id="BusinessStepEnd" name="BusinessStepEnd">
+      <bpmn:incoming>SequenceFlow_0t5lezz</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0t5lezz" sourceRef="Business_Step_Task1" targetRef="BusinessStepEnd" />
+    <bpmn:serviceTask id="Business_Step_Task1" name="Business_Step_Task1" camunda:class="org.camunda.bpm.qa.performance.engine.bpmn.delegate.NoopDelegate">
+      <bpmn:incoming>SequenceFlow_0ti0mm6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0t5lezz</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="NFT_BUSINESS_SUB_PROCESS">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartBusinessStep">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="156" y="145" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ti0mm6_di" bpmnElement="SequenceFlow_0ti0mm6">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="259" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1nwtvl0_di" bpmnElement="BusinessStepEnd">
+        <dc:Bounds x="409" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="384" y="145" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0t5lezz_di" bpmnElement="SequenceFlow_0t5lezz">
+        <di:waypoint x="359" y="120" />
+        <di:waypoint x="409" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0y014ij_di" bpmnElement="Business_Step_Task1">
+        <dc:Bounds x="259" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
