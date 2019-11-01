@@ -182,7 +182,12 @@ module.exports = [
         deploymentId: deploymentId
       };
 
-      search.updateSilently({processStart: processDefinitionKey});
+      var searchData = {processStart: processDefinitionKey};
+      if (processDefinition.tenantId) {
+        searchData.processTenant = processDefinition.tenantId;
+      }
+
+      search.updateSilently(searchData);
 
       processStartData.set('currentProcessDefinitionId', {
         id: processDefinitionId
@@ -191,23 +196,29 @@ module.exports = [
 
     var processToStart = $location.search()['processStart'];
     if (processToStart && typeof processToStart === 'string') {
-      camAPI.resource('process-definition').list(
-        {
-          key: processToStart,
-          latest: true,
-          active: true,
-          startableInTasklist: true,
-          startablePermissionCheck: true,
-          maxResults: 1
-        },
-        function(err, res) {
+      var processQuery = {
+        key: processToStart,
+        latest: true,
+        active: true,
+        startableInTasklist: true,
+        startablePermissionCheck: true,
+        maxResults: 1
+      };
+
+      var tenantId = $location.search()['processTenant'];
+      if (tenantId) {
+        processQuery.tenantIdIn = tenantId;
+      }
+
+      camAPI
+        .resource('process-definition')
+        .list(processQuery, function(err, res) {
           if (err || res.items.length === 0) {
             return err;
           }
 
           $scope.selectProcessDefinition(res.items[0]);
-        }
-      );
+        });
     }
 
     // start a process view /////////////////////////////////////////////////////////////////
