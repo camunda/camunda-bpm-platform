@@ -1027,6 +1027,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryIncludeClosedIncidents() {
     // given
@@ -1063,6 +1064,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertActivityStatistics(statistics.get(1), "task", 2, 1, 1, 2);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryIncludeClosedIncidentsAndProcessInstanceIds() {
     // given
@@ -1131,6 +1133,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertActivityStatistics(statistics.get(1), "task", 1, 1, 1, 0);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
   public void testQueryIncludeClosedIncidentsMultipleRunningTasks() {
     // given
@@ -1170,6 +1173,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertActivityStatistics(statistics.get(6), "task", 1, 1, 1, 0);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryCancelledIncludeClosedIncidents() throws ParseException {
     try {
@@ -1216,6 +1220,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryCompletedIncludeClosedIncidents() throws ParseException {
     try {
