@@ -133,7 +133,7 @@
 
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>database-test-drop-schema</id>
@@ -142,7 +142,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating reports" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
@@ -150,7 +150,7 @@
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -204,7 +204,7 @@
 
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>database-test-drop-schema</id>
@@ -213,7 +213,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating reports" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
@@ -221,7 +221,7 @@
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -272,7 +272,7 @@
           </plugin>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>database-test-drop-schema</id>
@@ -281,7 +281,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating reports in ${basedir}/target/reports/" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
@@ -289,7 +289,7 @@
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -323,7 +323,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>generate load</id>
@@ -332,10 +332,10 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating load" />
                     <java classname="org.camunda.bpm.qa.performance.engine.query.DefaultLoadGenerator" classpathref="maven.test.classpath" failonerror="true" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -391,7 +391,7 @@
           </plugin>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>database-test-drop-schema</id>
@@ -400,7 +400,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating reports in ${basedir}/target/reports/" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
@@ -408,7 +408,7 @@
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -459,7 +459,7 @@
 
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>generate-report</id>
@@ -468,7 +468,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo message="Generating reports" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
@@ -476,7 +476,7 @@
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityCountReporter" classpathref="maven.test.classpath" />
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
@@ -506,6 +506,13 @@
       <id>history-level-none</id>
       <properties>
         <historyLevel>none</historyLevel>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>history-level-audit</id>
+      <properties>
+        <historyLevel>audit</historyLevel>
       </properties>
     </profile>
 
