@@ -100,6 +100,8 @@ var Controller = [
       }
     ]);
 
+    var modalResolved = true;
+
     $scope.open = function(ignoreSearch) {
       if (!ignoreSearch) {
         search.updateSilently({processStart: true});
@@ -109,6 +111,7 @@ var Controller = [
         'processDefinitionQuery',
         angular.copy(DEFAULT_PROCESS_DEFINITION_QUERY)
       );
+      modalResolved = false;
       var modalInstance = $modal.open({
         size: 'lg',
         controller: 'camProcessStartModalCtrl',
@@ -122,23 +125,30 @@ var Controller = [
 
       modalInstance.result.then(
         function() {
-          search.updateSilently({processStart: null});
+          search.updateSilently({processStart: null, processTenant: null});
+          modalResolved = true;
           $scope.$root.$broadcast('refresh');
           document.querySelector('.start-process-action a').focus();
         },
         function() {
-          search.updateSilently({processStart: null});
+          search.updateSilently({processStart: null, processTenant: null});
+          modalResolved = true;
           document.querySelector('.start-process-action a').focus();
         }
       );
     };
 
     //open if deep-linked
-    if ($location.search()['processStart']) {
-      $scope.open(true);
-    }
+    var openFromUri = function() {
+      if (modalResolved && $location.search()['processStart']) {
+        $scope.open(true);
+      }
+    };
 
+    $scope.$on('$locationChangeSuccess', openFromUri);
     $scope.$on('shortcut:startProcess', $scope.open);
+
+    openFromUri();
   }
 ];
 
