@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -96,15 +94,14 @@ public class LicenseUserOperationLogTest {
     // given legacy license
     managementService.setProperty(LicenseCmd.LICENSE_KEY_PROPERTY_NAME, "oldLicense");
     identityService.setAuthenticatedUserId(USER_ID);
-
     // when
     managementService.setLicenseKey(LICENSE_KEY);
-    List<UserOperationLogEntry> entries = historyService.createUserOperationLogQuery().orderByTimestamp().asc().list();
-
     // then
-    assertThat(entries.size()).isEqualTo(2);
-    assertOperationLogEntry(entries.get(0), UserOperationLogEntry.OPERATION_TYPE_CREATE, LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
-    assertOperationLogEntry(entries.get(1), UserOperationLogEntry.OPERATION_TYPE_DELETE,  LicenseCmd.LICENSE_KEY_PROPERTY_NAME);
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(2L);
+    UserOperationLogEntry createEntry = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).singleResult();
+    UserOperationLogEntry deleteEntry = historyService.createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).singleResult();
+    assertOperationLogEntry(createEntry, UserOperationLogEntry.OPERATION_TYPE_CREATE, LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+    assertOperationLogEntry(deleteEntry, UserOperationLogEntry.OPERATION_TYPE_DELETE, LicenseCmd.LICENSE_KEY_PROPERTY_NAME);
   }
 
   @Test
@@ -148,12 +145,12 @@ public class LicenseUserOperationLogTest {
     assertThat(entry).isNull();
   }
 
-  private void assertOperationLogEntry(UserOperationLogEntry entry, String operationType, String newValue) {
+  private void assertOperationLogEntry(UserOperationLogEntry entry, String expectedOperationType, String expectedNewValue) {
     assertThat(entry.getEntityType()).isEqualTo(EntityTypes.PROPERTY);
     assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_ADMIN);
-    assertThat(entry.getOperationType()).isEqualTo(operationType);
+    assertThat(entry.getOperationType()).isEqualTo(expectedOperationType);
     assertThat(entry.getProperty()).isEqualTo("name");
     assertThat(entry.getOrgValue()).isNull();
-    assertThat(entry.getNewValue()).isEqualTo(newValue);
+    assertThat(entry.getNewValue()).isEqualTo(expectedNewValue);
   }
 }
