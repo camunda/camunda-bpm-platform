@@ -341,7 +341,7 @@ module.exports = [
 
           $scope.$watch(
             function() {
-              return $location.search().tab === 'groups' && groupsSorting;
+              return $location.search().tab === 'groups';
             },
             function(newValue) {
               if (newValue)
@@ -350,7 +350,6 @@ module.exports = [
                 }).then(function(res) {
                   pages.total = res.count;
                 });
-              return newValue && loadGroups();
             }
           );
 
