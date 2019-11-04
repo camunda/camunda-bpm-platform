@@ -35,6 +35,7 @@
         page="groupPages.current"
         ng-model="groupPages.current"
         ng-change="loadGroups()"
+        ng-if="groupPages.total > groupPages.size"
 
         total-items="groupPages.total"
         items-per-page="groupPages.size"
