@@ -57,7 +57,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                 if (result.executeImmediately) {
                   jobDefinition.suspended = result.suspended;
                   $rootScope.$broadcast(
-                    '$jobDefinition.suspensionState.changed',
+                    '$processDefinition.suspensionState.changed',
                     $scope.jobDefinition
                   );
                 }

@@ -40,7 +40,16 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
       '$translate',
       '$uibModal',
       'localConf',
-      function($scope, camAPI, Notifications, $translate, $modal, localConf) {
+      '$q',
+      function(
+        $scope,
+        camAPI,
+        Notifications,
+        $translate,
+        $modal,
+        localConf,
+        $q
+      ) {
         var jobProvider = camAPI.resource('job');
         var jobDefinitionProvider = camAPI.resource('job-definition');
         var processInstance = $scope.processInstance;
@@ -119,27 +128,41 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             //Load Job definitions
             $scope.jobs = res;
 
-            jobDefinitionProvider.list(
-              {processInstanceId: processInstance.definitionId},
-              function(err, res) {
-                var processDefinitions = res;
-                $scope.jobs = $scope.jobs.map(function(job) {
-                  var definition = processDefinitions.filter(function(
-                    definition
-                  ) {
-                    return definition.id === job.jobDefinitionId;
-                  })[0];
-
-                  if (definition) {
-                    job.activityId = definition.activityId;
-                  }
-                  return job;
-                });
-
-                updateActivityNames();
-                $scope.loadingState = $scope.jobs.length ? 'LOADED' : 'EMPTY';
+            var jobDefinitionIds = $scope.jobs.reduce(function(
+              accumulate,
+              current
+            ) {
+              // IE11 - Sets return undefined after .add()
+              if (current.jobDefinitionId) {
+                accumulate.add(current.jobDefinitionId);
               }
-            );
+              return accumulate;
+            },
+            new Set());
+
+            var promises = [];
+            jobDefinitionIds.forEach(function(id) {
+              promises.push(jobDefinitionProvider.get(id));
+            });
+
+            $q.all(promises).then(function(res) {
+              var processDefinitions = res;
+              $scope.jobs = $scope.jobs.map(function(job) {
+                var definition = processDefinitions.filter(function(
+                  definition
+                ) {
+                  return definition.id === job.jobDefinitionId;
+                })[0];
+
+                if (definition) {
+                  job.activityId = definition.activityId;
+                }
+                return job;
+              });
+
+              updateActivityNames();
+              $scope.loadingState = $scope.jobs.length ? 'LOADED' : 'EMPTY';
+            });
           }
         };
 

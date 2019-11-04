@@ -57,6 +57,9 @@ module.exports = function(config, browserifyConfig) {
         var livereloadPort = config.grunt.config(
           'pkg.gruntConfig.livereloadPort'
         );
+
+        if(err) console.log(err);
+
         if (buildMode !== 'prod' && livereloadPort) {
           config.grunt.log.writeln(
             'Enabling livereload for admin on port: ' + livereloadPort

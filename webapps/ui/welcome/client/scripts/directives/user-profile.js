@@ -55,13 +55,34 @@ module.exports = [
           valid: true
         };
 
-        var groupResource = camAPI.resource('group');
-        groupResource.list(function(err, groups) {
-          if (err) {
-            throw err;
-          }
-          $scope.user.groups = groups;
+        var groupPages = ($scope.groupPages = {
+          current: 1,
+          size: 25,
+          total: 0
         });
+
+        var groupResource = camAPI.resource('group');
+
+        groupResource.count().then(function(res) {
+          groupPages.total = res.count;
+        });
+
+        $scope.loadGroups = function() {
+          groupResource.list(
+            {
+              firstResult: groupPages.size * (groupPages.current - 1),
+              maxResults: groupPages.size
+            },
+            function(err, groups) {
+              if (err) {
+                throw err;
+              }
+              $scope.user.groups = groups;
+            }
+          );
+        };
+
+        $scope.loadGroups();
 
         var userResource = camAPI.resource('user');
         userResource.profile(

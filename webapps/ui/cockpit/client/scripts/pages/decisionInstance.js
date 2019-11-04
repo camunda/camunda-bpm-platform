@@ -328,7 +328,8 @@ var RouteConfig = [
                     includeInputs: true,
                     includeOutputs: true,
                     disableBinaryFetching: true,
-                    disableCustomObjectDeserialization: true
+                    disableCustomObjectDeserialization: true,
+                    maxResults: 1
                   },
                   function(err, data) {
                     if (!err && data.length) {

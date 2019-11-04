@@ -116,7 +116,7 @@
       <tbody>
         <tr ng-repeat="jobDefinition in showJobDefinitions">
           <td class="activity">
-            {{ jobDefinition.activityName }}
+            {{ jobDefinition.activityName || jobDefinition.activityId }}
           </td>
           <td class="type">
             {{ jobDefinition.jobType }}

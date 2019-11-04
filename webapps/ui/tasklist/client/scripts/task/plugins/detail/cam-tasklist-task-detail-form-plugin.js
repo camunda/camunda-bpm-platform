@@ -139,12 +139,14 @@ var Controller = [
       if ($scope.task.processInstanceId) {
         assignNotification({
           assignee: $scope.task.assignee,
-          processInstanceId: $scope.task.processInstanceId
+          processInstanceId: $scope.task.processInstanceId,
+          maxResults: 15
         });
       } else if ($scope.task.caseInstanceId) {
         assignNotification({
           assignee: $scope.task.assignee,
-          caseInstanceId: $scope.task.caseInstanceId
+          caseInstanceId: $scope.task.caseInstanceId,
+          maxResults: 15
         });
       }
 

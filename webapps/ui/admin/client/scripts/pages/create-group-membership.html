@@ -29,10 +29,11 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="group in availableGroups | orderBy:sorting.sortBy:sorting.sortReverse">
+      <tr ng-repeat="group in availableGroups">
         <td class="row-select">
           <input type="checkbox"
-                 ng-model="group.checked" />
+                 ng-model="group.checked"
+                 ng-change="selectGroup(group)" />
         </td>
 
         <td class="group-id">
@@ -50,13 +51,33 @@
     </tbody>
   </table>
 
-  <p ng-show="availableGroups.length == 0">
+  <p ng-show="availableGroups.length == 0 && pages.total <= 1">
   	{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_AVAILABLE_GROUPS' | translate }} <a href="#/group-create" ng-click="close">{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_HERE' | translate }}</a>.
   </p>
+  <p ng-show="availableGroups.length == 0 && pages.total > 1">
+  	{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_AVAILABLE_GROUPS_PAGE' | translate }}</a>.
+  </p>
+
+
+  <ul uib-pagination
+      ng-if="pages.total > pages.size && status === 'beforeCreate'"
+      class="pagination-sm"
+
+      page="pages.current"
+      ng-model="pages.current"
+      ng-change="onPaginationChange()"
+
+      total-items="pages.total"
+      items-per-page="pages.size"
+
+      max-size="7"
+      boundary-links="true"></ul>
+
 
   <p ng-show="status === 'SUCCESS'">
     {{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_SUCCESS' | translate }}
   </p>
+
 
 </div>
 

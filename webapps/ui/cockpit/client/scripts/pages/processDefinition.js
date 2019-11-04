@@ -40,7 +40,7 @@ var Controller = [
   'search',
   'ProcessDefinitionResource',
   'ProcessInstanceResource',
-  'JobDefinitionResource',
+  'camAPI',
   'Views',
   'Data',
   'Transform',
@@ -59,7 +59,7 @@ var Controller = [
     search,
     ProcessDefinitionResource,
     ProcessInstanceResource,
-    JobDefinitionResource,
+    camAPI,
     Views,
     Data,
     Transform,
@@ -286,12 +286,14 @@ var Controller = [
         return queryMaxResults(
           queryParams,
           function(params) {
-            return ProcessDefinitionResource.query(params).$promise;
+            return camAPI.resource('process-definition').list(params);
           },
           function(params) {
-            return ProcessDefinitionResource.count(params).$promise;
+            return camAPI.resource('process-definition').count(params);
           }
-        );
+        ).then(function(res) {
+          return res.items;
+        });
       }
     ]);
 
@@ -311,14 +313,20 @@ var Controller = [
         return diagram;
       }
     ]);
-
-    // activityInstances
-    processData.provide('activityInstances', [
+    processData.provide('activityInstanceStatistics', [
       'processDefinition',
       function(processDefinition) {
-        return JobDefinitionResource.query({
-          processDefinitionId: processDefinition.id
+        return ProcessDefinitionResource.queryActivityStatistics({
+          id: processDefinition.id,
+          incidents: true
         }).$promise;
+      }
+    ]);
+    // activityInstances
+    processData.provide('activityInstances', [
+      'activityInstanceStatistics',
+      function(instanceStatistics) {
+        return instanceStatistics;
       }
     ]);
 

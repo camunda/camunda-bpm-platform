@@ -78,6 +78,20 @@ module.exports = [
           $scope
         );
 
+        var DEFAULT_PAGES = {
+          size: 50,
+          total: 0,
+          current: 1
+        };
+
+        $scope.onPaginationChange = function onPaginationChange(pages) {
+          $scope.authorizations = [];
+          $scope.pages.current = pages.current;
+          filterAuthorizationData.changed('authorizations');
+        };
+
+        var pages = ($scope.pages = angular.copy(DEFAULT_PAGES));
+
         var _form = $scope.filterPermissionForm;
 
         var authorizations = null;
@@ -121,10 +135,25 @@ module.exports = [
               // no filter
               deferred.resolve([]);
             } else {
-              Authorization.list(
+              Authorization.count(
                 {
                   resourceType: RESOURCE_TYPE,
                   resourceId: filter.id
+                },
+                function(err, resp) {
+                  if (err) {
+                    deferred.reject(err);
+                  } else {
+                    pages.total = resp;
+                  }
+                }
+              );
+              Authorization.list(
+                {
+                  resourceType: RESOURCE_TYPE,
+                  resourceId: filter.id,
+                  maxResults: pages.size,
+                  firstResult: pages.size * (pages.current - 1)
                 },
                 function(err, resp) {
                   if (err) {

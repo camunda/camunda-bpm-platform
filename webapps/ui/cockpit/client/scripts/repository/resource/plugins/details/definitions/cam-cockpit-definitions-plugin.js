@@ -57,7 +57,24 @@ var Controller = [
 
     // observe //////////////////////////////////////////////////////
 
-    definitionsData.observe('definitions', function(definitions) {
+    $scope.pages = {current: 1, size: 50, total: 0};
+
+    $scope.onPaginationChange = function() {
+      definitionsData.changed('definitions');
+      $scope.loadingState = 'LOADING';
+    };
+
+    definitionsData.observe('resource', function() {
+      $scope.pages.current = 0;
+      $scope.loadingState = 'LOADING';
+    });
+
+    definitionsData.observe(['definitions', 'pages'], function(
+      definitions,
+      pages
+    ) {
+      $scope.pages = pages;
+
       $scope.loadingState =
         definitions && definitions.length ? 'LOADED' : 'EMPTY';
       $scope.definitions = definitions;

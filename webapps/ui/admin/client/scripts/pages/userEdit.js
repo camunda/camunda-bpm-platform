@@ -330,13 +330,13 @@ module.exports = [
 
           // group form /////////////////////////////
 
-          var groupsSorting = ($scope.groupsSorting = null);
+          var groupsSorting = ($scope.groupsSorting = {});
 
           $scope.onGroupsSortingChanged = function(_sorting) {
             groupsSorting = $scope.groupsSorting = $scope.groupsSorting || {};
             groupsSorting.sortBy = _sorting.sortBy;
             groupsSorting.sortOrder = _sorting.sortOrder;
-            groupsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+            loadGroups();
           };
 
           $scope.$watch(
@@ -344,24 +344,45 @@ module.exports = [
               return $location.search().tab === 'groups' && groupsSorting;
             },
             function(newValue) {
+              if (newValue)
+                GroupResource.count({
+                  member: $scope.decodedUserId
+                }).then(function(res) {
+                  pages.total = res.count;
+                });
               return newValue && loadGroups();
             }
           );
 
+          var pages = ($scope.pages = {size: 50, total: 0, current: 1});
+
+          $scope.onPaginationChange = function(evt) {
+            $scope.pages.current = evt.current;
+            loadGroups();
+          };
+
           var loadGroups = ($scope.loadGroups = function() {
             $scope.groupLoadingState = 'LOADING';
-            GroupResource.list({member: $scope.decodedUserId}, function(
-              err,
-              res
-            ) {
-              $scope.groupLoadingState = res.length ? 'LOADED' : 'EMPTY';
+            GroupResource.list(
+              angular.extend(
+                {},
+                {
+                  member: $scope.decodedUserId,
+                  firstResult: (pages.current - 1) * pages.size,
+                  maxResults: pages.size
+                },
+                groupsSorting
+              ),
+              function(err, res) {
+                $scope.groupLoadingState = res.length ? 'LOADED' : 'EMPTY';
 
-              $scope.groupList = res;
-              $scope.groupIdList = [];
-              angular.forEach($scope.groupList, function(group) {
-                $scope.groupIdList.push(group.id);
-              });
-            });
+                $scope.groupList = res;
+                $scope.groupIdList = [];
+                angular.forEach($scope.groupList, function(group) {
+                  $scope.groupIdList.push(group.id);
+                });
+              }
+            );
           });
 
           $scope.removeGroup = function(groupId) {
@@ -403,14 +424,15 @@ module.exports = [
 
           // Tenant Form ///////////////////////////////////////////
 
-          var tenantsSorting = ($scope.tenantsSorting = null);
+          var tenantsSorting = ($scope.tenantsSorting = {});
 
           $scope.onTenantsSortingChanged = function(_sorting) {
             tenantsSorting = $scope.tenantsSorting =
               $scope.tenantsSorting || {};
             tenantsSorting.sortBy = _sorting.sortBy;
             tenantsSorting.sortOrder = _sorting.sortOrder;
-            tenantsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+
+            loadTenants();
           };
 
           $scope.$watch(
@@ -418,24 +440,46 @@ module.exports = [
               return $location.search().tab === 'tenants' && tenantsSorting;
             },
             function(newValue) {
-              return newValue && loadTenants();
+              return newValue && (loadTenants() || countTenants());
             }
           );
 
+          var tenantPages = ($scope.tenantPages = {
+            size: 50,
+            total: 0,
+            current: 1
+          });
+
+          var countTenants = function() {
+            TenantResource.count({
+              userMember: $scope.decodedUserId
+            }).then(function(res) {
+              tenantPages.total = res.count;
+            });
+          };
+
           var loadTenants = ($scope.loadTenants = function() {
             $scope.tenantLoadingState = 'LOADING';
-            TenantResource.list({userMember: $scope.decodedUserId}, function(
-              err,
-              res
-            ) {
-              $scope.tenantLoadingState = res.length ? 'LOADED' : 'EMPTY';
+            TenantResource.list(
+              angular.extend(
+                {},
+                {
+                  userMember: $scope.decodedUserId,
+                  maxResults: tenantPages.size,
+                  firstResult: (tenantPages.current - 1) * tenantPages.size
+                },
+                tenantsSorting
+              ),
+              function(err, res) {
+                $scope.tenantLoadingState = res.length ? 'LOADED' : 'EMPTY';
 
-              $scope.tenantList = res;
-              $scope.idList = [];
-              angular.forEach($scope.tenantList, function(tenant) {
-                $scope.idList.push(tenant.id);
-              });
-            });
+                $scope.tenantList = res;
+                $scope.idList = [];
+                angular.forEach($scope.tenantList, function(tenant) {
+                  $scope.idList.push(tenant.id);
+                });
+              }
+            );
           });
 
           $scope.removeTenant = function(tenantId) {

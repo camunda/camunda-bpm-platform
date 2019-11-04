@@ -42,15 +42,14 @@
       </div>
     </div>
 
-    <div class="form-group" ng-if="tenants">
+    <div class="form-group">
       <label for="filter-form-color"
              class="col-xs-2 control-label">{{ 'NEW_TASK_TENANT_ID' | translate }}</label>
       <div class="col-xs-10">
-        <select class="form-control"
-                name="taskTenantId"
-                ng-model="task.tenantId">
-          <option ng-repeat="tenant in tenants" value="{{tenant.id}}">{{tenant.id}}</option>
-        </select>
+        <input class="form-control"
+          name="taskTenantId"
+          ng-model="task.tenantId"
+          type="text" />
       </div>
     </div>
 

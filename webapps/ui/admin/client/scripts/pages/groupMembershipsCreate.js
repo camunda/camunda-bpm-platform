@@ -60,75 +60,106 @@ module.exports = [
       $modalInstance.close($scope.status);
     });
 
+    var pages = ($scope.pages = {current: 0, size: 50, total: 0});
+    var selectedGroups = [];
+
+    GroupResource.count().then(function(res) {
+      pages.total = res.count;
+    });
+
     function loadAllGroups() {
       var deferred = $q.defer();
 
-      GroupResource.list(function(err, res) {
-        if (err === null) {
-          deferred.resolve(res);
-        } else {
-          deferred.reject(err.data);
+      GroupResource.list(
+        angular.extend(
+          {},
+          {
+            maxResults: pages.size,
+            firstResult: (pages.current - 1) * pages.size
+          },
+          sorting
+        ),
+        function(err, res) {
+          if (err === null) {
+            deferred.resolve(res);
+          } else {
+            deferred.reject(err.data);
+          }
         }
-      });
+      );
 
       return deferred.promise;
     }
 
-    var sorting = ($scope.sorting = null);
+    var sorting = ($scope.sorting = {});
 
     $scope.onSortingChanged = function(_sorting) {
       sorting = $scope.sorting = $scope.sorting || {};
       sorting.sortBy = _sorting.sortBy;
       sorting.sortOrder = _sorting.sortOrder;
-      sorting.sortReverse = _sorting.sortOrder !== 'asc';
+      filterGroups();
     };
 
-    $q.all([loadAllGroups()]).then(
-      function(results) {
-        var availableGroups = results[0];
-        $scope.availableGroups = [];
-        angular.forEach(availableGroups, function(group) {
-          if ($scope.groupIdList.indexOf(group.id) == -1) {
-            $scope.availableGroups.push(group);
-          }
-        });
-        $scope.status = BEFORE_CREATE;
-      },
-      function(error) {
-        $scope.status = LOADING_FAILED;
-        Notifications.addError({
-          status: 'Failed',
-          message: $translate.instant('GROUP_MEMBERSHIP_CREATE_LOAD_FAILED', {
-            message: error.message
-          }),
-          exclusive: ['type']
-        });
+    $scope.onPaginationChange = function() {
+      filterGroups();
+    };
+
+    var filterGroups = function() {
+      $q.all([loadAllGroups()]).then(
+        function(results) {
+          var availableGroups = results[0];
+          $scope.availableGroups = [];
+          angular.forEach(availableGroups, function(group) {
+            if ($scope.groupIdList.indexOf(group.id) == -1) {
+              if (selectedGroups.indexOf(group.id) !== -1) {
+                group.checked = true;
+              }
+              $scope.availableGroups.push(group);
+            }
+          });
+
+          $scope.status = BEFORE_CREATE;
+        },
+        function(error) {
+          $scope.status = LOADING_FAILED;
+          Notifications.addError({
+            status: 'Failed',
+            message: $translate.instant('GROUP_MEMBERSHIP_CREATE_LOAD_FAILED', {
+              message: error.message
+            }),
+            exclusive: ['type']
+          });
+        }
+      );
+    };
+    filterGroups();
+
+    $scope.selectGroup = function(group) {
+      var index = selectedGroups.indexOf(group.id);
+
+      if (index === -1) {
+        selectedGroups.push(group.id);
+      } else {
+        selectedGroups.splice(index, 1);
       }
-    );
+    };
 
     $scope.createGroupMemberships = function() {
       $scope.status = PERFORM_CREATE;
 
-      var selectedGroupIds = [];
-      angular.forEach($scope.availableGroups, function(group) {
-        if (group.checked) {
-          selectedGroupIds.push(group.id);
-        }
-      });
-
       var completeCount = 0;
       var deferred = $q.defer();
-      angular.forEach(selectedGroupIds, function(groupId) {
+      angular.forEach(selectedGroups, function(groupId) {
         GroupResource.createMember(
           {id: groupId, userId: $scope.userId},
           function(err) {
             completeCount++;
             if (err === null) {
-              if (completeCount == selectedGroupIds.length) {
+              if (completeCount == selectedGroups.length) {
                 deferred.resolve();
               }
             } else {
-              if (completeCount == selectedGroupIds.length) {
+              if (completeCount == selectedGroups.length) {
                 deferred.reject(err);
               }
             }

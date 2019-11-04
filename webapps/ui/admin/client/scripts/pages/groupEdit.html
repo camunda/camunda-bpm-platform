@@ -135,7 +135,7 @@
             </thead>
 
             <tbody>
-            <tr ng-repeat="tenant in tenantList | orderBy:tenantsSorting.sortBy:tenantsSorting.sortReverse">
+            <tr ng-repeat="tenant in tenantList">
               <td class="tenant-id">
                 <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
               </td>
@@ -151,6 +151,19 @@
             </tr>
             </tbody>
           </table>
+
+          <ul uib-pagination ng-if="groupTenantPages.total > groupTenantPages.size"
+            class="pagination-sm"
+
+            ng-model="groupTenantPages.current"
+            ng-change="updateGroupTenantView()"
+
+            total-items="groupTenantPages.total"
+            items-per-page="groupTenantPages.size"
+            max-size="7"
+
+            boundary-links="true"></ul>
+
         </div>
 
       </form>

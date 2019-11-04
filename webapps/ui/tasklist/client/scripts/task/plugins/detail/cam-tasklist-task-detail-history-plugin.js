@@ -78,6 +78,16 @@ var Controller = [
 
     var historyData = $scope.taskData.newChild($scope);
 
+    var pages = ($scope.pages = {
+      size: 50,
+      total: 0,
+      current: 1
+    });
+
+    $scope.onPaginationChange = function onPaginationChange() {
+      historyData.changed('history');
+    };
+
     historyData.provide('history', [
       'task',
       function(task) {
@@ -87,13 +97,33 @@ var Controller = [
           return deferred.resolve(null);
         }
 
-        History.userOperation({taskId: task.id}, function(err, res) {
-          if (err) {
-            deferred.reject(err);
-          } else {
-            deferred.resolve(res);
+        History.userOperationCount(
+          {
+            taskId: task.id
+          },
+          function(err, res) {
+            if (err) {
+              throw err;
+            } else {
+              pages.total = res.count;
+            }
           }
-        });
+        );
+
+        History.userOperation(
+          {
+            taskId: task.id,
+            maxResults: pages.size,
+            firstResult: pages.size * (pages.current - 1)
+          },
+          function(err, res) {
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(res);
+            }
+          }
+        );
 
         return deferred.promise;
       }
