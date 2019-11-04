@@ -55,15 +55,18 @@ module.exports = [
     /**
      * Provides the list of filters
      */
+    tasklistData.provide('filterQuery', {maxResults: 50, firstResult: 0});
+
     tasklistData.provide('filters', [
-      function() {
+      'filterQuery',
+      function(filterQuery) {
         var deferred = $q.defer();
 
         Filter.list(
-          {
+          Object.assign({}, filterQuery, {
             itemCount: false,
-            resoureType: 'Task'
-          },
+            resourceType: 'Task'
+          }),
           function(err, res) {
             if (err) {
               deferred.reject(err);

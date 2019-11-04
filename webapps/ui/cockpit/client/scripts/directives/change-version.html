@@ -7,8 +7,8 @@
          ng-change="change(changeVersionForm)"
          ng-model-options="{debounce: 300}"
          required>
-  <button ng-click="changeLocation()"
-          ng-disabled="!isValid || isValidating"
+         <button ng-click="changeLocation()"
+          ng-disabled="!isValid || isValidating || storedVersion == model.newVersion"
           class="btn btn-xs btn-default">
     <span class="glyphicon glyphicon-ok"></span>
   </button>
@@ -20,5 +20,5 @@
 <button ng-if="!isActive"
         ng-click="open()"
         class="btn btn-xs btn-default">
-  <span>{{ model.newVersion }}</span>
+  <span>{{ definition.version }}</span>
 </button>

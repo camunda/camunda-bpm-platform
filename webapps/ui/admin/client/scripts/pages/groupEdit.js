@@ -131,7 +131,7 @@ var Controller = [
       tenantsSorting = $scope.tenantsSorting = $scope.tenantsSorting || {};
       tenantsSorting.sortBy = _sorting.sortBy;
       tenantsSorting.sortOrder = _sorting.sortOrder;
-      tenantsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+      updateGroupTenantView();
     };
 
     $scope.onUsersSortingInitialized = function(_sorting) {
@@ -212,13 +212,13 @@ var Controller = [
       });
     };
 
-    var updateGroupTenantView = function() {
+    var updateGroupTenantView = ($scope.updateGroupTenantView = function() {
       var pagingParams = preparePaging(groupTenantPages);
       var searchParams = {groupMember: $scope.decodedGroupId};
 
       $scope.tenantLoadingState = 'LOADING';
       TenantResource.list(
-        angular.extend({}, searchParams, pagingParams),
+        angular.extend({}, searchParams, pagingParams, tenantsSorting),
         function(err, res) {
           if (err === null) {
             $scope.tenantList = res;
@@ -240,7 +240,7 @@ var Controller = [
       });
 
       checkRemoveTenantMembershipAuthorized();
-    };
+    });
 
     var checkRemoveTenantMembershipAuthorized = function() {
       AuthorizationResource.check(

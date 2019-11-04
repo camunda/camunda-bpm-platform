@@ -26,7 +26,7 @@
       </thead>
 
       <tbody>
-      <tr ng-repeat="decision in decisions | orderBy:sortObj.sortBy:sortObj.sortReverse">
+      <tr ng-repeat="decision in decisions">
         <td class="name">
           <a href="#/decision-definition/{{ decision.id }}">
             {{ decision.name || decision.key }}
@@ -43,6 +43,19 @@
       </tr>
       </tbody>
     </table>
+
+    <ul uib-pagination ng-if="pagination.decisionPages.total > pagination.decisionPages.size"
+      class="pagination-sm"
+
+      page="pagination.decisionPages.current"
+      ng-model="pagination.decisionPages.current"
+      ng-change="pagination.changeDecisionPage(pagination.decisionPages)"
+
+      total-items="pagination.decisionPages.total"
+      items-per-page="pagination.decisionPages.size"
+
+      max-size="7"
+      boundary-links="true"></ul>
 
   </div>
 </section>

@@ -34,7 +34,6 @@
     <div class="user-read-permissions"
          ng-show="(!filter.id || (filter.id && accesses.update)) && !isGlobalReadAuthorization">
       <div class="form-group labels-left">
-
         <div class="col-xs-2 align-right">
           <button class="btn btn-link"
                   ng-click="addReadPermission()"
@@ -52,12 +51,6 @@
           {{ 'FILTER_FORM_PERMISSION_IDENTIFIER' | translate }}
         </label>
       </div>
-
-
-
-
-
-
 
       <div class="form-group"
            ng-repeat="auth in getReadAuthorizations(authorizations)">
@@ -129,6 +122,21 @@
           </div>
         </div>
       </div><!-- new perm -->
+
+      <ul uib-pagination
+
+        class="pagination-sm"
+        ng-if="pages.total > pages.size"
+
+        page="pages.current"
+        ng-model="pages.current"
+        ng-change="onPaginationChange(pages)"
+
+        total-items="pages.total"
+        items-per-page="pages.size"
+
+        max-size="7"
+        boundary-links="true"></ul>
     </div>
 
   </div>

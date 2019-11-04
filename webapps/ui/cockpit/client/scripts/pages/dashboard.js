@@ -172,17 +172,14 @@ var Controller = [
       var totalInstances = 0;
 
       processDefinitionStatistics.forEach(function(statistic) {
-        var processDefId = statistic.definition.id;
-        var foundIds = $scope.processDefinitionData.filter(function(pd) {
-          return pd.id === processDefId;
-        });
-
-        var foundObject = foundIds[0];
-        if (foundObject && statistic.instances) {
+        if (statistic.definition && statistic.instances) {
           values.push({
             value: statistic.instances,
-            label: foundObject.name || foundObject.id,
-            url: replaceAll($scope.linkBase.processInstances, foundObject)
+            label: statistic.definition.name || statistic.definition.id,
+            url: replaceAll(
+              $scope.linkBase.processInstances,
+              statistic.definition
+            )
           });
 
           totalInstances += statistic.instances;
@@ -239,28 +236,15 @@ var Controller = [
       series(
         {
           processes: function(next) {
-            processDefinitionService.list(
-              {
-                latest: true
-              },
-              function(err, data) {
-                if (err) {
-                  return next(err);
-                }
-
-                $scope.processDefinitionData = data.items;
-
-                processData.observe(
-                  'processDefinitionWithRootIncidentsStatistics',
-                  function(processDefinitionStatistics) {
-                    aggregateInstances(processDefinitionStatistics);
-                    aggregateIncidents(processDefinitionStatistics);
-                  }
-                );
-
-                next();
+            processData.observe(
+              'processDefinitionWithRootIncidentsStatistics',
+              function(processDefinitionStatistics) {
+                aggregateInstances(processDefinitionStatistics);
+                aggregateIncidents(processDefinitionStatistics);
               }
             );
+
+            next();
           },
           tasks: function(next) {
             taskResource.count({}, function(err, total) {

@@ -49,6 +49,12 @@ module.exports = [
             $scope
           ));
 
+          var page = ($scope.page = {
+            total: 0,
+            current: 1,
+            size: 50
+          });
+
           $scope.openModal = $scope.openModal() || noop;
 
           var filterResource = camAPI.resource('filter');
@@ -76,6 +82,17 @@ module.exports = [
 
             $scope.filters = filters;
           });
+
+          filterResource.count({resoureType: 'Task'}).then(function(res) {
+            page.total = res;
+          });
+
+          $scope.onPaginationchange = function(page) {
+            filtersData.set('filterQuery', {
+              maxResults: page.size,
+              firstResult: (page.current - 1) * page.size
+            });
+          };
 
           filtersData.observe('currentFilter', function(currentFilter) {
             $scope.currentFilter = currentFilter;

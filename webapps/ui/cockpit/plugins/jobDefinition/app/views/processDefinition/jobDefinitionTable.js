@@ -31,7 +31,9 @@ var Controller = [
   'Views',
   '$translate',
   'localConf',
-  function($scope, Views, $translate, localConf) {
+  'camAPI',
+  'search',
+  function($scope, Views, $translate, localConf, camAPI, search) {
     // prettier-ignore
     $scope.headColumns = [
       { class: 'state',         request: 'suspended'     , sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_STATE')},
@@ -66,14 +68,77 @@ var Controller = [
 
     var processData = $scope.processData.newChild($scope);
 
-    processData.observe(['filter', 'jobDefinitions', 'bpmnElements'], function(
-      filter,
-      jobDefinitions
-    ) {
-      updateView(filter, jobDefinitions);
+    var processDefinition;
+    var jobDefinitions,
+      bpmnElements = [];
+
+    var JobProvider = camAPI.resource('job-definition');
+
+    $scope.pages = {
+      total: 0,
+      current: parseInt(search().page || 1, 10),
+      size: 50
+    };
+
+    $scope.$on('$destroy', function() {
+      search('page', null);
     });
 
-    function updateView(filter, jobDefinitions) {
+    $scope.$watch('pages.current', function(newValue, oldValue) {
+      newValue !== oldValue && loadJobDefinitions();
+      search('page', !newValue || newValue == 1 ? null : newValue);
+    });
+
+    processData.observe(['filter'], function(filter) {
+      updateView(filter);
+    });
+
+    var updateTaskNames = function() {
+      angular.forEach(jobDefinitions, function(jobDefinition) {
+        var activityId = jobDefinition.activityId,
+          bpmnElement = bpmnElements[activityId];
+        jobDefinition.activityName =
+          (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
+      });
+    };
+
+    processData.observe(['bpmnElements', 'processDefinition'], function(
+      newElements,
+      newProcessDefinition
+    ) {
+      bpmnElements = newElements;
+      processDefinition = newProcessDefinition;
+
+      JobProvider.count({
+        processDefinitionId: processDefinition.id
+      }).then(function(count) {
+        $scope.pages.total = count;
+      });
+
+      loadJobDefinitions();
+    });
+
+    function loadJobDefinitions() {
+      $scope.jobDefinitions = null;
+
+      JobProvider.list({
+        processDefinitionId: processDefinition.id,
+        maxResults: $scope.pages.size,
+        firstResult: ($scope.pages.current - 1) * $scope.pages.size
+      }).then(function(res) {
+        jobDefinitions = res;
+
+        updateTaskNames();
+        updateView({});
+      });
+    }
+
+    $scope.$on(
+      '$processDefinition.suspensionState.changed',
+      loadJobDefinitions
+    );
+
+    function updateView(filter) {
       $scope.jobDefinitions = null;
 
       var activityIds = filter.activityIds;

@@ -22,7 +22,7 @@ module.exports = [
   'Uri',
   function($resource, Uri) {
     return $resource(
-      Uri.appUri('engine://engine/:engine/process-instance/:id/:action'),
+      Uri.appUri('engine://engine/:engine/process-instance/:id/:action/'),
       {id: '@id'},
       {
         query: {

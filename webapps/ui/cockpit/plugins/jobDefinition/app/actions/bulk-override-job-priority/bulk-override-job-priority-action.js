@@ -43,15 +43,15 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           var processData = $scope.processData.newChild($scope);
 
           var jobDefinitions;
-          processData.observe('jobDefinitions', function(_jobDefinitions) {
-            jobDefinitions = _jobDefinitions;
-          });
 
           $scope.openDialog = function() {
             var dialog = $modal.open({
               resolve: {
                 jobDefinitions: function() {
                   return jobDefinitions;
+                },
+                processData: function() {
+                  return processData;
                 }
               },
               controller: 'BulkJobDefinitionOverrideJobPriorityController',

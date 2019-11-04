@@ -28,7 +28,19 @@
         <li ng-repeat="group in user.groups"
             ng-class="'group-' + group.id + ' type-' + group.type.toLowerCase()">{{ group.name }}</li>
       </ul>
-    </div>
+
+      <ul uib-pagination
+        class="pagination-sm"
+
+        page="groupPages.current"
+        ng-model="groupPages.current"
+        ng-change="loadGroups()"
+
+        total-items="groupPages.total"
+        items-per-page="groupPages.size"
+
+        max-size="7"
+        boundary-links="false"></ul>
   </div>
 
   <form name="userProfile"

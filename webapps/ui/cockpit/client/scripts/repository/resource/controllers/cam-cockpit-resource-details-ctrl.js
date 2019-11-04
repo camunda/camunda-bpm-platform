@@ -153,10 +153,16 @@ module.exports = [
       }
     ]);
 
+    var pages = {current: 1, size: 50, total: 0};
+    resourceDetailsData.provide('pages', function() {
+      return pages;
+    });
+
     resourceDetailsData.provide('definitions', [
       'currentDeployment',
       'resource',
-      function(deployment, resource) {
+      'pages',
+      function(deployment, resource, pages) {
         var deferred = $q.defer();
 
         $scope.loadingState = 'LOADING';
@@ -179,23 +185,37 @@ module.exports = [
           if (!Service) {
             deferred.resolve([]);
           } else {
-            Service.list(
+            Service.count(
               {
                 deploymentId: deployment.id,
                 resourceName: resource.name
               },
               function(err, res) {
-                if (err) {
-                  $scope.loadingState = 'ERROR';
-                  $scope.textError =
-                    err.message ||
-                    $translate.instant(
-                      'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
-                    );
-                  return deferred.reject(err);
-                }
+                if (res) {
+                  pages.total = res;
 
-                deferred.resolve(bpmnResource ? res.items : res);
+                  Service.list(
+                    {
+                      deploymentId: deployment.id,
+                      resourceName: resource.name,
+                      maxResults: pages.size,
+                      firstResult: pages.size * (pages.current - 1)
+                    },
+                    function(err, res) {
+                      if (err) {
+                        $scope.loadingState = 'ERROR';
+                        $scope.textError =
+                          err.message ||
+                          $translate.instant(
+                            'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
+                          );
+                        return deferred.reject(err);
+                      }
+
+                      deferred.resolve(bpmnResource ? res.items : res);
+                    }
+                  );
+                }
               }
             );
           }

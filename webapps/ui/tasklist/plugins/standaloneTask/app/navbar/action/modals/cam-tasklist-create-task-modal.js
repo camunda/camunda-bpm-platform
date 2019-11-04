@@ -34,29 +34,10 @@ module.exports = [
     };
 
     var Task = camAPI.resource('task');
-    var Tenant = camAPI.resource('tenant');
 
     var task = ($scope.task = angular.copy(NEW_TASK));
 
-    function getTenants() {
-      var queryParams = {
-        userMember: $scope.authentication.name,
-        includingGroupsOfUser: true
-      };
-
-      Tenant.list(queryParams, function(err, res) {
-        if (res && res.length > 0) {
-          task.tenantId = res[0].id;
-          if (res.length > 1) {
-            $scope.tenants = res;
-          }
-        }
-      });
-    }
-
     var _form = null;
-
-    getTenants();
 
     $scope.setNewTaskForm = function(innerForm) {
       _form = innerForm;

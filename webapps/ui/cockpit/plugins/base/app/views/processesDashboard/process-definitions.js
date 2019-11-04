@@ -117,46 +117,41 @@ module.exports = [
 
           // get full list of process definitions and related resources
           var listProcessDefinitions = function() {
-            processDefinitionService.list(
-              {
-                latest: true
-              },
-              function(err, data) {
-                // Add label for sorting
-                data.items.forEach(function(item) {
-                  item.label = item.name || item.key;
-                });
+            $scope.loadingState = 'LOADING';
 
-                $scope.processDefinitionData = data.items;
-                $scope.processDefinitionsCount = data.count;
+            processData.observe('processDefinitionStatistics', function(
+              processDefinitionStatistics
+            ) {
+              $scope.processDefinitionData = processDefinitionStatistics.map(
+                function(el) {
+                  return el.definition;
+                }
+              );
 
-                $scope.loadingState = err ? 'ERROR' : 'LOADED';
+              $scope.processDefinitionsCount =
+                $scope.processDefinitionData.length;
+              $scope.loadingState = 'LOADED';
 
-                processData.observe('processDefinitionStatistics', function(
-                  processDefinitionStatistics
+              $scope.statistics = processDefinitionStatistics;
+
+              $scope.statistics.forEach(function(statistic) {
+                var processDefId = statistic.definition.id;
+                var foundIds = $scope.processDefinitionData.filter(function(
+                  pd
                 ) {
-                  $scope.statistics = processDefinitionStatistics;
-
-                  $scope.statistics.forEach(function(statistic) {
-                    var processDefId = statistic.definition.id;
-                    var foundIds = $scope.processDefinitionData.filter(function(
-                      pd
-                    ) {
-                      return pd.id === processDefId;
-                    });
-
-                    var foundObject = foundIds[0];
-                    if (foundObject) {
-                      foundObject.incidents = statistic.incidents;
-                      foundObject.incidentCount = getPDIncidentsCount(
-                        foundObject.incidents
-                      );
-                      foundObject.instances = statistic.instances;
-                    }
-                  });
+                  return pd.id === processDefId;
                 });
-              }
-            );
+
+                var foundObject = foundIds[0];
+                if (foundObject) {
+                  foundObject.incidents = statistic.incidents;
+                  foundObject.incidentCount = getPDIncidentsCount(
+                    foundObject.incidents
+                  );
+                  foundObject.instances = statistic.instances;
+                }
+              });
+            });
           };
 
           $scope.definitionVars = {read: ['pd']};

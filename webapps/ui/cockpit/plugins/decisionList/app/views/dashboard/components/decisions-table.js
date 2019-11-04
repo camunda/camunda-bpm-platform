@@ -28,7 +28,8 @@ module.exports = function() {
     scope: {
       decisionCount: '=',
       decisions: '=',
-      isDrdAvailable: '='
+      isDrdAvailable: '=',
+      pagination: '='
     },
     controller: [
       '$scope',
@@ -39,24 +40,23 @@ module.exports = function() {
         $scope.headColumns = [
           { class: 'name',     request: 'name'          , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_NAME')},
           { class: 'tenant-id', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_TENANT_ID')},
-          { class: 'drd',  request: 'drd.name', sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS'), condition: $scope.isDrdAvailable}
+          { class: 'drd',  request: 'drd.name', sortable: false, content: $translate.instant('PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS'), condition: $scope.isDrdAvailable}
         ];
 
         // Default sorting
         var defaultValue = {
           sortBy: 'name',
-          sortOrder: 'asc',
-          sortReverse: false
+          sortOrder: 'asc'
         };
         $scope.sortObj = loadLocal(defaultValue);
 
         // Update Table
         $scope.onSortChange = function(sortObj) {
           sortObj = sortObj || $scope.sortObj;
-          // transforms sortOrder to boolean required by anqular-sorting;
-          sortObj.sortReverse = sortObj.sortOrder !== 'asc';
           saveLocal(sortObj);
           $scope.sortObj = sortObj;
+
+          $scope.pagination.changeDecisionSorting(sortObj);
         };
 
         function saveLocal(sortObj) {

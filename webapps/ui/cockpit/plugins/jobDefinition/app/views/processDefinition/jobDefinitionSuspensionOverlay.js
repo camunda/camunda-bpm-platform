@@ -44,6 +44,10 @@ var Controller = [
       }
     ]);
 
+    $scope.$on('$processDefinition.suspensionState.changed', function() {
+      processData.changed('jobDefinitions');
+    });
+
     $scope.jobDefinitionsForElement = processData.observe(
       'jobDefinitionsForElement',
       function(jobDefinitionsForElement) {

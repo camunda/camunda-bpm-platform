@@ -71,5 +71,19 @@
         </div>
       </div>
     </div>
+    <ul uib-pagination
+    ng-if="pages.total > pages.size"
+    class="pagination-sm"
+
+    page="pages.current"
+    ng-model="pages.current"
+    ng-change="onPaginationChange()"
+
+    total-items="pages.total"
+    items-per-page="pages.size"
+
+    max-size="7"
+    boundary-links="true"></ul>
+
   </div>
 </div>
