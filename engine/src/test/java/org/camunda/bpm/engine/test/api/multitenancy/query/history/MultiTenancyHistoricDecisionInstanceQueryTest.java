@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,14 +35,18 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
 
   protected static final String DMN = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
+  protected final static String TENANT_NULL = null;
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
   @Override
   protected void setUp() {
+    deploymentForTenant(TENANT_NULL, DMN);
     deploymentForTenant(TENANT_ONE, DMN);
     deploymentForTenant(TENANT_TWO, DMN);
 
+    // given
+    evaluateDecisionInstance();
     evaluateDecisionInstanceForTenant(TENANT_ONE);
     evaluateDecisionInstanceForTenant(TENANT_TWO);
   }
@@ -52,7 +55,7 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
     HistoricDecisionInstanceQuery query = historyService.
         createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   public void testQueryByTenantId() {
@@ -60,29 +63,33 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
         .createHistoricDecisionInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     query = historyService
         .createHistoricDecisionInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   public void testQueryByTenantIds() {
+    // when
     HistoricDecisionInstanceQuery query = historyService
         .createHistoricDecisionInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   public void testQueryByNonExistingTenantId() {
+    // when
     HistoricDecisionInstanceQuery query = historyService
         .createHistoricDecisionInstanceQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    // then
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   public void testFailQueryByTenantIdNull() {
@@ -96,61 +103,95 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingAsc() {
+    // when
     List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicDecisionInstances.size(), is(2));
-    assertThat(historicDecisionInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(historicDecisionInstances.get(1).getTenantId(), is(TENANT_TWO));
+    // then
+    assertThat(historicDecisionInstances.size()).isEqualTo(3);
+    assertThat(historicDecisionInstances.get(0).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicDecisionInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicDecisionInstances.get(2).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   public void testQuerySortingDesc() {
+    // when
     List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicDecisionInstances.size(), is(2));
-    assertThat(historicDecisionInstances.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(historicDecisionInstances.get(1).getTenantId(), is(TENANT_ONE));
+    // then
+    assertThat(historicDecisionInstances.size()).isEqualTo(3);
+    assertThat(historicDecisionInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicDecisionInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicDecisionInstances.get(2).getTenantId()).isEqualTo(TENANT_NULL);
   }
 
   public void testQueryNoAuthenticatedTenants() {
+    // givem
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.count(), is(0L));
+
+    // then
+    assertThat(query.count()).isEqualTo(1L); // null-tenant instances are still visible
   }
 
   public void testQueryAuthenticatedTenant() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
+    // when
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+    // then
+    assertThat(query.count()).isEqualTo(2L); // null-tenant instances are also visible
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(1L);
   }
 
   public void testQueryAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
+    // when
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    // then
+    assertThat(query.count()).isEqualTo(3L); // null-tenant instances are also visible
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
   public void testQueryDisabledTenantCheck() {
+    // given
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.count(), is(2L));
+
+    // then
+    assertThat(query.count()).isEqualTo(3L);
+  }
+
+  public void testFilterWithoutTenantIdQuery() {
+    // given
+//    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    // when
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .withoutTenantId();
+
+    //then
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   protected void evaluateDecisionInstanceForTenant(String tenant) {
@@ -158,6 +199,16 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
         .tenantIdIn(tenant)
         .singleResult()
         .getId();
+
+    VariableMap variables = Variables.createVariables().putValue("status", "bronze");
+    decisionService.evaluateDecisionTableById(decisionDefinitionId, variables);
+  }
+
+  protected void evaluateDecisionInstance() {
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery()
+         .withoutTenantId()
+         .singleResult()
+         .getId();
 
     VariableMap variables = Variables.createVariables().putValue("status", "bronze");
     decisionService.evaluateDecisionTableById(decisionDefinitionId, variables);
