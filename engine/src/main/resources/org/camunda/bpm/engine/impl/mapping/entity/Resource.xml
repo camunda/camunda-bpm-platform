@@ -294,10 +294,13 @@
   <!-- postgresql specific -->
   <select id="selectResourcesByDeploymentId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap_postgres">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
-  </select>  
+  </select>
   
   <select id="selectLatestResourcesByDeploymentName_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
     <include refid="resourcesFromLastDeploymentWithName"/>
   </select>
 
+  <select id="selectResourceById_postgres" parameterType="string" resultMap="resourceResultMap_postgres">
+    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{parameter}
+  </select>
 </mapper>
