@@ -14,18 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test;
+package org.camunda.bpm.engine.impl.cmd;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class LicenseCmd {
+  public static final String LICENSE_KEY_PROPERTY_NAME = "camunda-license-key";
+  public static final String LICENSE_KEY_BYTE_ARRAY_ID = "camunda-license-key-id";
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface WatchLogger {
-
-  public String[] loggerNames() default {};
-  
-  public String level();
 }

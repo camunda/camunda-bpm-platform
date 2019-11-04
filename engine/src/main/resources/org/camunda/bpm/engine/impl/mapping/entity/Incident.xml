@@ -127,7 +127,8 @@
   <sql id="selectIncidentByQueryCriteriaSql">
     from ${prefix}ACT_RU_INCIDENT RES
 
-    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+    <if test="(processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0)
+        || (authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null)">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
@@ -153,6 +154,13 @@
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+	      and PROCDEF.KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="causeIncidentId != null">
         and RES.CAUSE_INCIDENT_ID_ = #{causeIncidentId}

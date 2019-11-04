@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ch.qos.logback.classic.Level;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,16 +31,14 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
-import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import ch.qos.logback.classic.Level;
 
 public class LoginAttemptsTest {
 

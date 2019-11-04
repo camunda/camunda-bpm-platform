@@ -53,6 +53,22 @@
   <delete id="deleteResourcesByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id}
   </delete>
+
+  <delete id="deleteLicenseResource" parameterType="map">
+    delete from ${prefix}ACT_GE_BYTEARRAY 
+    where ID_ IN 
+      (select P.VALUE_ from ${prefix}ACT_GE_PROPERTY P 
+      where P.NAME_ = #{license-id} 
+      and P.REV_ = #{property-revision})
+  </delete>
+
+  <delete id="purgeTablePreserveLicenseKey" parameterType="map">
+    delete from ${prefix}ACT_GE_BYTEARRAY 
+    where ID_ NOT IN 
+      (select P.VALUE_ from ${prefix}ACT_GE_PROPERTY P 
+      where P.NAME_ = #{license-id} 
+      and P.REV_ = #{property-revision})
+  </delete>
   
   <!-- RESOURCE RESULTMAP -->
 
@@ -138,11 +154,15 @@
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
-  
+
+  <select id="selectResourceById" parameterType="string" resultMap="resourceResultMap">
+    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{parameter}
+  </select>
+
   <select id="selectLatestResourcesByDeploymentName" parameterType="map" resultMap="resourceResultMap">
     <include refid="resourcesFromLastDeploymentWithName"/>
   </select>
-  
+
   <sql id="resourcesFromLastDeploymentWithName">
     <bind name="processApplicationSource" value="'process application'"/>
 
@@ -274,10 +294,13 @@
   <!-- postgresql specific -->
   <select id="selectResourcesByDeploymentId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap_postgres">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
-  </select>  
+  </select>
   
   <select id="selectLatestResourcesByDeploymentName_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
     <include refid="resourcesFromLastDeploymentWithName"/>
   </select>
-  
+
+  <select id="selectResourceById_postgres" parameterType="string" resultMap="resourceResultMap_postgres">
+    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{parameter}
+  </select>
 </mapper>

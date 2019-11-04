@@ -350,7 +350,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testSaveTaskInsertWithoutAuthorization() {
     // given
-    TaskEntity task = new TaskEntity("");
+    TaskEntity task = new TaskEntity();
 
     try {
       // when
@@ -365,7 +365,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testSaveTaskInsert() {
     // given
-    TaskEntity task = new TaskEntity("");
+    TaskEntity task = new TaskEntity();
     task.setAssignee("demo");
 
     createGrantAuthorization(TASK, ANY, userId, CREATE);
@@ -384,7 +384,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testSaveAndUpdateTaskWithTaskAssignPermission() {
     // given
-    TaskEntity task = new TaskEntity("");
+    TaskEntity task = new TaskEntity();
     task.setAssignee("demo");
 
     createGrantAuthorization(TASK, ANY, userId, CREATE, TASK_ASSIGN);

@@ -583,7 +583,7 @@
             </if>
 
             <if test="query.involvedUser != null">
-              ${queryType} I.USER_ID_ = #{involvedUser}
+              ${queryType} I.USER_ID_ = #{query.involvedUser}
             </if>
 
 
@@ -596,7 +596,10 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
+              <bind name="varPrefix" value="''"/>
+
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+
               <choose>
                 <when test="queryVariableValue.local">
                   and RES.ID_ = TASK_ID_
@@ -617,7 +620,6 @@
                 </otherwise>
               </choose>
               <bind name="varTypeField" value="'TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>

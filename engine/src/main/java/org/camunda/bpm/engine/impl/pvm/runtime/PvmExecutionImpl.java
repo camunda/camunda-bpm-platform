@@ -124,6 +124,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   protected boolean isConcurrent = false;
   protected boolean isEnded = false;
   protected boolean isEventScope = false;
+  protected boolean isRemoved = false;
 
   /**
    * transient; used for process instance modification to preserve a scope from getting deleted
@@ -411,12 +412,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     isActive = false;
     isEnded = true;
+    isRemoved = true;
 
     if (hasReplacedParent()) {
       getParent().replacedBy = null;
     }
 
     removeEventScopes();
+  }
+
+  public boolean isRemoved() {
+    return isRemoved;
   }
 
   public PvmExecutionImpl createConcurrentExecution() {

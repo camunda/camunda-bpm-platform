@@ -27,6 +27,8 @@ import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -79,7 +81,7 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
     List<String> tablesNames = dbEntityManager.getTableNamesPresentInDatabase();
     String databaseTablePrefix = commandContext.getProcessEngineConfiguration().getDatabaseTablePrefix().trim();
 
-    //for each table
+    // for each table
     DatabasePurgeReport databasePurgeReport = new DatabasePurgeReport();
     for (String tableName : tablesNames) {
       String tableNameWithoutPrefix = tableName.replace(databaseTablePrefix, EMPTY_STRING);
@@ -91,6 +93,22 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
         Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, param);
 
         if (count > 0) {
+          // allow License Key in byte array table
+          if (tableNameWithoutPrefix.equals("ACT_GE_BYTEARRAY") && commandContext.getResourceManager().findLicenseKeyResource() != null) {
+            if (count != 1) {
+              PropertyEntity licenseProperty = (PropertyEntity) dbEntityManager.selectOne("selectProperty", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+              Map<String, String> params = new HashMap<>();
+              params.put("license-id", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+              params.put("property-revision", String.valueOf(licenseProperty.getRevision()));
+
+              DbBulkOperation purgeByteArrayPreserveLicenseKeyBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, ByteArrayEntity.class,
+                  "purgeTablePreserveLicenseKey", params);
+              databasePurgeReport.addPurgeInformation(tableName, count - 1);
+              dbEntityManager.getDbOperationManager().addOperation(purgeByteArrayPreserveLicenseKeyBulkOp);
+            }
+            databasePurgeReport.setDbContainsLicenseKey(true);
+            continue;
+          }
           databasePurgeReport.addPurgeInformation(tableName, count);
           // Get corresponding entity classes for the table, which contains data
           List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);

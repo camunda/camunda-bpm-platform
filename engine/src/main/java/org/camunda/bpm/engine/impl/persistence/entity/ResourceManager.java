@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.cmd.LicenseCmd;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 import java.util.HashMap;
@@ -90,4 +91,15 @@ public class ResourceManager extends AbstractManager {
     return existingResourcesByName;
   }
 
+  public ResourceEntity findLicenseKeyResource() {
+    PropertyEntity licenseProperty = (PropertyEntity) getDbEntityManager().selectOne("selectProperty", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+    return licenseProperty == null ? null : (ResourceEntity) getDbEntityManager().selectOne("selectResourceById", licenseProperty.value);
+  }
+
+  public void deleteLicenseKeyResource(int propertyRevision) {
+    Map<String, String> params = new HashMap<>();
+    params.put("license-id", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+    params.put("property-revision", String.valueOf(propertyRevision));
+    getDbEntityManager().delete(ResourceEntity.class, "deleteLicenseResource", params);
+  }
 }

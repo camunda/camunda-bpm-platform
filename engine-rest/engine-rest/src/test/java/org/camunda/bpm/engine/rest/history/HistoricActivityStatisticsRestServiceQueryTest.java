@@ -308,6 +308,21 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
     inOrder.verifyNoMoreInteractions();
   }
 
+  @Test
+  public void testClosedIncidentsFilter() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("closedIncidents", "true")
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
+
+    InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
+    inOrder.verify(historicActivityStatisticsQuery).includeClosedIncidents();
+    inOrder.verify((HistoricActivityStatisticsQueryImpl)historicActivityStatisticsQuery)
+        .unboundedResultList();
+    inOrder.verifyNoMoreInteractions();
+  }
 
   @Test
   public void testSimpleTaskQuery() {

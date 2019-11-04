@@ -29,6 +29,7 @@
     <result property="finished" column="FINISHED_COUNT_" jdbcType="INTEGER" />
     <result property="canceled" column="CANCELED_COUNT_" jdbcType="INTEGER" />
     <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
+    <result property="closedIncidents" column="CLOSED_INCIDENT_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
   <resultMap id="historicCaseActivityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityStatisticsImpl">
@@ -92,30 +93,52 @@
             )
             </if>
 
-            <if test="startedBefore != null">
-            and PI.START_TIME_ &lt;= #{startedBefore}
-            </if>
-            <if test="startedAfter != null">
-            and PI.START_TIME_ &gt;= #{startedAfter}
-            </if>
-            <if test="finishedBefore != null">
-            and PI.END_TIME_ &lt;= #{finishedBefore}
-            </if>
-            <if test="finishedAfter != null">
-            and PI.END_TIME_ &gt;= #{finishedAfter}
-            </if>
-            <if test="processInstanceIds != null">
-            and PI.ID_ in
-            <foreach item="processInstanceId" index="index" collection="processInstanceIds"
-                open="(" separator="," close=")">
-            #{processInstanceId}
-            </foreach>
-            </if>
-            
+          <!-- should apply the same filters for #selectHistoricActivityStatisticsWithIncident -->
+          <include refid="applyStatisticsFilters" />
+
           GROUP BY ACT_ID_
 
         ) RES
   </sql>
+
+  <sql id="applyStatisticsFilters">
+    <if test="startedBefore != null">
+      and PI.START_TIME_ &lt;= #{startedBefore}
+    </if>
+    <if test="startedAfter != null">
+      and PI.START_TIME_ &gt;= #{startedAfter}
+    </if>
+    <if test="finishedBefore != null">
+      and PI.END_TIME_ &lt;= #{finishedBefore}
+    </if>
+    <if test="finishedAfter != null">
+      and PI.END_TIME_ &gt;= #{finishedAfter}
+    </if>
+    <if test="processInstanceIds != null">
+      and PI.ID_ in
+      <foreach item="processInstanceId" index="index" collection="processInstanceIds"
+          open="(" separator="," close=")">
+        #{processInstanceId}
+      </foreach>
+    </if>
+  </sql>
+
+  <select id ="selectHistoricActivityStatisticsWithIncident" resultMap="historicActivityStatisticsResultMap"
+    parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
+    select
+      INC.ACTIVITY_ID_ as ID_,
+      sum(CASE WHEN INC.INCIDENT_STATE_ = 1 or INC.INCIDENT_STATE_ = 2 THEN 1 ELSE 0 END) as CLOSED_INCIDENT_COUNT_
+    from ${prefix}ACT_HI_INCIDENT INC
+
+    inner join ${prefix}ACT_HI_PROCINST PI
+    on INC.PROC_INST_ID_ = PI.ID_
+
+    where INC.PROC_DEF_ID_ = #{processDefinitionId}
+
+    <include refid="applyStatisticsFilters" />
+
+    GROUP BY INC.ACTIVITY_ID_
+  </select>
 
   <!-- HistoricCaseActivity statistics -->
 

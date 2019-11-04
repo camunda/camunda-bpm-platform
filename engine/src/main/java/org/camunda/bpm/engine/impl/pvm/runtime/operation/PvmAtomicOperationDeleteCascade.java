@@ -37,6 +37,14 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
     do {
       nextLeaf = findNextLeaf(execution);
 
+      // nextLeaf can already be removed, if it was the concurrent parent of the previous leaf.
+      // In that case, DELETE_CASCADE_FIRE_ACTIVITY_END on the previousLeaf already removed
+      // nextLeaf, so calling DELETE_CASCADE_FIRE_ACTIVITY_END again would incorrectly
+      // invoke execution listeners
+      if (nextLeaf.isDeleteRoot() && nextLeaf.isRemoved()) {
+        return;
+      }
+
       // propagate skipCustomListeners property
       PvmExecutionImpl deleteRoot = getDeleteRoot(execution);
       if (deleteRoot != null) {

@@ -31,10 +31,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
+import java.util.List;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -48,11 +53,15 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
+import org.camunda.bpm.engine.rest.exception.ExceptionLogger;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.restassured.http.ContentType;
@@ -65,6 +74,10 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch(ExceptionLogger.REST_API);
 
   protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/user";
   protected static final String USER_URL = SERVICE_URL + "/{id}";
@@ -315,6 +328,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testGetNonExistingUserProfile() {
+    String exceptionMessage = "User with id aNonExistingUser does not exist";
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(identityServiceMock.createUserQuery()).thenReturn(sampleUserQuery);
     when(sampleUserQuery.userId(anyString())).thenReturn(sampleUserQuery);
@@ -325,9 +339,11 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then()
         .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("User with id aNonExistingUser does not exist"))
+        .body("message", equalTo(exceptionMessage))
     .when()
         .get(USER_PROFILE_URL);
+
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
@@ -364,6 +380,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
         .delete(USER_URL);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   @Test
@@ -430,6 +448,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(identityServiceMock).newUser(MockProvider.EXAMPLE_USER_ID);
     verify(identityServiceMock).saveUser(newUser);
+
+    verifyLogs(Level.WARN, "org.camunda.bpm.engine.ProcessEngineException");
   }
 
   @Test
@@ -450,6 +470,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .post(USER_CREATE_URL);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   @Test
@@ -471,6 +493,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .post(USER_CREATE_URL);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   @Test
@@ -523,6 +547,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
         .put(USER_CREDENTIALS_URL);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   @Test
@@ -563,6 +589,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testChangeCredentialsWithWrongAuthenticatedUserPassword() {
+    String exceptionMessage = "The given authenticated user password is not valid.";
     User initialUser = MockProvider.createMockUser();
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(identityServiceMock.createUserQuery()).thenReturn(sampleUserQuery);
@@ -586,13 +613,16 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .contentType(ContentType.JSON)
         .body("type", equalTo("InvalidRequestException"))
-        .body("message", equalTo("The given authenticated user password is not valid."))
+        .body("message", equalTo(exceptionMessage))
     .when()
         .put(USER_CREDENTIALS_URL);
+
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
   public void testPutCredentialsNonExistingUserFails() {
+    String exceptionMessage = "User with id aNonExistingUser does not exist";
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(identityServiceMock.createUserQuery()).thenReturn(sampleUserQuery);
     when(sampleUserQuery.userId("aNonExistingUser")).thenReturn(sampleUserQuery);
@@ -607,12 +637,13 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then()
         .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("User with id aNonExistingUser does not exist"))
+        .body("message", equalTo(exceptionMessage))
     .when()
         .put(USER_CREDENTIALS_URL);
 
     // user was not updated
     verify(identityServiceMock, never()).saveUser(any(User.class));
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
@@ -646,6 +677,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testPutProfileNonexistingFails() {
+    String exceptionMessage = "User with id aNonExistingUser does not exist";
     User userUpdate = MockProvider.createMockUserUpdate();
 
     UserQuery sampleUserQuery = mock(UserQuery.class);
@@ -661,12 +693,13 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then()
         .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("User with id aNonExistingUser does not exist"))
+        .body("message", equalTo(exceptionMessage))
     .when()
         .put(USER_PROFILE_URL);
 
     // nothing was saved
     verify(identityServiceMock, never()).saveUser(any(User.class));
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
@@ -694,24 +727,29 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
         .body("message", equalTo(message))
     .when()
         .put(USER_PROFILE_URL);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   @Test
   public void testReadOnlyUserCreateFails() {
+    String exceptionMessage = "Identity service implementation is read-only.";
     User newUser = MockProvider.createMockUser();
     when(identityServiceMock.isReadOnly()).thenReturn(true);
 
     given().body(UserDto.fromUser(newUser, true)).contentType(ContentType.JSON)
       .then().expect().statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Identity service implementation is read-only."))
+      .body("message", equalTo(exceptionMessage))
       .when().post(USER_CREATE_URL);
 
     verify(identityServiceMock, never()).newUser(MockProvider.EXAMPLE_USER_ID);
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
   public void testReadOnlyPutUserProfileFails() {
+    String exceptionMessage = "Identity service implementation is read-only.";
     User userUdpdate = MockProvider.createMockUser();
     when(identityServiceMock.isReadOnly()).thenReturn(true);
 
@@ -721,14 +759,16 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then().expect()
         .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("Identity service implementation is read-only."))
+        .body("message", equalTo(exceptionMessage))
     .when().put(USER_PROFILE_URL);
 
     verify(identityServiceMock, never()).saveUser(userUdpdate);
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
   public void testReadOnlyPutUserCredentialsFails() {
+    String exceptionMessage = "Identity service implementation is read-only.";
     User userUdpdate = MockProvider.createMockUser();
     when(identityServiceMock.isReadOnly()).thenReturn(true);
 
@@ -738,23 +778,26 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then().expect()
         .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("Identity service implementation is read-only."))
+        .body("message", equalTo(exceptionMessage))
     .when().put(USER_CREDENTIALS_URL);
 
     verify(identityServiceMock, never()).saveUser(userUdpdate);
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
   public void testReadOnlyUserDeleteFails() {
+    String exceptionMessage = "Identity service implementation is read-only.";
     when(identityServiceMock.isReadOnly()).thenReturn(true);
 
     given().pathParam("id", MockProvider.EXAMPLE_USER_ID)
       .then().expect().statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Identity service implementation is read-only."))
+      .body("message", equalTo(exceptionMessage))
       .when().delete(USER_URL);
 
     verify(identityServiceMock, never()).deleteUser(MockProvider.EXAMPLE_USER_ID);
+    verifyLogs(Level.DEBUG, exceptionMessage);
   }
 
   @Test
@@ -793,6 +836,8 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .post(USER_UNLOCK);
+
+    verifyLogs(Level.DEBUG, message);
   }
 
   protected void verifyNoAuthorizationCheckPerformed() {
@@ -800,4 +845,10 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(authorizationServiceMock, times(0)).isUserAuthorized(anyString(), anyListOf(String.class), any(Permission.class), any(Resource.class));
   }
 
+  protected void verifyLogs(Level logLevel, String message) {
+    List<ILoggingEvent> logs = loggingRule.getLog();
+    assertThat(logs).hasSize(1);
+    assertThat(logs.get(0).getLevel()).isEqualTo(logLevel);
+    assertThat(logs.get(0).getMessage()).containsIgnoringCase(message);
+  }
 }

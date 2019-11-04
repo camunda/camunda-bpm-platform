@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>0.2</version>
+    <version>1.0.0</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -35,9 +35,9 @@
     <version.mybatis>3.4.4</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.2.0</version.uuid-generator>
-    <version.camunda.commons>1.8.0</version.camunda.commons>
+    <version.camunda.commons>1.8.2</version.camunda.commons>
     <version.camunda.connect>1.2.1</version.camunda.connect>
-    <version.camunda.spin>1.7.2</version.camunda.spin>
+    <version.camunda.spin>1.7.3</version.camunda.spin>
     <version.camunda.template-engines>1.1.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
   </properties>

@@ -92,6 +92,13 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  */
 public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, HasDbReferences, CommandContextListener, VariablesProvider<VariableInstanceEntity> {
 
+  protected static final List<VariableInstanceLifecycleListener<CoreVariableInstance>> DEFAULT_VARIABLE_LIFECYCLE_LISTENERS =
+    Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
+      (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
+    );
+
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public static final String DELETE_REASON_COMPLETED = "completed";
@@ -163,6 +170,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected transient List<PropertyChange> identityLinkChanges = new ArrayList<>();
 
+  protected List<VariableInstanceLifecycleListener<VariableInstanceEntity>> customLifecycleListeners;
+
   // name references of tracked properties
   public static final String ASSIGNEE = "assignee";
   public static final String DELEGATION = "delegation";
@@ -175,6 +184,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String PARENT_TASK = "parentTask";
   public static final String PRIORITY = "priority";
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
+
 
   /**
    * Mybatis constructor
@@ -304,9 +314,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
 
     // trigger TaskListener.complete event
-    final boolean listenersSuccessful = transitionTo(TaskState.STATE_COMPLETED);
+    final boolean shouldDeleteTask = transitionTo(TaskState.STATE_COMPLETED);
 
-    if (listenersSuccessful)
+    // shouldn't attempt to delete the task if the COMPLETE Task listener failed,
+    // or managed to cancel the Process or Task Instance
+    if (shouldDeleteTask)
     {
       // delete the task
       // this method call doesn't invoke additional task listeners
@@ -346,7 +358,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.deleteReason = deleteReason;
 
     // only fire lifecycle events if task is actually cancelled/deleted
-    if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
+    if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)
+        && !TaskState.STATE_DELETED.equals(lifecycleState)) {
       transitionTo(TaskState.STATE_DELETED);
     }
 
@@ -502,11 +515,34 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
-    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
-        (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
-      );
+    if (customLifecycleListeners == null || customLifecycleListeners.isEmpty()) {
+      return DEFAULT_VARIABLE_LIFECYCLE_LISTENERS;
+    } else {
+      List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<>();
+      listeners.addAll(DEFAULT_VARIABLE_LIFECYCLE_LISTENERS);
+      listeners.addAll((List) customLifecycleListeners);
+      return listeners;
+    }
+  }
+
+  public void addCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners == null) {
+      customLifecycleListeners = new ArrayList<>();
+    }
+
+    this.customLifecycleListeners.add(customLifecycleListener);
+  }
+
+  public VariableInstanceLifecycleListener<VariableInstanceEntity> removeCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners != null) {
+      customLifecycleListeners.remove(customLifecycleListener);
+    }
+
+    return customLifecycleListener;
   }
 
   @Override
@@ -1131,7 +1167,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         return fireEvent(TaskListener.EVENTNAME_CREATE) && fireAssignmentEvent();
 
       case STATE_COMPLETED:
-        return fireEvent(TaskListener.EVENTNAME_COMPLETE);
+        return fireEvent(TaskListener.EVENTNAME_COMPLETE) && TaskState.STATE_COMPLETED.equals(this.lifecycleState);
 
       case STATE_DELETED:
         return fireEvent(EVENTNAME_DELETE);

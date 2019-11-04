@@ -20,12 +20,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.notNullValue;
-
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyDigitRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyLengthRuleImpl;
@@ -174,6 +174,35 @@ public class DefaultPasswordPolicyTest {
 
     // when
     assertThat(passwordPolicy, notNullValue());
+  }
+
+  @Test
+  public void shouldUpdateUserDetailsWithoutPolicyCheck() {
+    // given
+    // first, create a new user
+    User user = identityService.newUser("johndoe");
+    user.setFirstName("John");
+    user.setLastName("Doe");
+    user.setEmail("john@doe.com");
+    user.setPassword("Passw0rds!");
+    identityService.saveUser(user);
+
+    // when
+    // fetch and update the user
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    user.setEmail("jane@donnel.com");
+    user.setFirstName("Jane");
+    user.setLastName("Donnel");
+    identityService.saveUser(user);
+
+    // then
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertThat(user.getFirstName(), is("Jane"));
+    assertThat(user.getLastName(), is("Donnel"));
+    assertThat(user.getEmail(), is("jane@donnel.com"));
+    assertThat(identityService.checkPassword("johndoe", "Passw0rds!"), is(true));
+
+    identityService.deleteUser(user.getId());
   }
 
   private void checkThatPasswordWasInvalid(PasswordPolicyResult result) {

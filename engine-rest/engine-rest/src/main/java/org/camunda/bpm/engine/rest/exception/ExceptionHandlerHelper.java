@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -33,13 +34,27 @@ import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptio
  */
 public class ExceptionHandlerHelper {
 
-  private static ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
+  protected static final ExceptionLogger LOGGER = ExceptionLogger.REST_LOGGER;
+  protected static ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
 
   private ExceptionHandlerHelper() {
   }
 
   public static ExceptionHandlerHelper getInstance(){
     return INSTANCE;
+  }
+
+  public Response getResponse(Throwable throwable) {
+    LOGGER.log(throwable);
+
+    Response.Status responseStatus = getStatus(throwable);
+    ExceptionDto exceptionDto = fromException(throwable);
+
+    return Response
+        .status(responseStatus)
+        .entity(exceptionDto)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
   }
 
   public ExceptionDto fromException(Throwable e) {

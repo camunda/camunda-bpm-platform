@@ -17,7 +17,8 @@
 package org.camunda.bpm.engine.impl.form.engine;
 
 import java.io.StringWriter;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * <p>The {@link HtmlDocumentBuilder} is part of the {@link HtmlFormEngine}
@@ -32,7 +33,7 @@ public class HtmlDocumentBuilder {
 
   protected HtmlWriteContext context = new HtmlWriteContext();
 
-  protected Stack<HtmlElementWriter> elements = new Stack<HtmlElementWriter>();
+  protected Deque<HtmlElementWriter> elements = new ArrayDeque<>();
   protected StringWriter writer = new StringWriter();
 
   public HtmlDocumentBuilder(HtmlElementWriter documentElement) {

@@ -7,3 +7,7 @@ How this test suite works (`$CURRENT` refers to current minor version, `$PREVIOU
 1. Patch DB schema to `$CURRENT`
 1. Execute test setup with `$CURRENT` engine
 1. Run tests with `$PREVIOUS` engine
+
+## Executing Tests
+
+Run `mvn clean install -Prolling-update,${DATABASE}`.

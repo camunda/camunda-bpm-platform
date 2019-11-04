@@ -1117,6 +1117,32 @@ public interface ManagementService {
    */
   void deleteProperty(String name);
 
+  /**
+   * Set the license key.
+   *
+   * @param licenseKey the license key string.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  void setLicenseKey(String licenseKey);
+
+  /**
+   * Get the stored license key string or <code>null</code> if no license is set.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  String getLicenseKey();
+  
+  /**
+   * Deletes the stored license key. If no license key is set, the request is ignored.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  void deleteLicenseKey();
+
   /** programmatic schema update on a given connection returning feedback about what happened
    *
    *  Note: will always return an empty string

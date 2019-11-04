@@ -36,6 +36,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents which have the given process definition id. **/
   HistoricIncidentQuery processDefinitionId(String processDefinitionId);
 
+  /** Only select historic incidents which have one of the given process definition keys. **/
+  HistoricIncidentQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
   /** Only select historic incidents which have the given process instance id. **/
   HistoricIncidentQuery processInstanceId(String processInstanceId);
 
