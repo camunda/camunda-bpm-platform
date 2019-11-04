@@ -33,18 +33,18 @@ import org.junit.rules.RuleChain;
 
 public class LicenseKeyAuthTest {
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public final ExpectedException exceptionRule = ExpectedException.none();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(exceptionRule);
 
-  ProcessEngine processEngine;
-  ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  ManagementService managementService;
-  IdentityService identityService;
-  AuthorizationService authorizationService;
+  protected ManagementService managementService;
+  protected IdentityService identityService;
+  protected AuthorizationService authorizationService;
 
   @Before
   public void init() {
@@ -60,6 +60,7 @@ public class LicenseKeyAuthTest {
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     identityService.clearAuthentication();
+    removeAdminUser();
   }
 
   @Test
@@ -114,12 +115,16 @@ public class LicenseKeyAuthTest {
     // expect exception
   }
 
-  private void authenticateAdminUser() {
+  protected void authenticateAdminUser() {
     processEngineConfiguration.getAdminUsers().add("user");
     authenticateUser();
   }
 
-  private void authenticateUser() {
+  protected void authenticateUser() {
     identityService.setAuthentication("user", null, null);
+  }
+
+  protected void removeAdminUser() {
+    processEngineConfiguration.getAdminUsers().remove("user");
   }
 }
