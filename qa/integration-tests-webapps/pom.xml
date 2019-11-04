@@ -152,6 +152,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-logging</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
       <version>${project.version}</version>
