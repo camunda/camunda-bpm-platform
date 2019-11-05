@@ -76,7 +76,8 @@ public class LicenseKeyDirtyDbTest {
     return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Long>() {
       @Override
       public Long execute(CommandContext commandContext) {
-        return commandContext.getProcessEngineConfiguration().getManagementService().getTableCount().get("ACT_GE_BYTEARRAY");
+        String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+        return commandContext.getProcessEngineConfiguration().getManagementService().getTableCount().get(tablePrefix + "ACT_GE_BYTEARRAY");
       }
     });
   }
