@@ -59,16 +59,18 @@ module.exports = [
         });
     }
 
-    function getDecisionsLists(params) {
+    function getDecisionsLists(decParams, drdParams) {
       var decisionsProm = decisionDefinitionService.list(
-        Object.assign({}, defaultParams, params)
+        Object.assign({}, defaultParams, decParams)
       );
 
       var decisionsCountProm = decisionDefinitionService.count({
         latestVersion: true
       });
 
-      var drdsProm = drdService.list(Object.assign({}, defaultParams, params));
+      var drdsProm = drdService.list(
+        Object.assign({}, defaultParams, drdParams)
+      );
 
       var drdsCountProm = drdService.count({
         latestVersion: true
