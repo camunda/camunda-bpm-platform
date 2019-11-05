@@ -20,14 +20,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.repository.Resource;
 
 
 /**
  * @author Tom Baeyens
  */
-public class ResourceEntity implements Serializable, DbEntity, HasDbRevision, Resource {
+public class ResourceEntity implements Serializable, DbEntity, Resource {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,7 +38,6 @@ public class ResourceEntity implements Serializable, DbEntity, HasDbRevision, Re
   protected String tenantId;
   protected Integer type;
   protected Date createTime;
-  protected int revision = 1;
 
   public String getId() {
     return id;
@@ -114,22 +112,6 @@ public class ResourceEntity implements Serializable, DbEntity, HasDbRevision, Re
   }
 
   @Override
-  public int getRevision() {
-    return revision;
-  }
-
-  @Override
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
-  
-
-  @Override
-  public int getRevisionNext() {
-    return revision + 1;
-  }
-
-  @Override
   public String toString() {
     return this.getClass().getSimpleName()
            + "[id=" + id
@@ -139,7 +121,6 @@ public class ResourceEntity implements Serializable, DbEntity, HasDbRevision, Re
            + ", tenantId=" + tenantId
            + ", type=" + type
            + ", createTime=" + createTime
-           + ", revision=" + revision
            + "]";
   }
 

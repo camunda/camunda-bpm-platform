@@ -51,7 +51,7 @@
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteResource" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </delete>
 
   <delete id="deleteResourcesByDeploymentId" parameterType="string">
