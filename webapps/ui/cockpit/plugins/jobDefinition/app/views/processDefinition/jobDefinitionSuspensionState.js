@@ -29,6 +29,7 @@ module.exports = [
   'jobDefinition',
   '$translate',
   'fixDate',
+  '$rootScope',
   function(
     $scope,
     $http,
@@ -38,7 +39,8 @@ module.exports = [
     $modalInstance,
     jobDefinition,
     $translate,
-    fixDate
+    fixDate,
+    $rootScope
   ) {
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
       PERFORM_UPDATE = 'PERFORM_UDPATE',
@@ -85,6 +87,10 @@ module.exports = [
           $scope.status = UPDATE_SUCCESS;
 
           if ($scope.data.executeImmediately) {
+            $rootScope.$broadcast(
+              '$processDefinition.suspensionState.changed',
+              jobDefinition
+            );
             Notifications.addMessage({
               status: $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'),
               message: $translate.instant(

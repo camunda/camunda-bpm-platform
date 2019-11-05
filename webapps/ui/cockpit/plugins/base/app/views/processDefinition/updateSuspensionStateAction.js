@@ -40,9 +40,8 @@ module.exports = [
         template: actionTemplate,
         controller: [
           '$scope',
-          '$rootScope',
           '$uibModal',
-          function($scope, $rootScope, $modal) {
+          function($scope, $modal) {
             $scope.openDialog = function() {
               var dialog = $modal.open({
                 resolve: {
@@ -63,10 +62,6 @@ module.exports = [
                   if (result.status === 'SUCCESS') {
                     if (result.executeImmediately) {
                       $scope.processDefinition.suspended = result.suspended;
-                      $rootScope.$broadcast(
-                        '$processDefinition.suspensionState.changed',
-                        $scope.processDefinition
-                      );
                     }
 
                     $scope.processData.set(
