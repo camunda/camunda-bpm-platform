@@ -55,6 +55,11 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
+    <dependency>
+		  <groupId>org.camunda.bpm.consulting.snippet</groupId>
+		  <artifactId>engine-plugin-external-task-listener</artifactId>
+		  <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -359,7 +364,7 @@
         <numberOfThreads>1</numberOfThreads>
         <numberOfRuns>1</numberOfRuns>
         <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
-        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
+        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin,org.camunda.bpm.qa.performance.engine.junit.ExternalTaskRecorderProcessEnginePlugin</processEnginePlugins>
         <watchActivities />
         <test.includes>query</test.includes>
         <skip.tests>false</skip.tests>
