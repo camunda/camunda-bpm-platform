@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProcessEngineTestCase {
 
+  protected final static String TENANT_NULL = null;
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
@@ -45,120 +45,166 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
       .endEvent()
     .done();
 
+    // given
+    deploymentForTenant(TENANT_NULL, oneTaskProcess);
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
 
+    startProcessInstanceForTenant(TENANT_NULL);
     startProcessInstanceForTenant(TENANT_ONE);
     startProcessInstanceForTenant(TENANT_TWO);
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricActivityInstanceQuery query = historyService.
-        createHistoricActivityInstanceQuery();
+    // when
+    HistoricActivityInstanceQuery query = historyService
+        .createHistoricActivityInstanceQuery();
 
-    assertThat(query.count(), is(4L));
+    // then
+    assertThat(query.count()).isEqualTo(6L);
+  }
+
+  public void testQueryFilterWithoutTenantId() {
+    // when
+    HistoricActivityInstanceQuery query = historyService
+        .createHistoricActivityInstanceQuery()
+        .withoutTenantId();
+
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   public void testQueryByTenantId() {
-    HistoricActivityInstanceQuery query = historyService
+    // when
+    HistoricActivityInstanceQuery queryTenantOne = historyService
         .createHistoricActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(2L));
-
-    query = historyService
+    HistoricActivityInstanceQuery queryTenantTwo = historyService
         .createHistoricActivityInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    // then
+    assertThat(queryTenantOne.count()).isEqualTo(2L);
+    assertThat(queryTenantTwo.count()).isEqualTo(2L);
   }
 
   public void testQueryByTenantIds() {
+    // when
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(4L));
+    // then
+    assertThat(query.count()).isEqualTo(4L);
   }
 
   public void testQueryByNonExistingTenantId() {
+    // when
     HistoricActivityInstanceQuery query = historyService
         .createHistoricActivityInstanceQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    // then
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
+      // when
       historyService.createHistoricActivityInstanceQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
+
+      // then
     } catch (NullValueException e) {
     }
   }
 
   public void testQuerySortingAsc() {
+    // when
     List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicActivityInstances.size(), is(4));
-    assertThat(historicActivityInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(historicActivityInstances.get(1).getTenantId(), is(TENANT_ONE));
-    assertThat(historicActivityInstances.get(2).getTenantId(), is(TENANT_TWO));
-    assertThat(historicActivityInstances.get(3).getTenantId(), is(TENANT_TWO));
+    // then
+    assertThat(historicActivityInstances.size()).isEqualTo(6);
+    assertThat(historicActivityInstances.get(0).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicActivityInstances.get(1).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicActivityInstances.get(2).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicActivityInstances.get(3).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicActivityInstances.get(4).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicActivityInstances.get(5).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   public void testQuerySortingDesc() {
+    // when
     List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicActivityInstances.size(), is(4));
-    assertThat(historicActivityInstances.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(historicActivityInstances.get(1).getTenantId(), is(TENANT_TWO));
-    assertThat(historicActivityInstances.get(2).getTenantId(), is(TENANT_ONE));
-    assertThat(historicActivityInstances.get(3).getTenantId(), is(TENANT_ONE));
+    // then
+    assertThat(historicActivityInstances.size()).isEqualTo(6);
+    assertThat(historicActivityInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicActivityInstances.get(1).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicActivityInstances.get(2).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicActivityInstances.get(3).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicActivityInstances.get(4).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicActivityInstances.get(5).getTenantId()).isEqualTo(TENANT_NULL);
   }
 
   public void testQueryNoAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-    assertThat(query.count(), is(0L));
+
+    // then
+    assertThat(query.count()).isEqualTo(2L); // null-tenant instances are still included
   }
 
   public void testQueryAuthenticatedTenant() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
+    // when
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(4L); // null-tenant instances are still included
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(2L);
   }
 
   public void testQueryAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
+    // when
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
-    assertThat(query.count(), is(4L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(6L); // null-tenant instances are still included
+    assertThat(query.withoutTenantId().count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(2L);
   }
 
   public void testQueryDisabledTenantCheck() {
+    // given
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-    assertThat(query.count(), is(4L));
+
+    // then
+    assertThat(query.count()).isEqualTo(6L);
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
