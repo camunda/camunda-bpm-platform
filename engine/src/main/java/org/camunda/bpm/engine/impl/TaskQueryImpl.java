@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  */
 public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements TaskQuery {
 
-  /**
+  /*
    * When adding a property filter that supports Tasklist filters,
    * the following classes need to be modified:
    *
