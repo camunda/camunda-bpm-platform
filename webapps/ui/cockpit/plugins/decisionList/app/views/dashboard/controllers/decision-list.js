@@ -24,48 +24,61 @@ module.exports = [
   'decisionList',
   'Views',
   'localConf',
-  function($scope, decisionList, Views, localConf) {
+  '$location',
+  'search',
+  function($scope, decisionList, Views, localConf, $location, search) {
     $scope.loadingState = 'LOADING';
     $scope.drdDashboard = Views.getProvider({
       component: 'cockpit.plugin.drd.dashboard'
     });
     $scope.isDrdDashboardAvailable = !!$scope.drdDashboard;
 
+    var initialSearch = $location.search();
+
     var pages = ($scope.paginationController = {
-      decisionPages: {size: 50, total: 0, current: 1},
-      drdPages: {size: 50, total: 0, current: 1},
+      decisionPages: {
+        size: 50,
+        total: 0,
+        current: initialSearch.decisionPage || 1
+      },
+      drdPages: {size: 50, total: 0, current: initialSearch.drdPage || 1},
       changeDecisionPage: changeDecisionPage,
       changeDecisionSorting: changeDecisionSorting,
       changeDrdPage: changeDrdPage,
       changeDrdSorting: changeDrdSorting
     });
 
-    function changeDrdPage(pages) {
-      $scope.loadingState = 'LOADING';
-
-      $scope.paginationController.drdPages.current = pages.current;
-      updateDrdPage();
-    }
-
     var decisionSorting = localConf.get('sortDecDefTab', {
       sortBy: 'name',
       sortOrder: 'asc'
     });
-    var drdSorting = {};
+    var drdSorting = localConf.get('sortDecReqDefTab', {
+      sortBy: 'name',
+      sortOrder: 'asc'
+    });
+
+    function changeDrdPage(pages) {
+      $scope.loadingState = 'LOADING';
+      search.updateSilently({drdPage: pages.current});
+      $scope.paginationController.drdPages.current = pages.current;
+      updateDrdPage();
+    }
 
     function changeDecisionSorting(sorting) {
       decisionSorting = sorting;
+      localConf.set('sortDecDefTab', sorting);
       updateDecisionPage();
     }
 
     function changeDrdSorting(sorting) {
       drdSorting = sorting;
+      localConf.set('sortDecReqDefTab', sorting);
       updateDrdPage();
     }
 
     function changeDecisionPage(pages) {
       $scope.loadingState = 'LOADING';
-
+      search.updateSilently({decisionPage: pages.current});
       $scope.paginationController.decisionPages.current = pages.current;
       updateDecisionPage();
     }
@@ -119,6 +132,14 @@ module.exports = [
             maxResults: pages.decisionPages.size
           },
           decisionSorting
+        ),
+        angular.extend(
+          {},
+          {
+            firstResult: (pages.drdPages.current - 1) * pages.drdPages.size,
+            maxResults: pages.drdPages.size
+          },
+          drdSorting
         )
       )
       .then(function(data) {

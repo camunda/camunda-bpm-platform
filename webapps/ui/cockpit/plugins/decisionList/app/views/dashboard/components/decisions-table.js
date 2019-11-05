@@ -53,15 +53,11 @@ module.exports = function() {
         // Update Table
         $scope.onSortChange = function(sortObj) {
           sortObj = sortObj || $scope.sortObj;
-          saveLocal(sortObj);
           $scope.sortObj = sortObj;
 
           $scope.pagination.changeDecisionSorting(sortObj);
         };
 
-        function saveLocal(sortObj) {
-          localConf.set('sortDecDefTab', sortObj);
-        }
         function loadLocal(defaultValue) {
           return localConf.get('sortDecDefTab', defaultValue);
         }
