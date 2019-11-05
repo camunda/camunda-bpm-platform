@@ -282,6 +282,7 @@ var Controller = [
         // Unpaginated, will be fixed after CAM-10906 is implemented
         return camAPI.resource('history').incident({
           processInstanceId: processInstance.id,
+          open: true,
           maxResults: 2000
         });
       }
