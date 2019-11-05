@@ -520,6 +520,31 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  @Test
+  public void testWithoutTenantIdQueryParameter() {
+    // given
+    mockedQuery = setUpMockHistoricDecisionInstanceQuery(Collections.singletonList(MockProvider.createMockHistoricDecisionInstanceBase(null)));
+
+    // when
+    Response response = given()
+          .queryParam("withoutTenantId", true)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .get(HISTORIC_DECISION_INSTANCE_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
   private List<HistoricDecisionInstance> createMockHistoricDecisionInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricDecisionInstanceBase(MockProvider.EXAMPLE_TENANT_ID),
