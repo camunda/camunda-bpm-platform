@@ -18,9 +18,6 @@ package org.camunda.bpm.engine.test.api.mgmt.license;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -79,10 +76,7 @@ public class LicenseKeyDirtyDbTest {
     return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Long>() {
       @Override
       public Long execute(CommandContext commandContext) {
-        Map<String, String> param = new HashMap<String, String>();
-        param.put("tableName", "ACT_GE_BYTEARRAY");
-
-        return (Long) commandContext.getDbEntityManager().selectOne("selectTableCount", param);
+        return commandContext.getProcessEngineConfiguration().getManagementService().getTableCount().get("ACT_GE_BYTEARRAY");
       }
     });
   }
