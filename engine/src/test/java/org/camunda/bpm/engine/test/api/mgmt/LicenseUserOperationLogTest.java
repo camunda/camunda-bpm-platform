@@ -58,8 +58,8 @@ public class LicenseUserOperationLogTest {
 
   @After
   public void tearDown() {
-    managementService.deleteLicenseKey();
     identityService.clearAuthentication();
+    managementService.deleteLicenseKey();
   }
 
   @Test

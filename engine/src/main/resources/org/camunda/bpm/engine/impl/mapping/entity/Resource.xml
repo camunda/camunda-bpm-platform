@@ -50,24 +50,19 @@
 
   <!-- RESOURCE DELETE -->
 
+  <delete id="deleteResource" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
+  </delete>
+
   <delete id="deleteResourcesByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id}
   </delete>
 
-  <delete id="deleteLicenseResource" parameterType="map">
-    delete from ${prefix}ACT_GE_BYTEARRAY 
-    where ID_ IN 
-      (select P.VALUE_ from ${prefix}ACT_GE_PROPERTY P 
-      where P.NAME_ = #{license-id} 
-      and P.REV_ = #{property-revision})
-  </delete>
-
-  <delete id="purgeTablePreserveLicenseKey" parameterType="map">
+  <delete id="purgeTablePreserveLicenseKey" parameterType="string">
     delete from ${prefix}ACT_GE_BYTEARRAY 
     where ID_ NOT IN 
       (select P.VALUE_ from ${prefix}ACT_GE_PROPERTY P 
-      where P.NAME_ = #{license-id} 
-      and P.REV_ = #{property-revision})
+      where P.NAME_ = #{license-id})
   </delete>
   
   <!-- RESOURCE RESULTMAP -->

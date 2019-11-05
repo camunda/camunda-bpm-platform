@@ -28,8 +28,6 @@ import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,13 +94,8 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
           // allow License Key in byte array table
           if (tableNameWithoutPrefix.equals("ACT_GE_BYTEARRAY") && commandContext.getResourceManager().findLicenseKeyResource() != null) {
             if (count != 1) {
-              PropertyEntity licenseProperty = (PropertyEntity) dbEntityManager.selectOne("selectProperty", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
-              Map<String, String> params = new HashMap<>();
-              params.put("license-id", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
-              params.put("property-revision", String.valueOf(licenseProperty.getRevision()));
-
               DbBulkOperation purgeByteArrayPreserveLicenseKeyBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, ByteArrayEntity.class,
-                  "purgeTablePreserveLicenseKey", params);
+                  "purgeTablePreserveLicenseKey", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
               databasePurgeReport.addPurgeInformation(tableName, count - 1);
               dbEntityManager.getDbOperationManager().addOperation(purgeByteArrayPreserveLicenseKeyBulkOp);
             }

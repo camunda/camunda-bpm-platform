@@ -40,12 +40,14 @@ public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     final ResourceManager resourceManager = commandContext.getResourceManager();
     final PropertyManager propertyManager = commandContext.getPropertyManager();
     
+    // lock the property
+    @SuppressWarnings("unused")
     PropertyEntity licenseProperty = propertyManager.findPropertyById(LICENSE_KEY_BYTE_ARRAY_ID);
 
     // delete license key BLOB
     ResourceEntity licenseKey = resourceManager.findLicenseKeyResource();
     if(licenseKey != null) {
-      resourceManager.deleteLicenseKeyResource(licenseProperty.getRevision());
+      resourceManager.delete(licenseKey);
     }
 
     // always delete license key legacy property if it still exists

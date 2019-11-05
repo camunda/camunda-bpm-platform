@@ -95,11 +95,4 @@ public class ResourceManager extends AbstractManager {
     PropertyEntity licenseProperty = (PropertyEntity) getDbEntityManager().selectOne("selectProperty", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
     return licenseProperty == null ? null : (ResourceEntity) getDbEntityManager().selectOne("selectResourceById", licenseProperty.value);
   }
-
-  public void deleteLicenseKeyResource(int propertyRevision) {
-    Map<String, String> params = new HashMap<>();
-    params.put("license-id", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
-    params.put("property-revision", String.valueOf(propertyRevision));
-    getDbEntityManager().delete(ResourceEntity.class, "deleteLicenseResource", params);
-  }
 }
