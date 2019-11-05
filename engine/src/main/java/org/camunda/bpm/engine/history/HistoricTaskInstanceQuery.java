@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -334,6 +335,9 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Only select historic task instances with one of the given tenant ids. */
   HistoricTaskInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic task instances that have no tenant id. */
+  HistoricTaskInstanceQuery withoutTenantId();
 
   /**
    * Only select tasks where end time is after given date
