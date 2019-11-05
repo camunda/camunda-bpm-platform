@@ -44,6 +44,7 @@ module.exports = [
       $scope.loadingState = 'LOADING';
 
       $scope.paginationController.drdPages.current = pages.current;
+      updateDrdPage();
     }
 
     var decisionSorting = localConf.get('sortDecDefTab', {
