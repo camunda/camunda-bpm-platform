@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +34,11 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
+  protected final static String TENANT_NULL = null;
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
+  protected final static String TENANT_NULL_VAR = "tenantNullVar";
   protected final static String TENANT_ONE_VAR = "tenant1Var";
   protected final static String TENANT_TWO_VAR = "tenant2Var";
 
@@ -48,122 +49,159 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
       .endEvent()
     .done();
 
+    // given
+    deploymentForTenant(TENANT_NULL, oneTaskProcess);
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
 
+    startProcessInstanceForTenant(TENANT_NULL, TENANT_NULL_VAR);
     startProcessInstanceForTenant(TENANT_ONE, TENANT_ONE_VAR);
     startProcessInstanceForTenant(TENANT_TWO, TENANT_TWO_VAR);
   }
 
   public void testQueryWithoutTenantId() {
+    // when
     HistoricVariableInstanceQuery query = historyService.
         createHistoricVariableInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(3);
   }
 
   public void testQueryByTenantId() {
-    HistoricVariableInstanceQuery query = historyService
+    // when
+    HistoricVariableInstanceQuery queryTenantOne = historyService
         .createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
-    assertEquals(query.list().get(0).getValue(), TENANT_ONE_VAR);
-
-    query = historyService
+    HistoricVariableInstanceQuery queryTenantTwo = historyService
         .createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
-    assertEquals(query.list().get(0).getValue(), TENANT_TWO_VAR);
+    // then
+    assertThat(queryTenantOne.count()).isEqualTo(1);
+    assertEquals(queryTenantOne.list().get(0).getValue(), TENANT_ONE_VAR);
+    assertThat(queryTenantTwo.count()).isEqualTo(1);
+    assertEquals(queryTenantTwo.list().get(0).getValue(), TENANT_TWO_VAR);
   }
 
   public void testQueryByTenantIds() {
+    // when
     HistoricVariableInstanceQuery query = historyService
         .createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(2);
   }
 
   public void testQueryByNonExistingTenantId() {
+    // when
     HistoricVariableInstanceQuery query = historyService
         .createHistoricVariableInstanceQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    // then
+    assertThat(query.count()).isEqualTo(0);
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
+      // when
       historyService.createHistoricVariableInstanceQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
+
+      // then
     } catch (NullValueException e) {
     }
   }
 
   public void testQuerySortingAsc() {
+    // when
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicVariableInstances.size(), is(2));
-    assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertEquals(historicVariableInstances.get(0).getValue(), TENANT_ONE_VAR);
-    assertThat(historicVariableInstances.get(1).getTenantId(), is(TENANT_TWO));
-    assertEquals(historicVariableInstances.get(1).getValue(), TENANT_TWO_VAR);
+    // then
+    assertThat(historicVariableInstances.size()).isEqualTo(3); // null-tenant instances are still included
+    assertThat(historicVariableInstances.get(0).getTenantId()).isEqualTo(TENANT_NULL);
+    assertEquals(historicVariableInstances.get(0).getValue(), TENANT_NULL_VAR);
+    assertThat(historicVariableInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
+    assertEquals(historicVariableInstances.get(1).getValue(), TENANT_ONE_VAR);
+    assertThat(historicVariableInstances.get(2).getTenantId()).isEqualTo(TENANT_TWO);
+    assertEquals(historicVariableInstances.get(2).getValue(), TENANT_TWO_VAR);
   }
 
   public void testQuerySortingDesc() {
+    // when
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicVariableInstances.size(), is(2));
-    assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_TWO));
+    // then
+    assertThat(historicVariableInstances.size()).isEqualTo(3); // null-tenant instances are still included
+    assertThat(historicVariableInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
     assertEquals(historicVariableInstances.get(0).getValue(), TENANT_TWO_VAR);
-    assertThat(historicVariableInstances.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(historicVariableInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
     assertEquals(historicVariableInstances.get(1).getValue(), TENANT_ONE_VAR);
+    assertThat(historicVariableInstances.get(2).getTenantId()).isEqualTo(TENANT_NULL);
+    assertEquals(historicVariableInstances.get(2).getValue(), TENANT_NULL_VAR);
   }
 
   public void testQueryNoAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
-    assertThat(query.count(), is(0L));
+
+    // then
+    assertThat(query.count()).isEqualTo(1); // null-tenant instances are still included
   }
 
   public void testQueryAuthenticatedTenant() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
+    // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+    // then
+    assertThat(query.count()).isEqualTo(2); // null-tenant instances are still included
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(1);
   }
 
   public void testQueryAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
+    // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    // then
+    assertThat(query.count()).isEqualTo(3); // null-tenant instances are still included
+    assertThat(query.withoutTenantId().count()).isEqualTo(1);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1);
   }
 
   public void testQueryDisabledTenantCheck() {
+    // given
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
-    assertThat(query.count(), is(2L));
+
+    // then
+    assertThat(query.count()).isEqualTo(3);
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant, String var) {
