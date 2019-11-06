@@ -28,12 +28,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import javax.ws.rs.core.Response.Status;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -47,11 +51,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import javax.ws.rs.core.Response.Status;
-
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 
 public class HistoricCaseActivityInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -635,6 +634,32 @@ public class HistoricCaseActivityInstanceRestServiceQueryTest extends AbstractRe
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    HistoricCaseActivityInstance caseInstance = MockProvider.createMockHistoricCaseActivityInstance(null);
+    mockedQuery = setUpMockHistoricCaseActivityInstanceQuery(Collections.singletonList(caseInstance));
+
+    // when
+    Response response = given()
+        .queryParam("withoutTenantId", true)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   @Test
