@@ -344,24 +344,28 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
     long canceled = from(content).getLong("[0].canceled");
     long finished = from(content).getLong("[0].finished");
     long completeScope = from(content).getLong("[0].completeScope");
+    long closedIncidents = from(content).getLong("[0].closedIncidents");
 
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, id);
     Assert.assertEquals(MockProvider.EXAMPLE_INSTANCES_LONG, instances);
     Assert.assertEquals(MockProvider.EXAMPLE_CANCELED_LONG, canceled);
     Assert.assertEquals(MockProvider.EXAMPLE_FINISHED_LONG, finished);
     Assert.assertEquals(MockProvider.EXAMPLE_COMPLETE_SCOPE_LONG, completeScope);
+    Assert.assertEquals(MockProvider.EXAMPLE_CLOSED_INCIDENTS_LONG, closedIncidents);
 
     id = from(content).getString("[1].id");
     instances = from(content).getLong("[1].instances");
     canceled = from(content).getLong("[1].canceled");
     finished = from(content).getLong("[1].finished");
     completeScope = from(content).getLong("[1].completeScope");
+    closedIncidents = from(content).getLong("[1].closedIncidents");
 
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID, id);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_INSTANCES_LONG, instances);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_CANCELED_LONG, canceled);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_FINISHED_LONG, finished);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG, completeScope);
+    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_CLOSED_INCIDENTS_LONG, closedIncidents);
 
   }
 
