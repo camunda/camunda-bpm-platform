@@ -57,6 +57,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents that belong to one of the given tenant ids. */
   HistoricIncidentQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic incidents that have no tenant id. */
+  HistoricIncidentQuery withoutTenantId();
+
   /** Only select incidents which contain the configuration. **/
   HistoricIncidentQuery configuration(String configuration);
 

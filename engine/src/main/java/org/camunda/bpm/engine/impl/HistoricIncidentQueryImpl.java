@@ -50,6 +50,7 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String historyConfiguration;
   protected IncidentState incidentState;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected String[] jobDefinitionIds;
 
   public HistoricIncidentQueryImpl() {
@@ -123,6 +124,14 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricIncidentQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -317,4 +326,7 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return incidentState;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 }
