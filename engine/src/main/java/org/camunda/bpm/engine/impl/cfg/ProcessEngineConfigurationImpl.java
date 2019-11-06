@@ -40,7 +40,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -320,6 +319,7 @@ import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
+import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
@@ -354,6 +354,7 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -852,6 +853,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdentityProviderSessionFactory();
     initSessionFactories();
     initValueTypeResolver();
+    initTypeValidator();
     initSerialization();
     initJpa();
     initDelegateInterceptor();
@@ -875,6 +877,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initAdminGroups();
     initPasswordPolicy();
     invokePostInit();
+  }
+
+  protected void initTypeValidator() {
+    if (deserializationTypeValidator == null) {
+      deserializationTypeValidator = new DefaultDeserializationTypeValidator();
+    }
+    if (deserializationTypeValidator instanceof WhitelistingDeserializationTypeValidator) {
+      WhitelistingDeserializationTypeValidator validator = (WhitelistingDeserializationTypeValidator) deserializationTypeValidator;
+      validator.setAllowedClasses(deserializationAllowedClasses);
+      validator.setAllowedPackages(deserializationAllowedPackages);
+    }
   }
 
   public void initHistoryRemovalTime() {

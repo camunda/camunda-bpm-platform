@@ -16,12 +16,19 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -30,16 +37,13 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 
 public abstract class AbstractVariablesResource implements VariableResource {
@@ -164,13 +168,54 @@ public abstract class AbstractVariablesResource implements VariableResource {
   protected Object deserializeJsonObject(String className, byte[] data) {
     try {
       JavaType type = TypeFactory.defaultInstance().constructFromCanonical(className);
-
+      validateType(type);
       return objectMapper.readValue(new String(data, Charset.forName("UTF-8")), type);
-
     } catch(Exception e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Could not deserialize JSON object: "+e.getMessage());
-
     }
+  }
+
+  /**
+   * Validate the type with the help of the validator in the engine.<br>
+   * Note: when adjusting this method, please also consider adjusting
+   * the {@code JacksonJsonDataFormatMapper#validateType} in the Engine Spin Plugin
+   */
+  protected void validateType(JavaType type) {
+    if (getProcessEngineConfiguration().isDeserializationTypeValidationEnabled()) {
+      DeserializationTypeValidator validator = getProcessEngineConfiguration().getDeserializationTypeValidator();
+      if (validator != null) {
+        List<String> invalidTypes = new ArrayList<>();
+        validateType(type, validator, invalidTypes);
+        if (!invalidTypes.isEmpty()) {
+          throw new IllegalArgumentException("The following classes are not whitelisted for deserialization: " + invalidTypes);
+        }
+      }
+    }
+  }
+
+  protected void validateType(JavaType type, DeserializationTypeValidator validator, List<String> invalidTypes) {
+    if (!type.isPrimitive()) {
+      if (!type.isArrayType()) {
+        validateTypeInternal(type, validator, invalidTypes);
+      }
+      if (type.isMapLikeType()) {
+        validateType(type.getKeyType(), validator, invalidTypes);
+      }
+      if (type.isContainerType() || type.hasContentType()) {
+        validateType(type.getContentType(), validator, invalidTypes);
+      }
+    }
+  }
+
+  protected void validateTypeInternal(JavaType type, DeserializationTypeValidator validator, List<String> invalidTypes) {
+    String className = type.getRawClass().getName();
+    if (!validator.validate(className) && !invalidTypes.contains(className)) {
+      invalidTypes.add(className);
+    }
+  }
+
+  protected ProcessEngineConfiguration getProcessEngineConfiguration() {
+    return engine.getProcessEngineConfiguration();
   }
 
   @Override

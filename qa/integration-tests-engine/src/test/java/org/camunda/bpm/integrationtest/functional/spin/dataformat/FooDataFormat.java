@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Pattern;
 
+import org.camunda.spin.DeserializationTypeValidator;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
@@ -90,11 +91,21 @@ public class FooDataFormat implements DataFormat<FooSpin> {
 
       @Override
       public <T> T mapInternalToJava(Object parameter, String typeIdentifier) {
+        return mapInternalToJava(parameter, typeIdentifier, null);
+      }
+
+      @Override
+      public <T> T mapInternalToJava(Object parameter, String typeIdentifier, DeserializationTypeValidator validator) {
         return (T) new Foo();
       }
 
       @Override
       public <T> T mapInternalToJava(Object parameter, Class<T> type) {
+        return null;
+      }
+
+      @Override
+      public <T> T mapInternalToJava(Object parameter, Class<T> type, DeserializationTypeValidator validator) {
         return null;
       }
 
@@ -107,6 +118,7 @@ public class FooDataFormat implements DataFormat<FooSpin> {
       public boolean canMap(Object parameter) {
         return parameter instanceof Foo;
       }
+
     };
   }
 
