@@ -63,6 +63,9 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries that belong to one of the given tenant ids. */
   HistoricJobLogQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic job log entries that have no tenant id. */
+  HistoricJobLogQuery withoutTenantId();
+
   /**
    * Only select log entries where the job had a priority higher than or
    * equal to the given priority.

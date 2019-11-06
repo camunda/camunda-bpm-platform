@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,125 +42,173 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
       .endEvent()
       .done();
 
+  protected final static String TENANT_NULL = null;
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
   @Override
   protected void setUp() {
+    // given
+    deploymentForTenant(TENANT_NULL, BPMN);
     deploymentForTenant(TENANT_ONE, BPMN);
     deploymentForTenant(TENANT_TWO, BPMN);
 
+    startProcessInstanceAndExecuteFailingJobForTenant(TENANT_NULL);
     startProcessInstanceAndExecuteFailingJobForTenant(TENANT_ONE);
     startProcessInstanceAndExecuteFailingJobForTenant(TENANT_TWO);
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricJobLogQuery query = historyService.
-        createHistoricJobLogQuery();
+    // when
+    HistoricJobLogQuery query = historyService
+        .createHistoricJobLogQuery();
 
-    assertThat(query.count(), is(4L));
+    // then
+    assertThat(query.count()).isEqualTo(6L);
+  }
+
+  public void testQueryFilterWithoutTenantId() {
+    // when
+    HistoricJobLogQuery query = historyService
+        .createHistoricJobLogQuery()
+        .withoutTenantId();
+
+    // then
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   public void testQueryByTenantId() {
-    HistoricJobLogQuery query = historyService
+    // when
+    HistoricJobLogQuery queryTenantOne = historyService
         .createHistoricJobLogQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(2L));
-
-    query = historyService
+    HistoricJobLogQuery queryTenantTwo = historyService
         .createHistoricJobLogQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    // then
+    assertThat(queryTenantOne.count()).isEqualTo(2L);
+    assertThat(queryTenantTwo.count()).isEqualTo(2L);
   }
 
   public void testQueryByTenantIds() {
+    // when
     HistoricJobLogQuery query = historyService
         .createHistoricJobLogQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(4L));
+    // then
+    assertThat(query.count()).isEqualTo(4L);
   }
 
   public void testQueryByNonExistingTenantId() {
+    // when
     HistoricJobLogQuery query = historyService
         .createHistoricJobLogQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    // then
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
+      // when
       historyService.createHistoricJobLogQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
+
+      // then
     } catch (NullValueException e) {
     }
   }
 
   public void testQuerySortingAsc() {
+    // when
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicJobLogs.size(), is(4));
-    assertThat(historicJobLogs.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(historicJobLogs.get(1).getTenantId(), is(TENANT_ONE));
-    assertThat(historicJobLogs.get(2).getTenantId(), is(TENANT_TWO));
-    assertThat(historicJobLogs.get(3).getTenantId(), is(TENANT_TWO));
+    // then
+    assertThat(historicJobLogs.size()).isEqualTo(6);
+    assertThat(historicJobLogs.get(0).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicJobLogs.get(1).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicJobLogs.get(2).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicJobLogs.get(3).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicJobLogs.get(4).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicJobLogs.get(5).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   public void testQuerySortingDesc() {
+    // when
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicJobLogs.size(), is(4));
-    assertThat(historicJobLogs.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(historicJobLogs.get(1).getTenantId(), is(TENANT_TWO));
-    assertThat(historicJobLogs.get(2).getTenantId(), is(TENANT_ONE));
-    assertThat(historicJobLogs.get(3).getTenantId(), is(TENANT_ONE));
+    // then
+    assertThat(historicJobLogs.size()).isEqualTo(6);
+    assertThat(historicJobLogs.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicJobLogs.get(1).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicJobLogs.get(2).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicJobLogs.get(3).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicJobLogs.get(4).getTenantId()).isEqualTo(TENANT_NULL);
+    assertThat(historicJobLogs.get(5).getTenantId()).isEqualTo(TENANT_NULL);
   }
 
   public void testQueryNoAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
-    assertThat(query.count(), is(0L));
+
+    // then
+    assertThat(query.count()).isEqualTo(2L); // null-tenant entries are still included
   }
 
   public void testQueryAuthenticatedTenant() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
+    // when
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(4L);  // null-tenant entries are still included
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(2L);
   }
 
   public void testQueryAuthenticatedTenants() {
+    // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
+    // when
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
 
-    assertThat(query.count(), is(4L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
+    // then
+    assertThat(query.count()).isEqualTo(6L); // null-tenant entries are still included
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(2L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(2L);
   }
 
   public void testQueryDisabledTenantCheck() {
+    // given
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
+    // when
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
-    assertThat(query.count(), is(4L));
+
+    // then
+    assertThat(query.count()).isEqualTo(6L);
   }
 
   protected void startProcessInstanceAndExecuteFailingJobForTenant(String tenant) {
