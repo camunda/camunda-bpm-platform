@@ -17,7 +17,11 @@
 package org.camunda.spin.impl.json.jackson.format;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.camunda.spin.DeserializationTypeValidator;
+import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.spi.DataFormatMapper;
 
@@ -56,30 +60,80 @@ public class JacksonJsonDataFormatMapper implements DataFormatMapper {
   }
 
   public <T> T mapInternalToJava(Object parameter, Class<T> type) {
+    return mapInternalToJava(parameter, type, null);
+  }
+
+  @Override
+  public <T> T mapInternalToJava(Object parameter, Class<T> type, DeserializationTypeValidator validator) {
     JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-    T result = mapInternalToJava(parameter, javaType);
-    return result;
+    return mapInternalToJava(parameter, javaType, validator);
   }
 
   public <T> T mapInternalToJava(Object parameter, String typeIdentifier) {
+    return mapInternalToJava(parameter, typeIdentifier, null);
+  }
+
+  @Override
+  public <T> T mapInternalToJava(Object parameter, String typeIdentifier, DeserializationTypeValidator validator) {
     try {
       //sometimes the class identifier is at once a fully qualified class name
       final Class<?> aClass = Class.forName(typeIdentifier, true, Thread.currentThread().getContextClassLoader());
-      return (T) mapInternalToJava(parameter, aClass);
+      return (T) mapInternalToJava(parameter, aClass, validator);
     } catch (ClassNotFoundException e) {
       JavaType javaType = format.constructJavaTypeFromCanonicalString(typeIdentifier);
-      T result = mapInternalToJava(parameter, javaType);
+      T result = mapInternalToJava(parameter, javaType, validator);
       return result;
     }
   }
 
   public <C> C mapInternalToJava(Object parameter, JavaType type) {
+    return mapInternalToJava(parameter, type, null);
+  }
+
+  public <C> C mapInternalToJava(Object parameter, JavaType type, DeserializationTypeValidator validator) {
     JsonNode jsonNode = (JsonNode) parameter;
-    ObjectMapper mapper = format.getObjectMapper();
     try {
+      validateType(type, validator);
+      ObjectMapper mapper = format.getObjectMapper();
       return mapper.readValue(mapper.treeAsTokens(jsonNode), type);
-    } catch (IOException e) {
+    } catch (IOException | SpinRuntimeException e) {
       throw LOG.unableToDeserialize(jsonNode, type, e);
+    }
+  }
+
+  /**
+   * Validate the type with the help of the validator.<br>
+   * Note: when adjusting this method, please also consider adjusting
+   * the {@code AbstractVariablesResource#validateType} in the REST API
+   */
+  protected void validateType(JavaType type, DeserializationTypeValidator validator) {
+    if (validator != null) {
+      List<String> invalidTypes = new ArrayList<>();
+      validateType(type, validator, invalidTypes);
+      if (!invalidTypes.isEmpty()) {
+        throw new SpinRuntimeException("The following classes are not whitelisted for deserialization: " + invalidTypes);
+      }
+    }
+  }
+
+  protected void validateType(JavaType type, DeserializationTypeValidator validator, List<String> invalidTypes) {
+    if (!type.isPrimitive()) {
+      if (!type.isArrayType()) {
+        validateTypeInternal(type, validator, invalidTypes);
+      }
+      if (type.isMapLikeType()) {
+        validateType(type.getKeyType(), validator, invalidTypes);
+      }
+      if (type.isContainerType() || type.hasContentType()) {
+        validateType(type.getContentType(), validator, invalidTypes);
+      }
+    }
+  }
+
+  protected void validateTypeInternal(JavaType type, DeserializationTypeValidator validator, List<String> invalidTypes) {
+    String className = type.getRawClass().getName();
+    if (!validator.validate(className) && !invalidTypes.contains(className)) {
+      invalidTypes.add(className);
     }
   }
 

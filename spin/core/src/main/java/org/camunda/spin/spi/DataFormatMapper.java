@@ -16,6 +16,8 @@
  */
 package org.camunda.spin.spi;
 
+import org.camunda.spin.DeserializationTypeValidator;
+
 /**
  * Maps a java object to the data format's internal representation and vice versa.
  *
@@ -41,7 +43,7 @@ public interface DataFormatMapper {
 
   /**
    * Maps the internal representation of a data format to a java object of the
-   * desired class.
+   * desired class. The desired class is not validated prior to the mapping.
    *
    * @param parameter the object to be mapped
    * @param type the class to map the object to
@@ -52,9 +54,24 @@ public interface DataFormatMapper {
 
   /**
    * Maps the internal representation of a data format to a java object of the
+   * desired class. The desired class is validated by the <code>validator</code>
+   * prior to the mapping.
+   *
+   * @param parameter the object to be mapped
+   * @param type the class to map the object to
+   * @param validator the validator for the target class
+   * @return a java object of the specified class that was populated with the input
+   * parameter
+   */
+
+  public <T> T mapInternalToJava(Object parameter, Class<T> type, DeserializationTypeValidator validator);
+
+  /**
+   * Maps the internal representation of a data format to a java object of the
    * desired class. The type identifier is given in a data format specific format. Its
    * interpretation is data-format-specific. For example, it can be used to express generic
    * type information that cannot be expressed by a {@link Class} object.
+   * The desired class is not validated prior to the mapping.
    *
    * @param parameter the object to be mapped
    * @param typeIdentifier a data-format-specific type identifier that describes
@@ -63,6 +80,22 @@ public interface DataFormatMapper {
    *   parameter
    */
   public <T> T mapInternalToJava(Object parameter, String typeIdentifier);
+
+  /**
+   * Maps the internal representation of a data format to a java object of the
+   * desired class. The type identifier is given in a data format specific format. Its
+   * interpretation is data-format-specific. For example, it can be used to express generic
+   * type information that cannot be expressed by a {@link Class} object.
+   * The desired class is validated by the <code>validator</code> prior to the mapping.
+   *
+   * @param parameter the object to be mapped
+   * @param typeIdentifier a data-format-specific type identifier that describes
+   *   the class to map to
+   * @param validator the validator for the target class
+   * @return a java object of the specified type that was populated with the input
+   *   parameter
+   */
+  public <T> T mapInternalToJava(Object parameter, String typeIdentifier, DeserializationTypeValidator validator);
 
   String getCanonicalTypeName(Object object);
 }

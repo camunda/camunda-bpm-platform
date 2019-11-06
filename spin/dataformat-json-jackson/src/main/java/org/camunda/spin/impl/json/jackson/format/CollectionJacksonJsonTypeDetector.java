@@ -17,15 +17,14 @@
 package org.camunda.spin.impl.json.jackson.format;
 
 import java.lang.reflect.TypeVariable;
-import java.util.List;
-
+import java.util.Collection;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-public class ListJacksonJsonTypeDetector extends AbstractJacksonJsonTypeDetector {
+public class CollectionJacksonJsonTypeDetector extends AbstractJacksonJsonTypeDetector {
 
   public boolean canHandle(Object object) {
-    return object instanceof List;
+    return object instanceof Collection;
   }
 
   public String detectType(Object object) {
@@ -35,12 +34,12 @@ public class ListJacksonJsonTypeDetector extends AbstractJacksonJsonTypeDetector
   protected JavaType constructType(Object object) {
     TypeFactory typeFactory = TypeFactory.defaultInstance();
 
-    if (object instanceof List && !((List<?>) object).isEmpty()) {
-      List<?> list = (List<?>) object;
-      Object firstElement = list.get(0);
-      if (bindingsArePresent(list.getClass())) {
+    if (object instanceof Collection && !((Collection<?>) object).isEmpty()) {
+      Collection<?> collection = (Collection<?>) object;
+      Object firstElement = collection.iterator().next();
+      if (bindingsArePresent(collection.getClass())) {
         final JavaType elementType = constructType(firstElement);
-        return typeFactory.constructCollectionType(list.getClass(), elementType);
+        return typeFactory.constructCollectionType(collection.getClass(), elementType);
       }
     }
     return typeFactory.constructType(object.getClass());

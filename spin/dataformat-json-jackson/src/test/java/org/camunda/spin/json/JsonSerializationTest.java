@@ -45,7 +45,7 @@ public class JsonSerializationTest {
 
   @Test
   public void testNotGenericList() throws Exception {
-    CustomerList customers = new CustomerList();
+    CustomerList<RegularCustomer> customers = new CustomerList<>();
     customers.add(new RegularCustomer("someCustomer", 5));
 
     String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
@@ -57,7 +57,7 @@ public class JsonSerializationTest {
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(CustomerList.class);
 
-    CustomerList deserializedCustomerList = (CustomerList) o;
+    CustomerList<?> deserializedCustomerList = (CustomerList<?>) o;
     assertEquals("someCustomer", deserializedCustomerList.get(0).getName());
     assertEquals(5, deserializedCustomerList.get(0).getContractStartDate());
   }
@@ -99,7 +99,7 @@ public class JsonSerializationTest {
 
   @Test
   public void testGenericList() throws Exception {
-    GenericCustomerList customers = new GenericCustomerList();
+    GenericCustomerList<RegularCustomer> customers = new GenericCustomerList<>();
     customers.add(new RegularCustomer("someCustomer", 5));
 
     String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
@@ -111,7 +111,7 @@ public class JsonSerializationTest {
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(GenericCustomerList.class);
 
-    GenericCustomerList deserializedCustomerList = (GenericCustomerList) o;
+    GenericCustomerList<?> deserializedCustomerList = (GenericCustomerList<?>) o;
     assertEquals("someCustomer", deserializedCustomerList.get(0).getName());
     assertEquals(5, deserializedCustomerList.get(0).getContractStartDate());
 
@@ -119,7 +119,7 @@ public class JsonSerializationTest {
 
   @Test
   public void serializeAndDeserializeGenericCollection() throws Exception {
-    List<DmnDecisionResultEntries> ruleResults = new ArrayList<DmnDecisionResultEntries>();
+    List<DmnDecisionResultEntries> ruleResults = new ArrayList<>();
     final DmnDecisionResultEntriesImpl result1 = new DmnDecisionResultEntriesImpl();
     result1.putValue("key1", "value1");
     result1.putValue("key2", "value2");
@@ -145,10 +145,10 @@ public class JsonSerializationTest {
     final byte[] bytes = new String("{\"foo\": \"bar\"}").getBytes();
     assertThat(bytes).isNotEmpty();
 
-    final Object o = deserializeFromByteArray(bytes, "java.util.HashMap");
+    final Object o = deserializeFromByteArray(bytes, "java.util.HashMap<java.lang.String, java.lang.String>");
     assertThat(o).isInstanceOf(HashMap.class);
-    assertTrue(((HashMap)o).containsKey("foo"));
-    assertEquals("bar", ((HashMap)o).get("foo"));
+    assertTrue(((HashMap<?, ?>)o).containsKey("foo"));
+    assertEquals("bar", ((HashMap<?, ?>)o).get("foo"));
   }
 
   protected byte[] serializeToByteArray(Object deserializedObject) throws Exception {
@@ -181,12 +181,16 @@ public class JsonSerializationTest {
 
     try {
       Object mappedObject = reader.readInput(bufferedReader);
-      return mapper.mapInternalToJava(mappedObject, objectTypeName);
+      return doDeserialization(mapper, mappedObject, objectTypeName);
     } finally {
       bais.close();
       inReader.close();
       bufferedReader.close();
     }
+  }
+
+  protected Object doDeserialization(DataFormatMapper mapper, Object mappedObject, String objectTypeName) {
+    return mapper.mapInternalToJava(mappedObject, objectTypeName);
   }
 
 }

@@ -19,7 +19,6 @@ package org.camunda.spin.impl.xml.dom.format;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.beans.Introspector;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -29,6 +28,8 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
+import org.camunda.spin.DeserializationTypeValidator;
+import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.impl.util.SpinReflectUtil;
 import org.camunda.spin.impl.xml.dom.DomXmlLogger;
 import org.camunda.spin.impl.xml.dom.format.spi.JaxBContextProvider;
@@ -52,16 +53,19 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     this.dataFormat = format;
   }
 
+  @Override
   public boolean canMap(Object parameter) {
     // TODO: can JAX-B tell us whether it is capable of mapping a class?
     return parameter != null;
   }
 
+  @Override
   public String getCanonicalTypeName(Object object) {
-    // simply returns the the name of the class.
+    // simply returns the name of the class
     return object.getClass().getName();
   }
 
+  @Override
   public Object mapJavaToInternal(Object parameter) {
     ensureNotNull("Parameter", parameter);
 
@@ -99,14 +103,20 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     marshaller.marshal(root, domResult);
   }
 
+  @Override
   public <T> T mapInternalToJava(Object parameter, Class<T> javaClass) {
+    return mapInternalToJava(parameter, javaClass, null);
+  }
+
+  @Override
+  public <T> T mapInternalToJava(Object parameter, Class<T> javaClass, DeserializationTypeValidator validator) {
     ensureNotNull("Parameter", parameter);
     ensureNotNull("Type", javaClass);
 
     Node xmlNode = (Node) parameter;
     try {
+      validateType(javaClass, validator);
       Unmarshaller unmarshaller = getUnmarshaller(javaClass);
-
       JAXBElement<T> root = unmarshaller.unmarshal(new DOMSource(xmlNode), javaClass);
       return root.getValue();
 
@@ -115,14 +125,36 @@ public class DomXmlDataFormatMapper implements DataFormatMapper {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  protected void validateType(Class<?> type, DeserializationTypeValidator validator) {
+    if (validator != null) {
+      // validate the outer class
+      if (!type.isPrimitive()) {
+        Class<?> typeToValidate = type;
+        if (type.isArray()) {
+          typeToValidate = type.getComponentType();
+        }
+        String className = typeToValidate.getName();
+        if (!validator.validate(className)) {
+          throw new SpinRuntimeException("The class '" + className + "' is not whitelisted for deserialization.");
+        }
+      }
+    }
+  }
+
+  @Override
   public <T> T mapInternalToJava(Object parameter, String classIdentifier) {
+    return mapInternalToJava(parameter, classIdentifier, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T mapInternalToJava(Object parameter, String classIdentifier, DeserializationTypeValidator validator) {
     ensureNotNull("Parameter", parameter);
     ensureNotNull("classIdentifier", classIdentifier);
 
     try {
       Class<?> javaClass = SpinReflectUtil.loadClass(classIdentifier, dataFormat);
-      return (T) mapInternalToJava(parameter, javaClass);
+      return (T) mapInternalToJava(parameter, javaClass, validator);
     }
     catch (Exception e) {
       throw LOG.unableToDeserialize(parameter, classIdentifier, e);

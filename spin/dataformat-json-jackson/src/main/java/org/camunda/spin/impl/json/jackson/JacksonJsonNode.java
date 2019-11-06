@@ -463,7 +463,8 @@ public class JacksonJsonNode extends SpinJsonNode {
   }
 
   /**
-   * Maps the json represented by this object to a java object of the given type.
+   * Maps the json represented by this object to a java object of the given type.<br>
+   * Note: the desired target type is not validated and needs to be trusted.
    *
    * @throws SpinJsonException if the json representation cannot be mapped to the specified type
    */
@@ -475,7 +476,8 @@ public class JacksonJsonNode extends SpinJsonNode {
   /**
    * Maps the json represented by this object to a java object of the given type.
    * Argument is to be supplied in Jackson's canonical type string format
-   * (see {@link JavaType#toCanonical()}).
+   * (see {@link JavaType#toCanonical()}).<br>
+   * Note: the desired target type is not validated and needs to be trusted.
    *
    * @throws SpinJsonException if the json representation cannot be mapped to the specified type
    * @throws SpinJsonDataFormatException if the parameter does not match a valid type
@@ -486,7 +488,8 @@ public class JacksonJsonNode extends SpinJsonNode {
   }
 
   /**
-   * Maps the json represented by this object to a java object of the given type.
+   * Maps the json represented by this object to a java object of the given type.<br>
+   * Note: the desired target type is not validated and needs to be trusted.
    *
    * @throws SpinJsonException if the json representation cannot be mapped to the specified type
    */
