@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected Boolean resolved;
   protected Boolean deleted;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
   protected List<String> jobDefinitionIds;
 
 
@@ -179,6 +182,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @CamundaQueryParam(value = "jobDefinitionIdIn", converter = StringListConverter.class)
   public void setJobDefinitionIdIn(List<String> jobDefinitionIds) {
     this.jobDefinitionIds = jobDefinitionIds;
@@ -243,6 +251,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (jobDefinitionIds != null && !jobDefinitionIds.isEmpty()) {
       query.jobDefinitionIdIn(jobDefinitionIds.toArray(new String[jobDefinitionIds.size()]));
