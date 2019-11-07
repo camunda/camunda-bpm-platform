@@ -17,20 +17,30 @@
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn.query.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyHistoricCaseActivityInstanceQueryTest {
 
   protected final static String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
@@ -38,19 +48,35 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
-  @Override
-  protected void setUp() {
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  protected HistoryService historyService;
+  protected CaseService caseService;
+  protected IdentityService identityService;
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Before
+  public void setUp() {
+    historyService = engineRule.getHistoryService();
+    caseService = engineRule.getCaseService();
+    identityService = engineRule.getIdentityService();
+
     // given
-    deploymentForTenant(TENANT_NULL, CMMN_FILE);
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_NULL, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     createCaseInstance(TENANT_NULL);
     createCaseInstance(TENANT_ONE);
     createCaseInstance(TENANT_TWO);
   }
 
-  public void testQueryWithoutTenantId() {
+  @Test
+  public void shouldQueryWithoutTenantId() {
     // when
     HistoricCaseActivityInstanceQuery query = historyService
         .createHistoricCaseActivityInstanceQuery();
@@ -59,7 +85,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.count()).isEqualTo(3L);
   }
 
-  public void testQueryFilterWithoutTenantId() {
+  @Test
+  public void shouldQueryFilterWithoutTenantId() {
     // when
     HistoricCaseActivityInstanceQuery query = historyService
         .createHistoricCaseActivityInstanceQuery()
@@ -69,7 +96,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.count()).isEqualTo(1L);
   }
 
-  public void testQueryByTenantId() {
+  @Test
+  public void shouldQueryByTenantId() {
     // when
     HistoricCaseActivityInstanceQuery queryTenantOne = historyService
         .createHistoricCaseActivityInstanceQuery()
@@ -84,7 +112,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(queryTenantTwo.count()).isEqualTo(1L);
   }
 
-  public void testQueryByTenantIds() {
+  @Test
+  public void shouldQueryByTenantIds() {
     // when
     HistoricCaseActivityInstanceQuery query = historyService
         .createHistoricCaseActivityInstanceQuery()
@@ -94,7 +123,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.count()).isEqualTo(2L);
   }
 
-  public void testQueryByNonExistingTenantId() {
+  @Test
+  public void shouldQueryByNonExistingTenantId() {
     // when
     HistoricCaseActivityInstanceQuery query = historyService
         .createHistoricCaseActivityInstanceQuery()
@@ -104,7 +134,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.count()).isEqualTo(0L);
   }
 
-  public void testFailQueryByTenantIdNull() {
+  @Test
+  public void shouldFailQueryByTenantIdNull() {
     try {
       // when
       historyService.createHistoricCaseActivityInstanceQuery()
@@ -117,7 +148,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     }
   }
 
-  public void testQuerySortingAsc() {
+  @Test
+  public void shouldQuerySortingAsc() {
     // when
     List<HistoricCaseActivityInstance> historicCaseActivityInstances = historyService
         .createHistoricCaseActivityInstanceQuery()
@@ -132,7 +164,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(historicCaseActivityInstances.get(2).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
-  public void testQuerySortingDesc() {
+  @Test
+  public void shouldQuerySortingDesc() {
     // when
     List<HistoricCaseActivityInstance> historicCaseActivityInstances = historyService.createHistoricCaseActivityInstanceQuery()
         .orderByTenantId()
@@ -146,7 +179,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(historicCaseActivityInstances.get(2).getTenantId()).isEqualTo(TENANT_NULL);
   }
 
-  public void testQueryNoAuthenticatedTenants() {
+  @Test
+  public void shouldQueryNoAuthenticatedTenants() {
     // given
     identityService.setAuthentication("user", null, null);
 
@@ -157,7 +191,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.count()).isEqualTo(1L); // null-tenant instances are still included
   }
 
-  public void testQueryAuthenticatedTenant() {
+  @Test
+  public void shouldQueryAuthenticatedTenant() {
     // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -172,7 +207,8 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(1L);
   }
 
-  public void testQueryAuthenticatedTenants() {
+  @Test
+  public void shouldQueryAuthenticatedTenants() {
     // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -186,9 +222,10 @@ public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends Pluggable
     assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
-  public void testQueryDisabledTenantCheck() {
+  @Test
+  public void shouldQueryDisabledTenantCheck() {
     // given
-    processEngineConfiguration.setTenantCheckEnabled(false);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
     // when
