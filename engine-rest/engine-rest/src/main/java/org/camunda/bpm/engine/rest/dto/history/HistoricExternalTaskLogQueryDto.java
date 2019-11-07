@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
@@ -79,6 +81,7 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
   protected Long priorityHigherThanOrEquals;
   protected Long priorityLowerThanOrEquals;
   protected String[] tenantIds;
+  protected Boolean withoutTenantId;
   protected Boolean creationLog;
   protected Boolean failureLog;
   protected Boolean successLog;
@@ -158,6 +161,11 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
   @CamundaQueryParam(value = "tenantIdIn", converter = StringArrayConverter.class)
   public void setTenantIdIn(String[] tenantIds) {
     this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @CamundaQueryParam(value="creationLog", converter = BooleanConverter.class)
@@ -262,6 +270,9 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
     }
     if (tenantIds != null && tenantIds.length > 0) {
       query.tenantIdIn(tenantIds);
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
   }
 
