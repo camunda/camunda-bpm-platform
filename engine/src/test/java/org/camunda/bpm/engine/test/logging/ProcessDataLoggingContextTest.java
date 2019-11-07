@@ -80,7 +80,7 @@ public class ProcessDataLoggingContextTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configuration.setLogginContextBusinessKey("businessKey");
+      return configuration.setLoggingContextBusinessKey("businessKey");
     }
   };
 
@@ -118,19 +118,19 @@ public class ProcessDataLoggingContextTest {
   @After
   public void resetLogConfiguration() {
     engineRule.getProcessEngineConfiguration()
-      .setLogginContextActivityId("activityId")
-      .setLogginContextApplicationName("applicationName")
-      .setLogginContextBusinessKey("businessKey")
-      .setLogginContextProcessDefinitionId("processDefinitionId")
-      .setLogginContextProcessInstanceId("processInstanceId")
-      .setLogginContextTenantId("tenantId");
+      .setLoggingContextActivityId("activityId")
+      .setLoggingContextApplicationName("applicationName")
+      .setLoggingContextBusinessKey("businessKey")
+      .setLoggingContextProcessDefinitionId("processDefinitionId")
+      .setLoggingContextProcessInstanceId("processInstanceId")
+      .setLoggingContextTenantId("tenantId");
   }
 
   @Test
   @WatchLogger(loggerNames = PVM_LOGGER, level = "DEBUG")
   public void shouldNotLogBusinessKeyIfNotConfigured() {
     // given
-    engineRule.getProcessEngineConfiguration().setLogginContextBusinessKey(null);
+    engineRule.getProcessEngineConfiguration().setLoggingContextBusinessKey(null);
     manageDeployment(modelOneTaskProcess());
     // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
@@ -144,9 +144,9 @@ public class ProcessDataLoggingContextTest {
   public void shouldNotLogDisabledProperties() {
     // given
     engineRule.getProcessEngineConfiguration()
-      .setLogginContextActivityId(null)
-      .setLogginContextBusinessKey(null)
-      .setLogginContextProcessDefinitionId("");
+      .setLoggingContextActivityId(null)
+      .setLoggingContextBusinessKey(null)
+      .setLoggingContextProcessDefinitionId("");
     manageDeployment(modelOneTaskProcess());
     // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
@@ -174,12 +174,12 @@ public class ProcessDataLoggingContextTest {
   public void shouldLogCustomMdcPropertiesOnlyInActivityContext() {
     // given
     engineRule.getProcessEngineConfiguration()
-      .setLogginContextActivityId("actId")
-      .setLogginContextApplicationName("appName")
-      .setLogginContextBusinessKey("busKey")
-      .setLogginContextProcessDefinitionId("defId")
-      .setLogginContextProcessInstanceId("instId")
-      .setLogginContextTenantId("tenId");
+      .setLoggingContextActivityId("actId")
+      .setLoggingContextApplicationName("appName")
+      .setLoggingContextBusinessKey("busKey")
+      .setLoggingContextProcessDefinitionId("defId")
+      .setLoggingContextProcessInstanceId("instId")
+      .setLoggingContextTenantId("tenId");
     manageDeployment(modelOneTaskProcess());
     // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);

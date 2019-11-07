@@ -42,12 +42,12 @@ import org.camunda.commons.logging.MdcAccess;
  * process engine configuration}. The following configuration options are
  * available:
  * <ul>
- * <li>logginContextActivityId - the context property for the activity id</li>
- * <li>logginContextApplicationName - the context property for the application name</li>
- * <li>logginContextBusinessKey - the context property for the business key</li>
- * <li>logginContextDefinitionId - the context property for the definition id</li>
- * <li>logginContextProcessInstanceId - the context property for the instance id</li>
- * <li>logginContextTenantId - the context property for the tenant id</li>
+ * <li>loggingContextActivityId - the context property for the activity id</li>
+ * <li>loggingContextApplicationName - the context property for the application name</li>
+ * <li>loggingContextBusinessKey - the context property for the business key</li>
+ * <li>loggingContextDefinitionId - the context property for the definition id</li>
+ * <li>loggingContextProcessInstanceId - the context property for the instance id</li>
+ * <li>loggingContextTenantId - the context property for the tenant id</li>
  * </ul>
  */
 public class ProcessDataLoggingContext {
@@ -69,27 +69,27 @@ public class ProcessDataLoggingContext {
   private Deque<List<String>> sections = new ArrayDeque<>();
 
   public ProcessDataLoggingContext(ProcessEngineConfigurationImpl configuration) {
-    propertyActivityId = configuration.getLogginContextActivityId();
+    propertyActivityId = configuration.getLoggingContextActivityId();
     if (isNotBlank(propertyActivityId)) {
       propertyNames.add(propertyActivityId);
     }
-    propertyApplicationName = configuration.getLogginContextApplicationName();
+    propertyApplicationName = configuration.getLoggingContextApplicationName();
     if (isNotBlank(propertyApplicationName)) {
       propertyNames.add(propertyApplicationName);
     }
-    propertyBusinessKey = configuration.getLogginContextBusinessKey();
+    propertyBusinessKey = configuration.getLoggingContextBusinessKey();
     if (isNotBlank(propertyBusinessKey)) {
       propertyNames.add(propertyBusinessKey);
     }
-    propertyDefinitionId = configuration.getLogginContextProcessDefinitionId();
+    propertyDefinitionId = configuration.getLoggingContextProcessDefinitionId();
     if (isNotBlank(propertyDefinitionId)) {
       propertyNames.add(propertyDefinitionId);
     }
-    propertyInstanceId = configuration.getLogginContextProcessInstanceId();
+    propertyInstanceId = configuration.getLoggingContextProcessInstanceId();
     if (isNotBlank(propertyInstanceId)) {
       propertyNames.add(propertyInstanceId);
     }
-    propertyTenantId = configuration.getLogginContextTenantId();
+    propertyTenantId = configuration.getLoggingContextTenantId();
     if (isNotBlank(propertyTenantId)) {
       propertyNames.add(propertyTenantId);
     }

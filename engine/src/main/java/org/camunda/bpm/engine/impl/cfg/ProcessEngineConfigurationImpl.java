@@ -799,12 +799,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int queryMaxResultsLimit = Integer.MAX_VALUE;
 
   // logging context property names (with default values)
-  protected String logginContextActivityId = "activityId";
-  protected String logginContextApplicationName = "applicationName";
-  protected String logginContextBusinessKey;// default == null => disabled by default
-  protected String logginContextProcessDefinitionId = "processDefinitionId";
-  protected String logginContextProcessInstanceId = "processInstanceId";
-  protected String logginContextTenantId = "tenantId";
+  protected String loggingContextActivityId = "activityId";
+  protected String loggingContextApplicationName = "applicationName";
+  protected String loggingContextBusinessKey;// default == null => disabled by default
+  protected String loggingContextProcessDefinitionId = "processDefinitionId";
+  protected String loggingContextProcessInstanceId = "processInstanceId";
+  protected String loggingContextTenantId = "tenantId";
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -4369,57 +4369,57 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public String getLogginContextActivityId() {
-    return logginContextActivityId;
+  public String getLoggingContextActivityId() {
+    return loggingContextActivityId;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextActivityId(String logginContextActivityId) {
-    this.logginContextActivityId = logginContextActivityId;
+  public ProcessEngineConfigurationImpl setLoggingContextActivityId(String loggingContextActivityId) {
+    this.loggingContextActivityId = loggingContextActivityId;
     return this;
   }
 
-  public String getLogginContextApplicationName() {
-    return logginContextApplicationName;
+  public String getLoggingContextApplicationName() {
+    return loggingContextApplicationName;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextApplicationName(String logginContextApplicationName) {
-    this.logginContextApplicationName = logginContextApplicationName;
+  public ProcessEngineConfigurationImpl setLoggingContextApplicationName(String loggingContextApplicationName) {
+    this.loggingContextApplicationName = loggingContextApplicationName;
     return this;
   }
 
-  public String getLogginContextBusinessKey() {
-    return logginContextBusinessKey;
+  public String getLoggingContextBusinessKey() {
+    return loggingContextBusinessKey;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextBusinessKey(String logginContextBusinessKey) {
-    this.logginContextBusinessKey = logginContextBusinessKey;
+  public ProcessEngineConfigurationImpl setLoggingContextBusinessKey(String loggingContextBusinessKey) {
+    this.loggingContextBusinessKey = loggingContextBusinessKey;
     return this;
   }
 
-  public String getLogginContextProcessDefinitionId() {
-    return logginContextProcessDefinitionId;
+  public String getLoggingContextProcessDefinitionId() {
+    return loggingContextProcessDefinitionId;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextProcessDefinitionId(String logginContextProcessDefinitionId) {
-    this.logginContextProcessDefinitionId = logginContextProcessDefinitionId;
+  public ProcessEngineConfigurationImpl setLoggingContextProcessDefinitionId(String loggingContextProcessDefinitionId) {
+    this.loggingContextProcessDefinitionId = loggingContextProcessDefinitionId;
     return this;
   }
 
-  public String getLogginContextProcessInstanceId() {
-    return logginContextProcessInstanceId;
+  public String getLoggingContextProcessInstanceId() {
+    return loggingContextProcessInstanceId;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextProcessInstanceId(String logginContextProcessInstanceId) {
-    this.logginContextProcessInstanceId = logginContextProcessInstanceId;
+  public ProcessEngineConfigurationImpl setLoggingContextProcessInstanceId(String loggingContextProcessInstanceId) {
+    this.loggingContextProcessInstanceId = loggingContextProcessInstanceId;
     return this;
   }
 
-  public String getLogginContextTenantId() {
-    return logginContextTenantId;
+  public String getLoggingContextTenantId() {
+    return loggingContextTenantId;
   }
 
-  public ProcessEngineConfigurationImpl setLogginContextTenantId(String logginContextTenantId) {
-    this.logginContextTenantId = logginContextTenantId;
+  public ProcessEngineConfigurationImpl setLoggingContextTenantId(String loggingContextTenantId) {
+    this.loggingContextTenantId = loggingContextTenantId;
     return this;
   }
 
