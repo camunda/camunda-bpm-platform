@@ -39,7 +39,7 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
   protected Boolean includeCanceled;
   protected Boolean includeFinished;
   protected Boolean includeCompleteScope;
-  protected Boolean includeClosedIncidents;
+  protected Boolean includeIncidents;
 
   protected Date startedAfter;
   protected Date startedBefore;
@@ -75,9 +75,9 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
     this.includeCompleteScope = includeCompleteScope;
   }
 
-  @CamundaQueryParam(value = "closedIncidents", converter = BooleanConverter.class)
-  public void setIncludeClosedIncidents(Boolean includeClosedIncidents) {
-    this.includeClosedIncidents = includeClosedIncidents;
+  @CamundaQueryParam(value = "incidents", converter = BooleanConverter.class)
+  public void setIncludeIncidents(Boolean includeClosedIncidents) {
+    this.includeIncidents = includeClosedIncidents;
   }
 
   @CamundaQueryParam(value = "startedAfter", converter = DateConverter.class)
@@ -130,8 +130,8 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
       query.includeCompleteScope();
     }
 
-    if (includeClosedIncidents !=null && includeClosedIncidents) {
-      query.includeClosedIncidents();
+    if (includeIncidents !=null && includeIncidents) {
+      query.includeIncidents();
     }
 
     if (startedAfter != null) {

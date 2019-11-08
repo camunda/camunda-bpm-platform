@@ -392,13 +392,17 @@ public abstract class MockProvider {
   public static final long EXAMPLE_FINISHED_LONG = 124;
   public static final long EXAMPLE_CANCELED_LONG = 125;
   public static final long EXAMPLE_COMPLETE_SCOPE_LONG = 126;
-  public static final long EXAMPLE_CLOSED_INCIDENTS_LONG = 0;
+  public static final long EXAMPLE_OPEN_INCIDENTS_LONG = 0;
+  public static final long EXAMPLE_RESOLVED_INCIDENTS_LONG = 0;
+  public static final long EXAMPLE_DELETED_INCIDENTS_LONG = 0;
 
   public static final long ANOTHER_EXAMPLE_INSTANCES_LONG = 127;
   public static final long ANOTHER_EXAMPLE_FINISHED_LONG = 128;
   public static final long ANOTHER_EXAMPLE_CANCELED_LONG = 129;
   public static final long ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG = 130;
-  public static final long ANOTHER_EXAMPLE_CLOSED_INCIDENTS_LONG = 2;
+  public static final long ANOTHER_EXAMPLE_OPEN_INCIDENTS_LONG = 1;
+  public static final long ANOTHER_EXAMPLE_RESOLVED_INCIDENTS_LONG = 2;
+  public static final long ANOTHER_EXAMPLE_DELETED_INCIDENTS_LONG = 3;
 
   public static final long EXAMPLE_AVAILABLE_LONG = 123;
   public static final long EXAMPLE_ACTIVE_LONG = 124;
@@ -1936,7 +1940,9 @@ public abstract class MockProvider {
     when(statistics.getCanceled()).thenReturn(EXAMPLE_CANCELED_LONG);
     when(statistics.getFinished()).thenReturn(EXAMPLE_FINISHED_LONG);
     when(statistics.getCompleteScope()).thenReturn(EXAMPLE_COMPLETE_SCOPE_LONG);
-    when(statistics.getClosedIncidents()).thenReturn(EXAMPLE_CLOSED_INCIDENTS_LONG);
+    when(statistics.getOpenIncidents()).thenReturn(EXAMPLE_OPEN_INCIDENTS_LONG);
+    when(statistics.getResolvedIncidents()).thenReturn(EXAMPLE_RESOLVED_INCIDENTS_LONG);
+    when(statistics.getDeletedIncidents()).thenReturn(EXAMPLE_DELETED_INCIDENTS_LONG);
 
     HistoricActivityStatistics anotherStatistics = mock(HistoricActivityStatistics.class);
 
@@ -1945,7 +1951,9 @@ public abstract class MockProvider {
     when(anotherStatistics.getCanceled()).thenReturn(ANOTHER_EXAMPLE_CANCELED_LONG);
     when(anotherStatistics.getFinished()).thenReturn(ANOTHER_EXAMPLE_FINISHED_LONG);
     when(anotherStatistics.getCompleteScope()).thenReturn(ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG);
-    when(anotherStatistics.getClosedIncidents()).thenReturn(ANOTHER_EXAMPLE_CLOSED_INCIDENTS_LONG);
+    when(anotherStatistics.getOpenIncidents()).thenReturn(ANOTHER_EXAMPLE_OPEN_INCIDENTS_LONG);
+    when(anotherStatistics.getResolvedIncidents()).thenReturn(ANOTHER_EXAMPLE_RESOLVED_INCIDENTS_LONG);
+    when(anotherStatistics.getDeletedIncidents()).thenReturn(ANOTHER_EXAMPLE_DELETED_INCIDENTS_LONG);
 
     List<HistoricActivityStatistics> activityResults = new ArrayList<HistoricActivityStatistics>();
     activityResults.add(statistics);

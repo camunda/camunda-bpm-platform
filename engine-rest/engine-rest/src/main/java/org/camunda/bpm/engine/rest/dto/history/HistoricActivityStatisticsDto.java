@@ -30,7 +30,9 @@ public class HistoricActivityStatisticsDto {
   protected long canceled;
   protected long finished;
   protected long completeScope;
-  protected long closedIncidents;
+  protected long openIncidents;
+  protected long resolvedIncidents;
+  protected long deletedIncidents;
 
   public HistoricActivityStatisticsDto () {}
 
@@ -54,8 +56,16 @@ public class HistoricActivityStatisticsDto {
     return completeScope;
   }
 
-  public long getClosedIncidents() {
-    return closedIncidents;
+  public long getOpenIncidents() {
+    return openIncidents;
+  }
+
+  public long getResolvedIncidents() {
+    return resolvedIncidents;
+  }
+
+  public long getDeletedIncidents() {
+    return deletedIncidents;
   }
 
   public static HistoricActivityStatisticsDto fromHistoricActivityStatistics(HistoricActivityStatistics statistics) {
@@ -67,7 +77,9 @@ public class HistoricActivityStatisticsDto {
     result.canceled = statistics.getCanceled();
     result.finished = statistics.getFinished();
     result.completeScope = statistics.getCompleteScope();
-    result.closedIncidents = statistics.getClosedIncidents();
+    result.openIncidents = statistics.getOpenIncidents();
+    result.resolvedIncidents = statistics.getResolvedIncidents();
+    result.deletedIncidents = statistics.getDeletedIncidents();
 
     return result;
   }
