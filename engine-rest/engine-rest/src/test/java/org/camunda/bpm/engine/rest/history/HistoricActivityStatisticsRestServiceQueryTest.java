@@ -309,16 +309,16 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
   }
 
   @Test
-  public void testClosedIncidentsFilter() {
+  public void testIncidentsFilter() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .queryParam("closedIncidents", "true")
+      .queryParam("incidents", "true")
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
 
     InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
-    inOrder.verify(historicActivityStatisticsQuery).includeClosedIncidents();
+    inOrder.verify(historicActivityStatisticsQuery).includeIncidents();
     inOrder.verify((HistoricActivityStatisticsQueryImpl)historicActivityStatisticsQuery)
         .unboundedResultList();
     inOrder.verifyNoMoreInteractions();
@@ -344,28 +344,36 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
     long canceled = from(content).getLong("[0].canceled");
     long finished = from(content).getLong("[0].finished");
     long completeScope = from(content).getLong("[0].completeScope");
-    long closedIncidents = from(content).getLong("[0].closedIncidents");
+    long openIncidents = from(content).getLong("[0].openIncidents");
+    long resolvedIncidents = from(content).getLong("[0].resolvedIncidents");
+    long deletedIncidents = from(content).getLong("[0].deletedIncidents");
 
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, id);
     Assert.assertEquals(MockProvider.EXAMPLE_INSTANCES_LONG, instances);
     Assert.assertEquals(MockProvider.EXAMPLE_CANCELED_LONG, canceled);
     Assert.assertEquals(MockProvider.EXAMPLE_FINISHED_LONG, finished);
     Assert.assertEquals(MockProvider.EXAMPLE_COMPLETE_SCOPE_LONG, completeScope);
-    Assert.assertEquals(MockProvider.EXAMPLE_CLOSED_INCIDENTS_LONG, closedIncidents);
+    Assert.assertEquals(MockProvider.EXAMPLE_OPEN_INCIDENTS_LONG, openIncidents);
+    Assert.assertEquals(MockProvider.EXAMPLE_RESOLVED_INCIDENTS_LONG, resolvedIncidents);
+    Assert.assertEquals(MockProvider.EXAMPLE_DELETED_INCIDENTS_LONG, deletedIncidents);
 
     id = from(content).getString("[1].id");
     instances = from(content).getLong("[1].instances");
     canceled = from(content).getLong("[1].canceled");
     finished = from(content).getLong("[1].finished");
     completeScope = from(content).getLong("[1].completeScope");
-    closedIncidents = from(content).getLong("[1].closedIncidents");
+    openIncidents = from(content).getLong("[1].openIncidents");
+    resolvedIncidents = from(content).getLong("[1].resolvedIncidents");
+    deletedIncidents = from(content).getLong("[1].deletedIncidents");
 
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID, id);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_INSTANCES_LONG, instances);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_CANCELED_LONG, canceled);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_FINISHED_LONG, finished);
     Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG, completeScope);
-    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_CLOSED_INCIDENTS_LONG, closedIncidents);
+    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_OPEN_INCIDENTS_LONG, openIncidents);
+    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_RESOLVED_INCIDENTS_LONG, resolvedIncidents);
+    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_DELETED_INCIDENTS_LONG, deletedIncidents);
 
   }
 

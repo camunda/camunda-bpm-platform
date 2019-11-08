@@ -20,10 +20,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
@@ -42,9 +39,6 @@ public class HistoricStatisticsManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<HistoricActivityStatistics> getHistoricStatisticsGroupedByActivity(HistoricActivityStatisticsQueryImpl query, Page page) {
     if (ensureHistoryReadOnProcessDefinition(query)) {
-      if (query.isIncludeClosedIncidents()) {
-        return getStatisticsWithIncidents(query, page);
-      }
       return getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
     }
     else {
@@ -85,36 +79,6 @@ public class HistoricStatisticsManager extends AbstractManager {
     }
 
     return true;
-  }
-
-  // CAM-10892
-  // the historic incidents cannot be added to the statistic query due to lack of activity instance id in the incident
-  // so a second query is perform to fetch the incidents group by activity id and the result is merged
-  @SuppressWarnings("unchecked")
-  protected List<HistoricActivityStatistics> getStatisticsWithIncidents(HistoricActivityStatisticsQueryImpl query, Page page) {
-    // this is sorted list
-    List<HistoricActivityStatisticsImpl> statsWithoutIncidents = getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
-    // fetch incidents per activity id by applying the same filters as the statistic query
-    List<HistoricActivityStatistics> incidentStats = getDbEntityManager().selectList("selectHistoricActivityStatisticsWithIncident", query, page);
-    Map<String, Long> incidentsMap = convertIncidentStatisticsToMap(incidentStats);
-
-    List<HistoricActivityStatistics> mergedResult = new ArrayList<>();
-
-    for (HistoricActivityStatisticsImpl stats : statsWithoutIncidents) {
-      if(incidentsMap.get(stats.getId()) != null) {
-        stats.setClosedIncidents(incidentsMap.get(stats.getId()).longValue());
-      }
-      mergedResult.add(stats); // the sorting is preserved
-    }
-    return mergedResult;
-  }
-
-  protected Map<String, Long> convertIncidentStatisticsToMap(List<HistoricActivityStatistics> incidentStats) {
-    Map<String, Long> incidentsMap = new HashMap<>();
-    for (HistoricActivityStatistics incidentStat : incidentStats) {
-      incidentsMap.put(incidentStat.getId(), incidentStat.getClosedIncidents());
-    }
-    return incidentsMap;
   }
 
 }

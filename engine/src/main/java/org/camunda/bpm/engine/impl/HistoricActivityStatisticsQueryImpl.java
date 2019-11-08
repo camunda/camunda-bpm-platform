@@ -38,7 +38,7 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeFinished;
   protected boolean includeCanceled;
   protected boolean includeCompleteScope;
-  protected boolean includeClosedIncidents;
+  protected boolean includeIncidents;
 
   protected Date startedBefore;
   protected Date startedAfter;
@@ -67,8 +67,8 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
     return this;
   }
 
-  public HistoricActivityStatisticsQuery includeClosedIncidents() {
-    includeClosedIncidents = true;
+  public HistoricActivityStatisticsQuery includeIncidents() {
+    includeIncidents = true;
     return this;
   }
 
@@ -150,8 +150,8 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
     return processInstanceIds;
   }
 
-  public boolean isIncludeClosedIncidents() {
-    return includeClosedIncidents;
+  public boolean isIncludeIncidents() {
+    return includeIncidents;
   }
 
 }

@@ -29,7 +29,9 @@
     <result property="finished" column="FINISHED_COUNT_" jdbcType="INTEGER" />
     <result property="canceled" column="CANCELED_COUNT_" jdbcType="INTEGER" />
     <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
-    <result property="closedIncidents" column="CLOSED_INCIDENT_COUNT_" jdbcType="INTEGER" />
+    <result property="openIncidents" column="OPEN_INCIDENT_COUNT_" jdbcType="INTEGER" />
+    <result property="resolvedIncidents" column="RESOLVED_INCIDENT_COUNT_" jdbcType="INTEGER" />
+    <result property="deletedIncidents" column="DELETED_INCIDENT_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
   <resultMap id="historicCaseActivityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityStatisticsImpl">
@@ -64,41 +66,120 @@
 
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
     from (
+
+      <!-- in case of fetching the incidents number ("includeIncidents")
+           a UNION and second aggregation are required for the final result -->
+      <if test="includeIncidents">
+      select ID_,
+        sum(INSTANCE_COUNT_) as INSTANCE_COUNT_
+        <if test="includeFinished">
+        , sum(FINISHED_COUNT_) as FINISHED_COUNT_
+        </if>
+        <if test="includeCanceled">
+        , sum(CANCELED_COUNT_) as CANCELED_COUNT_
+        </if>
+        <if test="includeCompleteScope">
+        , sum(COMPLETE_SCOPE_COUNT_) as COMPLETE_SCOPE_COUNT_
+        </if>
+        <if test="includeIncidents">
+        , sum(OPEN_INCIDENT_COUNT_) as OPEN_INCIDENT_COUNT_
+        , sum(RESOLVED_INCIDENT_COUNT_) as RESOLVED_INCIDENT_COUNT_
+        , sum(DELETED_INCIDENT_COUNT_) as DELETED_INCIDENT_COUNT_
+        </if>
+      from (
+      </if>
+
           select ACT.ACT_ID_ as ID_,
-          sum(CASE WHEN ACT.END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
-          <if test="includeFinished">
-          , sum(CASE WHEN ACT.END_TIME_ is not NULL THEN 1 ELSE 0 END)  as FINISHED_COUNT_
-          </if>
-          <if test="includeCanceled">
-          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END)  as CANCELED_COUNT_
-          </if>
-          <if test="includeCompleteScope">
-          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END)  as COMPLETE_SCOPE_COUNT_
-          </if>
+            sum(CASE WHEN ACT.END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
+            <if test="includeFinished">
+            , sum(CASE WHEN ACT.END_TIME_ is not NULL THEN 1 ELSE 0 END) as FINISHED_COUNT_
+            </if>
+            <if test="includeCanceled">
+            , sum(CASE WHEN ACT.ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END) as CANCELED_COUNT_
+            </if>
+            <if test="includeCompleteScope">
+            , sum(CASE WHEN ACT.ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END) as COMPLETE_SCOPE_COUNT_
+            </if>
+            <if test="includeIncidents">
+            , 0 as OPEN_INCIDENT_COUNT_
+            , 0 as RESOLVED_INCIDENT_COUNT_
+            , 0 as DELETED_INCIDENT_COUNT_
+            </if>
 
           from ${prefix}ACT_HI_ACTINST ACT
-          INNER JOIN ${prefix}ACT_HI_PROCINST PI
-          ON ACT.PROC_INST_ID_ = PI.ID_
+
+          <if test="startedBefore != null || startedAfter != null || finishedBefore != null || finishedAfter != null">
+            INNER JOIN ${prefix}ACT_HI_PROCINST PI
+            ON ACT.PROC_INST_ID_ = PI.ID_
+          </if>
 
           where ACT.PROC_DEF_ID_ = #{processDefinitionId}
             <if test="!includeFinished">
-            and (
-              ACT.END_TIME_ is null
-            <if test="includeCanceled">
-            or ACT.ACT_INST_STATE_ = 2
-            </if>
-            <if test="includeCompleteScope">
-            or ACT.ACT_INST_STATE_ = 1
-            </if>
-            )
+              and (
+                ACT.END_TIME_ is null
+              <if test="includeCanceled">
+                or ACT.ACT_INST_STATE_ = 2
+              </if>
+              <if test="includeCompleteScope">
+                or ACT.ACT_INST_STATE_ = 1
+              </if>
+              )
             </if>
 
-          <!-- should apply the same filters for #selectHistoricActivityStatisticsWithIncident -->
           <include refid="applyStatisticsFilters" />
+
+          <if test="processInstanceIds != null">
+            and ACT.PROC_INST_ID_ in
+            <foreach item="processInstanceId" index="index" collection="processInstanceIds"
+                open="(" separator="," close=")">
+              #{processInstanceId}
+            </foreach>
+          </if>
 
           GROUP BY ACT_ID_
 
-        ) RES
+      <if test="includeIncidents">
+        UNION
+            select
+              INC.ACTIVITY_ID_ as ID_,
+              0 as INSTANCE_COUNT_
+              <if test="includeFinished">
+              , 0 as FINISHED_COUNT_
+              </if>
+              <if test="includeCanceled">
+              , 0 as CANCELED_COUNT_
+              </if>
+              <if test="includeCompleteScope">
+              , 0 as COMPLETE_SCOPE_COUNT_
+              </if>
+              , sum(CASE WHEN INC.INCIDENT_STATE_ = 0 THEN 1 ELSE 0 END) as OPEN_INCIDENT_COUNT_
+              , sum(CASE WHEN INC.INCIDENT_STATE_ = 1 THEN 1 ELSE 0 END) as RESOLVED_INCIDENT_COUNT_
+              , sum(CASE WHEN INC.INCIDENT_STATE_ = 2 THEN 1 ELSE 0 END) as DELETED_INCIDENT_COUNT_
+            from ${prefix}ACT_HI_INCIDENT INC
+
+            <if test="startedBefore != null || startedAfter != null || finishedBefore != null || finishedAfter != null">
+              INNER JOIN ${prefix}ACT_HI_PROCINST PI
+              ON INC.PROC_INST_ID_ = PI.ID_
+            </if>
+
+            where INC.PROC_DEF_ID_ = #{processDefinitionId}
+
+            <include refid="applyStatisticsFilters" />
+
+            <if test="processInstanceIds != null">
+              and INC.PROC_INST_ID_ in
+              <foreach item="processInstanceId" index="index" collection="processInstanceIds"
+                  open="(" separator="," close=")">
+                #{processInstanceId}
+              </foreach>
+            </if>
+
+            GROUP BY INC.ACTIVITY_ID_
+      ) RES
+      GROUP BY ID_
+      </if>
+
+    ) RES
   </sql>
 
   <sql id="applyStatisticsFilters">
@@ -114,31 +195,7 @@
     <if test="finishedAfter != null">
       and PI.END_TIME_ &gt;= #{finishedAfter}
     </if>
-    <if test="processInstanceIds != null">
-      and PI.ID_ in
-      <foreach item="processInstanceId" index="index" collection="processInstanceIds"
-          open="(" separator="," close=")">
-        #{processInstanceId}
-      </foreach>
-    </if>
   </sql>
-
-  <select id ="selectHistoricActivityStatisticsWithIncident" resultMap="historicActivityStatisticsResultMap"
-    parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
-    select
-      INC.ACTIVITY_ID_ as ID_,
-      sum(CASE WHEN INC.INCIDENT_STATE_ = 1 or INC.INCIDENT_STATE_ = 2 THEN 1 ELSE 0 END) as CLOSED_INCIDENT_COUNT_
-    from ${prefix}ACT_HI_INCIDENT INC
-
-    inner join ${prefix}ACT_HI_PROCINST PI
-    on INC.PROC_INST_ID_ = PI.ID_
-
-    where INC.PROC_DEF_ID_ = #{processDefinitionId}
-
-    <include refid="applyStatisticsFilters" />
-
-    GROUP BY INC.ACTIVITY_ID_
-  </select>
 
   <!-- HistoricCaseActivity statistics -->
 
