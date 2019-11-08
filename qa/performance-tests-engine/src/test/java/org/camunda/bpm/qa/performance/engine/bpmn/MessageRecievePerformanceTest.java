@@ -18,14 +18,10 @@ package org.camunda.bpm.qa.performance.engine.bpmn;
 
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.performance.engine.junit.ProcessEnginePerformanceTestCase;
-import org.camunda.bpm.qa.performance.engine.steps.WorkNoFetchLockExternalTaskStep;
 import org.camunda.bpm.qa.performance.engine.steps.CorrelateMessageStep;
-import org.camunda.bpm.qa.performance.engine.steps.ExecuteJobStep;
 import org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants;
-import org.camunda.bpm.qa.performance.engine.steps.SignalExecutionStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
-import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.TASK_ID;
 
 /**
  * @author: Falko Menge & Paul Lungu

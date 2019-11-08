@@ -19,7 +19,6 @@ package org.camunda.bpm.qa.performance.engine.bpmn;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.qa.performance.engine.bpmn.delegate.NoopDelegate;
@@ -52,7 +51,7 @@ public class ServiceTaskPerformanceTest extends ProcessEnginePerformanceTestCase
       .endEvent()
       .done();
 
-    Deployment deployment = repositoryService.createDeployment()
+    repositoryService.createDeployment()
       .addModelInstance("process.bpmn", process)
       .deploy();
 
