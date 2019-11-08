@@ -17,6 +17,11 @@
 package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
+import java.util.Scanner;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -24,15 +29,10 @@ import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaCon
 import org.camunda.bpm.spring.boot.starter.util.CamundaBpmVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
-import java.util.Scanner;
-
 public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
 
-  protected static final String LICENSE_KEY_PROPERTY = "camunda-license-key";
   protected static final String DEFAULT_LICENSE_FILE = "camunda-license.txt";
+  private static final String LICENSE_HEADER_FOOTER_REGEX = "(?i)[-\\s]*(BEGIN|END)\\s*(OPTIMIZE|CAMUNDA|CAMUNDA\\s*BPM)\\s*LICENSE\\s*KEY[-\\s]*";
 
   @Autowired
   protected CamundaBpmVersion version;
@@ -60,9 +60,7 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
     }
 
     // if a license key is already present in the database, return
-    Optional<String> existingLicenseKey = Optional.ofNullable(processEngine.getManagementService()
-                     .getProperties()
-                     .get(LICENSE_KEY_PROPERTY));
+    Optional<String> existingLicenseKey = Optional.ofNullable(getLicenseKey(processEngine));
     if (existingLicenseKey.isPresent()) {
       return;
     }
@@ -71,8 +69,7 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
     ProcessEngineConfigurationImpl processEngineConfiguration =
       (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
-      processEngineConfiguration.getManagementService()
-                                .setProperty(LICENSE_KEY_PROPERTY, finalLicenseKey.get());
+      setLicenseKey(processEngine, finalLicenseKey.get());
       return null;
     });
 
@@ -86,12 +83,20 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
     try {
       return Optional.of(new Scanner(licenseFileUrl.openStream(), "UTF-8").useDelimiter("\\A"))
         .filter(Scanner::hasNext).map(Scanner::next)
-        .map(s -> s.split("---------------")[2])
+        .map(s -> s.replaceAll(LICENSE_HEADER_FOOTER_REGEX, ""))
         .map(s -> s.replaceAll("\\n", ""))
         .map(String::trim);
     } catch (IOException e) {
       LOG.enterLicenseKeyFailed(licenseFileUrl, e);
       return Optional.empty();
     }
+  }
+
+  protected String getLicenseKey(ProcessEngine processEngine) {
+    return processEngine.getManagementService().getLicenseKey();
+  }
+
+  private void setLicenseKey(ProcessEngine processEngine, String license) {
+    processEngine.getManagementService().setLicenseKey(license);
   }
 }
