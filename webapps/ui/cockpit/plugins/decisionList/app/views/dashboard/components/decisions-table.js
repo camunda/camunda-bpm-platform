@@ -38,9 +38,9 @@ module.exports = function() {
       function($scope, localConf, $translate) {
         // prettier-ignore
         $scope.headColumns = [
-          { class: 'name',     request: 'name'          , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_NAME')},
-          { class: 'tenant-id', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_TENANT_ID')},
-          { class: 'drd',  request: 'drd.name', sortable: false, content: $translate.instant('PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS'), condition: $scope.isDrdAvailable}
+          {class: 'name', request: 'name', sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_NAME')},
+          {class: 'tenant-id', request: 'tenantId', sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_TENANT_ID')},
+          {class: 'drd', request: 'decisionRequirementsDefinitionKey', sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS'), condition: $scope.isDrdAvailable}
         ];
 
         // Default sorting
