@@ -30,17 +30,14 @@ import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.TASK
 /**
  * @author: Falko Menge & Paul Lungu
  */
-public class CallActivityPerformanceTest extends ProcessEnginePerformanceTestCase {
+public class ServiceTask20ActivityPerformanceTest extends ProcessEnginePerformanceTestCase {
     
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/qa/performance/engine/bpmn/NFT_TEST_FLOW_Business_20.bpmn",
-      "org/camunda/bpm/qa/performance/engine/bpmn/NFT_BUSINESS_SUB_PROCESS.bpmn"})
-  public void sequence20CallActivities() {
+  @Deployment(resources = {"org/camunda/bpm/qa/performance/engine/bpmn/NFT_TEST_FLOW_Service_20.bpmn"})
+  public void sequence20ServiceTasks() {
 
-	performanceTest()
-        .step(new StartProcessInstanceStep(engine, "NFT_TEST_FLOW_Business_20"))
-//        .steps(1, new ExecuteJobStep(engine))
+    performanceTest()
+        .step(new StartProcessInstanceStep(engine, "NFT_TEST_FLOW_Service_20"))
         .run();
   }
   

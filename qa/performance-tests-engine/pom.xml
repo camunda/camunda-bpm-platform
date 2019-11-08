@@ -246,7 +246,9 @@
         <numberOfThreads>1</numberOfThreads>
         <numberOfRuns>1</numberOfRuns>
         <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
-        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin,org.camunda.bpm.qa.performance.engine.junit.ExternalTaskRecorderProcessEnginePlugin</processEnginePlugins>
+        <processEnginePlugins>
+        	org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin,org.camunda.bpm.qa.performance.engine.junit.ExternalTaskRecorderProcessEnginePlugin
+        </processEnginePlugins>
         <watchActivities />
         <test.excludes>query</test.excludes>
       </properties>
