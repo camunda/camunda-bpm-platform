@@ -84,7 +84,7 @@ public class TaskManager extends AbstractManager {
         ((TaskEntity) subTask).delete(deleteReason, cascade, skipCustomListeners);
       }
 
-      task.deleteIdentityLinks(false);
+      task.deleteIdentityLinks();
 
       commandContext
         .getVariableInstanceManager()
@@ -98,11 +98,6 @@ public class TaskManager extends AbstractManager {
         commandContext
           .getHistoricTaskInstanceManager()
           .markTaskInstanceEnded(taskId, deleteReason);
-        if (TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
-          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
-        } else {
-          task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_DELETE);
-        }
       }
 
       deleteAuthorizations(Resources.TASK, taskId);

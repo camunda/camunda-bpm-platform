@@ -34,7 +34,7 @@ public class AssignTaskCmd extends AddIdentityLinkCmd {
   @Override
   public Void execute(CommandContext commandContext) {
     super.execute(commandContext);
-    task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_ASSIGN);
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_ASSIGN);
     return null;
   }
 }

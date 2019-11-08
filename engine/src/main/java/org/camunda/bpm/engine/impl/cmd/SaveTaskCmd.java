@@ -73,7 +73,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       task.triggerUpdateEvent();
     }
 
-    task.createHistoricTaskDetails(operation);
+    task.logUserOperation(operation);
 
     return null;
   }
