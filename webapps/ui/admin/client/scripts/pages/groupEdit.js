@@ -81,8 +81,16 @@ var Controller = [
     $scope.groupUserList = null;
     $scope.tenantList = null;
 
-    var groupUserPages = ($scope.groupUserPages = {size: 25, total: 0});
-    var groupTenantPages = ($scope.groupTenantPages = {size: 25, total: 0});
+    var groupUserPages = ($scope.groupUserPages = {
+      size: 25,
+      total: 0,
+      current: 1
+    });
+    var groupTenantPages = ($scope.groupTenantPages = {
+      size: 25,
+      total: 0,
+      current: 1
+    });
 
     var tenantsSorting = ($scope.tenantsSorting = null);
     var usersSorting = null;
