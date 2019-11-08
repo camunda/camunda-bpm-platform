@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagationException;
@@ -750,12 +751,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void deleteIdentityLinks(boolean withHistory) {
+  public void deleteIdentityLinks() {
     List<IdentityLinkEntity> identityLinkEntities = getIdentityLinks();
     for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
       fireDeleteIdentityLinkAuthorizationProvider(identityLinkEntity.getType(),
         identityLinkEntity.getUserId(), identityLinkEntity.getGroupId());
-      identityLinkEntity.delete(withHistory);
+      identityLinkEntity.delete(false);
     }
     isIdentityLinksInitialized = false;
   }
@@ -1501,7 +1502,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public void setDeleted(boolean isDeleted) {
-    propertyChanged(DELETE, this.isDeleted, isDeleted);
     this.isDeleted = isDeleted;
   }
 
@@ -1569,7 +1569,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return propertyChanges;
   }
 
-  public void createHistoricTaskDetails(String operation) {
+  public void logUserOperation(String operation) {
+    if (UserOperationLogEntry.OPERATION_TYPE_COMPLETE.equals(operation) ||
+        UserOperationLogEntry.OPERATION_TYPE_DELETE.equals(operation)) {
+      propertyChanged(DELETE, false, true);
+    }
+
     final CommandContext commandContext = Context.getCommandContext();
     if (commandContext != null) {
       List<PropertyChange> values = new ArrayList<>(propertyChanges.values());

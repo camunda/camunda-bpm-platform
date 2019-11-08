@@ -134,7 +134,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     Map<String, PropertyChange> changes = entity.getPropertyChanges();
     assertEquals("er", changes.get(ASSIGNEE).getNewValue());
     assertSame(DelegationState.PENDING, changes.get(DELEGATION).getNewValue());
-    assertTrue((Boolean) changes.get(DELETE).getNewValue());
     assertEquals("a description", changes.get(DESCRIPTION).getNewValue());
     assertEquals(tomorrow, changes.get(DUE_DATE).getNewValue());
     assertEquals(yesterday, changes.get(FOLLOW_UP_DATE).getNewValue());
@@ -142,6 +141,8 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals("icke", changes.get(OWNER).getNewValue());
     assertEquals("parent", changes.get(PARENT_TASK).getNewValue());
     assertEquals(73, changes.get(PRIORITY).getNewValue());
+
+    // DELETE property is not validated here; it is set directly on task deletion
   }
 
   public void testDeleteTask() {

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -311,6 +312,31 @@ public class ModificationUserOperationLogTest {
     assertEquals(1, logs.size());
 
     assertEquals(annotation, logs.get(0).getAnnotation());
+  }
+
+
+  @Test
+  public void testModificationLogShouldNotIncludeEntryForTaskDeletion() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    identityService.setAuthenticatedUserId("userId");
+
+    // when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("user1")
+        .execute();
+
+    identityService.clearAuthentication();
+
+    // then
+    List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().list();
+    assertEquals(1, logs.size());
+
+    UserOperationLogEntry userOperationLogEntry = logs.get(0);
+    assertThat(userOperationLogEntry.getEntityType()).isEqualTo("ProcessInstance");
+    assertThat(userOperationLogEntry.getOperationType()).isEqualTo("ModifyProcessInstance");
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {

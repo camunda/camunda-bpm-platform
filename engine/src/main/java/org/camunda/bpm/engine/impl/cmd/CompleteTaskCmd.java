@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -95,6 +96,7 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
   }
 
   protected void completeTask(TaskEntity task) {
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     task.complete();
   }
 
