@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +79,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected Boolean variableUpdates;
   protected Boolean excludeTaskDetails;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
   protected String[] processInstanceIdIn;
   protected String userOperationId;
   private Date occurredBefore;
@@ -149,11 +152,15 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @CamundaQueryParam(value="processInstanceIdIn", converter = StringArrayConverter.class)
   public void setProcessInstanceIdIn(String[] processInstanceIdIn) {
     this.processInstanceIdIn = processInstanceIdIn;
   }
-
 
   @CamundaQueryParam(value = "userOperationId")
   public void setUserOperationId(String userOperationId) {
@@ -237,6 +244,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (processInstanceIdIn != null && processInstanceIdIn.length > 0) {
       query.processInstanceIdIn(processInstanceIdIn);

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,20 +37,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricActivityInstanceQuery> {
 
-  private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE = "activityInstanceId";
-  private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
-  private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
-  private static final String SORT_BY_ACTIVITY_ID_VALUE = "activityId";
-  private static final String SORT_BY_ACTIVITY_NAME_VALUE = "activityName";
-  private static final String SORT_BY_ACTIVITY_TYPE_VALUE = "activityType";
-  private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE = "startTime";
-  private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
-  private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
-  private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
-  private static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
-  private static final String SORT_BY_TENANT_ID = "tenantId";
+  protected static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE = "activityInstanceId";
+  protected static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+  protected static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
+  protected static final String SORT_BY_ACTIVITY_ID_VALUE = "activityId";
+  protected static final String SORT_BY_ACTIVITY_NAME_VALUE = "activityName";
+  protected static final String SORT_BY_ACTIVITY_TYPE_VALUE = "activityType";
+  protected static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE = "startTime";
+  protected static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
+  protected static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
+  protected static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
+  protected static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
+  protected static final String SORT_BY_TENANT_ID = "tenantId";
 
-  private static final List<String> VALID_SORT_BY_VALUES;
+  protected static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE);
@@ -65,23 +67,24 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
-  private String activityInstanceId;
-  private String processInstanceId;
-  private String processDefinitionId;
-  private String executionId;
-  private String activityId;
-  private String activityName;
-  private String activityType;
-  private String taskAssignee;
-  private Boolean finished;
-  private Boolean unfinished;
-  private Boolean completeScope;
-  private Boolean canceled;
-  private Date startedBefore;
-  private Date startedAfter;
-  private Date finishedBefore;
-  private Date finishedAfter;
-  private List<String> tenantIds;
+  protected String activityInstanceId;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String executionId;
+  protected String activityId;
+  protected String activityName;
+  protected String activityType;
+  protected String taskAssignee;
+  protected Boolean finished;
+  protected Boolean unfinished;
+  protected Boolean completeScope;
+  protected Boolean canceled;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Date finishedBefore;
+  protected Date finishedAfter;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   public HistoricActivityInstanceQueryDto() {
   }
@@ -175,6 +178,11 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -237,6 +245,9 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
   }
 

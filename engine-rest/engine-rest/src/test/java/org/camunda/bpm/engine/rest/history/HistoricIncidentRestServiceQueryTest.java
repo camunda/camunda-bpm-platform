@@ -31,8 +31,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -604,6 +606,31 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    mockedQuery = setUpMockHistoricIncidentQuery(Collections.singletonList(MockProvider.createMockHistoricIncident(null)));
+
+    // when
+    Response response = given()
+        .queryParam("withoutTenantId", true)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORY_INCIDENT_QUERY_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   @Test

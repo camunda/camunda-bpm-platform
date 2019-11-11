@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,6 +88,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected Boolean completed;
   protected Boolean terminated;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   public HistoricCaseActivityInstanceQueryDto() {
   }
@@ -209,6 +212,11 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -289,6 +297,9 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
   }
 

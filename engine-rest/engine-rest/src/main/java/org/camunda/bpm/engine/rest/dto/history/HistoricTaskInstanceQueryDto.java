@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -131,7 +133,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskFollowUpDate;
   protected Date taskFollowUpDateBefore;
   protected Date taskFollowUpDateAfter;
-  private List<String> tenantIds;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   protected Date startedBefore;
   protected Date startedAfter;
@@ -398,6 +401,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @CamundaQueryParam("taskInvolvedUser")
   public void setTaskInvolvedUser(String taskInvolvedUser) {
     this.taskInvolvedUser = taskInvolvedUser;
@@ -598,6 +606,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
     if(taskInvolvedUser != null){
       query.taskInvolvedUser(taskInvolvedUser);
     }
@@ -633,11 +644,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
       query.startedBefore(startedBefore);
     }
 
-    if (Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+    if (TRUE.equals(variableNamesIgnoreCase)) {
       query.matchVariableNamesIgnoreCase();
     }
 
-    if (Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+    if (TRUE.equals(variableValuesIgnoreCase)) {
       query.matchVariableValuesIgnoreCase();
     }
 
