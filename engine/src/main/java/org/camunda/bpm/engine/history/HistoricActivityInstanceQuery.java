@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.history;
 import java.util.Date;
 
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 
 /**
@@ -32,7 +33,7 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   HistoricActivityInstanceQuery activityInstanceId(String activityInstanceId);
 
   /** Only select historic activity instances with the given process instance.
-   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
+   * {@link ProcessInstance ) ids and {@link HistoricProcessInstance} ids match. */
   HistoricActivityInstanceQuery processInstanceId(String processInstanceId);
 
   /** Only select historic activity instances for the given process definition */
@@ -131,6 +132,9 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
 
   /** Only select historic activity instances with one of the given tenant ids. */
   HistoricActivityInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic activity instances that have no tenant id. */
+  HistoricActivityInstanceQuery withoutTenantId();
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

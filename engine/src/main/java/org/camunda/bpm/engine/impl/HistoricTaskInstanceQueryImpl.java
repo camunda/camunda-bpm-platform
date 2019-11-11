@@ -85,7 +85,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date followUpBefore;
 
   protected Date followUpAfter;
+
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
+
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
   protected String caseDefinitionName;
@@ -488,6 +491,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public HistoricTaskInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -933,6 +944,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public Date getStartedBefore() {
     return startedBefore;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
   public List<HistoricTaskInstanceQueryImpl> getQueries() {

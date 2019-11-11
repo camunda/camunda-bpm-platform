@@ -75,6 +75,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   protected String decisionRequirementsDefinitionKey;
 
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   public HistoricDecisionInstanceQueryImpl() {
   }
@@ -206,6 +207,14 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   public HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet =  true;
+    return this;
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -368,5 +377,9 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   public String getDecisionRequirementsDefinitionKey() {
     return decisionRequirementsDefinitionKey;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 }

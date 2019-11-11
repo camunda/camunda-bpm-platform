@@ -39,10 +39,8 @@ import java.util.List;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_PROCESS_KEY;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricExternalTaskLogTest {
@@ -60,6 +58,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected final String TENANT_NULL = null;
   protected final String TENANT_ONE = "tenant1";
   protected final String TENANT_TWO = "tenant2";
 
@@ -76,6 +75,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     identityService = engineRule.getIdentityService();
     externalTaskService = engineRule.getExternalTaskService();
 
+    testRule.deployForTenant(TENANT_NULL, ONE_EXTERNAL_TASK_PROCESS);
     testRule.deployForTenant(TENANT_ONE, ONE_EXTERNAL_TASK_PROCESS);
     testRule.deployForTenant(TENANT_TWO, ONE_EXTERNAL_TASK_PROCESS);
 
@@ -84,7 +84,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   @Test
-  public void testQueryWithoutTenantId() {
+  public void shouldQueryWithoutTenantId() {
 
     //given two process with different tenants
 
@@ -93,11 +93,25 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       createHistoricExternalTaskLogQuery();
 
     // then
-    assertThat(query.count(), is(5L));
+    assertThat(query.count()).isEqualTo(5L);
   }
 
   @Test
-  public void testQueryByTenantId() {
+  public void shouldQueryFilterWithoutTenantId() {
+    // given
+    startProcessInstanceAndFailExternalTask(TENANT_NULL);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService
+        .createHistoricExternalTaskLogQuery()
+        .withoutTenantId();
+
+    // then
+    assertThat(query.count()).isEqualTo(2L);
+  }
+
+  @Test
+  public void shouldQueryByTenantId() {
 
     // given two process with different tenants
 
@@ -110,12 +124,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       .tenantIdIn(TENANT_TWO);
 
     // then
-    assertThat(queryTenant1.count(), is(2L));
-    assertThat(queryTenant2.count(), is(3L));
+    assertThat(queryTenant1.count()).isEqualTo(2L);
+    assertThat(queryTenant2.count()).isEqualTo(3L);
   }
 
   @Test
-  public void testQueryByTenantIds() {
+  public void shouldQueryByTenantIds() {
 
     //given two process with different tenants
 
@@ -125,11 +139,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     // then
-    assertThat(query.count(), is(5L));
+    assertThat(query.count()).isEqualTo(5L);
   }
 
   @Test
-  public void testQueryByNonExistingTenantId() {
+  public void shouldQueryByNonExistingTenantId() {
 
     //given two process with different tenants
 
@@ -139,23 +153,26 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       .tenantIdIn("nonExisting");
 
     // then
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
-  public void testFailQueryByTenantIdNull() {
+  public void shouldFailQueryByTenantIdNull() {
     try {
+      // when
       historyService.createHistoricExternalTaskLogQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
+
+      // then
     } catch (NullValueException e) {
       // test passed
     }
   }
 
   @Test
-  public void testQuerySortingAsc() {
+  public void shouldQuerySortingAsc() {
 
     //given two process with different tenants
 
@@ -166,16 +183,16 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       .list();
 
     // then
-    assertThat(HistoricExternalTaskLogs.size(), is(5));
-    assertThat(HistoricExternalTaskLogs.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(HistoricExternalTaskLogs.get(1).getTenantId(), is(TENANT_ONE));
-    assertThat(HistoricExternalTaskLogs.get(2).getTenantId(), is(TENANT_TWO));
-    assertThat(HistoricExternalTaskLogs.get(3).getTenantId(), is(TENANT_TWO));
-    assertThat(HistoricExternalTaskLogs.get(4).getTenantId(), is(TENANT_TWO));
+    assertThat(HistoricExternalTaskLogs.size()).isEqualTo(5);
+    assertThat(HistoricExternalTaskLogs.get(0).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(HistoricExternalTaskLogs.get(1).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(HistoricExternalTaskLogs.get(2).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(HistoricExternalTaskLogs.get(3).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(HistoricExternalTaskLogs.get(4).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
-  public void testQuerySortingDesc() {
+  public void shouldQuerySortingDesc() {
 
     //given two process with different tenants
 
@@ -186,16 +203,16 @@ public class MultiTenancyHistoricExternalTaskLogTest {
       .list();
 
     // then
-    assertThat(HistoricExternalTaskLogs.size(), is(5));
-    assertThat(HistoricExternalTaskLogs.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(HistoricExternalTaskLogs.get(1).getTenantId(), is(TENANT_TWO));
-    assertThat(HistoricExternalTaskLogs.get(2).getTenantId(), is(TENANT_TWO));
-    assertThat(HistoricExternalTaskLogs.get(3).getTenantId(), is(TENANT_ONE));
-    assertThat(HistoricExternalTaskLogs.get(4).getTenantId(), is(TENANT_ONE));
+    assertThat(HistoricExternalTaskLogs.size()).isEqualTo(5);
+    assertThat(HistoricExternalTaskLogs.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(HistoricExternalTaskLogs.get(1).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(HistoricExternalTaskLogs.get(2).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(HistoricExternalTaskLogs.get(3).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(HistoricExternalTaskLogs.get(4).getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
-  public void testQueryNoAuthenticatedTenants() {
+  public void shouldQueryNoAuthenticatedTenants() {
 
     // given
     identityService.setAuthentication("user", null, null);
@@ -204,11 +221,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
 
     // then
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
-  public void testQueryAuthenticatedTenant() {
+  public void shouldQueryAuthenticatedTenant() {
     // given
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
@@ -216,14 +233,14 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
 
     // then
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(2L);
   }
 
   @Test
-  public void testQueryAuthenticatedTenants() {
+  public void shouldQueryAuthenticatedTenants() {
     // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -231,13 +248,13 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
 
     // then
-    assertThat(query.count(), is(5L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(3L));
+    assertThat(query.count()).isEqualTo(5L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(3L);
   }
 
   @Test
-  public void testQueryDisabledTenantCheck() {
+  public void shouldQueryDisabledTenantCheck() {
     // given
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
@@ -246,11 +263,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
 
     // then
-    assertThat(query.count(), is(5L));
+    assertThat(query.count()).isEqualTo(5L);
   }
 
   @Test
-  public void testGetErrorDetailsNoAuthenticatedTenants() {
+  public void shouldGetErrorDetailsNoAuthenticatedTenants() {
     // given
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
@@ -271,14 +288,14 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     } catch (ProcessEngineException e) {
       // then
       String errorMessage = e.getMessage();
-      assertThat(errorMessage.contains("Cannot get the historic external task log "), is(true));
-      assertThat(errorMessage.contains(failedHistoricExternalTaskLogId), is(true));
-      assertThat(errorMessage.contains("because it belongs to no authenticated tenant."), is(true));
+      assertThat(errorMessage.contains("Cannot get the historic external task log ")).isEqualTo(true);
+      assertThat(errorMessage.contains(failedHistoricExternalTaskLogId)).isEqualTo(true);
+      assertThat(errorMessage.contains("because it belongs to no authenticated tenant.")).isEqualTo(true);
     }
   }
 
   @Test
-  public void testGetErrorDetailsAuthenticatedTenant() {
+  public void shouldGetErrorDetailsAuthenticatedTenant() {
     // given
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
@@ -293,12 +310,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
 
     // then
-    assertThat(stacktrace, is(notNullValue()));
-    assertThat(stacktrace, is(ERROR_DETAILS));
+    assertThat(stacktrace).isNotNull();
+    assertThat(stacktrace).isEqualTo(ERROR_DETAILS);
   }
 
   @Test
-  public void testGetErrorDetailsAuthenticatedTenants() {
+  public void shouldGetErrorDetailsAuthenticatedTenants() {
     // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -321,10 +338,10 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     String stacktrace2 = historyService.getHistoricExternalTaskLogErrorDetails(logIdTenant2);
 
     // then
-    assertThat(stacktrace1, is(notNullValue()));
-    assertThat(stacktrace1, is(ERROR_DETAILS));
-    assertThat(stacktrace2, is(notNullValue()));
-    assertThat(stacktrace2, is(ERROR_DETAILS));
+    assertThat(stacktrace1).isNotNull();
+    assertThat(stacktrace1).isEqualTo(ERROR_DETAILS);
+    assertThat(stacktrace2).isNotNull();
+    assertThat(stacktrace2).isEqualTo(ERROR_DETAILS);
   }
 
   // helper methods

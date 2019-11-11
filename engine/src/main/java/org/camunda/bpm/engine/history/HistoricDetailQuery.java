@@ -110,6 +110,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic details with one of the given tenant ids. */
   HistoricDetailQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic details that have no tenant id. */
+  HistoricDetailQuery withoutTenantId();
+
   /** Only select historic details with the given process instance ids. */
   HistoricDetailQuery processInstanceIdIn(String... processInstanceIds);
 

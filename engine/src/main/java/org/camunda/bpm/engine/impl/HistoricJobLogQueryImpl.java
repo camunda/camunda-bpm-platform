@@ -55,6 +55,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected Long jobPriorityHigherThanOrEqual;
   protected Long jobPriorityLowerThanOrEqual;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   public HistoricJobLogQueryImpl() {
   }
@@ -154,6 +155,14 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   public HistoricJobLogQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricJobLogQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -271,6 +280,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   // getter //////////////////////////////////
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 
   public String getJobId() {
     return jobId;

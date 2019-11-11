@@ -58,6 +58,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Integer caseActivityInstanceState;
   protected Boolean required;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   public HistoricCaseActivityInstanceQueryImpl() {
   }
@@ -215,6 +216,14 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricCaseActivityInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -335,4 +344,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return required;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 }

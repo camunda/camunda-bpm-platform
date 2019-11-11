@@ -52,6 +52,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected Date finishedAfter;
   protected ActivityInstanceState activityInstanceState;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   public HistoricActivityInstanceQueryImpl() {
   }
@@ -161,6 +162,14 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   public HistoricActivityInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -283,5 +292,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   }
   public ActivityInstanceState getActivityInstanceState() {
     return activityInstanceState;
+  }
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 }

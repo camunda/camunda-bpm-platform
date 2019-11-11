@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -68,6 +68,7 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
 
   protected static final String A_USER_ID = "aUserId";
 
+  protected final static String TENANT_NULL = null;
   protected final static String TENANT_1 = "tenant1";
   protected final static String TENANT_2 = "tenant2";
   protected final static String TENANT_3 = "tenant3";
@@ -87,57 +88,61 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
     .done();
 
     // deploy tenants
+    testRule.deployForTenant(TENANT_NULL, oneTaskProcess);
     testRule.deployForTenant(TENANT_1, oneTaskProcess);
     testRule.deployForTenant(TENANT_2, oneTaskProcess);
-    testRule.deployForTenant(TENANT_3, oneTaskProcess);  
+    testRule.deployForTenant(TENANT_3, oneTaskProcess);
   }
 
   @Test
-  public void addandDeleteHistoricIdentityLinkForSingleTenant() {
-
+  public void shouldAddAndDeleteHistoricIdentityLinkForSingleTenant() {
+    // given
     startProcessInstanceForTenant(TENANT_1);
-    
-    HistoricIdentityLinkLog historicIdentityLink = historyService
-        .createHistoricIdentityLinkLogQuery()
-        .singleResult();
-    
+    HistoricIdentityLinkLogQuery query = historyService
+        .createHistoricIdentityLinkLogQuery();
+
+    // when
+    HistoricIdentityLinkLog historicIdentityLink = query.singleResult();
     taskService.deleteCandidateUser(historicIdentityLink.getTaskId(), A_USER_ID);
     
-    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_1).count(), 2);
-    
+    // then
+    assertThat(query.tenantIdIn(TENANT_1).count()).isEqualTo(2L);
   }
 
   @Test
-  public void historicIdentityLinkForMultipleTenant() {
+  public void shouldQueryWithoutTenantId() {
+    // given
+    startProcessInstanceForTenant(TENANT_NULL);
     startProcessInstanceForTenant(TENANT_1);
-    
-    // Query test
-    HistoricIdentityLinkLog historicIdentityLink = historyService
+
+    // when
+    HistoricIdentityLinkLogQuery query = historyService
         .createHistoricIdentityLinkLogQuery()
-        .singleResult();
-    
-    assertEquals(historicIdentityLink.getTenantId(), TENANT_1);
-    
-    // start process instance for another tenant
-    startProcessInstanceForTenant(TENANT_2);
-    
-    // Query test
-    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
-    .createHistoricIdentityLinkLogQuery()
-    .list();
+        .withoutTenantId();
 
-    assertEquals(historicIdentityLinks.size(), 2);
-
-    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_1).count(), 1);
-    
-    query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_2).count(), 1);
+    // then
+    assertThat(query.count()).isEqualTo(1L);
   }
-  
+
   @Test
-  public void addAndRemoveHistoricIdentityLinksForProcessDefinitionWithTenantId() throws Exception {
+  public void shouldAddHistoricIdentityLinkForMultipleTenants() {
+    // given
+    startProcessInstanceForTenant(TENANT_1);
+    startProcessInstanceForTenant(TENANT_2);
+
+    // when
+    HistoricIdentityLinkLogQuery query = historyService
+        .createHistoricIdentityLinkLogQuery();
+
+    // then
+    assertThat(query.list().size()).isEqualTo(2);
+    assertThat(query.tenantIdIn(TENANT_1).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_2).count()).isEqualTo(1L);
+  }
+
+  @Test
+  public void shouldAddAndRemoveHistoricIdentityLinksForProcessDefinitionWithTenantId() throws Exception {
+    // given
     String resourceName = "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";
     testRule.deployForTenant(TENANT_1, resourceName);
     testRule.deployForTenant(TENANT_2, resourceName);
@@ -153,41 +158,25 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
       .list()
       .get(1);
 
-    assertNotNull(processDefinition1);
-    assertNotNull(processDefinition2);
+    // assume
+    assertThat(processDefinition1).isNotNull();
+    assertThat(processDefinition2).isNotNull();
 
-    testTenantsByProcessDefinition(processDefinition1.getId());   
-    testTenantsByProcessDefinition(processDefinition2.getId());
-    
-    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
-        .createHistoricIdentityLinkLogQuery()
-        .list();
-    
-    assertEquals(historicIdentityLinks.size(), 8);
+    // when
+    createIdentityLinks(processDefinition1.getId());
+    createIdentityLinks(processDefinition2.getId());
 
-    // Query test
+    // then
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_1).count(), 4);
-    query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_2).count(), 4);
-  }
-
-  @SuppressWarnings("deprecation")
-  public void testTenantsByProcessDefinition(String processDefinitionId) {
-    
-    repositoryService.addCandidateStarterGroup(processDefinitionId, GROUP_1);
-    
-    repositoryService.addCandidateStarterUser(processDefinitionId, USER_1);
-    
-    repositoryService.deleteCandidateStarterGroup(processDefinitionId, GROUP_1);
-
-    repositoryService.deleteCandidateStarterUser(processDefinitionId, USER_1);
-
+    assertThat(query.count()).isEqualTo(8);
+    assertThat(query.tenantIdIn(TENANT_1).count()).isEqualTo(4L);
+    assertThat(query.tenantIdIn(TENANT_2).count()).isEqualTo(4L);
   }
 
   @SuppressWarnings("deprecation")
   @Test
-  public void identityLinksForProcessDefinitionWithTenantId() throws Exception {
+  public void shouldAddIdentityLinksForProcessDefinitionWithTenantId() throws Exception {
+    // given
     String resourceName = "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";
     testRule.deployForTenant(TENANT_1, resourceName);
     testRule.deployForTenant(TENANT_2, resourceName);
@@ -198,56 +187,64 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
         .list()
         .get(0);
 
-    assertNotNull(processDefinition1);
-
-    // Add candidate group with process definition 1
-    repositoryService.addCandidateStarterGroup(processDefinition1.getId(), GROUP_1);
-
-    // Add candidate user for process definition 2
-    repositoryService.addCandidateStarterUser(processDefinition1.getId(), USER_1);
-
     ProcessDefinition processDefinition2 = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey(PROCESS_DEFINITION_KEY)
         .list()
         .get(1);
-    
-    assertNotNull(processDefinition2);
 
-    // Add candidate group with process definition 2
-    repositoryService.addCandidateStarterGroup(processDefinition2.getId(), GROUP_1);
+    assertThat(processDefinition1).isNotNull();
+    assertThat(processDefinition2).isNotNull();
 
-    // Add candidate user for process definition 2
-    repositoryService.addCandidateStarterUser(processDefinition2.getId(), USER_1);
+    // when
+    addIdentityLinks(processDefinition1.getId());
+    addIdentityLinks(processDefinition2.getId());
 
+    // then
     // Identity link test
     List<IdentityLink> identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinition1.getId());
-    assertEquals(identityLinks.size(),2);
-    assertEquals(identityLinks.get(0).getTenantId(), TENANT_1);
-    assertEquals(identityLinks.get(1).getTenantId(), TENANT_1);
+    assertThat(identityLinks.size()).isEqualTo(2);
+    assertThat(identityLinks.get(0).getTenantId()).isEqualTo(TENANT_1);
+    assertThat(identityLinks.get(1).getTenantId()).isEqualTo(TENANT_1);
 
     identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinition2.getId());
-    assertEquals(identityLinks.size(),2);
-    assertEquals(identityLinks.get(0).getTenantId(), TENANT_2);
-    assertEquals(identityLinks.get(1).getTenantId(), TENANT_2);
-    
+    assertThat(identityLinks.size()).isEqualTo(2);
+    assertThat(identityLinks.get(0).getTenantId()).isEqualTo(TENANT_2);
+    assertThat(identityLinks.get(1).getTenantId()).isEqualTo(TENANT_2);
   }
 
   @Test
-  public void singleQueryForMultipleTenant() {
+  public void shouldUseSingleQueryForMultipleTenants() {
+    // when
+    startProcessInstanceForTenant(TENANT_NULL);
     startProcessInstanceForTenant(TENANT_1);
     startProcessInstanceForTenant(TENANT_2);
     startProcessInstanceForTenant(TENANT_3);
 
+    // then
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_1, TENANT_2).count(), 2);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1);
+    assertThat(query.tenantIdIn(TENANT_1, TENANT_2).count()).isEqualTo(2);
+    assertThat(query.tenantIdIn(TENANT_2, TENANT_3).count()).isEqualTo(2);
+    assertThat(query.tenantIdIn(TENANT_1, TENANT_2, TENANT_3).count()).isEqualTo(3);
+  }
 
-    query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_2, TENANT_3).count(), 2);
+  @SuppressWarnings("deprecation")
+  protected void createIdentityLinks(String processDefinitionId) {
+    addIdentityLinks(processDefinitionId);
+    deleteIdentityLinks(processDefinitionId);
+  }
 
-    query = historyService.createHistoricIdentityLinkLogQuery();
-    assertEquals(query.tenantIdIn(TENANT_1, TENANT_2, TENANT_3).count(), 3);
+  @SuppressWarnings("deprecation")
+  protected void addIdentityLinks(String processDefinitionId) {
+    repositoryService.addCandidateStarterGroup(processDefinitionId, GROUP_1);
+    repositoryService.addCandidateStarterUser(processDefinitionId, USER_1);
+  }
 
+  @SuppressWarnings("deprecation")
+  protected void deleteIdentityLinks(String processDefinitionId) {
+    repositoryService.deleteCandidateStarterGroup(processDefinitionId, GROUP_1);
+    repositoryService.deleteCandidateStarterUser(processDefinitionId, USER_1);
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
