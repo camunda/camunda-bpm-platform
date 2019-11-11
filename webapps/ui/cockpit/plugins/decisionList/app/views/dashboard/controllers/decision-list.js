@@ -52,7 +52,7 @@ module.exports = [
       sortBy: 'name',
       sortOrder: 'asc'
     });
-    var drdSorting = localConf.get('sortDecReqDefTab', {
+    var drdSorting = localConf.get('sortDRDTab', {
       sortBy: 'name',
       sortOrder: 'asc'
     });
@@ -72,7 +72,7 @@ module.exports = [
 
     function changeDrdSorting(sorting) {
       drdSorting = sorting;
-      localConf.set('sortDecReqDefTab', sorting);
+      localConf.set('sortDRDTab', sorting);
       updateDrdPage();
     }
 
