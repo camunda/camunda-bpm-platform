@@ -18,6 +18,9 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicIncidentByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.Arrays;
 import java.util.List;
@@ -165,9 +168,7 @@ public class MultiTenancyHistoricIncidentQueryTest {
 
     // then
     assertThat(historicIncidents.size()).isEqualTo(3);
-    assertThat(historicIncidents.get(0).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicIncidents.get(1).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicIncidents.get(2).getTenantId()).isEqualTo(TENANT_TWO);
+    verifySorting(historicIncidents, historicIncidentByTenantId());
   }
 
   @Test
@@ -180,9 +181,7 @@ public class MultiTenancyHistoricIncidentQueryTest {
 
     // then
     assertThat(historicIncidents.size()).isEqualTo(3);
-    assertThat(historicIncidents.get(0).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicIncidents.get(1).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicIncidents.get(2).getTenantId()).isEqualTo(TENANT_NULL);
+    verifySorting(historicIncidents, inverted(historicIncidentByTenantId()));
   }
 
   @Test

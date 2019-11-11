@@ -18,6 +18,9 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicDetailByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -188,12 +191,7 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest {
 
     // then
     assertThat(historicDetails.size()).isEqualTo(6);
-    assertThat(historicDetails.get(0).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicDetails.get(1).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicDetails.get(2).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicDetails.get(3).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicDetails.get(4).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicDetails.get(5).getTenantId()).isEqualTo(TENANT_TWO);
+    verifySorting(historicDetails, historicDetailByTenantId());
   }
 
   @Test
@@ -207,12 +205,7 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest {
 
     // then
     assertThat(historicDetails.size()).isEqualTo(6);
-    assertThat(historicDetails.get(0).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicDetails.get(1).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicDetails.get(2).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicDetails.get(3).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicDetails.get(4).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicDetails.get(5).getTenantId()).isEqualTo(TENANT_NULL);
+    verifySorting(historicDetails, inverted(historicDetailByTenantId()));
   }
 
   @Test

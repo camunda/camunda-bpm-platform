@@ -18,6 +18,10 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicTaskInstanceByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicVariableInstanceByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.Arrays;
 import java.util.List;
@@ -172,12 +176,7 @@ public class MultiTenancyHistoricVariableInstanceQueryTest {
 
     // then
     assertThat(historicVariableInstances.size()).isEqualTo(3); // null-tenant instances are still included
-    assertThat(historicVariableInstances.get(0).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicVariableInstances.get(0).getValue()).isEqualTo(TENANT_NULL_VAR);
-    assertThat(historicVariableInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicVariableInstances.get(1).getValue()).isEqualTo(TENANT_ONE_VAR);
-    assertThat(historicVariableInstances.get(2).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicVariableInstances.get(2).getValue()).isEqualTo(TENANT_TWO_VAR);
+    verifySorting(historicVariableInstances, historicVariableInstanceByTenantId());
   }
 
   @Test
@@ -190,12 +189,7 @@ public class MultiTenancyHistoricVariableInstanceQueryTest {
 
     // then
     assertThat(historicVariableInstances.size()).isEqualTo(3); // null-tenant instances are still included
-    assertThat(historicVariableInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
-    assertThat(historicVariableInstances.get(0).getValue()).isEqualTo(TENANT_TWO_VAR);
-    assertThat(historicVariableInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
-    assertThat(historicVariableInstances.get(1).getValue()).isEqualTo(TENANT_ONE_VAR);
-    assertThat(historicVariableInstances.get(2).getTenantId()).isEqualTo(TENANT_NULL);
-    assertThat(historicVariableInstances.get(2).getValue()).isEqualTo(TENANT_NULL_VAR);
+    verifySorting(historicVariableInstances, inverted(historicVariableInstanceByTenantId()));
   }
 
   @Test
