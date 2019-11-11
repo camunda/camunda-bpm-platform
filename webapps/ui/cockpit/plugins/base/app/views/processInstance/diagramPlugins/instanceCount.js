@@ -69,11 +69,11 @@ module.exports = [
 
             function observe(callback) {
               processData.observe(
-                ['activityIdToInstancesMap', 'activityIdToIncidentsMap'],
-                function(activityIdToInstancesMap, activityIdToIncidentsMap) {
+                ['activityIdToInstancesMap', 'activityIdToIncidentIdMap'],
+                function(activityIdToInstancesMap, activityIdToIncidentIdMap) {
                   callback([
                     activityIdToInstancesMap,
-                    activityIdToIncidentsMap
+                    activityIdToIncidentIdMap
                   ]);
                 }
               );
