@@ -20,19 +20,11 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.Response;
 
-import ch.qos.logback.classic.Level;
 import com.sun.jersey.api.client.ClientResponse;
-import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
-
-  @Rule
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
-      .level(Level.INFO)
-      .watch("org.camunda.bpm.engine.rest.exception");
 
   @Before
   public void createClient() throws Exception {
@@ -40,14 +32,13 @@ public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
   }
 
   @Test
-  public void shouldCheckNonFoundResponse() {
+  public void shouldNotFailForUndefinedUser() {
     // when
     ClientResponse response = client.resource(APP_BASE_PATH + "app/admin/default/#/users/undefined?tab=profile")
                                     .get(ClientResponse.class);
 
     // then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    assertEquals(0, loggingRule.getLog().size());
 
     // cleanup
     response.close();
