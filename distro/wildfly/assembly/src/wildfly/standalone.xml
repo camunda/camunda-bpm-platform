@@ -130,10 +130,10 @@
                 </handlers>
             </root-logger>
             <formatter name="PATTERN">
-                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %X %s%e%n"/>
             </formatter>
             <formatter name="COLOR-PATTERN">
-                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %X %s%e%n"/>
             </formatter>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:batch-jberet:2.0">
