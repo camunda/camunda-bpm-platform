@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.db.FlushResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -149,7 +150,13 @@ public class BatchDbSqlSession extends DbSqlSession {
       DbOperation operation = operationsIt.next();
 
       if (statementResult == Statement.SUCCESS_NO_INFO) {
-        throw LOG.batchingNotSupported(operation);
+
+        if (requiresAffectedRows(operation.getOperationType())) {
+          throw LOG.batchingNotSupported(operation);
+        } else {
+          postProcessOperationPerformed(operation, 1, null);
+        }
+
       } else if (statementResult == Statement.EXECUTE_FAILED) {
 
         /*
@@ -186,6 +193,20 @@ public class BatchDbSqlSession extends DbSqlSession {
       postProcessOperationPerformed(failedOperation, 0, failure);
       failedOperations.add(failedOperation);
     }
+  }
+
+  protected boolean requiresAffectedRows(DbOperationType operationType) {
+    /*
+     * Affected rows required:
+     * - UPDATE and DELETE: optimistic locking
+     * - BULK DELETE: history cleanup
+     * - BULK UPDATE: not required currently, but we'll require it for consistency with deletes
+     *
+     * Affected rows not required:
+     * - INSERT: not required for any functionality and some databases
+     *   have performance optimizations that sacrifice this (e.g. Postgres with reWriteBatchedInserts)
+     */
+    return operationType != DbOperationType.INSERT;
   }
 
   protected void postProcessOperationPerformed(DbOperation operation, int rowsAffected, Exception failure) {
