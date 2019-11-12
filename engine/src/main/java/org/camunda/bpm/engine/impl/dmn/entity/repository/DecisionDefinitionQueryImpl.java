@@ -227,6 +227,10 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
   }
 
+  public DecisionDefinitionQuery orderByDecisionRequirementsDefinitionKey() {
+    return orderBy(DecisionDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_KEY);
+  }
+
   @Override
   public DecisionDefinitionQuery orderByVersionTag() {
     return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);

@@ -20,6 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +31,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -631,6 +635,51 @@ public class DecisionDefinitionQueryTest {
       .list();
 
     assertEquals("1.1.0", decisionDefinitionList.get(1).getVersionTag());
+  }
+
+
+
+  @Test
+  public void testQueryOrderByDecisionRequirementsDefinitionKey() {
+    // given
+    List<DecisionDefinition> scoreDefinitions = testRule.deploy(DRD_SCORE_RESOURCE).getDeployedDecisionDefinitions();
+    List<String> scoreDefinitionIds = asIds(scoreDefinitions);
+
+    List<DecisionDefinition> dishDefinitions = testRule.deploy(DRD_DISH_RESOURCE).getDeployedDecisionDefinitions();
+    List<String> dishDefinitionIds = asIds(dishDefinitions);
+
+    // when
+    List<DecisionDefinition> decisionDefinitionList = repositoryService
+      .createDecisionDefinitionQuery()
+      .decisionDefinitionIdIn(merge(scoreDefinitionIds, dishDefinitionIds))
+      .orderByDecisionRequirementsDefinitionKey()
+      .asc()
+      .list();
+
+    // then
+    List<DecisionDefinition> firstThreeResults = decisionDefinitionList.subList(0, 3);
+    List<DecisionDefinition> lastTwoResults = decisionDefinitionList.subList(3, 5);
+
+    assertThat(firstThreeResults).extracting("id").containsExactlyInAnyOrderElementsOf(dishDefinitionIds);
+    assertThat(lastTwoResults).extracting("id").containsExactlyInAnyOrderElementsOf(scoreDefinitionIds);
+  }
+
+  protected String[] merge(List<String> list1, List<String> list2) {
+    int numElements = list1.size() + list2.size();
+    List<String> copy = new ArrayList<>(numElements);
+    copy.addAll(list1);
+    copy.addAll(list2);
+
+    return copy.toArray(new String[numElements]);
+  }
+
+  protected List<String> asIds(List<DecisionDefinition> decisions) {
+    List<String> ids = new ArrayList<>();
+    for (DecisionDefinition decision : decisions) {
+      ids.add(decision.getId());
+    }
+
+    return ids;
   }
 
   @Deployment(resources = {
