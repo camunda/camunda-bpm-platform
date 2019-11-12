@@ -193,7 +193,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
    * Note that the ordering of decision definitions without tenant id is database-specific. */
   DecisionDefinitionQuery orderByTenantId();
 
-  /** Order by key of the decision requirements definition a decision definition belongs to
+  /** Order by key of the decision requirements definition 
    * (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of decision definitions without decision requirements definition
    * is database-specific. */
