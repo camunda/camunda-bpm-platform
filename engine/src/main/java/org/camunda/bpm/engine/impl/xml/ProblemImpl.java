@@ -46,10 +46,10 @@ public class ProblemImpl implements Problem {
     extractElementDetails(element);
   }
 
-  public ProblemImpl(String errorMessage, Element element, String... bpmnElementIds) {
+  public ProblemImpl(String errorMessage, Element element, String... elementIds) {
     this(errorMessage, element);
-    this.mainElementId = bpmnElementIds[0];
-    for (String elementId : bpmnElementIds) {
+    this.mainElementId = elementIds[0];
+    for (String elementId : elementIds) {
       if(elementId != null && elementId.length() > 0) {
         this.elementIds.add(elementId);
       }
