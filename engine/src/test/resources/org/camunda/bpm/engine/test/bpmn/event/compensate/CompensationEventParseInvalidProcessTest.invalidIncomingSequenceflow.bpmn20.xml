@@ -8,7 +8,7 @@
 
 		<startEvent id="start" />
 		
-		<sequenceFlow id="SequenceFlow_1" sourceRef="start"	targetRef="task" />	
+		<sequenceFlow sourceRef="start"	targetRef="task" />	
 		
         <!-- compensation handler should not have an incoming sequence flow -->
 		<userTask id="task" isForCompensation="true" />

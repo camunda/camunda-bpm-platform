@@ -19,7 +19,7 @@
   
    <subProcess id="subProcess">
     <startEvent id="startSubProcess">
-      <timerEventDefinition id="TimerEventDefinition_1">
+      <timerEventDefinition>
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
       <messageEventDefinition id="MessageEventDefinition_1" messageRef="newMessage" />
