@@ -62,11 +62,12 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "Warnings during parsing: {}", formattedMessage);
   }
 
-  public ProcessEngineException exceptionDuringParsing(String string, List<Problem> errors, List<Problem> warnings) {
+  public ProcessEngineException exceptionDuringParsing(String string, String resourceName, List<Problem> errors, List<Problem> warnings) {
     return new ParseException(exceptionMessage(
         "005",
         "Could not parse BPMN process. Errors: {}",
         string),
+        resourceName,
         errors,
         warnings);
   }

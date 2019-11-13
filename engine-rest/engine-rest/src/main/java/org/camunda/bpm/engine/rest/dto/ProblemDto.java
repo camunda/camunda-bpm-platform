@@ -28,8 +28,7 @@ import org.camunda.bpm.engine.Problem;
  */
 public class ProblemDto {
 
-  protected String errorMessage;
-  protected String resource;
+  protected String message;
   protected int line;
   protected int column;
   protected String mainBpmnElementId;
@@ -40,32 +39,23 @@ public class ProblemDto {
   public static ProblemDto fromProblem(Problem problem) {
     ProblemDto dto = new ProblemDto();
 
-    dto.setErrorMessage(problem.getErrorMessage());
-    dto.setResource(problem.getResource());
+    dto.setMessage(problem.getMessage());
     dto.setLine(problem.getLine());
     dto.setColumn(problem.getColumn());
-    dto.setMainBpmnElementId(problem.getMainBpmnElementId());
-    dto.setBpmnElementIds(problem.getBpmnElementIds());
+    dto.setMainBpmnElementId(problem.getMainElementId());
+    dto.setBpmnElementIds(problem.getElementIds());
 
     return dto;
   }
 
   // getter / setters ////////////////////////
 
-  public String getErrorMessage() {
-    return errorMessage;
+  public String getMessage() {
+    return message;
   }
 
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-
-  public String getResource() {
-    return resource;
-  }
-
-  public void setResource(String resource) {
-    this.resource = resource;
+  public void setMessage(String errorMessage) {
+    this.message = errorMessage;
   }
 
   public int getLine() {

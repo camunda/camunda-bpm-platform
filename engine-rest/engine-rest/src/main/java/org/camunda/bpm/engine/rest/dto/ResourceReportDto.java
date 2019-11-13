@@ -14,34 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine;
+package org.camunda.bpm.engine.rest.dto;
 
-import java.util.List;
-
-/**
- * Interface of a problem occurred during bpmn parsing
- */
-public interface Problem {
-
-  /** The message of this problem */
-  String getMessage();
-
-  /** The line where the problem occurs */
-  int getLine();
-
-  /** The column where the problem occurs */
-  int getColumn();
-
-  /**
-   * The id of the main element causing the problem. It can be
-   * <code>null</code> in case the element doesn't have an id.
-   */
-  String getMainElementId();
-
-  /**
-   * The ids of all involved elements in the problem. It can be an empty
-   * list in case the elements do not have assigned ids.
-   */
-  List<String> getElementIds();
+public interface ResourceReportDto {
 
 }

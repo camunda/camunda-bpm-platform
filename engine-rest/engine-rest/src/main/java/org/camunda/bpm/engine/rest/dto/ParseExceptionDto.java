@@ -17,10 +17,14 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
+import org.camunda.bpm.engine.ResourceReport;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 
 /**
  * Dto for {@link ParseException}
@@ -30,8 +34,7 @@ import org.camunda.bpm.engine.Problem;
  */
 public class ParseExceptionDto extends ExceptionDto {
 
-  protected List<ProblemDto> errors;
-  protected List<ProblemDto> warnings;
+  protected Map<String, ResourceReportDto> details = new HashMap<>();
 
   // transformer /////////////////////////////
 
@@ -40,37 +43,35 @@ public class ParseExceptionDto extends ExceptionDto {
 
     dto.setType(ParseException.class.getSimpleName());
     dto.setMessage(exception.getMessage());
-    List<ProblemDto> errorDtos = new ArrayList<>();
-    for (Problem error : exception.getErrors()) {
-      errorDtos.add(ProblemDto.fromProblem(error));
-    }
-    dto.setErrors(errorDtos);
 
-    List<ProblemDto> warningDtos = new ArrayList<>();
-    for (Problem warning : exception.getWarnings()) {
-      warningDtos.add(ProblemDto.fromProblem(warning));
+    for (ResourceReport report : exception.getResorceReports()) {
+      if (report instanceof BpmnResourceReport) {
+        BpmnResourceReport bpmnResourceReport = (BpmnResourceReport) report;
+        List<ProblemDto> errorDtos = new ArrayList<>();
+        for (Problem error : bpmnResourceReport.getErrors()) {
+          errorDtos.add(ProblemDto.fromProblem(error));
+        }
+
+        List<ProblemDto> warningDtos = new ArrayList<>();
+        for (Problem warning : bpmnResourceReport.getWarnings()) {
+          warningDtos.add(ProblemDto.fromProblem(warning));
+        }
+        BpmnResourceReportDto bpmnResourceReportDto = new BpmnResourceReportDto(errorDtos, warningDtos);
+        dto.details.put(bpmnResourceReport.getResourceName(), bpmnResourceReportDto);
+      }
     }
-    dto.setWarnings(warningDtos);
+
 
     return dto;
   }
 
   // getter / setters ////////////////////////
 
-  public List<ProblemDto> getErrors() {
-    return errors;
+  public Map<String, ResourceReportDto> getDetails() {
+    return details;
   }
 
-  public void setErrors(List<ProblemDto> errors) {
-    this.errors = errors;
+  public void setDetails(Map<String, ResourceReportDto> details) {
+    this.details = details;
   }
-
-  public List<ProblemDto> getWarnings() {
-    return warnings;
-  }
-
-  public void setWarnings(List<ProblemDto> warnings) {
-    this.warnings = warnings;
-  }
-
 }

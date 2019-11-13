@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -57,7 +58,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
       fail("Exception expected");
     } catch (ParseException e) {
       assertTextPresent("Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.", e.getMessage());
-      assertThat(e.getErrors().get(0).getBpmnElementIds()).containsExactly("service");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getElementIds()).containsExactly("service");
     }
 
   }

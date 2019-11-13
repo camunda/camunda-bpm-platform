@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -91,9 +92,9 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testInvalidEventLinkMultipleTargets.bpmn20.xml").deploy();
       fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
     }
-    catch (ParseException ex) {
-      assertTrue(ex.getMessage().contains("Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
-      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("IntermediateCatchEvent_2");
+    catch (ParseException e) {
+      assertTrue(e.getMessage().contains("Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 
@@ -102,9 +103,9 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testCatchLinkEventAfterEventBasedGatewayNotAllowed.bpmn20.xml").deploy();
       fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
     }
-    catch (ParseException ex) {
-      assertTrue(ex.getMessage().contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
-      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("IntermediateCatchEvent_2");
+    catch (ParseException e) {
+      assertTrue(e.getMessage().contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 }

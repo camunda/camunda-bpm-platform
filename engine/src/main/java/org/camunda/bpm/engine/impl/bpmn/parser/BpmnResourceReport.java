@@ -14,34 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine;
+package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.Problem;
+import org.camunda.bpm.engine.ResourceReport;
+
 /**
- * Interface of a problem occurred during bpmn parsing
+ * Resource report created during bpmn parsing
  */
-public interface Problem {
+public class BpmnResourceReport implements ResourceReport {
 
-  /** The message of this problem */
-  String getMessage();
+  protected String resourceName;
+  protected List<Problem> errors = new ArrayList<>();
+  protected List<Problem> warnings = new ArrayList<>();
 
-  /** The line where the problem occurs */
-  int getLine();
+  public BpmnResourceReport(String resourceName, List<Problem> errors, List<Problem> warnings) {
+    this.resourceName = resourceName;
+    this.errors.addAll(errors);
+    this.warnings.addAll(warnings);
+  }
 
-  /** The column where the problem occurs */
-  int getColumn();
+  @Override
+  public String getResourceName() {
+    return resourceName;
+  }
 
-  /**
-   * The id of the main element causing the problem. It can be
-   * <code>null</code> in case the element doesn't have an id.
-   */
-  String getMainElementId();
+  public List<Problem> getErrors() {
+    return errors;
+  }
 
-  /**
-   * The ids of all involved elements in the problem. It can be an empty
-   * list in case the elements do not have assigned ids.
-   */
-  List<String> getElementIds();
+  public List<Problem> getWarnings() {
+    return warnings;
+  }
 
 }

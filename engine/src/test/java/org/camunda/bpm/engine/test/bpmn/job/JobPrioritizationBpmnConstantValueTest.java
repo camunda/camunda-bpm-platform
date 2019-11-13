@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -194,7 +195,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     } catch (ParseException e) {
       assertTextPresentIgnoreCase("value 'thisIsNotANumber' for attribute 'jobPriority' "
           + "is not a valid number", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("task2");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("task2");
     }
   }
 

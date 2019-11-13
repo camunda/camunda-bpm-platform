@@ -29,6 +29,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -707,7 +708,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       fail("Exception expected");
     } catch (ParseException e) {
       assertTextPresent("Missing attribute 'target'", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("callActivity");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("callActivity");
     } finally {
       if (deploymentId != null) {
         repositoryService.deleteDeployment(deploymentId, true);

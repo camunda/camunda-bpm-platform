@@ -816,6 +816,7 @@ public class BpmnParse extends Parse {
   protected void parseAssociationOfCompensationBoundaryEvent(Element associationElement, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
     if (!targetActivity.isCompensationHandler()) {
       addError("compensation boundary catch must be connected to element with isForCompensation=true",
+          associationElement,
           sourceActivity.getId(),
           targetActivity.getId());
 
@@ -825,6 +826,7 @@ public class BpmnParse extends Parse {
       ActivityImpl compensationHandler = compensatedActivity.findCompensationHandler();
       if (compensationHandler != null && compensationHandler.isSubProcessScope()) {
         addError("compensation boundary event and event subprocess with compensation start event are not supported on the same scope",
+            associationElement,
             compensatedActivity.getId(),
             sourceActivity.getId()
             );
@@ -1371,7 +1373,7 @@ public class BpmnParse extends Parse {
       Condition condition = (Condition) flow.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
       if (condition != null) {
         addError("Exclusive Gateway '" + activity.getId() + "' has only one outgoing sequence flow ('" + flow.getId()
-            + "'). This is not allowed to have a condition.", activity.getId(), flow.getId());
+            + "'). This is not allowed to have a condition.", null, activity.getId(), flow.getId());
       }
     } else {
       String defaultSequenceFlow = (String) activity.getProperty("default");
@@ -1388,7 +1390,7 @@ public class BpmnParse extends Parse {
         }
         if (hasConditon && isDefaultFlow) {
           addError("Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId()
-              + "' which is the default flow but has a condition too.", activity.getId(), flow.getId());
+              + "' which is the default flow but has a condition too.", null, activity.getId(), flow.getId());
         }
       }
       if (hasDefaultFlow || flowsWithoutCondition.size() > 1) {
@@ -1398,7 +1400,7 @@ public class BpmnParse extends Parse {
         for (PvmTransition flow : flowsWithoutCondition) {
           addError(
               "Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId() + "' without condition which is not the default flow.",
-              activity.getId(), flow.getId());
+              null, activity.getId(), flow.getId());
         }
       } else if (flowsWithoutCondition.size() == 1) {
         // Havinf no default and exactly one flow without condition this is
@@ -1622,7 +1624,8 @@ public class BpmnParse extends Parse {
   protected void validateCatchCompensateEventDefinition(Element compensateEventDefinitionElement, String parentElementId) {
     String activityRef = compensateEventDefinitionElement.attribute("activityRef");
     if (activityRef != null) {
-      addWarning("attribute 'activityRef' is not supported on catching compensation event. attribute will be ignored", compensateEventDefinitionElement, parentElementId);
+      addWarning("attribute 'activityRef' is not supported on catching compensation event. attribute will be ignored",
+          compensateEventDefinitionElement, parentElementId);
     }
 
     String waitForCompletion = compensateEventDefinitionElement.attribute("waitForCompletion");
@@ -2572,7 +2575,7 @@ public class BpmnParse extends Parse {
     if (receiveTaskElement.attribute("messageRef") != null) {
       activity.setScope(true);
       activity.setEventScope(activity);
-      EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement, null);
+      EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement, activity.getId());
       declaration.setActivityId(activity.getActivityId());
       declaration.setEventScopeActivityId(activity.getActivityId());
       addEventSubscriptionDeclaration(declaration, activity, receiveTaskElement);
@@ -3596,7 +3599,8 @@ public class BpmnParse extends Parse {
 
       for (String variableEvent : variableEventsList) {
         if (!VARIABLE_EVENTS.contains(variableEvent)) {
-          addWarning("Variable event: " + variableEvent + " is not valid. Possible variable change events are: " + Arrays.toString(VARIABLE_EVENTS.toArray()), element, conditionalActivityId);
+          addWarning("Variable event: " + variableEvent + " is not valid. Possible variable change events are: " + Arrays.toString(VARIABLE_EVENTS.toArray()),
+              element, conditionalActivityId);
         }
       }
 
@@ -4071,14 +4075,16 @@ public class BpmnParse extends Parse {
           || (sourceActivity != null && sourceActivity.isCompensationHandler())) {
         addError("Invalid outgoing sequence flow of compensation activity '" + sourceRef
             + "'. A compensation activity should not have an incoming or outgoing sequence flow.",
+            sequenceFlowElement,
             sourceRef,
-            sequenceFlowElement.attribute("id"));
+            id);
       } else if ((destinationActivity == null && compensationHandlers.containsKey(destinationRef))
           || (destinationActivity != null && destinationActivity.isCompensationHandler())) {
         addError("Invalid incoming sequence flow of compensation activity '" + destinationRef
             + "'. A compensation activity should not have an incoming or outgoing sequence flow.",
+            sequenceFlowElement,
             destinationRef,
-            sequenceFlowElement.attribute("id"));
+            id);
       } else if (sourceActivity == null) {
         addError("Invalid source '" + sourceRef + "' of sequence flow '" + id + "'", sequenceFlowElement);
       } else if (destinationActivity == null) {

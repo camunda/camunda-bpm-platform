@@ -921,6 +921,7 @@ public abstract class MockProvider {
   public static final int EXAMPLE_PROBLEM_LINE_2 = 87;
   public static final int EXAMPLE_PROBLEM_COLUMN_2 = 88;
   public static final String EXAMPLE_PROBLEM_ELEMENT_ID_2 = "element_89";
+  public static final String EXAMPLE_RESOURCE_NAME = "abc";
   public static final List<String> EXAMPLE_ELEMENT_IDS = Arrays.asList(EXAMPLE_PROBLEM_ELEMENT_ID, EXAMPLE_PROBLEM_ELEMENT_ID_2);
 
   public static Task createMockTask() {

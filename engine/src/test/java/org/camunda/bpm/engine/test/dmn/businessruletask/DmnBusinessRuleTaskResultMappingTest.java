@@ -17,12 +17,14 @@
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -175,8 +177,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
       fail("expect parse exception");
     } catch (ParseException e) {
       assertTextPresent("No decision result mapper found for name 'invalid'", e.getMessage());
-      assertThat(e.getErrors().size()).isEqualTo(1);
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("ruleTask");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().size()).isEqualTo(1);
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("ruleTask");
     }
   }
 

@@ -161,7 +161,6 @@ public class Parse extends DefaultHandler {
       }
       saxParser.parse(inputStream, new ParseHandler(this));
     } catch (Exception e) {
-//      addError(e.getMessage(), null);
       throw LOG.parsingFailureException(name, e);
     }
 
@@ -194,27 +193,23 @@ public class Parse extends DefaultHandler {
   }
 
   public void addError(SAXParseException e) {
-    errors.add(new ProblemImpl(e, name));
+    errors.add(new ProblemImpl(e));
   }
 
   public void addError(String errorMessage, Element element) {
-    errors.add(new ProblemImpl(errorMessage, name, element));
+    errors.add(new ProblemImpl(errorMessage, element));
   }
 
-  public void addError(String errorMessage, Element element, String elementId) {
-    errors.add(new ProblemImpl(errorMessage, name, element, elementId));
-  }
-
-  public void addError(String errorMessage, String... elementIds) {
-    errors.add(new ProblemImpl(errorMessage, name, null, elementIds));
+  public void addError(String errorMessage, Element element, String... elementIds) {
+    errors.add(new ProblemImpl(errorMessage, element, elementIds));
   }
   
   public void addError(BpmnParseException e) {
-    errors.add(new ProblemImpl(e, name));
+    errors.add(new ProblemImpl(e));
   }
 
   public void addError(BpmnParseException e, String elementId) {
-    errors.add(new ProblemImpl(e, name, elementId));
+    errors.add(new ProblemImpl(e, elementId));
   }
 
   public boolean hasErrors() {
@@ -222,15 +217,15 @@ public class Parse extends DefaultHandler {
   }
 
   public void addWarning(SAXParseException e) {
-    warnings.add(new ProblemImpl(e, name));
+    warnings.add(new ProblemImpl(e));
   }
 
   public void addWarning(String errorMessage, Element element) {
-    warnings.add(new ProblemImpl(errorMessage, name, element));
+    warnings.add(new ProblemImpl(errorMessage, element));
   }
 
   public void addWarning(String errorMessage, Element element, String... elementIds) {
-    warnings.add(new ProblemImpl(errorMessage, name, element, elementIds));
+    warnings.add(new ProblemImpl(errorMessage, element, elementIds));
   }
 
   public boolean hasWarnings() {
@@ -241,6 +236,8 @@ public class Parse extends DefaultHandler {
     StringBuilder builder = new StringBuilder();
     for (Problem warning : warnings) {
       builder.append("\n* ");
+      builder.append(warning.getMessage());
+      builder.append(" | resource " + name);
       builder.append(warning.toString());
     }
     LOG.logParseWarnings(builder.toString());
@@ -250,9 +247,11 @@ public class Parse extends DefaultHandler {
     StringBuilder strb = new StringBuilder();
     for (Problem error : errors) {
       strb.append("\n* ");
+      strb.append(error.getMessage());
+      strb.append(" | resource " + name);
       strb.append(error.toString());
     }
-    throw LOG.exceptionDuringParsing(strb.toString(), errors, warnings);
+    throw LOG.exceptionDuringParsing(strb.toString(), name, errors, warnings);
   }
 
   public void setSchemaResource(String schemaResource) {

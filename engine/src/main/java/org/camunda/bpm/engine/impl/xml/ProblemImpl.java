@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.xml;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.Problem;
@@ -30,50 +29,52 @@ import org.xml.sax.SAXParseException;
  */
 public class ProblemImpl implements Problem {
 
-  protected String errorMessage;
-  protected String resource;
+  protected String message;
   protected int line;
   protected int column;
-  protected String mainBpmnElementId;
-  protected List<String> bpmnElementIds = new ArrayList<>();
+  protected String mainElementId;
+  protected List<String> elementIds = new ArrayList<>();
 
-  public ProblemImpl(SAXParseException e, String resource) {
+  public ProblemImpl(SAXParseException e) {
     concatenateErrorMessages(e);
-    this.resource = resource;
     this.line = e.getLineNumber();
     this.column = e.getColumnNumber();
   }
 
-  public ProblemImpl(String errorMessage, String resourceName, Element element) {
-    this.errorMessage = errorMessage;
-    this.resource = resourceName;
+  public ProblemImpl(String errorMessage, Element element) {
+    this.message = errorMessage;
     extractElementDetails(element);
   }
 
-  public ProblemImpl(String errorMessage, String resourceName, Element element, String... bpmnElementIds) {
-    this(errorMessage, resourceName, element);
-    this.mainBpmnElementId = bpmnElementIds[0];
-    this.bpmnElementIds.addAll(Arrays.asList(bpmnElementIds));
+  public ProblemImpl(String errorMessage, Element element, String... bpmnElementIds) {
+    this(errorMessage, element);
+    this.mainElementId = bpmnElementIds[0];
+    for (String elementId : bpmnElementIds) {
+      if(elementId != null && elementId.length() > 0) {
+        this.elementIds.add(elementId);
+      }
+    }
   }
 
-  public ProblemImpl(BpmnParseException exception, String resourceName) {
+  public ProblemImpl(BpmnParseException exception) {
     concatenateErrorMessages(exception);
-    this.resource = resourceName;
     extractElementDetails(exception.getElement());
   }
 
-  public ProblemImpl(BpmnParseException exception, String resourceName, String elementId) {
-    this(exception, resourceName);
-    this.mainBpmnElementId = elementId;
-    this.bpmnElementIds.add(elementId);
+  public ProblemImpl(BpmnParseException exception, String elementId) {
+    this(exception);
+    this.mainElementId = elementId;
+    if(elementId != null && elementId.length() > 0) {
+      this.elementIds.add(elementId);
+    }
   }
 
   protected void concatenateErrorMessages(Throwable throwable) {
     while (throwable != null) {
-      if (errorMessage == null) {
-        errorMessage = throwable.getMessage();
+      if (message == null) {
+        message = throwable.getMessage();
       } else {
-        errorMessage += ": " + throwable.getMessage();
+        message += ": " + throwable.getMessage();
       }
       throwable = throwable.getCause();
     }
@@ -85,8 +86,8 @@ public class ProblemImpl implements Problem {
       this.column = element.getColumn();
       String id = element.attribute("id");
       if (id != null && id.length() > 0) {
-        this.mainBpmnElementId = id;
-        this.bpmnElementIds.add(id);
+        this.mainElementId = id;
+        this.elementIds.add(id);
       }
     }
   }
@@ -94,13 +95,8 @@ public class ProblemImpl implements Problem {
   // getters
 
   @Override
-  public String getErrorMessage() {
-    return errorMessage;
-  }
-
-  @Override
-  public String getResource() {
-    return resource;
+  public String getMessage() {
+    return message;
   }
 
   @Override
@@ -114,20 +110,17 @@ public class ProblemImpl implements Problem {
   }
 
   @Override
-  public String getMainBpmnElementId() {
-    return mainBpmnElementId;
+  public String getMainElementId() {
+    return mainElementId;
   }
 
   @Override
-  public List<String> getBpmnElementIds() {
-    return bpmnElementIds;
+  public List<String> getElementIds() {
+    return elementIds;
   }
 
   public String toString() {
-    StringBuilder string = new StringBuilder(errorMessage); 
-    if (resource != null) {
-      string.append(" | " + resource);
-    }
+    StringBuilder string = new StringBuilder(); 
     if (line > 0) {
       string.append(" | line " + line);
     }

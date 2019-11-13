@@ -26,6 +26,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
@@ -103,9 +104,9 @@ public class EscalationEventParseInvalidProcessTest {
       fail("exception expected: " + expectedErrorMessage);
     } catch (ParseException e) {
       assertExceptionMessageContainsText(e, expectedErrorMessage);
-      List<Problem> errors = e.getErrors();
+      List<Problem> errors = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors();
       for (int i = 0; i < bpmnElementIds.length; i++) {
-        assertThat(errors.get(i).getMainBpmnElementId()).isEqualTo(bpmnElementIds[i]);
+        assertThat(errors.get(i).getMainElementId()).isEqualTo(bpmnElementIds[i]);
       }
     }
   }

@@ -16,26 +16,27 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 
 public class ParseException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
-  protected List<Problem> errors;
-  protected List<Problem> warnings;
+  protected List<ResourceReport> resorceReports;
 
-  public ParseException(String exceptionMessage, List<Problem> errors, List<Problem> warnings) {
+  public ParseException(String exceptionMessage, String resource, List<Problem> errors, List<Problem> warnings) {
     super(exceptionMessage);
-    this.errors = errors;
-    this.warnings = warnings;
+    BpmnResourceReport bpmnResourceReport = new BpmnResourceReport(resource, errors, warnings);
+    List<ResourceReport> reports = new ArrayList<>();
+    reports.add(bpmnResourceReport);
+    this.resorceReports = reports;
   }
 
-  public List<Problem> getErrors() {
-    return errors;
+  public List<ResourceReport> getResorceReports() {
+    return resorceReports;
   }
 
-  public List<Problem> getWarnings() {
-    return warnings;
-  }
 }

@@ -16,10 +16,16 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -27,11 +33,6 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -97,9 +98,9 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     } catch (ParseException e) {
       assertTextPresent("Cannot have more than one message event subscription with name 'messageName' for scope 'task'", e.getMessage());
       assertEquals(0, repositoryService.createDeploymentQuery().count());
-      List<Problem> errors = e.getErrors();
+      List<Problem> errors = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors();
       assertThat(errors).hasSize(1);
-      assertThat(errors.get(0).getMainBpmnElementId()).isEqualTo("messageBoundary_2");
+      assertThat(errors.get(0).getMainElementId()).isEqualTo("messageBoundary_2");
     }
   }
 

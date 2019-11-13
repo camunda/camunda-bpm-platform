@@ -14,34 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine;
+package org.camunda.bpm.engine.rest.dto;
 
 import java.util.List;
 
-/**
- * Interface of a problem occurred during bpmn parsing
- */
-public interface Problem {
+public class BpmnResourceReportDto implements ResourceReportDto {
 
-  /** The message of this problem */
-  String getMessage();
+  protected List<ProblemDto> errors;
+  protected List<ProblemDto> warnings;
 
-  /** The line where the problem occurs */
-  int getLine();
+  public BpmnResourceReportDto(List<ProblemDto> errors,
+      List<ProblemDto> warnings) {
+    super();
+    this.errors = errors;
+    this.warnings = warnings;
+  }
 
-  /** The column where the problem occurs */
-  int getColumn();
+  // getter / setters ////////////////////////
 
-  /**
-   * The id of the main element causing the problem. It can be
-   * <code>null</code> in case the element doesn't have an id.
-   */
-  String getMainElementId();
+  public List<ProblemDto> getErrors() {
+    return errors;
+  }
 
-  /**
-   * The ids of all involved elements in the problem. It can be an empty
-   * list in case the elements do not have assigned ids.
-   */
-  List<String> getElementIds();
+  public void setErrors(List<ProblemDto> errors) {
+    this.errors = errors;
+  }
+
+  public List<ProblemDto> getWarnings() {
+    return warnings;
+  }
+
+  public void setWarnings(List<ProblemDto> warnings) {
+    this.warnings = warnings;
+  }
 
 }

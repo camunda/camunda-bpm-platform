@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -145,7 +146,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertTrue(e.getMessage().contains("Event based gateway can only be connected to elements of type intermediateCatchEvent"));
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("gw1");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("gw1");
     }
 
   }
@@ -159,7 +160,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertTrue(e.getMessage().contains("Invalid incoming sequenceflow for intermediateCatchEvent"));
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("invalidFlow");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("invalidFlow");
     }
 
   }

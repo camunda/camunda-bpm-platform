@@ -40,7 +40,7 @@
   
    <subProcess id="eventSubProcess" triggeredByEvent="true">
     <startEvent id="startEventSubProcess">
-      <timerEventDefinition  id="TimerEventDefinition_2">
+      <timerEventDefinition>
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
       <messageEventDefinition id="MessageEventDefinition_2" messageRef="newMessage" />

@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -194,9 +196,11 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", flowWithoutConditionNoDefaultFlow).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ParseException ex) {
-      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' without condition which is not the default flow."));
-      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
+    catch (ParseException e) {
+      assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' without condition which is not the default flow."));
+      Problem error = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0);
+      assertThat(error.getMainElementId()).isEqualTo("exclusiveGw");
+      assertThat(error.getElementIds()).containsExactlyInAnyOrder("exclusiveGw", "flow3");
     }
   }
 
@@ -223,9 +227,11 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", defaultFlowWithCondition).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ParseException ex) {
-      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' which is the default flow but has a condition too."));
-      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
+    catch (ParseException e) {
+      assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' which is the default flow but has a condition too."));
+      Problem error = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0);
+      assertThat(error.getMainElementId()).isEqualTo("exclusiveGw");
+      assertThat(error.getElementIds()).containsExactlyInAnyOrder("exclusiveGw", "flow3");
     }
   }
 
@@ -242,9 +248,9 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().addString("myprocess.bpmn20.xml", noOutgoingFlow).deploy();
       fail("Could deploy a process definition with a sequence flow out of a XOR Gateway without condition with is not the default flow.");
     }
-    catch (ParseException ex) {
-      assertTrue(ex.getMessage().contains("Exclusive Gateway 'exclusiveGw' has no outgoing sequence flows."));
-      assertThat(ex.getErrors().get(0).getMainBpmnElementId()).isEqualTo("exclusiveGw");
+    catch (ParseException e) {
+      assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has no outgoing sequence flows."));
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("exclusiveGw");
     }
 
   }

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -120,7 +121,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
       fail("expected exception");
     } catch (ParseException e) {
       assertTextPresent("camunda:inputOutput mapping unsupported for element type 'startEvent'", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("start");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("start");
     }
   }
 
@@ -133,7 +134,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
       fail("expected exception");
     } catch (ParseException e) {
       assertTextPresent("camunda:outputParameter not allowed for element type 'endEvent'", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("endMapping");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("endMapping");
     }
   }
 
@@ -243,7 +244,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
       fail("expected exception");
     } catch (ParseException e) {
       assertTextPresent("camunda:inputOutput mapping unsupported for element type 'boundaryEvent'", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("messageBoundary");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("messageBoundary");
     }
   }
 

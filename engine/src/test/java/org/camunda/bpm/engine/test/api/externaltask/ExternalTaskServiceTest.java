@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -97,10 +98,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (ParseException e) {
       assertTextPresentIgnoreCase("value 'NOTaNumber' for attribute 'taskPriority' "
           + "is not a valid number", e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo("externalTaskWithPrio");
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("externalTaskWithPrio");
     }
   }
-
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testFetch() {

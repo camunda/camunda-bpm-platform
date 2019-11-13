@@ -16,16 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import junit.framework.AssertionFailedError;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
@@ -35,6 +34,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * Parse an invalid process definition and assert the error message.
@@ -87,7 +88,7 @@ public class SignalEventParseInvalidProcessTest {
       fail("exception expected: " + expectedErrorMessage);
     } catch (ParseException e) {
       assertTextPresent(expectedErrorMessage, e.getMessage());
-      assertThat(e.getErrors().get(0).getMainBpmnElementId()).isEqualTo(elementIds);
+      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo(elementIds);
     }
   }
 
