@@ -59,7 +59,7 @@ module.exports = function() {
         };
 
         function loadLocal(defaultValue) {
-          return localConf.get('sortDecDefTab', defaultValue);
+          return localConf.get('sortDecDefTable', defaultValue);
         }
       }
     ]
