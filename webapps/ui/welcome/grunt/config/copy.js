@@ -65,7 +65,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/',
-        src: ['index.html', 'camunda-welcome-bootstrap.js', 'csrf-token.html'],
+        src: ['index.html', 'camunda-welcome-bootstrap.js'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/'
       }
     ]
