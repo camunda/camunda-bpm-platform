@@ -19,7 +19,7 @@ package org.camunda.bpm.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
+import org.camunda.bpm.engine.impl.bpmn.parser.ResourceReportImpl;
 
 public class ParseException extends ProcessEngineException {
 
@@ -29,9 +29,9 @@ public class ParseException extends ProcessEngineException {
 
   public ParseException(String exceptionMessage, String resource, List<Problem> errors, List<Problem> warnings) {
     super(exceptionMessage);
-    BpmnResourceReport bpmnResourceReport = new BpmnResourceReport(resource, errors, warnings);
+    ResourceReportImpl resourceReport = new ResourceReportImpl(resource, errors, warnings);
     List<ResourceReport> reports = new ArrayList<>();
-    reports.add(bpmnResourceReport);
+    reports.add(resourceReport);
     this.resorceReports = reports;
   }
 

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine;
 import java.util.List;
 
 /**
- * Interface of a problem occurred during bpmn parsing
+ * Interface of a problem occurred during parsing
  */
 public interface Problem {
 

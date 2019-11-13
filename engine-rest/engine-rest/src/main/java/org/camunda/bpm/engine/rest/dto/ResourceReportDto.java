@@ -16,6 +16,34 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-public interface ResourceReportDto {
+import java.util.List;
+
+public class ResourceReportDto {
+
+  protected List<ProblemDto> errors;
+  protected List<ProblemDto> warnings;
+
+  public ResourceReportDto(List<ProblemDto> errors, List<ProblemDto> warnings) {
+    this.errors = errors;
+    this.warnings = warnings;
+  }
+
+  // getter / setters ////////////////////////
+
+  public List<ProblemDto> getErrors() {
+    return errors;
+  }
+
+  public void setErrors(List<ProblemDto> errors) {
+    this.errors = errors;
+  }
+
+  public List<ProblemDto> getWarnings() {
+    return warnings;
+  }
+
+  public void setWarnings(List<ProblemDto> warnings) {
+    this.warnings = warnings;
+  }
 
 }

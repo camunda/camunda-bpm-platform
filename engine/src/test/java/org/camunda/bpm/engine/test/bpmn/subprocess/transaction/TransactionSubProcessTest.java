@@ -26,7 +26,6 @@ import java.util.List;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -618,7 +617,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertThat(e.getMessage()).contains("multiple boundary events with cancelEventDefinition not supported on same transaction");
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx2");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx2");
     }
   }
 
@@ -630,7 +629,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertThat(e.getMessage()).contains("boundary event with cancelEventDefinition only supported on transaction subprocesses");
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx");
     }
   }
 
@@ -642,7 +641,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertThat(e.getMessage()).contains("end event with cancelEventDefinition only supported inside transaction subprocess");
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("failure");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("failure");
     }
   }
 

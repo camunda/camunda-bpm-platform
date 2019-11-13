@@ -14,38 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class BpmnResourceReportDto implements ResourceReportDto {
+import org.camunda.bpm.engine.Problem;
+import org.camunda.bpm.engine.ResourceReport;
 
-  protected List<ProblemDto> errors;
-  protected List<ProblemDto> warnings;
+/**
+ * Resource report created during resource parsing
+ */
+public class ResourceReportImpl implements ResourceReport {
 
-  public BpmnResourceReportDto(List<ProblemDto> errors,
-      List<ProblemDto> warnings) {
-    super();
-    this.errors = errors;
-    this.warnings = warnings;
+  protected String resourceName;
+  protected List<Problem> errors = new ArrayList<>();
+  protected List<Problem> warnings = new ArrayList<>();
+
+  public ResourceReportImpl(String resourceName, List<Problem> errors, List<Problem> warnings) {
+    this.resourceName = resourceName;
+    this.errors.addAll(errors);
+    this.warnings.addAll(warnings);
   }
 
-  // getter / setters ////////////////////////
+  @Override
+  public String getResourceName() {
+    return resourceName;
+  }
 
-  public List<ProblemDto> getErrors() {
+  public List<Problem> getErrors() {
     return errors;
   }
 
-  public void setErrors(List<ProblemDto> errors) {
-    this.errors = errors;
-  }
-
-  public List<ProblemDto> getWarnings() {
+  public List<Problem> getWarnings() {
     return warnings;
-  }
-
-  public void setWarnings(List<ProblemDto> warnings) {
-    this.warnings = warnings;
   }
 
 }

@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
@@ -44,8 +43,8 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ParseException e) {
       assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().size()).isEqualTo(1);
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("externalTask");
+      assertThat(e.getResorceReports().get(0).getErrors().size()).isEqualTo(1);
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("externalTask");
     }
   }
 

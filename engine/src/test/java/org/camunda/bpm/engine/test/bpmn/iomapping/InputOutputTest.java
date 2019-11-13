@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -785,7 +784,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     } catch (ParseException e) {
       // happy path
       assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("SubProcess_1");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("SubProcess_1");
     }
   }
 
@@ -962,7 +961,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
       fail("Exception expected");
     } catch (ParseException e) {
       assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("miTask");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("miTask");
     }
 
   }

@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -87,7 +86,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ParseException e) {
       assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("theEnd");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("theEnd");
     }
   }
 
@@ -99,7 +98,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ParseException e) {
       assertTextPresent("'errorCode' is mandatory on errors referenced by throwing error event definitions", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("theEnd");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("theEnd");
     }
   }
 

@@ -26,7 +26,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -198,7 +197,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
     catch (ParseException e) {
       assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' without condition which is not the default flow."));
-      Problem error = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0);
+      Problem error = e.getResorceReports().get(0).getErrors().get(0);
       assertThat(error.getMainElementId()).isEqualTo("exclusiveGw");
       assertThat(error.getElementIds()).containsExactlyInAnyOrder("exclusiveGw", "flow3");
     }
@@ -229,7 +228,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
     catch (ParseException e) {
       assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has outgoing sequence flow 'flow3' which is the default flow but has a condition too."));
-      Problem error = ((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0);
+      Problem error = e.getResorceReports().get(0).getErrors().get(0);
       assertThat(error.getMainElementId()).isEqualTo("exclusiveGw");
       assertThat(error.getElementIds()).containsExactlyInAnyOrder("exclusiveGw", "flow3");
     }
@@ -250,7 +249,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
     catch (ParseException e) {
       assertTrue(e.getMessage().contains("Exclusive Gateway 'exclusiveGw' has no outgoing sequence flows."));
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("exclusiveGw");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("exclusiveGw");
     }
 
   }

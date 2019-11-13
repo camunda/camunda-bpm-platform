@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -94,7 +93,7 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
     }
     catch (ParseException e) {
       assertTrue(e.getMessage().contains("Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 
@@ -105,7 +104,7 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
     }
     catch (ParseException e) {
       assertTrue(e.getMessage().contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("IntermediateCatchEvent_2");
     }
   }
 }

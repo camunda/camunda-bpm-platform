@@ -16,10 +16,19 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.List;
+
 /**
  * This a report created during a parsing.
  */
 public interface ResourceReport {
 
+  /** Returns the resource name where the problems occurred. */
   String getResourceName();
+
+  /** Returns list of errors in this report */
+  List<Problem> getErrors();
+
+  /** Returns list of warnings in this report */
+  List<Problem> getWarnings();
 }

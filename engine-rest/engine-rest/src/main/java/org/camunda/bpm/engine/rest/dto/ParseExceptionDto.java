@@ -24,7 +24,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ResourceReport;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 
 /**
  * Dto for {@link ParseException}
@@ -45,22 +44,18 @@ public class ParseExceptionDto extends ExceptionDto {
     dto.setMessage(exception.getMessage());
 
     for (ResourceReport report : exception.getResorceReports()) {
-      if (report instanceof BpmnResourceReport) {
-        BpmnResourceReport bpmnResourceReport = (BpmnResourceReport) report;
-        List<ProblemDto> errorDtos = new ArrayList<>();
-        for (Problem error : bpmnResourceReport.getErrors()) {
-          errorDtos.add(ProblemDto.fromProblem(error));
-        }
-
-        List<ProblemDto> warningDtos = new ArrayList<>();
-        for (Problem warning : bpmnResourceReport.getWarnings()) {
-          warningDtos.add(ProblemDto.fromProblem(warning));
-        }
-        BpmnResourceReportDto bpmnResourceReportDto = new BpmnResourceReportDto(errorDtos, warningDtos);
-        dto.details.put(bpmnResourceReport.getResourceName(), bpmnResourceReportDto);
+      List<ProblemDto> errorDtos = new ArrayList<>();
+      for (Problem error : report.getErrors()) {
+        errorDtos.add(ProblemDto.fromProblem(error));
       }
-    }
 
+      List<ProblemDto> warningDtos = new ArrayList<>();
+      for (Problem warning : report.getWarnings()) {
+        warningDtos.add(ProblemDto.fromProblem(warning));
+      }
+      ResourceReportDto resourceReportDto = new ResourceReportDto(errorDtos, warningDtos);
+      dto.details.put(report.getResourceName(), resourceReportDto);
+    }
 
     return dto;
   }

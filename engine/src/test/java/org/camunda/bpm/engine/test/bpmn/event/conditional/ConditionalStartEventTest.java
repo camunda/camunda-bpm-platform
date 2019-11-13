@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -471,7 +470,7 @@ public class ConditionalStartEventTest {
     } catch (ParseException e) {
       // then
       assertThat(e.getMessage()).contains("Cannot have more than one conditional event subscription with the same condition '${variable == 1}'");
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("StartEvent_2");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("StartEvent_2");
       List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
       assertEquals(0, eventSubscriptions.size());
     }

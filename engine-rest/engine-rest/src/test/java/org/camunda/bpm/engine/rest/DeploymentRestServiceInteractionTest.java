@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.ResourceReport;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
+import org.camunda.bpm.engine.impl.bpmn.parser.ResourceReportImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.*;
@@ -1338,16 +1338,16 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     assertEquals(EXAMPLE_PROBLEM_COLUMN, error.get("column"));
     assertEquals(EXAMPLE_PROBLEM_LINE, error.get("line"));
     assertEquals(message, error.get("message"));
-    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID, error.get("mainBpmnElementId"));
-    assertEquals(EXAMPLE_ELEMENT_IDS, error.get("bpmnElementIds"));
+    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID, error.get("mainElementId"));
+    assertEquals(EXAMPLE_ELEMENT_IDS, error.get("еlementIds"));
 
     List<HashMap<String, Object>> warnings = problems.get("warnings");
     HashMap<String, Object> warning = warnings.get(0);
     assertEquals(EXAMPLE_PROBLEM_COLUMN_2, warning.get("column"));
     assertEquals(EXAMPLE_PROBLEM_LINE_2, warning.get("line"));
     assertEquals(EXAMPLE_EXCEPTION_MESSAGE, warning.get("message"));
-    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID_2, warning.get("mainBpmnElementId"));
-    assertEquals(EXAMPLE_ELEMENT_IDS, warning.get("bpmnElementIds"));
+    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID_2, warning.get("mainElementId"));
+    assertEquals(EXAMPLE_ELEMENT_IDS, warning.get("еlementIds"));
   }
 
   @Test
@@ -2062,7 +2062,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     ParseException mockParseException = mock(ParseException.class);
     when(mockParseException.getMessage()).thenReturn(message);
 
-    BpmnResourceReport report = mock(BpmnResourceReport.class);
+    ResourceReportImpl report = mock(ResourceReportImpl.class);
     when(report.getResourceName()).thenReturn(EXAMPLE_RESOURCE_NAME);
     when(report.getErrors()).thenReturn(mockErrors);
     when(report.getWarnings()).thenReturn(mockWarnings);

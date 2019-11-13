@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
@@ -88,7 +87,7 @@ public class SignalEventParseInvalidProcessTest {
       fail("exception expected: " + expectedErrorMessage);
     } catch (ParseException e) {
       assertTextPresent(expectedErrorMessage, e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo(elementIds);
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo(elementIds);
     }
   }
 

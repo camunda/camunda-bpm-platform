@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.Problem;
 /**
  * Dto for {@link Problem}
  *
- * The problem contains a list of bpmn element ids and other details for root
+ * The problem contains a list of element ids and other details for root
  * causing the issue.
  */
 public class ProblemDto {
@@ -31,8 +31,8 @@ public class ProblemDto {
   protected String message;
   protected int line;
   protected int column;
-  protected String mainBpmnElementId;
-  protected List<String> bpmnElementIds;
+  protected String mainElementId;
+  protected List<String> еlementIds;
 
   // transformer /////////////////////////////
 
@@ -42,8 +42,8 @@ public class ProblemDto {
     dto.setMessage(problem.getMessage());
     dto.setLine(problem.getLine());
     dto.setColumn(problem.getColumn());
-    dto.setMainBpmnElementId(problem.getMainElementId());
-    dto.setBpmnElementIds(problem.getElementIds());
+    dto.setMainElementId(problem.getMainElementId());
+    dto.setЕlementIds(problem.getElementIds());
 
     return dto;
   }
@@ -74,20 +74,20 @@ public class ProblemDto {
     this.column = column;
   }
 
-  public String getMainBpmnElementId() {
-    return mainBpmnElementId;
+  public String getMainElementId() {
+    return mainElementId;
   }
 
-  public void setMainBpmnElementId(String mainBpmnElementId) {
-    this.mainBpmnElementId = mainBpmnElementId;
+  public void setMainElementId(String mainElementId) {
+    this.mainElementId = mainElementId;
   }
 
-  public List<String> getBpmnElementIds() {
-    return bpmnElementIds;
+  public List<String> getЕlementIds() {
+    return еlementIds;
   }
 
-  public void setBpmnElementIds(List<String> bpmnElementIds) {
-    this.bpmnElementIds = bpmnElementIds;
+  public void setЕlementIds(List<String> elementIds) {
+    this.еlementIds = elementIds;
   }
 
 }

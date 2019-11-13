@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnResourceReport;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -32,7 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Tests the mapping of the decision result.
+ * Tests the mapping of the decision result.  
  *
  * @author Philipp Ossler
  */
@@ -177,8 +176,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
       fail("expect parse exception");
     } catch (ParseException e) {
       assertTextPresent("No decision result mapper found for name 'invalid'", e.getMessage());
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().size()).isEqualTo(1);
-      assertThat(((BpmnResourceReport) e.getResorceReports().get(0)).getErrors().get(0).getMainElementId()).isEqualTo("ruleTask");
+      assertThat(e.getResorceReports().get(0).getErrors().size()).isEqualTo(1);
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("ruleTask");
     }
   }
 
