@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -703,8 +705,9 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     try {
       deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
       fail("Exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresent("Missing attribute 'target'", e.getMessage());
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("callActivity");
     } finally {
       if (deploymentId != null) {
         repositoryService.deleteDeployment(deploymentId, true);

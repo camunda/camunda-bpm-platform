@@ -12,7 +12,7 @@
 		<sequenceFlow sourceRef="signalEvent" targetRef="task2" />
 		
 		<!-- invalid sequence flow -->
-		<sequenceFlow sourceRef="start" targetRef="signalEvent" />
+		<sequenceFlow id="invalidFlow" sourceRef="start" targetRef="signalEvent" />
 
 		<startEvent id="start" />
 

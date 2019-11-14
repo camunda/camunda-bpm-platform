@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -613,10 +615,9 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultipleCancelBoundaryFails.bpmn20.xml")
         .deploy();
       fail("exception expected");
-    } catch (Exception e) {
-      if(!e.getMessage().contains("multiple boundary events with cancelEventDefinition not supported on same transaction")) {
-        fail("different exception expected");
-      }
+    } catch (ParseException e) {
+      assertThat(e.getMessage()).contains("multiple boundary events with cancelEventDefinition not supported on same transaction");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx2");
     }
   }
 
@@ -626,10 +627,9 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelBoundaryNoTransactionFails.bpmn20.xml")
         .deploy();
       fail("exception expected");
-    } catch (Exception e) {
-      if(!e.getMessage().contains("boundary event with cancelEventDefinition only supported on transaction subprocesses")) {
-        fail("different exception expected");
-      }
+    } catch (ParseException e) {
+      assertThat(e.getMessage()).contains("boundary event with cancelEventDefinition only supported on transaction subprocesses");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("catchCancelTx");
     }
   }
 
@@ -639,10 +639,9 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelEndNoTransactionFails.bpmn20.xml")
         .deploy();
       fail("exception expected");
-    } catch (Exception e) {
-      if(!e.getMessage().contains("end event with cancelEventDefinition only supported inside transaction subprocess")) {
-        fail("different exception expected");
-      }
+    } catch (ParseException e) {
+      assertThat(e.getMessage()).contains("end event with cancelEventDefinition only supported inside transaction subprocess");
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("failure");
     }
   }
 

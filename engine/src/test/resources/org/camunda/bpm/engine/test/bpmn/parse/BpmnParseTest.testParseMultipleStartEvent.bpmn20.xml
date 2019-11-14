@@ -22,7 +22,7 @@
       <timerEventDefinition>
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
-      <messageEventDefinition messageRef="newMessage" />
+      <messageEventDefinition id="MessageEventDefinition_1" messageRef="newMessage" />
     </startEvent>
     <sequenceFlow id="flow_4" sourceRef="startSubProcess" targetRef="mySubProcessUserTask" />
     <userTask id="mySubProcessUserTask" />
@@ -43,7 +43,7 @@
       <timerEventDefinition>
         <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
-      <messageEventDefinition messageRef="newMessage" />
+      <messageEventDefinition id="MessageEventDefinition_2" messageRef="newMessage" />
     </startEvent>
     
     <sequenceFlow id="flow_6" sourceRef="startEventSubProcess" targetRef="myEventSubProcessUserTask" />

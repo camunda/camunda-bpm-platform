@@ -12,10 +12,6 @@
 		
         <!-- compensation handler should not have an incoming sequence flow -->
 		<userTask id="task" isForCompensation="true" />
-		
-		<sequenceFlow sourceRef="task" targetRef="end" />
-		
-		<endEvent id="end" />
     
 	</process>
 

@@ -69,6 +69,8 @@
       
       <subProcess id="nested">
       
+        <startEvent id="startSubProcess_1" />
+        <sequenceFlow sourceRef="startSubProcess_1" targetRef="someServiceInNestedScope" /> 
         <serviceTask id="someServiceInNestedScope" camunda:expression="${true}"/>
       
       </subProcess>

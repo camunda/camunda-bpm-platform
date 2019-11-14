@@ -920,6 +920,16 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_DELETION_LOG = true;
   public static final String EXAMPLE_JOB_CREATE_TIME = withTimezone("2015-01-01T00:00:00");
 
+  // problems
+  public static final int EXAMPLE_PROBLEM_LINE = 77;
+  public static final int EXAMPLE_PROBLEM_COLUMN = 78;
+  public static final String EXAMPLE_PROBLEM_ELEMENT_ID = "element_79";
+  public static final int EXAMPLE_PROBLEM_LINE_2 = 87;
+  public static final int EXAMPLE_PROBLEM_COLUMN_2 = 88;
+  public static final String EXAMPLE_PROBLEM_ELEMENT_ID_2 = "element_89";
+  public static final String EXAMPLE_RESOURCE_NAME = "abc";
+  public static final List<String> EXAMPLE_ELEMENT_IDS = Arrays.asList(EXAMPLE_PROBLEM_ELEMENT_ID, EXAMPLE_PROBLEM_ELEMENT_ID_2);
+
   public static Task createMockTask() {
     return mockTask().build();
   }
