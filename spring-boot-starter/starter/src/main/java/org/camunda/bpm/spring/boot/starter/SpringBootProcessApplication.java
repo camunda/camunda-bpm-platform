@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ServletContextAware;
@@ -88,7 +89,7 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
       .ifPresent(this::setBeanName);
 
     if (camundaBpmProperties.getGenerateUniqueProcessApplicationName()) {
-      setBeanName(CamundaBpmProperties.getUniqueName(CamundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
+      setBeanName(CamundaBpmProperties.getUniqueName(camundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
     }
 
     String processEngineName = processEngine.getName();
@@ -117,12 +118,8 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
   }
 
   @ConditionalOnWebApplication
-  @Bean
-  public WebApplicationConfiguration myWebAppConfiguration() {
-    return new WebApplicationConfiguration();
-  }
-
-  public class WebApplicationConfiguration implements ServletContextAware {
+  @Configuration
+  class WebApplicationConfiguration implements ServletContextAware {
 
     @Override
     public void setServletContext(ServletContext servletContext) {

@@ -17,6 +17,7 @@
   <artifactId>camunda-bpm-spring-boot-starter-qa</artifactId>
 
   <modules>
+    <module>integration-test-simple</module>
     <module>integration-test-webapp</module>
     <module>integration-test-plugins</module>
   </modules>

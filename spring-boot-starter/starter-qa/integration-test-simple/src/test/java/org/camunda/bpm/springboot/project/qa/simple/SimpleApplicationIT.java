@@ -14,40 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter;
+package org.camunda.bpm.springboot.project.qa.simple;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.application.ProcessApplicationInfo;
-import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
-import org.camunda.bpm.spring.boot.starter.test.pa.TestProcessApplication;
-import org.junit.Ignore;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-  classes = { TestProcessApplication.class },
-  webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ActiveProfiles("customContextPath")
-public class CustomContextPathWebProcessApplicationIT {
+@SpringBootTest(classes = { Application.class },
+                webEnvironment = SpringBootTest.WebEnvironment.NONE)
+public class SimpleApplicationIT {
 
   @Autowired
-  private SpringProcessApplication application;
+  RuntimeService runtimeService;
 
-  @Ignore("CAM-10187")
   @Test
-  public void testPostDeployEvent() {
-    assertNotNull(application);
-    assertEquals("/my/custom/context/path", application.getProperties().get(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH));
+  public void shouldStartApplicationSuccessfully() {
+    // then no exception due to missing classes is thrown
+    assertThat(runtimeService).isNotNull();
   }
 
 }
