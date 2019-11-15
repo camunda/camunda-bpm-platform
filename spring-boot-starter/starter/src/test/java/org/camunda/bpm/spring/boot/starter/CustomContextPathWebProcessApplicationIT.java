@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
 import org.camunda.bpm.spring.boot.starter.test.pa.TestProcessApplication;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,6 @@ public class CustomContextPathWebProcessApplicationIT {
   @Autowired
   private SpringProcessApplication application;
 
-  @Ignore("CAM-10187")
   @Test
   public void testPostDeployEvent() {
     assertNotNull(application);

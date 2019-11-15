@@ -46,6 +46,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ServletContextAware;
 
+@Configuration
 public class SpringBootProcessApplication extends SpringProcessApplication {
 
   @Bean
@@ -89,7 +90,7 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
       .ifPresent(this::setBeanName);
 
     if (camundaBpmProperties.getGenerateUniqueProcessApplicationName()) {
-      setBeanName(CamundaBpmProperties.getUniqueName(camundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
+      setBeanName(CamundaBpmProperties.getUniqueName(CamundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
     }
 
     String processEngineName = processEngine.getName();
