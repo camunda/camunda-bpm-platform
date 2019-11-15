@@ -181,7 +181,7 @@
                 <goal>test</goal>
               </goals>
               <configuration>
-                <skipTests>false</skipTests>
+		      <!--<skipTests>false</skipTests>-->
                 <includes>
                   <include>**/*IT.*</include>
                 </includes>
