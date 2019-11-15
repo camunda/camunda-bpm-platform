@@ -28,10 +28,10 @@
   <properties>
     <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
     <!-- for SNAPSHOT versions ${camunda.version} and ${camunda-webapp-ee.version} will be the same, for released versions, the latter must be with -ee suffix -->
-    <camunda.version>7.12.0-SNAPSHOT</camunda.version>
+    <camunda.version>7.12.0-alpha6</camunda.version>
     <!-- for SNAPSHOT versions the camunda.version stays as it is, e.g. 7.12.0-SNAPSHOT -->
     <!-- for released versions, add the suffix '-ee', e.g. 7.12.0-ee -->
-    <camunda-webapp-ee.version>${camunda.version}</camunda-webapp-ee.version>
+    <camunda-webapp-ee.version>${camunda.version}-ee</camunda-webapp-ee.version>
 
     <version.java>1.8</version.java>
     <java.version>${version.java}</java.version>
