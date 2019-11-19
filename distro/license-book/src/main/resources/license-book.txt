@@ -111,7 +111,7 @@ Copyright: various authors (https://github.com/cowtowncoder/java-uuid-generator/
 Licensed under Apache 2.0
 ===========================================================================================
 [Backend / Engine / Rest and and Backend / Spin / json and Backend / Webapp]
-Jackson-annotations: 2.6.0 / 2.10.0 (https://github.com/cowtowncoder/java-uuid-generator)
+Jackson-annotations: 2.6.0 / 2.10.0 (https://github.com/FasterXML/jackson-annotations)
 Copyright: various authors 
 Licensed under Apache 2.0
 ===========================================================================================
