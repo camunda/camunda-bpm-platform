@@ -543,28 +543,6 @@
     </profile>
 
     <profile>
-      <id>oracle-10</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes>
-                <exclude>**/ManagementServiceTest.java</exclude>
-
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>mariadb-galera</id>
       <build>
         <plugins>
