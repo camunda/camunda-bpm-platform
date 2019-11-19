@@ -43,7 +43,7 @@ public class SpinScriptTaskSupportTest {
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule();
 
-  @Parameters
+  @Parameters(name = "{index}: {0}")
   public static Object[] data() {
       return new Object[][] {
                { "groovy", "" },

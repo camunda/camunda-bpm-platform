@@ -98,9 +98,9 @@ public class SpinScriptTaskSupportWithAutoStoreScriptVariablesTest extends Plugg
     deployProcess("ruby", script);
 
     startProcess();
-    checkVariables("foo");
+    checkVariablesJRuby("foo");
     continueProcess();
-    checkVariables("foo");
+    checkVariablesJRuby("foo");
   }
 
   protected void startProcess() {
@@ -116,16 +116,28 @@ public class SpinScriptTaskSupportWithAutoStoreScriptVariablesTest extends Plugg
 
   protected void checkVariables(String... expectedVariables) {
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-
-    assertFalse(variables.containsKey("S"));
-    assertFalse(variables.containsKey("XML"));
-    assertFalse(variables.containsKey("JSON"));
-
-    for (String expectedVariable : expectedVariables) {
-      assertTrue(variables.containsKey(expectedVariable));
-    }
+    checkVariablesValues(expectedVariables, variables);
 
     assertEquals(expectedVariables.length, variables.size());
+  }
+
+  protected void checkVariablesJRuby(String... expectedVariables) {
+
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    checkVariablesValues(expectedVariables, variables);
+
+    // do not assert number of actual variables here, because JRuby leaks variables (see CAM-11114)
+  }
+
+  protected void checkVariablesValues(String[] expectedVariables, Map<String, Object> actualVariables) {
+
+    assertFalse(actualVariables.containsKey("S"));
+    assertFalse(actualVariables.containsKey("XML"));
+    assertFalse(actualVariables.containsKey("JSON"));
+
+    for (String expectedVariable : expectedVariables) {
+      assertTrue(actualVariables.containsKey(expectedVariable));
+    }
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {
