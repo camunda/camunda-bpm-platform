@@ -72,7 +72,6 @@
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
-        <module>distro/wildfly8</module>
         <module>distro/sql-script</module>
 
         <module>database</module>
@@ -148,7 +147,6 @@
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/license-book</module>
-        <module>distro/wildfly8</module>
         <module>distro/wildfly</module>
       </modules>
     </profile>
