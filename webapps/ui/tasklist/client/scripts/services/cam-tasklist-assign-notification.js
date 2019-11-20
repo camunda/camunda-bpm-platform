@@ -53,7 +53,7 @@ module.exports = [
               '<a ng-href="#/?forceDisplayTask=true&task=' +
               task.id +
               '" ng-click="removeNotification(notification)">' +
-              escapeHtml(task.name) +
+              escapeHtml(task.name || task.taskDefinitionKey) +
               '</a>, ';
           }
           $translate(
