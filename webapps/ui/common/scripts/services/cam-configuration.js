@@ -53,7 +53,8 @@ var defaultConfig = {
     mode: 'filter'
   },
   csrfCookieName: 'XSRF-TOKEN',
-  disableWelcomeMessage: false
+  disableWelcomeMessage: false,
+  userOperationLogAnnotationLength: 4000
 };
 
 module.exports = function(config, app) {
@@ -165,6 +166,11 @@ module.exports = function(config, app) {
 
       this.getDisableWelcomeMessage = function() {
         var param = 'disableWelcomeMessage';
+        return config[param] || defaultConfig[param];
+      };
+
+      this.getUserOperationLogAnnotationLength = function() {
+        var param = 'userOperationLogAnnotationLength';
         return config[param] || defaultConfig[param];
       };
 
