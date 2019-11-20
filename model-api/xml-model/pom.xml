@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm.model</groupId>
   <artifactId>camunda-xml-model</artifactId>
-  <version>7.12.0</version>
+  <version>7.13.0-SNAPSHOT</version>
   <name>camunda BPM - Xml Model API</name>
   <packaging>jar</packaging>
 
@@ -186,7 +186,7 @@
     <url>https://github.com/camunda/camunda-xml-model</url>
     <connection>scm:git:git@github.com:camunda/camunda-xml-model.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-xml-model.git</developerConnection>
-    <tag>7.12.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
