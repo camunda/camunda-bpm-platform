@@ -30,12 +30,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-plugin-spin</artifactId>
-        <version>${camunda.version}</version>
-      </dependency>
-
     </dependencies>
 
   </dependencyManagement>

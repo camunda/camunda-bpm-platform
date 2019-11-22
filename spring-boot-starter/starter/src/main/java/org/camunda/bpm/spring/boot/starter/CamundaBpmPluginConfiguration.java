@@ -29,13 +29,23 @@ import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CamundaBpmPluginConfiguration {
 
+  /*
+     When `camunda-spin-dataformat-all` is used as a dependency,
+     SpinDataFormatConfigurationJSR310, SpinDataFormatConfigurationParameterNames
+     and SpinDataFormatConfigurationJdk8 are not used. The `camunda-spin-dataformat-all`
+     artifact comes with a shaded Jackson ObjectMapper (prefixed with `spinjar`),
+     which breaks auto-configuration for Jackson Java 8 modules.
+  */
+
   @ConditionalOnClass({JacksonJsonDataFormat.class, JavaTimeModule.class})
+  @ConditionalOnMissingClass("spinjar.com.fasterxml.jackson.databind.ObjectMapper")
   @Configuration
   static class SpinDataFormatConfigurationJSR310 {
 
@@ -48,6 +58,7 @@ public class CamundaBpmPluginConfiguration {
   }
 
   @ConditionalOnClass({JacksonJsonDataFormat.class, ParameterNamesModule.class})
+  @ConditionalOnMissingClass("spinjar.com.fasterxml.jackson.databind.ObjectMapper")
   @Configuration
   static class SpinDataFormatConfigurationParameterNames {
 
@@ -60,6 +71,7 @@ public class CamundaBpmPluginConfiguration {
   }
 
   @ConditionalOnClass({JacksonJsonDataFormat.class, Jdk8Module.class})
+  @ConditionalOnMissingClass("spinjar.com.fasterxml.jackson.databind.ObjectMapper")
   @Configuration
   static class SpinDataFormatConfigurationJdk8 {
 
