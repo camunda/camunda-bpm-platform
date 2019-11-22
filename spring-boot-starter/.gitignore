@@ -18,3 +18,4 @@ target/
 pom.xml.versionsBackup
 github-pages/
 /.gradle/
+.mvn/maven.config
