@@ -59,11 +59,11 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
     }
 
     if (topmostCancellableExecution.isPreserveScope()) {
-      topmostCancellableExecution.interrupt(cancellationReason, skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.interrupt(cancellationReason, skipCustomListeners, skipIoMappings, externallyTerminated);
       topmostCancellableExecution.leaveActivityInstance();
       topmostCancellableExecution.setActivity(null);
     } else {
-      topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners, skipIoMappings, externallyTerminated, false);
       ModificationUtil.handleChildRemovalInScope(topmostCancellableExecution);
     }
 

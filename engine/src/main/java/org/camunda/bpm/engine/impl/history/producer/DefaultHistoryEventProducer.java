@@ -637,10 +637,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     //determine state
     if (executionEntity.getActivity() != null) {
       evt.setState(HistoricProcessInstance.STATE_COMPLETED);
-    } else if (executionEntity.getActivity() == null && executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
-    } else if (executionEntity.getActivity() == null && !executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
+    } else {
+      if (executionEntity.isExternallyTerminated()) {
+        evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
+      } else if (!executionEntity.isExternallyTerminated()) {
+        evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
+      }
     }
   }
 
