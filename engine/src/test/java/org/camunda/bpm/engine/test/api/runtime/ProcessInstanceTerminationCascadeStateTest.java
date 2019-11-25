@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -136,6 +137,66 @@ public class ProcessInstanceTerminationCascadeStateTest {
 
     // when
     runtimeService.deleteProcessInstance(process.getId(), "test", false, externallyTerminated);
+
+    // then
+    assertHistoricProcessInstances();
+  }
+
+  @Test
+  public void shouldNotCascadeStateFromSubprocessUpCancelation() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess").singleResult();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(subProcess.getId());
+    externallyTerminated = false;
+
+    // when
+    runtimeService.createProcessInstanceModification(subProcess.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+
+    // then
+    assertHistoricProcessInstances();
+  }
+
+  @Test
+  public void shouldNotCascadeStateFromProcessDownCancelation() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(process.getId());
+    externallyTerminated = false;
+
+    // when
+    runtimeService.createProcessInstanceModification(process.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+
+    // then
+    assertHistoricProcessInstances();
+  }
+
+  @Test
+  public void shouldCascadeStateFromSubprocessUpCancelation() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess").singleResult();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(subProcess.getId());
+    externallyTerminated = true;
+
+    // when
+    runtimeService.createProcessInstanceModification(subProcess.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+
+    // then
+    assertHistoricProcessInstances();
+  }
+
+  @Test
+  public void shouldCascadeStateFromProcessDownCancelation() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(process.getId());
+    externallyTerminated = true;
+
+    // when
+    runtimeService.createProcessInstanceModification(process.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
 
     // then
     assertHistoricProcessInstances();

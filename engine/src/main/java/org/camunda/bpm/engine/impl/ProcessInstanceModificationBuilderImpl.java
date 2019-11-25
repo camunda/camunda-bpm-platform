@@ -93,6 +93,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return cancelActivityInstance(activityInstanceId, false);
   }
 
+  @Override
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId, boolean externallyTerminated) {
     ensureNotNull(NotValidException.class, "activityInstanceId", activityInstanceId);
     this.externallyTerminated = externallyTerminated;
