@@ -41,6 +41,7 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
   protected String processInstanceId;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected boolean externallyTerminated;
 
   public AbstractProcessInstanceModificationCommand(String processInstanceId) {
     this.processInstanceId = processInstanceId;
@@ -52,6 +53,10 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMappings = skipIoMappings;
+  }
+  
+  public void setExternallyTerminated(boolean externallyTerminated) {
+    this.externallyTerminated = externallyTerminated;
   }
 
   public void setProcessInstanceId(String processInstanceId) {

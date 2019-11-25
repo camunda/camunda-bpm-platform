@@ -45,11 +45,12 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
         return;
       }
 
-      // propagate skipCustomListeners property
+      // propagate properties
       PvmExecutionImpl deleteRoot = getDeleteRoot(execution);
       if (deleteRoot != null) {
         nextLeaf.setSkipCustomListeners(deleteRoot.isSkipCustomListeners());
         nextLeaf.setSkipIoMappings(deleteRoot.isSkipIoMappings());
+        nextLeaf.setExternallyTerminated(deleteRoot.isExternallyTerminated());
       }
 
       PvmExecutionImpl subProcessInstance = nextLeaf.getSubProcessInstance();
@@ -57,7 +58,8 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
         if (deleteRoot.isSkipSubprocesses()) {
           subProcessInstance.setSuperExecution(null);
         } else {
-          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
+          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings(),
+              nextLeaf.isExternallyTerminated(), nextLeaf.isSkipSubprocesses());
         }
       }
 
