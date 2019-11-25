@@ -287,21 +287,22 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public void clearScope(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void clearScope(String reason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
+    this.externallyTerminated = externallyTerminated;
 
     if (getSubProcessInstance() != null) {
-      getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
+      getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings, externallyTerminated, false);
     }
 
     // remove all child executions and sub process instances:
     List<PvmExecutionImpl> executions = new ArrayList<>(getNonEventScopeExecutions());
     for (PvmExecutionImpl childExecution : executions) {
       if (childExecution.getSubProcessInstance() != null) {
-        childExecution.getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
+        childExecution.getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings, externallyTerminated, false);
       }
-      childExecution.deleteCascade(reason, skipCustomListeners, skipIoMappings);
+      childExecution.deleteCascade(reason, skipCustomListeners, skipIoMappings, externallyTerminated, false);
     }
 
     // fire activity end on active activity
@@ -324,13 +325,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   @Override
   public void interrupt(String reason) {
-    interrupt(reason, false, false);
+    interrupt(reason, false, false, false);
   }
 
-  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     LOG.interruptingExecution(reason, skipCustomListeners);
 
-    clearScope(reason, skipCustomListeners, skipIoMappings);
+    clearScope(reason, skipCustomListeners, skipIoMappings, externallyTerminated);
   }
 
   /**
@@ -556,11 +557,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public void deleteCascade(String deleteReason) {
-    deleteCascade(deleteReason, false);
-  }
-
-  public void deleteCascade(String deleteReason, boolean skipCustomListeners) {
-    deleteCascade(deleteReason, skipCustomListeners, false);
+    deleteCascade(deleteReason, false, false);
   }
 
   public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {

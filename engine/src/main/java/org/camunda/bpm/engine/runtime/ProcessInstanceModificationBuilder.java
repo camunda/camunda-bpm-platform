@@ -98,6 +98,23 @@ public interface ProcessInstanceModificationBuilder extends
   /**
    * <p><i>Submits the instruction:</i></p>
    *
+   * <p>Cancel an activity instance in a process. If this instance has child activity instances
+   * (e.g. in a subprocess instance), these children, their grandchildren, etc. are cancelled as well.</p>
+   *
+   * <p>Process instance cancellation will propagate upward, removing any parent process instances that are
+   * only waiting on the cancelled process to complete.</p>
+   * 
+   * <p>All canceled activity instances will be marked as terminated internally or externally to indicate if
+   * the cancelation was triggered from internal or external context. (internal = engine, external = e.g. API call)</p>
+   *
+   * @param activityInstanceId the id of the activity instance to cancel
+   * @param externallyTerminated indicator if deletion triggered from external context, for instance API call
+   */
+  ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId, boolean externallyTerminated);
+
+  /**
+   * <p><i>Submits the instruction:</i></p>
+   *
    * <p>Cancel a transition instance (i.e. an async continuation) in a process.</p>
    *
    * @param transitionInstanceId the id of the transition instance to cancel

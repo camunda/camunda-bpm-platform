@@ -77,6 +77,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
       instruction.setSkipIoMappings(builder.isSkipIoMappings());
+      instruction.setExternallyTerminated(builder.isExternallyTerminated());
       instruction.execute(commandContext);
     }
 
@@ -86,7 +87,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       if (processInstance.getActivity() == null) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
-        deletePropagate(processInstance, builder.getModificationReason(), builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+        deletePropagate(processInstance, builder.getModificationReason(), builder.isSkipCustomListeners(), builder.isSkipIoMappings(),
+            builder.isExternallyTerminated());
       }
       else if (processInstance.isEnded()) {
         // process instance has ended regularly
@@ -143,7 +145,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     }
   }
 
-  protected void deletePropagate(ExecutionEntity processInstance, String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
+  protected void deletePropagate(ExecutionEntity processInstance, String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     ExecutionEntity topmostDeletableExecution = processInstance;
     ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostDeletableExecution.getParentScopeExecution(true);
 
@@ -152,7 +154,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
         parentScopeExecution = (ExecutionEntity) topmostDeletableExecution.getParentScopeExecution(true);
     }
 
-    topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings);
+    topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated, false);
     ModificationUtil.handleChildRemovalInScope(topmostDeletableExecution);
   }
 
