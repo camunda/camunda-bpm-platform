@@ -2,7 +2,7 @@ package org.camunda.feel.integration
 
 import org.camunda.feel.interpreter._
 import org.camunda.feel.spi._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import java.time._
 import org.camunda.spin.json.SpinJsonNode
 import org.camunda.spin.xml.SpinXmlNode
@@ -60,7 +60,7 @@ class CamundaValueMapper extends JavaValueMapper {
       val fields = n.fieldNames().asScala
       val pairs = fields.map(field => field -> spinJsonToVal(n.prop(field)))
 
-      ValContext(DefaultContext(pairs.toMap))
+      ValContext(Context.StaticContext(pairs.toMap))
     }
     case n if (n.isArray()) => {
       val elements = n.elements().asScala
@@ -76,7 +76,7 @@ class CamundaValueMapper extends JavaValueMapper {
     val name = nodeName(e)
     val value = spinXmlElementToVal(e)
 
-    ValContext(DefaultContext(variables = Map(nodeName(e) -> value)))
+    ValContext(Context.StaticContext(variables = Map(nodeName(e) -> value)))
   }
 
   private def spinXmlElementToVal(e: SpinXmlElement): Val = {
@@ -105,7 +105,7 @@ class CamundaValueMapper extends JavaValueMapper {
     if (members.isEmpty) {
       ValNull
     } else {
-      ValContext(DefaultContext(variables = members))
+      ValContext(Context.StaticContext(variables = members))
     }
   }
 
