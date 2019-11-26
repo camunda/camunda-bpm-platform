@@ -12,43 +12,40 @@
   <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.12.0</name>
 
   <properties>
-    <!-- comment when 7.X is released -->
-    <camunda.version.current>${project.version}</camunda.version.current>
     <camunda.version.previous>7.11.0</camunda.version.previous>
   </properties>
 
-  <!-- uncomment when 7.X is released -->
-  <!-- <dependencyManagement>
+  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
-        <version>7.X.0</version>
+        <version>7.12.0</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
-        <version>7.X.0</version>
+        <version>7.12.0</version>
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-cmmn-model</artifactId>
-        <version>7.X.0</version>
+        <version>7.12.0</version>
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-dmn-model</artifactId>
-        <version>7.X.0</version>
+        <version>7.12.0</version>
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-xml-model</artifactId>
-        <version>7.X.0</version>
+        <version>7.12.0</version>
       </dependency>
     </dependencies>
-  </dependencyManagement> -->
+  </dependencyManagement>
 
   <dependencies>
     <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
@@ -56,28 +53,28 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-dmn</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-api</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-juel</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
 
     <dependency>
@@ -93,7 +90,7 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
-      <!--<version>7.12.0</version>-->
+      <version>7.12.0</version>
     </dependency>
 
     <dependency>
@@ -135,8 +132,7 @@
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
                     <version>${camunda.version.current}</version>
-                    <!-- Replace after 7.12.0 release -->
-                    <!--<version>7.12.0</version>-->
+                    <version>7.12.0</version>
                     <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
@@ -211,9 +207,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
-                  <!-- Replace after 7.12.0 release -->
-                  <!--<versionString>7.12.0</versionString>-->
+                  <versionString>7.12.0</versionString>
                 </configuration>
               </execution>
               <execution>
@@ -279,6 +273,28 @@
                 </configuration>
               </execution>
               -->
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
+              <includeProjectDependencies>true</includeProjectDependencies>
+              <includePluginDependencies>false</includePluginDependencies>
+              <classpathScope>test</classpathScope>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-test-fixture</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
