@@ -29,6 +29,7 @@
     <module>test-fixture-710</module>
     <module>test-fixture-711</module>
     <module>test-fixture-712</module>
+    <module>test-fixture-713</module>
     <module>test-migration</module>
   </modules>
 

@@ -12,7 +12,7 @@
   <name>camunda BPM - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.11.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.12.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -97,34 +97,34 @@
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-xml-model</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-bpmn-model</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-cmmn-model</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-dmn-model</artifactId>
-            <version>7.11.0</version>
+            <version>7.12.0</version>
           </dependency>
           <dependency>
             <groupId>org.mybatis</groupId>
@@ -218,7 +218,7 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
-          <version>7.11.0</version>
+          <version>7.12.0</version>
           <scope>test</scope>
         </dependency>
         <dependency>
