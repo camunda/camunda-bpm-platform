@@ -13,6 +13,12 @@
     <version>7.13.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <!-- on 7.12 release this property should be removed and
+    camunda.version.old from camunda-database-settigns used -->
+    <version.old>1.7.1</version.old>
+  </properties>
+
   <dependencies>
 
     <dependency>
@@ -46,7 +52,9 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
-          <comparisonVersion>${camunda.version.old}</comparisonVersion>
+          <!-- After 7.12 release, use camunda.version.old -->
+          <!--<comparisonVersion>${camunda.version.old}</comparisonVersion>-->
+          <comparisonVersion>${version.old}</comparisonVersion>
           <logResults>true</logResults>
           <excludes>
             <exclude>org/camunda/bpm/engine/impl/**</exclude>
