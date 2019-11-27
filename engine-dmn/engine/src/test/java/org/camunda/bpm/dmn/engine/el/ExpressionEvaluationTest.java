@@ -36,7 +36,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     public void testHasInputVariableName() {
       DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 2));
 
-      assertThat(decisionResult.getSingleEntry()).isEqualTo(true);
+      assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     public void testOverrideInputVariableName() {
       DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 2));
 
-      assertThat(decisionResult.getSingleEntry()).isEqualTo(true);
+      assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     public void testHasVariableContext() {
       DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 3));
 
-      assertThat(decisionResult.getSingleEntry()).isEqualTo(true);
+      assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     public void testHasInputVariableNameInVariableContext() {
       DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 3));
 
-      assertThat(decisionResult.getSingleEntry()).isEqualTo(true);
+      assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
 
 }

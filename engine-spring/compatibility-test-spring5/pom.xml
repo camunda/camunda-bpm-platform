@@ -109,7 +109,7 @@
                 <dependency>org.camunda.bpm:camunda-engine-spring</dependency>
             </dependenciesToScan>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <argLine>-XX:MaxPermSize=160m -Xmx768m</argLine>
+            <argLine>-Xmx768m</argLine>
         </configuration>
       </plugin>
     </plugins>
