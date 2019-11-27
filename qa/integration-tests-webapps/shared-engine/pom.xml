@@ -129,8 +129,8 @@
     <profile>
       <id>tomcat</id>
       <properties>
-        <tomcat.runtime>${basedir}/../${tomcat6.runtime.location}</tomcat.runtime>
-        <http.port>${tomcat6.connector.http.port}</http.port>
+        <tomcat.runtime>${basedir}/../${tomcat.runtime.location}</tomcat.runtime>
+        <http.port>${tomcat.connector.http.port}</http.port>
       </properties>
       <dependencies>
         <dependency>
@@ -191,8 +191,8 @@
                 <type>standalone</type>
                 <home>${project.build.directory}/config-tomcat</home>
                 <properties>
-                  <cargo.servlet.port>${tomcat6.connector.http.port}</cargo.servlet.port>
-                  <cargo.tomcat.ajp.port>${tomcat6.connector.ajp.port}</cargo.tomcat.ajp.port>
+                  <cargo.servlet.port>${tomcat.connector.http.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${tomcat.connector.ajp.port}</cargo.tomcat.ajp.port>
                 </properties>
               </configuration>
               <deployables>
@@ -201,7 +201,7 @@
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
                   <classifier>tomcat</classifier>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/engine-rest/engine/default/process-definition</pingURL>
+                  <pingURL>http://localhost:${tomcat.connector.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>engine-rest</context>
@@ -211,7 +211,7 @@
                   <groupId>org.camunda.bpm.webapp</groupId>
                   <artifactId>camunda-webapp-tomcat</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
+                  <pingURL>http://localhost:${tomcat.connector.http.port}/camunda</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>camunda</context>

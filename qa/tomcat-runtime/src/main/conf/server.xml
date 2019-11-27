@@ -19,7 +19,7 @@
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
  -->
-<Server port="${tomcat6.server.port}" shutdown="SHUTDOWN">
+<Server port="${tomcat.server.port}" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
@@ -95,9 +95,9 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="${tomcat6.connector.http.port}" protocol="HTTP/1.1" 
+    <Connector port="${tomcat.connector.http.port}" protocol="HTTP/1.1" 
                connectionTimeout="20000" 
-               redirectPort="${tomcat6.connector.http.redirectPort}" />
+               redirectPort="${tomcat.connector.http.redirectPort}" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -116,7 +116,7 @@
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector port="${tomcat6.connector.ajp.port}" protocol="AJP/1.3" redirectPort="${tomcat6.connector.ajp.redirectPort}" />
+    <Connector port="${tomcat.connector.ajp.port}" protocol="AJP/1.3" redirectPort="${tomcat.connector.ajp.redirectPort}" />
 
 
     <!-- An Engine represents the entry point (within Catalina) that processes
