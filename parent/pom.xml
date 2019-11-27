@@ -55,8 +55,6 @@
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
-    <version.java.wildfly>1.8</version.java.wildfly>
-
     <!-- OSGi bundles properties -->
     <camunda.artifact />
     <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
@@ -119,10 +117,10 @@
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
       </dependency>
-	  <dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
-		<artifactId>commons-lang3</artifactId>
-		<version>3.8.1</version>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.8.1</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>

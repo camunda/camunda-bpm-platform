@@ -756,7 +756,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionWithVariableMap() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
@@ -766,7 +766,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionWithVariableContext() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
@@ -776,7 +776,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionLiteralExpression() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
