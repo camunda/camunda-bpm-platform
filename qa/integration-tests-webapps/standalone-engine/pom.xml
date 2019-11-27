@@ -111,7 +111,7 @@
 
       <properties>
         <tomcat.runtime>${basedir}/../../vanilla-runtimes/tomcat/target/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
-        <http.port>${tomcat6.connector.http.port}</http.port>
+        <http.port>${tomcat.connector.http.port}</http.port>
       </properties>
 
       <dependencies>
@@ -157,8 +157,8 @@
                 <type>standalone</type>
                 <home>${project.build.directory}/config-tomcat</home>
                 <properties>
-                  <cargo.servlet.port>${tomcat6.connector.http.port}</cargo.servlet.port>
-                  <cargo.tomcat.ajp.port>${tomcat6.connector.ajp.port}</cargo.tomcat.ajp.port>
+                  <cargo.servlet.port>${tomcat.connector.http.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${tomcat.connector.ajp.port}</cargo.tomcat.ajp.port>
                 </properties>
               </configuration>
               <deployables>
@@ -166,7 +166,7 @@
                   <groupId>org.camunda.bpm.webapp</groupId>
                   <artifactId>camunda-webapp-tomcat-standalone</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
+                  <pingURL>http://localhost:${tomcat.connector.http.port}/camunda</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
                     <context>camunda</context>

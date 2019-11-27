@@ -63,7 +63,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
   public void testFeelInputEntry() {
     DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy, atLeastOnce()).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
@@ -77,7 +77,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy, atLeastOnce()).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
@@ -162,7 +162,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = engine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy).evaluateSimpleExpression(anyString(), any(VariableContext.class));
   }
@@ -179,7 +179,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = engine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy).evaluateSimpleExpression(anyString(), any(VariableContext.class));
   }

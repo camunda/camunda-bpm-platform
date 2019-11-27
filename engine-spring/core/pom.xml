@@ -156,7 +156,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <argLine>-XX:MaxPermSize=160m -Xmx768m</argLine>
+            <argLine>-Xmx768m</argLine>
         </configuration>
       </plugin>
 
