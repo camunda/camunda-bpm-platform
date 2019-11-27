@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <!-- DO NOT REMOVE EMPTY TAG https://issues.apache.org/jira/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -33,8 +33,6 @@
     <!-- for released versions, add the suffix '-ee', e.g. 7.12.0-ee -->
     <camunda-webapp-ee.version>${camunda.version}</camunda-webapp-ee.version>
 
-    <version.java>1.8</version.java>
-    <java.version>${version.java}</java.version>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -128,13 +126,6 @@
     </pluginManagement>
 
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
