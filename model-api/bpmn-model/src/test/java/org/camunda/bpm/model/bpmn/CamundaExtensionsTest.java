@@ -1044,7 +1044,7 @@ public class CamundaExtensionsTest {
     assertThat(elements).isEmpty();
 
     inputParameter.removeValue();
-    assertThat(inputParameter.getValue()).isNull();
+    assertThat((Object) inputParameter.getValue()).isNull();
 
   }
 
@@ -1085,7 +1085,7 @@ public class CamundaExtensionsTest {
     assertThat(entries).hasSize(2);
 
     inputParameter.removeValue();
-    assertThat(inputParameter.getValue()).isNull();
+    assertThat((Object) inputParameter.getValue()).isNull();
   }
 
   @Test
@@ -1113,7 +1113,7 @@ public class CamundaExtensionsTest {
     assertThat(script.getTextContent()).isEmpty();
 
     inputParameter.removeValue();
-    assertThat(inputParameter.getValue()).isNull();
+    assertThat((Object) inputParameter.getValue()).isNull();
   }
 
   @Test

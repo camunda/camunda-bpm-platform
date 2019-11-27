@@ -40,13 +40,13 @@
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
 
     <!-- tomcat -->
-    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
-    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
-    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
-    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-    <tomcat6.server.port>48005</tomcat6.server.port>
+    <tomcat.connector.http.port>48080</tomcat.connector.http.port>
+    <tomcat.connector.http.redirectPort>48443</tomcat.connector.http.redirectPort>
+    <tomcat.connector.ajp.port>48009</tomcat.connector.ajp.port>
+    <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
+    <tomcat.server.port>48005</tomcat.server.port>
 
-    <tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
+    <tomcat.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat.runtime.location>
 
   </properties>
 

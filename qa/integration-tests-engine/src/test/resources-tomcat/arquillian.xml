@@ -10,14 +10,14 @@
 
   <container qualifier="tomcat" default="true">
     <configuration>
-      <property name="catalinaHome">${tomcat6.runtime.location}</property>
-      <property name="catalinaBase">${tomcat6.runtime.location}</property>
-      <property name="bindHttpPort">${tomcat6.connector.http.port}</property>
+      <property name="catalinaHome">${tomcat.runtime.location}</property>
+      <property name="catalinaBase">${tomcat.runtime.location}</property>
+      <property name="bindHttpPort">${tomcat.connector.http.port}</property>
       <property name="user">arquillian</property>
       <property name="pass">arquillian</property>
       <property name="jmxPort">8089</property>
-      <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=192m</property>
-<!--       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=192m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
+      <property name="javaVmArguments">-Xmx512m</property>
+<!--       <property name="javaVmArguments">-Xmx512m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
     </configuration>
   </container>
 </arquillian>
