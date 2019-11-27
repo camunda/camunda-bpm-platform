@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
+import org.camunda.bpm.engine.RuntimeService;
 
 /**
  * <p>A fluent builder for defining message correlation</p>
@@ -250,7 +251,9 @@ public interface MessageCorrelationBuilder {
    * Executes the message correlation for multiple messages.
    *
    * @see {@link #correlateAllWithResult()}
+   * @deprecated use {@link RuntimeService#signalEventReceived()} since Messages are defined as point-to-point comunication in BPMN
    */
+  @Deprecated
   void correlateAll();
 
   /**
@@ -277,7 +280,9 @@ public interface MessageCorrelationBuilder {
    * @return The result list of the message correlations. Each result contains
    * either the execution id or the start event activity id and the process definition.
    * @since 7.6
+   * @deprecated use {@link RuntimeService#signalEventReceived()} since Messages are defined as point-to-point comunication in BPMN
    */
+  @Deprecated
   List<MessageCorrelationResult> correlateAllWithResult();
 
   /**
@@ -293,7 +298,9 @@ public interface MessageCorrelationBuilder {
    * @return The result list of the message correlations. Each result contains
    *         either the execution id or the start event activity id, the process
    *         definition, and the process variables.
+   * @deprecated use {@link RuntimeService#signalEventReceived()} since Messages are defined as point-to-point comunication in BPMN
    */
+  @Deprecated
   List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables(boolean deserializeValues);
 
   /**
