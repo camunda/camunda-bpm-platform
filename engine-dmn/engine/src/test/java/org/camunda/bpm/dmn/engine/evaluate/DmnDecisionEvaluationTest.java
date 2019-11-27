@@ -274,7 +274,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
 
     assertThat(result.getSingleResult().keySet()).containsOnly("c");
 
-    assertThat(result.getSingleEntry())
+    assertThat((int) result.getSingleEntry())
       .isNotNull()
       .isEqualTo(5);
   }
@@ -298,7 +298,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
           .putValue("x", 2)
           .putValue("bean", new TestBean(3)));
 
-    assertThat(result.getSingleEntry())
+    assertThat((int) result.getSingleEntry())
       .isNotNull()
       .isEqualTo(6);
   }
@@ -310,7 +310,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
     variables.putValue("dayType","WeekDay");
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
-    assertThat(result.getSingleEntry())
+    assertThat((String) result.getSingleEntry())
       .isNotNull()
       .isEqualTo("Steak");
   }
@@ -322,7 +322,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
     variables.putValue("dayType","WeekDay");
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
-    assertThat(result.getSingleEntry())
+    assertThat((String) result.getSingleEntry())
       .isNotNull()
       .isEqualTo("Steak");
   }
