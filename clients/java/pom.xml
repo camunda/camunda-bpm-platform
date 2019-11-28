@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -29,8 +29,6 @@
     <camunda.version>7.13.0-SNAPSHOT</camunda.version>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-
-    <version.java>1.8</version.java>
 
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
