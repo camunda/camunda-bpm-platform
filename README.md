@@ -117,12 +117,6 @@ In order to configure the build, compose the profiles for runtime container, tes
 mvn clean install -Pengine-integration,wildfly,h2
 ```
 
-or, for WildFly:
-
-```
-mvn clean install -Pengine-integration,wildfly,h2
-```
-
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
 
 ```
