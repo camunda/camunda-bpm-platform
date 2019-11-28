@@ -81,19 +81,6 @@
     <!-- Server profiles -->
 
     <profile>
-      <id>jboss</id>
-      <modules>
-        <module>jboss7-runtime</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>jboss-domain</id>
-      <modules>
-        <module>jboss7-runtime</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>wildfly</id>
       <modules>
         <module>wildfly-runtime</module>
