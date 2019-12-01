@@ -24,9 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1320,6 +1318,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (databaseType == null) {
       initDatabaseType();
     }
+    initDatabaseSchema();
   }
 
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
@@ -1383,6 +1382,55 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  /**
+   * Try to read schema name use jdbc.Make it more self config.
+   * <p>
+   * If we use a oracle database and not set the {@link #databaseSchema}.
+   * The engine {@link #databaseSchemaUpdate} check call
+   * {@link org.camunda.bpm.engine.impl.db.sql.DbSqlSession#isTablePresent(String)}
+   * would read all the schema tables in the database.
+   * <p>
+   * And it would return true if there is another schema have the same name of check table
+   * which will fail the {#databaseSchemaUpdate}
+   */
+  protected void initDatabaseSchema() {
+    if (databaseSchema == null) {
+      Connection connection = null;
+      try {
+        connection = dataSource.getConnection();
+        databaseSchema = connection.getSchema();
+        if (databaseSchema == null && databaseType.equalsIgnoreCase("oracle")) {
+          //oracle not return schema from the connection
+          try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery("SELECT SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') FROM DUAL");
+            if (resultSet.next()) {
+              databaseSchema = resultSet.getString(1);
+            }
+          }
+        }
+      } catch (SQLException e) {
+        LOG.databaseConnectionAccessException(e);
+      } finally {
+        try {
+          if (connection != null) {
+            connection.close();
+          }
+        } catch (SQLException e) {
+          LOG.databaseConnectionCloseException(e);
+        }
+      }
+    }
+    //auto config for ensurePrefixAndSchemaFitToegether
+    if (databaseSchema != null) {
+      if (databaseTablePrefix != null) {
+        if (!databaseTablePrefix.startsWith(databaseSchema + ".") && !databaseTablePrefix.contains(".")) {
+          databaseTablePrefix = databaseSchema + "." + databaseTablePrefix;
+        }
+      } else {
+        databaseTablePrefix = databaseSchema + ".";
+      }
+    }
+  }
   /**
    * The product name of mariadb is still 'MySQL'. This method
    * tries if it can find some evidence for mariadb. If it is successful
