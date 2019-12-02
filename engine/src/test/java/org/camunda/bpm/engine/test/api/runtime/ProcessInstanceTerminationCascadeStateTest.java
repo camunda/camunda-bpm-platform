@@ -44,17 +44,18 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class ProcessInstanceTerminationCascadeStateTest {
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testRule);
 
-  ProcessEngine engine;
-  RepositoryService repositoryService;
-  RuntimeService runtimeService;
-  HistoryService historyService;
+  protected ProcessEngine engine;
+  protected RepositoryService repositoryService;
+  protected RuntimeService runtimeService;
+  protected HistoryService historyService;
 
-  boolean externallyTerminated;
+  protected boolean externallyTerminated;
+
 
   @Before
   public void init() {
@@ -66,7 +67,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     prepareDeployment();
   }
 
-  private void prepareDeployment() {
+  protected void prepareDeployment() {
     BpmnModelInstance callee = Bpmn.createExecutableProcess("subProcess").startEvent().userTask("userTask").endEvent().done();
     BpmnModelInstance caller = Bpmn.createExecutableProcess("process").startEvent().callActivity("callActivity").calledElement("subProcess").endEvent().done();
 
@@ -202,7 +203,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     assertHistoricProcessInstances();
   }
 
-  private void assertHistoricProcessInstances() {
+  protected void assertHistoricProcessInstances() {
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
     assertThat(historicProcessInstances.size()).isEqualTo(2);
     for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
