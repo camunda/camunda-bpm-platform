@@ -218,7 +218,7 @@
     <include refid="selectTaskByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
-  
+
   <sql id="columnSelection">
     RES.REV_, RES.ID_, RES.NAME_, RES.PARENT_TASK_ID_, RES.DESCRIPTION_, RES.PRIORITY_,
     RES.CREATE_TIME_, RES.OWNER_, RES.ASSIGNEE_, RES.DELEGATION_, RES.EXECUTION_ID_,
@@ -285,18 +285,18 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
-      on RES.PROC_DEF_ID_ = PROCDEF.ID_           
-      <if test="!authCheck.revokeAuthorizationCheckEnabled">    
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+      on RES.PROC_DEF_ID_ = PROCDEF.ID_
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))
       </if>
     </if>
-    
+
     <foreach collection="orderingProperties" item="orderingProperty" index="i">
       <if test="orderingProperty.relation != null">
         <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
-        left join 
-        ${prefix}${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableMapping(orderingProperty.relation)} 
+        left join
+        ${prefix}${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableMapping(orderingProperty.relation)}
         ${tableAlias}
         on
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.filterOrderByRelations"/>
@@ -421,6 +421,9 @@
             </if>
             <if test="query.keyLike != null">
               ${queryType} RES.TASK_DEF_KEY_ like #{query.keyLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.keyNotLike != null">
+              ${queryType} RES.TASK_DEF_KEY_ like #{query.keyNotLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.parentTaskId != null">
               ${queryType} RES.PARENT_TASK_ID_ = #{query.parentTaskId}
@@ -638,10 +641,10 @@
         </trim>
         )
       </foreach>
-      
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
- 
+
     </where>
   </sql>
 

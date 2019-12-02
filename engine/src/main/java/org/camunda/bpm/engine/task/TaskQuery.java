@@ -391,6 +391,15 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    **/
   TaskQuery taskDefinitionKeyLike(String keyLike);
 
+  /**
+   * same as {@link #taskDefinitionKeyNotLike(String)}
+   *
+   * but not like
+   * @param keyNotLike
+   * @return
+   */
+  TaskQuery taskDefinitionKeyNotLike(String keyNotLike);
+
   /** Only select tasks which have one of the taskDefinitionKeys. **/
   TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
 
