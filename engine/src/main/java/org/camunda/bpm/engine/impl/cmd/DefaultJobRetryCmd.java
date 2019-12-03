@@ -111,7 +111,9 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
       int intervalsCount = intervals.size();
       int indexOfInterval = Math.max(0, Math.min(intervalsCount - 1, intervalsCount - (job.getRetries() - 1)));
       DurationHelper durationHelper = getDurationHelper(intervals.get(indexOfInterval));
-      job.setLockExpirationTime(durationHelper.getDateAfter());
+
+      job.setDuedate(durationHelper.getDateAfter());
+      job.unlock();
 
       logException(job);
       decrementRetries(job);
