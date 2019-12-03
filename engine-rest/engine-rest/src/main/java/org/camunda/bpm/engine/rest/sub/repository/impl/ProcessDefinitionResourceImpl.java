@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
-import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
@@ -239,8 +238,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       query.includeIncidentsForType(includeIncidentsForType);
     }
 
-    List<ActivityStatistics> queryResults =
-        ((ActivityStatisticsQueryImpl) query).unboundedResultList();
+    List<ActivityStatistics> queryResults = query.unlimitedList();
 
     List<StatisticsResultDto> results = new ArrayList<>();
     for (ActivityStatistics queryResult : queryResults) {

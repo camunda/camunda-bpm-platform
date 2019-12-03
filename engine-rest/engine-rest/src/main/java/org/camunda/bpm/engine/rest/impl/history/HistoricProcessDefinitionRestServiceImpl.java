@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
-import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
@@ -50,8 +49,7 @@ public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProces
 
     List<HistoricActivityStatisticsDto> result = new ArrayList<HistoricActivityStatisticsDto>();
 
-    List<HistoricActivityStatistics> statistics =
-        ((HistoricActivityStatisticsQueryImpl) query).unboundedResultList();
+    List<HistoricActivityStatistics> statistics = query.unlimitedList();
 
     for (HistoricActivityStatistics currentStatistics : statistics) {
       result.add(HistoricActivityStatisticsDto.fromHistoricActivityStatistics(currentStatistics));

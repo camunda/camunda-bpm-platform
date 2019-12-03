@@ -64,6 +64,13 @@ public interface Query<T extends Query< ? , ? >, U extends Object> {
   List<U> list();
 
   /**
+   * Executes the query. No limitation checks are performed (e. g. query limit).
+   *
+   * @return a list of results
+   */
+  List<U> unlimitedList();
+
+  /**
    * Executes the query and get a list of entities as the result.
    *
    * @param firstResult the index of the first result
@@ -75,4 +82,5 @@ public interface Query<T extends Query< ? , ? >, U extends Object> {
    *   (default {@link Integer#MAX_VALUE}).
    */
   List<U> listPage(int firstResult, int maxResults);
+
 }

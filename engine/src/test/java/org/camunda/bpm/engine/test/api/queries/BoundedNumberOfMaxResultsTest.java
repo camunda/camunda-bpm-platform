@@ -249,7 +249,7 @@ public class BoundedNumberOfMaxResultsTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<ProcessInstance> processInstances = processInstanceQuery.unboundedResultList();
+    List<ProcessInstance> processInstances = processInstanceQuery.unlimitedList();
 
     // then
     assertThat(processInstances.size()).isEqualTo(1);
