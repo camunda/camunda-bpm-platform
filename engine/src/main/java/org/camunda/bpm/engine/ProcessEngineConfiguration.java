@@ -408,7 +408,7 @@ public abstract class ProcessEngineConfiguration {
   protected DeserializationTypeValidator deserializationTypeValidator;
 
   /** Indicates whether type validation should be done before deserialization */
-  protected boolean deserializationTypeValidationEnabled = false;
+  protected boolean deserializationTypeValidationEnabled = true;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
