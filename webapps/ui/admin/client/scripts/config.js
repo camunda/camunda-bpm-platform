@@ -44,5 +44,6 @@ window.camAdminConf = {
   //   'fallbackLocale': 'en'
   // },
   // csrfCookieName: 'XSRF-TOKEN',
-  // disableWelcomeMessage: false
+  // disableWelcomeMessage: false,
+  // userOperationLogAnnotationLength: 4000
 };
