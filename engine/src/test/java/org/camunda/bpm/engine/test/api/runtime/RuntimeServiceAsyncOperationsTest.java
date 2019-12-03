@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -271,6 +272,55 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, null);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    assertHistoricTaskDeletionPresent(processIds, "deleted", testRule);
+    assertHistoricBatchExists(testRule);
+    assertProcessInstancesAreDeleted();
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncWithHistoryQuery() {
+    // given
+    List<String> processIds = startTestProcesses(2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery()
+            .processInstanceIds(new HashSet<>(processIds));
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(null, null,
+        historicProcessInstanceQuery, "", false, false);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    assertHistoricTaskDeletionPresent(processIds, "deleted", testRule);
+    assertHistoricBatchExists(testRule);
+    assertProcessInstancesAreDeleted();
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncWithRuntimeAndHistoryQuery() {
+    // given
+    List<String> processIds = startTestProcesses(2);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processIds.get(0));
+
+    ProcessInstanceQuery processInstanceQuery =
+        runtimeService.createProcessInstanceQuery().processInstanceId(processIds.get(1));
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery,
+        historicProcessInstanceQuery, "", false, false);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);

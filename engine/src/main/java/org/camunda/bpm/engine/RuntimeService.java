@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
@@ -650,6 +651,32 @@ public interface RuntimeService {
    *          {@link BatchPermissions#CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses);
+
+  /**
+   * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * Deletion propagates upward as far as necessary.
+   *
+   * @param processInstanceIds id's of process instances to delete.
+   * @param processInstanceQuery query that will be used to fetch affected process instances.
+   * @param historicProcessInstanceQuery query that will be used to fetch affected
+   *                                     process instances based on history data.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners skips custom execution listeners when removing instances
+   * @param skipSubprocesses skips subprocesses when removing instances
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given queries or ids.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+                                    ProcessInstanceQuery processInstanceQuery,
+                                    HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                    String deleteReason,
+                                    boolean skipCustomListeners,
+                                    boolean skipSubprocesses);
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.

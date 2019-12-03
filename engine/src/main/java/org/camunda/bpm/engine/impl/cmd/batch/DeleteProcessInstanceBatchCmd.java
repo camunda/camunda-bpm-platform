@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.impl.cmd.batch;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -44,13 +46,20 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   protected final String deleteReason;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
+  protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchCmd(List<String> processInstances,
+                                       ProcessInstanceQuery processInstanceQuery,
+                                       HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                       String deleteReason,
+                                       boolean skipCustomListeners,
+                                       boolean skipSubprocesses) {
     super();
     this.processInstanceIds = processInstances;
     this.processInstanceQuery = processInstanceQuery;
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
@@ -70,7 +79,13 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
       collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
 
-    return new ArrayList<String>(collectedProcessInstanceIds);
+    final HistoricProcessInstanceQueryImpl historicProcessInstanceQuery =
+        (HistoricProcessInstanceQueryImpl) this.historicProcessInstanceQuery;
+    if (historicProcessInstanceQuery != null) {
+      collectedProcessInstanceIds.addAll(historicProcessInstanceQuery.listIds());
+    }
+
+    return new ArrayList<>(collectedProcessInstanceIds);
   }
 
   public List<String> getProcessInstanceIds() {

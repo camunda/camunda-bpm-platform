@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.api.mgmt;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -237,6 +238,46 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
     //when
     Batch batch = managementService.setJobRetriesAsync(null, query, RETRIES);
+    executeSeedJob(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions.size(), is(0));
+    assertRetries(ids, RETRIES);
+    assertHistoricBatchExists(testRule);
+  }
+
+  @Test
+  public void testSetJobsRetryAsyncWithHistoryProcessQuery() {
+    //given
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery();
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(null, null,
+        historicProcessInstanceQuery, RETRIES);
+    executeSeedJob(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions.size(), is(0));
+    assertRetries(ids, RETRIES);
+    assertHistoricBatchExists(testRule);
+  }
+
+  @Test
+  public void testSetJobsRetryAsyncWithRuntimeAndHistoryProcessQuery() {
+    //given
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceIds.get(0));
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processInstanceIds.get(1));
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(null, query,
+        historicProcessInstanceQuery, RETRIES);
     executeSeedJob(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
