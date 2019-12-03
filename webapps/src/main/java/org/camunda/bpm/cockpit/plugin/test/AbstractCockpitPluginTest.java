@@ -57,7 +57,7 @@ public abstract class AbstractCockpitPluginTest {
   }
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
 
   @BeforeClass
   public static void beforeClass() {
