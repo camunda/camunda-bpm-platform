@@ -179,7 +179,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   @SuppressWarnings("unchecked")
-  public List<U> unboundedResultList() {
+  public List<U> unlimitedList() {
     this.resultType = ResultType.LIST;
     if (commandExecutor != null) {
       return (List<U>) commandExecutor.execute(this);
