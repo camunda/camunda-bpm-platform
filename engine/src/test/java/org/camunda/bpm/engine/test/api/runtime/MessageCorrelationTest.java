@@ -85,6 +85,7 @@ public class MessageCorrelationTest {
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
+      configuration.setDeserializationAllowedClasses(FailingJavaSerializable.class.getName());
       return configuration;
     }
   };

@@ -25,6 +25,9 @@
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
       </list>
     </property>
+    
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
   </bean>
   
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->

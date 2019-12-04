@@ -32,8 +32,10 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -41,7 +43,9 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -65,7 +69,15 @@ public class JsonSerializationTest {
   protected static final String JSON_FORMAT_NAME = DataFormats.JSON_DATAFORMAT_NAME;
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setDeserializationAllowedClasses(JsonSerializable.class.getName() + "," + JsonSerializationTest.class.getName());
+      return configuration;
+    }
+  };
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);

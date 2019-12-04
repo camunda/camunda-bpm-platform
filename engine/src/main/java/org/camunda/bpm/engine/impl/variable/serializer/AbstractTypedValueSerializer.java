@@ -65,4 +65,9 @@ public abstract class AbstractTypedValueSerializer<T extends TypedValue> impleme
     return false;
   }
 
+  @Override
+  public void validateTargetType(String typeIdentifier) {
+    // nothing to do
+  }
+
 }

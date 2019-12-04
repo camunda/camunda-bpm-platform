@@ -67,6 +67,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
+      configuration.setDeserializationAllowedClasses(JavaSerializable.class.getName());
       return configuration;
     }
   };

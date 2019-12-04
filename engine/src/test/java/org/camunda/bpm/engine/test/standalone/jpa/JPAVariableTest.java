@@ -97,6 +97,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
           .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
 
       processEngineConfiguration.setJavaSerializationFormatEnabled(true);
+      processEngineConfiguration.setDeserializationAllowedClasses(JavaSerializable.class.getName());
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 

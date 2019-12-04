@@ -25,8 +25,12 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.ClassLoadingException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 
 /**
@@ -96,5 +100,35 @@ public class JavaObjectSerializer extends AbstractObjectValueSerializer {
       return ReflectUtil.loadClass(desc.getName());
     }
 
+  }
+
+  @Override
+  public void validateTargetType(String typeIdentifier) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (processEngineConfiguration.isDeserializationTypeValidationEnabled()) {
+      DeserializationTypeValidator validator = processEngineConfiguration.getDeserializationTypeValidator();
+      if (validator != null) {
+        try {
+          Class<?> javaClass = ReflectUtil.loadClass(typeIdentifier);
+          validateType(javaClass, validator);
+        } catch (ClassLoadingException e) {
+          // class cannot be loaded and therefore not be validated as well
+        }
+      }
+    }
+  }
+
+  protected void validateType(Class<?> type, DeserializationTypeValidator validator) {
+    // validate the outer class
+    if (!type.isPrimitive()) {
+      Class<?> typeToValidate = type;
+      if (type.isArray()) {
+        typeToValidate = type.getComponentType();
+      }
+      String className = typeToValidate.getName();
+      if (!validator.validate(className)) {
+        throw new RuntimeException("The class '" + className + "' is not whitelisted for deserialization.");
+      }
+    }
   }
 }

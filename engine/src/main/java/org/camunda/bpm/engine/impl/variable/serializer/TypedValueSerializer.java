@@ -94,4 +94,12 @@ public interface TypedValueSerializer<T extends TypedValue> {
    */
   boolean isMutableValue(T typedValue);
 
+  /**
+   * Validates if the target type is allowed for deserialization.
+   * An implementation must throw a runtime exception if the type is not allowed.
+   *
+   * @param typeIdentifier the identifier of the target type
+   */
+  void validateTargetType(String typeIdentifier);
+
 }

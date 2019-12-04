@@ -58,6 +58,11 @@ public class SpinObjectValueSerializer extends AbstractObjectValueSerializer {
     return name;
   }
 
+  @Override
+  public void validateTargetType(String typeIdentifier) {
+    dataFormat.getMapper().validateTargetType(typeIdentifier, getValidator(Context.getProcessEngineConfiguration()));
+  }
+
   protected boolean isSerializationTextBased() {
     // for the moment we assume that all spin data formats are text based.
     return true;
@@ -98,7 +103,7 @@ public class SpinObjectValueSerializer extends AbstractObjectValueSerializer {
 
     try {
       Object mappedObject = reader.readInput(bufferedReader);
-      return mapper.mapInternalToJava(mappedObject, objectTypeName, getValidator(processEngineConfiguration));
+      return mapper.mapInternalToJava(mappedObject, objectTypeName);
     }
     finally{
       IoUtil.closeSilently(bais);

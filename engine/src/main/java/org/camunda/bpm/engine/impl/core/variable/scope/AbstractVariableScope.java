@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -345,7 +346,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
 
-    checkJavaSerialization(variableName, value);
+    checkSerialization(variableName, value);
 
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
 
@@ -377,32 +378,36 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
    * @param variableName
    * @param value
    */
-  protected void checkJavaSerialization(String variableName, TypedValue value) {
+  protected void checkSerialization(String variableName, TypedValue value) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (value instanceof SerializableValue && !processEngineConfiguration.isJavaSerializationFormatEnabled()) {
-
+    if (value instanceof SerializableValue) {
       SerializableValue serializableValue = (SerializableValue) value;
-
-      // if Java serialization is prohibited
       if (!serializableValue.isDeserialized()) {
-
-        String javaSerializationDataFormat = Variables.SerializationDataFormats.JAVA.getName();
-        String requestedDataFormat = serializableValue.getSerializationDataFormat();
-
-        if (requestedDataFormat == null) {
-          // check if Java serializer will be used
-          final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
-              .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
-          if (serializerForValue != null) {
-            requestedDataFormat = serializerForValue.getSerializationDataformat();
-          }
-        }
-
-        if (javaSerializationDataFormat.equals(requestedDataFormat)) {
+        TypedValueSerializer<?> serializerForValue = TypedValueField.getSerializers()
+            .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
+        // check if Java serialization is prohibited
+        if (!processEngineConfiguration.isJavaSerializationFormatEnabled()
+            && Variables.SerializationDataFormats.JAVA.getName().equals(getRequestedDataFormat(serializableValue, serializerForValue))) {
           throw ProcessEngineLogger.CORE_LOGGER.javaSerializationProhibitedException(variableName);
+        }
+        // check if target type is prohibited
+        String typeIdentifier = (String) value.getType().getValueInfo(serializableValue).get(SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME);
+        if (typeIdentifier != null) {
+          serializerForValue.validateTargetType(typeIdentifier);
         }
       }
     }
+  }
+
+  protected String getRequestedDataFormat(SerializableValue serializableValue, TypedValueSerializer<?> serializerForValue) {
+    String requestedDataFormat = serializableValue.getSerializationDataFormat();
+    if (requestedDataFormat == null) {
+      // check which serializer will be used
+      if (serializerForValue != null) {
+        requestedDataFormat = serializerForValue.getSerializationDataformat();
+      }
+    }
+    return requestedDataFormat;
   }
 
   protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
@@ -454,7 +459,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   public void setVariableLocalTransient(String variableName, Object value) {
     TypedValue typedValue = Variables.untypedValue(value, true);
 
-    checkJavaSerialization(variableName, typedValue);
+    checkSerialization(variableName, typedValue);
 
     CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
     getVariableStore().addVariable(coreVariableInstance);

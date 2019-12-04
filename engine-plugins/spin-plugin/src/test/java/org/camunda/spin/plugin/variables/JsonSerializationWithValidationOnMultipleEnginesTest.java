@@ -16,25 +16,24 @@
  */
 package org.camunda.spin.plugin.variables;
 
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.hamcrest.CoreMatchers.isA;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
-import org.camunda.spin.json.SpinJsonException;
+import org.camunda.spin.SpinRuntimeException;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,8 +91,8 @@ public class JsonSerializationWithValidationOnMultipleEnginesTest {
 
     // add serialized value
     JsonSerializable bean = new JsonSerializable("a String", 42, true);
-    engineRulePositive.getRuntimeService().setVariable(instance.getId(), "simpleBean",
-        objectValue(bean).serializationDataFormat(DataFormats.JSON_DATAFORMAT_NAME).create());
+    String beanAsString = bean.toExpectedJsonString();
+    engineRulePositive.getRuntimeService().setVariable(instance.getId(), "simpleBean", getSerializedObjectValue(beanAsString));
 
     // when
     Object value = engineRulePositive.getRuntimeService().getVariable(instance.getId(), "simpleBean");
@@ -109,19 +108,15 @@ public class JsonSerializationWithValidationOnMultipleEnginesTest {
         .addModelInstance("foo.bpmn", getOneTaskModel())
         .deploy());
     ProcessInstance instance = engineRuleNegative.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
-
-    // add serialized value
-    JsonSerializable bean = new JsonSerializable("a String", 42, true);
-    engineRuleNegative.getRuntimeService().setVariable(instance.getId(), "simpleBean",
-        objectValue(bean).serializationDataFormat(DataFormats.JSON_DATAFORMAT_NAME).create());
+    String beanAsString = new JsonSerializable("a String", 42, true).toExpectedJsonString();
 
     // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot deserialize");
-    thrown.expectCause(isA(SpinJsonException.class));
+    thrown.expect(SpinRuntimeException.class);
+    thrown.expectMessage("not whitelisted for deserialization");
+    thrown.expectMessage("[org.camunda.spin.plugin.variables.JsonSerializable]");
 
     // when
-    engineRuleNegative.getRuntimeService().getVariable(instance.getId(), "simpleBean");
+    engineRuleNegative.getRuntimeService().setVariable(instance.getId(), "simpleBean", getSerializedObjectValue(beanAsString));
   }
 
   protected BpmnModelInstance getOneTaskModel() {
@@ -131,5 +126,12 @@ public class JsonSerializationWithValidationOnMultipleEnginesTest {
         .endEvent()
         .done();
     return oneTaskProcess;
+  }
+
+  protected ObjectValue getSerializedObjectValue(String beanAsString) {
+    return serializedObjectValue(beanAsString)
+    .serializationDataFormat(DataFormats.JSON_DATAFORMAT_NAME)
+    .objectTypeName(JsonSerializable.class.getName())
+    .create();
   }
 }
