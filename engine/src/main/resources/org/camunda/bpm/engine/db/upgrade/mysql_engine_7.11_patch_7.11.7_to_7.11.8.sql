@@ -16,7 +16,7 @@
 --
 
 insert into ACT_GE_SCHEMA_LOG
-values ('2', CURRENT_TIMESTAMP, '7.11.7');
+values ('2', CURRENT_TIMESTAMP, '7.11.8');
 
 -- https://app.camunda.com/jira/browse/CAM-11117
 drop index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST;
