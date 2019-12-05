@@ -17,31 +17,13 @@
   <profiles>
     <profile>
       <id>distro</id>
-      <activation>
-        <jdk>(,1.8]</jdk>
-      </activation>
       <modules>
-        <module>assembly</module>
         <module>modules</module>
         <module>subsystem</module>
       </modules>
     </profile>
     <profile>
       <id>distro-ce</id>
-      <activation>
-        <jdk>(,1.8]</jdk>
-      </activation>
-      <modules>
-        <module>distro</module>
-        <module>webapp</module>
-        <module>webapp-standalone</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>jdk-9-and-onwards</id>
-      <activation>
-        <jdk>[9,)</jdk>
-      </activation>
       <modules>
         <module>webapp</module>
         <module>webapp-standalone</module>
