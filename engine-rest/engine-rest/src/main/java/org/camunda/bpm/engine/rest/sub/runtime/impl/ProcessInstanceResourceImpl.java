@@ -124,6 +124,8 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
         modificationBuilder.setAnnotation(dto.getAnnotation());
       }
 
+      modificationBuilder.cancellationSourceExternal(true);
+
       modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
     }
   }
@@ -140,6 +142,8 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
       if (dto.getAnnotation() != null) {
         modificationBuilder.setAnnotation(dto.getAnnotation());
       }
+
+      modificationBuilder.cancellationSourceExternal(true);
 
       try {
         batch = modificationBuilder.executeAsync(dto.isSkipCustomListeners(), dto.isSkipIoMappings());

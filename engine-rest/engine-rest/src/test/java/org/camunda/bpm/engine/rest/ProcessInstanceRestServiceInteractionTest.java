@@ -3556,6 +3556,54 @@ public class ProcessInstanceRestServiceInteractionTest extends
     inOrder.verifyNoMoreInteractions();
   }
 
+  @Test
+  public void testSyncProcessInstanceModificationCancellationSource() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    verify(mockModificationBuilder).cancellationSourceExternal(true);
+  }
+  
+  @Test
+  public void testAsyncProcessInstanceModificationCancellationSource() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+    Batch batchMock = createMockBatch();
+    when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    verify(mockModificationBuilder).cancellationSourceExternal(true);
+  }
+
   @SuppressWarnings("unchecked")
   protected ProcessInstanceModificationInstantiationBuilder setUpMockModificationBuilder() {
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder =
@@ -3563,6 +3611,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     when(mockModificationBuilder.cancelActivityInstance(anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.cancelAllForActivity(anyString())).thenReturn(mockModificationBuilder);
+    when(mockModificationBuilder.cancellationSourceExternal(anyBoolean())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startAfterActivity(anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startAfterActivity(anyString(), anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.startBeforeActivity(anyString())).thenReturn(mockModificationBuilder);
