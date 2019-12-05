@@ -19,7 +19,6 @@ package org.camunda.bpm.rest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jettison.json.JSONArray;
@@ -31,7 +30,6 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,7 +91,7 @@ public class RestIT extends AbstractWebIntegrationTest {
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
     // invoice example
-    assertEquals(2, definitionsJson.length());
+    assertEquals(4, definitionsJson.length());
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
@@ -226,7 +224,7 @@ public class RestIT extends AbstractWebIntegrationTest {
 
     assertEquals(200, response.getStatus());
     // invoice example instance
-    assertEquals(2, instancesJson.length());
+    assertEquals(4, instancesJson.length());
 
   }
 
@@ -240,7 +238,7 @@ public class RestIT extends AbstractWebIntegrationTest {
 
     assertEquals(200, response.getStatus());
     // invoice example instance
-    assertEquals(2, definitionStatistics.length());
+    assertEquals(4, definitionStatistics.length());
 
     // check that definition is also serialized
     for (int i = 0; i < definitionStatistics.length(); i++) {
