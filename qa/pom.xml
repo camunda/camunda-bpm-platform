@@ -62,7 +62,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>jboss7-runtime</module>
         <module>wildfly-runtime</module>
         <module>tomcat-runtime</module>
         <module>vanilla-runtimes/tomcat</module>
