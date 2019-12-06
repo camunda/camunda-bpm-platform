@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -282,6 +284,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
@@ -305,6 +308,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test

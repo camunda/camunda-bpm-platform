@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
 import org.junit.After;
 import org.junit.Assert;
@@ -247,6 +249,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     assertHistoricBatchExists(testRule);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testSetJobsRetryAsyncWithHistoryProcessQuery() {
     //given
@@ -265,6 +268,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     assertHistoricBatchExists(testRule);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testSetJobsRetryAsyncWithRuntimeAndHistoryProcessQuery() {
     //given
