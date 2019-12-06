@@ -98,23 +98,6 @@ public interface ProcessInstanceModificationBuilder extends
   /**
    * <p><i>Submits the instruction:</i></p>
    *
-   * <p>Cancel an activity instance in a process. If this instance has child activity instances
-   * (e.g. in a subprocess instance), these children, their grandchildren, etc. are cancelled as well.</p>
-   *
-   * <p>Process instance cancellation will propagate upward, removing any parent process instances that are
-   * only waiting on the cancelled process to complete.</p>
-   * 
-   * <p>All canceled activity instances will be marked as terminated internally or externally to indicate if
-   * the cancelation was triggered from internal or external context. (internal = engine, external = e.g. API call)</p>
-   *
-   * @param activityInstanceId the id of the activity instance to cancel
-   * @param externallyTerminated indicator if deletion triggered from external context, for instance API call
-   */
-  ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId, boolean externallyTerminated);
-
-  /**
-   * <p><i>Submits the instruction:</i></p>
-   *
    * <p>Cancel a transition instance (i.e. an async continuation) in a process.</p>
    *
    * @param transitionInstanceId the id of the transition instance to cancel
@@ -139,6 +122,25 @@ public interface ProcessInstanceModificationBuilder extends
    * @param activityId the activity for which all instances should be cancelled
    */
   ProcessInstanceModificationBuilder cancelAllForActivity(String activityId);
+
+  /**
+   * <p>
+   * A canceled process instance receives a termination state to indicate the
+   * source of the cancellation call. The state can have the following values:
+   *   <ul>
+   *     <li><code>EXTERNALLY_TERMINATED</code>: the cancellation was triggered by
+   * an external source. (e.g. REST call, external application)</li>
+   *     <li><code>INTERNALLY_TERMINATED</code>: the cancellation was triggered
+   * internally. (e.g. by the engine)</li>
+   *   </ul>
+   * </p>
+   * 
+   * @param external
+   *          was the cancellation triggered by an external source?
+   *          <code>true</code> for <code>EXTERNALLY_TERMINATED</code>,
+   *          <code>false</code> for <code>INTERNALLY_TERMINATED</code>.
+   */
+  ProcessInstanceModificationBuilder cancellationSourceExternal(boolean external);
 
   /** Provides annotation for the current modification. */
   ProcessInstanceModificationBuilder setAnnotation(String annotation);

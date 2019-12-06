@@ -72,8 +72,7 @@ public class HistoricDecisionStatisticsRestServiceQueryTest extends AbstractRest
     .thenReturn(historicDecisionInstanceStatisticsQuery);
 
     when(historicDecisionInstanceStatisticsQuery.decisionInstanceId(MockProvider.EXAMPLE_DECISION_INSTANCE_ID)).thenReturn(historicDecisionInstanceStatisticsQuery);
-    when(((HistoricDecisionInstanceStatisticsQueryImpl)historicDecisionInstanceStatisticsQuery)
-        .unboundedResultList()).thenReturn(mocks);
+    when(historicDecisionInstanceStatisticsQuery.unlimitedList()).thenReturn(mocks);
   }
 
   @Test

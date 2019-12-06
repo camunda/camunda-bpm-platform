@@ -61,8 +61,7 @@ public class HistoricCaseActivityStatisticsRestServiceQueryTest extends Abstract
 
     historicCaseActivityStatisticsQuery = mock(HistoricCaseActivityStatisticsQueryImpl.class);
     when(processEngine.getHistoryService().createHistoricCaseActivityStatisticsQuery(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(historicCaseActivityStatisticsQuery);
-    when(((HistoricCaseActivityStatisticsQueryImpl)historicCaseActivityStatisticsQuery)
-        .unboundedResultList()).thenReturn(mocks);
+    when(historicCaseActivityStatisticsQuery.unlimitedList()).thenReturn(mocks);
   }
 
   @Test
