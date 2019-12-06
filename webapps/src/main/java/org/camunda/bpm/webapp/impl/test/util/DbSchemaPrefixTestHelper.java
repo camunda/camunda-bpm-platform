@@ -56,7 +56,8 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
             .setProcessEngineName("DatabaseTablePrefixTest-engine1")
             .setDataSource(dataSource)
-            .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
+            .setDatabaseSchemaUpdate("NO_CHECK") // disable auto create/drop schema
+            .setDbMetricsReporterActivate(false);
     config1.setDatabaseTablePrefix("SCHEMA1.");
     ProcessEngine engine1 = config1.buildProcessEngine();
 
