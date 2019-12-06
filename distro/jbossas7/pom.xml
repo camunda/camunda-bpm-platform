@@ -17,14 +17,12 @@
   <profiles>
     <profile>
       <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <modules>
         <module>modules</module>
         <module>subsystem</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>distro-ce</id>
-      <modules>
         <module>webapp</module>
         <module>webapp-standalone</module>
       </modules>
