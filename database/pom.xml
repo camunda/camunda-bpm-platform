@@ -30,9 +30,8 @@
     <version.sqlserver>4.0</version.sqlserver>
     <version.db2-11.1>11.1.1.1</version.db2-11.1>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
-    <version.db2-10.1>10.1.0.4</version.db2-10.1>
-    <version.db2-9.7>9.7</version.db2-9.7>
-    <version.db2>${version.db2-9.7}</version.db2>
+    <version.db2>${version.db2-10.5}</version.db2>
+    
     <version.postgresql>9.3-1102-jdbc4</version.postgresql>
 
     <!-- needed for sql script and backward compatibility checks -->
@@ -155,18 +154,6 @@
       <id>db2-105</id>
       <properties>
         <version.db2>${version.db2-10.5}</version.db2>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2-101</id>
-      <properties>
-        <version.db2>${version.db2-10.1}</version.db2>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2-97</id>
-      <properties>
-        <version.db2>${version.db2-9.7}</version.db2>
       </properties>
     </profile>
 
