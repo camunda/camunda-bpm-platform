@@ -927,7 +927,7 @@ public interface ManagementService {
    * @param processInstanceIds ids of the process instances that for which jobs retries will be set
    * @param processInstanceQuery query that identifies process instances with jobs
    *                             that have to be modified
-   * @param historicProcessInstanceQuery historic query that identifies rubtime process instances
+   * @param historicProcessInstanceQuery historic query that identifies runtime process instances
    *                                     with jobs that have to be modified
    * @param retries number of retries.
    *
