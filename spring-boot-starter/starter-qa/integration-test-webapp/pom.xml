@@ -19,4 +19,41 @@
     <module>runtimes</module>
   </modules>
 
+  <properties>
+    <!-- default os -->
+    <os.type>linux64</os.type>
+  </properties>
+
+  <profiles>
+
+    <profile>
+      <id>windows</id>
+
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+
+      <properties>
+        <os.type>win32</os.type>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>mac</id>
+
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+
+      <properties>
+        <os.type>mac64</os.type>
+      </properties>
+    </profile>
+
+  </profiles>
+
 </project>

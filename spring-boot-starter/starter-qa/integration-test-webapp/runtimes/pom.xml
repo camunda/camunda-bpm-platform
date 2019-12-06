@@ -21,16 +21,79 @@
     <version.glassfish-jaxb>2.3.1</version.glassfish-jaxb>
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
     <version.junit>4.12</version.junit>
+    <version.chromedriver>78.0.3904.70</version.chromedriver>
 
     <http.port>58080</http.port>
     <http.ctx-path.webapp />
     <http.ctx-path.rest>rest/</http.ctx-path.rest>
   </properties>
 
-  <modules>
-    <module>community</module>
-    <module>enterprise</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>distro-ee</id>
+
+      <modules>
+        <module>community</module>
+        <module>enterprise</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <!-- used by travis ci; No enterprise repo access -->
+      <id>webapp-qa-ce</id>
+
+      <modules>
+        <module>community</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <!-- convenience profile; Not used by any build jobs -->
+      <id>webapp-qa-ee</id>
+
+      <modules>
+        <module>enterprise</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>skip-selenium</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>integration-tests</id>
+                  <phase>integration-test</phase>
+                  <goals>
+                    <goal>test</goal>
+                  </goals>
+                  <configuration>
+                    <includes>
+                      <include>**/*IT.*</include>
+                    </includes>
+
+                    <excludes>
+                      <!-- [Google Chrome is missing on Travis CI]
+                         See https://app.camunda.com/jira/browse/CAM-11161
+                      -->
+                      <exclude>**/LoginIT.*</exclude>
+                      <!-- [/Google Chrome is missing on Travis CI] -->
+
+                      <exclude>**/ErrorPageIT.*</exclude>
+                    </excludes>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencies>
     <!-- REST API -->
@@ -184,14 +247,28 @@
                 </includes>
 
                 <excludes>
-                  <!-- [Google Chrome is missing]
-                     See https://app.camunda.com/jira/browse/CAM-10604
-                  -->
-                  <exclude>**/LoginIT.*</exclude>
-                  <!-- [/Google Chrome is missing] -->
-
                   <exclude>**/ErrorPageIT.*</exclude>
                 </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.3.0</version>
+          <executions>
+            <execution>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>wget</goal>
+              </goals>
+              <configuration>
+                <url>https://chromedriver.storage.googleapis.com/${version.chromedriver}/chromedriver_${os.type}.zip</url>
+                <outputFileName>chromedriver.zip</outputFileName>
+                <unpack>true</unpack>
+                <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
               </configuration>
             </execution>
           </executions>
