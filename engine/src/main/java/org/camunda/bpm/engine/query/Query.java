@@ -71,7 +71,7 @@ public interface Query<T extends Query< ? , ? >, U extends Object> {
   List<U> unlimitedList();
 
   /**
-   * Executes the query and get a list of entities as the result. 
+   * Executes the query and get a list of entities as the result.
    *
    * @param firstResult the index of the first result
    * @param maxResults the maximum number of results

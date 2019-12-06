@@ -290,7 +290,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void clearScope(String reason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
-    this.externallyTerminated = externallyTerminated;
 
     if (getSubProcessInstance() != null) {
       getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings, externallyTerminated, false);

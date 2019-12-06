@@ -90,13 +90,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   @Override
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
-    return cancelActivityInstance(activityInstanceId, false);
-  }
-
-  @Override
-  public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId, boolean externallyTerminated) {
     ensureNotNull(NotValidException.class, "activityInstanceId", activityInstanceId);
-    this.externallyTerminated = externallyTerminated;
     operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId, this.modificationReason));
     return this;
   }
@@ -112,6 +106,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
+    return this;
+  }
+
+  @Override
+  public ProcessInstanceModificationBuilder cancellationSourceExternal(boolean external) {
+    this.externallyTerminated = external;
     return this;
   }
 
