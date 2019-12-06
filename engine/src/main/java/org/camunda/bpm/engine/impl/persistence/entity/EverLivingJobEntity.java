@@ -61,22 +61,14 @@ public class EverLivingJobEntity extends JobEntity {
     setRetries(commandContext.getProcessEngineConfiguration().getDefaultNumberOfRetries());
 
     //delete the job's exception byte array and exception message
-    String exceptionByteArrayIdToDelete =null;
     if (exceptionByteArrayId != null) {
-      exceptionByteArrayIdToDelete = exceptionByteArrayId;
-      this.exceptionByteArrayId = null;
-      this.exceptionMessage = null;
+      clearFailedJobException();
     }
 
     //clean the lock information
     if (shouldResetLock) {
       setLockOwner(null);
       setLockExpirationTime(null);
-    }
-
-    if (exceptionByteArrayIdToDelete != null) {
-      ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);
-      commandContext.getDbEntityManager().delete(byteArray);
     }
   }
 
