@@ -151,7 +151,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     externallyTerminated = false;
 
     // when
-    runtimeService.createProcessInstanceModification(subProcess.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+    runtimeService.createProcessInstanceModification(subProcess.getId()).cancellationSourceExternal(externallyTerminated).cancelActivityInstance(activityInstance.getId()).execute();
 
     // then
     assertHistoricProcessInstances();
@@ -166,7 +166,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     externallyTerminated = false;
 
     // when
-    runtimeService.createProcessInstanceModification(process.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+    runtimeService.createProcessInstanceModification(process.getId()).cancellationSourceExternal(externallyTerminated).cancelActivityInstance(activityInstance.getId()).execute();
 
     // then
     assertHistoricProcessInstances();
@@ -181,7 +181,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     externallyTerminated = true;
 
     // when
-    runtimeService.createProcessInstanceModification(subProcess.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+    runtimeService.createProcessInstanceModification(subProcess.getId()).cancellationSourceExternal(externallyTerminated).cancelActivityInstance(activityInstance.getId()).execute();
 
     // then
     assertHistoricProcessInstances();
@@ -196,7 +196,7 @@ public class ProcessInstanceTerminationCascadeStateTest {
     externallyTerminated = true;
 
     // when
-    runtimeService.createProcessInstanceModification(process.getId()).cancelActivityInstance(activityInstance.getId(), externallyTerminated).execute();
+    runtimeService.createProcessInstanceModification(process.getId()).cancellationSourceExternal(externallyTerminated).cancelActivityInstance(activityInstance.getId()).execute();
 
     // then
     assertHistoricProcessInstances();

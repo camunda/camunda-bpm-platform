@@ -64,7 +64,7 @@ public interface Query<T extends Query< ? , ? >, U extends Object> {
   List<U> list();
 
   /**
-   * Executes the query. No limitation checks are performed (e. g. query limit). 
+   * Executes the query. No limitation checks are performed (e. g. query limit).
    *
    * @return a list of results
    */
