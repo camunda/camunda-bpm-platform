@@ -509,6 +509,21 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
+  protected void clearFailedJobException() {
+    ByteArrayEntity byteArray = getExceptionByteArray();
+
+    // Avoid NPE when the job was reconfigured by another
+    // node in the meantime
+    if (byteArray != null) {
+      Context.getCommandContext()
+          .getDbEntityManager()
+          .delete(byteArray);
+    }
+
+    this.exceptionByteArrayId = null;
+    this.exceptionMessage = null;
+  }
+
   @Override
   public String getDeploymentId() {
     return deploymentId;
