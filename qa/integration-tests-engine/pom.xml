@@ -290,10 +290,6 @@
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources-jboss</directory>
-            <filtering>true</filtering>
-          </testResource>
-          <testResource>
             <directory>src/test/resources-wildfly</directory>
             <filtering>true</filtering>
           </testResource>
@@ -311,7 +307,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -388,7 +384,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -434,7 +430,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss-servlet</source>
+                    <source>src/test/java-wildfly-servlet</source>
                   </sources>
                 </configuration>
               </execution>
@@ -562,9 +558,9 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jboss.as}</version>
+          <groupId>${wildfly.container.adapter.groupId}</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>${wildfly.container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -590,7 +586,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -603,7 +599,7 @@
                 <configuration>
                   <resources>
                     <resource>
-                      <directory>src/test/resources-jboss</directory>
+                      <directory>src/test/resources-wildfly</directory>
                     </resource>
                   </resources>
                 </configuration>
