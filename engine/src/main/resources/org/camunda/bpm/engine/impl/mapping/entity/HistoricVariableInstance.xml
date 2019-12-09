@@ -453,13 +453,13 @@
   </select>
 
   <sql id="selectHistoricVariableProcessAndCaseInstanceByIdsSql">
-    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size > 0">
       and
         <bind name="listOfIds" value="processInstanceIds"/>
         <bind name="fieldName" value="'PROC_INST_ID_'"/>
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
-    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size > 0">
       and CASE_INST_ID_ IN
         <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
           #{caseInstanceId}
@@ -468,7 +468,7 @@
   </sql>
 
   <sql id="selectHistoricVariableTaskInstanceByIdsSql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -478,7 +478,7 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       )
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -491,7 +491,7 @@
   </sql>
 
   <sql id="selectHistoricVariableTaskInstanceByIdsSql_mysql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and T.PROC_INST_ID_ in
@@ -499,7 +499,7 @@
             #{processInstanceId}
           </foreach>
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and T.CASE_INST_ID_ in

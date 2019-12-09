@@ -89,7 +89,7 @@
   <delete id="deleteCommentsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_COMMENT
     where 
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -99,7 +99,7 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       )
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -109,7 +109,7 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
         )
     </if>
-    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size > 0">
       <bind name="listOfIds" value="processInstanceIds"/>
       <bind name="fieldName" value="'PROC_INST_ID_'"/>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
@@ -120,19 +120,19 @@
     delete CO from ${prefix}ACT_HI_COMMENT CO
     left join ${prefix}ACT_HI_TASKINST T
       on CO.TASK_ID_ = T.ID_
-      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
         where
           <bind name="listOfIds" value="taskProcessInstanceIds"/>
           <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
-      <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+      <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
         where
           <bind name="listOfIds" value="taskCaseInstanceIds"/>
           <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
-      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size > 0">
         where
           <bind name="listOfIds" value="processInstanceIds"/>
           <bind name="fieldName" value="'CO.PROC_INST_ID_'"/>
