@@ -116,8 +116,7 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
 
   protected void initTypeDetectors() {
     typeDetectors = new ArrayList<>();
-    typeDetectors.add(new CollectionJacksonJsonTypeDetector());
-    typeDetectors.add(new MapJacksonJsonTypeDetector());
+    typeDetectors.add(new ListJacksonJsonTypeDetector());
     typeDetectors.add(new DefaultJsonJacksonTypeDetector());
   }
 

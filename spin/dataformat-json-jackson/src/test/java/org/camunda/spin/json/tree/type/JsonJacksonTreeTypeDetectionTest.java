@@ -21,11 +21,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.DataFormats.json;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.camunda.spin.json.mapping.Customer;
 import org.camunda.spin.json.mapping.RegularCustomer;
@@ -58,40 +54,6 @@ public class JsonJacksonTreeTypeDetectionTest {
   }
 
   @Test
-  public void shouldDetectSetType() {
-    Set<Customer> customers = new HashSet<>();
-    customers.add(new RegularCustomer());
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<org.camunda.spin.json.mapping.RegularCustomer>");
-  }
-
-  @Test
-  public void shouldDetectSetTypeFromEmptySet() {
-    Set<RegularCustomer> customers = new HashSet<>();
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.lang.Object>");
-  }
-
-  @Test
-  public void shouldDetectMapType() {
-    Map<String, Customer> customers = new HashMap<>();
-    customers.put("foo", new RegularCustomer());
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashMap<java.lang.String,org.camunda.spin.json.mapping.RegularCustomer>");
-  }
-
-  @Test
-  public void shouldDetectMapTypeFromEmptyMap() {
-    Map<Integer, RegularCustomer> customers = new HashMap<>();
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(customers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashMap<java.lang.Object,java.lang.Object>");
-  }
-
-  @Test
   public void shouldHandleNullParameter() {
     try {
       json().getMapper().getCanonicalTypeName(null);
@@ -110,50 +72,6 @@ public class JsonJacksonTreeTypeDetectionTest {
 
     String canonicalTypeString = json().getMapper().getCanonicalTypeName(nestedCustomers);
     assertThat(canonicalTypeString).isEqualTo("java.util.ArrayList<java.util.ArrayList<org.camunda.spin.json.mapping.RegularCustomer>>");
-  }
-
-  @Test
-  public void shouldHandleListOfSets() {
-    List<Set<RegularCustomer>> nestedCustomers = new ArrayList<>();
-    Set<RegularCustomer> customers = new HashSet<>();
-    customers.add(new RegularCustomer());
-    nestedCustomers.add(customers);
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(nestedCustomers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.ArrayList<java.util.HashSet<org.camunda.spin.json.mapping.RegularCustomer>>");
-  }
-
-  @Test
-  public void shouldHandleSetOfSets() {
-    Set<Set<RegularCustomer>> nestedCustomers = new HashSet<>();
-    Set<RegularCustomer> customers = new HashSet<>();
-    customers.add(new RegularCustomer());
-    nestedCustomers.add(customers);
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(nestedCustomers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.util.HashSet<org.camunda.spin.json.mapping.RegularCustomer>>");
-  }
-
-  @Test
-  public void shouldHandleSetOfLists() {
-    Set<List<RegularCustomer>> nestedCustomers = new HashSet<>();
-    List<RegularCustomer> customers = new ArrayList<>();
-    customers.add(new RegularCustomer());
-    nestedCustomers.add(customers);
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(nestedCustomers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.util.ArrayList<org.camunda.spin.json.mapping.RegularCustomer>>");
-  }
-
-  @Test
-  public void shouldHandleMapOfMaps() {
-    Map<String, Map<Integer, RegularCustomer>> nestedCustomers = new HashMap<>();
-    Map<Integer, RegularCustomer> customers = new HashMap<>();
-    customers.put(42, new RegularCustomer());
-    nestedCustomers.put("foo", customers);
-
-    String canonicalTypeString = json().getMapper().getCanonicalTypeName(nestedCustomers);
-    assertThat(canonicalTypeString).isEqualTo("java.util.HashMap<java.lang.String,java.util.HashMap<java.lang.Integer,org.camunda.spin.json.mapping.RegularCustomer>>");
   }
 
 }
