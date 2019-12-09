@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.CreateIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
@@ -196,7 +197,18 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners, skipSubprocesses));
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds,
+        processInstanceQuery, null, deleteReason, skipCustomListeners, skipSubprocesses));
+  }
+
+  @Override
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+                                           ProcessInstanceQuery processInstanceQuery,
+                                           HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                           String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds,
+        processInstanceQuery, historicProcessInstanceQuery,
+        deleteReason, skipCustomListeners, skipSubprocesses));
   }
 
   @Override
