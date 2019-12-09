@@ -19,5 +19,5 @@ insert into ACT_GE_SCHEMA_LOG
 values ('101', CURRENT_TIMESTAMP, '7.12.1');
 
 -- https://app.camunda.com/jira/browse/CAM-11117
-drop index ACT_IDX_HI_ACT_INST_START;
+drop index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST;
 create index ACT_IDX_HI_ACT_INST_START_END on ACT_HI_ACTINST(START_TIME_, END_TIME_);
