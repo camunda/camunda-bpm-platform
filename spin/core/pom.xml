@@ -89,7 +89,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-XX:PermSize=128m -XX:MaxPermSize=256m</argLine>
+              <argLine>-XX:PermSize=128m</argLine>
               <excludes>
                 <exclude>**/javascript/**</exclude>
               </excludes>
@@ -110,7 +110,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-XX:PermSize=128m -XX:MaxPermSize=256m</argLine>
+              <argLine>-XX:PermSize=128m</argLine>
               <excludes>
                 <exclude>**/DataFormatLoadingTest.java</exclude>
               </excludes>
