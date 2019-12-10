@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
-import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -70,14 +69,14 @@ public class IdentityRestServiceQueryTest extends AbstractRestServiceTest {
     mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
 
-    when(sampleUserQuery.list()).thenReturn(mockUsers);
+    when(sampleUserQuery.unlimitedList()).thenReturn(mockUsers);
     when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
     when(sampleUserQuery.count()).thenReturn((long) mockUsers.size());
 
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
 
     List<Group> mockGroups = MockProvider.createMockGroups();
-    when(sampleGroupQuery.list()).thenReturn(mockGroups);
+    when(sampleGroupQuery.unlimitedList()).thenReturn(mockGroups);
     when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.orderByGroupName()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.orderByGroupId()).thenReturn(sampleGroupQuery);

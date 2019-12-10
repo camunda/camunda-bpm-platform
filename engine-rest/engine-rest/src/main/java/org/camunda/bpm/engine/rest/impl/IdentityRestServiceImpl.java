@@ -57,13 +57,19 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     IdentityService identityService = getProcessEngine().getIdentityService();
 
     GroupQuery query = identityService.createGroupQuery();
-    List<Group> userGroups = query.groupMember(userId).orderByGroupName().asc().list();
+    List<Group> userGroups = query.groupMember(userId)
+        .orderByGroupName()
+        .asc()
+        .unlimitedList();
 
     Set<UserDto> allGroupUsers = new HashSet<UserDto>();
     List<GroupDto> allGroups = new ArrayList<GroupDto>();
 
     for (Group group : userGroups) {
-      List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
+      List<User> groupUsers = identityService.createUserQuery()
+          .memberOfGroup(group.getId())
+          .unlimitedList();
+
       for (User user : groupUsers) {
         if (!user.getId().equals(userId)) {
           allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
