@@ -106,7 +106,7 @@ actual integration tests are located in the `qa/integration-tests-engine` and `q
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
 We have different maven profiles for selecting
-* *Runtime containers & environments*: jboss, tomcat, wildfly
+* *Runtime containers & environments*: tomcat, wildfly
 * *The testsuite*: engine-integration, webapps-integration
 * *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
   postgresql are supported in engine-integration tests)
@@ -129,9 +129,8 @@ You can select multiple testsuites but only a single database and a single runti
 mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 ```
 
-There is a special profile for the JBoss and WildFly Application Servers:
+There is a special profile for the WildFly Application Servers:
 
-* JBoss Domain mode: `mvn clean install -Pengine-integration,h2,jboss-domain`
 * WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
 
 Limiting the number of engine unit tests
