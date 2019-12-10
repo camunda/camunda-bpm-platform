@@ -41,11 +41,11 @@ public abstract class XmlDomAttributeScriptTest extends ScriptTest {
     }
   )
   public void shouldGetInformationAndSetValue() {
-    assertThat((String) script.getVariable("name")).isEqualTo("order");
-    assertThat((String) script.getVariable("value")).isEqualTo("order1");
-    assertThat((String) script.getVariable("namespace")).isNull();
+    assertThat(script.getVariable("name")).isEqualTo("order");
+    assertThat(script.getVariable("value")).isEqualTo("order1");
+    assertThat(script.getVariable("namespace")).isNull();
     assertThat(script.<Boolean>getVariable("hasNullNamespace")).isTrue();
-    assertThat((String) script.getVariable("newValue")).isEqualTo("order2");
+    assertThat(script.getVariable("newValue")).isEqualTo("order2");
   }
 
   @Test(expected = SpinXmlAttributeException.class)
