@@ -11,6 +11,9 @@
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
 
+    <!-- Note: The database is created within dbSchemaPrefixTestHelper (org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper)-->
+    <!-- If some database changes are required during the database setup, they should be performed in the DbSchemaPrefixTestHelper -->
+
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="NO_CHECK" />
 
