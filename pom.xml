@@ -57,6 +57,7 @@
         <module>javaee/jobexecutor-ra</module>
         <module>javaee/jobexecutor-rar</module>
 
+        <module>model-api</module>
         <module>typed-values</module>
         <module>engine-dmn</module>
 
@@ -188,6 +189,8 @@
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
+        <module>model-api</module>
+
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
