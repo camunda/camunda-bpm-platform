@@ -74,7 +74,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  
   <profiles>
     <profile>
       <id>distro-ee</id>
@@ -121,6 +121,20 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring-boot.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <trimStackTrace>false</trimStackTrace>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <trimStackTrace>false</trimStackTrace>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
