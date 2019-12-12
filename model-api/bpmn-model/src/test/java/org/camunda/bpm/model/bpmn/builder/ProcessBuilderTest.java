@@ -2116,6 +2116,54 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testMultiInstanceLoopCharacteristicsAsynchronousMultiInstanceAsyncBeforeElement() {
+    modelInstance = Bpmn.createProcess()
+            .startEvent()
+            .userTask("task")
+            .multiInstance()
+            .camundaAsyncBefore()
+            .parallel()
+            .multiInstanceDone()
+            .endEvent()
+            .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
+            userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
+
+    assertThat(miCharacteristics).hasSize(1);
+
+    MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
+    assertThat(miCharacteristic.isSequential()).isFalse();
+    assertThat(miCharacteristic.isCamundaAsyncAfter()).isFalse();
+    assertThat(miCharacteristic.isCamundaAsyncBefore()).isTrue();
+  }
+
+  @Test
+  public void testMultiInstanceLoopCharacteristicsAsynchronousMultiInstanceAsyncAfterElement() {
+    modelInstance = Bpmn.createProcess()
+            .startEvent()
+            .userTask("task")
+            .multiInstance()
+            .camundaAsyncAfter()
+            .parallel()
+            .multiInstanceDone()
+            .endEvent()
+            .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
+            userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
+
+    assertThat(miCharacteristics).hasSize(1);
+
+    MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
+    assertThat(miCharacteristic.isSequential()).isFalse();
+    assertThat(miCharacteristic.isCamundaAsyncAfter()).isTrue();
+    assertThat(miCharacteristic.isCamundaAsyncBefore()).isFalse();
+  }
+
+  @Test
   public void testTaskWithCamundaInputOutputWithExistingExtensionElements() {
     modelInstance = Bpmn.createProcess()
       .startEvent()

@@ -104,6 +104,26 @@ public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractM
   }
 
   /**
+   * Sets the multi instance loop characteristics to be asynchronous before.
+   *
+   * @return  the builder object
+   */
+  public B camundaAsyncBefore() {
+    element.setCamundaAsyncBefore(true);
+    return myself;
+  }
+
+  /**
+   * Sets the multi instance loop characteristics to be asynchronous after.
+   *
+   * @return  the builder object
+   */
+  public B camundaAsyncAfter() {
+    element.setCamundaAsyncAfter(true);
+    return myself;
+  }
+
+  /**
    * Finishes the building of a multi instance loop characteristics.
    *
    * @return the parent activity builder
