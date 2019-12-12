@@ -182,6 +182,8 @@ import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
+import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -630,7 +632,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
+  /**
+   * As an instance of {@link org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler}
+   * it contains all the provided history event handlers that process history events.
+   */
   protected HistoryEventHandler historyEventHandler;
+
+  /**
+   *  Allows users to add additional {@link HistoryEventHandler}
+   *  instances to process history events.
+   */
+  protected List<HistoryEventHandler> customHistoryEventHandlers = new ArrayList<>();
+
+  /**
+   * If true, the default {@link DbHistoryEventHandler} will be included in the list
+   * of history event handlers.
+   */
+  protected boolean enableDefaultDbHistoryEventHandler = true;
 
   protected PermissionProvider permissionProvider;
 
@@ -2371,7 +2389,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initHistoryEventHandler() {
     if (historyEventHandler == null) {
-      historyEventHandler = new DbHistoryEventHandler();
+      if (enableDefaultDbHistoryEventHandler) {
+        historyEventHandler = new CompositeDbHistoryEventHandler(customHistoryEventHandlers);
+      } else {
+        historyEventHandler = new CompositeHistoryEventHandler(customHistoryEventHandlers);
+      }
     }
   }
 
@@ -3370,6 +3392,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public HistoryEventHandler getHistoryEventHandler() {
     return historyEventHandler;
+  }
+
+  public boolean isEnableDefaultDbHistoryEventHandler() {
+    return enableDefaultDbHistoryEventHandler;
+  }
+
+  public void setEnableDefaultDbHistoryEventHandler(boolean enableDefaultDbHistoryEventHandler) {
+    this.enableDefaultDbHistoryEventHandler = enableDefaultDbHistoryEventHandler;
+  }
+
+  public List<HistoryEventHandler> getCustomHistoryEventHandlers() {
+    return customHistoryEventHandlers;
+  }
+
+  public void setCustomHistoryEventHandlers(List<HistoryEventHandler> customHistoryEventHandlers) {
+    this.customHistoryEventHandlers = customHistoryEventHandlers;
   }
 
   public IncidentHandler getIncidentHandler(String incidentType) {
