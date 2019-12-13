@@ -94,7 +94,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
         }
       }
 
-      if (cachedValue != null && (asTransientValue ^ !cachedValue.isTransient())) {
+      if (cachedValue != null && (asTransientValue ^ cachedValue.isTransient())) {
         // clear cached value if the value is not transient, but a transient value is requested
         cachedValue = null;
       }
