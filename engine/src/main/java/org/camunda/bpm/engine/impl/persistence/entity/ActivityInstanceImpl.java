@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
@@ -44,6 +45,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
 
   protected String[] executionIds = NO_IDS;
   protected String[] incidentIds = NO_IDS;
+  protected Incident[] incidents = new Incident[0];
 
   public ActivityInstance[] getChildActivityInstances() {
     return childActivityInstances;
@@ -107,6 +109,14 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
 
   public void setIncidentIds(String[] incidentIds) {
     this.incidentIds = incidentIds;
+  }
+
+  public Incident[] getIncidents() {
+    return incidents;
+  }
+
+  public void setIncidents(Incident[] incidents) {
+    this.incidents = incidents;
   }
 
   protected void writeTree(StringWriter writer, String prefix, boolean isTail) {

@@ -198,6 +198,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
         // "name" is deprecated and there for legacy reasons
         .body("name", equalTo(EXAMPLE_ACTIVITY_NAME))
         .body("incidentIds", empty())
+        .body("incidents", not(empty()))
+        .body("incidents[0].id", equalTo("anIncidentId"))
+        .body("incidents[0].activityId", equalTo("anActivityId"))
         .body("childActivityInstances", not(empty()))
         .body("childActivityInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childActivityInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
@@ -212,6 +215,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .body("childActivityInstances[0].childTransitionInstances", empty())
         .body("childActivityInstances[0].incidentIds", not(empty()))
         .body("childActivityInstances[0].incidentIds[0]", equalTo(EXAMPLE_INCIDENT_ID))
+        .body("childActivityInstances[0].incidents[0].id", equalTo("anIncidentId"))
+        .body("childActivityInstances[0].incidents[0].activityId", equalTo("anActivityId"))
         .body("childTransitionInstances", not(empty()))
         .body("childTransitionInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childTransitionInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
@@ -224,9 +229,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
         .body("childTransitionInstances[0].incidentIds", not(empty()))
         .body("childTransitionInstances[0].incidentIds[0]", equalTo(EXAMPLE_ANOTHER_INCIDENT_ID))
+        .body("childTransitionInstances[0].incidents[0].id", equalTo("anIncidentId"))
+        .body("childTransitionInstances[0].incidents[0].activityId", equalTo("anActivityId"))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
 
-    Assert.assertEquals("Should return right number of properties", 12, response.jsonPath().getMap("").size());
+    Assert.assertEquals("Should return right number of properties", 13,
+        response.jsonPath().getMap("").size());
   }
 
   @Test
