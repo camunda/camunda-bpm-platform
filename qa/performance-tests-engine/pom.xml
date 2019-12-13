@@ -55,11 +55,6 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
-    <dependency>
-		  <groupId>org.camunda.bpm.consulting.snippet</groupId>
-		  <artifactId>engine-plugin-external-task-listener</artifactId>
-		  <version>0.0.1-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <profiles>
