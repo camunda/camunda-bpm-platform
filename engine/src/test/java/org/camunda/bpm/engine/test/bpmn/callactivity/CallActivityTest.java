@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -42,6 +44,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -1779,6 +1782,78 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
+
+  }
+
+  public void testTransientVariableInputMapping() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("simpleSubProcess")
+      .startEvent()
+      .serviceTask()
+      .camundaClass(AssertTransientVariableDelegate.class)
+      .userTask()
+      .endEvent()
+      .done();
+
+    deployment("org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml");
+    deployment(modelInstance);
+
+    VariableMap variables = Variables.createVariables().putValue("var", Variables.stringValue("value", true));
+
+    // when
+    runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", variables);
+
+    // then
+    // presence of transient variable is asserted in delegate
+
+    // and
+    long numVariables = runtimeService.createVariableInstanceQuery().count();
+    assertThat(numVariables).isEqualTo(0);
+  }
+
+
+  public void testTransientVariableOutputMapping() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("superProcess")
+      .startEvent()
+      .callActivity()
+      .calledElement("oneTaskProcess")
+      .camundaOut("var", "var")
+      .serviceTask()
+      .camundaClass(AssertTransientVariableDelegate.class)
+      .userTask()
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
+    deployment("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
+
+    runtimeService.startProcessInstanceByKey("superProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+
+
+    // when
+    VariableMap variables = Variables.createVariables().putValue("var", Variables.stringValue("value", true));
+    taskService.complete(task.getId(), variables);
+
+    // then
+    // presence of transient variable was asserted in delegate
+
+    long numVariables = runtimeService.createVariableInstanceQuery().count();
+    assertThat(numVariables).isEqualTo(0);
+  }
+
+
+  public static class AssertTransientVariableDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      TypedValue typedValue = execution.getVariableTyped("var");
+      assertThat(typedValue).isNotNull();
+      assertThat(typedValue.getType()).isEqualTo(ValueType.STRING);
+      assertThat(typedValue.isTransient()).isTrue();
+      assertThat(typedValue.getValue()).isEqualTo("value");
+    }
 
   }
 
