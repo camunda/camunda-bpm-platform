@@ -91,12 +91,12 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
     }
   }
 
-  public ObjectValue readValue(ValueFields valueFields, boolean deserializeObjectValue) {
+  public ObjectValue readValue(ValueFields valueFields, boolean deserializeObjectValue, boolean asTransientValue) {
     if(valueFields.getTextValue() != null && valueFields.getTextValue2() != null) {
       Object jpaEntity = mappings.getJPAEntity(valueFields.getTextValue(), valueFields.getTextValue2());
-      return Variables.objectValue(jpaEntity).create();
+      return Variables.objectValue(jpaEntity).setTransient(asTransientValue).create();
     }
-    return Variables.objectValue(null).create();
+    return Variables.objectValue(null).setTransient(asTransientValue).create();
   }
 
 }

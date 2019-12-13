@@ -36,8 +36,8 @@ public class StringValueSerializer extends PrimitiveValueSerializer<StringValue>
     return Variables.stringValue((String) untypedValue.getValue(), untypedValue.isTransient());
   }
 
-  public StringValue readValue(ValueFields valueFields) {
-    return Variables.stringValue(valueFields.getTextValue());
+  public StringValue readValue(ValueFields valueFields, boolean asTransientValue) {
+    return Variables.stringValue(valueFields.getTextValue(), asTransientValue);
   }
 
   public void writeValue(StringValue variableValue, ValueFields valueFields) {

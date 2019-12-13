@@ -48,14 +48,14 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
 
   }
 
-  public IntegerValue readValue(ValueFields valueFields) {
+  public IntegerValue readValue(ValueFields valueFields, boolean asTransientValue) {
     Integer intValue = null;
 
     if(valueFields.getLongValue() != null) {
       intValue = Integer.valueOf(valueFields.getLongValue().intValue());
     }
 
-    return Variables.integerValue(intValue);
+    return Variables.integerValue(intValue, asTransientValue);
   }
 
 }

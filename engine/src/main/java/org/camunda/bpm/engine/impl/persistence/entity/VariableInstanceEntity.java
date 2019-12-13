@@ -162,7 +162,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
+    Map<String, Object> persistentState = new HashMap<>();
     if (typedValueField.getSerializerName() != null) {
       persistentState.put("serializerName", typedValueField.getSerializerName());
     }
@@ -262,11 +262,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public TypedValue getTypedValue() {
-    return typedValueField.getTypedValue();
+    return typedValueField.getTypedValue(isTransient);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    return typedValueField.getTypedValue(deserializeValue);
+    return typedValueField.getTypedValue(deserializeValue, isTransient);
   }
 
   public void setValue(TypedValue value) {
@@ -652,13 +652,13 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (processInstanceId != null){
       referenceIdAndClass.put(processInstanceId, ExecutionEntity.class);
