@@ -73,6 +73,8 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
   public HistoryCleanupConfigurationDto getHistoryCleanupConfiguration() {
     HistoryCleanupConfigurationDto configurationDto = new HistoryCleanupConfigurationDto();
     final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    configurationDto.setEnabled(processEngineConfiguration.isHistoryCleanupEnabled());
+
     Date now = ClockUtil.getCurrentTime();
     final BatchWindow batchWindow = processEngineConfiguration.getBatchWindowManager()
       .getCurrentOrNextBatchWindow(now, processEngineConfiguration);

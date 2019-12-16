@@ -197,6 +197,10 @@
 
       and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
 
+      <if test="!parameter.historyCleanupEnabled">
+        and HANDLER_TYPE_ != 'history-cleanup'
+      </if>
+
     <if test="parameter.applyOrdering">
       ${orderBy}
     </if>
