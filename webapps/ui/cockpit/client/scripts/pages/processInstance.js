@@ -186,17 +186,23 @@ var Controller = [
             return name;
           }
 
+          function addIncidents(incidents) {
+            incidents.forEach(function(incident) {
+              var incidentIds =
+                activityIdToIncidentIdMap[incident.activityId] || [];
+              incidentIds.push(incident.id);
+              activityIdToIncidentIdMap[incident.activityId] = incidentIds;
+            });
+          }
+
           function decorateActivityInstanceTree(instance) {
             var children = instance.childActivityInstances;
-            var incidents = [];
 
             if (children && children.length > 0) {
               for (var i = 0, child; (child = children[i]); i++) {
                 var activityId = child.activityId,
                   bpmnElement = bpmnElements[activityId],
                   instances = activityIdToInstancesMap[activityId] || [];
-
-                incidents = activityIdToIncidentIdMap[activityId] || [];
 
                 if (bpmnElement) {
                   child.name = getActivityName(bpmnElement);
@@ -208,9 +214,10 @@ var Controller = [
                 if (!instanceIdToInstanceMap[child.id]) {
                   instanceIdToInstanceMap[child.id] = child;
                 }
+
+                addIncidents(child.incidents);
+
                 instances.push(child);
-                incidents = incidents.concat(child.incidentIds || []);
-                activityIdToIncidentIdMap[activityId] = incidents;
 
                 decorateActivityInstanceTree(child);
               }
@@ -224,10 +231,6 @@ var Controller = [
                   transitionInstances =
                     activityIdToInstancesMap[targetActivityId] || [];
 
-                incidents = activityIdToIncidentIdMap[targetActivityId] || [];
-                incidents = incidents.concat(transition.incidentIds || []);
-                activityIdToIncidentIdMap[targetActivityId] = incidents;
-
                 if (transitionBpmnElement) {
                   transition.name = getActivityName(transitionBpmnElement);
                 } else {
@@ -240,6 +243,9 @@ var Controller = [
                 if (!instanceIdToInstanceMap[transition.id]) {
                   instanceIdToInstanceMap[transition.id] = transition;
                 }
+
+                addIncidents(transition.incidents);
+
                 transitionInstances.push(transition);
               }
             }
