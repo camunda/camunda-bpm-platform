@@ -44,7 +44,7 @@ public class ActivityInstanceIncidentDto {
     ActivityInstanceIncidentDto[] incidentDtos = new ActivityInstanceIncidentDto[incidents.length];
 
     for (int i = 0; i<incidents.length; i++) {
-      incidentDtos[i] = fromIncident(incidents[0]);
+      incidentDtos[i] = fromIncident(incidents[i]);
     }
 
     return incidentDtos;
