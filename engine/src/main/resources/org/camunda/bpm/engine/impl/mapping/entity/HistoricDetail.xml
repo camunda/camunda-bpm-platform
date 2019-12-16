@@ -165,7 +165,7 @@
       <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
       <!-- https://app.camunda.com/jira/browse/CAM-9436 -->
       <!-- null filter to speed up the history cleanup -->
-      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
         and D.TASK_ID_ is not null
       </if>
       <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
@@ -418,13 +418,13 @@
   </sql>
 
   <sql id="selectHistoricDetailsProcessAndCaseInstanceByIdsSql">
-    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size > 0">
       and
         <bind name="listOfIds" value="processInstanceIds"/>
         <bind name="fieldName" value="'PROC_INST_ID_'"/>
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
-    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size > 0">
       and
         <bind name="listOfIds" value="caseInstanceIds"/>
         <bind name="fieldName" value="'CASE_INST_ID_'"/>
@@ -433,7 +433,7 @@
   </sql>
 
   <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -443,7 +443,7 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       )
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -456,7 +456,7 @@
   </sql>
 
   <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and
@@ -464,7 +464,7 @@
           <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and

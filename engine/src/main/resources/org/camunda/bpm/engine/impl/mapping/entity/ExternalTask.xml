@@ -198,7 +198,7 @@
       (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
       and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
-      <if test="parameter != null &amp;&amp; parameter.topics.size() > 0">
+      <if test="parameter != null &amp;&amp; parameter.topics.size > 0">
         and
         <foreach collection="parameter.topics" open="(" close=")" separator="or" item="topicFilters">
           RES.TOPIC_NAME_ like #{topicFilters.topicName}
@@ -237,7 +237,7 @@
               </foreach>
             </if>
           </if>
-          <if test="topicFilters.filterVariables.size() > 0">
+          <if test="topicFilters.filterVariables.size > 0">
             and RES.PROC_INST_ID_ in (
               select VAR.EXECUTION_ID_
               from ${prefix}ACT_RU_VARIABLE VAR

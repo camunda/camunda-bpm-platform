@@ -354,7 +354,7 @@
             <if test="query.assigneeLike != null">
               ${queryType} RES.ASSIGNEE_ like #{query.assigneeLike} ESCAPE ${escapeChar}
             </if>
-            <if test="query.assigneeIn != null &amp;&amp; query.assigneeIn.size() &gt; 0">
+            <if test="query.assigneeIn != null &amp;&amp; query.assigneeIn.size &gt; 0">
               ${queryType} RES.ASSIGNEE_ in
               <foreach item="assignee" index="index" collection="query.assigneeIn"
                        open="(" separator="," close=")">
@@ -535,10 +535,10 @@
                   <if test="query.candidateUser != null">
                     I.USER_ID_ = #{query.candidateUser}
                   </if>
-                  <if test="query.candidateUser != null &amp;&amp; query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                  <if test="query.candidateUser != null &amp;&amp; query.candidateGroups != null &amp;&amp; query.candidateGroups.size &gt; 0">
                     or
                   </if>
-                  <if test="query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                  <if test="query.candidateGroups != null &amp;&amp; query.candidateGroups.size &gt; 0">
                     I.GROUP_ID_ IN
                     <foreach item="group" index="index" collection="query.candidateGroups"
                              open="(" separator="," close=")">

@@ -162,7 +162,7 @@
         EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
     AND
         TASK_ID_ is null
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
@@ -213,7 +213,7 @@
         CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
     AND
         TASK_ID_ is null
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
@@ -241,7 +241,7 @@
 
     WHERE
         TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
