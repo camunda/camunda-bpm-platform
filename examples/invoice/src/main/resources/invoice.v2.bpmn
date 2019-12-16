@@ -57,6 +57,11 @@
       <documentation>Prepare the bank transfer.</documentation>
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
+      <property id="Property_0bzbsgl" name="__targetRef_placeholder" />
+      <dataInputAssociation id="DataInputAssociation_08di2kz">
+        <sourceRef>DataStoreReference_1</sourceRef>
+        <targetRef>Property_0bzbsgl</targetRef>
+      </dataInputAssociation>
     </userTask>
     <businessRuleTask id="assignApprover" name="Assign Approver Group" camunda:resultVariable="approverGroups" camunda:decisionRef="invoice-assign-approver" camunda:mapDecisionResult="collectEntries">
       <incoming>SequenceFlow_1</incoming>
@@ -245,6 +250,10 @@
       <bpmndi:BPMNShape id="Rechnung_kl_ren_148_gui" bpmnElement="reviewInvoice">
         <omgdc:Bounds x="708" y="132" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataInputAssociation_08di2kz_di" bpmnElement="DataInputAssociation_08di2kz">
+        <omgdi:waypoint x="793" y="596" />
+        <omgdi:waypoint x="839" y="543" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>

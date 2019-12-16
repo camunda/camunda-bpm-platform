@@ -65,6 +65,11 @@
       <documentation>Prepare the bank transfer.</documentation>
       <incoming>SequenceFlow_1pcdtz2</incoming>
       <outgoing>SequenceFlow_2</outgoing>
+      <property id="Property_16iplb1" name="__targetRef_placeholder" />
+      <dataInputAssociation id="DataInputAssociation_01h3b65">
+        <sourceRef>DataStoreReference_1</sourceRef>
+        <targetRef>Property_16iplb1</targetRef>
+      </dataInputAssociation>
     </userTask>
     <endEvent id="invoiceProcessed" name="Invoice&#10;processed">
       <incoming>SequenceFlow_3</incoming>
@@ -261,6 +266,10 @@
       <bpmndi:BPMNShape id="Rechnung_kl_ren_148_gui" bpmnElement="reviewInvoice">
         <omgdc:Bounds x="745" y="142" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataInputAssociation_01h3b65_di" bpmnElement="DataInputAssociation_01h3b65">
+        <omgdi:waypoint x="867" y="613" />
+        <omgdi:waypoint x="944" y="553" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>
