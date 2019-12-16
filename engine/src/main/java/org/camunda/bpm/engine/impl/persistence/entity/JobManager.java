@@ -179,6 +179,8 @@ public class JobManager extends AbstractManager {
       }
     }
 
+    params.put("historyCleanupEnabled", Context.getProcessEngineConfiguration().isHistoryCleanupEnabled());
+
     List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
     if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByPriority()) {
       orderingProperties.add(JOB_PRIORITY_ORDERING_PROPERTY);

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -169,6 +170,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
+    processEngineConfiguration.setHistoryCleanupEnabled(true);
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
@@ -246,6 +248,32 @@ public class HistoryCleanupTest {
 
     UserOperationLogEntry entry = userOperationLogEntries.get(0);
     assertEquals(CATEGORY_OPERATOR, entry.getCategory());
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenCleanupDisabled_1() {
+    // given
+    processEngineConfiguration.setHistoryCleanupEnabled(false);
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("History cleanup is disabled for this engine");
+
+    // when
+    historyService.cleanUpHistoryAsync();
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenCleanupDisabled_2() {
+    // given
+    processEngineConfiguration.setHistoryCleanupEnabled(false);
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("History cleanup is disabled for this engine");
+
+    // when
+    historyService.cleanUpHistoryAsync(true);
   }
 
   @Test

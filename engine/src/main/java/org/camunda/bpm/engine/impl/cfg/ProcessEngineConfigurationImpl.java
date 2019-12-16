@@ -804,6 +804,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private boolean historyCleanupMetricsEnabled = true;
 
+  /**
+   * Controls whether engine participates in history cleanup or not.
+   */
+  protected boolean historyCleanupEnabled = true;
+
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   protected String failedJobRetryTimeCycle;
@@ -4270,6 +4275,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
+  }
+
+  public boolean isHistoryCleanupEnabled() {
+    return historyCleanupEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupEnabled(boolean historyCleanupEnabled) {
+    this.historyCleanupEnabled = historyCleanupEnabled;
+    return this;
   }
 
   public String getHistoryTimeToLive() {
