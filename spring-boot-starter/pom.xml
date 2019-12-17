@@ -33,7 +33,6 @@
     <!-- for released versions, add the suffix '-ee', e.g. 7.12.0-ee -->
     <camunda-webapp-ee.version>${camunda.version}</camunda-webapp-ee.version>
 
-    <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
 
