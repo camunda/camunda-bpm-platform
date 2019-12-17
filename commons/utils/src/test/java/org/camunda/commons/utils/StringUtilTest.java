@@ -70,18 +70,18 @@ public class StringUtilTest {
     assertThat(join(null, (String[]) null)).isNull();
     assertThat(join("aax", "a", "b", "c")).isEqualTo("aaaxbaaxc");
   }
-  
+
   @Test
   public void testDefaultString() {
     assertThat(defaultString(null)).isEqualTo("");
     assertThat(defaultString("")).isEqualTo("");
     assertThat(defaultString("bat")).isEqualTo("bat");
   }
-  
+
   @Test
   public void testGetStacktrace() {
     Throwable th = new IllegalArgumentException("Wrong argument!", new NullPointerException("This shouldn't have been empty"));
-    assertThat(getStackTrace(th)).containsSequence("java.lang.IllegalArgumentException: Wrong argument!", 
+    assertThat(getStackTrace(th)).containsSubsequence("java.lang.IllegalArgumentException: Wrong argument!",
       "at org.camunda.commons.utils.StringUtilTest.testGetStacktrace(StringUtilTest.java:",
       "Caused by: java.lang.NullPointerException: This shouldn't have been empty");
   }
