@@ -35,7 +35,7 @@ public class CompositeHistoryEventHandler implements HistoryEventHandler {
   /**
    * The list of {@link HistoryEventHandler} which consume the event.
    */
-  protected final List<HistoryEventHandler> historyEventHandlers = new ArrayList<HistoryEventHandler>();
+  protected final List<HistoryEventHandler> historyEventHandlers = new ArrayList<>();
 
   /**
    * Non-argument constructor for default initialization.
