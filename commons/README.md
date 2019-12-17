@@ -44,7 +44,7 @@ Now you can reference individual commons projects:
 
 ### Which Java (JRE) Version is required?
 
-Java JRE 1.7+ is required.
+Java JRE 1.8+ is required.
 
 ## License:
 
