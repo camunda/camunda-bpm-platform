@@ -30,7 +30,22 @@ var included = [
   'moment',
   'camunda-bpm-sdk-js/lib/angularjs/index',
   'camunda-bpm-sdk-js',
-  'q'
+  'q',
+
+  // Okay, this looks bad. But hear me out:
+  // We create our own DMN editor using DMN-JS
+  // DMN-JS only exports a viewer on the default entry, so we have to require the modules directly
+  // As we don't want to ship dmn-js multiple times, we need to bundle all the required libs here as well
+  // let's hope we can refactor this when we introduce DMN 1.3
+  // The culprit is over here:
+  // camunda-bpm-webapp/camunda-commons-ui/lib/widgets/dmn-viewer/lib/navigatedViewer.js
+  'dmn-js-shared/lib/base/Manager',
+  'dmn-js-drd/lib/NavigatedViewer',
+  'dmn-js-decision-table/lib/Viewer',
+  'dmn-js-literal-expression/lib/Viewer',
+  'dmn-js-shared/lib/util/ModelUtil',
+  'dmn-js-shared/lib/util/DiUtil',
+  'dmn-js/lib/Modeler'
 ];
 
 
@@ -46,7 +61,8 @@ module.exports = function(grunt, dirname) {
       transform: [
         ['envify',
           {
-            NODE_ENV: 'development'
+            global: true,
+            NODE_ENV: 'production'
           }
         ],
         [
@@ -71,6 +87,8 @@ module.exports = function(grunt, dirname) {
         ]],
       paths: [
         'node_modules',
+        'node_modules/camunda-bpm-webapp',
+        'node_modules/camunda-bpm-webapp/node_modules',
         '../../../node_modules',
         '../../../',
         './'
