@@ -62,13 +62,6 @@ module.exports = function(grunt) {
   grunt.initConfig({
     commonsConf: commonsConf,
 
-    karma: {
-      unit: {
-        configFile: './test/karma.conf.js',
-        singleRun: true
-      }
-    },
-
     protractor: {
       widgets: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
         options: {
@@ -259,7 +252,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('auto-build', ['build', 'connect:widgetTests', 'watch']);
 
-  grunt.registerTask('default', ['build', 'karma', 'ensureSelenium', 'connect:widgetTests', 'protractor:widgets']);
+  grunt.registerTask('default', ['build', 'ensureSelenium', 'connect:widgetTests', 'protractor:widgets']);
 
   grunt.registerTask('protractorTests', ['ensureSelenium', 'connect:widgetTests', 'protractor:widgets']);
 };
