@@ -1389,10 +1389,10 @@ public class HistoryCleanupTest {
     prepareCMMNData(instanceCount - 2 * createdInstances);
   }
 
-  private void prepareBPMNData(int instanceCount, String businesskey) {
+  private void prepareBPMNData(int instanceCount, String definitionKey) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
-    final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), instanceCount);
+    final List<String> ids = prepareHistoricProcesses(definitionKey, getVariables(), instanceCount);
     deleteProcessInstances(ids);
     ClockUtil.setCurrentTime(oldCurrentTime);
   }
@@ -1431,11 +1431,11 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
-  private List<String> prepareHistoricProcesses(String businessKey, VariableMap variables, Integer processInstanceCount) {
+  private List<String> prepareHistoricProcesses(String definitionKey, VariableMap variables, Integer processInstanceCount) {
     List<String> processInstanceIds = new ArrayList<>();
 
     for (int i = 0; i < processInstanceCount; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey, variables);
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(definitionKey, variables);
       processInstanceIds.add(processInstance.getId());
     }
 
