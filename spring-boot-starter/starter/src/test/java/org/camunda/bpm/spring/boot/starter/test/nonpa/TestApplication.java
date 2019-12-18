@@ -16,8 +16,12 @@
  */
 package org.camunda.bpm.spring.boot.starter.test.nonpa;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,6 +51,23 @@ public class TestApplication {
           registerFallbackSerializer(processEngineConfiguration);
         }
       };
+    }
+  }
+
+  @Bean
+  public HistoryEventHandler customHistoryEventHandler() {
+    return new CustomHistoryEventHandler();
+  }
+
+  public static class CustomHistoryEventHandler implements HistoryEventHandler {
+    @Override
+    public void handleEvent(HistoryEvent historyEvent) {
+      // noop
+    }
+
+    @Override
+    public void handleEvents(List<HistoryEvent> list) {
+      // noop
     }
   }
 }

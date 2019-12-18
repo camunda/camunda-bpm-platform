@@ -73,7 +73,8 @@ public class EventPublisherPlugin extends SpringBootProcessEnginePlugin {
     if (property.isHistory()) {
       logger.info("EVENTING-007: History events will be published as Spring events.");
       // register composite DB event handler.
-      processEngineConfiguration.setHistoryEventHandler(new CompositeDbHistoryEventHandler(new PublishHistoryEventHandler(this.publisher)));
+      processEngineConfiguration.getCustomHistoryEventHandlers()
+          .add(new PublishHistoryEventHandler(this.publisher));
     } else {
       logger.info("EVENTING-008: History eventing is disabled via property.");
     }

@@ -19,6 +19,9 @@ package org.camunda.bpm.spring.boot.starter.configuration.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -70,8 +73,14 @@ public class DefaultHistoryConfigurationTest {
   @Test
   public void historyEventHandlerTest() {
     HistoryEventHandler historyEventHandlerMock = mock(HistoryEventHandler.class);
+    List customHandlersList = mock(List.class);
+    when(springProcessEngineConfiguration.getCustomHistoryEventHandlers()).thenReturn(customHandlersList);
+
     defaultHistoryConfiguration.historyEventHandler = historyEventHandlerMock;
+    springProcessEngineConfiguration.setCustomHistoryEventHandlers(customHandlersList);
     defaultHistoryConfiguration.preInit(springProcessEngineConfiguration);
-    verify(springProcessEngineConfiguration).setHistoryEventHandler(historyEventHandlerMock);
+
+    verify(springProcessEngineConfiguration).getCustomHistoryEventHandlers();
+    verify(springProcessEngineConfiguration.getCustomHistoryEventHandlers()).add(historyEventHandlerMock);
   }
 }

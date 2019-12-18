@@ -34,7 +34,7 @@ public class DefaultHistoryConfiguration extends AbstractCamundaConfiguration im
     }
     if (historyEventHandler != null) {
       logger.debug("registered history event handler: {}", historyEventHandler.getClass());
-      configuration.setHistoryEventHandler(historyEventHandler);
+      configuration.getCustomHistoryEventHandlers().add(historyEventHandler);
     }
   }
 
