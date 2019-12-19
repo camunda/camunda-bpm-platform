@@ -23,15 +23,12 @@ import org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
-/**
- * @author: Falko Menge & Paul Lungu
- */
 public class MessageRecievePerformanceTest extends ProcessEnginePerformanceTestCase {
   
   @Test
   @Deployment(resources = {"org/camunda/bpm/qa/performance/engine/bpmn/NFT_TEST_FLOW_MSG_RECIEVE_20.bpmn"})
   public void sequence20MessageRecieve() {
-	// Performance test external service task EXTERNAL_STEP_1
+    // Performance test external service task EXTERNAL_STEP_1
     performanceTest()
     .step(new StartProcessInstanceStep(engine, "NFT_TEST_FLOW_MSG_RECIEVE_20"))
 	  .step(new CorrelateMessageStep(engine, "STEP_1", PerfTestConstants.PROCESS_INSTANCE_ID))
