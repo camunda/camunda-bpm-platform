@@ -92,13 +92,6 @@ module.exports = function(grunt) {
             '.'
           ]
         }
-      },
-      'gh-pages': {
-        options: {
-          // livereload: false,
-          port: (pkg.gruntConfig.connectPort + 3),
-          base: ['gh-pages']
-        }
       }
     },
 
@@ -244,11 +237,7 @@ module.exports = function(grunt) {
     });
   });
 
-  require('./grunt/tasks/gh-pages')(grunt);
-
   grunt.registerTask('build', ['newer:eslint', 'less:widgets', 'browserify:watch']);
-
-  grunt.registerTask('build-gh-pages', ['build', 'gh-pages']);
 
   grunt.registerTask('auto-build', ['build', 'connect:widgetTests', 'watch']);
 

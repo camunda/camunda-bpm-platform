@@ -30,7 +30,7 @@ Widgets are reusable components which should be easy to integrate in the [Camund
 
 #### Usage
 
-A good way to get familiar with the widgets integration in your projects is by reading the source code of the `lib/widgets/*/test/*.spec.html` or their online versions (see the _widgets_ menu on the [GitHub page](//camunda.github.io/camunda-commons-ui)).   
+A good way to get familiar with the widgets integration in your projects is by reading the source code of the `lib/widgets/*/test/*.spec.html`.
 In those examples, we use uncompiled versions of the library and its dependencies and wire the whole with [requirejs](//requirejs.org).
 
 
@@ -91,19 +91,19 @@ grunt karma
 
 ### Testing the widgets under macOS
 
-Add to protractor.config.js: 
+Add to protractor.config.js:
 ```
 directConnect: true,
 ```
-Run in commons-ui folder: 
-``` 
+Run in commons-ui folder:
+```
 rm -rf node_modules
 npm install —-legacy-bundling
 ```
 Open webdriver-manager and change mac32.zip to mac64.zip if you run a newer macOS version.
-``` 
+```
 vim /camunda-commons-ui/node_modules/protractor/bin/webdriver-manager
-``` 
+```
 Run chrome update for protractor
 ```
 camunda-commons-ui/node_modules/protractor/bin/webdriver-manager --chrome update
