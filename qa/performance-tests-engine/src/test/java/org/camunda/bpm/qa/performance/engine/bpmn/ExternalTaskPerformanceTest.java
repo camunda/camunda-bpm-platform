@@ -22,15 +22,12 @@ import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.camunda.bpm.qa.performance.engine.steps.WorkExternalTaskStep;
 import org.junit.Test;
 
-/**
- * @author: Paul Lungu
- */
 public class ExternalTaskPerformanceTest extends ProcessEnginePerformanceTestCase {
   
   @Test
   @Deployment(resources = {"org/camunda/bpm/qa/performance/engine/bpmn/NFT_TEST_FLOW_External_20.bpmn"})
   public void sequence20ExternalServiceTasks() {
-	// Performance test external service task EXTERNAL_STEP_1
+    // Performance test external service task EXTERNAL_STEP_1
     performanceTest()
     .step(new StartProcessInstanceStep(engine, "NFT_TEST_FLOW_External_20"))
     .step(new WorkExternalTaskStep(engine, "STEP_1", "worker"+1, 1))
