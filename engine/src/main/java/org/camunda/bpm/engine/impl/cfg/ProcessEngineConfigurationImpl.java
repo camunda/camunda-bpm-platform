@@ -787,7 +787,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private boolean historyCleanupMetricsEnabled = true;
 
   /**
-   * Controls wether engine participates in history cleanup or not.
+   * Controls whether engine participates in history cleanup or not.
    */
   protected boolean historyCleanupEnabled = true;
 
