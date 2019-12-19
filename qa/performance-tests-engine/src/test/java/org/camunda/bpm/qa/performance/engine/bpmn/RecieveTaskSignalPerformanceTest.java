@@ -23,9 +23,6 @@ import org.camunda.bpm.qa.performance.engine.steps.SignalExecutionStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
-/**
- * @author: Falko Menge & Paul Lungu
- */
 public class RecieveTaskSignalPerformanceTest extends ProcessEnginePerformanceTestCase {  
   
   @Test
