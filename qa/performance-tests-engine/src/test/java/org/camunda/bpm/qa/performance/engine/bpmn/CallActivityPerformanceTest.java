@@ -21,9 +21,6 @@ import org.camunda.bpm.qa.performance.engine.junit.ProcessEnginePerformanceTestC
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
-/**
- * @author: Falko Menge & Paul Lungu
- */
 public class CallActivityPerformanceTest extends ProcessEnginePerformanceTestCase {
     
   @Test
@@ -34,7 +31,6 @@ public class CallActivityPerformanceTest extends ProcessEnginePerformanceTestCas
 
 	performanceTest()
         .step(new StartProcessInstanceStep(engine, "NFT_TEST_FLOW_Business_20"))
-//        .steps(1, new ExecuteJobStep(engine))
         .run();
   }
   
