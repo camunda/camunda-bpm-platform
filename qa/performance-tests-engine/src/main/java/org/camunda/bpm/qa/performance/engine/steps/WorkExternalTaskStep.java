@@ -22,10 +22,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
 
-/**
- * @author Paul Lungu
- *
- */
 public class WorkExternalTaskStep extends ProcessEngineAwareStep {
 
   protected String topic;
