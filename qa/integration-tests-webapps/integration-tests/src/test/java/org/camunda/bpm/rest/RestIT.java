@@ -19,19 +19,16 @@ package org.camunda.bpm.rest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,28 +89,38 @@ public class RestIT extends AbstractWebIntegrationTest {
     assertEquals(200, response.getStatus());
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
+    response.close();
+
     // invoice example
-    assertEquals(2, definitionsJson.length());
+    assertEquals(3, definitionsJson.length());
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
-    assertEquals("invoice", definitionJson.getString("key"));
-    assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
-    assertEquals("Invoice Receipt", definitionJson.getString("name"));
-    Assert.assertTrue(definitionJson.isNull("description"));
-    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.v1.bpmn"));
+    assertEquals("ReviewInvoice", definitionJson.getString("key"));
+    assertEquals("http://bpmn.io/schema/bpmn", definitionJson.getString("category"));
+    assertEquals("Review Invoice", definitionJson.getString("name"));
+    assertTrue(definitionJson.isNull("description"));
+    assertTrue(definitionJson.getString("resource").contains("reviewInvoice.bpmn"));
     assertFalse(definitionJson.getBoolean("suspended"));
-
+    
     definitionJson = definitionsJson.getJSONObject(1);
 
     assertEquals("invoice", definitionJson.getString("key"));
     assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
     assertEquals("Invoice Receipt", definitionJson.getString("name"));
-    Assert.assertTrue(definitionJson.isNull("description"));
-    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.v2.bpmn"));
+    assertTrue(definitionJson.isNull("description"));
+    assertTrue(definitionJson.getString("resource").contains("invoice.v1.bpmn"));
     assertFalse(definitionJson.getBoolean("suspended"));
 
-    response.close();
+    definitionJson = definitionsJson.getJSONObject(2);
+
+    assertEquals("invoice", definitionJson.getString("key"));
+    assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
+    assertEquals("Invoice Receipt", definitionJson.getString("name"));
+    assertTrue(definitionJson.isNull("description"));
+    assertTrue(definitionJson.getString("resource").contains("invoice.v2.bpmn"));
+    assertFalse(definitionJson.getBoolean("suspended"));
+
 
   }
 
@@ -240,7 +247,7 @@ public class RestIT extends AbstractWebIntegrationTest {
 
     assertEquals(200, response.getStatus());
     // invoice example instance
-    assertEquals(2, definitionStatistics.length());
+    assertEquals(3, definitionStatistics.length());
 
     // check that definition is also serialized
     for (int i = 0; i < definitionStatistics.length(); i++) {
@@ -248,7 +255,7 @@ public class RestIT extends AbstractWebIntegrationTest {
       assertEquals("org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto", definitionStatistic.getString("@class"));
       assertEquals(0, definitionStatistic.getJSONArray("incidents").length());
       JSONObject definition = definitionStatistic.getJSONObject("definition");
-      assertEquals("Invoice Receipt", definition.getString("name"));
+      assertTrue(definition.getString("name").toLowerCase().contains("invoice"));
       assertFalse(definition.getBoolean("suspended"));
     }
   }
