@@ -22,10 +22,6 @@ import org.camunda.bpm.qa.performance.engine.steps.ExecuteJobStep;
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
-/**
- * @author Paul Lungu
- *
- */
 public class AsyncServiceTaskPerformanceTest extends ProcessEnginePerformanceTestCase {
 
 	  @Test
