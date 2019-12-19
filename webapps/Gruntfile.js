@@ -209,14 +209,8 @@ module.exports = function(grunt) {
   require('./camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('./camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
   require('./camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
-  require('./camunda-commons-ui/grunt/tasks/gh-pages')(grunt);
 
   grunt.loadNpmTasks('grunt-karma');
-
-  grunt.registerTask('commons-build-gh-pages', [
-    'less:commons-ui-styles',
-    'gh-pages'
-  ]);
 
   grunt.registerTask('build-sdk-js', [
     'eslint:sdk-js',
