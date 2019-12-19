@@ -21,9 +21,6 @@ import org.camunda.bpm.qa.performance.engine.junit.ProcessEnginePerformanceTestC
 import org.camunda.bpm.qa.performance.engine.steps.StartProcessInstanceStep;
 import org.junit.Test;
 
-/**
- * @author: Falko Menge & Paul Lungu
- */
 public class ServiceTask20ActivityPerformanceTest extends ProcessEnginePerformanceTestCase {
     
   @Test
