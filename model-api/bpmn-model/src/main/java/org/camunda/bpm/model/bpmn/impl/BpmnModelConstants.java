@@ -231,6 +231,8 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_BEHAVIOR= "behavior";
   public static final String BPMN_ELEMENT_ONE_BEHAVIOR_EVENT_REF = "oneBehaviorEventRef";
   public static final String BPMN_ELEMENT_NONE_BEHAVIOR_EVENT_REF = "noneBehaviorEventRef";
+  public static final String BPMN_ELEMENT_GROUP = "group";
+  public static final String BPMN_ELEMENT_CATEGORY = "category";
 
   /** DC */
 
@@ -374,6 +376,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_METHOD = "method";
   public static final String BPMN_ATTRIBUTE_CAPACITY = "capacity";
   public static final String BPMN_ATTRIBUTE_IS_UNLIMITED = "isUnlimited";
+  public static final String BPMN_ATTRIBUTE_CATEGORY_VALUE_REF = "categoryValueRef";
 
   /** DC */
 

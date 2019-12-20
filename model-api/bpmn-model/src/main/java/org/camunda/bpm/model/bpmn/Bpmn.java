@@ -299,6 +299,7 @@ public class Bpmn {
     CallConversationImpl.registerType(bpmnModelBuilder);
     CancelEventDefinitionImpl.registerType(bpmnModelBuilder);
     CatchEventImpl.registerType(bpmnModelBuilder);
+    CategoryImpl.registerType(bpmnModelBuilder);
     CategoryValueImpl.registerType(bpmnModelBuilder);
     CategoryValueRef.registerType(bpmnModelBuilder);
     ChildLaneSet.registerType(bpmnModelBuilder);
@@ -358,6 +359,7 @@ public class Bpmn {
     From.registerType(bpmnModelBuilder);
     GatewayImpl.registerType(bpmnModelBuilder);
     GlobalConversationImpl.registerType(bpmnModelBuilder);
+    GroupImpl.registerType(bpmnModelBuilder);
     HumanPerformerImpl.registerType(bpmnModelBuilder);
     ImportImpl.registerType(bpmnModelBuilder);
     InclusiveGatewayImpl.registerType(bpmnModelBuilder);
