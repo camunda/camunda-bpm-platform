@@ -63,24 +63,6 @@ public class RestIT extends AbstractWebIntegrationTest {
 
   @Test
   public void testScenario() throws JSONException {
-
-    // FIXME: cannot do this on JBoss AS7, see https://app.camunda.com/jira/browse/CAM-787
-
-    // get list of process engines
-    // log.info("Checking " + APP_BASE_PATH + ENGINES_PATH);
-    // WebResource resource = client.resource(APP_BASE_PATH + ENGINES_PATH);
-    // ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-    //
-    // Assert.assertEquals(200, response.getStatus());
-    //
-    // JSONArray enginesJson = response.getEntity(JSONArray.class);
-    // Assert.assertEquals(1, enginesJson.length());
-    //
-    // JSONObject engineJson = enginesJson.getJSONObject(0);
-    // Assert.assertEquals("default", engineJson.getString("name"));
-    //
-    // response.close();
-
     // get process definitions for default engine
     log.info("Checking " + APP_BASE_PATH + PROCESS_DEFINITION_PATH);
     WebResource resource = client.resource(APP_BASE_PATH + PROCESS_DEFINITION_PATH);
@@ -94,34 +76,23 @@ public class RestIT extends AbstractWebIntegrationTest {
     // invoice example
     assertEquals(3, definitionsJson.length());
 
-    JSONObject definitionJson = definitionsJson.getJSONObject(0);
-
-    assertEquals("ReviewInvoice", definitionJson.getString("key"));
-    assertEquals("http://bpmn.io/schema/bpmn", definitionJson.getString("category"));
-    assertEquals("Review Invoice", definitionJson.getString("name"));
-    assertTrue(definitionJson.isNull("description"));
-    assertTrue(definitionJson.getString("resource").contains("reviewInvoice.bpmn"));
-    assertFalse(definitionJson.getBoolean("suspended"));
-    
-    definitionJson = definitionsJson.getJSONObject(1);
-
-    assertEquals("invoice", definitionJson.getString("key"));
-    assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
-    assertEquals("Invoice Receipt", definitionJson.getString("name"));
-    assertTrue(definitionJson.isNull("description"));
-    assertTrue(definitionJson.getString("resource").contains("invoice.v1.bpmn"));
-    assertFalse(definitionJson.getBoolean("suspended"));
-
-    definitionJson = definitionsJson.getJSONObject(2);
-
-    assertEquals("invoice", definitionJson.getString("key"));
-    assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
-    assertEquals("Invoice Receipt", definitionJson.getString("name"));
-    assertTrue(definitionJson.isNull("description"));
-    assertTrue(definitionJson.getString("resource").contains("invoice.v2.bpmn"));
-    assertFalse(definitionJson.getBoolean("suspended"));
-
-
+    // order of results is not consistent between database types
+    for (int i = 0; i < definitionsJson.length(); i++) {
+      JSONObject definitionJson = definitionsJson.getJSONObject(i);
+      assertTrue(definitionJson.isNull("description"));
+      assertFalse(definitionJson.getBoolean("suspended"));
+      if (definitionJson.getString("key").equals("ReviewInvoice")) {
+        assertEquals("http://bpmn.io/schema/bpmn", definitionJson.getString("category"));
+        assertEquals("Review Invoice", definitionJson.getString("name"));
+        assertTrue(definitionJson.getString("resource").equals("reviewInvoice.bpmn"));
+      } else if (definitionJson.getString("key").equals("invoice")) {
+        assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
+        assertEquals("Invoice Receipt", definitionJson.getString("name"));
+        assertTrue(definitionJson.getString("resource").matches("invoice\\.v[1,2]\\.bpmn"));
+      } else {
+        fail("Unexpected definition key in response JSON.");
+      }
+    }
   }
 
   @Test
