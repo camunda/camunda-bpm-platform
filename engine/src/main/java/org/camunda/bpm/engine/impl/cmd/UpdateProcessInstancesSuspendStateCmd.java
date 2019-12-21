@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Collection;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
@@ -26,20 +27,26 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Void> {
 
-  public UpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspendstate) {
+  public UpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor,
+                                               UpdateProcessInstancesSuspensionStateBuilderImpl builder,
+                                               boolean suspendstate) {
     super(commandExecutor, builder, suspendstate);
   }
 
+  @Override
   public Void execute(CommandContext commandContext) {
 
     Collection<String> processInstanceIds = collectProcessInstanceIds();
 
-    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "No process instance ids given", "Process Instance ids", processInstanceIds);
-    EnsureUtil.ensureNotContainsNull(BadUserRequestException.class, "Cannot be null.", "Process Instance ids", processInstanceIds);
+    EnsureUtil.ensureNotEmpty(BadUserRequestException.class,
+        "No process instance ids given", "Process Instance ids", processInstanceIds);
+    EnsureUtil.ensureNotContainsNull(BadUserRequestException.class,
+        "Cannot be null.", "Process Instance ids", processInstanceIds);
 
     writeUserOperationLog(commandContext, processInstanceIds.size(), false);
 
-    UpdateProcessInstanceSuspensionStateBuilderImpl suspensionStateBuilder = new UpdateProcessInstanceSuspensionStateBuilderImpl(commandExecutor);
+    UpdateProcessInstanceSuspensionStateBuilderImpl suspensionStateBuilder =
+        new UpdateProcessInstanceSuspensionStateBuilderImpl(commandExecutor);
     if (suspending) {
       // suspending
       for (String processInstanceId : processInstanceIds) {

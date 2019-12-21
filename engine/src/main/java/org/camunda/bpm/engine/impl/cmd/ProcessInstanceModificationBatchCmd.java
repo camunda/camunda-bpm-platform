@@ -23,25 +23,19 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
 import org.camunda.bpm.engine.impl.ModificationBuilderImpl;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.BatchUtil;
 
 public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd<Batch> {
-
-  protected static final CommandLogger LOGGER = ProcessEngineLogger.CMD_LOGGER;
 
   public ProcessInstanceModificationBatchCmd(ModificationBuilderImpl modificationBuilderImpl) {
     super(modificationBuilderImpl);
@@ -50,66 +44,43 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
   @Override
   public Batch execute(CommandContext commandContext) {
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
-    Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
+    ensureNotEmpty(BadUserRequestException.class,
+        "Modification instructions cannot be empty", instructions);
+
+    Collection<String> collectedInstanceIds = collectProcessInstanceIds();
+
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty",
+        "Process instance ids", collectedInstanceIds);
+
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null",
+        "Process instance ids", collectedInstanceIds);
+
+    String processDefinitionId = builder.getProcessDefinitionId();
+    ProcessDefinitionEntity processDefinition =
+        getProcessDefinition(commandContext, processDefinitionId);
+
+    ensureNotNull(BadUserRequestException.class,
+        "Process definition id cannot be null", processDefinition);
+
+    String tenantId = processDefinition.getTenantId();
     String annotation = builder.getAnnotation();
 
-    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", instructions);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
-    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
-
-    checkPermissions(commandContext);
-
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
-    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
-
-    writeUserOperationLog(commandContext, processDefinition,
-        processInstanceIds.size(),
-        true,
-        annotation);
-
-    BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds, processDefinition);
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-    return batch;
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION)
+        .config(getConfiguration(collectedInstanceIds))
+        .tenantId(tenantId)
+        .permission(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
+        .operationLogHandler((ctx, instanceCount) ->
+            writeUserOperationLog(ctx, processDefinition, instanceCount, true, annotation))
+        .build();
   }
 
-  protected void checkPermissions(CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
-    }
-  }
-
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
-      Collection<String> processInstanceIds, ProcessDefinitionEntity processDefinition) {
-
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
-
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(new ArrayList<String>(processInstanceIds), builder.getProcessDefinitionId(), instructions,
-        builder.isSkipCustomListeners(), builder.isSkipIoMappings());
-
-    BatchEntity batch = new BatchEntity();
-
-    batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
-    batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
-    batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
-    batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
-    batch.setTenantId(processDefinition.getTenantId());
-    commandContext.getBatchManager().insertBatch(batch);
-
-    return batch;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
+  public BatchConfiguration getConfiguration(Collection<String> instanceIds) {
+    return new ModificationBatchConfiguration(new ArrayList<>(instanceIds),
+        builder.getProcessDefinitionId(),
+        builder.getInstructions(),
+        builder.isSkipCustomListeners(),
+        builder.isSkipIoMappings());
   }
 
 }

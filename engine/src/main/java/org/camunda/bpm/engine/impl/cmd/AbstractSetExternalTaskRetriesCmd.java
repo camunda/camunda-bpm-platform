@@ -44,7 +44,7 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
 
   protected List<String> collectProcessInstanceIds() {
 
-    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+    Set<String> collectedProcessInstanceIds = new HashSet<>();
 
     List<String> processInstanceIds = builder.getProcessInstanceIds();
     if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
@@ -61,7 +61,7 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
       collectedProcessInstanceIds.addAll(historicProcessInstanceQuery.listIds());
     }
 
-    return new ArrayList<String>(collectedProcessInstanceIds);
+    return new ArrayList<>(collectedProcessInstanceIds);
   }
 
   protected List<String> collectExternalTaskIds() {
@@ -82,29 +82,31 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
     final List<String> collectedProcessInstanceIds = collectProcessInstanceIds();
     if (!collectedProcessInstanceIds.isEmpty()) {
 
-      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
-
-        public Void call() throws Exception {
-          ExternalTaskQueryImpl query = new ExternalTaskQueryImpl();
-          query.processInstanceIdIn(collectedProcessInstanceIds.toArray(new String[collectedProcessInstanceIds.size()]));
-          collectedIds.addAll(query.listIds());
-          return null;
-        }
-
+      Context.getCommandContext().runWithoutAuthorization((Callable<Void>) () -> {
+        ExternalTaskQueryImpl query = new ExternalTaskQueryImpl();
+        query.processInstanceIdIn(collectedProcessInstanceIds.toArray(new String[0]));
+        collectedIds.addAll(query.listIds());
+        return null;
       });
     }
 
-    return new ArrayList<String>(collectedIds);
+    return new ArrayList<>(collectedIds);
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext, int retries, int numInstances, boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances,
+                                       boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
-    propertyChanges.add(new PropertyChange("retries", null, retries));
+    propertyChanges.add(new PropertyChange("retries", null, builder.getRetries()));
 
     commandContext.getOperationLogManager().logExternalTaskOperation(
         UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES, null, propertyChanges);
   }
+
+  protected void writeUserOperationLogAsync(CommandContext commandContext, int numInstances) {
+    writeUserOperationLog(commandContext, numInstances, true);
+  }
+
 }
