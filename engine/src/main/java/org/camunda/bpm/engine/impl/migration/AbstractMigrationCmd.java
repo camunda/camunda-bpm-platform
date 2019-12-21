@@ -16,29 +16,28 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author Thorben Lindhauer
  *
  */
-public abstract class AbstractMigrationCmd<T> implements Command<T> {
+public abstract class AbstractMigrationCmd {
 
   protected MigrationPlanExecutionBuilderImpl executionBuilder;
 
@@ -47,29 +46,31 @@ public abstract class AbstractMigrationCmd<T> implements Command<T> {
   }
 
   protected void checkAuthorizations(CommandContext commandContext,
-      ProcessDefinitionEntity sourceDefinition,
-      ProcessDefinitionEntity targetDefinition,
-      Collection<String> processInstanceIds) {
+                                     ProcessDefinitionEntity sourceDefinition,
+                                     ProcessDefinitionEntity targetDefinition) {
 
     CompositePermissionCheck migrateInstanceCheck = new PermissionCheckBuilder()
       .conjunctive()
-      .atomicCheckForResourceId(Resources.PROCESS_DEFINITION, sourceDefinition.getKey(), Permissions.MIGRATE_INSTANCE)
-      .atomicCheckForResourceId(Resources.PROCESS_DEFINITION, targetDefinition.getKey(), Permissions.MIGRATE_INSTANCE)
+      .atomicCheckForResourceId(Resources.PROCESS_DEFINITION,
+          sourceDefinition.getKey(), Permissions.MIGRATE_INSTANCE)
+      .atomicCheckForResourceId(Resources.PROCESS_DEFINITION,
+          targetDefinition.getKey(), Permissions.MIGRATE_INSTANCE)
     .build();
 
     commandContext.getAuthorizationManager().checkAuthorization(migrateInstanceCheck);
   }
 
-  protected Collection<String> collectProcessInstanceIds(CommandContext commandContext) {
+  protected Collection<String> collectProcessInstanceIds() {
 
-    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+    Set<String> collectedProcessInstanceIds = new HashSet<>();
 
     List<String> processInstanceIds = executionBuilder.getProcessInstanceIds();
     if (processInstanceIds != null) {
       collectedProcessInstanceIds.addAll(processInstanceIds);
     }
 
-    final ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) executionBuilder.getProcessInstanceQuery();
+    final ProcessInstanceQueryImpl processInstanceQuery =
+        (ProcessInstanceQueryImpl) executionBuilder.getProcessInstanceQuery();
     if (processInstanceQuery != null) {
       collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
@@ -102,24 +103,29 @@ public abstract class AbstractMigrationCmd<T> implements Command<T> {
 
   protected ProcessDefinitionEntity resolveSourceProcessDefinition(CommandContext commandContext) {
 
-    String sourceProcessDefinitionId = executionBuilder.getMigrationPlan().getSourceProcessDefinitionId();
+    String sourceProcessDefinitionId = executionBuilder.getMigrationPlan()
+        .getSourceProcessDefinitionId();
 
-    ProcessDefinitionEntity sourceProcessDefinition = getProcessDefinition(commandContext, sourceProcessDefinitionId);
+    ProcessDefinitionEntity sourceProcessDefinition =
+        getProcessDefinition(commandContext, sourceProcessDefinitionId);
     EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
 
     return sourceProcessDefinition;
   }
 
   protected ProcessDefinitionEntity resolveTargetProcessDefinition(CommandContext commandContext) {
-    String targetProcessDefinitionId = executionBuilder.getMigrationPlan().getTargetProcessDefinitionId();
+    String targetProcessDefinitionId = executionBuilder.getMigrationPlan()
+        .getTargetProcessDefinitionId();
 
-    ProcessDefinitionEntity sourceProcessDefinition = getProcessDefinition(commandContext, targetProcessDefinitionId);
+    ProcessDefinitionEntity sourceProcessDefinition =
+        getProcessDefinition(commandContext, targetProcessDefinitionId);
     EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
 
     return sourceProcessDefinition;
   }
 
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext,
+                                                         String processDefinitionId) {
 
     return commandContext
         .getProcessEngineConfiguration()

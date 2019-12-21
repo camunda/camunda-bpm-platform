@@ -14,23 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd.batch;
+package org.camunda.bpm.engine.impl.batch.builder;
 
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
- * Representation of common logic to all Batch commands
- *
- * @author Askar Akhmerov
+ * This is a functional interface to pass a callback that writes
+ * the Operation Log.
  */
-public abstract class AbstractBatchCmd<T> implements Command<T> {
+public interface OperationLogHandler {
+  /**
+   * Callback to write the Operation Log.
+   * @param commandContext can be used when writing the Operation Log
+   */
+  void write(CommandContext commandContext);
 
-  protected void checkAuthorizations(CommandContext commandContext, Permission permission) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(permission);
-    }
-  }
 }

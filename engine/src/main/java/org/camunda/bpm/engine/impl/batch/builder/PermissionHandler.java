@@ -14,24 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.util;
+package org.camunda.bpm.engine.impl.batch.builder;
 
-import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class BatchUtil {
-  public static int calculateBatchSize(ProcessEngineConfigurationImpl engineConfiguration, BatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
+/**
+ * This is a functional interface to pass a callback that performs
+ * the permission check.
+ */
+public interface PermissionHandler {
 
-    if (processInstanceCount == 0 || invocationsPerBatchJob == 0) {
-      return 0;
-    }
+  /**
+   * Callback that performs the permission check.
+   * @param commandContext can be used within the permission check
+   */
+  void check(CommandContext commandContext);
 
-    if (processInstanceCount % invocationsPerBatchJob == 0) {
-      return processInstanceCount / invocationsPerBatchJob;
-    }
-
-    return (processInstanceCount / invocationsPerBatchJob) + 1;
-  }
 }
