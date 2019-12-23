@@ -257,6 +257,18 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   }
 
   /**
+   * Sets the documentation of the element.
+   *
+   * @param documentation  the documentation to set
+   * @return the builder object
+   */
+  public B documentation(String documentation) {
+    final Documentation child = createChild(element, Documentation.class);
+    child.setTextContent(documentation);
+    return myself;
+  }
+
+  /**
    * Add an extension element to the element.
    *
    * @param extensionElement  the extension element to add

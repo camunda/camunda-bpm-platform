@@ -351,6 +351,39 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testBaseElementDocumentation() {
+    modelInstance = Bpmn.createProcess("process")
+            .documentation("processDocumentation")
+            .startEvent("startEvent")
+            .documentation("startEventDocumentation_1")
+            .documentation("startEventDocumentation_2")
+            .documentation("startEventDocumentation_3")
+            .userTask("task")
+            .documentation("taskDocumentation")
+            .businessRuleTask("businessruletask")
+            .subProcess("subprocess")
+            .documentation("subProcessDocumentation")
+            .embeddedSubProcess()
+            .startEvent("subprocessStartEvent")
+            .endEvent("subprocessEndEvent")
+            .subProcessDone()
+            .endEvent("endEvent")
+            .documentation("endEventDocumentation")
+            .done();
+
+    assertThat(((Process) modelInstance.getModelElementById("process")).getDocumentations().iterator().next().getTextContent()).isEqualTo("processDocumentation");
+    assertThat(((UserTask) modelInstance.getModelElementById("task")).getDocumentations().iterator().next().getTextContent()).isEqualTo("taskDocumentation");
+    assertThat(((SubProcess) modelInstance.getModelElementById("subprocess")).getDocumentations().iterator().next().getTextContent()).isEqualTo("subProcessDocumentation");
+    assertThat(((EndEvent) modelInstance.getModelElementById("endEvent")).getDocumentations().iterator().next().getTextContent()).isEqualTo("endEventDocumentation");
+
+    final Documentation[] startEventDocumentations = ((StartEvent) modelInstance.getModelElementById("startEvent")).getDocumentations().toArray(new Documentation[]{});
+    assertThat(startEventDocumentations.length).isEqualTo(3);
+    for (int i = 1; i <=3; i++) {
+      assertThat(startEventDocumentations[i - 1].getTextContent()).isEqualTo("startEventDocumentation_" + i);
+    }
+  }
+
+  @Test
   public void testExtend() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
