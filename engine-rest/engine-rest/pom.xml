@@ -13,7 +13,7 @@
 
   <properties>
     <!-- pin tomcat version for engine-rest -->
-    <version.tomcat>7.0.50</version.tomcat>
+    <version.tomcat>8.5.2</version.tomcat>
     <rest.http.port>38080</rest.http.port>
     <!-- use inherited version as default -->
     <resteasy.version>${version.resteasy}</resteasy.version>
