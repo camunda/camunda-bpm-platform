@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -90,6 +91,13 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
 
+    // provide hostname before history cleanup job is created in `executeSchemaOperations()`
+    String hostname = processEngineConfiguration.getHostname();
+    if (hostname == null) {
+      hostname = processEngineConfiguration.getHostnameProvider().getHostname(this);
+      processEngineConfiguration.setHostname(hostname);
+    }
+
     executeSchemaOperations();
 
     if (name == null) {
@@ -106,7 +114,16 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     if (processEngineConfiguration.isMetricsEnabled()) {
-      String reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);
+      String reporterId;
+      // only use a deprecated, custom MetricsReporterIdProvider,
+      // if a custom HostnameProvider isn't provided
+      if (processEngineConfiguration.getMetricsReporterIdProvider() != null
+          && processEngineConfiguration.getHostnameProvider() instanceof SimpleIpBasedProvider) {
+        reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);
+      } else {
+        reporterId = hostname;
+      }
+
       DbMetricsReporter dbMetricsReporter = processEngineConfiguration.getDbMetricsReporter();
       dbMetricsReporter.setReporterId(reporterId);
 

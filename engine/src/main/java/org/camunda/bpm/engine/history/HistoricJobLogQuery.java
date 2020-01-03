@@ -66,6 +66,9 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only selects historic job log entries that have no tenant id. */
   HistoricJobLogQuery withoutTenantId();
 
+  /** Only selects historic job log entries that belong to the given host name. */
+  HistoricJobLogQuery hostname(String hostname);
+
   /**
    * Only select log entries where the job had a priority higher than or
    * equal to the given priority.
@@ -158,5 +161,11 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    * Note that the ordering of job log entries without tenant id is database-specific.
    */
   HistoricJobLogQuery orderByTenantId();
+
+  /**
+   * Order by hostname (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job log entries without hostname is database-specific.
+   */
+  HistoricJobLogQuery orderByHostname();
 
 }

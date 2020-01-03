@@ -14,23 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.metrics;
+package org.camunda.bpm.engine.impl.history.event;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
 
-/**
- * @deprecated Please use {@link HostnameProvider}
- * for providing the Metrics Reporter id.
- *
- * @author Thorben Lindhauer
- */
-@Deprecated
-public interface MetricsReporterIdProvider {
+public interface HostnameProvider {
 
   /**
-   * Provides an id that identifies the metrics reported as part of the given engine's
-   * process execution. May return null.
+   * Provides a <code>String</code> that identifies the host of the given Process Engine.
+   *
+   * @param processEngine the Process Engine that will run on the current host
+   * @return a String identifying the current host
    */
-  String provideId(ProcessEngine processEngine);
+  String getHostname(ProcessEngine processEngine);
 }

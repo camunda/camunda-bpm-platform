@@ -1065,6 +1065,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobRetries(jobEntity.getRetries());
     evt.setJobPriority(jobEntity.getPriority());
 
+    String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
+    evt.setHostname(hostName);
+
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {
       evt.setJobDefinitionId(jobDefinition.getId());

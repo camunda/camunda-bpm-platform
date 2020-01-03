@@ -140,6 +140,11 @@ public interface HistoricJobLog {
   public String getTenantId();
 
   /**
+   * Returns the name of the host where the Process Engine that added this job log runs.
+   */
+  String getHostname();
+
+  /**
    * Returns <code>true</code> when <code>this</code> log represents
    * the creation of the associated job.
    */

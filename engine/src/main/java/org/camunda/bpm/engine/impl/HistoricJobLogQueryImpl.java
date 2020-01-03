@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmpty
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -56,6 +57,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected Long jobPriorityLowerThanOrEqual;
   protected String[] tenantIds;
   protected boolean isTenantIdSet;
+  protected String hostname;
 
   public HistoricJobLogQueryImpl() {
   }
@@ -166,6 +168,14 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  @Override
+  public HistoricJobLogQuery hostname(String hostname) {
+    ensureNotNull("hostName", hostname);
+    ensureNotContainsEmptyString("hostName", Collections.singletonList(hostname));
+    this.hostname = hostname;
+    return this;
+  }
+
   public HistoricJobLogQuery creationLog() {
     setState(JobState.CREATED);
     return this;
@@ -263,6 +273,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return orderBy(HistoricJobLogQueryProperty.TENANT_ID);
   }
 
+  @Override
+  public HistoricJobLogQuery orderByHostname() {
+    return orderBy(HistoricJobLogQueryProperty.HOSTNAME);
+  }
+
   // results //////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
@@ -335,6 +350,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public String[] getTenantIds() {
     return tenantIds;
+  }
+
+  public String getHostname() {
+    return hostname;
   }
 
   // setter //////////////////////////////////

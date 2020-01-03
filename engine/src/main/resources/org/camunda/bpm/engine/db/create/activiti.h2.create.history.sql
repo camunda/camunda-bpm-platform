@@ -280,6 +280,7 @@ create table ACT_HI_JOB_LOG (
     DEPLOYMENT_ID_ varchar(64),
     SEQUENCE_COUNTER_ integer,
     TENANT_ID_ varchar(64),
+    HOSTNAME_ varchar(255),
     REMOVAL_TIME_ timestamp,
     primary key (ID_)
 );

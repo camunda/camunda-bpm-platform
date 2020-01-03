@@ -279,6 +279,7 @@ create table ACT_HI_JOB_LOG (
     DEPLOYMENT_ID_ nvarchar(64),
     SEQUENCE_COUNTER_ numeric(19,0),
     TENANT_ID_ nvarchar(64),
+    HOSTNAME_ nvarchar(255),
     REMOVAL_TIME_ datetime2,
     primary key (ID_)
 );
