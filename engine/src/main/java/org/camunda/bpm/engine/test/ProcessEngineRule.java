@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assume;
+import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
@@ -95,7 +96,7 @@ import org.junit.runners.model.Statement;
  *
  * @author Tom Baeyens
  */
-public class ProcessEngineRule /* extends TestWatcher */ implements ProcessEngineServices {
+public class ProcessEngineRule extends TestWatcher implements ProcessEngineServices {
 
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
@@ -222,7 +223,9 @@ public class ProcessEngineRule /* extends TestWatcher */ implements ProcessEngin
     identityService.clearAuthentication();
     processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
 
-    TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
+    TestHelper.annotationDeploymentTearDown(processEngine, deploymentId
+        , description.getTestClass(), description.getMethodName()
+        );
     for (String additionalDeployment : additionalDeployments) {
       TestHelper.deleteDeployment(processEngine, additionalDeployment);
     }

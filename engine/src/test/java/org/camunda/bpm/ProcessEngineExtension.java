@@ -1,5 +1,9 @@
 package org.camunda.bpm;
 
+import static java.util.Arrays.stream;
+
+import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,11 +22,18 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.junit.jupiter.api.extension.TestWatcher;
 
-public class ProcessEngineExtension implements ProcessEngineServices, TestWatcher {
+public class ProcessEngineExtension implements ProcessEngineServices, TestWatcher, TestInstancePostProcessor,
+AfterTestExecutionCallback, BeforeTestExecutionCallback {
 
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
@@ -219,5 +230,125 @@ public class ProcessEngineExtension implements ProcessEngineServices, TestWatche
   public void manageDeployment(org.camunda.bpm.engine.repository.Deployment deployment) {
     this.additionalDeployments.add(deployment.getId());
   }
+
+  @Override
+  public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+    if (processEngine == null) {
+      initializeProcessEngine();
+    }
+    stream(testInstance.getClass().getDeclaredFields())
+      .filter(field -> field.getType() == ProcessEngine.class)
+      .forEach(field -> inject(testInstance, field));
+  }
+
+  private void inject(Object instance, Field field) {
+    field.setAccessible(true);
+    try {
+      field.set(instance, processEngine);
+    } catch (IllegalAccessException iae) {
+      throw new RuntimeException(iae);
+    }
+  }
+  
+  protected void clearServiceReferences() {
+    processEngineConfiguration = null;
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    authorizationService = null;
+    caseService = null;
+    filterService = null;
+    externalTaskService = null;
+    decisionService = null;
+  }
+
+  @Override
+  public void afterTestExecution(ExtensionContext context) throws Exception {
+    identityService.clearAuthentication();
+    processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
+
+    TestHelper.annotationDeploymentTearDown(processEngine, deploymentId,
+        context.getTestClass().get(), context.getTestMethod().get().getName()
+        );
+    for (String additionalDeployment : additionalDeployments) {
+      TestHelper.deleteDeployment(processEngine, additionalDeployment);
+    }
+
+//    if (ensureCleanAfterTest) {
+//      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+//    }
+
+    TestHelper.resetIdGenerator(processEngineConfiguration);
+    ClockUtil.reset();
+
+
+    clearServiceReferences(); 
+    
+  }
+
+  @Override
+  public void beforeTestExecution(ExtensionContext context) throws Exception {
+    
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(),
+//        context.getTestMethod().get().getName(),
+        null,
+        null
+        // description.getAnnotation(Deployment.class)
+//        context.getElement().get().getAnnotation(Deployment.class)
+        );
+
+
+    //apply
+    if (processEngine == null) {
+      initializeProcessEngine();
+    }
+
+    initializeServices();
+
+//    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
+//    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
+//    return new Statement() {
+//
+//      @Override
+//      public void evaluate() throws Throwable {
+//        Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
+//        Assume.assumeTrue("ignored because the database doesn't match the required ones", runsWithRequiredDatabase);
+//        ProcessEngineRule.super.apply(base, description).evaluate();
+//      }
+//    };
+  }
+
+  protected void initializeProcessEngine() {
+    try {
+      processEngine = TestHelper.getProcessEngine(configurationResource);
+    } catch (RuntimeException ex) {
+      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
+        processEngine = TestHelper.getProcessEngine(configurationResourceCompat);
+      } else {
+        throw ex;
+      }
+    }
+  }
+
+  protected void initializeServices() {
+    processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    repositoryService = processEngine.getRepositoryService();
+    runtimeService = processEngine.getRuntimeService();
+    taskService = processEngine.getTaskService();
+    historyService = processEngine.getHistoryService();
+    identityService = processEngine.getIdentityService();
+    managementService = processEngine.getManagementService();
+    formService = processEngine.getFormService();
+    authorizationService = processEngine.getAuthorizationService();
+    caseService = processEngine.getCaseService();
+    filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
+    decisionService = processEngine.getDecisionService();
+  }
+
 
 }

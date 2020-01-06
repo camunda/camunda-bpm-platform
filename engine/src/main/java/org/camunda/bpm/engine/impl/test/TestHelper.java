@@ -154,8 +154,11 @@ public abstract class TestHelper {
     return annotationDeploymentSetUp(processEngine, testClass, methodName, null);
   }
 
-  public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
-    LOG.debug("annotation @Deployment deletes deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
+  public static void annotationDeploymentTearDown(ProcessEngine processEngine, 
+      String deploymentId, Class<?> testClass, String methodName ) {
+    LOG.debug("annotation @Deployment deletes deployment for {}.{}"
+        , ClassNameUtil.getClassNameWithoutPackage(testClass), methodName
+        );
     deleteDeployment(processEngine, deploymentId);
   }
 
@@ -497,7 +500,6 @@ public abstract class TestHelper {
   public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
         .execute(commandContext -> {
-
           commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
           return null;
         });
