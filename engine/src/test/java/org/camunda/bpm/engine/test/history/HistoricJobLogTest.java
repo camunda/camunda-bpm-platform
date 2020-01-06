@@ -69,6 +69,8 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricJobLogTest {
 
+  protected static final String CUSTOM_HOSTNAME = "TEST_HOST";
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -82,6 +84,7 @@ public class HistoricJobLogTest {
   protected HistoryService historyService;
 
   private boolean defaultEnsureJobDueDateSet;
+  protected String defaultHostname;
 
   @Before
   public void init() {
@@ -92,11 +95,14 @@ public class HistoricJobLogTest {
     historyService = engineRule.getHistoryService();
 
     defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
+    defaultHostname = processEngineConfiguration.getHostname();
+    processEngineConfiguration.setHostname(CUSTOM_HOSTNAME);
   }
 
   @After
   public void tearDown() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
+    processEngineConfiguration.setHostname(defaultHostname);
     ClockUtil.reset();
   }
 
@@ -132,6 +138,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getProcessDefinitionKey()).isEqualTo(job.getProcessDefinitionKey());
     assertThat(historicJob.getDeploymentId()).isEqualTo(job.getDeploymentId());
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
+    assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
 
     assertThat(historicJob.isCreationLog()).isTrue();
     assertThat(historicJob.isFailureLog()).isFalse();
@@ -177,6 +184,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getDeploymentId()).isEqualTo(job.getDeploymentId());
     assertThat(historicJob.getJobExceptionMessage()).isEqualTo(FailingDelegate.EXCEPTION_MESSAGE);
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
+    assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
 
     assertThat(historicJob.isCreationLog()).isFalse();
     assertThat(historicJob.isFailureLog()).isTrue();
@@ -218,6 +226,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getProcessDefinitionKey()).isEqualTo(job.getProcessDefinitionKey());
     assertThat(historicJob.getDeploymentId()).isEqualTo(job.getDeploymentId());
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
+    assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
 
     assertThat(historicJob.isCreationLog()).isFalse();
     assertThat(historicJob.isFailureLog()).isFalse();
@@ -259,6 +268,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getProcessDefinitionKey()).isEqualTo(job.getProcessDefinitionKey());
     assertThat(historicJob.getDeploymentId()).isEqualTo(job.getDeploymentId());
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
+    assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
 
     assertThat(historicJob.isCreationLog()).isFalse();
     assertThat(historicJob.isFailureLog()).isFalse();

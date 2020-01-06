@@ -57,9 +57,11 @@ import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.NullTolerantComp
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -75,10 +77,15 @@ public class HistoricJobLogQueryTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  @Rule
+  public ExpectedException thrown= ExpectedException.none();
+
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected HistoryService historyService;
+
+  protected String defaultHostname;
 
   @Before
   public void init() {
@@ -86,6 +93,13 @@ public class HistoricJobLogQueryTest {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     historyService = engineRule.getHistoryService();
+
+    defaultHostname = processEngineConfiguration.getHostname();
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.setHostname(defaultHostname);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -409,6 +423,119 @@ public class HistoricJobLogQueryTest {
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().deploymentId(deploymentId);
 
     verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Test
+  public void shouldQueryCreateLogByHostname() {
+    // given
+    String testHostname1 = "HOST_1";
+    processEngineConfiguration.setHostname(testHostname1);
+    startProcessInstanceWithJob(false);
+
+    String testHostname2 = "HOST_2";
+    processEngineConfiguration.setHostname(testHostname2);
+    startProcessInstanceWithJob(false);
+
+    // when
+    HistoricJobLogQuery query1 = historyService.createHistoricJobLogQuery()
+                                               .creationLog()
+                                               .hostname(testHostname1);
+    HistoricJobLogQuery query2 = historyService.createHistoricJobLogQuery()
+                                               .creationLog()
+                                               .hostname(testHostname2);
+
+    // then
+    verifyQueryResults(query1, 1);
+    verifyQueryResults(query2, 1);
+    assertThat(query1.singleResult().getHostname())
+        .isNotEqualToIgnoringCase(query2.singleResult().getHostname());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Test
+  public void shouldQuerySuccessLogByHostname() {
+    // given
+    String testHostname1 = "HOST_1";
+    processEngineConfiguration.setHostname(testHostname1);
+    startProcessInstanceWithJobAndCompleteJob(false);
+
+    String testHostname2 = "HOST_2";
+    processEngineConfiguration.setHostname(testHostname2);
+    startProcessInstanceWithJobAndCompleteJob(false);
+
+    // when
+    HistoricJobLogQuery query1 = historyService.createHistoricJobLogQuery()
+                                               .successLog()
+                                               .hostname(testHostname1);
+    HistoricJobLogQuery query2 = historyService.createHistoricJobLogQuery()
+                                               .successLog()
+                                               .hostname(testHostname2);
+
+    // then
+    verifyQueryResults(query1, 1);
+    verifyQueryResults(query2, 1);
+    assertThat(query1.singleResult().getHostname())
+        .isNotEqualToIgnoringCase(query2.singleResult().getHostname());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Test
+  public void shouldQueryFailureLogByHostname() {
+    // given
+    String testHostname1 = "HOST_1";
+    processEngineConfiguration.setHostname(testHostname1);
+    thrown.expectMessage("Expected_exception");
+    startProcessInstanceWithJobAndCompleteJob(true);
+
+
+    String testHostname2 = "HOST_2";
+    processEngineConfiguration.setHostname(testHostname2);
+    thrown.expectMessage("Expected_exception");
+    startProcessInstanceWithJobAndCompleteJob(true);
+
+    // when
+    HistoricJobLogQuery query1 = historyService.createHistoricJobLogQuery()
+                                               .failureLog()
+                                               .hostname(testHostname1);
+    HistoricJobLogQuery query2 = historyService.createHistoricJobLogQuery()
+                                               .failureLog()
+                                               .hostname(testHostname2);
+
+    // then
+    verifyQueryResults(query1, 1);
+    verifyQueryResults(query2, 1);
+    assertThat(query1.singleResult().getHostname())
+        .isNotEqualToIgnoringCase(query2.singleResult().getHostname());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Test
+  public void shouldQueryDeletionLogByHostname() {
+    // given
+    String testHostname1 = "HOST_1";
+    processEngineConfiguration.setHostname(testHostname1);
+    String pId1 = startProcessInstanceWithJob(false);
+    runtimeService.deleteProcessInstance(pId1, "delete job log");
+
+    String testHostname2 = "HOST_2";
+    processEngineConfiguration.setHostname(testHostname2);
+    String pId2 = startProcessInstanceWithJob(false);
+    runtimeService.deleteProcessInstance(pId2, "delete job log");
+
+    // when
+    HistoricJobLogQuery query1 = historyService.createHistoricJobLogQuery()
+                                               .deletionLog()
+                                               .hostname(testHostname1);
+    HistoricJobLogQuery query2 = historyService.createHistoricJobLogQuery()
+                                               .deletionLog()
+                                               .hostname(testHostname2);
+
+    // then
+    verifyQueryResults(query1, 1);
+    verifyQueryResults(query2, 1);
+    assertThat(query1.singleResult().getHostname())
+        .isNotEqualToIgnoringCase(query2.singleResult().getHostname());
   }
 
   @Test
@@ -767,6 +894,24 @@ public class HistoricJobLogQueryTest {
         .desc();
 
     verifyQueryWithOrdering(query, 5, inverted(historicJobLogPartiallyByOccurence()));
+  }
+
+  /**
+   * Results in the creation of a historic job log.
+   * @param failJob controlls if the job will fail or not.
+   * @return the ProcessInstance ID
+   */
+  protected String startProcessInstanceWithJob(boolean failJob) {
+    return runtimeService.startProcessInstanceByKey("process",
+                                                    Variables.createVariables()
+                                                             .putValue("fail", failJob)
+                                                   ).getId();
+  }
+
+  protected void startProcessInstanceWithJobAndCompleteJob(boolean failJob) {
+    String pId = startProcessInstanceWithJob(failJob);
+    String jobId = managementService.createJobQuery().processInstanceId(pId).singleResult().getId();
+    managementService.executeJob(jobId);
   }
 
   protected void verifyQueryResults(HistoricJobLogQuery query, int countExpected) {
