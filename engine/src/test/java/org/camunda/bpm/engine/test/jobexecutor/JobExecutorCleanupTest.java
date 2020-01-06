@@ -82,7 +82,7 @@ public class JobExecutorCleanupTest {
 
     // when: schedule & execute cleanup job
     historyService.cleanUpHistoryAsync(true);
-    testRule.waitForJobExecutorToProcessAllJobs(5_000L);
+    testRule.waitForJobExecutorToProcessAllJobs(10_000L);
 
     // then
     assertThat(historyService.createHistoricProcessInstanceQuery().count()).isZero();
