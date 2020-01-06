@@ -34,16 +34,16 @@ import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuild
  */
 public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
-  private String processInstanceId;
-  private String processDefinitionId;
-  private String processDefinitionKey;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
 
-  private List<String> processInstanceIds;
-  private ProcessInstanceQueryDto processInstanceQuery;
-  private HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
+  protected List<String> processInstanceIds;
+  protected ProcessInstanceQueryDto processInstanceQuery;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
-  private String processDefinitionTenantId;
-  private boolean processDefinitionWithoutTenantId;
+  protected String processDefinitionTenantId;
+  protected boolean processDefinitionWithoutTenantId;
 
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -53,24 +53,30 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     this.processInstanceId = processInstanceId;
   }
 
+  public String getProcessDefinitionId() { return processDefinitionId; }
+
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+
+  public String getProcessDefinitionKey() { return processDefinitionKey; }
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public List<String> getProcessInstanceIds() { return processInstanceIds; }
+
   public void setProcessInstanceIds(List<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
   }
 
-  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
-    this.processInstanceQuery = processInstanceQuery;
-  }
-
   public ProcessInstanceQueryDto getProcessInstanceQuery(){
     return processInstanceQuery;
+  }
+
+  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
   }
 
   public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
@@ -83,6 +89,8 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
     this.processDefinitionTenantId = processDefinitionTenantId;
   }
+
+  public boolean getProcessDefinitionWithoutTenantId() { return processDefinitionWithoutTenantId; }
 
   public void setProcessDefinitionWithoutTenantId(boolean processDefinitionWithoutTenantId) {
     this.processDefinitionWithoutTenantId = processDefinitionWithoutTenantId;
@@ -112,10 +120,12 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       updateSuspensionStateBuilder = createUpdateSuspensionStateGroupBuilder(engine);
     }
 
-    if (getSuspended()) {
-      updateSuspensionStateBuilder.suspend();
-    } else {
-      updateSuspensionStateBuilder.activate();
+    if (updateSuspensionStateBuilder != null) {
+      if (getSuspended()) {
+        updateSuspensionStateBuilder.suspend();
+      } else {
+        updateSuspensionStateBuilder.activate();
+      }
     }
   }
 
