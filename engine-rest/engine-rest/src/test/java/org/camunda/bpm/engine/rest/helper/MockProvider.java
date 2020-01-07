@@ -811,6 +811,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY = "aProcDefKey";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID = "aDeploymentId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID = "aRootProcInstId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME = "aHostname";
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG= true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG = true;
@@ -2812,6 +2813,7 @@ public abstract class MockProvider {
     when(mock.getDeploymentId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID);
     when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID);
+    when(mock.getHostname()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME);
 
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);

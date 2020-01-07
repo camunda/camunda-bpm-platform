@@ -103,6 +103,7 @@ public class HistoricJobLogRestServiceInteractionTest extends AbstractRestServic
         .body("processDefinitionKey", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY))
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID))
         .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("hostname", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME))
         .body("rootProcessInstanceId", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID))
         .body("creationLog", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG))
         .body("failureLog", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG))
