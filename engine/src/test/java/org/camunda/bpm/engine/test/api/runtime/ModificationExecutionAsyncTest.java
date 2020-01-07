@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -57,6 +58,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -1118,6 +1120,28 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(execution);
       assertEquals("user", ((ExecutionEntity) execution).getActivityId());
     }
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    configuration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, 42);
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> processInstanceIds = helper.startInstances("process1", 2);
+
+    // when
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user2")
+        .processInstanceIds(processInstanceIds)
+        .executeAsync();
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

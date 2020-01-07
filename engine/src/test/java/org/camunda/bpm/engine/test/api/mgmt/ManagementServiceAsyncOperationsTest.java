@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
@@ -35,6 +36,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -118,6 +120,24 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     assertThat(exceptions.size(), is(0));
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchTypeForJobsByJobIds() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_SET_JOB_RETRIES, 42);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(ids, RETRIES);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   @Test
@@ -375,4 +395,28 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     thrown.expect(ProcessEngineException.class);
     managementService.setJobRetriesAsync(query, -1);
   }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
+  public void shouldSetInvocationsPerBatchTypeForJobsByProcessInstanceIds() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_SET_JOB_RETRIES, 42);
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery();
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(null, null,
+        historicProcessInstanceQuery, RETRIES);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
 }

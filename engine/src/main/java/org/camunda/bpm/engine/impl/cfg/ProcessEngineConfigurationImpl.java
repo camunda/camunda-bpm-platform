@@ -383,6 +383,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final int DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES = 3;
 
+  public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
+
   public static SqlSessionFactory cachedSqlSessionFactory;
 
   // SERVICES /////////////////////////////////////////////////////////////////
@@ -493,7 +495,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /**
    * Number of invocations executed by a single batch job
    */
-  protected int invocationsPerBatchJob = 1;
+  protected int invocationsPerBatchJob = DEFAULT_INVOCATIONS_PER_BATCH_JOB;
+
+  /**
+   * Map to set an individual value for each batch type to
+   * control the invocations per batch job. Unless specified
+   * in this map, value of 'invocationsPerBatchJob' is used.
+   */
+  protected Map<String, Integer> invocationsPerBatchJobByBatchType;
+
   /**
    * seconds to wait between polling for batch completion
    */
@@ -896,6 +906,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDefaultUserPermissionForTask();
     initHistoryRemovalTime();
     initHistoryCleanup();
+    initInvocationsPerBatchJobByBatchType();
     initAdminUser();
     initAdminGroups();
     initPasswordPolicy();
@@ -1016,6 +1027,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     if (sundayHistoryCleanupBatchWindowStartTime != null || sundayHistoryCleanupBatchWindowEndTime != null) {
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
+    }
+  }
+
+  protected void initInvocationsPerBatchJobByBatchType() {
+    if (invocationsPerBatchJobByBatchType == null) {
+      invocationsPerBatchJobByBatchType = new HashMap<>();
+
+    } else {
+      Set<String> batchTypes = invocationsPerBatchJobByBatchType.keySet();
+      batchTypes.stream()
+          // batchHandlers contains custom & built-in batch handlers
+          .filter(batchType -> !batchHandlers.containsKey(batchType))
+          .forEach(LOG::invalidBatchTypeForInvocationsPerBatchJob);
     }
   }
 
@@ -3457,6 +3481,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchJobsPerSeed(int batchJobsPerSeed) {
     this.batchJobsPerSeed = batchJobsPerSeed;
+  }
+
+  public Map<String, Integer> getInvocationsPerBatchJobByBatchType() {
+    return invocationsPerBatchJobByBatchType;
+  }
+
+  public ProcessEngineConfigurationImpl setInvocationsPerBatchJobByBatchType(Map<String, Integer> invocationsPerBatchJobByBatchType) {
+    this.invocationsPerBatchJobByBatchType = invocationsPerBatchJobByBatchType;
+    return this;
   }
 
   public int getInvocationsPerBatchJob() {

@@ -55,16 +55,15 @@ import org.junit.rules.RuleChain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_NONE;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
-import static org.mockito.Matchers.contains;
 
 /**
  * @author Tassilo Weidner
@@ -2734,6 +2733,90 @@ public class BatchSetRemovalTimeTest {
     assertThat(report.getHistoryTimeToLive()).isNull();
 
     // clear database
+    historyService.deleteHistoricBatch(batchOne.getId());
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchTypeForProcesses() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_SET_REMOVAL_TIME, 42);
+
+    testRule.process().serviceTask().deploy().start();
+
+    // when
+    Batch batch = historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(historyService.createHistoricProcessInstanceQuery())
+        .executeAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetInvocationsPerBatchTypeForDecisions() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_DECISION_SET_REMOVAL_TIME, 42);
+
+    decisionService.evaluateDecisionByKey("dish-decision")
+        .variables(
+            Variables.createVariables()
+                .putValue("temperature", 32)
+                .putValue("dayType", "Weekend")
+        ).evaluate();
+
+    // when
+    Batch batch = historyService.setRemovalTimeToHistoricDecisionInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(historyService.createHistoricDecisionInstanceQuery())
+        .executeAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchTypeForBatches() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_BATCH_SET_REMOVAL_TIME, 42);
+
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    testRule.syncExec(batchOne, false);
+
+    // when
+    Batch batchTwo = historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(historyService.createHistoricBatchQuery())
+        .executeAsync();
+
+    // then
+    assertThat(batchTwo.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+    managementService.deleteBatch(batchTwo.getId(), true);
     historyService.deleteHistoricBatch(batchOne.getId());
   }
 

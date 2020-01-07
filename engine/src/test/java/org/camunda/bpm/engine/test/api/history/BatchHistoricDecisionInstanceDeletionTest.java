@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -532,6 +534,25 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     // then
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    configuration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION, 42);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
+
+    // when
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int decisionInstanceCount) {
