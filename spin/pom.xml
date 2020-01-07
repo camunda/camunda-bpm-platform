@@ -30,6 +30,7 @@
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <powermock.version>1.5.6</powermock.version>
+    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
   <dependencyManagement>
