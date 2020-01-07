@@ -9,6 +9,7 @@
     <properties>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
+      <property name="queryMaxResultsLimit">2000</property>
     </properties>
 
     <plugins>
