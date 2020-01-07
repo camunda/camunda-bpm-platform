@@ -28,7 +28,12 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,26 +42,28 @@ import java.util.Map;
 import static java.lang.String.format;
 
 /**
- * Convenience class to access only camunda *BPMN* related Assertions 
- * PLUS helper methods. Usage is possible, if you only need BPMN Tests and 
- * mandatory if you still use Camunda BPM <= 7.1. 
- * 
+ * Convenience class to access only camunda *BPMN* related Assertions
+ * PLUS helper methods. Usage is possible, if you only need BPMN Tests and
+ * mandatory if you still use Camunda BPM <= 7.1.
+ *
  * Use it with a static import:
  *
  * import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*;
  *
- * @see org.camunda.bpm.engine.test.assertions.ProcessEngineTests 
- *      for full Camunda BPM Assertions functionality  
+ * @see org.camunda.bpm.engine.test.assertions.ProcessEngineTests
+ *      for full Camunda BPM Assertions functionality
  *
  * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Ingo Richtsmeier <ingo.richtsmeier@camunda.com>
  */
 public class BpmnAwareTests extends AbstractAssertions {
 
+  private static final String DUPLICATED_NAME = "$DUPLICATED_NAME$";
   public static final long DEFAULT_LOCK_DURATION_EXTERNAL_TASK = 30L * 1000L;// 30 seconds
   public static final String DEFAULT_WORKER_EXTERNAL_TASK      = "anonymousWorker";
 
   protected BpmnAwareTests() {}
-  
+
   /**
    * Assert that... the given ProcessDefinition meets your expectations.
    *
@@ -86,7 +93,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   public static TaskAssert assertThat(final Task actual) {
     return TaskAssert.assertThat(processEngine(), actual);
   }
-  
+
   /**
    * Assert that... the given ExternalTask meets your expectations.
    *
@@ -106,7 +113,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   public static JobAssert assertThat(final Job actual) {
     return JobAssert.assertThat(processEngine(), actual);
   }
-  
+
   /**
    * Helper method to easily access RuntimeService
    *
@@ -120,7 +127,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   /**
    * Helper method to easily access AuthorizationService
    *
-   * @return  AuthorizationService of process engine bound to this 
+   * @return  AuthorizationService of process engine bound to this
    *          testing thread
    * @see     org.camunda.bpm.engine.AuthorizationService
    */
@@ -187,7 +194,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   public static TaskService taskService() {
     return processEngine().getTaskService();
   }
-  
+
   /**
    * Helper method to easily access ExternalTaskService
    *
@@ -217,7 +224,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   public static TaskQuery taskQuery() {
     return taskService().createTaskQuery();
   }
-  
+
   /**
    * Helper method to easily create a new ExternalTaskQuery
    *
@@ -241,7 +248,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   /**
    * Helper method to easily create a new ProcessInstanceQuery
    *
-   * @return  new ProcessInstanceQuery for process engine bound to this 
+   * @return  new ProcessInstanceQuery for process engine bound to this
    *          testing thread
    * @see     org.camunda.bpm.engine.runtime.ProcessInstanceQuery
    */
@@ -252,7 +259,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   /**
    * Helper method to easily create a new ProcessDefinitionQuery
    *
-   * @return  new ProcessDefinitionQuery for process engine bound to this 
+   * @return  new ProcessDefinitionQuery for process engine bound to this
    *          testing thread
    * @see     org.camunda.bpm.engine.repository.ProcessDefinitionQuery
    */
@@ -275,9 +282,9 @@ public class BpmnAwareTests extends AbstractAssertions {
    *
    * @param   key (obligatory) key of first process variable
    * @param   value (obligatory) value of first process variable
-   * @param   furtherKeyValuePairs (optional) key/value pairs for further 
+   * @param   furtherKeyValuePairs (optional) key/value pairs for further
    *          process variables
-   * @return  a map of process variables by passing a list of String 
+   * @return  a map of process variables by passing a list of String
    *          -> Object key value pairs.
    */
   public static Map<String, Object> withVariables(final String key, final Object value, final Object... furtherKeyValuePairs) {
@@ -306,8 +313,8 @@ public class BpmnAwareTests extends AbstractAssertions {
    * @return  the only task of the last asserted process
    *          instance. May return null if no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one task is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one task is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Task task() {
@@ -315,15 +322,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only task currently 
+   * Helper method to easily access the only task currently
    * available in the context of the given process instance.
    *
    * @param   processInstance the process instance for which
    *          a task should be retrieved.
-   * @return  the only task of the process instance. May 
+   * @return  the only task of the process instance. May
    *          return null if no such task exists.
-   * @throws  java.lang.IllegalStateException in case more 
-   *          than one task is delivered by the underlying 
+   * @throws  java.lang.IllegalStateException in case more
+   *          than one task is delivered by the underlying
    *          query.
    */
   public static Task task(ProcessInstance processInstance) {
@@ -331,17 +338,17 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only task with the 
-   * given taskDefinitionKey currently available in the context 
+   * Helper method to easily access the only task with the
+   * given taskDefinitionKey currently available in the context
    * of the last asserted process instance.
    *
    * @param   taskDefinitionKey the key of the task that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @return  the only task of the last asserted process
    *          instance. May return null if no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one task is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one task is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Task task(String taskDefinitionKey) {
@@ -350,18 +357,18 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only task with the 
-   * given taskDefinitionKey currently available in the context 
+   * Helper method to easily access the only task with the
+   * given taskDefinitionKey currently available in the context
    * of the given process instance.
    *
    * @param   taskDefinitionKey the key of the task that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @param   processInstance the process instance for which
    *          a task should be retrieved.
    * @return  the only task of the given process instance. May
    *          return null if no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one task is delivered by the underlying 
+   *          than one task is delivered by the underlying
    *          query.
    */
   public static Task task(String taskDefinitionKey, ProcessInstance processInstance) {
@@ -370,19 +377,19 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only task compliant to 
-   * a given taskQuery and currently available in the context 
+   * Helper method to easily access the only task compliant to
+   * a given taskQuery and currently available in the context
    * of the last asserted process instance.
    *
    * @param   taskQuery the query with which the task should
    *          be retrieved. This query will be further narrowed
    *          to the last asserted process instance.
-   * @return  the only task of the last asserted process instance 
-   *          and compliant to the given query. May return null 
+   * @return  the only task of the last asserted process instance
+   *          and compliant to the given query. May return null
    *          in case no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one task is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one task is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Task task(TaskQuery taskQuery) {
@@ -396,8 +403,8 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only task compliant to 
-   * a given taskQuery and currently available in the context 
+   * Helper method to easily access the only task compliant to
+   * a given taskQuery and currently available in the context
    * of the given process instance.
    *
    * @param   taskQuery the query with which the task should
@@ -405,25 +412,25 @@ public class BpmnAwareTests extends AbstractAssertions {
    *          to the given process instance.
    * @param   processInstance the process instance for which
    *          a task should be retrieved.
-   * @return  the only task of the given process instance and 
-   *          compliant to the given query. May return null in 
+   * @return  the only task of the given process instance and
+   *          compliant to the given query. May return null in
    *          case no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one task is delivered by the underlying 
+   *          than one task is delivered by the underlying
    *          query.
    */
   public static Task task(TaskQuery taskQuery, ProcessInstance processInstance) {
     return assertThat(processInstance).isNotNull().task(taskQuery).getActual();
   }
-  
+
   /**
-   * Helper method to easily access the only external task currently 
+   * Helper method to easily access the only external task currently
    * available in the context of the last asserted process instance.
    *
-   * @return the only external task of the last asserted process instance. 
+   * @return the only external task of the last asserted process instance.
    *         May return null if no such external task exists.
    * @throws java.lang.IllegalStateException
-   *           in case more than one external task is delivered by the underlying 
+   *           in case more than one external task is delivered by the underlying
    *           query or in case no process instance was asserted yet.
    */
   public static ExternalTask externalTask() {
@@ -431,15 +438,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only external task currently 
+   * Helper method to easily access the only external task currently
    * available in the context of the given process instance.
    *
    * @param   processInstance the process instance for which
    *          an external task should be retrieved.
-   * @return  the only external task of the process instance. 
+   * @return  the only external task of the process instance.
    *          May return null if no such external task exists.
-   * @throws  java.lang.IllegalStateException in case more 
-   *          than one external task is delivered by the underlying 
+   * @throws  java.lang.IllegalStateException in case more
+   *          than one external task is delivered by the underlying
    *          query.
    */
   public static ExternalTask externalTask(ProcessInstance processInstance) {
@@ -447,17 +454,17 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only external task with the 
-   * given activityId currently available in the context 
+   * Helper method to easily access the only external task with the
+   * given activityId currently available in the context
    * of the last asserted process instance.
    *
    * @param   activityId the key of the external task that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @return  the only external task of the last asserted process
    *          instance. May return null if no such external task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one external task is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one external task is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static ExternalTask externalTask(String activityId) {
@@ -466,18 +473,18 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only external task with the 
-   * given activityId currently available in the context 
+   * Helper method to easily access the only external task with the
+   * given activityId currently available in the context
    * of the given process instance.
    *
    * @param   activityId the key of the external task that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @param   processInstance the process instance for which
    *          a external task should be retrieved.
    * @return  the only external task of the given process instance. May
    *          return null if no such external task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one external task is delivered by the underlying 
+   *          than one external task is delivered by the underlying
    *          query.
    */
   public static ExternalTask externalTask(String activityId, ProcessInstance processInstance) {
@@ -486,19 +493,19 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only external task compliant to 
-   * a given externalTaskQuery and currently available in the context 
+   * Helper method to easily access the only external task compliant to
+   * a given externalTaskQuery and currently available in the context
    * of the last asserted process instance.
    *
    * @param   externalTaskQuery the query with which the external task should
    *          be retrieved. This query will be further narrowed
    *          to the last asserted process instance.
-   * @return  the only external task of the last asserted process instance 
-   *          and compliant to the given query. May return null 
+   * @return  the only external task of the last asserted process instance
+   *          and compliant to the given query. May return null
    *          in case no such external task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one external task is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one external task is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static ExternalTask externalTask(ExternalTaskQuery externalTaskQuery) {
@@ -512,8 +519,8 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only external task compliant to 
-   * a given externalTaskQuery and currently available in the context 
+   * Helper method to easily access the only external task compliant to
+   * a given externalTaskQuery and currently available in the context
    * of the given process instance.
    *
    * @param   externalTaskQuery the query with which the external task should
@@ -521,11 +528,11 @@ public class BpmnAwareTests extends AbstractAssertions {
    *          to the given process instance.
    * @param   processInstance the process instance for which
    *          a external task should be retrieved.
-   * @return  the only external task of the given process instance and 
-   *          compliant to the given query. May return null in 
+   * @return  the only external task of the given process instance and
+   *          compliant to the given query. May return null in
    *          case no such external task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one external task is delivered by the underlying 
+   *          than one external task is delivered by the underlying
    *          query.
    */
   public static ExternalTask externalTask(ExternalTaskQuery externalTaskQuery, ProcessInstance processInstance) {
@@ -533,12 +540,12 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the process definition 
+   * Helper method to easily access the process definition
    * on which the last asserted process instance is based.
    *
-   * @return  the process definition on which the last 
+   * @return  the process definition on which the last
    *          asserted process instance is based.
-   * @throws  java.lang.IllegalStateException in case no 
+   * @throws  java.lang.IllegalStateException in case no
    *          process instance was asserted yet.
    */
   public static ProcessDefinition processDefinition() {
@@ -552,12 +559,12 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the process definition 
+   * Helper method to easily access the process definition
    * on which the given process instance is based.
    *
    * @param   processInstance the process instance for which
    *          the definition should be retrieved.
-   * @return  the process definition on which the given 
+   * @return  the process definition on which the given
    *          process instance is based.
    */
   public static ProcessDefinition processDefinition(ProcessInstance processInstance) {
@@ -566,12 +573,12 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the process definition with the 
+   * Helper method to easily access the process definition with the
    * given processDefinitionKey.
    *
-   * @param   processDefinitionKey the key of the process definition 
-   *          that should be retrieved.                             
-   * @return  the process definition with the given key. 
+   * @param   processDefinitionKey the key of the process definition
+   *          that should be retrieved.
+   * @return  the process definition with the given key.
    *          May return null if no such process definition exists.
    */
   public static ProcessDefinition processDefinition(String processDefinitionKey) {
@@ -580,15 +587,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the process definition compliant 
+   * Helper method to easily access the process definition compliant
    * to a given process definition query.
    *
-   * @param   processDefinitionQuery the query with which the process 
+   * @param   processDefinitionQuery the query with which the process
    *          definition should be retrieved.
-   * @return  the process definition compliant to the given query. May 
+   * @return  the process definition compliant to the given query. May
    *          return null in case no such process definition exists.
-   * @throws  org.camunda.bpm.engine.ProcessEngineException in case more 
-   *          than one process definition is delivered by the underlying 
+   * @throws  org.camunda.bpm.engine.ProcessEngineException in case more
+   *          than one process definition is delivered by the underlying
    *          query.
    */
   public static ProcessDefinition processDefinition(ProcessDefinitionQuery processDefinitionQuery) {
@@ -596,15 +603,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance 
+   * Helper method to easily access the only called process instance
    * currently available in the context of the last asserted process
    * instance.
    *
    * @return  the only called process instance called by the last asserted process
    *          instance. May return null if no such process instance exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one process instance is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one process instance is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static ProcessInstance calledProcessInstance() {
@@ -612,15 +619,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance 
+   * Helper method to easily access the only called process instance
    * currently available in the context of the given process instance.
    *
    * @param   processInstance the process instance for which
    *          a called process instance should be retrieved.
-   * @return  the only called process instance called by the given process 
+   * @return  the only called process instance called by the given process
    *          instance. May return null if no such process instance exists.
-   * @throws  java.lang.IllegalStateException in case more 
-   *          than one process instance is delivered by the underlying 
+   * @throws  java.lang.IllegalStateException in case more
+   *          than one process instance is delivered by the underlying
    *          query.
    */
   public static ProcessInstance calledProcessInstance(ProcessInstance processInstance) {
@@ -628,17 +635,17 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance with 
-   * the given processDefinitionKey currently available in the context 
+   * Helper method to easily access the only called process instance with
+   * the given processDefinitionKey currently available in the context
    * of the last asserted process instance.
    *
    * @param   processDefinitionKey the key of the process instance that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @return  the only such process instance called by the last asserted process
    *          instance. May return null if no such process instance exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one process instance is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one process instance is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static ProcessInstance calledProcessInstance(String processDefinitionKey) {
@@ -647,18 +654,18 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance with the 
-   * given processDefinitionKey currently available in the context 
+   * Helper method to easily access the only called process instance with the
+   * given processDefinitionKey currently available in the context
    * of the given process instance.
    *
    * @param   processDefinitionKey the key of the process instance that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @param   processInstance the process instance for which
    *          a called process instance should be retrieved.
-   * @return  the only such process instance called by the given process instance. 
+   * @return  the only such process instance called by the given process instance.
    *          May return null if no such process instance exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one process instance is delivered by the underlying 
+   *          than one process instance is delivered by the underlying
    *          query.
    */
   public static ProcessInstance calledProcessInstance(String processDefinitionKey, ProcessInstance processInstance) {
@@ -667,17 +674,17 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance compliant to 
-   * a given processInstanceQuery and currently available in the context 
+   * Helper method to easily access the only called process instance compliant to
+   * a given processInstanceQuery and currently available in the context
    * of the last asserted process instance.
    *
    * @param   processInstanceQuery the query with which the called process instance should
-   *          be retrieved. This query will be further narrowed to the last asserted 
+   *          be retrieved. This query will be further narrowed to the last asserted
    *          process instance.
-   * @return  the only such process instance called by the last asserted process instance and 
+   * @return  the only such process instance called by the last asserted process instance and
    *          compliant to the given query. May return null in case no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one process instance is delivered by the underlying query or in case no 
+   *          than one process instance is delivered by the underlying query or in case no
    *          process instance was asserted yet.
    */
   public static ProcessInstance calledProcessInstance(ProcessInstanceQuery processInstanceQuery) {
@@ -691,20 +698,20 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only called process instance compliant to 
-   * a given processInstanceQuery and currently available in the context of the given 
+   * Helper method to easily access the only called process instance compliant to
+   * a given processInstanceQuery and currently available in the context of the given
    * process instance.
    *
    * @param   processInstanceQuery the query with which the process instance should
-   *          be retrieved. This query will be further narrowed to the given process 
+   *          be retrieved. This query will be further narrowed to the given process
    *          instance.
    * @param   processInstance the process instance for which
    *          a called process instance should be retrieved.
-   * @return  the only such process instance called by the given process instance and 
-   *          compliant to the given query. May return null in 
+   * @return  the only such process instance called by the given process instance and
+   *          compliant to the given query. May return null in
    *          case no such process instance exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one instance is delivered by the underlying 
+   *          than one instance is delivered by the underlying
    *          query.
    */
   public static ProcessInstance calledProcessInstance(ProcessInstanceQuery processInstanceQuery, ProcessInstance processInstance) {
@@ -719,8 +726,8 @@ public class BpmnAwareTests extends AbstractAssertions {
    * @return  the only job of the last asserted process
    *          instance. May return null if no such job exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one job is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one job is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Job job() {
@@ -728,15 +735,15 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only job currently 
+   * Helper method to easily access the only job currently
    * available in the context of the given process instance.
    *
    * @param   processInstance the process instance for which
    *          a job should be retrieved.
-   * @return  the only job of the process instance. May 
+   * @return  the only job of the process instance. May
    *          return null if no such task exists.
-   * @throws  java.lang.IllegalStateException in case more 
-   *          than one job is delivered by the underlying 
+   * @throws  java.lang.IllegalStateException in case more
+   *          than one job is delivered by the underlying
    *          query.
    */
   public static Job job(ProcessInstance processInstance) {
@@ -744,17 +751,17 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only job with the 
-   * given activityId currently available in the context 
+   * Helper method to easily access the only job with the
+   * given activityId currently available in the context
    * of the last asserted process instance.
    *
    * @param   activityId the id of the job that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @return  the only job of the last asserted process
    *          instance. May return null if no such job exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one job is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one job is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Job job(String activityId) {
@@ -768,18 +775,18 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only job with the 
-   * given activityId currently available in the context 
+   * Helper method to easily access the only job with the
+   * given activityId currently available in the context
    * of the given process instance.
    *
    * @param   activityId the activityId of the job that should
-   *          be retrieved.                             
+   *          be retrieved.
    * @param   processInstance the process instance for which
    *          a job should be retrieved.
    * @return  the only job of the given process instance. May
    *          return null if no such job exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one job is delivered by the underlying 
+   *          than one job is delivered by the underlying
    *          query.
    */
   public static Job job(String activityId, ProcessInstance processInstance) {
@@ -787,19 +794,19 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only job compliant to 
-   * a given jobQuery and currently available in the context 
+   * Helper method to easily access the only job compliant to
+   * a given jobQuery and currently available in the context
    * of the last asserted process instance.
    *
    * @param   jobQuery the query with which the job should
    *          be retrieved. This query will be further narrowed
    *          to the last asserted process instance.
-   * @return  the only job of the last asserted process instance 
-   *          and compliant to the given query. May return null 
+   * @return  the only job of the last asserted process instance
+   *          and compliant to the given query. May return null
    *          in case no such task exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one job is delivered by the underlying 
-   *          query or in case no process instance was asserted 
+   *          than one job is delivered by the underlying
+   *          query or in case no process instance was asserted
    *          yet.
    */
   public static Job job(JobQuery jobQuery) {
@@ -813,8 +820,8 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily access the only job compliant to 
-   * a given jobQuery and currently available in the context 
+   * Helper method to easily access the only job compliant to
+   * a given jobQuery and currently available in the context
    * of the given process instance.
    *
    * @param   jobQuery the query with which the job should
@@ -822,11 +829,11 @@ public class BpmnAwareTests extends AbstractAssertions {
    *          to the given process instance.
    * @param   processInstance the process instance for which
    *          a job should be retrieved.
-   * @return  the only job of the given process instance and 
-   *          compliant to the given query. May return null in 
+   * @return  the only job of the given process instance and
+   *          compliant to the given query. May return null in
    *          case no such job exists.
    * @throws  java.lang.IllegalStateException in case more
-   *          than one job is delivered by the underlying 
+   *          than one job is delivered by the underlying
    *          query.
    */
   public static Job job(JobQuery jobQuery, ProcessInstance processInstance) {
@@ -834,13 +841,13 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily claim a task for a specific 
+   * Helper method to easily claim a task for a specific
    * assignee.
    *
    * @param   task Task to be claimed for an assignee
-   * @param   assigneeUserId userId of assignee for which 
+   * @param   assigneeUserId userId of assignee for which
    *          the task should be claimed
-   * @return  the assigned task - properly refreshed to its 
+   * @return  the assigned task - properly refreshed to its
    *          assigned state.
    */
   public static Task claim(Task task, String assigneeUserId) {
@@ -856,7 +863,7 @@ public class BpmnAwareTests extends AbstractAssertions {
    * Helper method to easily unclaim a task.
    *
    * @param   task Task to be claimed for an assignee
-   * @return  the assigned task - properly refreshed to its 
+   * @return  the assigned task - properly refreshed to its
    *          unassigned state.
    */
   public static Task unclaim(Task task) {
@@ -869,13 +876,13 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily complete a task and pass some 
-   * process variables. 
+   * Helper method to easily complete a task and pass some
+   * process variables.
    *
-   * @param   task Task to be completed 
-   * @param   variables Process variables to be passed to the 
-   *          process instance when completing the task. For 
-   *          setting those variables, you can use 
+   * @param   task Task to be completed
+   * @param   variables Process variables to be passed to the
+   *          process instance when completing the task. For
+   *          setting those variables, you can use
    *          withVariables(String key, Object value, ...)
    */
   public static void complete(Task task, Map<String, Object> variables) {
@@ -887,14 +894,14 @@ public class BpmnAwareTests extends AbstractAssertions {
   /**
    * Helper method to easily complete a task.
    *
-   * @param   task Task to be completed 
+   * @param   task Task to be completed
    */
   public static void complete(Task task) {
     if (task == null)
       throw new IllegalArgumentException("Illegal call of complete(task = 'null') - must not be null!");
     taskService().complete(task.getId());
   }
-  
+
   /**
    * Helper method to easily fetch, lock and complete an external task.</br>
    * Note: if multiple external tasks exist that can be locked for the topic of
@@ -913,7 +920,7 @@ public class BpmnAwareTests extends AbstractAssertions {
     }
     complete(externalTask, Collections.<String, Object>emptyMap());
   }
-  
+
   /**
    * Helper method to easily fetch, lock and complete an external task.</br>
    * Note: if multiple external tasks exist that can be locked for the topic of
@@ -943,7 +950,7 @@ public class BpmnAwareTests extends AbstractAssertions {
     }
     complete(lockedTasks.get(0), variables);
   }
-  
+
   /**
    * Helper method to easily fetch and lock external tasks from a given topic
    * using a given workerId. The tasks will be locked for
@@ -979,7 +986,7 @@ public class BpmnAwareTests extends AbstractAssertions {
     }
     complete(lockedExternalTask, Collections.<String, Object>emptyMap());
   }
-  
+
   /**
    * Helper method to easily complete a locked external task.
    *
@@ -997,7 +1004,7 @@ public class BpmnAwareTests extends AbstractAssertions {
     }
     externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables);
   }
-  
+
   /**
    * Helper method to easily execute a job.
    *
@@ -1012,4 +1019,57 @@ public class BpmnAwareTests extends AbstractAssertions {
     managementService().executeJob(job.getId());
   }
 
+  /**
+   * Maps any element (task, event, gateway) from the name to the ID.
+   *
+   * @param name
+   * @return the ID of the element
+   */
+  public static String findId(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("Illegal call of findId(name = 'null') - must not be null!");
+    }
+    Map<String, String> nameToIDMapping = new HashMap<>();
+    // find deployed process models
+    List<ProcessDefinition> processDefinitions = repositoryService()
+        .createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion().asc()
+        .list();
+    // parse process models
+    for (ProcessDefinition processDefinition : processDefinitions) {
+      BpmnModelInstance bpmnModelInstance = repositoryService().getBpmnModelInstance(processDefinition.getId());
+      Collection<Activity> activities = bpmnModelInstance.getModelElementsByType(Activity.class);
+      for (Activity activity: activities) {
+        insertAndCheckForDuplicateNames(nameToIDMapping, activity.getName(), activity.getId());
+      }
+      Collection<Event> events = bpmnModelInstance.getModelElementsByType(Event.class);
+      for (Event event : events) {
+        insertAndCheckForDuplicateNames(nameToIDMapping, event.getName(), event.getId());
+      }
+      Collection<Gateway> gateways = bpmnModelInstance.getModelElementsByType(Gateway.class);
+      for (Gateway gateway : gateways) {
+        insertAndCheckForDuplicateNames(nameToIDMapping, gateway.getName(), gateway.getId());
+       }
+    }
+    // look for name and return ID
+    Assertions.assertThat(nameToIDMapping.containsKey(name))
+      .overridingErrorMessage("Element with name '%s' doesn't exist", name)
+      .isTrue();
+    Assertions.assertThat(nameToIDMapping.get(name))
+      .overridingErrorMessage("Name '%s' is not unique", name)
+      .isNotEqualTo(DUPLICATED_NAME);
+    return nameToIDMapping.get(name);
+  }
+
+  private static void insertAndCheckForDuplicateNames(Map<String, String> nameToIDMapping, String name, String id) {
+    if (nameToIDMapping.containsKey(name)) {
+      if (nameToIDMapping.get(name).equals(id)) {
+        // already inserted as diagram includes two pools
+      } else {
+        nameToIDMapping.put(name, DUPLICATED_NAME);
+      }
+    } else {
+      nameToIDMapping.put(name, id);
+    }
+  }
 }
