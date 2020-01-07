@@ -36,6 +36,19 @@ public abstract class ProcessAssertTestCase {
   protected void expect(Failure fail) {
     expect(fail, AssertionError.class);
   }
+  
+  protected void expect(Failure fail, String messageContent) {
+    try {
+      fail.when();
+    } catch (AssertionError e) {
+      if (e.getMessage().contains(messageContent)) {
+        System.out.println(String.format("AssertionError caught with message '%s' and expected content '%s'", e.getMessage(), messageContent));
+        return;
+      } else {
+        fail("Error message should include '" + messageContent + "'");
+      }
+    }
+  }
 
   @SafeVarargs
   protected final void expect(Failure fail, Class<? extends Throwable>... exception) {
