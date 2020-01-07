@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -63,29 +62,6 @@ public class JobExecutorCleanupTest {
   @After
   public void resetConfig() {
     configuration.setHistoryCleanupEnabled(true);
-  }
-
-  @Test
-  @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_AUDIT)
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void shouldExecuteCleanupJob() {
-    // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .camundaHistoryTimeToLive(0)
-        .startEvent()
-        .endEvent().done());
-
-    runtimeService.startProcessInstanceByKey("process");
-
-    // assume
-    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isOne();
-
-    // when: schedule & execute cleanup job
-    historyService.cleanUpHistoryAsync(true);
-    testRule.waitForJobExecutorToProcessAllJobs(10_000L);
-
-    // then
-    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isZero();
   }
 
   @Test
