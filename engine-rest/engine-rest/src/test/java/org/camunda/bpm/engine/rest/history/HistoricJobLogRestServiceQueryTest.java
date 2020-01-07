@@ -312,6 +312,16 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("hostname", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByHostname();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("hostname", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByHostname();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -477,6 +487,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedDeploymentId = from(content).getString("[0].deploymentId");
     String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
+    String returnedHostname = from(content).getString("[0].hostname");
     boolean returnedCreationLog = from(content).getBoolean("[0].creationLog");
     boolean returnedFailureLog = from(content).getBoolean("[0].failureLog");
     boolean returnedSuccessLog = from(content).getBoolean("[0].successLog");
@@ -500,6 +511,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID, returnedDeploymentId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ROOT_PROC_INST_ID, returnedRootProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME, returnedHostname);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG, returnedCreationLog);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG, returnedFailureLog);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG, returnedSuccessLog);
@@ -550,6 +562,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY);
     parameters.put("deploymentId", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID);
+    parameters.put("hostname", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_HOSTNAME);
 
     return parameters;
   }
@@ -567,6 +580,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
     verify(mockedQuery).deploymentId(stringQueryParameters.get("deploymentId"));
+    verify(mockedQuery).hostname(stringQueryParameters.get("hostname"));
 
     verify(mockedQuery).list();
   }

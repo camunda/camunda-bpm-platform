@@ -47,6 +47,7 @@ public class HistoricJobLogDto {
   protected String processDefinitionKey;
   protected String deploymentId;
   protected String tenantId;
+  protected String hostname;
   protected String rootProcessInstanceId;
 
   protected boolean creationLog;
@@ -126,6 +127,10 @@ public class HistoricJobLogDto {
     return tenantId;
   }
 
+  public String getHostname() {
+    return hostname;
+  }
+
   public String getRootProcessInstanceId() {
     return rootProcessInstanceId;
   }
@@ -170,6 +175,7 @@ public class HistoricJobLogDto {
     result.processDefinitionKey = historicJobLog.getProcessDefinitionKey();
     result.deploymentId = historicJobLog.getDeploymentId();
     result.tenantId = historicJobLog.getTenantId();
+    result.hostname = historicJobLog.getHostname();
     result.rootProcessInstanceId = historicJobLog.getRootProcessInstanceId();
 
     result.creationLog = historicJobLog.isCreationLog();
