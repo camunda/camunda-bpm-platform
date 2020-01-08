@@ -106,6 +106,7 @@ window.__define = window.define;
 window.__require = window.require;
 window.define = undefined;
 window.require = undefined;
+window.bust = '$GRUNT_CACHE_BUST';
 
 requirejs.config({
   baseUrl: '$APP_ROOT/app/welcome',
