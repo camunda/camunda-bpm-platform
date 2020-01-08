@@ -51,6 +51,7 @@ public class Application {
     processEngine.getRepositoryService()
       .createDeployment()
         .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
+        .addInputStream("reviewInvoice.bpmn", classLoader.getResourceAsStream("reviewInvoice.bpmn"))
       .deploy();
   }
 
