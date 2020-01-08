@@ -40,7 +40,9 @@ module.exports = function(ngModule, appRoot, appName) {
         }
 
         var deferred = $q.defer();
-        var cacheKey = options.prefix + '_locales_data_' + options.key;
+        var cacheKey =
+          options.prefix + '_locales_data_' + options.key + '_' + window.bust;
+
         var cachedLocalesData = configuration.get(cacheKey);
 
         if (cachedLocalesData) {
@@ -56,12 +58,14 @@ module.exports = function(ngModule, appRoot, appName) {
             {
               url: [options.prefix, options.key, options.suffix].join(''),
               method: 'GET',
+              // Use `now` instead of `window.bust` to update translations without rebuilding the app
               params: {_: now}
             },
             options.$http
           )
         )
           .then(function(response) {
+            configuration.clearTranslationData();
             configuration.set(cacheKey, JSON.stringify(response.data));
             if (!cachedLocalesData) {
               if (typeof options.callback === 'function') {

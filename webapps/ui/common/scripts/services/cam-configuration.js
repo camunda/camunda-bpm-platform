@@ -72,6 +72,17 @@ module.exports = function(config, app) {
         storage.setItem('camunda-web', JSON.stringify(values));
       };
 
+      // Removes old translations - default localStorage is limited to 10MB
+      this.clearTranslationData = function() {
+        for (var key in values) {
+          if (key.includes('_locales_data_') && !key.includes(window.bust)) {
+            delete values[key];
+          }
+        }
+
+        window.localStorage.setItem('camunda-web', JSON.stringify(values));
+      };
+
       this.getDateFormat = function(formatName) {
         var dateFormatObj = config.dateFormat || defaultConfig.dateFormat;
         return (
