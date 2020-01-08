@@ -78,13 +78,13 @@
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>../../license/LICENSE.txt</source>
+      <source>../../license/LICENSE</source>
       <filtered>true</filtered>
       <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
     </file>
     <file>
-      <source>../../license/NOTICE.txt</source>
+      <source>../../license/NOTICE</source>
       <filtered>true</filtered>
       <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
