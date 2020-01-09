@@ -3210,6 +3210,34 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo("version X.Y");
   }
 
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
+  public void testGetTopicNames(){
+    ExternalTaskQuery emptyQuery = externalTaskService.createExternalTaskQuery();
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    assertEquals(3,externalTaskService.getTopicNames(emptyQuery).size());
+    //when
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    //then
+    assertEquals(4,externalTaskService.getTopicNames(emptyQuery).size());
+  }
+
+  public void testGetTopicNamesEmptyList(){
+    ExternalTaskQuery emptyQuery = externalTaskService.createExternalTaskQuery();
+    assertEquals(new ArrayList<String>(), externalTaskService.getTopicNames(emptyQuery));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
+  public void testGetTopicNamesWithQuery(){
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    ProcessInstance p = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery().processDefinitionId(p.getProcessDefinitionId());
+    assertEquals(new ArrayList<String>(), externalTaskService.getTopicNames(query));
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }
