@@ -201,8 +201,6 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     return groupBuilder;
   }
 
-
-
   protected int parameterCount (Object... o){
     int count = 0;
     for (Object o1 : o) {
@@ -210,5 +208,4 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     }
     return count;
   }
-
 }
