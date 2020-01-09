@@ -59,6 +59,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String tenantId;
 
+  protected String hostname;
+
   public Date getTimestamp() {
     return timestamp;
   }
@@ -189,6 +191,14 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
   }
 
   public boolean isCreationLog() {

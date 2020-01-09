@@ -183,5 +183,10 @@ public class ProcessEngineLogger extends BaseLogger {
     );
   }
 
+  public void couldNotDetermineIp(Exception e) {
+    logWarn(
+        "009", "Could not determine local IP address for generating a host name", e);
+  }
+
 }
 

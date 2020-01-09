@@ -45,6 +45,7 @@
             PROCESS_DEF_KEY_,
             DEPLOYMENT_ID_,
             TENANT_ID_,
+            HOSTNAME_,
             SEQUENCE_COUNTER_,
             REMOVAL_TIME_
           )
@@ -68,6 +69,7 @@
             #{processDefinitionKey, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
+            #{hostname, jdbcType=VARCHAR},
             #{sequenceCounter, jdbcType=BIGINT},
             #{removalTime, jdbcType=TIMESTAMP}
     )
@@ -233,6 +235,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="state" column="JOB_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="hostname" column="HOSTNAME_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
@@ -375,6 +378,9 @@
         <if test="tenantIds == null">
           and RES.TENANT_ID_ is null
         </if>
+      </if>
+      <if test="hostname != null">
+        and RES.HOSTNAME_ = #{hostname, jdbcType=VARCHAR}
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">

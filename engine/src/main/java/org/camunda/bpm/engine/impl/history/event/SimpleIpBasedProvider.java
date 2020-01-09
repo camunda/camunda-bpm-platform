@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.metrics;
+package org.camunda.bpm.engine.impl.history.event;
 
 import java.net.InetAddress;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class SimpleIpBasedProvider implements MetricsReporterIdProvider {
+public class SimpleIpBasedProvider implements HostnameProvider {
 
-  private final static MetricsLogger LOG = ProcessEngineLogger.METRICS_LOGGER;
+  private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
-  public String provideId(ProcessEngine processEngine) {
+  @Override
+  public String getHostname(ProcessEngineConfigurationImpl processEngineConfiguration) {
     String localIp = "";
     try {
       localIp = InetAddress.getLocalHost().getHostAddress();
@@ -39,7 +40,7 @@ public class SimpleIpBasedProvider implements MetricsReporterIdProvider {
       LOG.couldNotDetermineIp(e);
     }
 
-    return createId(localIp, processEngine.getName());
+    return createId(localIp, processEngineConfiguration.getProcessEngineName());
   }
 
   public static final String createId(String ip, String engineName) {

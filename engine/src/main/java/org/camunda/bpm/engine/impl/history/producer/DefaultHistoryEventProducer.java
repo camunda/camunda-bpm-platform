@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.impl.history.producer;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,7 +41,18 @@ import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -62,9 +75,6 @@ import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLink;
-
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * @author Daniel Meyer
@@ -1064,6 +1074,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobDueDate(jobEntity.getDuedate());
     evt.setJobRetries(jobEntity.getRetries());
     evt.setJobPriority(jobEntity.getPriority());
+
+    String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
+    evt.setHostname(hostName);
 
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {

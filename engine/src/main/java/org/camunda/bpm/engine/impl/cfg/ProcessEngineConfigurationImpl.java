@@ -182,6 +182,7 @@ import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
+import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
 import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
@@ -234,7 +235,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelp
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
-import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
+import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -698,6 +699,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
   /**
+   * the historic job log host name
+   */
+  protected String hostname;
+  protected HostnameProvider hostnameProvider;
+
+  /**
    * handling of expressions submitted via API; can be used as guards against remote code execution
    */
   protected boolean enableExpressionsInAdhocQueries = false;
@@ -890,6 +897,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentHandlerFactory();
     initResourceAuthorizationProvider();
     initPermissionProvider();
+    initHostName();
     initMetrics();
     initMigration();
     initCommandCheckers();
@@ -2092,10 +2100,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initMetrics() {
     if (isMetricsEnabled) {
 
-      if (metricsReporterIdProvider == null) {
-        metricsReporterIdProvider = new SimpleIpBasedProvider();
-      }
-
       if (metricsRegistry == null) {
         metricsRegistry = new MetricsRegistry();
       }
@@ -2105,6 +2109,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (dbMetricsReporter == null) {
         dbMetricsReporter = new DbMetricsReporter(metricsRegistry, commandExecutorTxRequired);
       }
+    }
+  }
+
+  protected void initHostName() {
+    if (hostname == null) {
+      if (hostnameProvider == null) {
+        hostnameProvider = new SimpleIpBasedProvider();
+      }
+      hostname = hostnameProvider.getHostname(this);
     }
   }
 
@@ -3855,12 +3868,39 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  /**
+   * @deprecated use {@link #getHostnameProvider()} instead.
+   */
+  @Deprecated
   public MetricsReporterIdProvider getMetricsReporterIdProvider() {
     return metricsReporterIdProvider;
   }
 
-  public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
+  /**
+   * @deprecated use {@link #setHostnameProvider(HostnameProvider)} instead.
+   */
+  @Deprecated
+  public ProcessEngineConfigurationImpl setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+    return this;
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public ProcessEngineConfigurationImpl setHostname(String hostname) {
+    this.hostname = hostname;
+    return this;
+  }
+
+  public HostnameProvider getHostnameProvider() {
+    return hostnameProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setHostnameProvider(HostnameProvider hostnameProvider) {
+    this.hostnameProvider = hostnameProvider;
+    return this;
   }
 
   public boolean isEnableScriptEngineCaching() {

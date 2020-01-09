@@ -21,3 +21,7 @@ values ('200', CURRENT_TIMESTAMP, '7.13.0');
 -- https://jira.camunda.com/browse/CAM-10953
 create index ACT_IDX_HI_VAR_PI_NAME_TYPE on ACT_HI_VARINST(PROC_INST_ID_, NAME_, VAR_TYPE_);
 
+
+-- https://app.camunda.com/jira/browse/CAM-10784
+ALTER TABLE ACT_HI_JOB_LOG
+  ADD HOSTNAME_ NVARCHAR2(255) default null;

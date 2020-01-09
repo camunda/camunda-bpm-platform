@@ -14,23 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.metrics;
+package org.camunda.bpm.engine.test.util;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
- * @deprecated Please use {@link HostnameProvider}
- * for providing the Metrics Reporter id.
- *
- * @author Thorben Lindhauer
+ * This is a functional interface to pass a callback that
+ * adjusts the {@link ProcessEngineConfigurationImpl} and configure the Process Engine,
  */
-@Deprecated
-public interface MetricsReporterIdProvider {
+public interface ProcessEngineConfigurator {
 
   /**
-   * Provides an id that identifies the metrics reported as part of the given engine's
-   * process execution. May return null.
+   * Callback to adjust the {@link ProcessEngineConfigurationImpl}
+   * @param configuration can be used to set desired Process Engine properties
    */
-  String provideId(ProcessEngine processEngine);
+  void configureEngine(ProcessEngineConfigurationImpl configuration);
 }
