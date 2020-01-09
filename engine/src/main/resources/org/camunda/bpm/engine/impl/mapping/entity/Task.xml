@@ -564,20 +564,19 @@
                 <if test="!query.includeAssignedTasks">
                   and RES.ASSIGNEE_ is null
                 </if>
-                and RES.ID_ not in (
-                select
-                TASK_ID_
-                from
-                ${prefix}ACT_RU_IDENTITYLINK ARIEL
-                <where>
-                  ARIEL.TYPE_ = 'candidate'
-                  <if test="query.withoutCandidateGroups">
-                    and ARIEL.GROUP_ID_ is not null
-                  </if>
-                  <if test="query.withoutCandidateUsers">
-                    and ARIEL.USER_ID_ is not null
-                  </if>
-                </where>
+                and NOT EXISTS (
+                  select 1
+                  from ${prefix}ACT_RU_IDENTITYLINK I
+                  <where>
+                    I.TYPE_ = 'candidate'
+                    <if test="query.withoutCandidateGroups">
+                      and I.GROUP_ID_ is not null
+                    </if>
+                    <if test="query.withoutCandidateUsers">
+                      and I.USER_ID_ is not null
+                    </if>
+                    AND I.TASK_ID_ = RES.ID_
+                  </where>
                 )
               </trim>
             </if>
