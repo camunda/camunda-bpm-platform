@@ -412,4 +412,14 @@ public interface ExternalTaskService {
    * @since 7.6
    */
   String getExternalTaskErrorDetails(String externalTaskId);
+
+  /**
+   * Returns a list of distinct topics based on an ExternalTaskQuery. Ordering is not preserved.
+   * Returns an empty list if no topics are found.
+   *
+   * @param externalTaskQuery the query to execute
+   */
+
+  List<String> getTopicNames(ExternalTaskQuery externalTaskQuery);
+
 }

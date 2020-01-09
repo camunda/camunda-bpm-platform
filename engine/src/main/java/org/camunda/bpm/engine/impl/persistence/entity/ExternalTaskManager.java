@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
@@ -87,6 +88,11 @@ public class ExternalTaskManager extends AbstractManager {
 
     DbEntityManager manager = getDbEntityManager();
     return manager.selectList("selectExternalTasksForTopics", parameter);
+  }
+
+  public List<String> selectTopicNamesByQuery(ExternalTaskQueryImpl externalTaskQuery) {
+      configureQuery(externalTaskQuery);
+      return getDbEntityManager().selectList("selectTopicNamesByQuery", externalTaskQuery);
   }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
