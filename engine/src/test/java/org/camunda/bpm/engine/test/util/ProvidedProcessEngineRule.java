@@ -31,13 +31,7 @@ public class ProvidedProcessEngineRule extends ProcessEngineRule {
   }
 
   public ProvidedProcessEngineRule(final ProcessEngineBootstrapRule bootstrapRule) {
-    this(new Callable<ProcessEngine>() {
-
-      @Override
-      public ProcessEngine call() throws Exception {
-        return bootstrapRule.getProcessEngine();
-      }
-    });
+    this(() -> bootstrapRule.getProcessEngine());
   }
 
   public ProvidedProcessEngineRule(Callable<ProcessEngine> processEngineProvider) {
