@@ -21,6 +21,7 @@
     <version.h2>1.4.190</version.h2>
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-18>18.3.0.0</version.oracle-18>
+    <version.oracle-19>19.3.0.0</version.oracle-19>
     <version.oracle-11>11.2.0.4</version.oracle-11>
     <version.oracle>${version.oracle-11}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
@@ -55,6 +56,11 @@
       </dependency>
       <dependency>
         <groupId>com.oracle.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>${version.oracle}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.ojdbc</groupId>
         <artifactId>ojdbc8</artifactId>
         <version>${version.oracle}</version>
       </dependency>
@@ -395,6 +401,37 @@
               <dependencies>
                 <dependency>
                   <groupId>com.oracle.jdbc</groupId>
+                  <artifactId>ojdbc8</artifactId>
+                  <version>${version.oracle}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>oracle-19</id>
+      <properties>
+        <version.oracle>${version.oracle-19}</version.oracle>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.ojdbc</groupId>
+          <artifactId>ojdbc8</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>sql-maven-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>com.oracle.ojdbc</groupId>
                   <artifactId>ojdbc8</artifactId>
                   <version>${version.oracle}</version>
                 </dependency>
