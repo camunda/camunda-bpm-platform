@@ -43,6 +43,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class HostnameProviderTest {
 
+  public static final String ENGINE_NAME = "TEST_ENGINE";
   public static final String STATIC_HOSTNAME = "STATIC";
   public static final String CUSTOM_HOSTNAME = "CUSTOM_HOST";
   public static final String CUSTOM_REPORTER = "CUSTOM_REPORTER";
@@ -50,14 +51,14 @@ public class HostnameProviderTest {
   @Parameterized.Parameters(name = "Expected hostname: {3}, reporter: {4}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][]{
-        {null, null, null, null, null},
+        {null, null, null, ENGINE_NAME, ENGINE_NAME},
         {STATIC_HOSTNAME, null, null, STATIC_HOSTNAME, STATIC_HOSTNAME},
         {STATIC_HOSTNAME, new CustomHostnameProvider(), null, STATIC_HOSTNAME, STATIC_HOSTNAME},
         {STATIC_HOSTNAME, new CustomHostnameProvider(), new CustomMetricsReporterIdProvider(), STATIC_HOSTNAME, STATIC_HOSTNAME},
         {STATIC_HOSTNAME, null, new CustomMetricsReporterIdProvider(), STATIC_HOSTNAME, STATIC_HOSTNAME},
         {null, new CustomHostnameProvider(), null, CUSTOM_HOSTNAME, CUSTOM_HOSTNAME},
         {null, new CustomHostnameProvider(), new CustomMetricsReporterIdProvider(), CUSTOM_HOSTNAME, CUSTOM_HOSTNAME},
-        {null, null, new CustomMetricsReporterIdProvider(), null, CUSTOM_REPORTER}
+        {null, null, new CustomMetricsReporterIdProvider(), ENGINE_NAME, CUSTOM_REPORTER}
     });
   }
 
@@ -83,7 +84,7 @@ public class HostnameProviderTest {
             .createStandaloneInMemProcessEngineConfiguration();
 
     configuration
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testHostname")
+        .setProcessEngineName(ENGINE_NAME)
         .setHostname(hostname)
         .setHostnameProvider(hostnameProvider)
         .setMetricsReporterIdProvider(reporterProvider);
@@ -104,11 +105,6 @@ public class HostnameProviderTest {
   public void shouldUseCustomHostname() {
     // given a Process Engine with specified hostname parameters
 
-    // in case the default HostnameProvider is used
-    if (expectedHostname == null) {
-      expectedHostname = configuration.getProcessEngineName();
-    }
-
     // when
     String customHostname = configuration.getHostname();
 
@@ -119,11 +115,6 @@ public class HostnameProviderTest {
   @Test
   public void shouldUseCustomMetricsReporterId() {
     // given a Process Engine with some specified hostname and metric properties
-
-    // in case the default HostnameProvider is used for the reporter
-    if (expectedReporter == null) {
-      expectedReporter = configuration.getProcessEngineName();
-    }
 
     // when
     List<MetricIntervalValue> metrics = managementService
