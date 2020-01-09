@@ -80,10 +80,11 @@ public class HostnameProviderTest {
   @Before
   public void setUp() {
     configuration =
-        (ProcessEngineConfigurationImpl)ProcessEngineConfiguration
+        (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
             .createStandaloneInMemProcessEngineConfiguration();
 
     configuration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testHostnameProvider")
         .setProcessEngineName(ENGINE_NAME)
         .setHostname(hostname)
         .setHostnameProvider(hostnameProvider)
