@@ -119,6 +119,3 @@ Java JRE 1.6+ is required. We test camunda BPMN model API on Oracle and IBM JVMs
 No, but support is already quite extensive. See
 link:src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance]
 for a list of currently supported elements.
-
-== License:
-The source files in this repository are made available under the link:./LICENSE[Apache License, Version 2.0].
