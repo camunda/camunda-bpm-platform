@@ -132,7 +132,7 @@ public class HostnameProviderTest {
 
   public static class CustomHostnameProvider implements HostnameProvider {
     @Override
-    public String getHostname(ProcessEngineConfiguration processEngineConfiguration) {
+    public String getHostname(ProcessEngineConfigurationImpl processEngineConfiguration) {
       return CUSTOM_HOSTNAME;
     }
   }

@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;

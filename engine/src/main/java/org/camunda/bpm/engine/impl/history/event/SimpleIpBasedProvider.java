@@ -18,9 +18,8 @@ package org.camunda.bpm.engine.impl.history.event;
 
 import java.net.InetAddress;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -31,7 +30,7 @@ public class SimpleIpBasedProvider implements HostnameProvider {
   private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
   @Override
-  public String getHostname(ProcessEngineConfiguration processEngineConfiguration) {
+  public String getHostname(ProcessEngineConfigurationImpl processEngineConfiguration) {
     String localIp = "";
     try {
       localIp = InetAddress.getLocalHost().getHostAddress();
