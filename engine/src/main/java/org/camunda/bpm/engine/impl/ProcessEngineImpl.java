@@ -123,7 +123,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     if (processEngineConfiguration.isMetricsEnabled()) {
       String reporterId;
       // only use a deprecated, custom MetricsReporterIdProvider,
-      // if a custom HostnameProvider isn't provided
+      // if no static hostname AND custom HostnameProvider are set.
+      // See ProcessEngineConfigurationImpl#initHostname()
       if (processEngineConfiguration.getMetricsReporterIdProvider() != null
           && processEngineConfiguration.getHostnameProvider() instanceof SimpleIpBasedProvider) {
         reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);

@@ -50,6 +50,7 @@ public class HostnameProviderTest {
   @Parameterized.Parameters(name = "Expected hostname: {3}, reporter: {4}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][]{
+        {null, null, null, null, null},
         {STATIC_HOSTNAME, null, null, STATIC_HOSTNAME, STATIC_HOSTNAME},
         {STATIC_HOSTNAME, new CustomHostnameProvider(), null, STATIC_HOSTNAME, STATIC_HOSTNAME},
         {STATIC_HOSTNAME, new CustomHostnameProvider(), new CustomMetricsReporterIdProvider(), STATIC_HOSTNAME, STATIC_HOSTNAME},
@@ -118,6 +119,11 @@ public class HostnameProviderTest {
   @Test
   public void shouldUseCustomMetricsReporterId() {
     // given a Process Engine with some specified hostname and metric properties
+
+    // in case the default HostnameProvider is used for the reporter
+    if (expectedReporter == null) {
+      expectedReporter = configuration.getProcessEngineName();
+    }
 
     // when
     List<MetricIntervalValue> metrics = managementService
