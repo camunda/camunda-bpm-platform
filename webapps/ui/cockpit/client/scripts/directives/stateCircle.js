@@ -27,6 +27,10 @@ module.exports = function() {
         updateStateCircle();
       });
 
+      scope.$watch(attrs.running, function() {
+        updateStateCircle();
+      });
+
       function updateStateCircle() {
         var incidents = scope.$eval(attrs.incidents);
         var running = scope.$eval(attrs.running);
