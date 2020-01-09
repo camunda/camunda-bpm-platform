@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.history.event;
 import java.net.InetAddress;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
@@ -30,7 +31,7 @@ public class SimpleIpBasedProvider implements HostnameProvider {
   private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
   @Override
-  public String getHostname(ProcessEngine processEngine) {
+  public String getHostname(ProcessEngineConfiguration processEngineConfiguration) {
     String localIp = "";
     try {
       localIp = InetAddress.getLocalHost().getHostAddress();
@@ -40,7 +41,7 @@ public class SimpleIpBasedProvider implements HostnameProvider {
       LOG.couldNotDetermineIp(e);
     }
 
-    return createId(localIp, processEngine.getName());
+    return createId(localIp, processEngineConfiguration.getProcessEngineName());
   }
 
   public static final String createId(String ip, String engineName) {

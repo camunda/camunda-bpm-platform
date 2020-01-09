@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 public interface HostnameProvider {
 
   /**
    * Provides a <code>String</code> that identifies the host of the given Process Engine.
    *
-   * @param processEngine the Process Engine that will run on the current host
+   * @param processEngineConfiguration of the Process Engine that will run on the current host
    * @return a String identifying the current host
    */
-  String getHostname(ProcessEngine processEngine);
+  String getHostname(ProcessEngineConfiguration processEngineConfiguration);
 }

@@ -2113,8 +2113,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initHostName() {
-    if (hostnameProvider == null) {
-      hostnameProvider = new SimpleIpBasedProvider();
+    if (hostname == null) {
+      if (hostnameProvider == null) {
+        hostnameProvider = new SimpleIpBasedProvider();
+      }
+      hostname = hostnameProvider.getHostname(this);
     }
   }
 
@@ -3877,24 +3880,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * @deprecated use {@link #setHostnameProvider(HostnameProvider)} instead.
    */
   @Deprecated
-  public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
+  public ProcessEngineConfigurationImpl setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+    return this;
   }
 
   public String getHostname() {
     return hostname;
   }
 
-  public void setHostname(String hostname) {
+  public ProcessEngineConfigurationImpl setHostname(String hostname) {
     this.hostname = hostname;
+    return this;
   }
 
   public HostnameProvider getHostnameProvider() {
     return hostnameProvider;
   }
 
-  public void setHostnameProvider(HostnameProvider hostnameProvider) {
+  public ProcessEngineConfigurationImpl setHostnameProvider(HostnameProvider hostnameProvider) {
     this.hostnameProvider = hostnameProvider;
+    return this;
   }
 
   public boolean isEnableScriptEngineCaching() {

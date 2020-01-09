@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collections;
@@ -170,8 +171,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   @Override
   public HistoricJobLogQuery hostname(String hostname) {
-    ensureNotNull("hostName", hostname);
-    ensureNotContainsEmptyString("hostName", Collections.singletonList(hostname));
+    ensureNotEmpty("hostName", hostname);
     this.hostname = hostname;
     return this;
   }

@@ -393,25 +393,23 @@ public class HistoryCleanupOnEngineBootstrapTest {
   protected void closeProcessEngine(ProcessEngine processEngine) {
     ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     final HistoryService historyService = processEngine.getHistoryService();
-    configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    configuration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 
-        List<Job> jobs = historyService.findHistoryCleanupJobs();
-        for (Job job: jobs) {
-          commandContext.getJobManager().deleteJob((JobEntity) job);
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
-        }
-
-        //cleanup "detached" historic job logs
-        final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
-        for (HistoricJobLog jobLog: list) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
-        }
-
-        commandContext.getMeterLogManager().deleteAll();
-
-        return null;
+      List<Job> jobs = historyService.findHistoryCleanupJobs();
+      for (Job job: jobs) {
+        commandContext.getJobManager().deleteJob((JobEntity) job);
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
       }
+
+      //cleanup "detached" historic job logs
+      final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
+      for (HistoricJobLog jobLog: list) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
+      }
+
+      commandContext.getMeterLogManager().deleteAll();
+
+      return null;
     });
 
     processEngine.close();
