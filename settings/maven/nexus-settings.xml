@@ -73,6 +73,12 @@
       </properties>
     </profile>
     <profile>
+      <id>oracle-19</id>
+      <properties>
+        <database.name>orclcdb</database.name>
+      </properties>
+    </profile>
+    <profile>
       <id>postgresql</id>
       <properties>
         <database.host>localhost</database.host>
