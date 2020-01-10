@@ -3232,10 +3232,22 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml",
           "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
   public void testGetTopicNamesWithQuery(){
+    //given
     runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
-    ProcessInstance p = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery().processDefinitionId(p.getProcessDefinitionId());
-    assertEquals(new ArrayList<String>(), externalTaskService.getTopicNames(query));
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    //when
+    ExternalTaskQuery ascQuery = externalTaskService.createExternalTaskQuery()
+            .orderById()
+            .asc();
+
+    ExternalTaskQuery descQuery = externalTaskService.createExternalTaskQuery()
+            .orderById()
+            .desc();
+
+    //then
+    assertEquals("externalTaskTopic", externalTaskService.getTopicNames(descQuery).get(0));
+    assertEquals("topic1", externalTaskService.getTopicNames(ascQuery).get(0));
   }
 
   protected Date nowPlus(long millis) {
