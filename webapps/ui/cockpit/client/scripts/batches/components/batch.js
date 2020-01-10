@@ -384,7 +384,7 @@ Batch.prototype.loadDetails = function(id, type) {
 
   switch (type) {
     case 'runtime':
-      this._sdk.resource('batch').statistics({batchId: id}, cb);
+      this._sdk.resource('batch').statistics({batchId: id, maxResults: 1}, cb);
       break;
     case 'history':
       this._sdk.resource('history').singleBatch(id, cb);
