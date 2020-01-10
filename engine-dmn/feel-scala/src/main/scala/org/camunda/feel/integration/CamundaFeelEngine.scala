@@ -15,7 +15,7 @@ class CamundaFeelEngine extends org.camunda.bpm.dmn.feel.impl.FeelEngine {
 
   private lazy val engine =
     new org.camunda.feel.FeelEngine(
-      valueMapper = new CamundaValueMapper,
+      valueMapper = SpiServiceLoader.loadValueMapper,
       functionProvider = SpiServiceLoader.loadFunctionProvider
     )
 
