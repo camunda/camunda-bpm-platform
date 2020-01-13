@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -61,6 +62,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -902,6 +904,22 @@ public class BatchMigrationTest {
     // then
     Assert.assertEquals(2, runtimeService.createProcessInstanceQuery()
         .processDefinitionId(targetDefinition.getId()).count());
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    configuration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, 42);
+
+    // when
+    Batch batch = helper.migrateProcessInstancesAsync(15);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

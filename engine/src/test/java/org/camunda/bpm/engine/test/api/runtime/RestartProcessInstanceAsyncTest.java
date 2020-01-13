@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -59,6 +60,7 @@ import org.junit.rules.RuleChain;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -1080,6 +1082,36 @@ public class RestartProcessInstanceAsyncTest {
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).list();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstances.get(0).getId(), restartedProcessInstances.get(1).getId()).list();
     Assert.assertEquals(0, variables.size());
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_RESTART, 42);
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    List<String> processInstanceIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
+
+    // when
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+        .startAfterActivity("userTask2")
+        .processInstanceIds(processInstanceIds)
+        .executeAsync();
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

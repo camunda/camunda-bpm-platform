@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
@@ -36,6 +37,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -223,6 +225,24 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public void testDeleteHistoryProcessInstancesAsyncWithNullQuery() throws Exception {
     thrown.expect(ProcessEngineException.class);
     historyService.deleteHistoricProcessInstancesAsync((HistoricProcessInstanceQuery) null, TEST_REASON);
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION, 42);
+
+    //when
+    Batch batch = historyService.deleteHistoricProcessInstancesAsync(historicProcessInstances, TEST_REASON);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertNoHistoryForTasks() {

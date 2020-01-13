@@ -129,7 +129,7 @@ public class BatchBuilder {
     String type = jobHandler.getType();
     batch.setType(type);
 
-    int invocationPerBatchJobCount = engineConfig.getInvocationsPerBatchJob();
+    int invocationPerBatchJobCount = calculateInvocationsPerBatchJob(type);
     batch.setInvocationsPerBatchJob(invocationPerBatchJobCount);
 
     batch.setTenantId(tenantId);
@@ -198,6 +198,23 @@ public class BatchBuilder {
     }
 
     return (instanceCount / invocationPerBatchJobCount) + 1;
+  }
+
+  protected int calculateInvocationsPerBatchJob(String batchType) {
+    ProcessEngineConfigurationImpl engineConfig = commandContext.getProcessEngineConfiguration();
+
+    Map<String, Integer> invocationsPerBatchJobByBatchType =
+        engineConfig.getInvocationsPerBatchJobByBatchType();
+
+    Integer invocationCount = invocationsPerBatchJobByBatchType.get(batchType);
+
+    if (invocationCount != null) {
+      return invocationCount;
+
+    } else {
+      return engineConfig.getInvocationsPerBatchJob();
+
+    }
   }
 
 }

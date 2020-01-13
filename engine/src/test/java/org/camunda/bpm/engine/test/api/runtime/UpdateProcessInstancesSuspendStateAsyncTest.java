@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -38,6 +40,7 @@ import org.junit.rules.RuleChain;
 import org.python.google.common.collect.Sets;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -95,6 +98,55 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void shouldSetInvocationsPerBatchTypeOnSuspension() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE, 42);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    Batch batch = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void shouldSetInvocationsPerBatchTypeOnActivation() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE, 42);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    Batch batch = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .activateAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",

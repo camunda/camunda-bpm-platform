@@ -17,10 +17,13 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -624,6 +627,27 @@ public class SetExternalTasksRetriesTest {
     }
     processInstanceIds.addAll(ids);
     return ids;
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES, 42);
+
+    ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService()
+        .createExternalTaskQuery();
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(null, externalTaskQuery, 5);
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
 }

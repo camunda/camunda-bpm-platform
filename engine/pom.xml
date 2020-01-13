@@ -300,6 +300,7 @@
           <include>**/camunda.cfg.db.xml</include>
           <include>**/camunda.cfg.plugins.xml</include>
           <include>**/camunda.cfg.prefix.xml</include>
+          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
         </includes>
       </testResource>
     </testResources>
