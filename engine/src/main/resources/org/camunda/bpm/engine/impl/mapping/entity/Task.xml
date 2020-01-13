@@ -379,6 +379,13 @@
             <if test="query.processInstanceId != null">
               ${queryType} RES.PROC_INST_ID_ = #{query.processInstanceId}
             </if>
+            <if test="query.processInstanceIdIn != null &amp;&amp; query.processInstanceIdIn.length > 0">
+              ${queryType} RES.PROC_INST_ID_ in
+              <foreach item="item" index="index" collection="query.processInstanceIdIn"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
             <if test="query.processInstanceBusinessKey != null">
               ${queryType} E.BUSINESS_KEY_ = #{query.processInstanceBusinessKey}
             </if>

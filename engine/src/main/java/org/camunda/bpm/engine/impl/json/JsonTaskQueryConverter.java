@@ -26,12 +26,13 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * @author Sebastian Menski
@@ -67,6 +68,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String INCLUDE_ASSIGNED_TASKS = "includeAssignedTasks";
   public static final String INSTANCE_ID = "instanceId";
   public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+  public static final String PROCESS_INSTANCE_ID_IN = "processInstanceIdIn";
   public static final String EXECUTION_ID = "executionId";
   public static final String ACTIVITY_INSTANCE_ID_IN = "activityInstanceIdIn";
   public static final String CREATED = "created";
@@ -161,6 +163,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addDefaultField(json, WITHOUT_CANDIDATE_USERS, false, query.isWithoutCandidateUsers());
     JsonUtil.addField(json, INCLUDE_ASSIGNED_TASKS, query.isIncludeAssignedTasksInternal());
     JsonUtil.addField(json, PROCESS_INSTANCE_ID, query.getProcessInstanceId());
+    if (query.getProcessInstanceIdIn() != null) {
+      JsonUtil.addArrayField(json, PROCESS_INSTANCE_ID_IN, query.getProcessInstanceIdIn());
+    }
     JsonUtil.addField(json, EXECUTION_ID, query.getExecutionId());
     JsonUtil.addArrayField(json, ACTIVITY_INSTANCE_ID_IN, query.getActivityInstanceIdIn());
     JsonUtil.addDateField(json, CREATED, query.getCreateTime());
@@ -355,6 +360,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(PROCESS_INSTANCE_ID)) {
       query.processInstanceId(JsonUtil.getString(json, PROCESS_INSTANCE_ID));
+    }
+    if (json.has(PROCESS_INSTANCE_ID_IN)) {
+      query.processInstanceIdIn(getArray(JsonUtil.getArray(json, PROCESS_INSTANCE_ID_IN)));
     }
     if (json.has(EXECUTION_ID)) {
       query.executionId(JsonUtil.getString(json, EXECUTION_ID));

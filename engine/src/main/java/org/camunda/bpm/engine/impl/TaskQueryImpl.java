@@ -116,6 +116,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Boolean withoutCandidateUsers;
   protected Boolean includeAssignedTasks;
   protected String processInstanceId;
+  protected String[] processInstanceIdIn;
   protected String executionId;
   protected String[] activityInstanceIdIn;
   protected Date createTime;
@@ -483,6 +484,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  @Override
+  public TaskQuery processInstanceIdIn(String... processInstanceIds) {
+    this.processInstanceIdIn = processInstanceIds;
     return this;
   }
 
@@ -1480,6 +1487,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return processInstanceId;
   }
 
+  public String[] getProcessInstanceIdIn() {
+    return processInstanceIdIn;
+  }
+
   public String getExecutionId() {
     return executionId;
   }
@@ -1822,6 +1833,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getProcessInstanceId() != null) {
       extendedQuery.processInstanceId(this.getProcessInstanceId());
+    }
+
+    if (extendingQuery.getProcessInstanceIdIn() != null) {
+      extendedQuery.processInstanceIdIn(extendingQuery.getProcessInstanceIdIn());
+    } else if (this.processInstanceIdIn() != null) {
+      extendedQuery.processInstanceIdIn(this.getProcessInstanceIdIn());
     }
 
     if (extendingQuery.getExecutionId() != null) {

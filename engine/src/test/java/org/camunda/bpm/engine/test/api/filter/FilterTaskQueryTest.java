@@ -43,7 +43,6 @@ import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -56,6 +55,8 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Sebastian Menski
@@ -71,6 +72,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected String[] testActivityInstances = new String[] {"a", "b", "c"};
   protected String[] testKeys = new String[] {"d", "e"};
   protected List<String> testCandidateGroups = new ArrayList<String>();
+  protected String[] testInstances = new String[] {"x", "y", "z"};
 
   protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
   protected Object[] variableValues = new Object[] {1, 2, "3", "4", 5, 6};
@@ -165,6 +167,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.withCandidateUsers();
     query.withoutCandidateUsers();
     query.processInstanceId(testString);
+    query.processInstanceIdIn(testInstances);
     query.executionId(testString);
     query.activityInstanceIdIn(testActivityInstances);
     query.taskCreatedOn(testDate);
@@ -263,6 +266,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(query.isWithoutCandidateUsers());
     assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertEquals(testString, query.getProcessInstanceId());
+    assertEquals(testInstances.length, query.getProcessInstanceIdIn().length);
+    for (int i = 0; i < query.getProcessInstanceIdIn().length; i++) {
+      assertEquals(testInstances[i], query.getProcessInstanceIdIn()[i]);
+    }
     assertEquals(testString, query.getExecutionId());
     assertEquals(testActivityInstances.length, query.getActivityInstanceIdIn().length);
     for (int i = 0; i < query.getActivityInstanceIdIn().length; i++) {
@@ -2024,6 +2031,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // then
     assertThat(filterService.count(filter.getId()), is(1L));
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testExtendingTaskQueryWithProcessInstanceIn() {
+    // given
+    String firstId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getProcessInstanceId();
+    String secondId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getProcessInstanceId();
+
+    // then
+    TaskQuery query = taskService.createTaskQuery().processInstanceIdIn(firstId);
+    saveQuery(query);
+    List<Task> origQueryTasks = filterService.list(filter.getId());
+    List<Task> selfExtendQueryTasks = filterService.list(filter.getId(), query);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.processInstanceIdIn(firstId, secondId);
+    List<Task> extendingQueryTasks = filterService.list(filter.getId(), extendingQuery);
+
+    // then
+    assertEquals(1, origQueryTasks.size());
+    assertEquals(1, selfExtendQueryTasks.size());
+    assertEquals(2, extendingQueryTasks.size());
+  }
+
 
   protected void saveQuery(Query query) {
     filter.setQuery(query);
