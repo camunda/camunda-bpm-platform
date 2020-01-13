@@ -34,16 +34,16 @@ import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuild
  */
 public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
-  private String processInstanceId;
-  private String processDefinitionId;
-  private String processDefinitionKey;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
 
-  private List<String> processInstanceIds;
-  private ProcessInstanceQueryDto processInstanceQuery;
-  private HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
+  protected List<String> processInstanceIds;
+  protected ProcessInstanceQueryDto processInstanceQuery;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
-  private String processDefinitionTenantId;
-  private boolean processDefinitionWithoutTenantId;
+  protected String processDefinitionTenantId;
+  protected boolean processDefinitionWithoutTenantId;
 
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -53,24 +53,36 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     this.processInstanceId = processInstanceId;
   }
 
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public List<String> getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
   public void setProcessInstanceIds(List<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
   }
 
-  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
-    this.processInstanceQuery = processInstanceQuery;
+  public ProcessInstanceQueryDto getProcessInstanceQuery() {
+    return processInstanceQuery;
   }
 
-  public ProcessInstanceQueryDto getProcessInstanceQuery(){
-    return processInstanceQuery;
+  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
   }
 
   public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
@@ -80,8 +92,13 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
     return historicProcessInstanceQuery;
   }
+
   public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
     this.processDefinitionTenantId = processDefinitionTenantId;
+  }
+
+  public boolean getProcessDefinitionWithoutTenantId() {
+    return processDefinitionWithoutTenantId;
   }
 
   public void setProcessDefinitionWithoutTenantId(boolean processDefinitionWithoutTenantId) {
@@ -99,7 +116,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     } else if (params > 1) {
       String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    } else if(params == 0 && syncParams == 0) {
+    } else if (params == 0 && syncParams == 0) {
       String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
@@ -107,8 +124,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = null;
     if (params == 1) {
       updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
-    }
-    else if (syncParams >= 1) {
+    } else if (syncParams >= 1) {
       updateSuspensionStateBuilder = createUpdateSuspensionStateGroupBuilder(engine);
     }
 
@@ -124,7 +140,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     int params = parameterCount(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery);
 
     if (params == 0) {
-       String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+      String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
@@ -141,20 +157,15 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
     if (processInstanceId != null) {
       return selectBuilder.byProcessInstanceId(processInstanceId);
-
     } else if (processDefinitionId != null) {
       return selectBuilder.byProcessDefinitionId(processDefinitionId);
-
-    } else { //processDefinitionKey != null
+    } else { // processDefinitionKey != null
       UpdateProcessInstanceSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
-
       if (processDefinitionTenantId != null) {
         tenantBuilder.processDefinitionTenantId(processDefinitionTenantId);
-
       } else if (processDefinitionWithoutTenantId) {
         tenantBuilder.processDefinitionWithoutTenantId();
       }
-
       return tenantBuilder;
     }
   }
@@ -185,9 +196,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     return groupBuilder;
   }
 
-
-
-  protected int parameterCount (Object... o){
+  protected int parameterCount(Object... o) {
     int count = 0;
     for (Object o1 : o) {
       count += (o1 != null ? 1 : 0);

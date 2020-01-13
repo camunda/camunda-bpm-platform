@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -911,6 +912,33 @@ public interface ManagementService {
    *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * processInstanceIds, processInstanceQuery or historicProcessInstanceQuery has to be provided.
+   * If all are provided, resulting list of affected jobs will contain jobs related to the
+   * query as well as jobs related to instances in the list.
+   *
+   * @param processInstanceIds ids of the process instances that for which jobs retries will be set
+   * @param processInstanceQuery query that identifies process instances with jobs
+   *                             that have to be modified
+   * @param historicProcessInstanceQuery historic query that identifies runtime process instances
+   *                                     with jobs that have to be modified
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync (List<String> processInstanceIds,
+                            ProcessInstanceQuery processInstanceQuery,
+                            HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                            int retries);
 
   /**
    * <p>

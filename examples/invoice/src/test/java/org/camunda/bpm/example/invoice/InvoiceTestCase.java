@@ -141,7 +141,7 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
       .startBeforeActivity("approveInvoice")
       .execute();
 
-    // givent that the process instance is waiting at task "approveInvoice"
+    // given that the process instance is waiting at task "approveInvoice"
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("approveInvoice", task.getTaskDefinitionKey());
 
@@ -163,7 +163,56 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
 
     // then the variable "approver" exists and is set to mary
     assertEquals("mary", taskService.getVariable(task.getId(), "approver"));
-
   }
+
+  @Deployment(resources= {"invoice.v2.bpmn", "reviewInvoice.bpmn", "invoiceBusinessDecisions.dmn"})
+  public void testNonSuccessfulPath() {
+    InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
+    VariableMap variables = Variables.createVariables()
+      .putValue("creditor", "Great Pizza for Everyone Inc.")
+      .putValue("amount", 300.0d)
+      .putValue("invoiceCategory", "Travel Expenses")
+      .putValue("invoiceNumber", "GPFE-23232323")
+      .putValue("invoiceDocument", fileValue("invoice.pdf")
+        .file(invoiceInputStream)
+        .mimeType("application/pdf")
+        .create());
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("invoice", variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    assertEquals("approveInvoice", task.getTaskDefinitionKey());
+
+    List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
+    Set<String> approverGroups = new HashSet<String>();
+    for (IdentityLink link : links) {
+      approverGroups.add(link.getGroupId());
+    }
+    assertEquals(2, approverGroups.size());
+    assertTrue(approverGroups.contains("accounting"));
+    assertTrue(approverGroups.contains("sales"));
+
+    variables.clear();
+    variables.put("approved", Boolean.FALSE);
+    taskService.complete(task.getId(), variables);
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertEquals("assignReviewer", task.getTaskDefinitionKey());
+    variables.clear();
+    variables.put("reviewer", "peter");
+    taskService.complete(task.getId(), variables);
+
+    task = taskService.createTaskQuery().singleResult();
+
+    assertEquals("reviewInvoice", task.getTaskDefinitionKey());
+    variables.clear();
+    variables.put("clarified", Boolean.FALSE);
+    taskService.complete(task.getId(), variables);
+
+    assertProcessEnded(task.getProcessInstanceId());
+    assertProcessEnded(pi.getId());
+  }
+
 
 }

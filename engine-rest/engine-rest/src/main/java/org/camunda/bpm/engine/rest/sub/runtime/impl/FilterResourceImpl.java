@@ -45,7 +45,6 @@ import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 
 import javax.ws.rs.HttpMethod;
@@ -68,7 +67,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 
 /**
@@ -545,7 +546,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     // #tasks * #variableNames * 5 (we have five variable scopes per task)
     // this value may exceed the configured query pagination limit, so we make an unbounded query.
     // As #tasks is bounded by the pagination limit, it will never load an unbounded number of variables.
-    return query.unboundedResultList();
+    return query.unlimitedList();
 
   }
 

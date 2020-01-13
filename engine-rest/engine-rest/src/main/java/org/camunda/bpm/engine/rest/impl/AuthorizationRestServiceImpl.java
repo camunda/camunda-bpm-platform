@@ -204,11 +204,15 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
   }
 
   protected List<String> getUserGroups(String userId) {
-    List<String> groupIds= new ArrayList<>();
-    List<Group> userGroups = getIdentityService().createGroupQuery().groupMember(userId).list();
+    List<Group> userGroups = getIdentityService().createGroupQuery()
+        .groupMember(userId)
+        .unlimitedList();
+
+    List<String> groupIds = new ArrayList<>();
     for (Group group : userGroups) {
       groupIds.add(group.getId());
     }
+
     return groupIds;
   }
 

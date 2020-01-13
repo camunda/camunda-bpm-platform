@@ -1109,7 +1109,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     List<Group> groupMocks = MockProvider.createMockGroups();
     when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
     when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
-    when(mockGroupQuery.list()).thenReturn(groupMocks);
+    when(mockGroupQuery.unlimitedList()).thenReturn(groupMocks);
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groupMocks) {
       groupIds.add(group.getId());

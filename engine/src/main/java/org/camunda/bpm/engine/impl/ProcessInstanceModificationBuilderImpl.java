@@ -56,6 +56,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   protected boolean skipCustomListeners = false;
   protected boolean skipIoMappings = false;
+  protected boolean externallyTerminated = false;
   protected String annotation;
 
   protected List<AbstractProcessInstanceModificationCommand> operations = new ArrayList<AbstractProcessInstanceModificationCommand>();
@@ -105,6 +106,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
+    return this;
+  }
+
+  @Override
+  public ProcessInstanceModificationBuilder cancellationSourceExternal(boolean external) {
+    this.externallyTerminated = external;
     return this;
   }
 
@@ -300,6 +307,10 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   public boolean isSkipIoMappings() {
     return skipIoMappings;
+  }
+
+  public boolean isExternallyTerminated() {
+    return externallyTerminated;
   }
 
   public void setSkipCustomListeners(boolean skipCustomListeners) {

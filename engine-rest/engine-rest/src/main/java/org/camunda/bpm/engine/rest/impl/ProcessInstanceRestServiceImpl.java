@@ -163,27 +163,19 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto deleteProcessInstancesDto) {
-    List<String> processInstanceIds = new ArrayList<String>();
-
-    HistoricProcessInstanceQueryDto queryDto = deleteProcessInstancesDto.getHistoricProcessInstanceQuery();
-    if (queryDto != null) {
-      HistoricProcessInstanceQuery query = queryDto.toQuery(getProcessEngine());
-      List<HistoricProcessInstance> historicProcessInstances = query.list();
-
-      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-        processInstanceIds.add(historicProcessInstance.getId());
-      }
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = null;
+    if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
+      historicProcessInstanceQuery = deleteProcessInstancesDto.getHistoricProcessInstanceQuery()
+          .toQuery(getProcessEngine());
     }
 
-    if (deleteProcessInstancesDto.getProcessInstanceIds() != null) {
-      processInstanceIds.addAll(deleteProcessInstancesDto.getProcessInstanceIds());
-    }
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     try {
-      RuntimeService runtimeService = getProcessEngine().getRuntimeService();
       Batch batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds,
+        deleteProcessInstancesDto.getProcessInstanceIds(),
         null,
+        historicProcessInstanceQuery,
         deleteProcessInstancesDto.getDeleteReason(),
         deleteProcessInstancesDto.isSkipCustomListeners(),
         deleteProcessInstancesDto.isSkipSubprocesses());
@@ -221,27 +213,18 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto) {
-    List<String> processInstanceIds = new ArrayList<String>();
-
     HistoricProcessInstanceQueryDto queryDto = setJobRetriesDto.getHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery query = null;
     if (queryDto != null) {
-      HistoricProcessInstanceQuery query = queryDto.toQuery(getProcessEngine());
-      List<HistoricProcessInstance> historicProcessInstances = query.list();
-
-      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-        processInstanceIds.add(historicProcessInstance.getId());
-      }
-    }
-
-    if (setJobRetriesDto.getProcessInstances() != null) {
-      processInstanceIds.addAll(setJobRetriesDto.getProcessInstances());
+      query = queryDto.toQuery(getProcessEngine());
     }
 
     try {
       ManagementService managementService = getProcessEngine().getManagementService();
       Batch batch = managementService.setJobRetriesAsync(
-        processInstanceIds,
-        (ProcessInstanceQuery) null,
+        setJobRetriesDto.getProcessInstances(),
+        null,
+        query,
         setJobRetriesDto.getRetries());
 
       return BatchDto.fromBatch(batch);

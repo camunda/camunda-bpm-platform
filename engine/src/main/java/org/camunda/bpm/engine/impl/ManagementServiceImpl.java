@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
@@ -127,7 +128,16 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   @Override
   public Batch setJobRetriesAsync(List<String> processInstanceIds, ProcessInstanceQuery query, int retries) {
-    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query, retries));
+    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query,
+        null, retries));
+  }
+
+  @Override
+  public Batch setJobRetriesAsync(List<String> processInstanceIds, ProcessInstanceQuery query,
+                                  HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                  int retries) {
+    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query,
+        historicProcessInstanceQuery, retries));
   }
 
   public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {

@@ -2245,7 +2245,7 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Either query nor ids provided.");
+    thrown.expectMessage("Neither query nor ids provided.");
 
     // when
     batchBuilder.executeAsync();
@@ -2260,7 +2260,7 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Either query nor ids provided.");
+    thrown.expectMessage("Neither query nor ids provided.");
 
     // when
     batchBuilder.executeAsync();
@@ -2275,7 +2275,7 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Either query nor ids provided.");
+    thrown.expectMessage("Neither query nor ids provided.");
 
     // when
     batchBuilder.executeAsync();

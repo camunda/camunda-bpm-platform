@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -58,6 +59,10 @@ public class HistoryCleanupCmd implements Command<Job> {
 
   @Override
   public Job execute(CommandContext commandContext) {
+    if (!isHistoryCleanupEnabled(commandContext)) {
+      throw new BadUserRequestException("History cleanup is disabled for this engine");
+    }
+
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
@@ -211,4 +216,10 @@ public class HistoryCleanupCmd implements Command<Job> {
         null,
         propertyChange);
   }
+
+  protected boolean isHistoryCleanupEnabled(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration()
+        .isHistoryCleanupEnabled();
+  }
+
 }

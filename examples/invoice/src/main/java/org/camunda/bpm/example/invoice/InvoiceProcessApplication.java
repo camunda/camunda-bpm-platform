@@ -84,7 +84,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
         repositoryService.createDeployment(this.getReference())
           .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
           .addInputStream("invoiceBusinessDecisions.dmn", classLoader.getResourceAsStream("invoiceBusinessDecisions.dmn"))
-          .addInputStream("review-invoice.cmmn", classLoader.getResourceAsStream("review-invoice.cmmn"))
+          .addInputStream("reviewInvoice.bpmn", classLoader.getResourceAsStream("reviewInvoice.bpmn"))
           .deploy();
       }
     }

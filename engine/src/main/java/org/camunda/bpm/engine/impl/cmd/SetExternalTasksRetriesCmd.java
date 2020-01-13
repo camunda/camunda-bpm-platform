@@ -31,16 +31,16 @@ public class SetExternalTasksRetriesCmd extends AbstractSetExternalTaskRetriesCm
   @Override
   public Void execute(CommandContext commandContext) {
     List<String> collectedIds = collectExternalTaskIds();
-    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", collectedIds);
+    EnsureUtil.ensureNotEmpty(BadUserRequestException.class,
+        "externalTaskIds", collectedIds);
+
+    int instanceCount = collectedIds.size();
+    writeUserOperationLog(commandContext, instanceCount, false);
 
     int retries = builder.getRetries();
-    writeUserOperationLog(commandContext,
-        retries,
-        collectedIds.size(),
-        false);
-
     for (String externalTaskId : collectedIds) {
-      new SetExternalTaskRetriesCmd(externalTaskId, retries, false).execute(commandContext);
+      new SetExternalTaskRetriesCmd(externalTaskId, retries, false)
+          .execute(commandContext);
     }
 
     return null;

@@ -123,6 +123,25 @@ public interface ProcessInstanceModificationBuilder extends
    */
   ProcessInstanceModificationBuilder cancelAllForActivity(String activityId);
 
+  /**
+   * <p>
+   * A canceled process instance receives a termination state to indicate the
+   * source of the cancellation call. The state can have the following values:
+   *   <ul>
+   *     <li><code>EXTERNALLY_TERMINATED</code>: the cancellation was triggered by
+   * an external source. (e.g. REST call, external application)</li>
+   *     <li><code>INTERNALLY_TERMINATED</code>: the cancellation was triggered
+   * internally. (e.g. by the engine)</li>
+   *   </ul>
+   * </p>
+   * 
+   * @param external
+   *          was the cancellation triggered by an external source?
+   *          <code>true</code> for <code>EXTERNALLY_TERMINATED</code>,
+   *          <code>false</code> for <code>INTERNALLY_TERMINATED</code>.
+   */
+  ProcessInstanceModificationBuilder cancellationSourceExternal(boolean external);
+
   /** Provides annotation for the current modification. */
   ProcessInstanceModificationBuilder setAnnotation(String annotation);
 

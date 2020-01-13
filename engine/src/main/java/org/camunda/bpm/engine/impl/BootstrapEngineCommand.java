@@ -38,8 +38,11 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   public Void execute(CommandContext commandContext) {
 
     checkDeploymentLockExists(commandContext);
-    checkHistoryCleanupLockExists(commandContext);
-    createHistoryCleanupJob(commandContext);
+
+    if (isHistoryCleanupEnabled(commandContext)) {
+      checkHistoryCleanupLockExists(commandContext);
+      createHistoryCleanupJob(commandContext);
+    }
 
     return null;
   }
@@ -76,4 +79,10 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       LOG.noHistoryCleanupLockPropertyFound();
     }
   }
+
+  protected boolean isHistoryCleanupEnabled(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration()
+        .isHistoryCleanupEnabled();
+  }
+
 }

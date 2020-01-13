@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
@@ -62,14 +63,11 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
     return allProcessInstanceIds;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       int numInstances,
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances,
                                        boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-      null,
-      numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
 
     String operationType;
@@ -86,4 +84,9 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
           null,
           propertyChanges);
   }
+
+  protected void writeUserOperationLogAsync(CommandContext commandContext, int numInstances) {
+    writeUserOperationLog(commandContext, numInstances, true);
+  }
+
 }

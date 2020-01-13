@@ -306,7 +306,7 @@ public class ProcessEngineRestServiceTest extends
     when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.orderByGroupName()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.asc()).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.list()).thenReturn(mockGroups);
+    when(sampleGroupQuery.unlimitedList()).thenReturn(mockGroups);
 
     when(mockIdentityService.createGroupQuery()).thenReturn(sampleGroupQuery);
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);

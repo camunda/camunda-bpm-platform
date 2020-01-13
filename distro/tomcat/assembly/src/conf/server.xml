@@ -63,7 +63,7 @@
               defaultTransactionIsolation="READ_COMMITTED"
               username="sa"  
               password="sa"
-              maxActive="20"
+              maxTotal="20"
               minIdle="5"
               maxIdle="20" />
 

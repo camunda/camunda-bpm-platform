@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobsRetriesBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import java.util.ArrayList;
@@ -29,12 +31,18 @@ import java.util.List;
  * @author Askar Akhmerov
  */
 public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatchCmd {
+
   protected final List<String> processInstanceIds;
   protected final ProcessInstanceQuery query;
+  protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
 
-  public SetJobsRetriesByProcessBatchCmd(List<String> processInstanceIds, ProcessInstanceQuery query, int retries) {
+  public SetJobsRetriesByProcessBatchCmd(List<String> processInstanceIds,
+                                         ProcessInstanceQuery query,
+                                         HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                         int retries) {
     this.processInstanceIds = processInstanceIds;
     this.query = query;
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.retries = retries;
   }
 
@@ -44,6 +52,12 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
 
     if (query != null) {
       collectedProcessInstanceIds.addAll(((ProcessInstanceQueryImpl)query).listIds());
+    }
+
+    if (historicProcessInstanceQuery != null) {
+      List<String> ids =
+          ((HistoricProcessInstanceQueryImpl) historicProcessInstanceQuery).listIds();
+      collectedProcessInstanceIds.addAll(ids);
     }
 
     if (this.processInstanceIds != null) {

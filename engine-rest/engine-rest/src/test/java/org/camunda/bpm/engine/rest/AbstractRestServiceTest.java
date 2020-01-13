@@ -34,9 +34,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.rest.hal.Hal;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -113,6 +115,7 @@ public abstract class AbstractRestServiceTest {
     instance.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
     instance.setBusinessKey(EXAMPLE_BUSINESS_KEY);
     instance.setExecutionIds(new String[]{EXAMPLE_EXECUTION_ID});
+    instance.setIncidents(new Incident[] {MockProvider.createMockIncident()});
 
     ActivityInstanceImpl childActivity = new ActivityInstanceImpl();
     childActivity.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
@@ -127,6 +130,7 @@ public abstract class AbstractRestServiceTest {
     childActivity.setChildActivityInstances(new ActivityInstance[0]);
     childActivity.setChildTransitionInstances(new TransitionInstance[0]);
     childActivity.setIncidentIds(new String[]{EXAMPLE_INCIDENT_ID});
+    childActivity.setIncidents(new Incident[] {MockProvider.createMockIncident()});
 
     TransitionInstanceImpl childTransition = new TransitionInstanceImpl();
     childTransition.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
@@ -138,6 +142,7 @@ public abstract class AbstractRestServiceTest {
     childTransition.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
     childTransition.setExecutionId(EXAMPLE_EXECUTION_ID);
     childTransition.setIncidentIds(new String[]{EXAMPLE_ANOTHER_INCIDENT_ID});
+    childTransition.setIncidents(new Incident[] {MockProvider.createMockIncident()});
 
     instance.setChildActivityInstances(new ActivityInstance[]{childActivity});
     instance.setChildTransitionInstances(new TransitionInstance[]{childTransition});

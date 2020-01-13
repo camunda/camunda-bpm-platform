@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-bom</artifactId>
-    <version>7.12.0</version>
+    <version>7.13.0-SNAPSHOT</version>
     <relativePath>../bom</relativePath>
   </parent>
 
@@ -39,11 +39,8 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly8>8.2.1.Final</version.wildfly8>
     <version.wildfly>18.0.0.Final</version.wildfly>
     <version.wildfly.core>10.0.0.Final</version.wildfly.core>
-
-    <version.glassfish>3.1.2</version.glassfish>
 
     <!-- This version is mirrored in the external task client.
     If you change it here, also change it there -->
@@ -54,8 +51,6 @@
     <version.selenium>2.45.0</version.selenium>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
-
-    <version.java.wildfly>1.8</version.java.wildfly>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -119,10 +114,10 @@
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
       </dependency>
-	  <dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
-		<artifactId>commons-lang3</artifactId>
-		<version>3.8.1</version>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.8.1</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -230,6 +225,11 @@
         <artifactId>hamcrest-library</artifactId>
         <scope>test</scope>
         <version>1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.6.2</version>
       </dependency>
 
       <dependency>
@@ -467,7 +467,7 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-XX:MaxPermSize=160m -Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -500,7 +500,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>2.2</version>
+          <version>3.2.1</version>
           <configuration>
             <createSourcesJar>true</createSourcesJar>
           </configuration>

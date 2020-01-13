@@ -16,14 +16,14 @@
  */
 package org.camunda.spin.plugin.variables;
 
+import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Tassilo Weidner

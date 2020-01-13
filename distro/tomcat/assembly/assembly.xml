@@ -143,11 +143,11 @@
     </file>
       
     <file>
-      <source>src/tomcat6/setenv.bat</source>
+      <source>src/tomcat/setenv.bat</source>
       <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
     </file>
     <file>
-      <source>src/tomcat6/setenv.sh</source>
+      <source>src/tomcat/setenv.sh</source>
       <outputDirectory>server/apache-tomcat-${version.tomcat}/bin/</outputDirectory>
     </file>
   </files>

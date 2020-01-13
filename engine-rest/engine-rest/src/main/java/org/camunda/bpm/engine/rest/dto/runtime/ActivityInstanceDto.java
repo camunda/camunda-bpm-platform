@@ -37,6 +37,7 @@ public class ActivityInstanceDto {
   protected String[] executionIds;
   protected String activityName;
   protected String[] incidentIds;
+  protected ActivityInstanceIncidentDto[] incidents;
 
   /** The id of the activity instance */
   public String getId() {
@@ -101,6 +102,10 @@ public class ActivityInstanceDto {
     return incidentIds;
   }
 
+  public ActivityInstanceIncidentDto[] getIncidents() {
+    return incidents;
+  }
+
   public static ActivityInstanceDto fromActivityInstance(ActivityInstance instance) {
     ActivityInstanceDto result = new ActivityInstanceDto();
     result.id = instance.getId();
@@ -114,6 +119,7 @@ public class ActivityInstanceDto {
     result.executionIds = instance.getExecutionIds();
     result.activityName = instance.getActivityName();
     result.incidentIds = instance.getIncidentIds();
+    result.incidents = ActivityInstanceIncidentDto.fromIncidents(instance.getIncidents());
     return result;
   }
 

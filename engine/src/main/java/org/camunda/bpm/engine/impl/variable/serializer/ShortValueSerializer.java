@@ -35,7 +35,7 @@ public class ShortValueSerializer extends PrimitiveValueSerializer<ShortValue> {
     return Variables.shortValue((Short) untypedValue.getValue(), untypedValue.isTransient());
   }
 
-  public ShortValue readValue(ValueFields valueFields) {
+  public ShortValue readValue(ValueFields valueFields, boolean asTransientValue) {
     Long longValue = valueFields.getLongValue();
     Short shortValue = null;
 
@@ -43,7 +43,7 @@ public class ShortValueSerializer extends PrimitiveValueSerializer<ShortValue> {
       shortValue = Short.valueOf(longValue.shortValue());
     }
 
-    return Variables.shortValue(shortValue);
+    return Variables.shortValue(shortValue, asTransientValue);
   }
 
   public void writeValue(ShortValue value, ValueFields valueFields) {

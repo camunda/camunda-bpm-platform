@@ -583,7 +583,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
-  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
 
     // remove Jobs
     if (preserveScope) {
@@ -595,7 +595,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     removeTasks(reason);
 
-    super.interrupt(reason, skipCustomListeners, skipIoMappings);
+    super.interrupt(reason, skipCustomListeners, skipIoMappings, externallyTerminated);
   }
 
   protected void removeActivityJobs(String reason) {

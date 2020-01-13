@@ -133,7 +133,7 @@
       WHERE TYPE_ = 2
       AND (
         USER_ID_ IN (#{userId, jdbcType=VARCHAR}, '*')
-        <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+        <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
         OR GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item, jdbcType=VARCHAR}</foreach>
         </if>
       )
@@ -216,13 +216,13 @@
 
   <select id="isUserAuthorizedForResource" resultType="integer">
 
-  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
     SELECT
   </if>
 
   <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
 
-  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
     ${dbSpecificDummyTable}
   </if>
 
@@ -328,7 +328,7 @@
           (
           SELECT
             CASE
-              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+              <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
 
                 <!-- Group GRANTS -->
                 <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
@@ -527,7 +527,7 @@
                             null
                           </if>
 
-              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+              <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
                         END ${dbSpecificDummyTable}
                 )
               </if>
@@ -555,7 +555,7 @@
           </when> 
           <otherwise>
             AUTH.RESOURCE_ID_ IS NOT NULL 
-            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size() > 0"> 
+            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">
                 <if test="index > 0">
@@ -616,11 +616,11 @@
     FROM ${prefix}ACT_RU_AUTHORIZATION A
     WHERE A.TYPE_ &lt; 2     
     AND ( A.USER_ID_ in ( #{authCheck.authUserId, jdbcType=VARCHAR}, '*')           
-    <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+    <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
       OR A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
     </if>
     )
-    <if test="atomicChecks != null &amp;&amp; atomicChecks.size() > 0">
+    <if test="atomicChecks != null &amp;&amp; atomicChecks.size > 0">
       AND (
       <if test="disjunctive">
         <foreach item="permCheck" index="index" collection="atomicChecks" open="(" separator="OR" close=")">
@@ -641,14 +641,14 @@
    input: "permissionChecks": an instance of CompositePermissionCheck
   -->
   <sql id="atomicChecks">
-    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() == 1">
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size == 1">
 
       <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
 
     </if>
 
-    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
       <if test="permissionChecks.disjunctive">
         <bind name="atomicChecks" value="permissionChecks.atomicChecks" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveAtomicChecks" />
@@ -664,7 +664,7 @@
    input: "permissionChecks": an instance of CompositePermissionCheck
   -->
   <sql id="compositeChecks">
-    <if test="permissionChecks.compositeChecks != null &amp;&amp; permissionChecks.compositeChecks.size() > 1">
+    <if test="permissionChecks.compositeChecks != null &amp;&amp; permissionChecks.compositeChecks.size > 1">
       <if test="permissionChecks.disjunctive">
         <bind name="compositeChecks" value="permissionChecks.compositeChecks" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveCompositeChecks"/>
@@ -776,7 +776,7 @@
           (RES.CASE_EXECUTION_ID_ IS NOT NULL)
           OR
           (AUTH.RESOURCE_ID_ IS NOT NULL)
-            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size() > 0"> 
+            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">
                 <if test="index > 0">

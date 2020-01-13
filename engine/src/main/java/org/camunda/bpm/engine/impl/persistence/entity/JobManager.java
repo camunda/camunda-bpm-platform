@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.*;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -167,26 +168,30 @@ public class JobManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<AcquirableJobEntity> findNextJobsToExecute(Page page) {
-    Map<String,Object> params = new HashMap<String, Object>();
+    ProcessEngineConfigurationImpl engineConfiguration = Context.getProcessEngineConfiguration();
+
+    Map<String,Object> params = new HashMap<>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
     params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
-    params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
-    if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
-      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+    params.put("deploymentAware", engineConfiguration.isJobExecutorDeploymentAware());
+    if (engineConfiguration.isJobExecutorDeploymentAware()) {
+      Set<String> registeredDeployments = engineConfiguration.getRegisteredDeployments();
       if (!registeredDeployments.isEmpty()) {
         params.put("deploymentIds", registeredDeployments);
       }
     }
 
-    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
-    if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByPriority()) {
+    params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
+
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
+    if (engineConfiguration.isJobExecutorAcquireByPriority()) {
       orderingProperties.add(JOB_PRIORITY_ORDERING_PROPERTY);
     }
-    if (Context.getProcessEngineConfiguration().isJobExecutorPreferTimerJobs()) {
+    if (engineConfiguration.isJobExecutorPreferTimerJobs()) {
       orderingProperties.add(JOB_TYPE_ORDERING_PROPERTY);
     }
-    if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByDueDate()) {
+    if (engineConfiguration.isJobExecutorAcquireByDueDate()) {
       orderingProperties.add(JOB_DUEDATE_ORDERING_PROPERTY);
     }
 

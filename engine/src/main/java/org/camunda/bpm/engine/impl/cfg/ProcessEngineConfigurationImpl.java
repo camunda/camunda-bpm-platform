@@ -182,6 +182,9 @@ import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
+import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
+import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -232,7 +235,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelp
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
-import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
+import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -630,7 +633,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
+  /**
+   * As an instance of {@link org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler}
+   * it contains all the provided history event handlers that process history events.
+   */
   protected HistoryEventHandler historyEventHandler;
+
+  /**
+   *  Allows users to add additional {@link HistoryEventHandler}
+   *  instances to process history events.
+   */
+  protected List<HistoryEventHandler> customHistoryEventHandlers = new ArrayList<>();
+
+  /**
+   * If true, the default {@link DbHistoryEventHandler} will be included in the list
+   * of history event handlers.
+   */
+  protected boolean enableDefaultDbHistoryEventHandler = true;
 
   protected PermissionProvider permissionProvider;
 
@@ -678,6 +697,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDbMetricsReporterActivate = true;
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
+
+  /**
+   * the historic job log host name
+   */
+  protected String hostname;
+  protected HostnameProvider hostnameProvider;
 
   /**
    * handling of expressions submitted via API; can be used as guards against remote code execution
@@ -786,6 +811,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private boolean historyCleanupMetricsEnabled = true;
 
+  /**
+   * Controls whether engine participates in history cleanup or not.
+   */
+  protected boolean historyCleanupEnabled = true;
+
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   protected String failedJobRetryTimeCycle;
@@ -867,6 +897,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentHandlerFactory();
     initResourceAuthorizationProvider();
     initPermissionProvider();
+    initHostName();
     initMetrics();
     initMigration();
     initCommandCheckers();
@@ -2069,10 +2100,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initMetrics() {
     if (isMetricsEnabled) {
 
-      if (metricsReporterIdProvider == null) {
-        metricsReporterIdProvider = new SimpleIpBasedProvider();
-      }
-
       if (metricsRegistry == null) {
         metricsRegistry = new MetricsRegistry();
       }
@@ -2082,6 +2109,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (dbMetricsReporter == null) {
         dbMetricsReporter = new DbMetricsReporter(metricsRegistry, commandExecutorTxRequired);
       }
+    }
+  }
+
+  protected void initHostName() {
+    if (hostname == null) {
+      if (hostnameProvider == null) {
+        hostnameProvider = new SimpleIpBasedProvider();
+      }
+      hostname = hostnameProvider.getHostname(this);
     }
   }
 
@@ -2371,7 +2407,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initHistoryEventHandler() {
     if (historyEventHandler == null) {
-      historyEventHandler = new DbHistoryEventHandler();
+      if (enableDefaultDbHistoryEventHandler) {
+        historyEventHandler = new CompositeDbHistoryEventHandler(customHistoryEventHandlers);
+      } else {
+        historyEventHandler = new CompositeHistoryEventHandler(customHistoryEventHandlers);
+      }
     }
   }
 
@@ -3372,6 +3412,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return historyEventHandler;
   }
 
+  public boolean isEnableDefaultDbHistoryEventHandler() {
+    return enableDefaultDbHistoryEventHandler;
+  }
+
+  public void setEnableDefaultDbHistoryEventHandler(boolean enableDefaultDbHistoryEventHandler) {
+    this.enableDefaultDbHistoryEventHandler = enableDefaultDbHistoryEventHandler;
+  }
+
+  public List<HistoryEventHandler> getCustomHistoryEventHandlers() {
+    return customHistoryEventHandlers;
+  }
+
+  public void setCustomHistoryEventHandlers(List<HistoryEventHandler> customHistoryEventHandlers) {
+    this.customHistoryEventHandlers = customHistoryEventHandlers;
+  }
+
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
@@ -3812,12 +3868,39 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  /**
+   * @deprecated use {@link #getHostnameProvider()} instead.
+   */
+  @Deprecated
   public MetricsReporterIdProvider getMetricsReporterIdProvider() {
     return metricsReporterIdProvider;
   }
 
-  public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
+  /**
+   * @deprecated use {@link #setHostnameProvider(HostnameProvider)} instead.
+   */
+  @Deprecated
+  public ProcessEngineConfigurationImpl setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+    return this;
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public ProcessEngineConfigurationImpl setHostname(String hostname) {
+    this.hostname = hostname;
+    return this;
+  }
+
+  public HostnameProvider getHostnameProvider() {
+    return hostnameProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setHostnameProvider(HostnameProvider hostnameProvider) {
+    this.hostnameProvider = hostnameProvider;
+    return this;
   }
 
   public boolean isEnableScriptEngineCaching() {
@@ -4232,6 +4315,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
+  }
+
+  public boolean isHistoryCleanupEnabled() {
+    return historyCleanupEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupEnabled(boolean historyCleanupEnabled) {
+    this.historyCleanupEnabled = historyCleanupEnabled;
+    return this;
   }
 
   public String getHistoryTimeToLive() {

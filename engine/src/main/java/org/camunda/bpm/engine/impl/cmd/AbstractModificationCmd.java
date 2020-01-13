@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-public abstract class AbstractModificationCmd<T> implements Command<T> {
+public abstract class AbstractModificationCmd <T> implements Command<T> {
 
   protected ModificationBuilderImpl builder;
 
@@ -39,7 +39,7 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
     this.builder = modificationBuilderImpl;
   }
 
-  protected Collection<String> collectProcessInstanceIds(CommandContext commandContext) {
+  protected Collection<String> collectProcessInstanceIds() {
 
     Set<String> collectedProcessInstanceIds = new HashSet<String>();
 

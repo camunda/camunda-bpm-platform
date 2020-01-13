@@ -1859,7 +1859,46 @@ public class RuntimeServiceTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testActivityInstanceNoIncident() {
+  public void testActivityInstanceNoIncidents() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    // when
+    assertNotNull(tree);
+
+    Incident[] incidents = tree.getActivityInstances("theTask")[0].getIncidents();
+
+    // then
+    assertEquals(0, incidents.length);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceIncidents() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).active().singleResult().getId();
+    Incident incident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // assume
+    assertThat(tree).hasTotalIncidents(1);
+
+    Incident[] incidents = tree.getActivityInstances("theTask")[0].getIncidents();
+
+    // then
+    assertEquals(1, incidents.length);
+    assertEquals(incident, incidents[0]);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceNoIncidentIds() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1874,7 +1913,7 @@ public class RuntimeServiceTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testActivityInstanceIncident() {
+  public void testActivityInstanceIncidentIds() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).active().singleResult().getId();
