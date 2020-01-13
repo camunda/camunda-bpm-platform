@@ -7,6 +7,9 @@ import org.camunda.spin.xml.{SpinXmlAttribute, SpinXmlElement, SpinXmlNode}
 
 import scala.jdk.CollectionConverters._
 
+/**
+  * Transform objects from Camunda Spin JSON/XML into FEEL types.
+  */
 class CamundaSpinValueMapper extends CustomValueMapper {
 
   override def toVal(x: Any, innerValueMapper: Any => Val): Option[Val] =
