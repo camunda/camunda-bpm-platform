@@ -9,7 +9,7 @@ Add the dependency to your project:
 ```xml
 <dependency>
   <groupId>org.camunda.bpm.extension.feel.scala</groupId>
-  <artifactId>camunda-spin</artifactId>
+  <artifactId>feel-camunda-spin</artifactId>
   <version>${VERSION}</version>
 </dependency>
 ```
