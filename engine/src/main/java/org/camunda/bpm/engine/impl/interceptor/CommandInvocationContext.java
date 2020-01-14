@@ -48,11 +48,11 @@ public class CommandInvocationContext {
   protected boolean isExecuting = false;
   protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
   protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
-  protected ProcessDataLoggingContext processDataContext;
+  protected ProcessDataContext processDataContext;
 
   public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration) {
     this.command = command;
-    this.processDataContext = new ProcessDataLoggingContext(configuration);
+    this.processDataContext = new ProcessDataContext(configuration);
   }
 
   public Throwable getThrowable() {
@@ -159,7 +159,7 @@ public class CommandInvocationContext {
     }
   }
 
-  public ProcessDataLoggingContext getProcessDataContext() {
+  public ProcessDataContext getProcessDataContext() {
     return processDataContext;
   }
 }

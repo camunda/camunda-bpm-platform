@@ -50,7 +50,7 @@ import org.camunda.commons.logging.MdcAccess;
  * <li>loggingContextTenantId - the context property for the tenant id</li>
  * </ul>
  */
-public class ProcessDataLoggingContext {
+public class ProcessDataContext {
 
   private static final String NULL_VALUE = "~NULL_VALUE~";
 
@@ -72,7 +72,7 @@ public class ProcessDataLoggingContext {
   private boolean startNewSection = false;
   private Deque<List<String>> sections = new ArrayDeque<>();
 
-  public ProcessDataLoggingContext(ProcessEngineConfigurationImpl configuration) {
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcPropertyNames.add(mdcPropertyActivityId);

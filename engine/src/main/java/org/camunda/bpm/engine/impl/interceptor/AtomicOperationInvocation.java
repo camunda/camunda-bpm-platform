@@ -54,7 +54,7 @@ public class AtomicOperationInvocation {
     this.performAsync = performAsync;
   }
 
-  public void execute(BpmnStackTrace stackTrace, ProcessDataLoggingContext processDataContext) {
+  public void execute(BpmnStackTrace stackTrace, ProcessDataContext processDataContext) {
 
     if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE

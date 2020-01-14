@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.ProcessDataLoggingContext;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
@@ -110,7 +110,7 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
       job.execute(commandContext);
 
     } catch (Throwable t) {
-      jobFailureCollector.setFailedActivityId(Context.getCommandInvocationContext().getProcessDataContext().getLatestPropertyValue(ProcessDataLoggingContext.PROPERTY_ACTIVITY_ID));
+      jobFailureCollector.setFailedActivityId(Context.getCommandInvocationContext().getProcessDataContext().getLatestPropertyValue(ProcessDataContext.PROPERTY_ACTIVITY_ID));
       throw t;
     } finally {
       if (jobExecutorContext != null) {
