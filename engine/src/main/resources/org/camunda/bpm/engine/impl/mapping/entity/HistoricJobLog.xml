@@ -38,6 +38,7 @@
             JOB_DEF_TYPE_,
             JOB_DEF_CONFIGURATION_,
             ACT_ID_,
+            FAILED_ACT_ID_,
             EXECUTION_ID_,
             ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
@@ -62,6 +63,7 @@
             #{jobDefinitionType, jdbcType=VARCHAR},
             #{jobDefinitionConfiguration, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
+            #{lastFailingActivityId, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
             #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -227,6 +229,7 @@
     <result property="jobDefinitionType" column="JOB_DEF_TYPE_" jdbcType="VARCHAR" />
     <result property="jobDefinitionConfiguration" column="JOB_DEF_CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="lastFailingActivityId" column="FAILED_ACT_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
