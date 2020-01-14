@@ -4815,12 +4815,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
   public void testQueryByProcessInstanceIdIn() {
-    // given
+    // given three process instances
     String instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
     String instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
-    runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    // when
+    // when filter for two of them and non existing one
     List<Task> tasks = taskService.createTaskQuery().processInstanceIdIn(instance1, instance2, "nonexisting").list();
 
     // then
