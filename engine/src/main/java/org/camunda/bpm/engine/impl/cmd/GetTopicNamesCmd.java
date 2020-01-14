@@ -26,7 +26,7 @@ public class GetTopicNamesCmd implements Command<List<String>>, Serializable {
     //todo: note that ordering by default is process id [asc]
     @Override
     public List<String> execute(CommandContext commandContext) {
-        if (externalTaskQuery == null) throw new NullPointerException();
+        if (externalTaskQuery == null) throw new NullPointerException("ExternalTasKQuery cannot be null.");
         else {
             ExternalTaskQueryImpl impl = (ExternalTaskQueryImpl) externalTaskQuery;
             commandContext.getAuthorizationManager().configureExternalTaskQuery(impl);
