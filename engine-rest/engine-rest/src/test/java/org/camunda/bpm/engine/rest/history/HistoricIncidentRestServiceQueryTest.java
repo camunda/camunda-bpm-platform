@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -368,6 +367,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     String returnedIncidentType = from(content).getString("[0].incidentType");
     String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedLastFailingActivityId = from(content).getString("[0].lastFailingActivityId");
     String returnedCauseIncidentId = from(content).getString("[0].causeIncidentId");
     String returnedRootCauseIncidentId = from(content).getString("[0].rootCauseIncidentId");
     String returnedConfiguration = from(content).getString("[0].configuration");
@@ -389,6 +389,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_TYPE, returnedIncidentType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_FAILING_ACTIVITY_ID, returnedLastFailingActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID, returnedCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID, returnedRootCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_CONFIGURATION, returnedConfiguration);

@@ -481,6 +481,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
     String returnedJobDefinitionConfiguration = from(content).getString("[0].jobDefinitionConfiguration");
     String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedLastFailingActivityId = from(content).getString("[0].lastFailingActivityId");
     String returnedExecutionId = from(content).getString("[0].executionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
@@ -505,6 +506,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG, returnedJobDefinitionConfiguration);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_FAILING_ACTIVITY_ID, returnedLastFailingActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID, returnedProcessDefinitionId);
