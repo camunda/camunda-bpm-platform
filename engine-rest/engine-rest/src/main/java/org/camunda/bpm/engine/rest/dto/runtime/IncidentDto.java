@@ -34,6 +34,7 @@ public class IncidentDto {
   protected Date incidentTimestamp;
   protected String incidentType;
   protected String activityId;
+  protected String lastFailingActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -67,6 +68,10 @@ public class IncidentDto {
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public String getLastFailingActivityId() {
+    return lastFailingActivityId;
   }
 
   public String getCauseIncidentId() {
@@ -103,6 +108,7 @@ public class IncidentDto {
     dto.incidentTimestamp = incident.getIncidentTimestamp();
     dto.incidentType = incident.getIncidentType();
     dto.activityId = incident.getActivityId();
+    dto.lastFailingActivityId = incident.getLastFailingActivityId();
     dto.causeIncidentId = incident.getCauseIncidentId();
     dto.rootCauseIncidentId = incident.getRootCauseIncidentId();
     dto.configuration = incident.getConfiguration();

@@ -324,7 +324,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSimpleHistoricTaskInstanceQuery() {
+  public void testSimpleIncidentQuery() {
     Response response = given()
       .then()
         .expect()
@@ -347,6 +347,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     Date returnedIncidentTimestamp = DateTimeUtil.parseDate(from(content).getString("[0].incidentTimestamp"));
     String returnedIncidentType = from(content).getString("[0].incidentType");
     String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedLastFailingActivityId = from(content).getString("[0].lastFailingActivityId");
     String returnedCauseIncidentId = from(content).getString("[0].causeIncidentId");
     String returnedRootCauseIncidentId = from(content).getString("[0].rootCauseIncidentId");
     String returnedConfiguration = from(content).getString("[0].configuration");
@@ -361,6 +362,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_DEF_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_TYPE, returnedIncidentType);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_FAILING_ACTIVITY_ID, returnedLastFailingActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_CAUSE_INCIDENT_ID, returnedCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID, returnedRootCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_CONFIGURATION, returnedConfiguration);

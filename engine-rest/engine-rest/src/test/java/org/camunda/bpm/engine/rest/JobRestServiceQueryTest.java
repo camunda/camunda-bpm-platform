@@ -153,6 +153,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedExecutionId = from(content).getString("[0].executionId");
     String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
+    String returnedLastFailingActivityId = from(content).getString("[0].lastFailingActivityId");
     int returnedRetries = from(content).getInt("[0].retries");
     Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
     boolean returnedSuspended = from(content).getBoolean("[0].suspended");
@@ -167,6 +168,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_FAILING_ACTIVITY_ID, returnedLastFailingActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_DUE_DATE), returnedDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
