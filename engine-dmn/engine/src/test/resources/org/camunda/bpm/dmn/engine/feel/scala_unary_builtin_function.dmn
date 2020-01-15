@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.2.1">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable">
+      <input id="inputClause">
+        <inputExpression id="inputExpression" typeRef="integer">
+          <text>integerString</text>
+        </inputExpression>
+      </input>
+      <output id="outputClause" name="integerResult" typeRef="integer" />
+      <rule id="rule">
+        <inputEntry id="inputEntry">
+          <text>number(integerString)</text>
+        </inputEntry>
+        <outputEntry id="outputEntry">
+          <text>integerString</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
