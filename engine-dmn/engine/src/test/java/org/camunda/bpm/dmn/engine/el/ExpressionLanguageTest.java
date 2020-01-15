@@ -39,6 +39,7 @@ import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -220,6 +221,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     verify(scriptEngineResolver).getScriptEngineForLanguage("javascript");
   }
 
+  @Ignore("CAM-11317")
   @Test
   @DecisionResource(resource = EMPTY_EXPRESSIONS_DMN, decisionKey = "decision2")
   public void testFailFeelUseOfEmptyInputExpression() {
