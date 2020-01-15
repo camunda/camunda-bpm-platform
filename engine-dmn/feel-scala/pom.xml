@@ -2,30 +2,31 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda.bpm.extension.feel.scala</groupId>
-    <artifactId>feel-scala-root</artifactId>
-    <version>1.11.0-SNAPSHOT</version>
+    <groupId>org.camunda.bpm.dmn</groupId>
+    <artifactId>camunda-engine-dmn-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>feel-engine-factory</artifactId>
+  <artifactId>camunda-engine-feel-scala</artifactId>
 
-  <name>FEEL Scala Engine Factory</name>
+  <name>FEEL Scala Engine Integration</name>
 
   <dependencies>
+
     <dependency>
       <groupId>org.camunda.bpm.extension.feel.scala</groupId>
       <artifactId>feel-engine</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-engine-dmn</artifactId>
       <scope>provided</scope>
     </dependency>
 
