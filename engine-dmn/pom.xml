@@ -47,6 +47,8 @@
     <module>engine</module>
     <module>feel-api</module>
     <module>feel-juel</module>
+    <module>feel-scala</module>
+    <module>feel-spin</module>
   </modules>
 
   <build>
