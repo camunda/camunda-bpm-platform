@@ -8,9 +8,11 @@
         <groupId>org.camunda.bpm.rest-distro</groupId>
         <artifactId>rest-distro-root</artifactId>
         <version>1.0-SNAPSHOT</version>
+		<relativePath>../../</relativePath>
     </parent>
 
     <artifactId>camunda-bpm-rest-distro</artifactId>
+	<name>camunda BPM Rest Distro</name>
     <packaging>pom</packaging>
 
     <dependencies>

@@ -11,12 +11,12 @@
     </parent>
 
     <artifactId>camunda-rest-distro-modules</artifactId>
-    <name>camunda BPM - Rest Distro Modules</name>
+    <name>camunda BPM Rest Distro - Modules</name>
     <packaging>pom</packaging>
 
     <properties>
         <version.spring.boot>2.1.6.RELEASE</version.spring.boot>
-        <version.camunda.spring.boot.starter>3.3.3</version.camunda.spring.boot.starter>
+        <version.camunda.spring.boot.starter>3.4.0</version.camunda.spring.boot.starter>
     </properties>
 
     <!-- ADD Spring Boot pom -->
@@ -72,7 +72,8 @@
 
     <modules>
         <module>rest</module>
-        <module>webapps</module>
+        <module>webapps/community</module>
+        <module>webapps/enterprise</module>
     </modules>
 
 </project>
