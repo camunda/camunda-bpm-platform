@@ -16,6 +16,10 @@
 
   <properties>
     <version.juel>2.2.7</version.juel>
+    <version.scala>2.13.0</version.scala>
+    <version.scalatest>3.0.8</version.scalatest>
+    <version.feel-scala>1.11.0-SNAPSHOT</version.feel-scala>
+    <version.log4j>2.9.0</version.log4j>
   </properties>
 
   <dependencyManagement>
@@ -39,6 +43,36 @@
         <version>${version.juel}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+        <artifactId>feel-engine</artifactId>
+        <version>${version.feel-scala}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest_2.13</artifactId>
+        <version>${version.scalatest}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -47,6 +81,8 @@
     <module>engine</module>
     <module>feel-api</module>
     <module>feel-juel</module>
+    <module>feel-scala</module>
+    <module>feel-spin</module>
   </modules>
 
   <build>
@@ -58,6 +94,11 @@
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest-maven-plugin</artifactId>
+          <version>1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
