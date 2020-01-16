@@ -26,11 +26,13 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.el.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.el.JuelElProvider;
+import org.camunda.bpm.dmn.engine.impl.feel.scala.transformer.FeelDataTypeTransformerRegistry;
 import org.camunda.bpm.dmn.engine.impl.metrics.DefaultEngineMetricCollector;
 import org.camunda.bpm.dmn.engine.impl.metrics.DmnEngineMetricCollectorWrapper;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformerRegistry;
 import org.camunda.bpm.dmn.engine.impl.transform.DefaultDmnTransformer;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
@@ -140,6 +142,11 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   }
 
   protected void initFeelEngine() {
+    DmnDataTypeTransformerRegistry dataTypeTransformerRegistry =
+      transformer.getDataTypeTransformerRegistry();
+
+    FeelDataTypeTransformerRegistry.registerBy(dataTypeTransformerRegistry);
+
     if (feelEngineFactory == null) {
       feelEngineFactory = new CamundaFeelEngineFactory();
     }
