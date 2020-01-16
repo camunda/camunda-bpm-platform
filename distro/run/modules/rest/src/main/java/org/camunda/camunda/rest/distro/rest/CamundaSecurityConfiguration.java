@@ -21,8 +21,8 @@ public class CamundaSecurityConfiguration {
   CamundaRestDistroProperties camundaRestDistroProperties;
 
   @Bean
-  public FilterRegistrationBean processEngineAuthenticationFilter() {
-    FilterRegistrationBean registration = new FilterRegistrationBean();
+  public FilterRegistrationBean<Filter> processEngineAuthenticationFilter() {
+    FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
     registration.setName("camunda-auth");
     registration.setFilter(getProcessEngineAuthenticationFilter());
     registration.addUrlPatterns("/rest/*");
