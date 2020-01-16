@@ -23,6 +23,7 @@ import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.feel.integration.CamundaFeelEngineFactory;
 import org.junit.Rule;
@@ -33,7 +34,7 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ScalaFeelBehaviorTest extends DmnEngineTest {
+public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -45,19 +46,17 @@ public class ScalaFeelBehaviorTest extends DmnEngineTest {
     return configuration;
   }
 
-  /**
-   * Works with the Java FEEL engine because it ignores the time zone
-   * when processing the time zoned-String in the expression for the resulting
-   * Java Util Date
-   *
-   * Also works in the Scala FEEL engine because Java Util Dates (the input variable)
-   * get a time zone attached there and the time zone is respected for the expression
-   * string
-   *
-   * THIS MIGHT BREAK when we change the transformation behavior
-   * in the Scala FEEL engine to not attach time zone information to
-   * Java Util Dates
-   */
+  @Test
+  @DecisionResource(resource = "FeelLegacy_equals_boolean.dmn")
+  public void shouldEqualBoolean() {
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
+    DmnEngine engine = configuration.buildEngine();
+
+    DmnDecisionResult decisionResult = engine.evaluateDecision(decision, Variables.createVariables());
+
+    assertThat((String)decisionResult.getSingleEntry()).isEqualTo("foo");
+  }
+
   @Test
   @DecisionResource(resource = "FeelLegacy_compareDate_withTimeZone_non_typed.dmn")
   public void shouldEvaluateTimezoneComparisonWithTypedValue() {
@@ -92,13 +91,44 @@ public class ScalaFeelBehaviorTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = "FeelLegacy_SingleQuotes.dmn")
   public void shouldUseSingleQuotesInStringLiterals() {
+    // given
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
+    DmnEngine engine = configuration.buildEngine();
+
+    // then
+    thrown.expect(FeelException.class);
+    thrown.expectMessage("failed to parse expression ''Hello World'': [1.1] failure: '-' expected but ''' found");
+
+    // when
+    engine.evaluateDecision(decision, Variables.createVariables().putValue("input", "Hello World"));
+  }
+
+  /* TODO move to feel-scala-spin artifact
+  @Ignore("SPIN handling has changed")
+  @Test
+  @DecisionResource(resource = "FeelLegacy_SPIN.dmn")
+  public void shouldHandleSpinCorrectly() {
     DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
     DmnEngine engine = configuration.buildEngine();
 
     DmnDecisionResult decisionResult = engine.evaluateDecision(decision,
-      Variables.createVariables().putValue("input", "Hello World"));
+        Variables.createVariables()
+            .putValue("foo", Spin.JSON("{ \"foo\": 7}")));
 
     assertThat((String)decisionResult.getSingleEntry()).isEqualTo("foo");
   }
+
+  @Test
+  @DecisionResource(resource = "FeelLegacy_SPIN_Context.dmn")
+  public void shouldUseContextConversionForSpinValue() {
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
+    DmnEngine engine = configuration.buildEngine();
+
+    DmnDecisionResult decisionResult = engine.evaluateDecision(decision,
+        Variables.createVariables()
+            .putValue("foo", Spin.JSON("{ \"bar\": 7}")));
+
+    assertThat((String)decisionResult.getSingleEntry()).isEqualTo("bar");
+  }*/
 
 }
