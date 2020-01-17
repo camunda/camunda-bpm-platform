@@ -22,30 +22,28 @@
 
     <files>
         <file>
-            <source>src/start.sh</source>
+            <source>src/application.yml</source>
+            <outputDirectory>config/</outputDirectory>
+        </file>
+        <file>
+            <source>../src/start.sh</source>
             <filtered>true</filtered>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>src/start.bat</source>
+            <source>../src/start.bat</source>
             <filtered>true</filtered>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>../../modules/rest/target/camunda-rest-distro-rest-${project.version}.jar
-            </source>
+            <source>../../modules/rest/target/camunda-rest-distro-rest-${project.version}.jar</source>
             <outputDirectory>lib/</outputDirectory>
         </file>
         <file>
-            <source>../../modules/webapps/community/target/camunda-rest-distro-webapps-${project.version}.jar
-            </source>
-            <outputDirectory>lib/webapps</outputDirectory>
-        </file>
-        <file>
-            <source>src/application.yml</source>
-            <outputDirectory>config/</outputDirectory>
+            <source>../../modules/webapps/community/target/camunda-rest-distro-webapps-${project.version}.jar</source>
+            <outputDirectory>lib/</outputDirectory>
         </file>
     </files>
 </assembly>
