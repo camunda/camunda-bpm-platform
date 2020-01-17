@@ -1,4 +1,4 @@
-package org.camunda.feel.integration
+package org.camunda.bpm.dmn.feel.impl.scala
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
@@ -37,5 +37,5 @@ class CamundaFeelEngineIntegrationTest extends FlatSpec with Matchers {
     camundaFeelEngine.evaluateSimpleExpression[Int]("a + 2", context) should be(4)
     camundaFeelEngine.evaluateSimpleExpression[Int]("a * 4", context) should be(8)
   }
-  
+
 }

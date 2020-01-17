@@ -1,10 +1,10 @@
-package org.camunda.feel.integration
+package org.camunda.bpm.dmn.feel.impl.scala
 
 import org.camunda.bpm.dmn.feel.impl.FeelException
 import org.camunda.bpm.engine.variable.context.VariableContext
-import org.camunda.feel.FeelEngine.UnaryTests
-import org.camunda.feel.interpreter._
-import org.camunda.feel.spi._
+import org.camunda.feel.impl.FeelEngine.UnaryTests
+import org.camunda.feel.impl.interpreter.VariableProvider
+import org.camunda.feel.impl.spi.{CustomContext, SpiServiceLoader}
 
 import scala.jdk.CollectionConverters._
 
@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
 class CamundaFeelEngine extends org.camunda.bpm.dmn.feel.impl.FeelEngine {
 
   private lazy val engine =
-    new org.camunda.feel.FeelEngine(
+    new org.camunda.feel.impl.FeelEngine(
       valueMapper = SpiServiceLoader.loadValueMapper,
       functionProvider = SpiServiceLoader.loadFunctionProvider
     )

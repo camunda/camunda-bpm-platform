@@ -38,6 +38,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.bpm.dmn</groupId>
+      <artifactId>camunda-engine-feel-scala</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>de.odysseus.juel</groupId>
       <artifactId>juel-api</artifactId>
     </dependency>
@@ -80,24 +85,6 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>2.13.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.extension.feel.scala</groupId>
-      <artifactId>feel-engine</artifactId>
-      <version>1.11.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.extension.feel.scala</groupId>
-      <artifactId>feel-engine-factory</artifactId>
-      <version>1.11.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>

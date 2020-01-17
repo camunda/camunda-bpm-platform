@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.dmn.engine.feel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Date;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
@@ -23,16 +27,12 @@ import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.feel.integration.CamundaFeelEngineFactory;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
 

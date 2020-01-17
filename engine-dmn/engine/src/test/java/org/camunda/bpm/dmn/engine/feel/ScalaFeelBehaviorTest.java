@@ -18,7 +18,7 @@ package org.camunda.bpm.dmn.engine.feel;
 
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
-import org.camunda.feel.integration.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
 
 public class ScalaFeelBehaviorTest extends FeelBehavior {
 
