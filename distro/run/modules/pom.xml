@@ -17,8 +17,6 @@
 
   <modules>
     <module>rest</module>
-    <module>webapps/community</module>
-    <module>webapps/enterprise</module>
   </modules>
 
   <dependencies>
@@ -60,5 +58,20 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>ce</id>
+      <modules>
+        <module>webapps/community</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>ee</id>
+      <modules>
+        <module>webapps/enterprise</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

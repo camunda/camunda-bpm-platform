@@ -15,11 +15,6 @@
   <name>camunda BPM Rest Distro - Modules</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>community</module>
-    <module>enterprise</module>
-  </modules>
-
   <dependencies>
 
     <dependency>
@@ -58,5 +53,20 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>ce</id>
+      <modules>
+        <module>community</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>ee</id>
+      <modules>
+        <module>enterprise</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

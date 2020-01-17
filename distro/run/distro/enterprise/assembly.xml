@@ -22,7 +22,7 @@
 
     <files>
         <file>
-            <source>src/application.yml</source>
+            <source>../src/application.yml</source>
             <outputDirectory>config/</outputDirectory>
         </file>
         <file>
