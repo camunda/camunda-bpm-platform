@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.interceptor.ProcessDataLoggingContext;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataContext;
 
 public class ExecuteJobHelper {
 
@@ -65,11 +65,11 @@ public class ExecuteJobHelper {
       throw LOG.wrapJobExecutionFailure(jobFailureCollector, exception);
     } finally {
       // preserve MDC properties before listener invocation and clear MDC for job listener
-      ProcessDataLoggingContext loggingContext = null;
+      ProcessDataContext processDataContext = null;
       if (configuration != null) {
-        loggingContext = new ProcessDataLoggingContext(configuration);
-        loggingContext.fetchCurrentContext();
-        loggingContext.clearMdc();
+        processDataContext = new ProcessDataContext(configuration);
+        processDataContext.fetchCurrentContext();
+        processDataContext.clearMdc();
       }
       // invoke job listener
       invokeJobListener(commandExecutor, jobFailureCollector);
@@ -78,8 +78,8 @@ public class ExecuteJobHelper {
        * in case of an exception in the listener the logging context
        * of the listener is preserved and used from here on
        */
-      if (loggingContext != null) {
-        loggingContext.update();
+      if (processDataContext != null) {
+        processDataContext.updateMdc();
       }
     }
   }
@@ -89,7 +89,7 @@ public class ExecuteJobHelper {
       if (jobFailureCollector.getFailure() != null) {
         // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
 
-        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
+        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector);
 
         OptimisticLockingException exception = callFailedJobListenerWithRetries(commandExecutor, failedJobListener);
         if (exception != null) {
@@ -126,8 +126,8 @@ public class ExecuteJobHelper {
   }
 
 
-  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, Throwable exception, String jobId) {
-    return new FailedJobListener(commandExecutor, jobId, exception);
+  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
+    return new FailedJobListener(commandExecutor, jobFailureCollector);
   }
 
   protected static SuccessfulJobListener createSuccessfulJobListener(CommandExecutor commandExecutor) {

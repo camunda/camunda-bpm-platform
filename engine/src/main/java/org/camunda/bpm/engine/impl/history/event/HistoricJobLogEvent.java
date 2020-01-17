@@ -53,6 +53,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String activityId;
 
+  protected String lastFailingActivityId;
+
   protected String deploymentId;
 
   protected int state;
@@ -224,4 +226,13 @@ public class HistoricJobLogEvent extends HistoryEvent {
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
+
+  public String getLastFailingActivityId() {
+    return lastFailingActivityId;
+  }
+
+  public void setLastFailingActivityId(String lastFailingActivityId) {
+    this.lastFailingActivityId = lastFailingActivityId;
+  }
+
 }

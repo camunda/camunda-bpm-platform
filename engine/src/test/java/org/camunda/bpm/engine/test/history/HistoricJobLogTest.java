@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -151,7 +152,7 @@ public class HistoricJobLogTest {
   public void testFailedHistoricJobLogProperties() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
+    JobEntity job = (JobEntity) managementService
         .createJobQuery()
         .singleResult();
 
@@ -161,6 +162,8 @@ public class HistoricJobLogTest {
     } catch (Exception e) {
       // expected
     }
+
+    job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
@@ -185,6 +188,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getJobExceptionMessage()).isEqualTo(FailingDelegate.EXCEPTION_MESSAGE);
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
     assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
+    assertThat(historicJob.getLastFailingActivityId()).isNotNull().isEqualTo(job.getLastFailingActivityId());
 
     assertThat(historicJob.isCreationLog()).isFalse();
     assertThat(historicJob.isFailureLog()).isTrue();

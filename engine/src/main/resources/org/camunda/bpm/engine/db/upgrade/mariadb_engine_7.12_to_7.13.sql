@@ -25,3 +25,16 @@ create index ACT_IDX_HI_VAR_PI_NAME_TYPE on ACT_HI_VARINST(PROC_INST_ID_, NAME_,
 -- https://app.camunda.com/jira/browse/CAM-10784
 ALTER TABLE ACT_HI_JOB_LOG
   ADD HOSTNAME_ varchar(255) default null;
+
+-- https://jira.camunda.com/browse/CAM-10378
+ALTER TABLE ACT_RU_JOB
+  ADD FAILED_ACT_ID_ varchar(255);
+
+ALTER TABLE ACT_HI_JOB_LOG
+  ADD FAILED_ACT_ID_ varchar(255);
+
+ALTER TABLE ACT_RU_INCIDENT
+  ADD FAILED_ACTIVITY_ID_ varchar(255);
+
+ALTER TABLE ACT_HI_INCIDENT
+  ADD FAILED_ACTIVITY_ID_ varchar(255);

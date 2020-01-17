@@ -34,6 +34,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
 public class IncidentTest extends PluggableProcessEngineTestCase {
@@ -55,6 +57,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, incident.getIncidentMessage());
     assertEquals(processInstance.getId(), incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
+    assertEquals("theServiceTask", incident.getLastFailingActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), incident.getProcessDefinitionId());
     assertEquals(incident.getId(), incident.getCauseIncidentId());
@@ -147,6 +150,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, incident.getIncidentMessage());
     assertEquals(executionIdOfNestedFailingExecution, incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
+    assertEquals("theServiceTask", incident.getLastFailingActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
     assertEquals(incident.getId(), incident.getCauseIncidentId());
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
@@ -184,6 +188,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, causeIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), causeIncident.getExecutionId());
     assertEquals("theServiceTask", causeIncident.getActivityId());
+    assertEquals("theServiceTask", causeIncident.getLastFailingActivityId());
     assertEquals(failingProcess.getId(), causeIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), causeIncident.getRootCauseIncidentId());
@@ -203,6 +208,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(recursiveCreatedIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), recursiveCreatedIncident.getExecutionId());
     assertEquals("theCallActivity", recursiveCreatedIncident.getActivityId());
+    assertEquals("theCallActivity", recursiveCreatedIncident.getLastFailingActivityId());
     assertEquals(processInstance.getId(), recursiveCreatedIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getRootCauseIncidentId());
@@ -238,6 +244,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, rootCauseIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), rootCauseIncident.getExecutionId());
     assertEquals("theServiceTask", rootCauseIncident.getActivityId());
+    assertEquals("theServiceTask", rootCauseIncident.getLastFailingActivityId());
     assertEquals(failingProcess.getId(), rootCauseIncident.getProcessInstanceId());
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getRootCauseIncidentId());
@@ -260,6 +267,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(causeIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), causeIncident.getExecutionId());
     assertEquals("theCallActivity", causeIncident.getActivityId());
+    assertEquals("theCallActivity", causeIncident.getLastFailingActivityId());
     assertEquals(callFailingProcess.getId(), causeIncident.getProcessInstanceId());
     assertEquals(rootCauseIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), causeIncident.getRootCauseIncidentId());
@@ -279,6 +287,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(topLevelIncident.getIncidentMessage());
     assertEquals(theCallingCallActivity.getId(), topLevelIncident.getExecutionId());
     assertEquals("theCallingCallActivity", topLevelIncident.getActivityId());
+    assertEquals("theCallingCallActivity", topLevelIncident.getLastFailingActivityId());
     assertEquals(processInstance.getId(), topLevelIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), topLevelIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), topLevelIncident.getRootCauseIncidentId());
@@ -503,6 +512,60 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals("theStart", incident.getActivityId());
     assertNull(incident.getProcessInstanceId());
     assertNull(incident.getExecutionId());
+  }
+
+  public void testShouldShowFailingActivityIdPropertyForFailingAsyncTask() {
+    // given
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("theTask")
+        .camundaAsyncBefore()
+        .camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+
+    // when
+    executeAvailableJobs();
+
+    // then
+    Incident incident = runtimeService
+       .createIncidentQuery()
+       .singleResult();
+
+     assertNotNull(incident);
+
+     assertNotNull(incident.getLastFailingActivityId());
+     assertEquals("theTask", incident.getLastFailingActivityId());
+  }
+
+  public void testShouldShowFailingActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
+    // given
+    deployment(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask("theTask")
+          .camundaAsyncBefore()
+          .camundaClass(ChangeVariablesDelegate.class)
+        .serviceTask("theTask2").camundaClass(ChangeVariablesDelegate.class)
+        .serviceTask("theTask3").camundaClass(FailingDelegate.class)
+        .endEvent()
+        .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+
+    // when
+    executeAvailableJobs();
+
+    // then
+    Incident incident = runtimeService
+       .createIncidentQuery()
+       .singleResult();
+
+     assertNotNull(incident);
+
+     assertNotNull(incident.getLastFailingActivityId());
+     assertEquals("theTask3", incident.getLastFailingActivityId());
   }
 
   public void testBoundaryEventIncidentActivityId() {
