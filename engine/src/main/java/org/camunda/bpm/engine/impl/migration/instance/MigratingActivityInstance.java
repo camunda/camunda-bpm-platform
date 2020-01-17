@@ -361,7 +361,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
       @Override
       public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-        return producer.createProcessInstanceUpdateEvt(execution);
+        return producer.createProcessInstanceMigrateEvt(execution);
       }
     });
   }
