@@ -52,25 +52,25 @@ import org.camunda.commons.logging.MdcAccess;
  */
 public class ProcessDataContext {
 
-  private static final String NULL_VALUE = "~NULL_VALUE~";
-
   public static final String PROPERTY_ACTIVITY_ID = "activityId";
 
-  private String mdcPropertyActivityId;
-  private String mdcPropertyApplicationName;
-  private String mdcPropertyBusinessKey;
-  private String mdcPropertyDefinitionId;
-  private String mdcPropertyInstanceId;
-  private String mdcPropertyTenantId;
+  protected static final String NULL_VALUE = "~NULL_VALUE~";
 
-  private List<String> mdcPropertyNames = new ArrayList<>();
-  private Map<String, String> basicToMdcPropertyNames = new HashMap<>();
-  private boolean handleMdc = false;
+  protected String mdcPropertyActivityId;
+  protected String mdcPropertyApplicationName;
+  protected String mdcPropertyBusinessKey;
+  protected String mdcPropertyDefinitionId;
+  protected String mdcPropertyInstanceId;
+  protected String mdcPropertyTenantId;
 
-  private Map<String, Deque<String>> propertyValues = new HashMap<>();
+  protected List<String> mdcPropertyNames = new ArrayList<>();
+  protected Map<String, String> basicToMdcPropertyNames = new HashMap<>();
+  protected boolean handleMdc = false;
 
-  private boolean startNewSection = false;
-  private Deque<List<String>> sections = new ArrayDeque<>();
+  protected Map<String, Deque<String>> propertyValues = new HashMap<>();
+
+  protected boolean startNewSection = false;
+  protected Deque<List<String>> sections = new ArrayDeque<>();
 
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
