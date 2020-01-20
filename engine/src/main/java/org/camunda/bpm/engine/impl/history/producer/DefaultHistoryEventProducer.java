@@ -366,7 +366,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
     evt.setHistoryConfiguration(incident.getHistoryConfiguration());
-    evt.setLastFailingActivityId(incident.getLastFailingActivityId());
+    evt.setFailedActivityId(incident.getFailedActivityId());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
@@ -1101,7 +1101,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     evt.setActivityId(jobEntity.getActivityId());
-    evt.setLastFailingActivityId(jobEntity.getLastFailingActivityId());
+    evt.setFailedActivityId(jobEntity.getFailedActivityId());
     evt.setExecutionId(jobEntity.getExecutionId());
     evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());

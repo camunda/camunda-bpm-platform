@@ -30,7 +30,7 @@ public class IncidentContext {
   protected String tenantId;
   protected String jobDefinitionId;
   protected String historyConfiguration;
-  protected String lastFailingActivityId;
+  protected String failedActivityId;
 
   public IncidentContext() {}
 
@@ -99,12 +99,12 @@ public class IncidentContext {
     this.historyConfiguration = historicConfiguration;
   }
 
-  public String getLastFailingActivityId() {
-    return lastFailingActivityId;
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
-  public void setLastFailingActivityId(String lastFailingActivityId) {
-    this.lastFailingActivityId = lastFailingActivityId;
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
   }
 
 }

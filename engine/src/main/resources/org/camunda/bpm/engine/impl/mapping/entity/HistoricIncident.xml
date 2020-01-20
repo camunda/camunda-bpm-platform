@@ -57,7 +57,7 @@
         #{incidentMessage, jdbcType=VARCHAR},
         #{incidentType, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
-        #{lastFailingActivityId ,jdbcType=VARCHAR},
+        #{failedActivityId ,jdbcType=VARCHAR},
         #{causeIncidentId ,jdbcType=VARCHAR},
         #{rootCauseIncidentId ,jdbcType=VARCHAR},
         #{configuration, jdbcType=VARCHAR},
@@ -84,7 +84,7 @@
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
-      FAILED_ACTIVITY_ID_ = #{lastFailingActivityId, jdbcType=VARCHAR},
+      FAILED_ACTIVITY_ID_ = #{failedActivityId, jdbcType=VARCHAR},
       JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     where
       ID_ = #{id, jdbcType=VARCHAR}
@@ -256,7 +256,7 @@
     <result property="incidentMessage" column="INCIDENT_MSG_" jdbcType="VARCHAR" />
     <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="lastFailingActivityId" column="FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="failedActivityId" column="FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />

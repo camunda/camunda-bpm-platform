@@ -97,7 +97,7 @@ public interface Incident {
   /**
    * Returns the id of the activity on which the last exception occurred.
    */
-  String getLastFailingActivityId();
+  String getFailedActivityId();
 
   /**
    * Returns the specific process instance on which this

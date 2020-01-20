@@ -459,7 +459,7 @@ public abstract class MockProvider {
   public static final int EXAMPLE_JOB_RETRIES = 3;
   public static final String EXAMPLE_JOB_NO_EXCEPTION_MESSAGE = "";
   public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
-  public static final String EXAMPLE_JOB_FAILING_ACTIVITY_ID = "aFailingJobActivityId";
+  public static final String EXAMPLE_JOB_FAILED_ACTIVITY_ID = "aFailedJobActivityId";
   public static final String EXAMPLE_EMPTY_JOB_ID = "";
   public static final String EXAMPLE_DUE_DATE =  withTimezone("2013-04-23T13:42:43");
   public static final Boolean EXAMPLE_WITH_RETRIES_LEFT = true;
@@ -669,7 +669,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_INCIDENT_ACTIVITY_ID = "anActivityId";
-  public static final String EXAMPLE_INCIDENT_FAILING_ACTIVITY_ID = "aFailingActivityId";
+  public static final String EXAMPLE_INCIDENT_FAILED_ACTIVITY_ID = "aFailedActivityId";
   public static final String EXAMPLE_INCIDENT_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_INCIDENT_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
@@ -688,7 +688,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_HIST_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_HIST_INCIDENT_ACTIVITY_ID = "anActivityId";
-  public static final String EXAMPLE_HIST_INCIDENT_FAILING_ACTIVITY_ID = "aFailingActivityId";
+  public static final String EXAMPLE_HIST_INCIDENT_FAILED_ACTIVITY_ID = "aFailedActivityId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY = "aProcDefKey";
@@ -808,7 +808,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE = "aJobDefType";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG = "aJobDefConfig";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID = "anActId";
-  public static final String EXAMPLE_HISTORIC_JOB_LOG_FAILING_ACTIVITY_ID = "aFailingActId";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_FAILED_ACTIVITY_ID = "aFailedActId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID = "anExecId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID = "aProcDefId";
@@ -1718,7 +1718,7 @@ public abstract class MockProvider {
       .priority(EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_JOB_CREATE_TIME))
-      .lastFailingActivityId(EXAMPLE_JOB_FAILING_ACTIVITY_ID);
+      .failedActivityId(EXAMPLE_JOB_FAILED_ACTIVITY_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -2449,7 +2449,7 @@ public abstract class MockProvider {
     when(incident.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
     when(incident.getExecutionId()).thenReturn(EXAMPLE_INCIDENT_EXECUTION_ID);
     when(incident.getActivityId()).thenReturn(EXAMPLE_INCIDENT_ACTIVITY_ID);
-    when(incident.getLastFailingActivityId()).thenReturn(EXAMPLE_INCIDENT_FAILING_ACTIVITY_ID);
+    when(incident.getFailedActivityId()).thenReturn(EXAMPLE_INCIDENT_FAILED_ACTIVITY_ID);
     when(incident.getProcessInstanceId()).thenReturn(EXAMPLE_INCIDENT_PROC_INST_ID);
     when(incident.getProcessDefinitionId()).thenReturn(EXAMPLE_INCIDENT_PROC_DEF_ID);
     when(incident.getCauseIncidentId()).thenReturn(EXAMPLE_INCIDENT_CAUSE_INCIDENT_ID);
@@ -2482,7 +2482,7 @@ public abstract class MockProvider {
     when(incident.getIncidentType()).thenReturn(EXAMPLE_HIST_INCIDENT_TYPE);
     when(incident.getExecutionId()).thenReturn(EXAMPLE_HIST_INCIDENT_EXECUTION_ID);
     when(incident.getActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_ACTIVITY_ID);
-    when(incident.getLastFailingActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_FAILING_ACTIVITY_ID);
+    when(incident.getFailedActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_FAILED_ACTIVITY_ID);
     when(incident.getProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_INST_ID);
     when(incident.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_DEF_ID);
     when(incident.getProcessDefinitionKey()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY);
@@ -2813,7 +2813,7 @@ public abstract class MockProvider {
     when(mock.getJobDefinitionConfiguration()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG);
 
     when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID);
-    when(mock.getLastFailingActivityId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_FAILING_ACTIVITY_ID);
+    when(mock.getFailedActivityId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_FAILED_ACTIVITY_ID);
     when(mock.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID);

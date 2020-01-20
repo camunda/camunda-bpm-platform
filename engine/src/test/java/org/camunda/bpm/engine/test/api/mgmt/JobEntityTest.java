@@ -153,7 +153,7 @@ public class JobEntityTest {
   }
 
   @Test
-  public void shouldShowFailingActivityIdPropertyForFailingAsyncTask() {
+  public void shouldShowFailedActivityIdPropertyForFailingAsyncTask() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
       .startEvent()
@@ -176,11 +176,11 @@ public class JobEntityTest {
 
     // then
     job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertThat(job.getLastFailingActivityId(), is("theTask"));
+    assertThat(job.getFailedActivityId(), is("theTask"));
   }
 
   @Test
-  public void shouldShowFailingActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
+  public void shouldShowFailedActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("process")
       .startEvent()
@@ -205,7 +205,7 @@ public class JobEntityTest {
 
     // then
     job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertThat(job.getLastFailingActivityId(), is("theTask3"));
+    assertThat(job.getFailedActivityId(), is("theTask3"));
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
