@@ -29,7 +29,7 @@ public class JobDto {
   protected String processDefinitionKey;
   protected String executionId;
   protected String exceptionMessage;
-  protected String lastFailingActivityId;
+  protected String failedActivityId;
   protected int retries;
   protected Date dueDate;
   protected boolean suspended;
@@ -46,7 +46,7 @@ public class JobDto {
     dto.processDefinitionKey = job.getProcessDefinitionKey();
     dto.executionId = job.getExecutionId();
     dto.exceptionMessage = job.getExceptionMessage();
-    dto.lastFailingActivityId = job.getLastFailingActivityId();
+    dto.failedActivityId = job.getFailedActivityId();
     dto.retries = job.getRetries();
     dto.dueDate = job.getDuedate();
     dto.suspended = job.isSuspended();
@@ -77,8 +77,8 @@ public class JobDto {
     return exceptionMessage;
   }
 
-  public String getLastFailingActivityId() {
-    return lastFailingActivityId;
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
   public int getRetries() {

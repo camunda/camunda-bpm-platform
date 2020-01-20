@@ -107,7 +107,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   protected String lastFailureLogId;
 
   // last failing activity id ///////////////////////
-  protected String lastFailingActivityId;
+  protected String failedActivityId;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -339,7 +339,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
       incidentContext.setHistoryConfiguration(getLastFailureLogId());
-      incidentContext.setLastFailingActivityId(getLastFailingActivityId());
+      incidentContext.setFailedActivityId(getFailedActivityId());
 
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
@@ -670,12 +670,12 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.lastFailureLogId = lastFailureLogId;
   }
 
-  public String getLastFailingActivityId() {
-    return lastFailingActivityId;
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
-  public void setLastFailingActivityId(String lastFailingActivityId) {
-    this.lastFailingActivityId = lastFailingActivityId;
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
   }
 
   @Override
@@ -696,7 +696,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
            + ", exceptionByteArray=" + exceptionByteArray
            + ", exceptionByteArrayId=" + exceptionByteArrayId
            + ", exceptionMessage=" + exceptionMessage
-           + ", lastFailingActivityId=" + lastFailingActivityId
+           + ", failedActivityId=" + failedActivityId
            + ", deploymentId=" + deploymentId
            + ", priority=" + priority
            + ", tenantId=" + tenantId

@@ -57,7 +57,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, incident.getIncidentMessage());
     assertEquals(processInstance.getId(), incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
-    assertEquals("theServiceTask", incident.getLastFailingActivityId());
+    assertEquals("theServiceTask", incident.getFailedActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), incident.getProcessDefinitionId());
     assertEquals(incident.getId(), incident.getCauseIncidentId());
@@ -150,7 +150,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, incident.getIncidentMessage());
     assertEquals(executionIdOfNestedFailingExecution, incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
-    assertEquals("theServiceTask", incident.getLastFailingActivityId());
+    assertEquals("theServiceTask", incident.getFailedActivityId());
     assertEquals(processInstance.getId(), incident.getProcessInstanceId());
     assertEquals(incident.getId(), incident.getCauseIncidentId());
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
@@ -188,7 +188,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, causeIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), causeIncident.getExecutionId());
     assertEquals("theServiceTask", causeIncident.getActivityId());
-    assertEquals("theServiceTask", causeIncident.getLastFailingActivityId());
+    assertEquals("theServiceTask", causeIncident.getFailedActivityId());
     assertEquals(failingProcess.getId(), causeIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), causeIncident.getRootCauseIncidentId());
@@ -208,7 +208,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(recursiveCreatedIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), recursiveCreatedIncident.getExecutionId());
     assertEquals("theCallActivity", recursiveCreatedIncident.getActivityId());
-    assertEquals("theCallActivity", recursiveCreatedIncident.getLastFailingActivityId());
+    assertEquals("theCallActivity", recursiveCreatedIncident.getFailedActivityId());
     assertEquals(processInstance.getId(), recursiveCreatedIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getRootCauseIncidentId());
@@ -244,7 +244,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(AlwaysFailingDelegate.MESSAGE, rootCauseIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), rootCauseIncident.getExecutionId());
     assertEquals("theServiceTask", rootCauseIncident.getActivityId());
-    assertEquals("theServiceTask", rootCauseIncident.getLastFailingActivityId());
+    assertEquals("theServiceTask", rootCauseIncident.getFailedActivityId());
     assertEquals(failingProcess.getId(), rootCauseIncident.getProcessInstanceId());
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getRootCauseIncidentId());
@@ -267,7 +267,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(causeIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), causeIncident.getExecutionId());
     assertEquals("theCallActivity", causeIncident.getActivityId());
-    assertEquals("theCallActivity", causeIncident.getLastFailingActivityId());
+    assertEquals("theCallActivity", causeIncident.getFailedActivityId());
     assertEquals(callFailingProcess.getId(), causeIncident.getProcessInstanceId());
     assertEquals(rootCauseIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), causeIncident.getRootCauseIncidentId());
@@ -287,7 +287,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(topLevelIncident.getIncidentMessage());
     assertEquals(theCallingCallActivity.getId(), topLevelIncident.getExecutionId());
     assertEquals("theCallingCallActivity", topLevelIncident.getActivityId());
-    assertEquals("theCallingCallActivity", topLevelIncident.getLastFailingActivityId());
+    assertEquals("theCallingCallActivity", topLevelIncident.getFailedActivityId());
     assertEquals(processInstance.getId(), topLevelIncident.getProcessInstanceId());
     assertEquals(causeIncident.getId(), topLevelIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), topLevelIncident.getRootCauseIncidentId());
@@ -514,7 +514,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(incident.getExecutionId());
   }
 
-  public void testShouldShowFailingActivityIdPropertyForFailingAsyncTask() {
+  public void testShouldShowFailedActivityIdPropertyForFailingAsyncTask() {
     // given
     deployment(Bpmn.createExecutableProcess("process")
       .startEvent()
@@ -536,11 +536,11 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
      assertNotNull(incident);
 
-     assertNotNull(incident.getLastFailingActivityId());
-     assertEquals("theTask", incident.getLastFailingActivityId());
+     assertNotNull(incident.getFailedActivityId());
+     assertEquals("theTask", incident.getFailedActivityId());
   }
 
-  public void testShouldShowFailingActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
+  public void testShouldShowFailedActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
     // given
     deployment(Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -564,8 +564,8 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
      assertNotNull(incident);
 
-     assertNotNull(incident.getLastFailingActivityId());
-     assertEquals("theTask3", incident.getLastFailingActivityId());
+     assertNotNull(incident.getFailedActivityId());
+     assertEquals("theTask3", incident.getFailedActivityId());
   }
 
   public void testBoundaryEventIncidentActivityId() {

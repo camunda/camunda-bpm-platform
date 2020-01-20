@@ -59,7 +59,7 @@ public class FailedJobListener implements Command<Void> {
                 .findJobById(jobId);
 
         if (job != null) {
-          job.setLastFailingActivityId(jobFailureCollector.getFailedActivityId());
+          job.setFailedActivityId(jobFailureCollector.getFailedActivityId());
           fireHistoricJobFailedEvt(job);
           cmd.execute(commandContext);
         } else {
