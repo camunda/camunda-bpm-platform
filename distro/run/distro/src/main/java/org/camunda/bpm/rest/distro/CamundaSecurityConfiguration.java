@@ -1,5 +1,4 @@
-package org.camunda.camunda.rest.distro.rest;
-
+package org.camunda.bpm.rest.distro;
 
 import javax.servlet.Filter;
 

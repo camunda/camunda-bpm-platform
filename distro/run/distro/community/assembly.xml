@@ -38,12 +38,18 @@
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>../../modules/rest/target/camunda-rest-distro-rest-${project.version}.jar</source>
-            <outputDirectory>lib/</outputDirectory>
-        </file>
-        <file>
-            <source>../../modules/webapps/community/target/camunda-rest-distro-webapps-${project.version}.jar</source>
+            <source>target/camunda-bpm-rest-distro-${project.version}.jar</source>
             <outputDirectory>lib/</outputDirectory>
         </file>
     </files>
+    <fileSets>
+        <fileSet>
+            <directory>../../modules/rest/target/dependency/</directory>
+            <outputDirectory>lib/rest/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/webapps/community/target/dependency/</directory>
+            <outputDirectory>lib/webapps/</outputDirectory>
+        </fileSet>
+    </fileSets>
 </assembly>

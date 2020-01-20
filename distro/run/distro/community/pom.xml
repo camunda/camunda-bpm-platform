@@ -13,10 +13,15 @@
 
   <artifactId>camunda-bpm-rest-distro</artifactId>
   <name>camunda BPM Rest Distro</name>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <build>
+    <sourceDirectory>../src/main/java</sourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

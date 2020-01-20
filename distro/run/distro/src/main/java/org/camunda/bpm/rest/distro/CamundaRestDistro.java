@@ -1,4 +1,4 @@
-package org.camunda.camunda.rest.distro.rest;
+package org.camunda.bpm.rest.distro;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

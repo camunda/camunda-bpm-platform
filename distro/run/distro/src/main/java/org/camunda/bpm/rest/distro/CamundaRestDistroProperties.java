@@ -1,4 +1,4 @@
-package org.camunda.camunda.rest.distro.rest;
+package org.camunda.bpm.rest.distro;
 
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
