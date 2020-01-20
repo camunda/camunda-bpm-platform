@@ -27,6 +27,17 @@ var template = fs.readFileSync(
   'utf8'
 );
 
+// This is only relevant when editMode===true,
+// but we only want to rewrite the function once
+var original = document.addEventListener;
+document.addEventListener = function(...args) {
+  const event = args[0];
+  if(event === 'focusin') {
+    return;
+  }
+  return original.apply(document, args);
+};
+
 module.exports = [
   '$window',
   function($window) {
