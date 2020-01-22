@@ -39,6 +39,8 @@ public class GetTopicNamesCmd implements Command<List<String>>, Serializable {
   @Override public List<String> execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("externalTaskQuery", externalTaskQuery);
     ExternalTaskQueryImpl externalTaskQueryImpl = (ExternalTaskQueryImpl) externalTaskQuery;
-    return commandContext.getExternalTaskManager().selectTopicNamesByQuery(externalTaskQueryImpl);
+    return commandContext
+        .getExternalTaskManager()
+        .selectTopicNamesByQuery(externalTaskQueryImpl);
   }
 }
