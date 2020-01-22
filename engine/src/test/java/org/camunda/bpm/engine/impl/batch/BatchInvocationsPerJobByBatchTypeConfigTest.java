@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.standalone.history;
+package org.camunda.bpm.engine.impl.batch;
 
 import ch.qos.logback.classic.Level;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,10 +32,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-public class HistoryCleanupBatchTest {
+public class BatchInvocationsPerJobByBatchTypeConfigTest {
 
   protected static final String PROCESS_ENGINE_CONFIG =
-      "org/camunda/bpm/engine/test/standalone/history/camunda.cfg.xml";
+      "camunda.cfg.invocationsPerJobByBatchType.xml";
 
   protected static final String CONFIG_LOGGER = "org.camunda.bpm.engine.cfg";
 
@@ -63,33 +63,26 @@ public class HistoryCleanupBatchTest {
   }
 
   @Test
-  public void shouldSetGlobalConfigForBatchHistoryTimeToLive() {
+  public void shouldSetInvocationsPerJobByBatchType() {
     // when
-    String batchOperationHistoryTimeToLive =
-        engineConfiguration.getBatchOperationHistoryTimeToLive();
+    Map<String, Integer> invocationsPerBatchJobByBatchType =
+        engineConfiguration.getInvocationsPerBatchJobByBatchType();
 
     // then
-    assertThat(batchOperationHistoryTimeToLive).isEqualTo("P5D");
-  }
-
-  @Test
-  public void shouldSetHistoryTimeToLivePerBatchType() {
-    Map<String, String> batchOperationsForHistoryCleanup =
-        engineConfiguration.getBatchOperationsForHistoryCleanup();
-
-    assertThat(batchOperationsForHistoryCleanup)
-        .contains(
-            entry(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, "P10D"),
-            entry(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, "P7D"),
-            entry("uknown-operation", "P3D")
+    assertThat(invocationsPerBatchJobByBatchType)
+        .containsExactly(
+            entry(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, 7),
+            entry(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, 3),
+            entry("custom-batch-operation", 42)
         );
   }
 
   @Test
   public void shouldWriteLogWhenBatchTypeIsUnknown() {
     // then
-    assertThat(loggingRule.getFilteredLog("ENGINE-12010 Invalid batch operation name " +
-        "'uknown-operation' with history time to live set to'P3D'")).hasSize(1);
+    assertThat(loggingRule.getFilteredLog("ENGINE-12014 The configuration property " +
+        "'invocationsPerJobByBatchType' contains an invalid batch type 'custom-batch-operation' " +
+        "which is neither a custom nor a built-in batch type")).hasSize(1);
   }
 
 }

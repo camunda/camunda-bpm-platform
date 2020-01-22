@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -1227,6 +1229,46 @@ public class TaskQueryOrTest {
 
     // then
     assertEquals(3, taskService.createTaskQuery().or().active().processVariableValueEquals("foo", 0).endOr().list().size());
+  }
+
+  @Test
+  public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceIdIn() {
+    // given
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    repositoryService
+      .createDeployment()
+      .addModelInstance("foo.bpmn", aProcessDefinition)
+      .deploy();
+
+    String processInstanceId = runtimeService
+      .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey")
+      .getId();
+
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < 4; i++) {
+      processInstanceIds.add(runtimeService
+                              .startProcessInstanceByKey("aProcessDefinition")
+                              .getId());
+    }
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+        .processInstanceBusinessKey("aBusinessKey")
+        .processInstanceIdIn(processInstanceIds.get(0), processInstanceIds.get(1))
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(3, tasks.size());
+    for (Task task : tasks) {
+      assertThat(task.getProcessInstanceId()).isIn(processInstanceId, processInstanceIds.get(0), processInstanceIds.get(1));
+    }
   }
 
   protected HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {

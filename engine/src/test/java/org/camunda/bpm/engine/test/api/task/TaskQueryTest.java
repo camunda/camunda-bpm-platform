@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByAssignee;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCaseExecutionId;
@@ -4810,6 +4811,35 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     query = taskService.createTaskQuery().taskNameNotLike("gonzo\\_%");
     assertEquals(11, query.list().size());
     assertEquals(11, query.count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryByProcessInstanceIdIn() {
+    // given three process instances
+    String instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when filter for two of them and non existing one
+    List<Task> tasks = taskService.createTaskQuery().processInstanceIdIn(instance1, instance2, "nonexisting").list();
+
+    // then
+    assertThat(tasks.size()).isEqualTo(2);
+    for (Task task : tasks) {
+      assertThat(task.getProcessInstanceId()).isIn(instance1, instance2);
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
+  public void testQueryByProcessInstanceIdInNonExisting() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery().processInstanceIdIn("nonexisting").list();
+
+    // then
+    assertThat(tasks.size()).isZero();
   }
 
   /**
