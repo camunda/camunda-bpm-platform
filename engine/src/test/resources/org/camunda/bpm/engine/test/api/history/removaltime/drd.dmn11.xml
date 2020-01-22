@@ -12,8 +12,8 @@
       </input>
       <output id="output_1" name="pojo" />
       <rule id="DecisionRule_1q38vum">
-        <inputEntry id="UnaryTests_0tvyy8v">
-          <text>pojo</text>
+        <inputEntry id="UnaryTests_0tvyy8v" expressionLanguage="juel">
+          <text>${cellInput==pojo}</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0lody56">
           <text>pojo</text>
@@ -40,8 +40,8 @@
       </input>
       <output id="OutputClause_18x22kd" name="pojo" />
       <rule id="DecisionRule_1fva835">
-        <inputEntry id="UnaryTests_1boqgry">
-          <text>pojo</text>
+        <inputEntry id="UnaryTests_1boqgry" expressionLanguage="juel">
+          <text>${cellInput==pojo}</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0z6fdy9">
           <text>pojo</text>
