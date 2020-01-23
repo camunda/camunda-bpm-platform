@@ -63,7 +63,6 @@ public class CustomHistoryEventHandlerTest {
   private RuntimeService runtimeService;
   private TaskService taskService;
 
-  @Before
   @After
   public void clearHistoryEvents() {
     recorderHandler.clear();
