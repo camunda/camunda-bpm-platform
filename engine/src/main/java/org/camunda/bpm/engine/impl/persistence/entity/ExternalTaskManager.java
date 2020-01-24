@@ -89,6 +89,11 @@ public class ExternalTaskManager extends AbstractManager {
     return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
+  public List<String> selectTopicNamesByQuery(ExternalTaskQueryImpl externalTaskQuery) {
+    configureQuery(externalTaskQuery);
+    return getDbEntityManager().selectList("selectTopicNamesByQuery", externalTaskQuery);
+  }
+
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureQuery(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
