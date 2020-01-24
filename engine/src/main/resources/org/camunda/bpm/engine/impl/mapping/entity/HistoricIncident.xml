@@ -313,6 +313,9 @@
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
       </if>
+      <if test="failedActivityId != null">
+        and RES.FAILED_ACTIVITY_ID_ = #{failedActivityId}
+      </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
