@@ -598,6 +598,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     given()
       .queryParam("activityIdIn", anActId + "," + anotherActId)
       .queryParam("executionIdIn", anExecutionId + "," + anotherExecutionId)
+      .queryParam("failedActivityIdIn", anActId + "," + anotherActId)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -606,6 +607,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
 
     verify(mockedQuery).activityIdIn(anActId, anotherActId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+    verify(mockedQuery).failedActivityIdIn(anActId, anotherActId);
     verify(mockedQuery).list();
   }
 
@@ -620,6 +622,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     Map<String, List<String>> json = new HashMap<String, List<String>>();
     json.put("activityIdIn", Arrays.asList(anActId, anotherActId));
     json.put("executionIdIn", Arrays.asList(anExecutionId, anotherExecutionId));
+    json.put("failedActivityIdIn", Arrays.asList(anActId, anotherActId));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -632,6 +635,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
 
     verify(mockedQuery).activityIdIn(anActId, anotherActId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+    verify(mockedQuery).failedActivityIdIn(anActId, anotherActId);
     verify(mockedQuery).list();
   }
 

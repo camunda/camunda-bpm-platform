@@ -191,6 +191,54 @@ public class HistoricJobLogQueryTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
   @Test
+  public void testQueryByFailedActivityId() {
+    runtimeService.startProcessInstanceByKey("process");
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    try {
+      managementService.executeJob(jobId);
+      fail("exception expected");
+    } catch (Exception e) {
+      // expected
+    }
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().failedActivityIdIn("serviceTask");
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void testQueryByInvalidFailedActivityId() {
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().failedActivityIdIn("invalid");
+
+    verifyQueryResults(query, 0);
+
+    String[] nullValue = null;
+
+    try {
+      query.failedActivityIdIn(nullValue);
+      fail("exception expected");
+    } catch (Exception e) {
+    }
+
+    String[] activityIdsContainsNull = {"a", null, "b"};
+
+    try {
+      query.failedActivityIdIn(activityIdsContainsNull);
+      fail("exception expected");
+    } catch (Exception e) {
+    }
+
+    String[] activityIdsContainsEmptyString = {"a", "", "b"};
+
+    try {
+      query.failedActivityIdIn(activityIdsContainsEmptyString);
+      fail("exception expected");
+    } catch (Exception e) {
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Test
   public void testQueryByJobDefinitionId() {
     runtimeService.startProcessInstanceByKey("process");
     String jobDefinitionId = managementService.createJobQuery().singleResult().getJobDefinitionId();

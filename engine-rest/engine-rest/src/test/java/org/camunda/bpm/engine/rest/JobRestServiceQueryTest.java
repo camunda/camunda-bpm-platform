@@ -409,6 +409,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("timers", MockProvider.EXAMPLE_TIMERS);
     parameters.put("withException", MockProvider.EXAMPLE_WITH_EXCEPTION);
     parameters.put("exceptionMessage", MockProvider.EXAMPLE_EXCEPTION_MESSAGE);
+    parameters.put("failedActivityId", MockProvider.EXAMPLE_JOB_FAILED_ACTIVITY_ID);
     parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
     parameters.put("active", true);
     parameters.put("suspended", true);
@@ -445,6 +446,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).timers();
     verify(mockQuery).withException();
     verify(mockQuery).exceptionMessage((String) parameters.get("exceptionMessage"));
+    verify(mockQuery).failedActivityId((String) parameters.get("failedActivityId"));
     verify(mockQuery).noRetriesLeft();
     verify(mockQuery).active();
     verify(mockQuery).suspended();

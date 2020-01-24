@@ -45,6 +45,9 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries which are associated with one of the given activity ids. **/
   HistoricJobLogQuery activityIdIn(String... activityIds);
 
+  /** Only select historic job log entries which are associated with failures of one of the given activity ids. **/
+  HistoricJobLogQuery failedActivityIdIn(String... activityIds);
+
   /** Only select historic job log entries which are associated with one of the given execution ids. **/
   HistoricJobLogQuery executionIdIn(String... executionIds);
 
