@@ -326,6 +326,13 @@
       <if test="jobExceptionMessage != null">
         and RES.JOB_EXCEPTION_MSG_ = #{jobExceptionMessage}
       </if>
+      <if test="failedActivityIds != null &amp;&amp; failedActivityIds.length > 0">
+        and RES.FAILED_ACT_ID_ in
+        <foreach item="item" index="index" collection="failedActivityIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="jobDefinitionId != null">
         and RES.JOB_DEF_ID_ = #{jobDefinitionId}
       </if>

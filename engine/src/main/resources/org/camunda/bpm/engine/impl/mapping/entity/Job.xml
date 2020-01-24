@@ -360,6 +360,9 @@
       <if test="exceptionMessage">
       	and RES.EXCEPTION_MSG_ = #{exceptionMessage}
       </if>
+      <if test="failedActivityId != null">
+        and RES.FAILED_ACT_ID_ = #{failedActivityId}
+      </if>
       <if test="noRetriesLeft">
         and RES.RETRIES_ = 0
       </if>
