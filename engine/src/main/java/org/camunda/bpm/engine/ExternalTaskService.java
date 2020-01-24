@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
+import org.camunda.bpm.engine.impl.cmd.GetTopicNamesQueryMapper;
 
 /**
  * Service that provides access to {@link ExternalTask} instances. External tasks
@@ -397,6 +398,19 @@ public interface ExternalTaskService {
    * query for external tasks.
    */
   public ExternalTaskQuery createExternalTaskQuery();
+
+  /**
+   * Returns a list of distinct topic names.
+   * Returns an empty list if no topics are found.
+   */
+   List<String> getTopicNames();
+
+  /**
+   * Returns a list of distinct topics based on parameters given.
+   * Returns an empty list if no topics are found.
+   */
+
+  List<String> getTopicNames(GetTopicNamesQueryMapper query);
 
   /**
    * Returns the full error details that occurred while running external task

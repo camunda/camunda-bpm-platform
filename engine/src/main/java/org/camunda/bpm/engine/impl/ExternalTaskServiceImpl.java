@@ -96,6 +96,17 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     return new ExternalTaskQueryImpl(commandExecutor);
   }
 
+  @Override
+  public List<String> getTopicNames() {
+    GetTopicNamesQueryMapper query = new GetTopicNamesQueryMapper();
+    return commandExecutor.execute(new GetTopicNamesCmd(query));
+  }
+
+  @Override
+  public List<String> getTopicNames(GetTopicNamesQueryMapper query){
+    return commandExecutor.execute(new GetTopicNamesCmd(query));
+  }
+
   public String getExternalTaskErrorDetails(String externalTaskId) {
     return commandExecutor.execute(new GetExternalTaskErrorDetailsCmd(externalTaskId));
   }

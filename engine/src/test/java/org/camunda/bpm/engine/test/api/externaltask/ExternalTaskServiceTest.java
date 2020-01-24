@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.cmd.GetTopicNamesQueryMapper;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -3208,6 +3209,79 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertThat(fetchedExternalTasks.size()).isEqualTo(1);
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionKey()).isEqualTo("testFetchAndLockByProcessDefinitionVersionTag");
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo("version X.Y");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNames(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    //then
+    assertEquals(3, externalTaskService.getTopicNames().size());
+  }
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithLockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    //when
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic("topic1", LOCK_TIME)
+        .execute();
+    GetTopicNamesQueryMapper queryMapperLockedTasks = new GetTopicNamesQueryMapper().withLockedTasks();
+    GetTopicNamesQueryMapper queryMapperUnlockedTasks = new GetTopicNamesQueryMapper().withUnlockedTasks();
+
+
+    //then
+    assertEquals(1, externalTaskService.getTopicNames(queryMapperLockedTasks).size());
+    assertEquals("topic1", externalTaskService.getTopicNames(queryMapperLockedTasks).get(0));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithUnlockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    //when
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic("topic1", LOCK_TIME)
+        .execute();
+    GetTopicNamesQueryMapper queryMapper = new GetTopicNamesQueryMapper().withUnlockedTasks();
+
+    //then
+    assertEquals(2, externalTaskService.getTopicNames(queryMapper).size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithRetries(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    //when
+    ExternalTask topic1Task = externalTaskService.createExternalTaskQuery().topicName("topic1").singleResult();
+    ExternalTask topic2Task = externalTaskService.createExternalTaskQuery().topicName("topic2").singleResult();
+    ExternalTask topic3Task = externalTaskService.createExternalTaskQuery().topicName("topic3").singleResult();
+
+    externalTaskService.setRetries(topic1Task.getId(), 3);
+    externalTaskService.setRetries(topic2Task.getId(), 0);
+    externalTaskService.setRetries(topic3Task.getId(), 0);
+
+    GetTopicNamesQueryMapper queryMapper = new GetTopicNamesQueryMapper().withRetriesLeft();
+
+    //then
+    assertEquals(1, externalTaskService.getTopicNames(queryMapper).size());
+  }
+
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesisDistinct(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    //then
+    assertEquals(3, externalTaskService.getTopicNames().size());
   }
 
   protected Date nowPlus(long millis) {
