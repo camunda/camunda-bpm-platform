@@ -1,7 +1,7 @@
 package org.camunda.bpm.dmn.feel.impl.integration.spin
 
 import org.camunda.bpm.dmn.feel.impl.integration.spin.CamundaSpinValueMapper
-import org.camunda.feel.impl.interpreter._
+import org.camunda.feel.interpreter.impl._
 import org.camunda.spin.Spin
 import org.camunda.spin.json.SpinJsonNode
 import org.camunda.spin.xml.SpinXmlElement

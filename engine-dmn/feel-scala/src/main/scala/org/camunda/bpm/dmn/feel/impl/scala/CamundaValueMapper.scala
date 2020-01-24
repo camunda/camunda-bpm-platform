@@ -2,7 +2,7 @@ package org.camunda.bpm.dmn.feel.impl.scala
 
 import java.time._
 
-import org.camunda.feel.impl.interpreter._
+import org.camunda.feel.interpreter.impl._
 import org.camunda.feel.impl.spi.CustomValueMapper
 
 class CamundaValueMapper extends CustomValueMapper {
