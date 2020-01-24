@@ -47,6 +47,9 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   /** Only select incidents which contain an activity with the given id. **/
   IncidentQuery activityId(String activityId);
 
+  /** Only select incidents which were created due to a failure at an activity with the given id. **/
+  IncidentQuery failedActivityId(String activityId);
+
   /** Only select incidents which contain the id of the cause incident. **/
   IncidentQuery causeIncidentId(String causeIncidentId);
 

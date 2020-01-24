@@ -84,6 +84,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected String processInstanceId;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -140,6 +141,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam("failedActivityId")
+  public void setFailedActivityId(String activityId) {
+    this.failedActivityId = activityId;
   }
 
   @CamundaQueryParam("causeIncidentId")
@@ -227,6 +233,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     }
     if (activityId != null) {
       query.activityId(activityId);
+    }
+    if (failedActivityId != null) {
+      query.failedActivityId(failedActivityId);
     }
     if (causeIncidentId != null) {
       query.causeIncidentId(causeIncidentId);

@@ -497,11 +497,23 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     String activityId = MockProvider.EXAMPLE_HIST_INCIDENT_ACTIVITY_ID;
 
     given()
-      .queryParam("activityId", activityId)
+    .queryParam("activityId", activityId)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).activityId(activityId);
+  }
+
+  @Test
+  public void testQueryByFailedActivityId() {
+    String activityId = MockProvider.EXAMPLE_HIST_INCIDENT_FAILED_ACTIVITY_ID;
+
+    given()
+      .queryParam("failedActivityId", activityId)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORY_INCIDENT_QUERY_URL);
 
-    verify(mockedQuery).activityId(activityId);
+    verify(mockedQuery).failedActivityId(activityId);
   }
 
   @Test
