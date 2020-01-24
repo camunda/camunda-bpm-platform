@@ -1,10 +1,10 @@
-package org.camunda.feel.integration
+package org.camunda.bpm.dmn.feel.impl.scala
 
 import org.camunda.bpm.dmn.feel.impl.FeelException
 import org.camunda.bpm.engine.variable.context.VariableContext
 import org.camunda.feel.FeelEngine.UnaryTests
-import org.camunda.feel.interpreter._
-import org.camunda.feel.spi._
+import org.camunda.feel.impl.spi.{CustomContext, SpiServiceLoader}
+import org.camunda.feel.interpreter.impl.VariableProvider
 
 import scala.jdk.CollectionConverters._
 

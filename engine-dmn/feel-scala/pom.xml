@@ -8,13 +8,12 @@
   </parent>
 
   <artifactId>camunda-engine-feel-scala</artifactId>
-
-  <name>FEEL Scala Engine Integration</name>
+  <name>camunda DMN - engine Integration FEEL - SCALA </name>
 
   <dependencies>
 
     <dependency>
-      <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+      <groupId>org.camunda.feel</groupId>
       <artifactId>feel-engine</artifactId>
       <exclusions>
         <exclusion>
@@ -27,7 +26,6 @@
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-api</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -63,25 +61,6 @@
 
   <build>
     <plugins>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <descriptors>
-            <descriptor>assembly-complete.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.scalatest</groupId>
         <artifactId>scalatest-maven-plugin</artifactId>

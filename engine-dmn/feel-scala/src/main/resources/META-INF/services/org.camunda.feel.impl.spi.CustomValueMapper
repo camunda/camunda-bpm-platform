@@ -1,0 +1,2 @@
+org.camunda.feel.impl.spi.JavaValueMapper
+org.camunda.bpm.dmn.feel.impl.scala.CamundaValueMapper

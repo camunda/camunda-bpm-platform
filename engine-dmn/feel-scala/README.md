@@ -8,7 +8,7 @@ An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine]
 
     ```xml
     <dependency>
-      <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+      <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>feel-engine-factory</artifactId>
       <version>${VERSION}</version>
     </dependency>
@@ -21,7 +21,7 @@ An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine]
     ### Via DMN Engine Configuration:
 
     ```java
-    DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
+    DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
     dmnEngineConfig.setFeelEngineFactory(new CamundaFeelEngineFactory());
     // more configs ...
     DmnEngine engine = dmnEngineConfig.buildEngine();
@@ -35,10 +35,10 @@ An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine]
       <property name="dmnEngineConfiguration">
         <bean class="org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration">
           <property name="feelEngineFactory">
-            <bean class="org.camunda.feel.integration.CamundaFeelEngineFactory" />
+            <bean class="org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory" />
           </property>
         </bean>
-      </property>  
+      </property>
 
       <!-- more configs -->
     </bean>
@@ -60,11 +60,11 @@ or
   <property name="dmnEngineConfiguration">
     <bean class="org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration">
       <property name="defaultOutputEntryExpressionLanguage" value="feel" />
-      <!-- replace factory and other configs --> 
+      <!-- replace factory and other configs -->
     </bean>
-  </property>  
+  </property>
 ```
 
 > Using Camunda BPM < 7.7.0
 
-You have to set the default expression language to `feel-scala` instead of `feel`. This uses the FEEL engine as script engine to avoid a previous bug. 
+You have to set the default expression language to `feel-scala` instead of `feel`. This uses the FEEL engine as script engine to avoid a previous bug.

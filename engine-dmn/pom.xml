@@ -17,6 +17,7 @@
   <properties>
     <version.juel>2.2.7</version.juel>
     <version.scala>2.13.0</version.scala>
+    <version.scala.binary>2.13.0</version.scala.binary>
     <version.scalatest>3.0.8</version.scalatest>
     <version.feel-scala>1.11.0-SNAPSHOT</version.feel-scala>
     <version.log4j>2.9.0</version.log4j>
@@ -44,7 +45,7 @@
       </dependency>
 
       <dependency>
-        <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+        <groupId>org.camunda.feel</groupId>
         <artifactId>feel-engine</artifactId>
         <version>${version.feel-scala}</version>
       </dependency>
@@ -104,6 +105,39 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.2.1</version>
+        <configuration>
+          <scalaCompatVersion>${version.scala.binary}</scalaCompatVersion>
+          <scalaVersion>${version.scala}</scalaVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>add-source</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-doc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>doc-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

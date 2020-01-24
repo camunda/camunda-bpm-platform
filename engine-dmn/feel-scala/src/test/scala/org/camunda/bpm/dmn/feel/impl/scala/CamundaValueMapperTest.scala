@@ -1,4 +1,4 @@
-package org.camunda.feel.integration
+package org.camunda.bpm.dmn.feel.impl.scala
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers

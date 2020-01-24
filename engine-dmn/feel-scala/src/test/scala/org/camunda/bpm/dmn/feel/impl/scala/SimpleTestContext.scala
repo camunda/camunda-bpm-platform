@@ -1,4 +1,4 @@
-package org.camunda.feel.integration
+package org.camunda.bpm.dmn.feel.impl.scala
 
 import scala.collection.JavaConverters._
 import org.camunda.bpm.engine.variable.context.VariableContext
