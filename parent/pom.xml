@@ -3,12 +3,14 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-bom</artifactId>
+    <artifactId>camunda-root</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../bom</relativePath>
+    <relativePath>../</relativePath>
   </parent>
 
+  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-parent</artifactId>
+  <version>7.13.0-SNAPSHOT</version>
   <name>camunda BPM - Parent Pom</name>
   <inceptionYear>2013</inceptionYear>
   <packaging>pom</packaging>
@@ -93,6 +95,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
@@ -622,6 +631,11 @@
       <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
       <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
+
+    <repository>
+      <id>fix-maven-snapshots-issue-with-nexus</id>
+      <url>allow-parent-pom-resolving-when-snapshot</url>
+    </repository>
   </repositories>
 
   <licenses>
@@ -637,7 +651,6 @@
   </organization>
 
   <url>http://www.camunda.org</url>
-
 </project>
 
 
