@@ -129,6 +129,7 @@
               <goal>testCompile</goal>
             </goals>
           </execution>
+          <!-- CAM-11184: Makes the build fail
           <execution>
             <id>scala-doc</id>
             <phase>package</phase>
@@ -136,6 +137,7 @@
               <goal>doc-jar</goal>
             </goals>
           </execution>
+          -->
         </executions>
       </plugin>
       <plugin>
