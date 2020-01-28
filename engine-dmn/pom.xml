@@ -16,8 +16,8 @@
 
   <properties>
     <version.juel>2.2.7</version.juel>
-    <version.scala>2.13.0</version.scala>
-    <version.scala.binary>2.13.0</version.scala.binary>
+    <version.scala>2.13.1</version.scala>
+    <version.scala.binary>2.13.1</version.scala.binary>
     <version.scalatest>3.0.8</version.scalatest>
     <version.feel-scala>1.11.0-SNAPSHOT</version.feel-scala>
     <version.log4j>2.9.0</version.log4j>
@@ -108,7 +108,7 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>4.3.1</version>
         <configuration>
           <scalaCompatVersion>${version.scala.binary}</scalaCompatVersion>
           <scalaVersion>${version.scala}</scalaVersion>
