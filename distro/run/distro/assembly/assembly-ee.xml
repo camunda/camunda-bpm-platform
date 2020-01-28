@@ -10,7 +10,7 @@
     <format>tar.gz</format>
   </formats>
   
-  <includeBaseDirectory>true</includeBaseDirectory>
+  <includeBaseDirectory>false</includeBaseDirectory>
 
   <componentDescriptors>
     <componentDescriptor>base-component.xml</componentDescriptor>
