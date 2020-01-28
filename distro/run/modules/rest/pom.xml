@@ -12,8 +12,8 @@
   </parent>
 
   <artifactId>camunda-rest-distro-rest</artifactId>
-  <name>camunda BPM Rest Distro - Rest Module</name>
-  <packaging>jar</packaging>
+  <name>camunda BPM Rest Distro - Module REST</name>
+  <packaging>pom</packaging>
 
   <dependencies>
 

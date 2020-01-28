@@ -12,8 +12,8 @@
   </parent>
 
   <artifactId>camunda-rest-distro-webapps-ee</artifactId>
-  <name>camunda BPM Rest Distro - Webapps Enterprise Module</name>
-  <packaging>jar</packaging>
+  <name>camunda BPM Rest Distro - Module Webapps Enterprise</name>
+  <packaging>pom</packaging>
 
   <dependencies>
 

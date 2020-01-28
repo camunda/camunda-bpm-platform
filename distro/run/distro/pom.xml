@@ -11,9 +11,14 @@
     <relativePath>../bom</relativePath>
   </parent>
 
-  <artifactId>camunda-rest-distro-distros</artifactId>
-  <name>camunda BPM Rest Distro - Modules</name>
-  <packaging>pom</packaging>
+  <artifactId>camunda-rest-distro-distro</artifactId>
+  <name>camunda BPM Rest Distro</name>
+  <packaging>jar</packaging>
+  
+  <properties>
+    <skip.assembly.ce>true</skip.assembly.ce>
+    <skip.assembly.ee>true</skip.assembly.ee>
+  </properties>
 
   <dependencies>
 
@@ -41,13 +46,12 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
       <scope>provided</scope>
     </dependency>
-
 
   </dependencies>
 
@@ -81,22 +85,38 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
+          <configuration>
+            <attach>true</attach>
+            <outputDirectory>target/</outputDirectory>
+            <tarLongFileMode>gnu</tarLongFileMode>
+          </configuration>
           <executions>
             <execution>
-              <id>assemble</id>
+              <id>assemble-ce</id>
               <phase>package</phase>
               <goals>
                 <goal>single</goal>
               </goals>
               <configuration>
                 <descriptors>
-                  <descriptor>assembly.xml</descriptor>
+                  <descriptor>assembly/assembly-ce.xml</descriptor>
                 </descriptors>
-                <attach>true</attach>
-                <appendAssemblyId>false</appendAssemblyId>
-                <outputDirectory>target/</outputDirectory>
-                <workDirectory>target/assembly/work</workDirectory>
-                <tarLongFileMode>gnu</tarLongFileMode>
+                <workDirectory>target/assembly/work/ce</workDirectory>
+                <skipAssembly>${skip.assembly.ce}</skipAssembly>
+              </configuration>
+            </execution>
+            <execution>
+              <id>assemble-ee</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptors>
+                  <descriptor>assembly/assembly-ee.xml</descriptor>
+                </descriptors>
+                <workDirectory>target/assembly/work/ee</workDirectory>
+                <skipAssembly>${skip.assembly.ee}</skipAssembly>
               </configuration>
             </execution>
           </executions>
@@ -108,15 +128,39 @@
   <profiles>
     <profile>
       <id>ce</id>
-      <modules>
-        <module>community</module>
-      </modules>
+      <properties>
+        <skip.assembly.ce>false</skip.assembly.ce>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>ee</id>
-      <modules>
-        <module>enterprise</module>
-      </modules>
+      <properties>
+        <skip.assembly.ee>false</skip.assembly.ee>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 

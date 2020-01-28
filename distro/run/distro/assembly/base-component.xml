@@ -1,0 +1,43 @@
+<component xmlns="http://maven.apache.org/ASSEMBLY-COMPONENT/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY-COMPONENT/2.0.0 http://maven.apache.org/xsd/assembly-component-2.0.0.xsd">
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib/db</outputDirectory>
+      <includes>
+        <include>com.h2database:h2</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+  <files>
+    <file>
+      <source>src/main/resources/application.yml</source>
+      <outputDirectory>config/</outputDirectory>
+    </file>
+    <file>
+      <source>src/main/resources/start.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>src/main/resources/start.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>target/camunda-rest-distro-distro-${project.version}.jar
+      </source>
+      <outputDirectory>lib/</outputDirectory>
+      <destName>camunda-bpm-rest-distro.jar</destName>
+    </file>
+  </files>
+  <fileSets>
+    <fileSet>
+      <directory>../modules/rest/target/dependency/</directory>
+      <outputDirectory>lib/rest/</outputDirectory>
+    </fileSet>
+  </fileSets>
+</component>
