@@ -31,7 +31,7 @@
       <source>target/camunda-rest-distro-distro-${project.version}.jar
       </source>
       <outputDirectory>lib/</outputDirectory>
-      <destName>camunda-bpm-rest-distro.jar</destName>
+      <destName>camunda-rest-distro.jar</destName>
     </file>
   </files>
   <fileSets>

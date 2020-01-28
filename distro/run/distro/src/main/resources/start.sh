@@ -1,5 +1,6 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
 
 #### Usage
 
@@ -25,9 +26,9 @@ fi
 
 
 # set environment parameters
-webappsPath=../lib/webapps/
-restPath=../lib/rest/
-classPath=../lib/db/
+webappsPath=$BASEDIR/../lib/webapps/
+restPath=$BASEDIR/../lib/rest/
+classPath=$BASEDIR/../lib/db/
 
 
 # inspect arguments
@@ -48,4 +49,4 @@ done
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -jar "../lib/camunda-bpm-rest-distro-1.0-SNAPSHOT.jar" --spring.config.location=file:../config/application.yml
+"$JAVA" -Dloader.path="$classPath" -jar "$BASEDIR/../lib/camunda-rest-distro.jar" --spring.config.location=file:"$BASEDIR"/../config/application.yml

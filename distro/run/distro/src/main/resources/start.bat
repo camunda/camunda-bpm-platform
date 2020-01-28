@@ -1,5 +1,7 @@
 @echo off
 
+set BASEDIR=%~dp0
+
 REM setup the JVM
 IF "x%JAVA_HOME%" == "x" (
   SET JAVA=java
@@ -21,9 +23,9 @@ IF "x%JAVA_HOME%" == "x" (
 
 
 REM set environment parameters
-SET webappsPath=../lib/webapps/
-SET restPath=../lib/rest/
-SET classPath=../lib/db/
+SET webappsPath=%BASEDIR%/../lib/webapps/
+SET restPath=%BASEDIR%/../lib/rest/
+SET classPath=%BASEDIR%/../lib/db/
 
 
 REM inspect arguments
@@ -48,4 +50,4 @@ ECHO classpath: %classPath%
 
 
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -jar "../lib/camunda-bpm-rest-distro-1.0-SNAPSHOT.jar" --spring.config.location=file:../config/application.yml
+call %JAVA% -Dloader.path="%classPath%" -jar "%BASEDIR%/../lib/camunda-rest-distro.jar" --spring.config.location=file:"%BASEDIR%"/../config/application.yml
