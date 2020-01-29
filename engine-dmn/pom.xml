@@ -108,41 +108,6 @@
 
     <plugins>
       <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>3.2.1</version>
-        <configuration>
-          <scalaCompatVersion>${version.scala.binary}</scalaCompatVersion>
-          <scalaVersion>${version.scala}</scalaVersion>
-        </configuration>
-        <executions>
-          <execution>
-            <id>scala-compile-first</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>add-source</goal>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>scala-test-compile</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-          <!-- CAM-11184: Makes the build fail
-          <execution>
-            <id>scala-doc</id>
-            <phase>package</phase>
-            <goals>
-              <goal>doc-jar</goal>
-            </goals>
-          </execution>
-          -->
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>

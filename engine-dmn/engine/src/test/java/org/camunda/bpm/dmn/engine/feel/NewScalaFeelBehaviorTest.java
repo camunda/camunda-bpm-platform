@@ -74,6 +74,7 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
     assertThat(result).isEqualTo("foo");
   }
 
+  @Ignore("CAM-11314")
   @Test
   @DecisionResource(resource = "scala_compare_date_untyped.dmn")
   public void shouldEvaluateJodaDateWithTable_NonInputClauseType() {

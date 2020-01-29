@@ -20,6 +20,7 @@ import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -131,6 +132,7 @@ public abstract class FeelBehavior extends DmnEngineTest {
     .hasSingleEntryTyped(Variables.stringValue("foo"));
   }
 
+  @Ignore("CAM-11314")
   @Test
   @DecisionResource(resource = "compare_dates_non_typed.dmn")
   public void shouldCompareJodaLocalDateTimes() {
@@ -142,6 +144,7 @@ public abstract class FeelBehavior extends DmnEngineTest {
     .hasSingleEntryTyped(Variables.stringValue("foo"));
   }
 
+  @Ignore("CAM-11314")
   @Test
   @DecisionResource(resource = "compare_dates_non_typed.dmn")
   public void shouldCompareJodaDateTimes() {
