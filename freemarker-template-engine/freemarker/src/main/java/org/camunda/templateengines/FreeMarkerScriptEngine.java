@@ -84,7 +84,7 @@ public class FreeMarkerScriptEngine extends AbstractScriptEngine implements Comp
     if (configuration == null) {
       synchronized (this) {
         if (configuration == null) {
-          configuration = new Configuration();
+          configuration = new Configuration(Configuration.VERSION_2_3_29);
         }
       }
     }

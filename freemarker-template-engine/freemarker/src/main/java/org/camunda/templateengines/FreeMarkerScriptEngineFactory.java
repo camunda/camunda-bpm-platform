@@ -32,7 +32,7 @@ import org.camunda.commons.utils.StringUtil;
 public class FreeMarkerScriptEngineFactory implements ScriptEngineFactory {
 
   public final static String NAME = "freemarker";
-  public final static String VERSION = "2.3.20";
+  public final static String VERSION = "2.3.29";
 
   public final static List<String> names;
   public final static List<String> extensions;
