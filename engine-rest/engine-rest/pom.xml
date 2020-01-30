@@ -493,6 +493,111 @@
         </plugins>
       </build>
     </profile>
+    
+    
+    <profile>
+      <id>resteasy3</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <version>2.0.1.Final</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy3}</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <artifactId>httpclient</artifactId>
+              <groupId>org.apache.httpcomponents</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+          <version>4.1.42.Final</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-netty4</artifactId>
+          <version>${version.resteasy3}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
+                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
+                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
+              </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-resteasy</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>
+                        src/test/resources-resteasy
+                      </directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <id>wink</id>
