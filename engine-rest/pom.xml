@@ -22,6 +22,7 @@
   <modules>
     <module>engine-rest</module>
     <module>engine-rest-jaxrs2</module>
+    <module>engine-rest-openapi</module>
     <module>assembly</module>
   </modules>
 
