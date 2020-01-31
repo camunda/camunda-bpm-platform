@@ -23,12 +23,10 @@ import java.util.List;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
-import org.camunda.commons.utils.StringUtil;
-
 /**
- * 
+ *
  * {@link ScriptEngineFactory} to create a JSR 223 compatible wrapper of the Saxon XQuery processor.
- * 
+ *
  */
 public class XQueryScriptEngineFactory implements ScriptEngineFactory {
 
@@ -112,8 +110,18 @@ public class XQueryScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public String getProgram(String... statements) {
-    return StringUtil.join("\n", statements);
+    return joinStrings("\n", statements);
   }
+
+  protected String joinStrings(String delimiter, String[] values) {
+    if (values == null) {
+      return null;
+    }
+    else {
+      return String.join(delimiter, values);
+    }
+  }
+
 
   public ScriptEngine getScriptEngine() {
     return new XQueryScriptEngine(this);

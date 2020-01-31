@@ -19,9 +19,9 @@ package org.camunda.templateengines;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-import org.camunda.commons.utils.StringUtil;
 
 /**
  * {@link ScriptEngineFactory} to create a JSR 223 compatible
@@ -32,7 +32,7 @@ import org.camunda.commons.utils.StringUtil;
 public class VelocityScriptEngineFactory implements ScriptEngineFactory {
 
   public final static String NAME = "velocity";
-  public final static String VERSION = "1.7";
+  public final static String VERSION = "2.1";
 
   public final static List<String> names;
   public final static List<String> extensions;
@@ -91,7 +91,7 @@ public class VelocityScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public String getMethodCallSyntax(String object, String method, String... args) {
-    return "$" + object + "." + method + "(" + StringUtil.join(", ", args) + ")";
+    return "$" + object + "." + method + "(" + joinStrings(", ", args) + ")";
   }
 
   public String getOutputStatement(String toDisplay) {
@@ -99,7 +99,16 @@ public class VelocityScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public String getProgram(String... statements) {
-    return StringUtil.join("\n", statements);
+    return joinStrings("\n", statements);
+  }
+
+  protected String joinStrings(String delimiter, String[] values) {
+    if (values == null) {
+      return null;
+    }
+    else {
+      return String.join(delimiter, values);
+    }
   }
 
   public ScriptEngine getScriptEngine() {
