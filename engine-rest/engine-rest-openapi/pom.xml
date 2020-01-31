@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>camunda-engine-rest-openapi</artifactId>
+    <name>camunda BPM - engine - REST - OpenAPI</name>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-engine-rest-root</artifactId>
+    <relativePath>../</relativePath>
+    <version>7.13.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <generated-directory>${project.build.directory}/generated-sources/openapi-json</generated-directory>
+    <generated-file>openapi.json</generated-file>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-openapi-generator</artifactId>
+      <scope>test</scope>
+      <!-- TODO: managed version -->
+      <version>7.13.0-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-openapi-json</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <classpathScope>test</classpathScope>
+              <mainClass>com.camunda.bpm.engine.rest.TemplateParser</mainClass>
+              <arguments>
+                <argument>${project.basedir}/src/main/templates</argument>
+                <argument>main.ftl</argument>
+                <argument>${generated-directory}/${generated-file}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-openapi-json-resources</id>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${generated-directory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
