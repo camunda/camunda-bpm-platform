@@ -10,20 +10,89 @@
     <relativePath>../</relativePath>
     <version>7.13.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <generated-directory>${project.build.directory}/generated-sources/swagger-json</generated-directory>
+    <generated-file>swagger.json</generated-file>
+  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.freemarker</groupId>
-      <artifactId>freemarker</artifactId>
-        <!-- <version>2.3.29</version> -->
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-openapi-generator</artifactId>
+      <scope>test</scope>
+      <!-- TODO: managed version -->
+      <version>7.13.0-SNAPSHOT</version>
     </dependency>
+  
+<!--     <dependency> -->
+<!--       <groupId>org.freemarker</groupId> -->
+<!--       <artifactId>freemarker</artifactId> -->
+<!--         <version>2.3.29</version> -->
+<!--     </dependency> -->
 
-    <!-- for json formatting -->
+<!--     for json formatting -->
+<!-- TODO: should not be necessary to declare this again -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.8.6</version>
+      <scope>test</scope>
+    </dependency>
+    
+<!--     TODO: dependency scopes -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
-
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>generate-swagger-json</id>
+                <phase>generate-resources</phase>
+                <goals>
+                    <goal>java</goal>
+                </goals>
+                <configuration>
+                    <classpathScope>test</classpathScope>
+                    <mainClass>com.camunda.bpm.engine.rest.TemplateParser</mainClass>
+                    <arguments>
+                        <argument>${project.basedir}/src/main/templates</argument>
+                        <argument>main.ftl</argument>
+                        <argument>${generated-directory}/${generated-file}</argument>
+                    </arguments>
+                </configuration>
+            </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>add-swagger-json-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>${generated-directory}</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+            </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
