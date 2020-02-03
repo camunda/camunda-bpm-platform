@@ -9,6 +9,7 @@ import org.camunda.bpm.rest.distro.property.CamundaAuthenticationProperty;
 import org.camunda.bpm.rest.distro.property.CamundaCorsProperty;
 import org.camunda.bpm.rest.distro.property.CamundaRestDistroProperties;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
+import org.camunda.bpm.spring.boot.starter.rest.CamundaBpmRestInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -27,7 +28,7 @@ public class CamundaSecurityConfiguration {
   CamundaRestDistroProperties camundaRestDistroProperties;
 
   @Bean
-  @ConditionalOnClass(ProcessEngineAuthenticationFilter.class)
+  @ConditionalOnClass(CamundaBpmRestInitializer.class)
   @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaAuthenticationProperty.PREFIX)
   public FilterRegistrationBean<Filter> processEngineAuthenticationFilter() {
     FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
