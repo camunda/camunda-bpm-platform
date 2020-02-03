@@ -1,43 +1,56 @@
 {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string"
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The id of the decision definition."
     },
-    "key" : {
-      "type" : "string"
+    "key": {
+      "type": "string",
+      "description": "The key of the decision definition, i.e., the id of the DMN 1.0 XML decision definition."
     },
-    "category" : {
-      "type" : "string"
+    "category": {
+      "type": "string",
+      "description": "The category of the decision definition."
     },
-    "name" : {
-      "type" : "string"
+    "name": {
+      "type": "string",
+      "description": "The name of the decision definition."
     },
-    "version" : {
-      "type" : "integer",
-      "format" : "int32"
+    "version": {
+      "type": "integer",
+      "format": "int32",
+      "description": "The version of the decision definition that the engine assigned to it."
     },
-    "resource" : {
-      "type" : "string"
+    "resource": {
+      "type": "string",
+      "description": "The file name of the decision definition."
     },
-    "deploymentId" : {
-      "type" : "string"
+    "deploymentId": {
+      "type": "string",
+      "description": "The deployment id of the decision definition."
     },
-    "tenantId" : {
-      "type" : "string"
+    "tenantId": {
+      "type": "string",
+      "description": "The tenant id of the decision definition."
     },
-    "decisionRequirementsDefinitionId" : {
-      "type" : "string"
+    "decisionRequirementsDefinitionId": {
+      "type": "string",
+      "description": "The id of the decision requirements definition this decision definition belongs to."
     },
-    "decisionRequirementsDefinitionKey" : {
-      "type" : "string"
+    "decisionRequirementsDefinitionKey": {
+      "type": "string",
+      "description": "The key of the decision requirements definition this decision definition belongs to."
     },
-    "historyTimeToLive" : {
-      "type" : "integer",
-      "format" : "int32"
+    "historyTimeToLive": {
+      "type": "integer",
+      "description": "History time to live value of the decision definition. Is used within History cleanup.",
+      "format": "int32",
+      "minimum": 0
     },
-    "versionTag" : {
-      "type" : "string"
+    "versionTag": {
+      "type": "string",
+      "description": "The version tag of the process definition."
     }
   }
 }

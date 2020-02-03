@@ -1,15 +1,14 @@
 {
   "type" : "object",
   "properties" : {
+    <#-- NOTE: "processInstanceQuery" and "historicProcessInstanceQuery" are referenced in the request body
+         Do not add them here -->
     "processInstanceIds" : {
       "type" : "array",
       "items" : {
         "type" : "string"
       },
       "description": "A list process instance ids to delete."
-    },
-    "processInstanceQuery" : {
-      "$ref" : "#/components/schemas/ProcessInstanceQueryDto"
     },
     "deleteReason" : {
       "type" : "string",
@@ -20,11 +19,6 @@
       "description" : "Skip execution listener invocation for activities that are started or ended as part of this request.",
       "default": true
     },
-    <#-- 
-    "historicProcessInstanceQuery" : {
-      "$ref" : "#/components/schemas/HistoricProcessInstanceQueryDto"
-    },
-    -->
     "skipSubprocesses" : {
       "type" : "boolean",
       "description" : "Skip deletion of the subprocesses related to deleted processes as part of this request.",

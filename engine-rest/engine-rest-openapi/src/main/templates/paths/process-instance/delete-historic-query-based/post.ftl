@@ -1,6 +1,6 @@
 {
-  "operationId": "deleteProcessInstancesAsync",
-  "description": "Deletes multiple process instances asynchronously (batch).",
+  "operationId": "deleteAsyncHistoricQueryBased",
+  "description": "Deletes a set of process instances asynchronously (batch) based on a historic process instance query.",
   "tags": [
     "Process instance"
   ],
@@ -15,8 +15,8 @@
             {
               "type": "object",
               "properties": {
-                "processInstanceQuery": {
-                  "$ref": "#/components/schemas/ProcessInstanceQueryDto"
+                "historicProcessInstanceQuery": {
+                  "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
                 }
               }
             }
@@ -37,7 +37,7 @@
         dto = "ExceptionDto"
         last = true
         desc = "Bad Request
-        Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor processInstanceQuery is present"/>
+        Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor historicProcessInstanceQuery is present"/>
 
   }
 }

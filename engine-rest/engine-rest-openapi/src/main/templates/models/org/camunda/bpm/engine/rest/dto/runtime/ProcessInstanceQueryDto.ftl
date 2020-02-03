@@ -1,7 +1,23 @@
 {
   "type": "object",
+  "description": "A process instance query which defines a group of process instances",
   "properties": {
-    "deploymentId": {
+    <@lib.property
+        name="deploymentId"
+        type="string"
+        description="Filter by the deployment the id belongs to."/>
+
+    <@lib.property
+        name="processDefinitionId"
+        type="string"
+        description="Filter by the process definition the instances run on."/>
+
+    <@lib.property
+        name="processDefinitionKey"
+        type="string"
+        description="Filter by the key of the process definition the instances run on."/>
+
+<#--     "deploymentId": {
       "type": "string",
       "description": "Filter by the deployment the id belongs to."
     },
@@ -9,6 +25,10 @@
       "type": "string",
       "description": "Filter by the process definition the instances run on."
     },
+    "processDefinitionKey": {
+      "type": "string",
+      "description": "Filter by the key of the process definition the instances run on."
+    }, -->
     "processDefinitionKeyIn": {
       "type": "array",
       "writeOnly": true,
@@ -16,10 +36,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "processDefinitionKey": {
-      "type": "string",
-      "description": "Filter by the key of the process definition the instances run on."
     },
     "processDefinitionKeyNotIn": {
       "type": "array",
@@ -123,14 +139,13 @@
       "type": "boolean",
       "description": "Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances)"
     },
-    <#--
     "variables": {
       "type": "array",
+      "description": "A JSON array to only include process instances that have variables with certain values.\nThe array consists of objects with the three properties name, operator and value. name (String) is the variable name, operator (String) is the comparison operator to be used and value the variable value.\nvalue may be String, Number or Boolean.\nValid operator values are: eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like.",
       "items": {
         "$ref": "#/components/schemas/VariableQueryParameterDto"
       }
     },
-    -->
     "variableNamesIgnoreCase": {
       "type": "boolean",
       "description": "Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal."

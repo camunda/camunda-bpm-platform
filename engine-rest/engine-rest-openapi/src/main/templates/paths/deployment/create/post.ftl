@@ -33,7 +33,7 @@ Deployments can contain custom code in form of scripts or EL expressions to cust
               "type": "string",
               "description": "The name for the deployment to be created."
             },
-            "{*}": {
+            "data": {
               "type": "string",
               "format": "binary",
               "description": "The binary data to create the deployment resource. It is possible to have more than one form part with different form part names for the binary data to create a deployment."
