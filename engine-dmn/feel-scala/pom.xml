@@ -34,12 +34,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.13</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
       <scope>test</scope>
