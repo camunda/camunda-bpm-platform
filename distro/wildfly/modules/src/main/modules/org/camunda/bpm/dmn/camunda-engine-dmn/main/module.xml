@@ -6,7 +6,8 @@
   <dependencies>
     <module name="javax.api"/>
     <module name="org.joda.time" slot="2.1" />
-
+    <module name="sun.jdk" />
+    
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
