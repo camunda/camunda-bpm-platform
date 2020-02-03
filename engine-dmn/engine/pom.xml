@@ -132,6 +132,7 @@
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <artifactSet>
                 <excludes>
+                  <exclude>org.slf4j:slf4j-api</exclude>
                   <exclude>de.odysseus.juel:juel-api</exclude>
                   <exclude>de.odysseus.juel:juel-spi</exclude>
                   <exclude>de.odysseus.juel:juel-impl</exclude>
