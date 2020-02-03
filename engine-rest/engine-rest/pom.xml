@@ -538,9 +538,9 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <excludes>
-                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
-                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
-                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
+                <!-- This test is only needed for the Resteasy 2 profile; with
+                  Resteasy 3 we can run the regular test -->
+                <exclude>**/ResteasyTaskRestServiceInteractionTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -555,7 +555,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>
