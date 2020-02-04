@@ -13,7 +13,7 @@
   </parent>
   
   <properties>
-    <version.jaxrs>2.0</version.jaxrs>
+    <version.jaxrs>2.1.1</version.jaxrs>
   </properties>
 
   <dependencies>
