@@ -1,6 +1,0 @@
-camunda.bpm:
-  rest-distro:
-    auth.enabled: false
-    cors:
-      enabled: true
-      allowed-origins: "http://localhost:8081"

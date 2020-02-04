@@ -1,0 +1,3 @@
+camunda.bpm:
+  rest-distro:
+    cors.enabled: true

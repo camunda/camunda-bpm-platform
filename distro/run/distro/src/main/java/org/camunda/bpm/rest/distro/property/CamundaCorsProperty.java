@@ -17,7 +17,10 @@ public class CamundaCorsProperty {
   }
 
   public String getAllowedOrigins() {
-    return enabled && allowedOrigins == null ? DEFAULT_ORIGINS : allowedOrigins;
+    if(enabled) {
+      return allowedOrigins == null ? DEFAULT_ORIGINS : allowedOrigins;
+    }
+    return null;
   }
 
   public void setAllowedOrigins(String allowedOrigins) {
