@@ -74,21 +74,6 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
     assertThat(result).isEqualTo("foo");
   }
 
-  @Ignore("CAM-11314")
-  @Test
-  @DecisionResource(resource = "scala_compare_date_untyped.dmn")
-  public void shouldEvaluateJodaDateWithTable_NonInputClauseType() {
-    // given
-    getVariables()
-      .putValue("date1", org.joda.time.LocalDateTime.now());
-
-    // when
-    String result = evaluateDecision().getSingleEntry();
-
-    // then
-    assertThat(result).isEqualTo("not ok");
-  }
-
   @Test
   @DecisionResource(resource = "scala_compare_date_with_time_zone_non_typed.dmn")
   public void shouldEvaluateTimezoneComparisonWithZonedDateTime() {
@@ -123,9 +108,8 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
     assertThat(result).isEqualTo("not ok");
   }
 
-  @Ignore("CAM-11314")
   @Test
-  @DecisionResource(resource = "scala_literal_expression.dmn")
+  @DecisionResource(resource = "scala_literal_expression_date_typed.dmn")
   public void shouldEvaluateToUtilDateWithLiteralExpression() {
     // given
     getVariables()
@@ -138,7 +122,6 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
     assertThat(result).isInstanceOf(Date.class);
   }
 
-  @Ignore("CAM-11314")
   @Test
   @DecisionResource(resource = "scala_date_typed_output.dmn")
   public void shouldEvaluateToUtilDateForTypedOutputClause() {
