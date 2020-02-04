@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
+import org.camunda.bpm.engine.impl.cmd.GetTopicNamesQueryMapper;
 
 /**
  * Service that provides access to {@link ExternalTask} instances. External tasks
@@ -399,7 +400,11 @@ public interface ExternalTaskService {
   public ExternalTaskQuery createExternalTaskQuery();
 
   /**
+<<<<<<< HEAD
    * Returns a list of distinct topic names with ExternalTasks.
+=======
+   * Returns a list of distinct topic names.
+>>>>>>> dd51cb6b9b1cc119ef40f384a35bfb0c979704e2
    * Returns an empty list if no topics are found.
    */
    List<String> getTopicNames();
@@ -407,12 +412,18 @@ public interface ExternalTaskService {
   /**
    * Returns a list of distinct topics based on parameters given.
    * Returns an empty list if no topics are found.
+<<<<<<< HEAD
    * @param withLockedTasks return only topic names containing unlocked tasks
    * @param withUnlockedTasks return only topic names containing locked tasks
    * @param withRetriesLeft return only topic names of tasks with retries remaining
    */
 
   List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft);
+=======
+   */
+
+  List<String> getTopicNames(GetTopicNamesQueryMapper query);
+>>>>>>> dd51cb6b9b1cc119ef40f384a35bfb0c979704e2
 
   /**
    * Returns the full error details that occurred while running external task

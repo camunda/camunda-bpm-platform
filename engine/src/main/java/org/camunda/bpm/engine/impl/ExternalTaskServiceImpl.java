@@ -102,8 +102,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   @Override
-  public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft){
-    return commandExecutor.execute(new GetTopicNamesCmd(withLockedTasks,withUnlockedTasks,withRetriesLeft));
+  public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft) {
+    return commandExecutor.execute(new GetTopicNamesCmd(withLockedTasks, withUnlockedTasks, withRetriesLeft));
   }
 
   public String getExternalTaskErrorDetails(String externalTaskId) {

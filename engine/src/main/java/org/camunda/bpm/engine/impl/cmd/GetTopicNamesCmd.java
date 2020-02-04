@@ -17,7 +17,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -29,7 +28,7 @@ public class GetTopicNamesCmd implements Command<List<String>>, Serializable {
 
   protected ExternalTaskQueryImpl externalTaskQuery = new ExternalTaskQueryImpl();
 
-  public GetTopicNamesCmd(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft){
+  public GetTopicNamesCmd(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft) {
     if (withLockedTasks) {
       externalTaskQuery.locked();
     }
