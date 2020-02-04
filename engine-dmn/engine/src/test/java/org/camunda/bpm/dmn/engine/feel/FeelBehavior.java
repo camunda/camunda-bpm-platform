@@ -132,7 +132,7 @@ public abstract class FeelBehavior extends DmnEngineTest {
     .hasSingleEntryTyped(Variables.stringValue("foo"));
   }
 
-  @Ignore("CAM-11314")
+  @Ignore("CAM-11319")
   @Test
   @DecisionResource(resource = "compare_dates_non_typed.dmn")
   public void shouldCompareJodaLocalDateTimes() {
@@ -144,7 +144,7 @@ public abstract class FeelBehavior extends DmnEngineTest {
     .hasSingleEntryTyped(Variables.stringValue("foo"));
   }
 
-  @Ignore("CAM-11314")
+  @Ignore("CAM-11319")
   @Test
   @DecisionResource(resource = "compare_dates_non_typed.dmn")
   public void shouldCompareJodaDateTimes() {
@@ -206,7 +206,8 @@ public abstract class FeelBehavior extends DmnEngineTest {
       .putValue("date1", LocalDate.parse("2020-01-17"));
 
     // then
-    thrown.expectMessage("DMN-01005 Invalid value '2020-01-17' for clause with type 'date'.");
+    thrown.expectMessage("Unsupported type: 'java.time.LocalDate' " +
+      "cannot be converted to 'java.util.Date'");
     thrown.expect(DmnEngineException.class);
 
     // when
