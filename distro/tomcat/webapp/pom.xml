@@ -25,12 +25,6 @@
       <artifactId>resteasy-jaxrs</artifactId>
       <version>${version.resteasy3}</version>
     </dependency>
-    <!-- Resteasy 3.0.26 uses 1.0.1.Beta1, but it makes sense to use the final version -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-      <version>1.0.1.Final</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -39,7 +33,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>       
+        <artifactId>maven-war-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
