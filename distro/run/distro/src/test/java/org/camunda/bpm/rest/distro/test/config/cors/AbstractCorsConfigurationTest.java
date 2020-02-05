@@ -16,36 +16,16 @@
  */
 package org.camunda.bpm.rest.distro.test.config.cors;
 
-import java.util.Collections;
-
-import org.camunda.bpm.rest.distro.CamundaRestDistro;
-import org.camunda.bpm.rest.distro.test.util.LoggingInterceptor;
+import org.camunda.bpm.rest.distro.test.AbstractRestTest;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = { CamundaRestDistro.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = {"test-cors-enabled", "test-auth-disabled"})
-public abstract class AbstractCorsConfigurationTest {
-
-  @Autowired
-  TestRestTemplate testRestTemplate;
-
-  @LocalServerPort
-  int localPort;
+@ActiveProfiles(profiles = { "test-cors-enabled" }, inheritProfiles = true)
+public abstract class AbstractCorsConfigurationTest extends AbstractRestTest {
 
   @Before
-  public void init() {
+  public void allowOriginHeader() {
     // allow Origin header to be overridden
     System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
-    // enable request and response logging
-    testRestTemplate.getRestTemplate().setInterceptors(Collections.singletonList(new LoggingInterceptor()));
   }
 }
