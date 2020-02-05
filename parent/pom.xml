@@ -476,6 +476,7 @@
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
             <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
         <plugin>
