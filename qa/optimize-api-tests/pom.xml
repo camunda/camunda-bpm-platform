@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>optimize-api-tests</artifactId>
+  <name>Optimize API tests</name>
+
+  <properties>
+    <optimize.page.size>100000</optimize.page.size>
+    <skipTests>true</skipTests>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.dmn</groupId>
+      <artifactId>camunda-engine-dmn</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>pl.pragmatists</groupId>
+      <artifactId>JUnitParams</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.11</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>7.0.33</version>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>${skipTests}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>optimize-api-tests</id>
+
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>${skipTests}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+  </profiles>
+
+
+</project>
