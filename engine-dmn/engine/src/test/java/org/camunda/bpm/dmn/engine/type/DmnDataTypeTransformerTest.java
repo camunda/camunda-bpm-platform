@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -237,7 +238,10 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
 
     Date date = toDate("2015-09-18T12:00:00");
     TypedValue dateValue = Variables.dateValue(date);
-    ZonedDateTime zonedDateTime = ZonedDateTime.parse("2015-09-18T12:00:00+01:00[Europe/Berlin]");
+
+    String systemTimeZone = ZoneId.systemDefault().getId();
+    String zonedDateTimeStr = "2015-09-18T12:00:00+01:00[" + systemTimeZone + "]";
+    ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeStr);
 
     // when
     TypedValue transformedFromZonedDateTime = typeTransformer.transform(zonedDateTime);
