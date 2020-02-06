@@ -97,7 +97,7 @@
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>7.12.0</version>
+            <version>${camunda.old.engine.version}</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
@@ -237,7 +237,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm</groupId>
                       <artifactId>camunda-engine</artifactId>
-                      <version>7.12.0</version>
+                      <version>${camunda.old.engine.version}</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                     </artifactItem>
