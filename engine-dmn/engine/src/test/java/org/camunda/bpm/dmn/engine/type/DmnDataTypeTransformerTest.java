@@ -240,7 +240,7 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
     TypedValue dateValue = Variables.dateValue(date);
 
     String systemTimeZone = ZoneId.systemDefault().getId();
-    String zonedDateTimeStr = "2015-09-18T12:00:00+01:00[" + systemTimeZone + "]";
+    String zonedDateTimeStr = "2015-09-18T12:00:00+00:00[" + systemTimeZone + "]";
     ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeStr);
 
     // when
