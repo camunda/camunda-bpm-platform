@@ -43,7 +43,6 @@
       "ProcessInstanceDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceDto.ftl">,
       "ProcessInstanceQueryDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceQueryDto.ftl">,
       "SetJobRetriesByProcessDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/SetJobRetriesByProcessDto.ftl">,
-      "SortingDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/SortingDto.ftl">,
       "TransitionInstanceDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/TransitionInstanceDto.ftl">,
       "TriggerVariableValueDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/TriggerVariableValueDto.ftl">,
 
@@ -53,7 +52,10 @@
       "AtomLink": <#include "/models/org/camunda/bpm/engine/rest/dto/AtomLink.ftl">,
       "CountResultDto": <#include "/models/org/camunda/bpm/engine/rest/dto/CountResultDto.ftl">,
       "ExceptionDto": <#include "/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl">,
+      "ParseExceptionDto": <#include "/models/org/camunda/bpm/engine/rest/dto/ParseExceptionDto.ftl">,
       "PatchVariablesDto": <#include "/models/org/camunda/bpm/engine/rest/dto/PatchVariablesDto.ftl">,
+      "ProblemDto": <#include "/models/org/camunda/bpm/engine/rest/dto/ProblemDto.ftl">,
+      "ResourceReportDto": <#include "/models/org/camunda/bpm/engine/rest/dto/ResourceReportDto.ftl">,
       "VariableQueryParameterDto": <#include "/models/org/camunda/bpm/engine/rest/dto/VariableQueryParameterDto.ftl">,
       "VariableValueDto": <#include "/models/org/camunda/bpm/engine/rest/dto/VariableValueDto.ftl">
     }

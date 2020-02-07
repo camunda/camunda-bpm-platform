@@ -30,47 +30,67 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<#macro property name type
+<#macro property name type description="TODO"
         enum=false enumValues='""'
         hasDefault=false defaultValue=false
-        required=false description="TODO"
+        hasMinimum=false minimum=0
+        required=false
+        deprecated=false
+        additionalProperties=false
         itemType="string" dto=""
-        format="none" last=false >
+        format="none"
+        last=false >
     "${name}": {
 
-      "type": "${type}",
+      <#if type="ref">
+        "$ref": "#/components/schemas/${dto}"
+      <#else>
+        "type": "${type}",
 
-      <#if format!="none">
-        "format": ${format},
-      </#if>
+        <#if format!="none">
+          "format": ${format},
+        </#if>
 
-      <#if enum>
-        "enum": [
-          ${enumValues?join(", ")}
-        ],
-      </#if>
+        <#if enum>
+          "enum": [
+            ${enumValues?join(", ")}
+          ],
+        </#if>
 
-      <#if hasDefault>
-        "default": ${defaultValue?c}, <#-- ?c to print the value-->
-      </#if>
+        <#if hasDefault>
+          "default": ${defaultValue?c}, <#-- ?c to print the value-->
+        </#if>
 
-      <#if required>
-        "required": true,
-      </#if>
+        <#if hasMinimum>
+          "minimum": ${minimum},
+        </#if>
 
-      <#if type="array">
-        "items": {
+        <#if required>
+          "required": true,
+        </#if>
 
-          <#if dto="">
-            "type": "${itemType}"
-          <#else>
+        <#if deprecated>
+          "deprecated": true,
+        </#if>
+
+        <#if type="array">
+          "items": {
+            <#if dto="">
+              "type": "${itemType}"
+            <#else>
+              "$ref": "#/components/schemas/${dto}"
+            </#if>
+          },
+        </#if>
+
+        <#if additionalProperties>
+          "additionalProperties": {
             "$ref": "#/components/schemas/${dto}"
-          </#if>
+          },
+        </#if>
 
-        },
+        "description": "${description}"
       </#if>
-
-      "description": "${description}"
     }
 
     <#if !last> , </#if> <#-- if not a last property add a comma-->
@@ -110,7 +130,7 @@
                  "additionalProperties": {
                </#if>
 
-               "$ref": "#/components/schemas/${dto}"
+                 "$ref": "#/components/schemas/${dto}"
 
                <#if array || additionalProperties >
                  }

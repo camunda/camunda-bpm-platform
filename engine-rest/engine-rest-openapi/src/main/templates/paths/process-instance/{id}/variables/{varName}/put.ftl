@@ -18,6 +18,7 @@
         location = "path"
         type = "string"
         required = true
+        last = true
         description = "The name of the variable to set." />
 
   ],

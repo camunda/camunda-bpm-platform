@@ -1,10 +1,13 @@
 {
   "type" : "object",
   "properties" : {
-    "count" : {
-      "type" : "integer",
-      "description": "The number of matching instances.",
-      "format" : "int64"
-    }
+
+    <@lib.property
+        name = "count"
+        type = "integer"
+        format = "int64"
+        last = true
+        description = "The number of matching instances."/>
+
   }
 }

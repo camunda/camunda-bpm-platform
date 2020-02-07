@@ -20,14 +20,11 @@
       ]
     },
     "value": {
-      "type": "string",
-      <#-- TODO
-      [
-        "string",
-        "number",
-        "boolean"
+      "oneOf": [
+        {"type": "boolean"},
+        {"type": "string"},
+        {"type": "number"}
       ],
-       -->
       "description": "the variable value"
     }
   }
