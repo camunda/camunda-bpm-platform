@@ -2,16 +2,6 @@
 
 BASEDIR=$(dirname "$0")
 
-#### Usage
-
-usage()
-{
-  echo "usage: start.sh [--webapps | --rest]+"
-}
-
-
-#### Main
-
 # setup the JVM
 if [ "x$JAVA" = "x" ]; then
   if [ "x$JAVA_HOME" != "x" ]; then
@@ -29,22 +19,31 @@ fi
 webappsPath=$BASEDIR/../lib/webapps/
 restPath=$BASEDIR/../lib/rest/
 classPath=$BASEDIR/../lib/db/
+optionalComponentChosen=false
 
 
 # inspect arguments
 while [ "$1" != "" ]; do
   case $1 in 
-    --webapps ) classPath=$webappsPath,$classPath
+    --webapps ) optionalComponentChosen=true
+                classPath=$webappsPath,$classPath
                 echo WebApps enabled
                 ;;
-    --rest )    classPath=$restPath,$classPath
+    --rest )    optionalComponentChosen=true
+                classPath=$restPath,$classPath
                 echo REST API enabled
                 ;;
-    * )         usage
-                exit 1
+    * )         exit 1
   esac
   shift
 done
+
+# if neither REST nor Webapps are explicitly chosen, enable both
+if [ "$optionalComponentChosen" = "false" ]; then
+  echo REST API enabled
+  echo WebApps enabled
+  classPath=$webappsPath,$restPath,$classPath
+fi
 
 echo classpath: $classPath
 

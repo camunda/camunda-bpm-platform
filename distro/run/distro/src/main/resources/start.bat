@@ -26,6 +26,7 @@ REM set environment parameters
 SET webappsPath=%BASEDIR%/../lib/webapps/
 SET restPath=%BASEDIR%/../lib/rest/
 SET classPath=%BASEDIR%/../lib/db/
+SET optionalComponentChosen=false
 
 
 REM inspect arguments
@@ -33,11 +34,13 @@ REM inspect arguments
 IF [%~1]==[] GOTO Continue
 
 IF [%~1]==[--webapps] (
+  SET optionalComponentChosen=true
   SET classPath=%webappsPath%,%classPath%
   ECHO WebApps enabled
 ) 
 
 IF [%~1]==[--rest] (
+  SET optionalComponentChosen=true
   SET classPath=%restPath%,%classPath%
   ECHO REST API enabled
 )
@@ -45,6 +48,13 @@ IF [%~1]==[--rest] (
 SHIFT
 GOTO Loop
 :Continue
+
+REM if neither REST nor Webapps are explicitly chosen, enable both
+IF [%optionalComponentChosen%]==[false] (
+  ECHO REST API enabled
+  ECHO WebApps enabled
+  SET classPath=%webappsPath%,%restPath%,%classPath%
+)
 
 ECHO classpath: %classPath%
 
