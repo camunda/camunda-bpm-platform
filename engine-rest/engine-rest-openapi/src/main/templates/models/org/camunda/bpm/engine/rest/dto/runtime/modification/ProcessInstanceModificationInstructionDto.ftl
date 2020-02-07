@@ -32,13 +32,13 @@
         name = "activityInstanceId"
         type = "string"
         description = "Can be used with instructions of type cancel. Specifies the activity instance to cancel.
-        Valid values are the activity instance IDs supplied by the Get Activity Instance request (https://docs.camunda.org/manual/latest/reference/rest/process-instance/get-activity-instances/)." />
+        Valid values are the activity instance IDs supplied by the Get Activity Instance request (https://docs.camunda.org/manual/${docsVersion}/reference/rest/process-instance/get-activity-instances/)." />
 
     <@lib.property
         name = "transitionInstanceId"
         type = "string"
         description = "Can be used with instructions of type cancel. Specifies the transition instance to cancel.
-        Valid values are the transition instance IDs supplied by the Get Activity Instance request (https://docs.camunda.org/manual/latest/reference/rest/process-instance/get-activity-instances/)." />
+        Valid values are the transition instance IDs supplied by the Get Activity Instance request (https://docs.camunda.org/manual/${docsVersion}/reference/rest/process-instance/get-activity-instances/)." />
 
     <@lib.property
         name = "ancestorActivityInstanceId"

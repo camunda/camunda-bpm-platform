@@ -28,25 +28,22 @@
 <!--     <dependency> -->
 <!--       <groupId>org.freemarker</groupId> -->
 <!--       <artifactId>freemarker</artifactId> -->
-<!--         <version>2.3.29</version> -->
 <!--     </dependency> -->
 
 <!--     for json formatting -->
 <!-- TODO: should not be necessary to declare this again -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.8.6</version>
-      <scope>test</scope>
-    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>com.google.code.gson</groupId> -->
+<!--       <artifactId>gson</artifactId> -->
+<!--       <scope>test</scope> -->
+<!--     </dependency> -->
     
 <!--     TODO: dependency scopes -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.6</version>
-      <scope>test</scope>
-    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>commons-io</groupId> -->
+<!--       <artifactId>commons-io</artifactId> -->
+<!--       <scope>test</scope> -->
+<!--     </dependency> -->
   </dependencies>
   
   <build>
@@ -55,42 +52,42 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <executions>
-            <execution>
-                <id>generate-openapi-json</id>
-                <phase>generate-resources</phase>
-                <goals>
-                    <goal>java</goal>
-                </goals>
-                <configuration>
-                    <classpathScope>test</classpathScope>
-                    <mainClass>com.camunda.bpm.engine.rest.TemplateParser</mainClass>
-                    <arguments>
-                        <argument>${project.basedir}/src/main/templates</argument>
-                        <argument>main.ftl</argument>
-                        <argument>${generated-directory}/${generated-file}</argument>
-                    </arguments>
-                </configuration>
-            </execution>
+          <execution>
+            <id>generate-openapi-json</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <classpathScope>test</classpathScope>
+              <mainClass>com.camunda.bpm.engine.rest.TemplateParser</mainClass>
+              <arguments>
+                <argument>${project.basedir}/src/main/templates</argument>
+                <argument>main.ftl</argument>
+                <argument>${generated-directory}/${generated-file}</argument>
+              </arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
-            <execution>
-                <id>add-openapi-json-resources</id>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${generated-directory}</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-            </execution>
+          <execution>
+            <id>add-openapi-json-resources</id>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${generated-directory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>

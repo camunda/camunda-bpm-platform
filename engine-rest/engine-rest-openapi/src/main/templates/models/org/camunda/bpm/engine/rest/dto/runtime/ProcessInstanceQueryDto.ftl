@@ -164,7 +164,7 @@
         A process instance matches a nested query if it fulfills at least one of the query's predicates.
         With multiple nested queries, a process instance must fulfill at least one predicate of each query (Conjunctive Normal Form).
         All process instance query properties can be used except for: sorting
-        See the User guide (https://docs.camunda.org/manual/latest/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries." />
+        See the User guide (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries." />
 
 
     "sorting": {

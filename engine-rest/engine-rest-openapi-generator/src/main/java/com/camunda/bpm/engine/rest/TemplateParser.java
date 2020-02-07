@@ -3,7 +3,7 @@ package com.camunda.bpm.engine.rest;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,39 +33,52 @@ public class TemplateParser {
 
     Configuration cfg = new Configuration();
 
-    System.getProperties();
     cfg.setDirectoryForTemplateLoading(new File(sourceDirectory));
     cfg.setDefaultEncoding("UTF-8");
 
     Template template = cfg.getTemplate(mainTemplate);
 
-    Map<String, Object> templateData = new HashMap<>();
-    // templateData.put("msg", "Today is a beautiful day");
+    Map<String, Object> templateData = createTemplateData();
 
     try (StringWriter out = new StringWriter()) {
 
       template.process(templateData, out);
 
-      // System.out.println(out.getBuffer().toString()); // without formatting
-
       // format json with Gson
       String jsonString = out.getBuffer().toString();
-      String prettyJson = formatJsonString(jsonString);
-
-//      System.out.println(prettyJson);
+      String formattedJson = formatJsonString(jsonString);
 
       File outFile = new File(outputFile);
-      FileUtils.forceMkdirParent(outFile);
-      FileUtils.write(outFile, prettyJson, StandardCharsets.UTF_8);
+      FileUtils.forceMkdir(outFile.getParentFile());
+      Files.write(outFile.toPath(), formattedJson.getBytes());
     }
+  }
+
+  private static Map<String, Object> createTemplateData() {
+    Map<String, Object> templateData = new HashMap<>();
+
+    String version = TemplateParser.class.getPackage().getImplementationVersion();
+
+    // docsVersion = 7.X.Y
+    templateData.put("cambpmVersion", version);
+
+    if (version.contains("SNAPSHOT")) {
+      templateData.put("docsVersion", "develop");
+    } else {
+      // docsVersion = 7.X
+      templateData.put("docsVersion", version.substring(0, version.lastIndexOf(".")));
+    }
+    return templateData;
   }
 
   private static String formatJsonString(String jsonString) {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    JsonElement el = JsonParser.parseString(jsonString);
-    String prettyJson = gson.toJson(el);
-    return prettyJson;
+    JsonParser jsonParser = new JsonParser();
+    JsonElement json = jsonParser.parse(jsonString);
+    String formattedJson = gson.toJson(json);
+
+    return formattedJson;
   }
 
 }

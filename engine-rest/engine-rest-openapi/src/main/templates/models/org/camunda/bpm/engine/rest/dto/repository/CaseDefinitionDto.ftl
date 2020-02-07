@@ -50,7 +50,7 @@
         hasMinimum = true
         minimum = 0
         last = true
-        description = "History time to live value of the case definition. Is used within History cleanup (https://docs.camunda.org/manual/latest/user-guide/process-engine/history/#history-cleanup)." />
+        description = "History time to live value of the case definition. Is used within History cleanup (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/history/#history-cleanup)." />
 
   }
  

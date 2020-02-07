@@ -2,12 +2,17 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "[Test] Camunda REST API",
-    "description": "Swagger OpenApi Spec for some Camunda REST API.",
-    "version": "7.13.0-alpha1",
-    "contact": {
-      "email": "test@example.com"
+    "title": "Camunda Rest API",
+    "description": "OpenApi Spec for Camunda REST API.",
+    "version": "${cambpmVersion}",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
+  },
+  "externalDocs": {
+    "description": "Find out more about Camunda Rest API",
+    "url": "https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/"
   },
   "servers": [
     {
