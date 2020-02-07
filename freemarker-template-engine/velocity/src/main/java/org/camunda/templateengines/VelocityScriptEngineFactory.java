@@ -32,7 +32,7 @@ import javax.script.ScriptEngineFactory;
 public class VelocityScriptEngineFactory implements ScriptEngineFactory {
 
   public final static String NAME = "velocity";
-  public final static String VERSION = "2.1";
+  public final static String VERSION = "2.2";
 
   public final static List<String> names;
   public final static List<String> extensions;
