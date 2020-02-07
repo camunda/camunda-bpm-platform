@@ -74,9 +74,6 @@
     <module>feel-api</module>
     <module>feel-juel</module>
     <module>feel-scala</module>
-    <!-- See CAM-11346
-    <module>feel-spin</module>
-    -->
   </modules>
 
   <build>

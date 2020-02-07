@@ -167,14 +167,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- See CAM-11346
-      <dependency>
-        <groupId>org.camunda.bpm.dmn</groupId>
-        <artifactId>camunda-engine-feel-spin</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      -->
-
       <dependency>
         <!--
             make sure everybody uses the same commons version
