@@ -134,4 +134,18 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
     assertThat(result).isEqualTo("2019-08-08T22:22:22");
   }
 
+  @Ignore("CAM-11382")
+  @Test
+  @DecisionResource(resource = "scala_output_expression_double.dmn")
+  public void shouldReturnMaxDouble() {
+    // given
+    getVariables().putValue("myVariable", Double.MAX_VALUE);
+
+    // when
+    double result = evaluateDecision().getSingleEntry();
+
+    // then
+    assertThat(result).isEqualTo(Double.MAX_VALUE);
+  }
+
 }
