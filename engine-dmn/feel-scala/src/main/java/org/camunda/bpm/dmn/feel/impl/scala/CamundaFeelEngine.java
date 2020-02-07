@@ -41,7 +41,7 @@ public class CamundaFeelEngine implements FeelEngine {
 
   protected org.camunda.feel.FeelEngine feelEngine;
 
-  {
+  public CamundaFeelEngine() {
     feelEngine = new org.camunda.feel.FeelEngine(
       SpiServiceLoader.loadFunctionProvider(),
       SpiServiceLoader.loadValueMapper()
