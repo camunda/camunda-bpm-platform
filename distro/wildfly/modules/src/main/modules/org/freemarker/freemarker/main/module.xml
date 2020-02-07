@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.freemarker.freemarker">
   <resources>
-    <resource-root path="freemarker-2.3.20.jar" />
+    <resource-root path="freemarker-@version.freemarker@.jar" />
   </resources>
 
   <dependencies>

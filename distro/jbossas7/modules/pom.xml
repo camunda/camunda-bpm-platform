@@ -64,7 +64,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-connect</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
@@ -74,7 +74,7 @@
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
-    
+
     <!-- script engine dependencies -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -200,6 +200,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.freemarker@" value="${version.freemarker}">
                   <include name="**/module.xml" />
                 </replace>
 
