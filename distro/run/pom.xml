@@ -15,6 +15,7 @@
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-rest-distro-root</artifactId>
   <name>camunda BPM Rest Distro - Root</name>
+  <description>This is the root project of the Camunda BPM REST Distro</description>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -37,21 +38,6 @@
     <developerConnection>scm:git:git@github.com:camunda/spike-rest-distro.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
-
-  <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
-  <distributionManagement>
-    <repository>
-      <id>camunda-nexus</id>
-      <name>camunda bpm</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm</url>
-    </repository>
-    <snapshotRepository>
-      <id>camunda-nexus</id>
-      <name>camunda bpm snapshots</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-snapshots</url>
-      <uniqueVersion>true</uniqueVersion>
-    </snapshotRepository>
-  </distributionManagement>
 
   <repositories>
     <repository>
