@@ -14,9 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.dmn.engine.feel;
+package org.camunda.bpm.dmn.feel.impl.scala.function;
 
-import java.io.Serializable;
+import java.util.Collection;
+import java.util.Optional;
 
-public class TestPojo implements Serializable {
+/**
+ * Provides one or more functions which can be used in an FEEL expression.
+ */
+public interface FeelCustomFunctionProvider {
+
+  /**
+   * Returns the function for the given name.
+   *
+   * @param functionName the name of the function
+   * @return the function or {@link Optional#empty()}, if no function is provided for this name
+   */
+  Optional<CustomFunction> resolveFunction(String functionName);
+
+  /**
+   * Returns the names of all functions.
+   *
+   * @return the names of all functions
+   */
+  Collection<String> getFunctionNames();
+
 }

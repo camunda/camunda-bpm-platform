@@ -14,29 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.dmn.feel.impl.scala;
+package org.camunda.bpm.engine.test.dmn.feel.helper;
 
-import org.camunda.bpm.dmn.feel.impl.FeelEngine;
-import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunction;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
+import org.camunda.bpm.dmn.feel.impl.scala.function.builder.CustomFunctionBuilder;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
-public class CamundaFeelEngineFactory implements FeelEngineFactory {
+public class CustomFunctionProvider implements FeelCustomFunctionProvider {
 
-  protected List<FeelCustomFunctionProvider> customFunctionProviders;
+  protected Map<String, CustomFunction> functions = new HashMap<>();
 
-   public FeelEngine createInstance() {
-      return new CamundaFeelEngine(customFunctionProviders);
-   }
+  public CustomFunctionProvider(String name, String value) {
+    CustomFunction function = CustomFunction.create()
+      .setReturnValue(value)
+      .build();
 
-  public void setCustomFunctionProviders(List<FeelCustomFunctionProvider> customFunctionProviders) {
-    this.customFunctionProviders = customFunctionProviders;
+    functions.put(name, function);
   }
 
-  public List<FeelCustomFunctionProvider> getCustomFunctionProviders() {
-    return customFunctionProviders;
+  @Override
+  public Optional<CustomFunction> resolveFunction(String functionName) {
+    return Optional.ofNullable(functions.get(functionName));
+  }
+
+  @Override
+  public Collection<String> getFunctionNames() {
+    return functions.keySet();
   }
 
 }
-

@@ -36,6 +36,7 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
 public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
@@ -60,6 +61,11 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected ElProvider elProvider;
   protected FeelEngineFactory feelEngineFactory;
   protected FeelEngine feelEngine;
+
+  /**
+   * a list of DMN FEEL custom function providers
+   */
+  protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
 
   protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
   protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
@@ -141,7 +147,10 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
-      feelEngineFactory = new CamundaFeelEngineFactory();
+      CamundaFeelEngineFactory engineFactory = new CamundaFeelEngineFactory();
+      engineFactory.setCustomFunctionProviders(feelCustomFunctionProviders);
+
+      feelEngineFactory = engineFactory;
     }
 
     if (feelEngine == null) {
@@ -494,6 +503,24 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public DefaultDmnEngineConfiguration transformer(DmnTransformer transformer) {
     setTransformer(transformer);
+    return this;
+  }
+
+  /**
+   * @return the list of FEEL Custom Function Providers
+   */
+  public List<FeelCustomFunctionProvider> getFeelCustomFunctionProviders() {
+    return feelCustomFunctionProviders;
+  }
+
+  /**
+   * Set a list of FEEL Custom Function Providers.
+   *
+   * @param feelCustomFunctionProviders a list of FEEL Custom Function Providers
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration setFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    this.feelCustomFunctionProviders = feelCustomFunctionProviders;
     return this;
   }
 

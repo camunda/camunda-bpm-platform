@@ -18,11 +18,17 @@ package org.camunda.bpm.dmn.feel.impl.scala;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunctionTransformer;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.feel.FeelEngine.Failure;
 import org.camunda.feel.FeelEngine.UnaryTests$;
 import org.camunda.feel.impl.spi.CustomContext;
 import org.camunda.feel.impl.spi.SpiServiceLoader;
+import org.camunda.feel.interpreter.FunctionProvider;
+import org.camunda.feel.interpreter.FunctionProvider.CompositeFunctionProvider;
+import org.camunda.feel.interpreter.FunctionProvider.EmptyFunctionProvider$;
+import org.camunda.feel.interpreter.impl.ValueMapper;
 import org.camunda.feel.interpreter.impl.VariableProvider;
 import org.camunda.feel.interpreter.impl.VariableProvider.StaticVariableProvider;
 import scala.collection.immutable.List;
@@ -41,11 +47,15 @@ public class CamundaFeelEngine implements FeelEngine {
 
   protected org.camunda.feel.FeelEngine feelEngine;
 
-  public CamundaFeelEngine() {
-    feelEngine = new org.camunda.feel.FeelEngine(
-      SpiServiceLoader.loadFunctionProvider(),
-      SpiServiceLoader.loadValueMapper()
-    );
+  public CamundaFeelEngine(java.util.List<FeelCustomFunctionProvider> functionProviders) {
+    ValueMapper valueMapper = SpiServiceLoader.loadValueMapper();
+
+    CustomFunctionTransformer customFunctionTransformer =
+      new CustomFunctionTransformer(functionProviders, valueMapper);
+
+    FunctionProvider functionProvider = getFunctionProvider(customFunctionTransformer);
+
+    feelEngine = new org.camunda.feel.FeelEngine(functionProvider, valueMapper);
   }
 
   public <T> T evaluateSimpleExpression(String expression, VariableContext variableContext) {
@@ -83,7 +93,7 @@ public class CamundaFeelEngine implements FeelEngine {
     java.util.List<? extends VariableProvider> variableProviders =
       Arrays.asList(inputVariableContext, contextVariableWrapper);
 
-    List list = ListHasAsScala(variableProviders).asScala().toList();
+    List list = toList(variableProviders);
 
     CustomContext context = new CustomContext() {
       public VariableProvider variableProvider() {
@@ -107,6 +117,48 @@ public class CamundaFeelEngine implements FeelEngine {
       throw new FeelException(message);
 
     }
+  }
+
+  protected FunctionProvider getFunctionProvider(CustomFunctionTransformer customFunctionTransformer) {
+    FunctionProvider functionProvidersFromSpi = SpiServiceLoader.loadFunctionProvider();
+
+    if (functionProvidersFromSpi instanceof EmptyFunctionProvider$) {
+      List<FunctionProvider> functionProviders = toScalaList(customFunctionTransformer);
+
+      return new CompositeFunctionProvider(functionProviders);
+
+    } else if (functionProvidersFromSpi instanceof CompositeFunctionProvider) {
+      CompositeFunctionProvider compositeFunctionProviderFromSpi =
+        (CompositeFunctionProvider) functionProvidersFromSpi;
+
+      List<FunctionProvider> providersFromSpiAsList = compositeFunctionProviderFromSpi.providers();
+
+      List<FunctionProvider> functionProviders =
+        providersFromSpiAsList.$colon$colon(customFunctionTransformer);
+
+      return new CompositeFunctionProvider(functionProviders);
+
+    } else if (functionProvidersFromSpi != null) {
+      List<FunctionProvider> functionProviders =
+        toScalaList(functionProvidersFromSpi, customFunctionTransformer);
+
+      return new CompositeFunctionProvider(functionProviders);
+
+    } else { // should not happen
+      throw new FeelException("No function provider found!");
+
+    }
+  }
+
+  @SafeVarargs
+  protected final <T> List<T> toScalaList(T... elements) {
+    java.util.List<T> listAsJava = Arrays.asList(elements);
+
+    return toList(listAsJava);
+  }
+
+  protected <T> List<T> toList(java.util.List list) {
+    return ListHasAsScala(list).asScala().toList();
   }
 
 }
