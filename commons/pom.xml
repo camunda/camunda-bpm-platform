@@ -22,6 +22,7 @@
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
   <dependencyManagement>
