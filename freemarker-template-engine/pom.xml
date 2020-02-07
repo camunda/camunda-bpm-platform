@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.template-engines</groupId>
     <artifactId>camunda-template-engines-bom</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0</version>
     <relativePath>bom</relativePath>
   </parent>
 
@@ -129,7 +129,7 @@
     <url>https://github.com/camunda/camunda-template-engine</url>
     <connection>scm:git:git@github.com:camunda/camunda-template-engine.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-template-engine.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>2.0.0</tag>
   </scm>
 
 </project>
