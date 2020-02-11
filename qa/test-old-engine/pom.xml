@@ -93,65 +93,14 @@
       <id>old-engine</id>
 
       <dependencyManagement>
-        <dependencies>     
+        <dependencies>
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>7.12.0</version>
+            <version>${camunda.old.engine.version}</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
-          <dependency>
-            <groupId>org.camunda.bpm</groupId>
-            <artifactId>camunda-engine</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-		  <dependency>
-            <groupId>org.camunda.bpm.dmn</groupId>
-            <artifactId>camunda-engine-dmn</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-		  <dependency>
-            <groupId>org.camunda.bpm.dmn</groupId>
-            <artifactId>camunda-engine-feel-api</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-		  <dependency>
-            <groupId>org.camunda.bpm.dmn</groupId>
-            <artifactId>camunda-engine-feel-juel</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.camunda.commons</groupId>
-            <artifactId>camunda-commons-typed-values</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-xml-model</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-bpmn-model</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-cmmn-model</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-dmn-model</artifactId>
-            <version>7.12.0</version>
-          </dependency>
-          <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.4.4</version>
-          </dependency>
-
          </dependencies>
       </dependencyManagement>
 
@@ -191,7 +140,7 @@
           <artifactId>openjpa</artifactId>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-email</artifactId>
@@ -288,7 +237,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm</groupId>
                       <artifactId>camunda-engine</artifactId>
-                      <version>7.12.0</version>
+                      <version>${camunda.old.engine.version}</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                     </artifactItem>

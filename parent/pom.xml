@@ -3,9 +3,9 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-bom</artifactId>
+    <artifactId>camunda-root</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../bom</relativePath>
+    <relativePath>../</relativePath>
   </parent>
 
   <artifactId>camunda-parent</artifactId>
@@ -93,6 +93,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
@@ -637,7 +644,6 @@
   </organization>
 
   <url>http://www.camunda.org</url>
-
 </project>
 
 

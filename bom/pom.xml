@@ -3,16 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.0.0</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
-  <version>7.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Bom</name>
   <url>http://camunda.org</url>
@@ -30,17 +27,6 @@
     <name>camunda services GmbH</name>
     <url>http://www.camunda.com</url>
   </organization>
-
-  <properties>
-    <version.mybatis>3.5.3</version.mybatis>
-    <version.joda-time>2.1</version.joda-time>
-    <version.uuid-generator>3.2.0</version.uuid-generator>
-    <version.camunda.commons>1.9.0</version.camunda.commons>
-    <version.camunda.connect>1.3.0</version.camunda.connect>
-    <version.camunda.spin>1.8.0</version.camunda.spin>
-    <version.camunda.template-engines>1.1.0</version.camunda.template-engines>
-    <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -237,32 +223,4 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <developers>
-    <developer>
-      <id>camunda.org</id>
-      <name>camunda BPM Community</name>
-      <organization>camunda.org</organization>
-      <organizationUrl>http://camunda.org</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <url>https://github.com/camunda/camunda-bpm-platform</url>
-    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <issueManagement>
-    <system>Jira</system>
-    <url>https://app.camunda.com/jira/browse/CAM/</url>
-  </issueManagement>
-
-  <repositories>
-    <repository>
-      <id>fix-maven-snapshots-issue-with-nexus</id>
-      <url>allow-parent-pom-resolving-when-snapshot</url>
-    </repository>
-  </repositories>
 </project>

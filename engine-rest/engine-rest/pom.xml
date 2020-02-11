@@ -92,6 +92,18 @@
       <version>1.6.5</version>
       <scope>test</scope>
     </dependency>
+    
+    <!--
+      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
+      BOM must be installed before this module is built
+    -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
 
     <!-- test -->
     <dependency>

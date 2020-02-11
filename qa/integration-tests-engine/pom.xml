@@ -151,20 +151,20 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
       <version>2.10.0</version>
-      <!-- 
-      Excluding jackson-databind for the following reason: 
-      
+      <!--
+      Excluding jackson-databind for the following reason:
+
       PaDataFormatConfiguratorJodaTest uses ShrinkWrap to pack jackson-datatype-joda
       plus transitive dependencies into a WAR and deploy that via Arquillian.
       One transitive dependency is jackson-databind. jackson-datatype-joda declares a dependency
       to jackson-databind 2.9.9, however our current managed dependency version is 2.9.9.3 (via spin).
       In that case, Shrinkwrap is not able to resolve the managed dependency version and
       fails to resolve the dependency, because 2.9.9 is not available in the local Maven repo.
-      
+
       When can this exclusion be removed again?
-      
+
       At the time at which the Jackson versions of this artifact and Spin are in sync again,
-      so probably when we switch jackson-databind back to a proper patch level, for which also 
+      so probably when we switch jackson-databind back to a proper patch level, for which also
       a patch of this artifact exists.
 
       <exclusions>
@@ -176,6 +176,17 @@
       -->
     </dependency>
 
+    <!--
+      needed for offline shrinkwrap,
+      BOM must be installed before this module is built
+    -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
