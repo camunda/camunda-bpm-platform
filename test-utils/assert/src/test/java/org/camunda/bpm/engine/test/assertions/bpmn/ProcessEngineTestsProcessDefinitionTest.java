@@ -30,7 +30,7 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertTh
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class ProcessEngineTestsProcessDefinitionTest extends ProcessAssertTestCase {
 

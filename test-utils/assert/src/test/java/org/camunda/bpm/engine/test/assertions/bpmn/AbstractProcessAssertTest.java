@@ -32,7 +32,7 @@ import java.util.Iterator;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 @SuppressWarnings("unchecked")
 public class AbstractProcessAssertTest {

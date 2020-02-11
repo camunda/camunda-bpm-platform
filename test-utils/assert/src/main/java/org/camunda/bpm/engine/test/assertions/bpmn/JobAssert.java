@@ -24,7 +24,7 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Assertions for a {@link Job}
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 

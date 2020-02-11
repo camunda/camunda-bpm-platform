@@ -25,8 +25,8 @@ import java.util.Date;
 
 /**
  * Assertions for a {@link Task}
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Rafael Cordones <rafael@cordones.me>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Rafael Cordones (rafael@cordones.me)
  */
 public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
 
