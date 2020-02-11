@@ -25,7 +25,7 @@ IF "x%JAVA_HOME%" == "x" (
 REM set environment parameters
 SET webappsPath=%BASEDIR%/../lib/webapps/
 SET restPath=%BASEDIR%/../lib/rest/
-SET classPath=%BASEDIR%/../lib/db/
+SET classPath=%BASEDIR%/../lib/db/,%BASEDIR%/../keystore/
 SET optionalComponentChosen=false
 
 

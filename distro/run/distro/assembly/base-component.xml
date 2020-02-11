@@ -16,6 +16,10 @@
       <outputDirectory>config/</outputDirectory>
     </file>
     <file>
+      <source>assembly/resources/keystore.p12</source>
+      <outputDirectory>keystore/</outputDirectory>
+    </file>
+    <file>
       <source>assembly/resources/start.sh</source>
       <filtered>true</filtered>
       <outputDirectory>bin/</outputDirectory>

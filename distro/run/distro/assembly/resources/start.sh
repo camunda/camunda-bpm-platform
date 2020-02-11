@@ -18,7 +18,7 @@ fi
 # set environment parameters
 webappsPath=$BASEDIR/../lib/webapps/
 restPath=$BASEDIR/../lib/rest/
-classPath=$BASEDIR/../lib/db/
+classPath=$BASEDIR/../lib/db/,$BASEDIR/../keystore
 optionalComponentChosen=false
 
 
