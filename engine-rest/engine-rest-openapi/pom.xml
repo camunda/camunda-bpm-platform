@@ -23,7 +23,6 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -44,6 +43,23 @@
               <arguments>
                 <argument>${project.basedir}/src/main/templates</argument>
                 <argument>main.ftl</argument>
+                <argument>${generated-directory}/${generated-file}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>validate-openapi-json</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <classpathScope>test</classpathScope>
+              <mainClass>org.camunda.bpm.engine.rest.openapi.generator.impl.SchemaValidator</mainClass>
+              <arguments>
+                <!-- The following json schema is copy from https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v3.0/schema.json -->
+                <!-- Date: 11-Feb-2020 -->
+                <argument>${project.basedir}/src/main/openapi/schema.json</argument>
                 <argument>${generated-directory}/${generated-file}</argument>
               </arguments>
             </configuration>
