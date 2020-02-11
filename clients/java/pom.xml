@@ -30,7 +30,6 @@
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
-    <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
 
