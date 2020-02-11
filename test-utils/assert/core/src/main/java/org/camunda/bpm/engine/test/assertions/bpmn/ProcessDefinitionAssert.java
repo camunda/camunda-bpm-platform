@@ -24,8 +24,8 @@ import org.camunda.bpm.engine.runtime.*;
 
 /**
  * Assertions for a {@link ProcessDefinition}
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Rafael Cordones <rafael@cordones.me>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Rafael Cordones (rafael@cordones.me)
  */
 public class ProcessDefinitionAssert extends AbstractProcessAssert<ProcessDefinitionAssert, ProcessDefinition> {
 

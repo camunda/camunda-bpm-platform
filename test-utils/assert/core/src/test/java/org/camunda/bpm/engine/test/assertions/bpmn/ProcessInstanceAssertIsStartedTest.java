@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class ProcessInstanceAssertIsStartedTest extends ProcessAssertTestCase {
 

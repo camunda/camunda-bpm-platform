@@ -29,8 +29,8 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
 
 /**
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
- * @author Martin Günther <martin.guenther@holisticon.de>
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
+ * @author Martin Günther (martin.guenther@holisticon.de)
  */
 public class CaseInstanceAssertTest extends ProcessAssertTestCase {
 

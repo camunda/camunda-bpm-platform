@@ -28,7 +28,7 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.junit.Assert.fail;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTestCase {
 

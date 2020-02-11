@@ -30,9 +30,9 @@ import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExe
 import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseService;
 
 /**
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
- * @author Martin Günther <martin.guenther@holisticon.de>
- * @author Tobias Metzke <tobias.metzke@camunda.com>
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
+ * @author Martin Günther (martin.guenther@holisticon.de)
+ * @author Tobias Metzke (tobias.metzke@camunda.com)
  */
 public class StageTest extends ProcessAssertTestCase {
 

@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * Assertions for a {@link ProcessInstance}
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Rafael Cordones <rafael@cordones.me>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Rafael Cordones (rafael@cordones.me)
  */
 public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstanceAssert, ProcessInstance> {
 
@@ -657,10 +657,10 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
 
   /**
    * Enter into a chained map assert inspecting the variables currently
-   * - or, for finished process instances, historically - available in the 
+   * - or, for finished process instances, historically - available in the
    * context of the process instance under test of this ProcessInstanceAssert.
    *
-   * @return  MapAssert<String, Object> inspecting the process variables. 
+   * @return  MapAssert(String, Object) inspecting the process variables.
    *          Inspecting an empty map in case no such variables are available.
    */
   public MapAssert<String, Object> variables() {

@@ -35,9 +35,9 @@ import org.camunda.bpm.engine.test.assertions.bpmn.TaskAssert;
 import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
- * @author Martin Günther <martin.guenther@holisticon.de>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
+ * @author Martin Günther (martin.guenther@holisticon.de)
  */
 public abstract class AbstractCaseAssert<S extends AbstractCaseAssert<S, A>, A extends CaseExecution> extends AbstractProcessAssert<S, A> {
 
@@ -566,7 +566,7 @@ public abstract class AbstractCaseAssert<S extends AbstractCaseAssert<S, A>, A e
   }
 
   /**
-   * Retrieve HistoricCaseActivityInstance for object under test from history database
+   * @return historic state for the object under test from history database
    **/
   protected int getHistoricState() {
     isNotNull();
@@ -618,7 +618,7 @@ public abstract class AbstractCaseAssert<S extends AbstractCaseAssert<S, A>, A e
    * Enter into a chained map assert inspecting the variables currently available in the context of the case instance
    * under test of this AbstractCaseAssert.
    * 
-   * @return MapAssert<String, Object> inspecting the case instance variables. Inspecting an empty map in case no such variables
+   * @return MapAssert(String, Object) inspecting the case instance variables. Inspecting an empty map in case no such variables
    *         are available.
    */
   protected MapAssert<String, Object> variables() {
