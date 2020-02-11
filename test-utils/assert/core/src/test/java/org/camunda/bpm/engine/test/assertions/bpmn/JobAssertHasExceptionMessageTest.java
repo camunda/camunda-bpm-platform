@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class JobAssertHasExceptionMessageTest extends ProcessAssertTestCase {
 

@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import java.util.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public abstract class AbstractProcessAssert<S extends AbstractProcessAssert<S, A>, A> extends AbstractAssert<S, A> {
 

@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class TaskAssertHasCandidateGroupAssociatedTest extends ProcessAssertTestCase {
 

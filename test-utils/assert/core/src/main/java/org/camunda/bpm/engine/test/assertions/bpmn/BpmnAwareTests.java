@@ -42,10 +42,10 @@ import java.util.Map;
 import static java.lang.String.format;
 
 /**
- * Convenience class to access only camunda *BPMN* related Assertions
- * PLUS helper methods. Usage is possible, if you only need BPMN Tests and
- * mandatory if you still use Camunda BPM <= 7.1.
- *
+ * Convenience class to access only camunda *BPMN* related Assertions 
+ * PLUS helper methods. Usage is possible, if you only need BPMN Tests and 
+ * mandatory if you still use Camunda BPM lower than 7.2 version. 
+ * 
  * Use it with a static import:
  *
  * import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*;
@@ -53,8 +53,8 @@ import static java.lang.String.format;
  * @see org.camunda.bpm.engine.test.assertions.ProcessEngineTests
  *      for full Camunda BPM Assertions functionality
  *
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Ingo Richtsmeier <ingo.richtsmeier@camunda.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Ingo Richtsmeier (ingo.richtsmeier@camunda.com)
  */
 public class BpmnAwareTests extends AbstractAssertions {
 
@@ -284,8 +284,8 @@ public class BpmnAwareTests extends AbstractAssertions {
    * @param   value (obligatory) value of first process variable
    * @param   furtherKeyValuePairs (optional) key/value pairs for further
    *          process variables
-   * @return  a map of process variables by passing a list of String
-   *          -> Object key value pairs.
+   * @return  a map of process variables by passing a list of String, 
+   *          Object key value pairs.
    */
   public static Map<String, Object> withVariables(final String key, final Object value, final Object... furtherKeyValuePairs) {
     if (key == null)
@@ -903,7 +903,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily fetch, lock and complete an external task.</br>
+   * Helper method to easily fetch, lock and complete an external task.<p>
    * Note: if multiple external tasks exist that can be locked for the topic of
    * the given external task, this method might throw an
    * {@link IllegalStateException} if an external task with a different id is
@@ -922,7 +922,7 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
-   * Helper method to easily fetch, lock and complete an external task.</br>
+   * Helper method to easily fetch, lock and complete an external task.<p>
    * Note: if multiple external tasks exist that can be locked for the topic of
    * the given external task, this method might throw an
    * {@link IllegalStateException} if an external task with a different id is

@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
- * @author Martin Günther <martin.guenther@holisticon.de>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
+ * @author Martin Günther (martin.guenther@holisticon.de)
  */
 public class CaseExecutionAssert extends AbstractCaseAssert<CaseExecutionAssert, CaseExecution> {
 

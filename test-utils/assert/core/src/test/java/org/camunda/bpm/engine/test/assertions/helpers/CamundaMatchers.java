@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.mockito.ArgumentMatchers;
 
 /**
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 public class CamundaMatchers extends ArgumentMatchers {
 

@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * @author Malte Soerensen <malte.soerensen@holisticon.de>
+ * @author Malte Soerensen (malte.soerensen@holisticon.de)
  */
 @Deployment(resources = "cmmn/MilestoneAssertIsCompletedTest.cmmn")
 public class MilestoneAssertIsCompletedTest extends ProcessAssertTestCase {

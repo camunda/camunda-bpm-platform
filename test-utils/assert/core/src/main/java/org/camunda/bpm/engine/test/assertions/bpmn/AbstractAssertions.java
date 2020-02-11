@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.ProcessEngines;
 import java.util.Map;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public abstract class AbstractAssertions {
 

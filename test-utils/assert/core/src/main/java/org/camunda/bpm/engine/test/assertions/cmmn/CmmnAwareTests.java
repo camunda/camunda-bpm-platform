@@ -37,9 +37,9 @@ import static java.lang.String.format;
  *
  * import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.*;
  *
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Martin Günther <martin.guenter@holisticon.de>
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Martin Günther (martin.guenter@holisticon.de)
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 public class CmmnAwareTests extends BpmnAwareTests {
 

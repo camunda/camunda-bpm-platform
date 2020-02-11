@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class StageAssert extends AbstractCaseAssert<StageAssert, CaseExecution> {
 

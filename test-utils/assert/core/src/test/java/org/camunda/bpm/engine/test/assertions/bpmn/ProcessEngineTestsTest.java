@@ -46,7 +46,7 @@ import static org.junit.Assert.fail;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ProcessEngines.class)

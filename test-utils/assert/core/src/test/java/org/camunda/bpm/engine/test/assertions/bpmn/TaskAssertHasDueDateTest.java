@@ -30,7 +30,7 @@ import java.util.Date;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class TaskAssertHasDueDateTest extends ProcessAssertTestCase {
 

@@ -20,8 +20,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Malte Sörense <malte.soerensen@holisticon.de>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Malte Sörense (malte.soerensen@holisticon.de)
  */
 public class MilestoneAssert extends AbstractCaseAssert<MilestoneAssert, CaseExecution> {
 

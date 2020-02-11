@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class ProcessTaskAssert extends AbstractCaseAssert<ProcessTaskAssert, CaseExecution> {
 
@@ -122,7 +122,7 @@ public class ProcessTaskAssert extends AbstractCaseAssert<ProcessTaskAssert, Cas
    * Enter into a chained map assert inspecting the variables currently available in the context of the human task instance
    * under test of this ProcessTaskAssert.
    *
-   * @return MapAssert<String, Object> inspecting the human task instance variables. Inspecting an empty map in case no such variables
+   * @return MapAssert(String, Object) inspecting the human task instance variables. Inspecting an empty map in case no such variables
    *         are available.
    */
   @Override

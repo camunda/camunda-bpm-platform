@@ -52,7 +52,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * That's because simple, one-liner boilerplate code is not regarded as test-worthy.
  * That code is so simplistic, it is not expected to break easily.
  *
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({BpmnAwareTests.class, CmmnAwareTests.class, AbstractAssertions.class})

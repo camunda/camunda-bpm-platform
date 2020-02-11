@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests;
  *   
  * @see BpmnAwareTests if you only want to see BPMN related functionality
  *
- * @author Martin Schimak <martin.schimak@plexiti.com>
- * @author Martin Günther <martin.guenter@holisticon.de>
- * @author Malte Sörensen <malte.soerensen@holisticon.de>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
+ * @author Martin Günther (martin.guenter@holisticon.de)
+ * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 public class ProcessEngineTests extends CmmnAwareTests {
 

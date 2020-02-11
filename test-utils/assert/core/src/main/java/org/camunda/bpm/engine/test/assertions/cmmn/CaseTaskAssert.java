@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 
 /**
- * @author Martin Schimak <martin.schimak@plexiti.com>
+ * @author Martin Schimak (martin.schimak@plexiti.com)
  */
 public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecution> {
 
@@ -123,7 +123,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
    * Enter into a chained map assert inspecting the variables currently available in the context of the case task instance
    * under test of this CaseTaskAssert.
    *
-   * @return MapAssert<String, Object> inspecting the case task instance variables. Inspecting an empty map in case no such variables
+   * @return MapAssert(String, Object) inspecting the case task instance variables. Inspecting an empty map in case no such variables
    *         are available.
    */
   public MapAssert<String, Object> variables() {
