@@ -22,22 +22,19 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
-import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class TemplateParser {
 
-  public static void main(String[] args) throws ParseException, IOException, TemplateException {
+  public static void main(String[] args) throws IOException, TemplateException {
 
     if (args.length != 3) {
       throw new RuntimeException("Must provide three arguments: <source template directory> <main template> <output directory>");
@@ -68,6 +65,7 @@ public class TemplateParser {
       FileUtils.forceMkdir(outFile.getParentFile());
       Files.write(outFile.toPath(), formattedJson.getBytes());
     }
+
   }
 
   protected static Map<String, Object> createTemplateData() {
