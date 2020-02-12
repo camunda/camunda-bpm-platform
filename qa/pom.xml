@@ -75,7 +75,7 @@
         <module>test-db-rolling-update</module>
         <module>test-old-engine</module>
         <module>performance-tests-engine</module>
-        <module>optimize-api-tests</module>
+        <module>large-data-tests</module>
       </modules>
     </profile>
 

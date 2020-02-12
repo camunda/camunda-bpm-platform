@@ -18,10 +18,10 @@ package org.camunda.optimize.qa;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.OptimizeService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,19 +35,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class OptimizeApiPageSizeTest {
 
   private static OptimizeService optimizeService;
-  private static int optimizePageSize;
+  private static final int OPTIMIZE_PAGE_SIZE = 10_000;
+
+  @ClassRule
+  public static ProcessEngineRule processEngineRule = new ProcessEngineRule("camunda.cfg.xml");
 
 
   @BeforeClass
   public static void init() {
-    final TestProperties properties = new TestProperties();
-    final ProcessEngine processEngine = TestProcessEngine.getInstance(properties);
-    optimizeService =
-      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getOptimizeService();
-    optimizePageSize = Integer.parseInt(properties.getProperty("optimizePageSize", "10000"));
+    optimizeService = processEngineRule.getProcessEngineConfiguration().getOptimizeService();
 
     // given the generated engine data
-    EngineDataGenerator generator = new EngineDataGenerator(processEngine, optimizePageSize);
+    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE);
     generator.generateData();
   }
 
@@ -55,10 +54,10 @@ public class OptimizeApiPageSizeTest {
   @Parameters(method = "optimizeServiceFunctions")
   public void databaseCanCopeWithPageSize(TestScenario scenario) {
     // when
-    final List<?> pageOfEntries = scenario.getOptimizeServiceFunction().apply(optimizePageSize);
+    final List<?> pageOfEntries = scenario.getOptimizeServiceFunction().apply(OPTIMIZE_PAGE_SIZE);
 
     // then
-    assertThat(pageOfEntries.size(), is(optimizePageSize));
+    assertThat(pageOfEntries.size(), is(OPTIMIZE_PAGE_SIZE));
   }
 
   private Object[] optimizeServiceFunctions() {

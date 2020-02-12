@@ -16,6 +16,7 @@
  */
 package org.camunda.optimize.qa;
 
+import com.google.common.collect.Lists;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -24,6 +25,8 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -37,6 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.camunda.optimize.qa.DmnHelper.createSimpleDmnModel;
 
@@ -55,10 +61,15 @@ public class EngineDataGenerator {
   private final RepositoryService repositoryService;
   private final RuntimeService runtimeService;
   private final TaskService taskService;
+  private final ProcessEngine processEngine;
 
   public final int numberOfInstancesToGenerate;
 
+  // allows to configure how many commands are executed in one transaction if jdbc transaction is enabled
+  public static final int BATCH_SIZE = 100;
+
   public EngineDataGenerator(final ProcessEngine processEngine, final int optimizePageSize) {
+    this.processEngine = processEngine;
     this.identityService = processEngine.getIdentityService();
     this.decisionService = processEngine.getDecisionService();
     this.repositoryService = processEngine.getRepositoryService();
@@ -81,29 +92,43 @@ public class EngineDataGenerator {
 
   private void generateDecisionInstanceData() {
     logger.info("Generating decision instance data...");
-    for (int i = 0; i < numberOfInstancesToGenerate; i++) {
-      decisionService
-        .evaluateDecisionByKey(DECISION_KEY)
-        .variables(createSimpleVariables())
-        .evaluate();
-    }
+    final List<Integer> sequenceNumberList = createSequenceNumberList();
+    generateInBatches(
+      sequenceNumberList,
+      (ignored) -> evaluateDecision()
+    );
     logger.info("Successfully generated decision instance data.");
+  }
+
+  private void evaluateDecision() {
+    decisionService
+      .evaluateDecisionByKey(DECISION_KEY)
+      .variables(createSimpleVariables())
+      .evaluate();
   }
 
   private void generateCompletedProcessInstanceData() {
     logger.info("Generating completed process instance data...");
-    for (int i = 0; i < numberOfInstancesToGenerate; i++) {
-      runtimeService.startProcessInstanceByKey(AUTO_COMPLETE_PROCESS_KEY, createSimpleVariables());
-    }
+    final List<Integer> sequenceNumberList = createSequenceNumberList();
+    generateInBatches(
+      sequenceNumberList,
+      (ignored) -> startAutoCompleteProcess()
+    );
     logger.info("Successfully generated completed process instance data...");
+  }
+
+  private void startAutoCompleteProcess() {
+    runtimeService.startProcessInstanceByKey(AUTO_COMPLETE_PROCESS_KEY, createSimpleVariables());
   }
 
   private void generateUserTaskData() {
     // the user task data includes data for tasks, identity link log, operations log
     logger.info("Generating user task data....");
-    for (int i = 0; i < numberOfInstancesToGenerate; i++) {
-      runtimeService.startProcessInstanceByKey(USER_TASK_PROCESS_KEY, createSimpleVariables());
-    }
+    final List<Integer> sequenceNumberList = createSequenceNumberList();
+    generateInBatches(
+      sequenceNumberList,
+      (ignored) -> startUserTaskProcess()
+    );
     createUser();
     createGroup();
     setCandidateUserAndGroupForAllUserTask();
@@ -137,18 +162,48 @@ public class EngineDataGenerator {
   private void setCandidateUserAndGroupForAllUserTask() {
     List<Task> list = taskService.createTaskQuery().list();
     identityService.setAuthenticatedUserId(userId);
-    for (Task task : list) {
-      taskService.addCandidateUser(task.getId(), userId);
-      taskService.addCandidateGroup(task.getId(), groupId);
-    }
+    generateInBatches(
+      list,
+      (task) -> {
+        taskService.addCandidateUser(task.getId(), userId);
+        taskService.addCandidateGroup(task.getId(), groupId);
+      }
+    );
   }
 
   private void completeAllUserTasks() {
     List<Task> list = taskService.createTaskQuery().list();
-    for (Task task : list) {
-      taskService.claim(task.getId(), userId);
-      taskService.complete(task.getId());
-    }
+    generateInBatches(
+      list,
+      (task) -> {
+        taskService.claim(task.getId(), userId);
+        taskService.complete(task.getId());
+      }
+    );
+  }
+
+  private void startUserTaskProcess() {
+    runtimeService.startProcessInstanceByKey(USER_TASK_PROCESS_KEY, createSimpleVariables());
+  }
+
+  private List<Integer> createSequenceNumberList() {
+    return IntStream.range(0, numberOfInstancesToGenerate)
+      .boxed().collect(Collectors.toList());
+  }
+
+
+  private <T> void generateInBatches(List<T> allEntries, Consumer<T> generateData) {
+    final List<List<T>> partition = Lists.partition(allEntries, BATCH_SIZE);
+    partition.forEach(batch -> {
+      ProcessEngineConfigurationImpl configuration =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+      configuration.getCommandExecutorTxRequired().execute(
+        (Command<Void>) commandContext -> {
+          batch.forEach(generateData);
+          return null;
+        }
+      );
+    });
   }
 
   private Map<String, Object> createSimpleVariables() {

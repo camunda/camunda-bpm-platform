@@ -9,11 +9,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>optimize-api-tests</artifactId>
-  <name>Optimize API tests</name>
+  <artifactId>large-data-tests</artifactId>
+  <name>Large Data Tests</name>
 
   <properties>
-    <optimize.page.size>100000</optimize.page.size>
     <skipTests>true</skipTests>
   </properties>
 
@@ -29,6 +28,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>28.2-jre</version>
+    </dependency>
+
+    <dependency>
       <groupId>pl.pragmatists</groupId>
       <artifactId>JUnitParams</artifactId>
       <version>1.1.1</version>
@@ -38,40 +43,15 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <version>${version.logback}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.9.11</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <version>${version.junit}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jdbc</artifactId>
-      <version>7.0.33</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-juli</artifactId>
-      <version>7.0.33</version>
     </dependency>
   </dependencies>
 
@@ -95,7 +75,7 @@
     </profile>
 
     <profile>
-      <id>optimize-api-tests</id>
+      <id>large-data-tests</id>
 
       <properties>
         <skipTests>false</skipTests>
