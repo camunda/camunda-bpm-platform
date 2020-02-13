@@ -16,15 +16,18 @@
  */
 package org.camunda.bpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.List;
+
 import com.sun.jersey.api.client.ClientResponse;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CsrfPreventionIT extends AbstractWebIntegrationTest {
 
@@ -75,6 +78,30 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     }
 
     return false;
+  }
+
+  @Test(timeout=10000)
+  public void shouldRejectModifyingRequest() {
+    // given
+    String baseUrl = testProperties.getApplicationPath("/" + getWebappCtxPath());
+    String modifyingRequestPath = "api/admin/auth/user/default/login/welcome";
+
+    // when
+    URLConnection urlConnection = performRequest(baseUrl + modifyingRequestPath,
+                                                 "POST",
+                                                 "Content-Type",
+                                                 "application/x-www-form-urlencoded");
+
+    try {
+      urlConnection.getContent();
+      fail("Exception expected!");
+    } catch (IOException e) {
+      // then
+      assertTrue(getErrorResponseContent().contains("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty."));
+      assertTrue(getXsrfTokenHeader().equals("Required"));
+      assertTrue(e.getMessage().contains("Server returned HTTP response code: 403 for URL"));
+    }
+
   }
 
 }

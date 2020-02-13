@@ -20,6 +20,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -28,6 +29,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -53,6 +62,7 @@ public abstract class AbstractWebIntegrationTest {
   public ApacheHttpClient4 client;
   public DefaultHttpClient defaultHttpClient;
   public String httpPort;
+  protected HttpURLConnection connection;
 
   @Before
   public void before() throws Exception {
@@ -63,6 +73,7 @@ public abstract class AbstractWebIntegrationTest {
   @After
   public void destroyClient() {
     client.destroy();
+    connection = null;
   }
 
   public void createClient(String ctxPath) throws Exception {
@@ -79,6 +90,76 @@ public abstract class AbstractWebIntegrationTest {
     HttpParams params = defaultHttpClient.getParams();
     HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
     HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
+  }
+
+  public URLConnection performRequest(String url, String method, String headerName, String headerValue) {
+    try {
+      connection =
+          (HttpURLConnection) new URL(url)
+              .openConnection();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    if ("POST".equals(method)) {
+      try {
+        connection.setRequestMethod("POST");
+      } catch (ProtocolException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    if (headerName != null && headerValue != null) {
+      connection.setRequestProperty(headerName, headerValue);
+    }
+
+    try {
+      connection.connect();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    return connection;
+  }
+
+  public String getErrorResponseContent() {
+    try {
+      StringWriter writer = new StringWriter();
+      IOUtils.copy(connection.getErrorStream(), writer, "UTF-8");
+      return writer.toString();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public String getXsrfTokenHeader() {
+    return connection.getHeaderField("X-XSRF-TOKEN");
+  }
+
+  public String getXsrfCookieValue() {
+    return getCookieValue("XSRF-TOKEN");
+  }
+
+  public String getCookieValue(String cookieName) {
+    List<String> cookies = getCookieHeaders();
+
+    for (String cookie : cookies) {
+      if (cookie.startsWith(cookieName + "=")) {
+        return cookie;
+      }
+    }
+
+    return "";
+  }
+
+  public List<String> getCookieHeaders() {
+    return getHeaders("Set-Cookie");
+  }
+
+  public List<String> getHeaders(String name) {
+    Map<String, List<String>> headerFields = connection.getHeaderFields();
+    return headerFields.get(name);
   }
 
   public void preventRaceConditions() throws InterruptedException {
