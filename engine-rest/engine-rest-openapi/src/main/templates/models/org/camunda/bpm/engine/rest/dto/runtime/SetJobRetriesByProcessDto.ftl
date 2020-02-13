@@ -16,7 +16,6 @@
         name = "retries"
         type = "integer"
         format = "int32"
-        hasMinimum = true
         minimum = 0
         last = true
         description = "An integer representing the number of retries. Please note that the value cannot be negative or null." />

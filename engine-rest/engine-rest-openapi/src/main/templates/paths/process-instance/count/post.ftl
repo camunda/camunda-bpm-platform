@@ -11,15 +11,15 @@
   "responses" : {
 
     <@lib.response
-        code="200"
-        dto="CountResultDto"
-        desc="Request successful."/>
+        code = "200"
+        dto = "CountResultDto"
+        description = "Request successful."/>
 
     <@lib.response
-        code="400"
-        dto="ExceptionDto"
-        last =true
-        desc="Bad Request
+        code = "400"
+        dto = "ExceptionDto"
+        last = true
+        description = "Bad Request
         Returned if some of the query parameters are invalid, for example if an invalid operator for variable comparison is used."/>
 
   }

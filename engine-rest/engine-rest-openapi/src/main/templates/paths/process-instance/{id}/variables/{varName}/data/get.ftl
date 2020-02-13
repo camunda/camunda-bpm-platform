@@ -42,13 +42,13 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Bad Request\n\nA Process Variable with the given id exists but does not serialize as binary data."/>
+        description = "Bad Request\n\nA Process Variable with the given id exists but does not serialize as binary data."/>
 
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
         last = true
-        desc = "Not Found\n\nA Process Variable with the given id does not exist. "/>
+        description = "Not Found\n\nA Process Variable with the given id does not exist. "/>
 
   }
 }

@@ -18,13 +18,13 @@
     <@lib.response
         code = "200"
         dto = "ActivityInstanceDto"
-        desc = "Request successful." />
+        description = "Request successful." />
 
     <@lib.response
         code = "500"
         dto = "ExceptionDto"
         last = true
-        desc = "Process instance with given id does not exist."/>
+        description = "Process instance with given id does not exist."/>
 
   }
 }

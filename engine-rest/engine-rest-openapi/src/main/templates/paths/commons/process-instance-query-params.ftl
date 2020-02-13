@@ -67,24 +67,21 @@
 <@lib.parameter name = "active"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Only include active process instances. Value may only be true,
  as false is the default behavior."/>
 
 <@lib.parameter name = "suspended"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Only include suspended process instances. Value may only be true,
  as false is the default behavior."/>
 
 <@lib.parameter name = "withIncident"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Filter by presence of incidents. Selects only process instances that have an incident."/>
 
 <@lib.parameter name = "incidentId"
@@ -115,15 +112,13 @@
 <@lib.parameter name = "withoutTenantId"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Only include process instances which belong to no tenant."/>
 
 <@lib.parameter name = "processDefinitionWithoutTenantId"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Only include process instances which process definition has no tenant id."/>
 
 <@lib.parameter name = "activityIdIn"
@@ -134,15 +129,13 @@
 <@lib.parameter name = "rootProcessInstances"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Restrict the query to all process instances that are top level process instances."/>
 
 <@lib.parameter name = "leafProcessInstances"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances)."/>
 
 <@lib.parameter name = "variables"
@@ -161,14 +154,12 @@ key and value may not contain underscore or comma characters."/>
 <@lib.parameter name = "variableNamesIgnoreCase"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     description = "Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal."/>
 
 <@lib.parameter name = "variableValuesIgnoreCase"
     location = "query"
     type = "boolean"
-    hasDefault = true
-    defaultValue = false
+    defaultValue = 'false'
     last = last
     description = "Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal."/>

@@ -17,32 +17,28 @@
         name = "skipCustomListeners"
         location = "query"
         type = "boolean"
-        hasDefault = true
-        defaultValue = false
+        defaultValue = 'false'
         description = "If set to true, the custom listeners will be skipped." />
 
     <@lib.parameter
         name = "skipIoMappings"
         location = "query"
         type = "boolean"
-        hasDefault = true
-        defaultValue = false
+        defaultValue = 'false'
         description = "If set to true, the input/output mappings will be skipped." />
 
     <@lib.parameter
         name = "skipSubprocesses"
         location = "query"
         type = "boolean"
-        hasDefault = true
-        defaultValue = false
+        defaultValue = 'false'
         description = "If set to true, subprocesses related to deleted processes will be skipped." />
 
     <@lib.parameter
         name = "failIfNotExists"
         location = "query"
         type = "boolean"
-        hasDefault = true
-        defaultValue = true
+        defaultValue = "true"
         last = true
         description = "If set to false, the request will still be successful if the process id is not found." />
 
@@ -51,13 +47,13 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful." />
+        description = "Request successful." />
 
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
         last = true
-        desc = "Not found\n\n
+        description = "Not found\n\n
                 Process instance with given id does not exist. " />
 
   }

@@ -21,8 +21,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-openapi-generator</artifactId>
       <scope>test</scope>
-      <!-- TODO: managed version -->
-      <version>7.13.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
   </dependencies>
@@ -41,7 +40,7 @@
             </goals>
             <configuration>
               <classpathScope>test</classpathScope>
-              <mainClass>com.camunda.bpm.engine.rest.TemplateParser</mainClass>
+              <mainClass>org.camunda.bpm.engine.rest.openapi.generator.impl.TemplateParser</mainClass>
               <arguments>
                 <argument>${project.basedir}/src/main/templates</argument>
                 <argument>main.ftl</argument>

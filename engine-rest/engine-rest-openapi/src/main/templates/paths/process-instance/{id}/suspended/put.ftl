@@ -35,7 +35,7 @@
     <@lib.response
         code = "204"
         last = true
-        desc = "Request successful." />
+        description = "Request successful." />
 
       }
 }
