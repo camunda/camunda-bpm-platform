@@ -45,6 +45,7 @@
                 <argument>${project.basedir}/src/main/templates</argument>
                 <argument>main.ftl</argument>
                 <argument>${generated-directory}/${generated-file}</argument>
+                <argument>${project.build.directory}</argument>
               </arguments>
             </configuration>
           </execution>
