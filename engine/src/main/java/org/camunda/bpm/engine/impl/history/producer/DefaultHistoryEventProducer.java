@@ -584,6 +584,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
 
+    if (executionEntity.isSuspended()) {
+      evt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+    } else {
+      evt.setState(HistoricProcessInstance.STATE_ACTIVE);
+    }
+
     return evt;
   }
 
