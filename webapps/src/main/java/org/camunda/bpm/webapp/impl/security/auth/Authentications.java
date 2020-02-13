@@ -180,7 +180,9 @@ public class Authentications implements Serializable {
   }
 
   public static void updateSession(HttpSession session, Authentications authentications) {
-    session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
+    if (session != null) {
+      session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
+    }
   }
 
 }
