@@ -2,17 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.0.0</version>
-    <!-- DO NOT REMOVE EMPTY TAG https://issues.apache.org/jira/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm.springboot.project</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
+  <name>camunda BPM - Spring Boot Starter - Root Pom</name>
   <inceptionYear>2015</inceptionYear>
-  <version>3.5.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -21,18 +20,12 @@
     <module>starter-rest</module>
     <module>starter-webapp-core</module>
     <module>starter-webapp</module>
+    <module>starter-webapp-ee</module>
     <module>starter-test</module>
-    <module>starter-qa</module>
   </modules>
 
   <properties>
     <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
-    <!-- for SNAPSHOT versions ${camunda.version} and ${camunda-webapp-ee.version} will be the same, for released versions, the latter must be with -ee suffix -->
-    <camunda.version>7.13.0-SNAPSHOT</camunda.version>
-    <!-- for SNAPSHOT versions the camunda.version stays as it is, e.g. 7.12.0-SNAPSHOT -->
-    <!-- for released versions, add the suffix '-ee', e.g. 7.12.0-ee -->
-    <camunda-webapp-ee.version>${camunda.version}</camunda-webapp-ee.version>
-
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
 
@@ -45,7 +38,7 @@
         <!-- Import dependency management from camunda -->
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
-        <version>${camunda.version}</version>
+        <version>${project.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -76,17 +69,6 @@
   
   <profiles>
     <profile>
-      <id>distro-ee</id>
-      <activation>
-        <property>
-          <name>env.RELEASE_VERSION</name>
-        </property>
-      </activation>
-      <modules>
-        <module>starter-webapp-ee</module>
-      </modules>
-    </profile>
-    <profile>
       <id>license-header-check</id>
       <build>
         <plugins>
@@ -96,6 +78,12 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>integration-test-spring-boot-starter</id>
+      <modules>
+        <module>starter-qa</module>
+      </modules>
     </profile>
   </profiles>
 
@@ -129,7 +117,9 @@
           </configuration>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.22.2</version>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <trimStackTrace>false</trimStackTrace>
@@ -142,7 +132,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.22.2</version>
         <executions>
           <execution>
             <goals>
@@ -185,42 +174,5 @@
 
     </plugins>
   </build>
-
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</connection>
-    <url>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</url>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
-  <distributionManagement>
-    <repository>
-      <id>camunda-nexus</id>
-      <name>camunda bpm</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm</url>
-    </repository>
-    <snapshotRepository>
-      <id>camunda-nexus</id>
-      <name>camunda bpm snapshots</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-snapshots</url>
-      <uniqueVersion>true</uniqueVersion>
-    </snapshotRepository>
-  </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>camunda.com.public</id>
-      <name>Camunda Repository</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
 
 </project>

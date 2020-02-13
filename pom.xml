@@ -58,6 +58,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>spring-boot-starter</module>
+
         <module>qa</module>
 
         <module>webapps/h2-webapp</module>
@@ -199,6 +201,7 @@
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
+        <module>spring-boot-starter</module>
         <module>model-api</module>
 
         <module>engine</module>
