@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.util;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.rules.ExternalResource;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -115,6 +117,17 @@ public class HeaderRule extends ExternalResource {
 
   public String getXsrfCookieValue() {
     return getCookieValue("XSRF-TOKEN");
+  }
+
+  public String getErrorResponseContent() {
+    try {
+      StringWriter writer = new StringWriter();
+      IOUtils.copy(connection.getErrorStream(), writer, "UTF-8");
+      return writer.toString();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public List<String> getHeaders(String name) {

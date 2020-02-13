@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
 
+import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
@@ -26,6 +27,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,17 +78,14 @@ public class CsrfPreventionIT {
     URLConnection urlConnection = headerRule.performPostRequest("http://localhost:" + port + "/api/admin/auth/user/default/login/welcome",
       "Content-Type", "application/x-www-form-urlencoded");
 
-    /*
-      This "then" block smells bad. However, due to
-      https://app.camunda.com/jira/browse/CAM-10911
-      it is not possible to check the error properly.
-     */
     try {
       urlConnection.getContent();
       fail("Exception expected!");
     } catch (IOException e) {
       // then
-      assertThat(e).hasMessageContaining("Server returned HTTP response code: 500 for URL: ");
+      assertThat(e).hasMessageContaining("Server returned HTTP response code: 403 for URL");
+      assertThat(headerRule.getHeaderXsrfToken()).isEqualTo("Required");
+      assertThat(headerRule.getErrorResponseContent()).contains("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty.");
     }
 
   }
