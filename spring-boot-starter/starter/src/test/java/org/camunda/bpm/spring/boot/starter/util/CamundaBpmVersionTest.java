@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.util;
 
-import org.junit.Before;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -27,8 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 public class CamundaBpmVersionTest {
 
@@ -42,10 +40,7 @@ public class CamundaBpmVersionTest {
 
   @BeforeClass
   public static void setUp() throws IOException {
-    InputStream is = CamundaBpmVersionTest.class.getResourceAsStream("/test.properties");
-    Properties p = new Properties();
-    p.load(is);
-    currentVersion = p.getProperty("camunda.version");
+    currentVersion = ProcessEngine.class.getPackage().getImplementationVersion();
   }
 
   @Test

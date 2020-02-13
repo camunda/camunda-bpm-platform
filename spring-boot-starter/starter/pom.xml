@@ -3,11 +3,12 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+  <name>camunda BPM - Spring Boot Starter</name>
 
   <dependencies>
     <dependency>
@@ -32,6 +33,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-loader-tools</artifactId>
+    </dependency>
+    
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -142,24 +148,6 @@
   </dependencies>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>write-project-properties</goal>
-            </goals>
-            <configuration>
-              <outputFile>${project.build.testOutputDirectory}/test.properties</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
     <resources>
       <resource>
         <directory>src/main/resources</directory>

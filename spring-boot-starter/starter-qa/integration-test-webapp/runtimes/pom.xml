@@ -6,13 +6,19 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>qa-webapp</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
   <packaging>pom</packaging>
 
   <artifactId>qa-webapp-runtimes</artifactId>
+  <name>camunda BPM - Spring Boot Starter - QA - Webappps Runtimes</name>
+
+  <modules>
+    <module>community</module>
+    <module>enterprise</module>
+  </modules>
 
   <properties>
     <version.selenium>2.45.0</version.selenium>
@@ -28,72 +34,57 @@
     <http.ctx-path.rest>rest/</http.ctx-path.rest>
   </properties>
 
-  <profiles>
-    <profile>
-      <id>distro-ee</id>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client4</artifactId>
+        <version>${version.jersey-apache-client}</version>
+      </dependency>
 
-      <modules>
-        <module>community</module>
-        <module>enterprise</module>
-      </modules>
-    </profile>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-java</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-    <profile>
-      <!-- used by travis ci; No enterprise repo access -->
-      <id>webapp-qa-ce</id>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-server</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-      <modules>
-        <module>community</module>
-      </modules>
-    </profile>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-remote-driver</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-    <profile>
-      <!-- convenience profile; Not used by any build jobs -->
-      <id>webapp-qa-ee</id>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-chrome-driver</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-      <modules>
-        <module>enterprise</module>
-      </modules>
-    </profile>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-api</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-    <profile>
-      <id>skip-selenium</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>integration-tests</id>
-                  <phase>integration-test</phase>
-                  <goals>
-                    <goal>test</goal>
-                  </goals>
-                  <configuration>
-                    <includes>
-                      <include>**/*IT.*</include>
-                    </includes>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-support</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
 
-                    <excludes>
-                      <!-- [Google Chrome is missing on Travis CI]
-                         See https://app.camunda.com/jira/browse/CAM-11161
-                      -->
-                      <exclude>**/LoginIT.*</exclude>
-                      <!-- [/Google Chrome is missing on Travis CI] -->
-
-                      <exclude>**/ErrorPageIT.*</exclude>
-                    </excludes>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-json</artifactId>
+        <version>${version.jersey-json}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- REST API -->
@@ -106,7 +97,7 @@
     <dependency>
       <groupId>org.camunda.bpm.qa</groupId>
       <artifactId>camunda-qa-integration-tests-webapps</artifactId>
-      <version>${camunda.version}</version>
+      <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -120,75 +111,64 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${version.h2}</version>
     </dependency>
 
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
-      <version>${version.glassfish-jaxb}</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <version>${version.jersey-apache-client}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-server</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-remote-driver</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-chrome-driver</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-api</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
-      <version>${version.selenium}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>${version.jersey-json}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
 
