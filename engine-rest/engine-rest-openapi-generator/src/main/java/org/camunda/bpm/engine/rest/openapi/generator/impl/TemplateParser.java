@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
@@ -36,13 +38,14 @@ public class TemplateParser {
 
   public static void main(String[] args) throws IOException, TemplateException {
 
-    if (args.length != 3) {
-      throw new RuntimeException("Must provide three arguments: <source template directory> <main template> <output directory>");
+    if (args.length != 4) {
+      throw new RuntimeException("Must provide four arguments: <source template directory> <main template> <output directory> <intermediate output dir>");
     }
 
     String sourceDirectory = args[0];
     String mainTemplate = args[1];
     String outputFile = args[2];
+    String debugFile = args[3];
 
     Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
 
@@ -56,6 +59,11 @@ public class TemplateParser {
     try (StringWriter out = new StringWriter()) {
 
       template.process(templateData, out);
+
+      // create intermediate json file before the formatting
+      String path = createOutputFile(debugFile);
+      FileUtils.forceMkdir(new File(debugFile));
+      Files.write(Paths.get(path), out.getBuffer().toString().getBytes());
 
       // format json with Gson
       String jsonString = out.getBuffer().toString();
@@ -73,15 +81,22 @@ public class TemplateParser {
 
     String version = TemplateParser.class.getPackage().getImplementationVersion();
 
-    // docsVersion = 7.X.Y
-    templateData.put("cambpmVersion", version);
+    if (version != null) {
+      // docsVersion = 7.X.Y
+      templateData.put("cambpmVersion", version);
 
-    if (version.contains("SNAPSHOT")) {
-      templateData.put("docsVersion", "develop");
+      if (version.contains("SNAPSHOT")) {
+        templateData.put("docsVersion", "develop");
+      } else {
+        // docsVersion = 7.X
+        templateData.put("docsVersion", version.substring(0, version.lastIndexOf(".")));
+      }
     } else {
-      // docsVersion = 7.X
-      templateData.put("docsVersion", version.substring(0, version.lastIndexOf(".")));
+      // only for debug cases 
+      templateData.put("cambpmVersion", "develop");
+      templateData.put("docsVersion", "develop");
     }
+
     return templateData;
   }
 
@@ -93,6 +108,12 @@ public class TemplateParser {
     String formattedJson = gson.toJson(json);
 
     return formattedJson;
+  }
+
+  protected static String createOutputFile(String debugFile) throws IOException {
+    DateTimeFormatter timeStampPattern = DateTimeFormatter.ofPattern("MM-dd-HH-mm-ss");
+
+    return debugFile + "/intermediate-openapi-" + timeStampPattern.format(java.time.LocalDateTime.now()) + ".json";
   }
 
 }
