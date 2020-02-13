@@ -99,14 +99,21 @@ module.exports = [
         return $q.reject(response);
       }
 
-      return $http({
-        method: 'POST',
-        url: Uri.appUri('admin://auth/user/:engine/login/:appName'),
-        data: form,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      })
+      function performRequest() {
+        return $http({
+          method: 'POST',
+          url: Uri.appUri('admin://auth/user/:engine/login/:appName'),
+          data: form,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+      }
+
+      // We have to perform a GET request before login to make sure we have an up to date CSRF-Cookie
+      return $http
+        .get(Uri.appUri('engine://engine/'))
+        .then(performRequest)
         .then(parse)
         .then(success, error);
     };
