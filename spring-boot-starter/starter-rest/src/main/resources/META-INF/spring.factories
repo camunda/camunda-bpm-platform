@@ -1,0 +1,2 @@
+# AutoConfigurations
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.camunda.bpm.spring.boot.starter.rest.CamundaBpmRestJerseyAutoConfiguration

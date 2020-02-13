@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.springboot.project</groupId>
+    <artifactId>camunda-bpm-spring-boot-starter-qa</artifactId>
+    <version>3.5.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+  </parent>
+
+  <packaging>pom</packaging>
+
+  <artifactId>qa-webapp</artifactId>
+
+  <modules>
+    <module>invoice-example</module>
+    <module>runtimes</module>
+  </modules>
+
+  <properties>
+    <!-- default os -->
+    <os.type>linux64</os.type>
+  </properties>
+
+  <profiles>
+
+    <profile>
+      <id>windows</id>
+
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+
+      <properties>
+        <os.type>win32</os.type>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>mac</id>
+
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+
+      <properties>
+        <os.type>mac64</os.type>
+      </properties>
+    </profile>
+
+  </profiles>
+
+</project>
