@@ -116,7 +116,7 @@ public class MigrationHistoricProcessInstanceTest {
           .processDefinitionId(targetProcessDefinition.getId());
 
     HistoricProcessInstance historicProcessInstanceBeforeMigration = sourceHistoryProcessInstanceQuery.singleResult();
-    assertEquals(historicProcessInstanceBeforeMigration.getState(), HistoricProcessInstance.STATE_ACTIVE);
+    assertEquals(HistoricProcessInstance.STATE_ACTIVE, historicProcessInstanceBeforeMigration.getState());
 
     //when
     ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
@@ -126,7 +126,7 @@ public class MigrationHistoricProcessInstanceTest {
 
     //then
     HistoricProcessInstance instance = targetHistoryProcessInstanceQuery.singleResult();
-    assertEquals(instance.getState(), historicProcessInstanceBeforeMigration.getState());
+    assertEquals(historicProcessInstanceBeforeMigration.getState(), instance.getState());
   }
 
 }
