@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.rest.distro.test.config.cors;
+package org.camunda.bpm.run.test.config.cors;
 
-import org.camunda.bpm.rest.distro.test.AbstractRestTest;
+import org.camunda.bpm.run.test.AbstractRestTest;
 import org.junit.Before;
 import org.springframework.test.context.ActiveProfiles;
 

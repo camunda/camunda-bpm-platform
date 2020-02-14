@@ -1,10 +1,10 @@
-package org.camunda.bpm.rest.distro.test.config.cors;
+package org.camunda.bpm.run.test.config.cors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.rest.distro.property.CamundaCorsProperty;
+import org.camunda.bpm.run.property.CamundaBpmRunCorsProperty;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(properties = {CamundaCorsProperty.PREFIX + ".allowed-origins=http://other.origin:8081"})
+@TestPropertySource(properties = {CamundaBpmRunCorsProperty.PREFIX + ".allowed-origins=http://other.origin:8081"})
 public class CorsConfigurationEnabledAllowedOriginConfiguredTest extends AbstractCorsConfigurationTest {
 
   @Test

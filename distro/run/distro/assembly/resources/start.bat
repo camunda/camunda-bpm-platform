@@ -60,4 +60,4 @@ ECHO classpath: %classPath%
 
 
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -jar "%BASEDIR%/../lib/camunda-rest-distro.jar" --spring.config.location=file:"%BASEDIR%"/../config/application.yml
+call %JAVA% -Dloader.path="%classPath%" -jar "%BASEDIR%/../lib/camunda-bpm-run.jar" --spring.config.location=file:"%BASEDIR%"/../config/application.yml

@@ -1,11 +1,11 @@
-package org.camunda.bpm.rest.distro.property;
+package org.camunda.bpm.run.property;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class CamundaAuthenticationProperty {
+public class CamundaBpmRunAuthenticationProperties {
 
-  public static final String PREFIX = CamundaRestDistroProperties.PREFIX + ".auth";
+  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".auth";
   public static final String DEFAULT_AUTH = "basic";
   public static final List<String> AUTH_METHODS = Arrays.asList(DEFAULT_AUTH);
 
@@ -33,6 +33,6 @@ public class CamundaAuthenticationProperty {
 
   @Override
   public String toString() {
-    return "CamundaAuthenticationProperty [enabled=" + enabled + ", authentication=" + authentication + "]";
+    return "CamundaBpmRunAuthenticationProperties [enabled=" + enabled + ", authentication=" + authentication + "]";
   }
 }

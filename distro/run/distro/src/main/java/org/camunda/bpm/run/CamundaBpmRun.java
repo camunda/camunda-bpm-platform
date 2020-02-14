@@ -1,11 +1,11 @@
-package org.camunda.bpm.rest.distro;
+package org.camunda.bpm.run;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CamundaRestDistro {
+public class CamundaBpmRun {
   public static void main(String... args) {
-    SpringApplication.run(CamundaRestDistro.class, args);
+    SpringApplication.run(CamundaBpmRun.class, args);
   }
 }

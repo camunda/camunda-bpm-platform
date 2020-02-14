@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.rest.distro.test.util;
+package org.camunda.bpm.run.test.util;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

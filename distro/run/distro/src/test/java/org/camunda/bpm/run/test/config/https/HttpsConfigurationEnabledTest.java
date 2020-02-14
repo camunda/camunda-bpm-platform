@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.rest.distro.test.config.https;
+package org.camunda.bpm.run.test.config.https;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.rest.distro.CamundaRestDistro;
-import org.camunda.bpm.rest.distro.test.AbstractRestTest;
-import org.camunda.bpm.rest.distro.test.util.TestUtils;
+import org.camunda.bpm.run.CamundaBpmRun;
+import org.camunda.bpm.run.test.AbstractRestTest;
+import org.camunda.bpm.run.test.util.TestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.ResourceAccessException;
 
-@SpringBootTest(classes = { CamundaRestDistro.class }, webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = { CamundaBpmRun.class }, webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles(profiles = { "test-https-enabled" }, inheritProfiles = true)
 public class HttpsConfigurationEnabledTest extends AbstractRestTest {
   

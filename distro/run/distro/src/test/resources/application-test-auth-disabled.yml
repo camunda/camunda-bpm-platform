@@ -1,3 +1,1 @@
-camunda.bpm:
-  rest-distro:
-    auth.enabled: false
+camunda.bpm.run.auth.enabled: false

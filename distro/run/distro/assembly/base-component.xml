@@ -32,10 +32,10 @@
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>target/camunda-rest-distro-distro-${project.version}.jar
+      <source>target/camunda-bpm-run-distro-${project.version}.jar
       </source>
       <outputDirectory>lib/</outputDirectory>
-      <destName>camunda-rest-distro.jar</destName>
+      <destName>camunda-bpm-run.jar</destName>
     </file>
   </files>
   <fileSets>

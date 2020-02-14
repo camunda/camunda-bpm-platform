@@ -1,4 +1,4 @@
-package org.camunda.bpm.rest.distro.test.config.cors;
+package org.camunda.bpm.run.test.config.cors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

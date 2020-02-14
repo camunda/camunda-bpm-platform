@@ -12,18 +12,89 @@
     <relativePath />
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
-  <artifactId>camunda-rest-distro-root</artifactId>
-  <name>camunda BPM Rest Distro - Root</name>
-  <description>This is the root project of the Camunda BPM REST Distro</description>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>org.camunda.bpm.run</groupId>
+  <artifactId>camunda-bpm-run-root</artifactId>
+  <name>Camunda BPM Run - Root</name>
+  <description>This is the root of Camunda BPM Run</description>
+  <version>7.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>bom</module>
     <module>modules</module>
     <module>distro</module>
   </modules>
+  
+  <properties>
+    <version.spring.boot>2.2.1.RELEASE</version.spring.boot>
+	<!-- can be removed when starter merged to platform -->
+	<version.starter>3.5.0-SNAPSHOT</version.starter>
+  </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${version.spring.boot}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <!-- Import dependency management from camunda -->
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+	  
+	  <!-- can be removed when starter merged to platform and camunda-bom provides starter artifact versions -->
+	    <dependency>
+		  <groupId>org.camunda.bpm.springboot</groupId>
+		  <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+		  <version>${version.starter}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.camunda.bpm.springboot</groupId>
+		  <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+		  <version>${version.starter}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.camunda.bpm.springboot</groupId>
+		  <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+		  <version>${version.starter}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.camunda.bpm.springboot</groupId>
+		  <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
+		  <version>${version.starter}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.camunda.bpm.springboot</groupId>
+		  <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+		  <version>${version.starter}</version>
+		</dependency>
+
+    </dependencies>
+  </dependencyManagement>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${version.spring.boot}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <licenses>
     <license>

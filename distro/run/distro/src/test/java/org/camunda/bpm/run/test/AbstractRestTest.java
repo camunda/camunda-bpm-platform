@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.rest.distro.test;
+package org.camunda.bpm.run.test;
 
 import java.util.Collections;
 
-import org.camunda.bpm.rest.distro.CamundaRestDistro;
-import org.camunda.bpm.rest.distro.test.util.LoggingInterceptor;
+import org.camunda.bpm.run.CamundaBpmRun;
+import org.camunda.bpm.run.test.util.LoggingInterceptor;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { CamundaRestDistro.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { CamundaBpmRun.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = { "test-auth-disabled" })
 public abstract class AbstractRestTest {
 

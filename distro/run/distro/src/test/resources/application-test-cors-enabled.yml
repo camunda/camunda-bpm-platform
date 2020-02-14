@@ -1,3 +1,1 @@
-camunda.bpm:
-  rest-distro:
-    cors.enabled: true
+camunda.bpm.run.cors.enabled: true

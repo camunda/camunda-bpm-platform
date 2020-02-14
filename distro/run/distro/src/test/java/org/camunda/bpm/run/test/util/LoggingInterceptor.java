@@ -1,4 +1,4 @@
-package org.camunda.bpm.rest.distro.test.util;
+package org.camunda.bpm.run.test.util;
 
 import java.io.IOException;
 

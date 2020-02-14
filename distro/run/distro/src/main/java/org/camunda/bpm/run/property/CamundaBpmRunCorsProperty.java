@@ -1,8 +1,8 @@
-package org.camunda.bpm.rest.distro.property;
+package org.camunda.bpm.run.property;
 
-public class CamundaCorsProperty {
+public class CamundaBpmRunCorsProperty {
 
-  public static final String PREFIX = CamundaRestDistroProperties.PREFIX + ".cors";
+  public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".cors";
   public static final String DEFAULT_ORIGINS = "*";
 
   boolean enabled;
@@ -29,6 +29,6 @@ public class CamundaCorsProperty {
 
   @Override
   public String toString() {
-    return "CamundaCorsProperty [enabled=" + enabled + ", allowedOrigins=" + allowedOrigins + "]";
+    return "CamundaBpmRunCorsProperty [enabled=" + enabled + ", allowedOrigins=" + allowedOrigins + "]";
   }
 }
