@@ -99,7 +99,6 @@ module.exports = [
 
           angular.extend(params, {
             urlParams: {
-              taskId: params.taskId || null,
               userId: $scope.$root.authentication.name,
               engineName: Uri.appUri(':engine')
             },
@@ -108,6 +107,11 @@ module.exports = [
             formUrl: formUrl,
             done: done
           });
+
+          if (params.taskId) {
+            // Only add URL Params if they have a value
+            params.urlParams.taskId = params.taskId;
+          }
 
           camForm = new CamForm(params);
         }
