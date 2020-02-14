@@ -8,9 +8,9 @@ This is a pre-configured Camunda Spring Boot distribution that allows users to s
 3. Extract the archive
 4. Go to the `config` folder and add configuration to the `application.yml`
 5. Go to the `bin` folder and run `start.sh` (or `start.bat` if you're using Windows).
-  * add the `--webapps` flag if you want to run the Camunda Webapps only
-  * add the `--rest` flag if you want to run the Camunda REST API only
-  * add the `--webapps` and the `--rest` flags if you want to run both (default)
+   * add the `--webapps` flag if you want to run the Camunda Webapps only
+   * add the `--rest` flag if you want to run the Camunda REST API only
+   * add the `--webapps` and the `--rest` flags if you want to run both (default)
   
 ## Configuration
 
