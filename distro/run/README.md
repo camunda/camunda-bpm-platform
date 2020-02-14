@@ -55,7 +55,7 @@ Camunda BPM Run will use the H2 database by default. You will be able to find th
   the ones [supported by Camunda](https://docs.camunda.org/manual/latest/introduction/supported-environments/#databases))
  , you will need to perform the following steps:
 1. Put the appropriate JDBC driver `.jar` archive into the `lib/db` directory.
- * Optionally remove the `h2` JDBC driver that is already there. It will not be needed anymore.
+   * Optionally remove the `h2` JDBC driver that is already there. It will not be needed anymore.
 2. Modify the following code of the `config/application.yml` configuration file with the correct DB
  connection info:
 ```yaml
