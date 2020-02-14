@@ -54,6 +54,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
+    configuration.enableFeelLegacyBehavior(true);
     configuration.setFeelEngineFactory(new TestFeelEngineFactory());
     return configuration;
   }

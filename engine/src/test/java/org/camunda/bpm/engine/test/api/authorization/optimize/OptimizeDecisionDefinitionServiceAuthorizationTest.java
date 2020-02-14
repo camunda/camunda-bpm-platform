@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.optimize;
 
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -55,7 +57,26 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
       (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
 
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+
     super.setUp();
+  }
+
+  @Override
+  public void tearDown() {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
+
+    super.tearDown();
   }
 
   @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})

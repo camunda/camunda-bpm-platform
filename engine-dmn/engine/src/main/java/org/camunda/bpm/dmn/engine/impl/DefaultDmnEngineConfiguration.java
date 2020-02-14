@@ -73,10 +73,10 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   protected boolean enableFeelLegacyBehavior = false;
 
-  protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
-  protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
-  protected String defaultOutputEntryExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
-  protected String defaultLiteralExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultInputExpressionExpressionLanguage = null;
+  protected String defaultInputEntryExpressionLanguage = null;
+  protected String defaultOutputEntryExpressionLanguage = null;
+  protected String defaultLiteralExpressionLanguage = null;
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
 
@@ -91,8 +91,41 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     initDecisionTableEvaluationListener();
     initDecisionEvaluationListener();
     initScriptEngineResolver();
+    initElDefaults();
     initElProvider();
     initFeelEngine();
+  }
+
+  public void initElDefaults() {
+    if (enableFeelLegacyBehavior) {
+      if (defaultInputExpressionExpressionLanguage == null) {
+        defaultInputExpressionExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultInputEntryExpressionLanguage == null) {
+        defaultInputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultOutputEntryExpressionLanguage == null) {
+        defaultOutputEntryExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultLiteralExpressionLanguage == null) {
+        defaultLiteralExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+
+    } else {
+      if (defaultInputExpressionExpressionLanguage == null) {
+        defaultInputExpressionExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultInputEntryExpressionLanguage == null) {
+        defaultInputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultOutputEntryExpressionLanguage == null) {
+        defaultOutputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultLiteralExpressionLanguage == null) {
+        defaultLiteralExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+
+    }
   }
 
   protected void initMetricCollector() {
