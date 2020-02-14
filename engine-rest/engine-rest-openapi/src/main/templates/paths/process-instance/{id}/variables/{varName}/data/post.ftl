@@ -39,12 +39,11 @@
               <@lib.property
                 name = "valueType"
                 type = "string"
-                enum = true
                 enumValues = ['"Bytes"', '"File"']
                 last = true
                 description = "The name of the variable type. Either Bytes for a byte array variable or File for a file variable." />
 
-              <#-- TODO deprecated properties, the problem is that the property id must be unique and here data is repeating
+              <#-- TODO deprecated properties, the problem is that the property id must be unique and here "data" property is repeating
                 ,
               "type": {
                 "type": "string",
@@ -65,13 +64,13 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful."/>
+        description = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Bad Request\n\nThe variable value or type is invalid, for example if no filename is set."/>
+        description = "Bad Request\n\nThe variable value or type is invalid, for example if no filename is set."/>
 
   }
 }

@@ -22,23 +22,23 @@
     <@lib.response
         code = "200"
         dto = "BatchDto"
-        desc = "Request successful."/>
+        description = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Bad Request\n\nAt least one modification instruction misses required parameters."/>
+        description = "Bad Request\n\nAt least one modification instruction misses required parameters."/>
 
     <@lib.response
         code = "403"
         dto = "ExceptionDto"
-        desc = "Forbidden\n\nIf the user is not allowed to execute batches. See the Introduction for the error response format."/>
+        description = "Forbidden\n\nIf the user is not allowed to execute batches. See the Introduction for the error response format."/>
 
     <@lib.response
         code = "500"
         dto = "ExceptionDto"
         last = true
-        desc = "The modification cannot be performed, for example because it starts a failing activity."/>
+        description = "The modification cannot be performed, for example because it starts a failing activity."/>
 
    }
 }

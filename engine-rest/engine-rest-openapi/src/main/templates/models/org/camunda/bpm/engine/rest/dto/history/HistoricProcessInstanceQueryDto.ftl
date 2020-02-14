@@ -64,29 +64,25 @@
     <@lib.property
         name = "finished"
         type = "boolean"
-        hasDefault=false
-        defaultValue=false
+        defaultValue = 'false'
         description = "Only include finished process instances. Value may only be true, as false is the default behavior." />
 
     <@lib.property
         name = "unfinished"
         type = "boolean"
-        hasDefault=false
-        defaultValue=false
+        defaultValue = 'false'
         description = "Only include unfinished process instances. Value may only be true, as false is the default behavior." />
 
     <@lib.property
         name = "withIncidents"
         type = "boolean"
-        hasDefault=false
-        defaultValue=false
+        defaultValue = 'false'
         description = "Only include process instances which have an incident. Value may only be true, as false is the default behavior." />
 
     <@lib.property
         name = "withRootIncidents"
         type = "boolean"
-        hasDefault=false
-        defaultValue=false
+        defaultValue = '"false"'
         description = "Only include process instances which have a root incident. Value may only be true, as false is the default behavior." />
 
     <@lib.property
@@ -97,7 +93,6 @@
     <@lib.property
         name = "incidentStatus"
         type = "string"
-        enum = true
         enumValues = ['"open"', '"resolved"']
         description = "Only include process instances which have an incident in status either open or resolved. To get all process instances, use the query parameter withIncidents." />
 

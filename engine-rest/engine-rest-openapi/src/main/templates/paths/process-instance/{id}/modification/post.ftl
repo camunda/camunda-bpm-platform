@@ -21,18 +21,18 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful." />
+        description = "Request successful." />
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "At least one modification instruction misses required parameters."/>
+        description = "At least one modification instruction misses required parameters."/>
 
     <@lib.response
         code = "500"
         dto = "ExceptionDto"
         last = true
-        desc = "The modification cannot be performed, for example because it starts a failing activity."/>
+        description = "The modification cannot be performed, for example because it starts a failing activity."/>
 
    }
 }

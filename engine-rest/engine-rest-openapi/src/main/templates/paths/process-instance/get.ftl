@@ -17,15 +17,15 @@
   ],
   "responses" : {
     <@lib.response
-        code="200"
-        dto="ProcessInstanceDto"
-        array=true
-        desc="Request successful." />
+        code = "200"
+        dto = "ProcessInstanceDto"
+        array = true
+        description = "Request successful." />
 
     <@lib.response
-        code="400"
-        dto="ExceptionDto"
-        last =true
-        desc="Bad Request\n\nReturned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
+        code = "400"
+        dto = "ExceptionDto"
+        last = true
+        description = "Bad Request\n\nReturned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
   }
 }

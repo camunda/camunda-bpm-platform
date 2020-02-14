@@ -57,7 +57,6 @@
         name = "historyTimeToLive"
         type = "integer"
         format = "int32"
-        hasMinimum = true
         minimum = 0
         description = "History time to live value of the decision definition. Is used within History cleanup (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/history/#history-cleanup)." />
 

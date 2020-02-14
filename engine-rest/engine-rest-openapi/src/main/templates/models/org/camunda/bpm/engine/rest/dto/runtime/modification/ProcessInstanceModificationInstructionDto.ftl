@@ -5,7 +5,6 @@
     <@lib.property
         name = "type"
         type = "string"
-        enum = true
         enumValues = ['"cancel"', '"startBeforeActivity"', '"startAfterActivity"', '"startTransition"']
         description = "Mandatory. One of the following values: cancel, startBeforeActivity, startAfterActivity, startTransition.
         * A cancel instruction requests cancellation of a single activity instance or all instances of one activity.
@@ -16,7 +15,8 @@
     <@lib.property
         name = "variables"
         type = "ref"
-        dto = "TriggerVariableValueDto" />
+        dto = "TriggerVariableValueDto"
+        description = "Can be used with instructions of type startBeforeActivity, startAfterActivity, and startTransition. A JSON object containing variable key-value pairs. Each key is a variable name and each value a JSON variable value object." />
 
     <@lib.property
         name = "activityId"

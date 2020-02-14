@@ -1,20 +1,21 @@
-<#macro parameter name location type
-        enum=false enumValues='""'
-        hasDefault=false defaultValue=false
-        required=false description="TODO" last=false >
+<#macro parameter name location type description
+        enumValues=[]
+        defaultValue="" <#-- it will work for boolean, integer, string -->
+        required=false
+        last=false >
   {
     "name": "${name}",
     "in": "${location}",
     "schema": {
 
-      <#if enum>
+      <#if enumValues?size != 0>
         "enum": [
           ${enumValues?join(", ")}
         ],
       </#if>
 
-      <#if hasDefault>
-        "default": ${defaultValue?c}, <#-- ?c to print the value-->
+      <#if defaultValue?has_content>
+        "default": ${defaultValue},
       </#if>
 
       "type": "${type}"
@@ -30,38 +31,39 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<#macro property name type description="TODO"
-        enum=false enumValues='""'
-        hasDefault=false defaultValue=false
-        hasMinimum=false minimum=0
+<#macro property name type description
+        enumValues=[]
+        defaultValue="" <#-- it will work for boolean, integer, string -->
+        minimum=""
         required=false
         deprecated=false
         additionalProperties=false
-        itemType="string" dto=""
+        itemType="string"
+        dto=""
         format="none"
         last=false >
     "${name}": {
 
-      <#if type="ref">
+      <#if type == "ref">
         "$ref": "#/components/schemas/${dto}"
       <#else>
         "type": "${type}",
 
-        <#if format!="none">
+        <#if format != "none">
           "format": ${format},
         </#if>
 
-        <#if enum>
+        <#if enumValues?size != 0>
           "enum": [
             ${enumValues?join(", ")}
           ],
         </#if>
 
-        <#if hasDefault>
-          "default": ${defaultValue?c}, <#-- ?c to print the value-->
+        <#if defaultValue?has_content>
+          "default": ${defaultValue},
         </#if>
 
-        <#if hasMinimum>
+        <#if minimum?has_content>
           "minimum": ${minimum},
         </#if>
 
@@ -73,7 +75,7 @@
           "deprecated": true,
         </#if>
 
-        <#if type="array">
+        <#if type == "array">
           "items": {
             <#if dto="">
               "type": "${itemType}"
@@ -108,7 +110,7 @@
   },
 </#macro>
 
-<#macro response code desc 
+<#macro response code description 
         dto="ExceptionDto"
         array=false
         additionalProperties=false 
@@ -141,7 +143,7 @@
          },
        </#if>
 
-       "description": "${desc}"
+       "description": "${description}"
      }
 
     <#if !last> , </#if> <#-- if not a last response add a comma-->

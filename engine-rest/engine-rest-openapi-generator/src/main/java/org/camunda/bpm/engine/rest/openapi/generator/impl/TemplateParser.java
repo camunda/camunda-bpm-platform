@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.openapi.generator.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,14 +40,14 @@ public class TemplateParser {
   public static void main(String[] args) throws ParseException, IOException, TemplateException {
 
     if (args.length != 3) {
-      throw new RuntimeException("Must provide two arguments: <source template directory> <main template> <output directory>");
+      throw new RuntimeException("Must provide three arguments: <source template directory> <main template> <output directory>");
     }
 
     String sourceDirectory = args[0];
     String mainTemplate = args[1];
     String outputFile = args[2];
 
-    Configuration cfg = new Configuration();
+    Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
 
     cfg.setDirectoryForTemplateLoading(new File(sourceDirectory));
     cfg.setDefaultEncoding("UTF-8");
@@ -70,7 +70,7 @@ public class TemplateParser {
     }
   }
 
-  private static Map<String, Object> createTemplateData() {
+  protected static Map<String, Object> createTemplateData() {
     Map<String, Object> templateData = new HashMap<>();
 
     String version = TemplateParser.class.getPackage().getImplementationVersion();
@@ -87,7 +87,7 @@ public class TemplateParser {
     return templateData;
   }
 
-  private static String formatJsonString(String jsonString) {
+  protected static String formatJsonString(String jsonString) {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     JsonParser jsonParser = new JsonParser();

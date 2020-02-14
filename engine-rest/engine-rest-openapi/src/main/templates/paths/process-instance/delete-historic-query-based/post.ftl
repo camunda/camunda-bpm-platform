@@ -30,13 +30,13 @@
     <@lib.response
         code = "200"
         dto = "BatchDto"
-        desc = "Request successful."/>
+        description = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Bad Request
+        description = "Bad Request
         Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor historicProcessInstanceQuery is present"/>
 
   }
