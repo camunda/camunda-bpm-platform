@@ -19,10 +19,8 @@
     <module>rest</module>
   </modules>
 
-  <!-- 
-    define provided dependencies that will already be present in the Spring Boot ZIP and 
-	are not needed in the resulting dependency sets here 
-  -->
+  <!-- define provided dependencies that will already be present in the Spring 
+    Boot ZIP and are not needed in the resulting dependency sets here -->
   <dependencyManagement>
     <dependencies>
       <dependency>

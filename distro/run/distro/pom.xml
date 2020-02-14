@@ -14,7 +14,7 @@
   <artifactId>camunda-bpm-run-distro</artifactId>
   <name>Camunda BPM Run - Distribution</name>
   <packaging>jar</packaging>
-  
+
   <properties>
     <skip.assembly.ce>true</skip.assembly.ce>
     <skip.assembly.ee>true</skip.assembly.ee>
@@ -54,8 +54,8 @@
     </dependency>
 
     <dependency>
-        <groupId>org.apache.tomcat.embed</groupId>
-        <artifactId>tomcat-embed-core</artifactId>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-core</artifactId>
     </dependency>
 
     <!-- Testing -->
