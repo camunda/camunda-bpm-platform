@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.optimize;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -35,6 +36,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
@@ -98,6 +100,29 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
       authorizationService.deleteAuthorization(authorization.getId());
     }
     ClockUtil.reset();
+  }
+
+  @Before
+  public void enableDmnFeelLegacyBehavior() {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+  }
+
+  @After
+  public void disableDmnFeelLegacyBehavior() {
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
   }
 
   @Test

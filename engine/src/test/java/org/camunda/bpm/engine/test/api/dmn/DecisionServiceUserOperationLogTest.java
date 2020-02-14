@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
@@ -34,8 +35,10 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,6 +82,29 @@ public class DecisionServiceUserOperationLogTest {
     identityService = engineRule.getIdentityService();
     historyService = engineRule.getHistoryService();
     identityService.clearAuthentication();
+  }
+
+  @Before
+  public void enableDmnFeelLegacyBehavior() {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+  }
+
+  @After
+  public void disableDmnFeelLegacyBehavior() {
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
   }
 
   @Deployment(resources = DMN_DECISION_TABLE)
