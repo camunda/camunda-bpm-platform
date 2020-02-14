@@ -133,4 +133,10 @@ public class DmnEngineConfigurationBuilder {
     return customPostDecisionEvaluationListeners;
   }
 
+  public DmnEngineConfigurationBuilder enableFeelLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
+    dmnEngineConfiguration
+        .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
+    return this;
+  }
+
 }
