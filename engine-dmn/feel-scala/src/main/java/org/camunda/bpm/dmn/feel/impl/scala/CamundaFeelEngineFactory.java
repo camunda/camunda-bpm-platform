@@ -26,7 +26,14 @@ public class CamundaFeelEngineFactory implements FeelEngineFactory {
 
   protected List<FeelCustomFunctionProvider> customFunctionProviders;
 
-   public FeelEngine createInstance() {
+  public CamundaFeelEngineFactory() {
+  }
+
+  public CamundaFeelEngineFactory(List<FeelCustomFunctionProvider> customFunctionProviders) {
+    this.customFunctionProviders = customFunctionProviders;
+  }
+
+  public FeelEngine createInstance() {
       return new CamundaFeelEngine(customFunctionProviders);
    }
 

@@ -147,10 +147,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
-      CamundaFeelEngineFactory engineFactory = new CamundaFeelEngineFactory();
-      engineFactory.setCustomFunctionProviders(feelCustomFunctionProviders);
-
-      feelEngineFactory = engineFactory;
+      feelEngineFactory = new CamundaFeelEngineFactory(feelCustomFunctionProviders);
     }
 
     if (feelEngine == null) {

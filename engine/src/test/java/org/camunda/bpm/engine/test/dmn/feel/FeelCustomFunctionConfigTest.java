@@ -16,42 +16,34 @@
  */
 package org.camunda.bpm.engine.test.dmn.feel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.dmn.feel.helper.CustomFunctionProvider;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class FeelCustomFunctionConfigTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    List<FeelCustomFunctionProvider> customFunctionProviders = new ArrayList<>();
+    customFunctionProviders.add(new CustomFunctionProvider("myFunctionOne", "foo"));
+    customFunctionProviders.add(new CustomFunctionProvider("myFunctionTwo", "bar"));
 
-      List<FeelCustomFunctionProvider> customFunctionProviders = new ArrayList<>();
-      customFunctionProviders.add(new CustomFunctionProvider("myFunctionOne", "foo"));
-      customFunctionProviders.add(new CustomFunctionProvider("myFunctionTwo", "bar"));
-
-      configuration.setDmnFeelCustomFunctionProviders(customFunctionProviders);
-
-      return configuration;
-    }
-  };
+    configuration.setDmnFeelCustomFunctionProviders(customFunctionProviders);
+  });
 
   @Rule
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
@@ -64,19 +56,10 @@ public class FeelCustomFunctionConfigTest {
   public void setup() {
     processEngine = engineRule.getProcessEngine();
     repositoryService = processEngine.getRepositoryService();
-
-    deploymentId = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/dmn/feel/custom_function.dmn")
-        .deploy()
-        .getId();
-  }
-
-  @After
-  public void clear() {
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/feel/custom_function.dmn"})
   public void shouldRegisterCustomFunctions() {
     // given
     DecisionService decisionService = processEngine.getDecisionService();
