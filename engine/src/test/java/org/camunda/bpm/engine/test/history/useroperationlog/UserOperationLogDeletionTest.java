@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +45,30 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String PROCESS_KEY = "oneTaskProcess";
+
+  @Override
+  public void setUp() throws Exception {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+
+    super.setUp();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
+
+    super.tearDown();
+  }
 
   @Deployment(resources = PROCESS_PATH)
   public void testDeleteProcessTaskKeepTaskOperationLog() {

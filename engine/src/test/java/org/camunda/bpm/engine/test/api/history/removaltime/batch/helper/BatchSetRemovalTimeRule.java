@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch.helper;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.bpmn.async.FailingExecutionListener;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
@@ -67,6 +69,13 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
       .setHistoryRemovalTimeStrategy(ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START)
       .initHistoryRemovalTime();
 
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        getProcessEngineConfiguration().getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+
     ClockUtil.setCurrentTime(CURRENT_DATE);
 
     super.starting(description);
@@ -88,6 +97,13 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
 
     getProcessEngineConfiguration().setDmnEnabled(true);
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        getProcessEngineConfiguration().getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
 
     ClockUtil.reset();
 

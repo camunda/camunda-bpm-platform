@@ -24,7 +24,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
@@ -62,6 +61,7 @@ public class DataTypeTransformerIntegrationTest extends DmnEngineTest {
     when(dataTypeTransformerRegistry.getTransformer(anyString())).thenReturn(dataTypeTransformerMock);
 
     configuration.getTransformer().setDataTypeTransformerRegistry(dataTypeTransformerRegistry);
+    configuration.enableFeelLegacyBehavior(true);
 
     return configuration;
   }
