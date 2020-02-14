@@ -23,7 +23,6 @@ You can use the general Camunda Spring Boot Starter configuration properties ava
 |----------------------|-----------------|------------------------------------------------------------|---------------|
 | camunda.bpm.run.auth | .enabled        | Switch on/off authentication                               | true          |
 |                      | .authentication | Authentication method.  Currently only basic is supported  | basic         |
-|                      |                 |                                                            |               |
 
 ### HTTPS/SSL
 
