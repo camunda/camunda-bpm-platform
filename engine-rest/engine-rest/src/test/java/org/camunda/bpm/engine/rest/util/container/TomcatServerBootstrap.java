@@ -61,9 +61,12 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
     String contextPath = "/" + getContextPath();
 
-    // must not use shrinkwrap offline mode (see longer explanation at the end of the file)
+    // 1) Must not use shrinkwrap offline mode (see longer explanation at the end of the file)
+    // 2) Must use configuration via Shrinkwrap Maven plugin (see pom.xml for plugin definition);
+    //    This forwards things like the location of the settings.xml file to Shrinkwrap. We need
+    //    that for our CI where settings.xml is not in the default location.
     PomEquippedResolveStage resolver = Maven.configureResolver()
-      .useLegacyLocalRepo(true).loadPomFromFile("pom.xml");
+      .useLegacyLocalRepo(true).configureViaPlugin();
 
     WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML(webXmlPath)
         .addAsLibraries(resolver.resolve("org.codehaus.jackson:jackson-jaxrs:1.6.5").withTransitivity().asFile())
