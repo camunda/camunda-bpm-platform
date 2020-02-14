@@ -35,6 +35,7 @@ import org.camunda.bpm.dmn.engine.impl.transform.DefaultDmnTransformer;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
@@ -66,6 +67,11 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    * a list of DMN FEEL custom function providers
    */
   protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
+
+  /**
+   * Enable FEEL legacy behavior
+   */
+  protected boolean enableFeelLegacyBehavior = false;
 
   protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
   protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
@@ -147,7 +153,13 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
-      feelEngineFactory = new CamundaFeelEngineFactory(feelCustomFunctionProviders);
+      if (!enableFeelLegacyBehavior) {
+        feelEngineFactory = new CamundaFeelEngineFactory(feelCustomFunctionProviders);
+
+      } else {
+        feelEngineFactory = new FeelEngineFactoryImpl();
+
+      }
     }
 
     if (feelEngine == null) {
@@ -518,6 +530,33 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public DefaultDmnEngineConfiguration setFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
     this.feelCustomFunctionProviders = feelCustomFunctionProviders;
+    return this;
+  }
+
+  /**
+   * @return whether FEEL legacy behavior is enabled or not
+   */
+  public boolean isEnableFeelLegacyBehavior() {
+    return enableFeelLegacyBehavior;
+  }
+
+  /**
+   * Controls whether the FEEL legacy behavior is enabled or not
+   *
+   * @param enableFeelLegacyBehavior the FEEL legacy behavior
+   */
+  public void setEnableFeelLegacyBehavior(boolean enableFeelLegacyBehavior) {
+    this.enableFeelLegacyBehavior = enableFeelLegacyBehavior;
+  }
+
+  /**
+   * Controls whether the FEEL legacy behavior is enabled or not
+   *
+   * @param enableFeelLegacyBehavior the FEEL legacy behavior
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration enableFeelLegacyBehavior(boolean enableFeelLegacyBehavior) {
+    setEnableFeelLegacyBehavior(enableFeelLegacyBehavior);
     return this;
   }
 

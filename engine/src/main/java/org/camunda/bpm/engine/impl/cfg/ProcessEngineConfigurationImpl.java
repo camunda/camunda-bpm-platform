@@ -571,6 +571,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders;
 
+  /**
+   * Enable DMN FEEL legacy behavior
+   */
+  protected boolean dmnFeelEnableLegacyBehavior = false;
+
   protected HistoryLevel historyLevel;
 
   /**
@@ -2283,6 +2288,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .scriptEngineResolver(scriptingEngines)
           .expressionManager(expressionManager)
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
           .build();
 
       dmnEngine = dmnEngineConfiguration.buildEngine();
@@ -4574,6 +4580,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setDmnFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders) {
     this.dmnFeelCustomFunctionProviders = dmnFeelCustomFunctionProviders;
+    return this;
+  }
+
+  public boolean isDmnFeelEnableLegacyBehavior() {
+    return dmnFeelEnableLegacyBehavior;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnFeelEnableLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
+    this.dmnFeelEnableLegacyBehavior = dmnFeelEnableLegacyBehavior;
     return this;
   }
 
