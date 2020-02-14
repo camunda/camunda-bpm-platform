@@ -29,6 +29,7 @@ public class IncidentDto {
   protected String incidentType;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String causeIncidentId;
@@ -39,9 +40,11 @@ public class IncidentDto {
   protected String causeIncidentProcessInstanceId;
   protected String causeIncidentProcessDefinitionId;
   protected String causeIncidentActivityId;
+  protected String causeIncidentFailedActivityId;
   protected String rootCauseIncidentProcessInstanceId;
   protected String rootCauseIncidentProcessDefinitionId;
   protected String rootCauseIncidentActivityId;
+  protected String rootCauseIncidentFailedActivityId;
   protected String rootCauseIncidentConfiguration;
   protected String rootCauseIncidentMessage;
 
@@ -91,6 +94,14 @@ public class IncidentDto {
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
   }
 
   public String getProcessInstanceId() {
@@ -153,6 +164,14 @@ public class IncidentDto {
     this.causeIncidentActivityId = causeIncidentActivityId;
   }
 
+  public String getCauseIncidentFailedActivityId() {
+    return causeIncidentFailedActivityId;
+  }
+
+  public void setCauseIncidentFailedActivityId(String causeIncidentFailedActivityId) {
+    this.causeIncidentFailedActivityId = causeIncidentFailedActivityId;
+  }
+
   public void setCauseIncidentProcessDefinitionId(String causeIncidentProcessDefinitionId) {
     this.causeIncidentProcessDefinitionId = causeIncidentProcessDefinitionId;
   }
@@ -179,6 +198,14 @@ public class IncidentDto {
 
   public void setRootCauseIncidentActivityId(String rootCauseIncidentActivityId) {
     this.rootCauseIncidentActivityId = rootCauseIncidentActivityId;
+  }
+
+  public String getRootCauseIncidentFailedActivityId() {
+    return rootCauseIncidentFailedActivityId;
+  }
+
+  public void setRootCauseIncidentFailedActivityId(String rootCauseIncidentFailedActivityId) {
+    this.rootCauseIncidentFailedActivityId = rootCauseIncidentFailedActivityId;
   }
 
   public String getRootCauseIncidentConfiguration() {

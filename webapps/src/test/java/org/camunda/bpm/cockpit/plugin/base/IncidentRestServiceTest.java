@@ -100,6 +100,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getIncidentMessage()).isEqualTo("I am failing!");
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("ServiceTask_1");
+    assertThat(incident.getFailedActivityId()).isEqualTo("ServiceTask_1");
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());
     assertThat(incident.getExecutionId()).isEqualTo(processInstance1.getId());
@@ -108,10 +109,12 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getCauseIncidentProcessInstanceId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getCauseIncidentProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());
     assertThat(incident.getCauseIncidentActivityId()).isEqualTo("ServiceTask_1");
+    assertThat(incident.getCauseIncidentFailedActivityId()).isEqualTo("ServiceTask_1");
     assertThat(incident.getRootCauseIncidentId()).isEqualTo(incident.getId());
     assertThat(incident.getRootCauseIncidentProcessInstanceId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getRootCauseIncidentProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());
     assertThat(incident.getRootCauseIncidentActivityId()).isEqualTo("ServiceTask_1");
+    assertThat(incident.getRootCauseIncidentFailedActivityId()).isEqualTo("ServiceTask_1");
     assertThat(incident.getRootCauseIncidentConfiguration()).isNotNull();
     assertThat(incident.getRootCauseIncidentMessage()).isEqualTo("I am failing!");
   }
@@ -161,6 +164,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getIncidentMessage()).isEqualTo("I am failing!");
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("theServiceTask1");
+    assertThat(incident.getFailedActivityId()).isEqualTo("theServiceTask1");
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
     assertThat(incident.getExecutionId()).isNotNull();
@@ -169,10 +173,12 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getCauseIncidentProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getCauseIncidentProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
     assertThat(incident.getCauseIncidentActivityId()).isEqualTo("theServiceTask1");
+    assertThat(incident.getCauseIncidentFailedActivityId()).isEqualTo("theServiceTask1");
     assertThat(incident.getRootCauseIncidentId()).isEqualTo(incident.getId());
     assertThat(incident.getRootCauseIncidentProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getRootCauseIncidentProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
     assertThat(incident.getRootCauseIncidentActivityId()).isEqualTo("theServiceTask1");
+    assertThat(incident.getRootCauseIncidentFailedActivityId()).isEqualTo("theServiceTask1");
     assertThat(incident.getRootCauseIncidentConfiguration()).isNotNull();
     assertThat(incident.getRootCauseIncidentMessage()).isEqualTo("I am failing!");
   }
@@ -270,6 +276,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getIncidentMessage()).isNull();
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("CallActivity_1");
+    assertThat(incident.getFailedActivityId()).isEqualTo("CallActivity_1");
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());
     assertThat(incident.getExecutionId()).isNotNull();
@@ -279,11 +286,13 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getCauseIncidentProcessInstanceId()).isEqualTo(processInstance2.getId());
     assertThat(incident.getCauseIncidentProcessDefinitionId()).isEqualTo(processInstance2.getProcessDefinitionId());
     assertThat(incident.getCauseIncidentActivityId()).isEqualTo("CallActivity_1");
+    assertThat(incident.getCauseIncidentFailedActivityId()).isEqualTo("CallActivity_1");
 
     assertThat(incident.getRootCauseIncidentId()).isNotEqualTo(incident.getId());
     assertThat(incident.getRootCauseIncidentProcessInstanceId()).isEqualTo(processInstance3.getId());
     assertThat(incident.getRootCauseIncidentProcessDefinitionId()).isEqualTo(processInstance3.getProcessDefinitionId());
     assertThat(incident.getRootCauseIncidentActivityId()).isEqualTo("ServiceTask_1");
+    assertThat(incident.getRootCauseIncidentFailedActivityId()).isEqualTo("ServiceTask_1");
     assertThat(incident.getRootCauseIncidentConfiguration()).isNotNull();
     assertThat(incident.getRootCauseIncidentMessage()).isEqualTo("I am failing!");
   }
@@ -343,6 +352,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getIncidentMessage()).isNull();
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("CallActivity_1");
+    assertThat(incident.getFailedActivityId()).isEqualTo("CallActivity_1");
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
     assertThat(incident.getExecutionId()).isNotNull();

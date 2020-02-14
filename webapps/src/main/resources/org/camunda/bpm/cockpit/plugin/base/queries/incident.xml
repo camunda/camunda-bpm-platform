@@ -11,6 +11,7 @@
     <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="failedActivityId" column="FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
@@ -19,9 +20,11 @@
     <result property="causeIncidentProcessInstanceId" column="CAUSE_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentProcessDefinitionId" column="CAUSE_PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentActivityId" column="CAUSE_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="causeIncidentFailedActivityId" column="CAUSE_FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentProcessDefinitionId" column="ROOT_PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentActivityId" column="ROOT_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentFailedActivityId" column="ROOT_FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentMessage" column="ROOT_INC_MSG_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
   </resultMap>
@@ -48,9 +51,11 @@
                  CAUSE.PROC_INST_ID_ CAUSE_PROC_INST_ID_,
                  CAUSE.PROC_DEF_ID_ CAUSE_PROC_DEF_ID_,
                  CAUSE.ACTIVITY_ID_ CAUSE_ACTIVITY_ID_,
+                 CAUSE.FAILED_ACTIVITY_ID_ CAUSE_FAILED_ACTIVITY_ID_,
                  ROOT_CAUSE.PROC_INST_ID_ ROOT_PROC_INST_ID_,
                  ROOT_CAUSE.PROC_DEF_ID_ ROOT_PROC_DEF_ID_,
                  ROOT_CAUSE.ACTIVITY_ID_ ROOT_ACTIVITY_ID_,
+                 ROOT_CAUSE.FAILED_ACTIVITY_ID_ ROOT_FAILED_ACTIVITY_ID_,
                  ROOT_CAUSE.INCIDENT_MSG_ ROOT_INC_MSG_,
                  ROOT_CAUSE.CONFIGURATION_ ROOT_INC_CONF_
           from
