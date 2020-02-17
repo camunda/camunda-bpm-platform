@@ -114,6 +114,11 @@ var ChoicesFieldHandler = AbstractFormField.extend(
       // select option referenced in cam-variable-name (if any)
       this.previousValue = this.element.val() || '';
       var variableValue = this.variableManager.variableValue(this.variableName);
+
+      // check if variable is defined before writing values to the html
+      // variableValue can be the Number 0 or negative, so `|| ''` does not work here
+      variableValue = (variableValue === null) ? '' : variableValue;
+
       if (variableValue !== this.previousValue) {
         // write value to html control
         this.element.val(variableValue);
@@ -145,7 +150,7 @@ var ChoicesFieldHandler = AbstractFormField.extend(
           value.push($(this).val());
         });
       } else {
-        value = this.element.find('option:selected').attr('value'); //.val();
+        value = this.element.find('option:selected').attr('value');
       }
 
       // write value to variable
