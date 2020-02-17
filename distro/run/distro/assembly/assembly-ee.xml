@@ -12,14 +12,37 @@
   
   <includeBaseDirectory>false</includeBaseDirectory>
 
-  <componentDescriptors>
-    <componentDescriptor>base-component.xml</componentDescriptor>
-  </componentDescriptors>
+  <dependencySets>
 
+    <dependencySet>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-assembly</include>
+      </includes>
+      <outputDirectory />
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>lib/db</outputDirectory>
+      <includes>
+        <include>com.h2database:h2</include>
+      </includes>
+    </dependencySet>
+
+  </dependencySets>
+
+  <files>
+    <file>
+      <source>target/camunda-bpm-run-distro-${project.version}.jar
+      </source>
+      <outputDirectory>lib/</outputDirectory>
+      <destName>camunda-bpm-run.jar</destName>
+    </file>
+  </files>
+  
   <fileSets>
     <fileSet>
-      <directory>../modules/webapps/enterprise/target/dependency/
-      </directory>
+      <directory>../modules/webapps/enterprise/target/dependency/</directory>
       <outputDirectory>lib/webapps/</outputDirectory>
     </fileSet>
   </fileSets>

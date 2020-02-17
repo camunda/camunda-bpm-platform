@@ -21,6 +21,7 @@
 
   <modules>
     <module>modules</module>
+    <module>assembly</module>
     <module>distro</module>
   </modules>
 
