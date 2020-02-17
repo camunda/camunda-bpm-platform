@@ -29,11 +29,6 @@
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
       <scope>test</scope>
@@ -85,5 +80,43 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.slf4j:slf4j-api</exclude>
+                  <exclude>org.camunda.commons:camunda-commons-logging</exclude>
+                  <exclude>org.camunda.commons:camunda-commons-utils</exclude>
+                  <exclude>org.camunda.commons:camunda-commons-typed-values</exclude>
+                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-api</exclude>
+                </excludes>
+              </artifactSet>
+
+              <relocations>
+                <relocation>
+                  <pattern>scala</pattern>
+                  <shadedPattern>camundajar.impl.scala</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
