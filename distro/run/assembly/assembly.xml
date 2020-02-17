@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+  <id>assembly</id>
+  
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <files>
+    <file>
+      <source>resources/application.yml</source>
+      <outputDirectory>config/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/keystore.p12</source>
+      <outputDirectory>keystore/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/start.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>resources/start.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory>bin/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+  </files>
+  
+  <fileSets>
+    <fileSet>
+      <directory>../modules/rest/target/dependency/</directory>
+      <outputDirectory>lib/rest/</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+</assembly>
