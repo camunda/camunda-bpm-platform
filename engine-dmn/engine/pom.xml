@@ -40,6 +40,20 @@
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-scala</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.camunda.feel</groupId>
+          <artifactId>feel-engine</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-parser-combinators_2.13</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -115,44 +129,6 @@
             <goals>
               <goal>manifest</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.slf4j:slf4j-api</exclude>
-                  <exclude>de.odysseus.juel:juel-api</exclude>
-                  <exclude>de.odysseus.juel:juel-spi</exclude>
-                  <exclude>de.odysseus.juel:juel-impl</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-utils</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-logging</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-typed-values</exclude>
-                  <exclude>org.camunda.bpm.model:camunda-dmn-model</exclude>
-                  <exclude>org.camunda.bpm.model:camunda-xml-model</exclude>
-                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-api</exclude>
-                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-juel</exclude>
-                </excludes>
-              </artifactSet>
-
-              <relocations>
-                <relocation>
-                  <pattern>scala</pattern>
-                  <shadedPattern>camundajar.impl.scala</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
           </execution>
         </executions>
       </plugin>
