@@ -1,5 +1,4 @@
 {
-  "title": "VariableQueryParameterDto",
   "type": "object",
   "properties": {
     "name": {
@@ -20,12 +19,8 @@
       ]
     },
     "value": {
-      "oneOf": [
-        {"type": "boolean"},
-        {"type": "string"},
-        {"type": "number"}
-      ],
-      "description": "the variable value"
+      "type": "object",
+      "description": "the variable value, could be of type boolean, string or number"
     }
   }
 }

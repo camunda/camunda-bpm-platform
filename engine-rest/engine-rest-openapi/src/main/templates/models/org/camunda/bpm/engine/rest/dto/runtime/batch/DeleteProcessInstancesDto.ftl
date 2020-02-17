@@ -2,11 +2,6 @@
   "type" : "object",
   "properties" : {
 
-    <#-- NOTE: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         "processInstanceQuery" and "historicProcessInstanceQuery" are referenced in the request body
-         Do not add them here
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-
     <@lib.property
         name = "processInstanceIds"
         type = "array"

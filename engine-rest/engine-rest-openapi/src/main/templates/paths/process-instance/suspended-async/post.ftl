@@ -1,6 +1,6 @@
 {
-  "operationId" : "updateSuspensionState",
-  "description": "Activates or suspends process instances.",
+  "operationId" : "updateSuspensionStateAsync",
+  "description": "Activates or suspends process instances asynchronously with a list of process instance ids, a process instance query, and/or a historical process instance query.",
   "tags": [
     "Process instance"
   ],
@@ -8,7 +8,7 @@
     "content" : {
       "application/json" : {
         "schema" : {
-          "$ref": "#/components/schemas/ProcessInstanceSuspensionStateDto"
+          "$ref": "#/components/schemas/ProcessInstanceSuspensionStateQueriesDto"
         }
       }
     }
@@ -16,7 +16,8 @@
   "responses" : {
 
     <@lib.response
-        code = "204"
+        code = "200"
+        dto = "BatchDto"
         description = "Request successful."/>
 
     <@lib.response

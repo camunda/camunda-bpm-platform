@@ -8,19 +8,7 @@
     "content" : {
       "application/json" : {
         "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/SetJobRetriesByProcessDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "historicProcessInstanceQuery": {
-                  "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
+          "$ref": "#/components/schemas/SetJobRetriesByProcessHPIQDto"
         }
       }
     },
