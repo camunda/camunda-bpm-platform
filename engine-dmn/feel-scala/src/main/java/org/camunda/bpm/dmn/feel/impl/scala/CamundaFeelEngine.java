@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.feel.FeelEngine.Failure;
 import org.camunda.feel.FeelEngine.UnaryTests$;
 import org.camunda.feel.context.CustomContext;
+import org.camunda.feel.context.CustomContext;
 import org.camunda.feel.context.FunctionProvider;
 import org.camunda.feel.context.FunctionProvider.CompositeFunctionProvider;
 import org.camunda.feel.context.VariableProvider;
