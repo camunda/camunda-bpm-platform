@@ -122,17 +122,6 @@ public abstract class AbstractWebIntegrationTest {
     return connection;
   }
 
-  public String getErrorResponseContent() {
-    try {
-      StringWriter writer = new StringWriter();
-      IOUtils.copy(connection.getErrorStream(), writer, "UTF-8");
-      return writer.toString();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
   public String getXsrfTokenHeader() {
     return connection.getHeaderField("X-XSRF-TOKEN");
   }
