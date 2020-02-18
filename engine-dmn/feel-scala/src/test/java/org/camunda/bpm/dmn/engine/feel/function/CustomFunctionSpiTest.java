@@ -22,10 +22,9 @@ import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngine;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
-import org.camunda.feel.impl.spi.SpiServiceLoader;
-import org.camunda.feel.interpreter.FunctionProvider;
-import org.camunda.feel.interpreter.FunctionProvider.CompositeFunctionProvider;
-import org.camunda.feel.interpreter.impl.ValueMapper;
+import org.camunda.feel.context.FunctionProvider;
+import org.camunda.feel.impl.SpiServiceLoader;
+import org.camunda.feel.valuemapper.ValueMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +39,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.feel.context.FunctionProvider.EmptyFunctionProvider$;
+import static org.camunda.feel.context.FunctionProvider.CompositeFunctionProvider;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -136,7 +137,7 @@ public class CustomFunctionSpiTest {
     nonSpiFunctionProviders.add(functionProvider);
 
     when(SpiServiceLoader.loadFunctionProvider())
-      .thenReturn(FunctionProvider.EmptyFunctionProvider$.MODULE$);
+      .thenReturn(EmptyFunctionProvider$.MODULE$);
 
     // when
     String result = evaluateExpression("myNonSpiFunction()");
