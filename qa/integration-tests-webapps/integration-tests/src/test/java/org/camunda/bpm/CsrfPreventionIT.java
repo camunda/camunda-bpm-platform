@@ -97,7 +97,6 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
       fail("Exception expected!");
     } catch (IOException e) {
       // then
-      assertTrue(getErrorResponseContent().contains("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty."));
       assertTrue(getXsrfTokenHeader().equals("Required"));
       assertTrue(e.getMessage().contains("Server returned HTTP response code: 403 for URL"));
     }
