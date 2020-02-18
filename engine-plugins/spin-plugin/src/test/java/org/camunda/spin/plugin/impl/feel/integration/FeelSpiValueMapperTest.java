@@ -18,12 +18,12 @@ package org.camunda.spin.plugin.impl.feel.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.feel.impl.spi.CustomValueMapper;
-import org.camunda.feel.impl.spi.SpiServiceLoader;
-import org.camunda.feel.interpreter.impl.ValueMapper;
+import org.camunda.feel.impl.SpiServiceLoader;
+import org.camunda.feel.valuemapper.CustomValueMapper;
+import org.camunda.feel.valuemapper.ValueMapper;
 import org.junit.Test;
-import scala.collection.JavaConverters;
-import scala.collection.immutable.List;
+import camundajar.impl.scala.collection.JavaConverters;
+import camundajar.impl.scala.collection.immutable.List;
 
 public class FeelSpiValueMapperTest {
 

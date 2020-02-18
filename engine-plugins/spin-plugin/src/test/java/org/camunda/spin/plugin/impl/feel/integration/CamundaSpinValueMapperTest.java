@@ -17,28 +17,28 @@
 package org.camunda.spin.plugin.impl.feel.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static scala.jdk.CollectionConverters.ListHasAsScala;
+import static camundajar.impl.scala.jdk.CollectionConverters.ListHasAsScala;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.camunda.feel.impl.spi.CustomValueMapper;
-import org.camunda.feel.interpreter.impl.Context;
-import org.camunda.feel.interpreter.impl.DefaultValueMapper;
-import org.camunda.feel.interpreter.impl.Val;
-import org.camunda.feel.interpreter.impl.ValContext;
-import org.camunda.feel.interpreter.impl.ValList;
-import org.camunda.feel.interpreter.impl.ValString;
-import org.camunda.feel.interpreter.impl.ValueMapper;
+import org.camunda.feel.context.Context;
+import org.camunda.feel.syntaxtree.Val;
+import org.camunda.feel.syntaxtree.ValContext;
+import org.camunda.feel.syntaxtree.ValList;
+import org.camunda.feel.syntaxtree.ValString;
+import org.camunda.feel.valuemapper.CustomValueMapper;
+import org.camunda.feel.valuemapper.ValueMapper;
+import org.camunda.feel.impl.DefaultValueMapper;
 import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import scala.collection.immutable.Map;
-import scala.collection.immutable.Map$;
+import camundajar.impl.scala.collection.immutable.Map;
+import camundajar.impl.scala.collection.immutable.Map$;
 
 public class CamundaSpinValueMapperTest {
 
