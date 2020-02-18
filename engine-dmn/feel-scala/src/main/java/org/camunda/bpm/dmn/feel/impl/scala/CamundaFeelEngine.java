@@ -23,14 +23,13 @@ import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.feel.FeelEngine.Failure;
 import org.camunda.feel.FeelEngine.UnaryTests$;
-import org.camunda.feel.impl.spi.CustomContext;
-import org.camunda.feel.impl.spi.SpiServiceLoader;
-import org.camunda.feel.interpreter.FunctionProvider;
-import org.camunda.feel.interpreter.FunctionProvider.CompositeFunctionProvider;
-import org.camunda.feel.interpreter.FunctionProvider.EmptyFunctionProvider$;
-import org.camunda.feel.interpreter.impl.ValueMapper;
-import org.camunda.feel.interpreter.impl.VariableProvider;
-import org.camunda.feel.interpreter.impl.VariableProvider.StaticVariableProvider;
+import org.camunda.feel.context.CustomContext;
+import org.camunda.feel.context.FunctionProvider;
+import org.camunda.feel.context.FunctionProvider.CompositeFunctionProvider;
+import org.camunda.feel.context.VariableProvider;
+import org.camunda.feel.context.VariableProvider.StaticVariableProvider;
+import org.camunda.feel.impl.SpiServiceLoader;
+import org.camunda.feel.valuemapper.ValueMapper;
 import scala.collection.immutable.List;
 import scala.collection.immutable.Map;
 import scala.runtime.BoxesRunTime;
@@ -40,7 +39,8 @@ import scala.util.Right;
 
 import java.util.Arrays;
 
-import static org.camunda.feel.interpreter.impl.VariableProvider.CompositeVariableProvider;
+import static org.camunda.feel.context.FunctionProvider.EmptyFunctionProvider$;
+import static org.camunda.feel.context.VariableProvider.CompositeVariableProvider;
 import static scala.jdk.CollectionConverters.ListHasAsScala;
 
 public class CamundaFeelEngine implements FeelEngine {

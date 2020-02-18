@@ -18,7 +18,7 @@ package org.camunda.bpm.dmn.feel.impl.scala;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.camunda.feel.interpreter.impl.VariableProvider;
+import org.camunda.feel.context.VariableProvider;
 import scala.Option;
 import scala.Some;
 import scala.collection.Iterable;
