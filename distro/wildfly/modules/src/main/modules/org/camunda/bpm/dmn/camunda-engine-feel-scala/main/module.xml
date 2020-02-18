@@ -7,5 +7,6 @@
     <module name="org.slf4j" />
     <module name="sun.jdk" />
     <module name="org.camunda.bpm.dmn.camunda-engine-feel-api" />
+    <module name="org.camunda.commons.camunda-commons-typed-values" />
   </dependencies>
 </module>
