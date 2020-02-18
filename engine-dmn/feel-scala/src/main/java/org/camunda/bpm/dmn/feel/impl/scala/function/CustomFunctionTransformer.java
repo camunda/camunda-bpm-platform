@@ -17,6 +17,7 @@
 package org.camunda.bpm.dmn.feel.impl.scala.function;
 
 import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.feel.context.JavaFunction;
 import org.camunda.feel.context.JavaFunctionProvider;
 import org.camunda.feel.syntaxtree.Val;
