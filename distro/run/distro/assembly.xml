@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
 
-  <id>ee</id>
+  <id>assembly</id>
   
   <formats>
     <format>zip</format>
@@ -23,7 +23,7 @@
     </dependencySet>
 
     <dependencySet>
-      <outputDirectory>lib/db</outputDirectory>
+      <outputDirectory>configuration/database</outputDirectory>
       <includes>
         <include>com.h2database:h2</include>
       </includes>
@@ -33,17 +33,17 @@
 
   <files>
     <file>
-      <source>target/camunda-bpm-run-distro-${project.version}.jar
+      <source>target/camunda-bpm-run-${project.version}.jar
       </source>
-      <outputDirectory>lib/</outputDirectory>
+      <outputDirectory>internal/</outputDirectory>
       <destName>camunda-bpm-run.jar</destName>
     </file>
   </files>
-  
+
   <fileSets>
     <fileSet>
-      <directory>../modules/webapps/enterprise/target/dependency/</directory>
-      <outputDirectory>lib/webapps/</outputDirectory>
+      <directory>../modules/webapps/target/dependency/</directory>
+      <outputDirectory>internal/webapps/</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

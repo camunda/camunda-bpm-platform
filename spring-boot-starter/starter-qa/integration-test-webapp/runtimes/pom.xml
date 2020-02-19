@@ -180,7 +180,7 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring-boot.version}</version>
+          <version>${version.spring-boot}</version>
           <configuration>
             <mainClass>org.camunda.bpm.qa.Application</mainClass>
           </configuration>

@@ -4,32 +4,23 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- 
+    This distro cannot be a child of the camunda-parent due to the Spring dependencies defined there in
+    the dependencyManagement section. The distro needs to work with the Spring dependency versions defined
+    in the spring-boot-dependencies artifact which would be overriden by the versions defined in the camunda-parent.
+  -->
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.0.0</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm.run</groupId>
   <artifactId>camunda-bpm-run-root</artifactId>
-  <name>Camunda BPM Run - Root</name>
+  <name>Camunda BPM - Run - Root</name>
   <description>This is the root of Camunda BPM Run</description>
-  <version>7.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <modules>
-    <module>modules</module>
-    <module>assembly</module>
-    <module>distro</module>
-  </modules>
-
-  <properties>
-    <version.spring.boot>2.2.1.RELEASE</version.spring.boot>
-    <!-- can be removed when starter merged to platform -->
-    <version.starter>3.5.0-SNAPSHOT</version.starter>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -37,50 +28,17 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring.boot}</version>
+        <version>${version.spring-boot}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
 
       <dependency>
-        <!-- Import dependency management from camunda -->
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
         <version>${project.version}</version>
         <scope>import</scope>
         <type>pom</type>
-      </dependency>
-
-      <!-- starter dependencies can be removed when starter merged to platform 
-        and camunda-bom provides their versions -->
-      <dependency>
-        <groupId>org.camunda.bpm.springboot</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-        <version>${version.starter}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.springboot</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-        <version>${version.starter}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.springboot</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-        <version>${version.starter}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.springboot</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
-        <version>${version.starter}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.springboot</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
-        <version>${version.starter}</version>
       </dependency>
 
     </dependencies>
@@ -92,32 +50,32 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${version.spring.boot}</version>
+          <version>${version.spring-boot}</version>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
-
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com:camunda/spike-rest-distro.git</connection>
-    <url>scm:git:git@github.com:camunda/spike-rest-distro.git</url>
-    <developerConnection>scm:git:git@github.com:camunda/spike-rest-distro.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <repositories>
-    <repository>
-      <id>camunda.com.public</id>
-      <name>Camunda Repository</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
+  
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules</module>
+        <module>assembly</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

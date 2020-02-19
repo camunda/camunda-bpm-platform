@@ -14,22 +14,22 @@
   <files>
     <file>
       <source>resources/application.yml</source>
-      <outputDirectory>config/</outputDirectory>
+      <outputDirectory>configuration/</outputDirectory>
     </file>
     <file>
       <source>resources/keystore.p12</source>
-      <outputDirectory>keystore/</outputDirectory>
+      <outputDirectory>configuration/keystore/</outputDirectory>
     </file>
     <file>
       <source>resources/start.sh</source>
       <filtered>true</filtered>
-      <outputDirectory>bin/</outputDirectory>
+      <outputDirectory />
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>resources/start.bat</source>
       <filtered>true</filtered>
-      <outputDirectory>bin/</outputDirectory>
+      <outputDirectory />
       <fileMode>0755</fileMode>
     </file>
   </files>
@@ -37,7 +37,7 @@
   <fileSets>
     <fileSet>
       <directory>../modules/rest/target/dependency/</directory>
-      <outputDirectory>lib/rest/</outputDirectory>
+      <outputDirectory>internal/rest/</outputDirectory>
     </fileSet>
   </fileSets>
 

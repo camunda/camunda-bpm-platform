@@ -8,18 +8,18 @@
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
+    <relativePath>..</relativePath>
   </parent>
 
-  <artifactId>camunda-bpm-run-modules-webapps-ee</artifactId>
-  <name>Camunda BPM Run - Module Webapps Enterprise</name>
+  <artifactId>camunda-bpm-run-modules-webapps</artifactId>
+  <name>camunda BPM - Run - Module Webapps</name>
   <packaging>pom</packaging>
 
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
+      <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
     </dependency>
 
   </dependencies>
