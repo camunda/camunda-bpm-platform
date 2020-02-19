@@ -10,6 +10,7 @@
    ],
 
   <@lib.requestBody
+      mediaType = "application/json"
       dto = "ProcessInstanceQueryDto" />
 
   "responses" : {

@@ -4,28 +4,12 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/SetJobRetriesByProcessDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "processInstanceQuery": {
-                  "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-   "description": "Please note that if both processInstances and processInstanceQuery are provided, then the resulting execution will be performed on the union of these sets."
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "SetJobRetriesByProcessPIQDto"
+      requestDescription = "Please note that if both processInstances and processInstanceQuery are provided, then the resulting execution will be performed on the union of these sets." />
+
   "responses" : {
 
     <@lib.response

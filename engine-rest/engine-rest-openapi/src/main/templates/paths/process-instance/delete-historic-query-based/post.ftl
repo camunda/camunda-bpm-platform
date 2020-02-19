@@ -4,27 +4,11 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/DeleteProcessInstancesDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "historicProcessInstanceQuery": {
-                  "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "DeleteProcessInstanceHPIQDto" />
+
   "responses": {
 
     <@lib.response

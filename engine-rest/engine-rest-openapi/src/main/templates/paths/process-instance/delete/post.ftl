@@ -4,27 +4,11 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/DeleteProcessInstancesDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "processInstanceQuery": {
-                  "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "DeleteProcessInstancePIQDto" />
+
   "responses": {
 
     <@lib.response

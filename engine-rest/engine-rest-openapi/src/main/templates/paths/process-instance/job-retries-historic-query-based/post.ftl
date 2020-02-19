@@ -4,28 +4,12 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/SetJobRetriesByProcessDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "historicProcessInstanceQuery": {
-                  "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-   "description": "Please note that if both processInstances and processInstanceQuery are provided, then the resulting execution will be performed on the union of these sets."
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "SetJobRetriesByProcessHPIQDto"
+      requestDescription = "Please note that if both processInstances and historicProcessInstanceQuery are provided, then the resulting execution will be performed on the union of these sets." />
+
   "responses" : {
 
     <@lib.response

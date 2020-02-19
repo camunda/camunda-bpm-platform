@@ -1,18 +1,19 @@
 {
-  "operationId" : "updateSuspensionState",
-  "description": "Activates or suspends process instances.",
+  "operationId" : "updateSuspensionStateAsync",
+  "description": "Activates or suspends process instances asynchronously with a list of process instance ids, a process instance query, and/or a historical process instance query.",
   "tags": [
     "Process instance"
   ],
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceSuspensionStateDto" />
+      dto = "ProcessInstanceSuspensionStateQueriesDto" />
 
   "responses" : {
 
     <@lib.response
-        code = "204"
+        code = "200"
+        dto = "BatchDto"
         description = "Request successful."/>
 
     <@lib.response

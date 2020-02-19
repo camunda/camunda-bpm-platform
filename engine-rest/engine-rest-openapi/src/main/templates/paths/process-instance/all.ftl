@@ -69,4 +69,8 @@
   "/process-instance/suspended": {
     "put":
     <#include "/paths/process-instance/suspended/put.ftl">
+  },
+  "/process-instance/suspended-async": {
+    "post":
+    <#include "/paths/process-instance/suspended-async/post.ftl">
   }
