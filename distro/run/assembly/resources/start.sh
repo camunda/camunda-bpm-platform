@@ -48,4 +48,4 @@ fi
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$BASEDIR"/configuration/application.yml
+"$JAVA" -Dloader.path="$classPath" -DdeploymentDir="configuration/resources/" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$BASEDIR"/configuration/application.yml

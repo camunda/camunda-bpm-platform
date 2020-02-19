@@ -49,6 +49,14 @@
       <directory>../modules/rest/target/dependency/</directory>
       <outputDirectory>internal/rest/</outputDirectory>
     </fileSet>
+        <!-- create empty resource folder -->
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory>config/resources/</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
 
 </assembly>
