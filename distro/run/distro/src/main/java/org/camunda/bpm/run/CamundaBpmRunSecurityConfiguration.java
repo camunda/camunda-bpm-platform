@@ -21,8 +21,10 @@ import javax.servlet.ServletException;
 
 import org.apache.catalina.filters.CorsFilter;
 import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
+import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
 import org.camunda.bpm.run.property.CamundaBpmRunAuthenticationProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunCorsProperty;
+import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
 import org.camunda.bpm.spring.boot.starter.rest.CamundaBpmRestInitializer;
@@ -71,5 +73,11 @@ public class CamundaBpmRunSecurityConfiguration {
     registration.addUrlPatterns("/rest/*");
     registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_ORIGINS, camundaBpmRunProperties.getCors().getAllowedOrigins());
     return registration;
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunLdapProperties.PREFIX)
+  public LdapIdentityProviderPlugin ldapIdentityProviderPlugin() {
+    return camundaBpmRunProperties.getLdap();
   }
 }
