@@ -143,6 +143,31 @@
         <artifactId>camunda-webapp-webjar-ee</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->

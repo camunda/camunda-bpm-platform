@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-modules</artifactId>
-  <name>Camunda BPM Run - Modules</name>
+  <name>Camunda BPM - Run - Modules</name>
   <packaging>pom</packaging>
 
   <modules>
@@ -96,21 +96,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <profiles>
-    <profile>
-      <id>ce</id>
-      <modules>
-        <module>webapps/community</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>ee</id>
-      <modules>
-        <module>webapps/enterprise</module>
-      </modules>
-    </profile>
-  </profiles>
-
   <build>
     <pluginManagement>
       <plugins>
@@ -132,5 +117,17 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>webapps</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

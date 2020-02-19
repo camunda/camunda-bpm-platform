@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-assembly</artifactId>
-  <name>Camunda BPM Run - Assembly</name>
+  <name>Camunda BPM - Run - Assembly</name>
   <packaging>pom</packaging>
   
   <dependencies>

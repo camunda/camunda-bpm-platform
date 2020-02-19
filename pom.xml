@@ -33,6 +33,7 @@
     <version.camunda.spin>1.8.0</version.camunda.spin>
     <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
+    <version.spring-boot>2.2.1.RELEASE</version.spring-boot>
   </properties>
 
   <build>
@@ -86,6 +87,7 @@
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
+        <module>distro/run</module>
 
         <module>database</module>
         <module>parent</module>
@@ -102,6 +104,7 @@
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
+        <module>distro/run</module>
       </modules>
     </profile>
 
@@ -171,6 +174,16 @@
       </activation>
       <modules>
         <module>distro/webjar</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/run</module>
       </modules>
     </profile>
 

@@ -11,14 +11,9 @@
     <relativePath>..</relativePath>
   </parent>
 
-  <artifactId>camunda-bpm-run-distro</artifactId>
-  <name>Camunda BPM Run - Distribution</name>
+  <artifactId>camunda-bpm-run</artifactId>
+  <name>Camunda BPM - Run - Distribution</name>
   <packaging>jar</packaging>
-
-  <properties>
-    <skip.assembly.ce>true</skip.assembly.ce>
-    <skip.assembly.ee>true</skip.assembly.ee>
-  </properties>
 
   <dependencies>
 
@@ -82,112 +77,56 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <configuration>
-            <layout>ZIP</layout>
-            <excludes>
-              <exclude>
-                <groupId>org.camunda.bpm.springboot</groupId>
-                <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-              </exclude>
-              <exclude>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-              </exclude>
-            </excludes>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>repackage</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <configuration>
-            <attach>true</attach>
-            <outputDirectory>target/</outputDirectory>
-            <tarLongFileMode>gnu</tarLongFileMode>
-          </configuration>
-          <executions>
-            <execution>
-              <id>assemble-ce</id>
-              <phase>package</phase>
-              <goals>
-                <goal>single</goal>
-              </goals>
-              <configuration>
-                <descriptors>
-                  <descriptor>assembly/assembly-ce.xml</descriptor>
-                </descriptors>
-                <workDirectory>target/assembly/work/ce</workDirectory>
-                <skipAssembly>${skip.assembly.ce}</skipAssembly>
-              </configuration>
-            </execution>
-            <execution>
-              <id>assemble-ee</id>
-              <phase>package</phase>
-              <goals>
-                <goal>single</goal>
-              </goals>
-              <configuration>
-                <descriptors>
-                  <descriptor>assembly/assembly-ee.xml</descriptor>
-                </descriptors>
-                <workDirectory>target/assembly/work/ee</workDirectory>
-                <skipAssembly>${skip.assembly.ee}</skipAssembly>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <layout>ZIP</layout>
+          <excludes>
+            <exclude>
+              <groupId>org.camunda.bpm.springboot</groupId>
+              <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+            </exclude>
+            <exclude>
+              <groupId>com.h2database</groupId>
+              <artifactId>h2</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>target/</outputDirectory>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>ce</id>
-      <properties>
-        <skip.assembly.ce>false</skip.assembly.ce>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>ee</id>
-      <properties>
-        <skip.assembly.ee>false</skip.assembly.ee>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>

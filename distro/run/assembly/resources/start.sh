@@ -16,9 +16,9 @@ fi
 
 
 # set environment parameters
-webappsPath=$BASEDIR/../lib/webapps/
-restPath=$BASEDIR/../lib/rest/
-classPath=$BASEDIR/../lib/db/,$BASEDIR/../keystore
+webappsPath=$BASEDIR/internal/webapps/
+restPath=$BASEDIR/internal/rest/
+classPath=$BASEDIR/configuration/database/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
 
 
@@ -48,4 +48,4 @@ fi
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -jar "$BASEDIR/../lib/camunda-bpm-run.jar" --spring.config.location=file:"$BASEDIR"/../config/application.yml
+"$JAVA" -Dloader.path="$classPath" -jar "$BASEDIR/internal/camunda-bpm-run.jar" --spring.config.location=file:"$BASEDIR"/configuration/application.yml
