@@ -559,10 +559,19 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    * Set a list of FEEL Custom Function Providers.
    *
    * @param feelCustomFunctionProviders a list of FEEL Custom Function Providers
+   */
+  public void setFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    this.feelCustomFunctionProviders = feelCustomFunctionProviders;
+  }
+
+  /**
+   * Set a list of FEEL Custom Function Providers.
+   *
+   * @param feelCustomFunctionProviders a list of FEEL Custom Function Providers
    * @return this
    */
-  public DefaultDmnEngineConfiguration setFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
-    this.feelCustomFunctionProviders = feelCustomFunctionProviders;
+  public DefaultDmnEngineConfiguration feelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    setFeelCustomFunctionProviders(feelCustomFunctionProviders);
     return this;
   }
 
