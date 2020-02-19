@@ -1,7 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-engine-rest-openapi</artifactId>
-    <name>camunda BPM - engine - REST - OpenAPI</name>
+  <name>camunda BPM - engine - REST - OpenAPI</name>
   <packaging>jar</packaging>
 
   <parent>
@@ -14,15 +16,116 @@
   <properties>
     <generated-directory>${project.build.directory}/generated-sources/openapi-json</generated-directory>
     <generated-file>openapi.json</generated-file>
+
+    <wiremock.version>1.58</wiremock.version>
+
+    <openapi.generator.version>4.2.3</openapi.generator.version>
+    <!-- properties versions used by the openapi client -->
+    <!-- update them during openapi.generator version update  -->
+    <gson-fire-version>1.8.3</gson-fire-version>
+    <swagger-core-version>1.5.22</swagger-core-version>
+    <okhttp-version>3.14.2</okhttp-version>
+    <gson-version>2.8.5</gson-version>
+    <commons-lang3-version>3.9</commons-lang3-version>
+    <threetenbp-version>1.4.0</threetenbp-version>
+    <maven-plugin-version>1.0.0</maven-plugin-version>
+    <javax-annotation-version>1.0</javax-annotation-version>
+    <junit-version>4.13</junit-version>
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-openapi-generator</artifactId>
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>${wiremock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!-- dependencies required by the openapi client -->
+    <!-- update them during openapi-generator-maven-plugin version update  -->
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>${swagger-core-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- @Nullable annotation -->
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>${okhttp-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>${okhttp-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gsonfire</groupId>
+      <artifactId>gson-fire</artifactId>
+      <version>${gson-fire-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons-lang3-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.threeten</groupId>
+      <artifactId>threetenbp</artifactId>
+      <version>${threetenbp-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>jsr250-api</artifactId>
+      <version>${javax-annotation-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit-version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -58,7 +161,7 @@
               <classpathScope>test</classpathScope>
               <mainClass>org.camunda.bpm.engine.rest.openapi.generator.impl.SchemaValidator</mainClass>
               <arguments>
-                <!-- The following json schema is copy from https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v3.0/schema.json -->
+                <!-- The following json schema is a copy from https://github.com/OAI/OpenAPI-Specification/blob/master/schemas/v3.0/schema.json -->
                 <!-- Date: 11-Feb-2020 -->
                 <argument>${project.basedir}/src/main/openapi/schema.json</argument>
                 <argument>${generated-directory}/${generated-file}</argument>
@@ -67,6 +170,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -85,8 +189,42 @@
               </resources>
             </configuration>
           </execution>
+          <execution>
+            <id>add-openapi-generated-test-sources</id>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/openapi/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi.generator.version}</version>
+        <executions>
+          <execution>
+            <id>generate-java-client</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${generated-directory}/${generated-file}</inputSpec>
+              <output>${project.build.directory}/openapi</output>
+              <generatorName>java</generatorName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
+
 </project>
