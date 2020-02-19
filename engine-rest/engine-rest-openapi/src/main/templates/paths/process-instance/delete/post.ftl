@@ -8,19 +8,7 @@
     "content" : {
       "application/json" : {
         "schema" : {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/DeleteProcessInstancesDto"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "processInstanceQuery": {
-                  "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-                }
-              }
-            }
-          ]
+          "$ref": "#/components/schemas/DeleteProcessInstancePIQDto"
         }
       }
     }

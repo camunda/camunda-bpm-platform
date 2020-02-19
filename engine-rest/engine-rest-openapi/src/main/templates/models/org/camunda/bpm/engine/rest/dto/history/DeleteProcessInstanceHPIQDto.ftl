@@ -1,5 +1,6 @@
 {
   "allOf": [
+
     {
       "$ref": "#/components/schemas/DeleteProcessInstancesDto"
     },

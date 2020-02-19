@@ -53,7 +53,6 @@ Deployments can contain custom code in form of scripts or EL expressions to cust
     <@lib.response
         code = "200"
         dto = "DeploymentDto"
-        array = true
         description = "Request successful."/>
 
     <@lib.response
