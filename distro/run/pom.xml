@@ -55,7 +55,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <profiles>
     <profile>
       <id>distro</id>
@@ -74,6 +74,12 @@
       </activation>
       <modules>
         <module>distro</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>integration-test-camunda-run</id>
+      <modules>
+        <module>qa</module>
       </modules>
     </profile>
   </profiles>
