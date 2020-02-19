@@ -58,6 +58,7 @@ var Directive = [
         {class: 'end-time', request: 'endTime', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
         {class: 'timestamp', request: 'incidentTimestamp', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')},
         {class: 'activity', request: 'activityId', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')},
+        {class: 'failedActivityId', request: 'failedActivityId', sortable: false, content: $translate.instant('PLGN_HIST_FAILING_ACTIVITY')},
         {class: 'cause instance-id uuid', request: 'causeIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
         {class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
         {class: 'type', request: 'incidentType', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')},
@@ -69,6 +70,7 @@ var Directive = [
       // filter table column based on the view level (definition | instance | history | runtime)
       var classesToInclude = [
         'activity',
+        'failedActivityId',
         'cause instance-id uuid',
         'cause-root instance-id uuid',
         'type',
@@ -219,6 +221,13 @@ var Directive = [
               incident.activityName =
                 (bpmnElement && (bpmnElement.name || bpmnElement.id)) ||
                 activityId;
+
+              var failedActivityId = incident.failedActivityId;
+              var failedElement = bpmnElements[failedActivityId];
+              incident.failedActivityName =
+                (failedElement && (failedElement.name || failedElement.id)) ||
+                failedActivityId;
+
               incident.linkable =
                 bpmnElements[activityId] &&
                 activityIdToInstancesMap[activityId] &&

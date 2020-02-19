@@ -11,7 +11,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
       on-sort-change="onSortChange(sortObj)"
       default-sort="sorting">
     </thead>
-    
+
     <tbody>
       <tr ng-repeat="job in jobs">
         <td class="id">
@@ -26,11 +26,17 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
         </td>
         <td>
           {{job.retries}}
-        </td> 
+        </td>
         <td>
           <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?activityIds={{job.activityId}}&amp;tab=jobs-tab">
             {{job.activityName}}
           </a>
+        </td>
+        <td>
+          <span ng-if="job.failedActivityId"
+          cam-widget-clipboard="job.failedActivityId">
+            {{ job.failedActivityName }}
+          </span>
         </td>
         <td>
             <a class="btn btn-sm btn-default action-button"
@@ -48,7 +54,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
                tooltip-placement="left">
 
               <span class="glyphicon glyphicon-pause"></span>
-            </a>   
+            </a>
             <a class="btn btn-sm btn-default action-button"
                ng-click="openRecalculationWindow(job)"
                ng-if="job.dueDate"
@@ -56,7 +62,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
                tooltip-placement="left">
 
               <span class="glyphicon glyphicon-time"></span>
-            </a>  
+            </a>
         </td>
       </tr>
     </tbody>

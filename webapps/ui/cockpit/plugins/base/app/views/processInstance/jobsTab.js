@@ -69,6 +69,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           { class: 'createTime', request: 'createTime', sortable: false, content: $translate.instant('PLUGIN_JOBS_CREATION_DATE') },
           { class: 'retries', request: 'jobRetries', sortable: true, content: $translate.instant('PLUGIN_JOBS_RETRIES') },
           { class: 'activityName', request: 'activityName', sortable: false, content: $translate.instant('PLUGIN_JOBS_ACTIVITY') },
+          { class: 'failedActivityId', request: 'failedActivityId', sortable: false, content: $translate.instant('PLGN_HIST_FAILING_ACTIVITY') },
           { class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_JOBS_ACTION') }
         ];
 
@@ -307,6 +308,12 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             job.activityName =
               (bpmnElement && (bpmnElement.name || bpmnElement.id)) ||
               activityId;
+
+            var failedActivityId = job.failedActivityId;
+            var failedElement = $scope.bpmnElements[failedActivityId];
+            job.failedActivityName =
+              (failedElement && (failedElement.name || failedElement.id)) ||
+              failedActivityId;
           });
         };
 
