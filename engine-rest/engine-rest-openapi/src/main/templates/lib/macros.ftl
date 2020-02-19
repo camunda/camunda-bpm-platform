@@ -50,7 +50,7 @@
         "type": "${type}",
 
         <#if format != "none">
-          "format": ${format},
+          "format": "${format}",
         </#if>
 
         <#if enumValues?size != 0>
@@ -98,10 +98,16 @@
     <#if !last> , </#if> <#-- if not a last property add a comma-->
 </#macro>
 
-<#macro requestBody dto >
+<#macro requestBody mediaType dto
+        requestDescription="" >
   "requestBody" : {
+
+    <#if requestDescription?has_content >
+      "description": "${requestDescription}",
+    </#if>
+
     "content" : {
-      "application/json" : {
+      "${mediaType}" : {
         "schema" : {
           "$ref" : "#/components/schemas/${dto}"
         }

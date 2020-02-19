@@ -4,15 +4,11 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "$ref": "#/components/schemas/DeleteProcessInstancePIQDto"
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "DeleteProcessInstancePIQDto" />
+
   "responses": {
 
     <@lib.response

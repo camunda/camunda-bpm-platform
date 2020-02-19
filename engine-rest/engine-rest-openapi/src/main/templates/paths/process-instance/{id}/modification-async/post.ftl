@@ -15,6 +15,7 @@
   ],
 
   <@lib.requestBody
+      mediaType = "application/json"
       dto = "ProcessInstanceModificationDto" />
 
   "responses" : {

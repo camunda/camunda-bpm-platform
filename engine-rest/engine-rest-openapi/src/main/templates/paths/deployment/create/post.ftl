@@ -5,15 +5,11 @@
   ],
   "description": "Creates a deployment. Security Consideration
 Deployments can contain custom code in form of scripts or EL expressions to customize process behavior. This may be abused for remote execution of arbitrary code.",
-  "requestBody": {
-    "content": {
-      "multipart/form-data": {
-        "schema": {
-          "$ref": "#/components/schemas/MultiFormDeploymentDto"
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "multipart/form-data"
+      dto = "MultiFormDeploymentDto" />
+
   "responses": {
     <@lib.response
         code = "200"

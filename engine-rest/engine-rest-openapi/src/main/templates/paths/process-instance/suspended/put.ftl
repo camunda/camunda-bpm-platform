@@ -4,15 +4,11 @@
   "tags": [
     "Process instance"
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "$ref": "#/components/schemas/ProcessInstanceSuspensionStateDto"
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "ProcessInstanceSuspensionStateDto" />
+
   "responses" : {
 
     <@lib.response

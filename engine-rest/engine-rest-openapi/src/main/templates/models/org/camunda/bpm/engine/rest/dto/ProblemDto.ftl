@@ -27,7 +27,7 @@
 
 
     <@lib.property
-        name = "еlementIds"
+        name = "elementIds"
         type = "array"
         itemType = "string"
         last = true

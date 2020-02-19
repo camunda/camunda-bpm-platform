@@ -17,6 +17,7 @@
   ],
 
   <@lib.requestBody
+      mediaType = "application/json"
       dto = "PatchVariablesDto" />
 
   "responses": {

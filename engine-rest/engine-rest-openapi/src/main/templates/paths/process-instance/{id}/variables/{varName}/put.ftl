@@ -24,6 +24,7 @@
   ],
 
   <@lib.requestBody
+      mediaType = "application/json"
       dto = "VariableValueDto" />
 
   "responses": {

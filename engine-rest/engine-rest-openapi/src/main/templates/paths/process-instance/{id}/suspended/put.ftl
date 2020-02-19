@@ -13,15 +13,11 @@
         last = true
         description = "The id of the process instance to activate or suspend."/>
   ],
-  "requestBody" : {
-    "content" : {
-      "application/json" : {
-        "schema" : {
-          "$ref": "#/components/schemas/SingleProcessInstanceSuspensionStateDto"
-        }
-      }
-    }
-  },
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "SingleProcessInstanceSuspensionStateDto" />
+
   "responses" : {
 
     <@lib.response

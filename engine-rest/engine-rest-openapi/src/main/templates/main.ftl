@@ -65,6 +65,7 @@
       "CountResultDto":                            <#include "/models/org/camunda/bpm/engine/rest/dto/CountResultDto.ftl">,
       "ExceptionDto":                              <#include "/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl">,
       "MultiFormDeploymentDto":                    <#include "/models/org/camunda/bpm/engine/rest/dto/MultiFormDeploymentDto.ftl">,
+      "MultiFormVariableBinaryDto":                <#include "/models/org/camunda/bpm/engine/rest/dto/MultiFormVariableBinaryDto.ftl">,
       "ParseExceptionDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/ParseExceptionDto.ftl">,
       "PatchVariablesDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/PatchVariablesDto.ftl">,
       "ProblemDto":                                <#include "/models/org/camunda/bpm/engine/rest/dto/ProblemDto.ftl">,
