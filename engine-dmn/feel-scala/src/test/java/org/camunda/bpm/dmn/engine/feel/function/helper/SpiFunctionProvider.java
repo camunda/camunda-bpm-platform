@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.dmn.engine.feel.function.helper;
 
-import org.camunda.feel.impl.spi.JavaFunction;
-import org.camunda.feel.impl.spi.JavaFunctionProvider;
-import org.camunda.feel.interpreter.impl.ValString;
+import org.camunda.feel.context.JavaFunction;
+import org.camunda.feel.context.JavaFunctionProvider;
+import org.camunda.feel.syntaxtree.ValString;
 
 import java.util.Collection;
 import java.util.Collections;

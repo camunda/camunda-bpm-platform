@@ -18,7 +18,6 @@ package org.camunda.bpm.dmn.engine.feel.function.helper;
 
 import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunction;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
-import org.camunda.bpm.dmn.feel.impl.scala.function.builder.CustomFunctionBuilder;
 
 import java.util.Collection;
 import java.util.HashMap;

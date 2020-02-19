@@ -17,10 +17,10 @@
 package org.camunda.bpm.dmn.feel.impl.scala.function;
 
 import org.camunda.bpm.dmn.feel.impl.FeelException;
-import org.camunda.feel.impl.spi.JavaFunction;
-import org.camunda.feel.impl.spi.JavaFunctionProvider;
-import org.camunda.feel.interpreter.impl.Val;
-import org.camunda.feel.interpreter.impl.ValueMapper;
+import org.camunda.feel.context.JavaFunction;
+import org.camunda.feel.context.JavaFunctionProvider;
+import org.camunda.feel.syntaxtree.Val;
+import org.camunda.feel.valuemapper.ValueMapper;
 
 import java.util.Collection;
 import java.util.HashMap;
