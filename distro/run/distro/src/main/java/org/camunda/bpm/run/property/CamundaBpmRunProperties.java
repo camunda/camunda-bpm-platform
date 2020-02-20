@@ -31,6 +31,9 @@ public class CamundaBpmRunProperties {
   @NestedConfigurationProperty
   private CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
 
+  @NestedConfigurationProperty
+  private CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+
   public CamundaBpmRunAuthenticationProperties getAuth() {
     return auth;
   }
@@ -47,8 +50,16 @@ public class CamundaBpmRunProperties {
     this.cors = cors;
   }
 
+  public CamundaBpmRunLdapProperties getLdap() {
+    return ldap;
+  }
+
+  public void setLdap(CamundaBpmRunLdapProperties ldap) {
+    this.ldap = ldap;
+  }
+
   @Override
   public String toString() {
-    return "CamundaRestDistroProperties [auth=" + auth + ", cors=" + cors + "]";
+    return "CamundaBpmRunProperties [auth=" + auth + ", cors=" + cors + ", ldap=" + ldap + "]";
   }
 }
