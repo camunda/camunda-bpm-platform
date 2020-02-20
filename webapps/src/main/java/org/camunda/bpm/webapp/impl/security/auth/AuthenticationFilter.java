@@ -57,9 +57,11 @@ public class AuthenticationFilter implements Filter {
 
     try {
 
-      SecurityActions.runWithAuthentications((SecurityAction<Void>) () -> {
-        chain.doFilter(request, response);
-        return null;
+      SecurityActions.runWithAuthentications(new SecurityAction<Void>() {
+        public Void execute() throws IOException, ServletException {
+          chain.doFilter(request, response);
+          return null;
+        }
       }, authentications);
     } finally {
       Authentications.clearCurrent();
