@@ -76,13 +76,13 @@ By parsing this file the end .json file is generated.
 
 ### macros
 
-Contains all of the macros used in paths and models:
+Contains all of the [macros](https://freemarker.apache.org/docs/ref_directive_macro.html) used in paths and models:
 * `parameter` (used in paths)
 * `property` (used in paths and models)
 * `requestBody` (used in paths)
 * `response` (used in paths)
 
-Try to get familiar with them as they are heavily used in the templates. Keep in mind that in certain situation it is fine to not use them, if the endpoint/dto is too complex for example. Feel free to add missing parameters to the macros, however, do not forget to reflect your changes to all usages of the macros.
+Try to get familiar with them as they are heavily used in the templates. Keep in mind that in certain situation, it is fine to not use them, if the endpoint/dto is too complex for example. Feel free to add missing parameters to the macros, however, do not forget to reflect your changes to all usages of the macros.
 Some parameters are required (`name` and `description` in most of the cases) and some need to be provided if necessary (nice to have - `minimum`,`defaultValue`, `deprecated`). 
 
 ### models
