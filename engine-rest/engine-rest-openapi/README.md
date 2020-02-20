@@ -3,8 +3,12 @@ REST API - OpenAPI documentation
 
  This project generates a single openapi.json containing the OpeanAPI documentation of the Engine Rest API. Alligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md).
 
-Build and phases
--------------
+# Table of Contents
+1. [Build and phases](#build-and-phases)
+2. [Contribution](#contribution)
+TODO do we need it? if yes --> fill it up at the end
+
+## Build and phases
 
 To build the artifact run: `mvn clean install`
 
@@ -14,8 +18,7 @@ The build contains:
 * Generation of java client from the openapi.json file
 * Run of smoke tests against that client (the tests use [WireMock](http://wiremock.org/docs/))
 
-Contribution
--------------
+## Contribution
 
 NOTE: Please follow the next step to get familiar with the structure and the instructions that follow.
 
@@ -103,7 +106,7 @@ Contains the endpoints definitions of the Rest API. Instructions:
 * each endpoint definition contains at least one response defined.
 * use the macros from the previous section when possible
 * for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the comas in the json file
-* the endpoints that have sorting or pagination properties/parameter should use the [common templates](#commons) from the next section.
+* the endpoints that have sorting or pagination properties/parameter should use the [common templates](#commons).
 
 #### commons
 
@@ -121,7 +124,6 @@ Please set the `sortByValues` enumeration whenever the template is in use and do
 <#include "/paths/commons/sort-props.ftl" >
 ```
 
-
 ##### pagination
 
 * [pagination-params.ftl](./src/main/templates/paths/commons/pagination-params.ftl)
@@ -135,3 +137,9 @@ Use whenever `firstResult` and `maxResults` are part of the endpoint parameters.
 ##### more
 Sometimes the same bunch of parameters are used in multiple endpoint, feel free to create an template and reuse it.
 Example: [process-instance-query-params.ftl](./src/main/templates/paths/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
+
+### Long descriptions
+TODO CAM-11377
+### Dates
+TODO CAM-11407
+
