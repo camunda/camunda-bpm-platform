@@ -23,5 +23,5 @@ camunda.bpm.run.ldap:
   allow-anonymous-login: true
   authorization-check-enabled: false
   accept-untrusted-certificates: true
-  initial-context-factory:
+  initial-context-factory: contextFactory
   security-authentication: secAuth
