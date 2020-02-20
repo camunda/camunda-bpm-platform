@@ -99,6 +99,7 @@ Contains the endpoints definitions of the Rest API. Instructions:
 * each resource has its own folder under /paths (e.g. `/process-instance`, `/deployment`)
 * each resource directory contains `all.ftl` file that contains endpoint paths, methods and includes endpoint definition templates.
 * the path of the endpoint is resolved to a folder structure (e.g. get process instance count `GET /process-instance/count` goes to `/paths/process-instance/count`).
+* the dinamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`, then the path parameters (`id` and `varName`) should be always included in the endpoint definition and marked as `required`
 * the name of the method's request (GET, POST, PUT, DELETE, OPTIONS) is the name of the template file (get.ftl, post.frl, etc.).
 * each endpoint definition has unique `operationId` that will be used for the generation of clients. Most of the cases the java method name should be used (e.g. `deleteProcessInstancesAsync`). When this is not possible please define it according to the Java conventions.
 * each endpoint definition contains tag of its resource (e.g. `Process instance`, `Deployment`).
