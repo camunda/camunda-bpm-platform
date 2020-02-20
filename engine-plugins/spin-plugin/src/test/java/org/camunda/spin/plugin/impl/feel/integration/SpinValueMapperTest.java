@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.feel.impl.scala.spin.SpinValueMapperFactory;
 import org.camunda.feel.impl.DefaultValueMapper;
 import org.camunda.feel.syntaxtree.Val;
 import org.camunda.feel.syntaxtree.ValContext;
@@ -247,4 +248,11 @@ public class SpinValueMapperTest {
     // then
     assertThat(value).isEqualTo(context);
   }
+
+  @Test
+  public void shouldEqualClassNameForSpinValueMapper() {
+    assertThat(SpinValueMapper.class.getName())
+        .isEqualTo(SpinValueMapperFactory.SPIN_VALUE_MAPPER_CLASS_NAME);
+  }
+
 }

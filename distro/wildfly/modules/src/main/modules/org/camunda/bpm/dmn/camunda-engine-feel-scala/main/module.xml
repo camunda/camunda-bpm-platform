@@ -8,5 +8,8 @@
     <module name="sun.jdk" />
     <module name="org.camunda.bpm.dmn.camunda-engine-feel-api" />
     <module name="org.camunda.commons.camunda-commons-typed-values" />
+    <module name="org.camunda.commons.camunda-commons-logging" />
+
+    <module name="org.camunda.bpm.camunda-engine-plugin-spin" optional="true" />
   </dependencies>
 </module>

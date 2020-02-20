@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.dmn.engine.feel.function;
 
-import org.camunda.bpm.dmn.engine.feel.function.helper.NonSpiFunctionProvider;
+import org.camunda.bpm.dmn.engine.feel.function.helper.FunctionProvider;
 import org.camunda.bpm.dmn.engine.feel.function.helper.MyPojo;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
-import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngine;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngine;
 import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunction;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.function.builder.CustomFunctionBuilder;
@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.entry;
 
 public class CustomFunctionTest {
 
-  protected NonSpiFunctionProvider functionProvider = new NonSpiFunctionProvider();
+  protected FunctionProvider functionProvider = new FunctionProvider();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -477,7 +477,7 @@ public class CustomFunctionTest {
     List<FeelCustomFunctionProvider> functionProviders =
       Collections.singletonList(functionProvider);
 
-    CamundaFeelEngine feelEngine = new CamundaFeelEngine(functionProviders);
+    ScalaFeelEngine feelEngine = new ScalaFeelEngine(functionProviders);
 
     VariableContext variableCtx = Variables.putValue("variable", value).asVariableContext();
 
