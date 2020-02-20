@@ -15,10 +15,6 @@
   <name>Camunda BPM - Run - Modules</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>rest</module>
-  </modules>
-
   <!-- define provided dependencies that will already be present in the Spring 
     Boot ZIP and are not needed in the resulting dependency sets here -->
   <dependencyManagement>
@@ -117,17 +113,5 @@
       </plugins>
     </pluginManagement>
   </build>
-  
-  <profiles>
-    <profile>
-      <id>distro-ce</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>webapps</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>

@@ -64,6 +64,7 @@
       </activation>
       <modules>
         <module>modules</module>
+        <module>modules/rest</module>
         <module>assembly</module>
       </modules>
     </profile>
@@ -73,6 +74,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>modules/webapps</module>
         <module>distro</module>
       </modules>
     </profile>
