@@ -25,10 +25,6 @@
     <version.httpcomponents>4.5.10</version.httpcomponents>
     <version.junit>4.13</version.junit>
     <version.chromedriver>78.0.3904.70</version.chromedriver>
-
-    <http.port>8080</http.port>
-    <http.ctx-path.webapp />
-    <http.ctx-path.rest>rest/</http.ctx-path.rest>
   </properties>
 
   <dependencyManagement>
