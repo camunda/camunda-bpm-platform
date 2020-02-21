@@ -7,23 +7,14 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
 # Table of Contents
 1. [Build and phases](#build-and-phases)
 2. [Contribution](#contribution)
-
 2.1. [main.ftl](#mainftl)
-
 2.2. [macros](#macros)
-
 2.3. [models](#models)
-
 2.4. [paths](#paths)
-
 2.5. [commons](#commons)
-
 2.5.1. [sorting](#sorting)
-
 2.5.2. [pagination](#pagination)
-
 2.5.3. [more](#more)
-
 2.6. [TODOs](#todos)
 
 
