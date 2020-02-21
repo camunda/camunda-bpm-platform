@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.dmn.feel.impl.scala.function;
 
-import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelLogger;
 import org.camunda.feel.context.JavaFunction;
 import org.camunda.feel.context.JavaFunctionProvider;
 import org.camunda.feel.syntaxtree.Val;
@@ -31,6 +31,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CustomFunctionTransformer extends JavaFunctionProvider {
+
+  protected static final ScalaFeelLogger LOGGER = ScalaFeelLogger.LOGGER;
 
   protected Map<String, JavaFunction> functions;
   protected ValueMapper valueMapper;
@@ -51,7 +53,7 @@ public class CustomFunctionTransformer extends JavaFunctionProvider {
 
       functionNames.forEach(functionName -> {
         CustomFunction customFunction = functionProvider.resolveFunction(functionName)
-            .orElseThrow(() -> new FeelException("Custom function not available"));
+            .orElseThrow(LOGGER::customFunctionNotFoundException);
 
         List<String> params = customFunction.getParams();
 
