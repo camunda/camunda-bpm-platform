@@ -28,6 +28,12 @@ var deleteModalTemplate = fs.readFileSync(
 );
 var deleteModalCtrl = require('./modal-ctrl');
 
+var jobLogModalCtrl = require('./job-log-ctrl');
+var jobLogModalTemplate = fs.readFileSync(
+  __dirname + '/../templates/job-log.html',
+  'utf8'
+);
+
 module.exports = [
   '$scope',
   'page',
@@ -185,5 +191,18 @@ module.exports = [
 
     $scope.ctrl = new Ctrl(camAPI, localConf);
     $scope.ctrl.loadPeriodically(5000);
+
+    $scope.openLog = function(job) {
+      $modal.open({
+        controller: jobLogModalCtrl,
+        template: jobLogModalTemplate,
+        resolve: {
+          job: function() {
+            return job;
+          }
+        },
+        size: 'lg'
+      });
+    };
   }
 ];

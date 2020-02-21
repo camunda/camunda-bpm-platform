@@ -1264,6 +1264,36 @@ History.cleanableBatch = function(params, done) {
   });
 };
 
+History.jobLogList = function(params, done) {
+  var url = this.path + '/job-log';
+
+  if (typeof params === 'function') {
+    done = params;
+    params = {};
+  }
+
+  return this.http.get(url, {
+    data: params,
+    done: done
+  });
+
+
+};
+
+History.jobLogCount = function(params, done) {
+  var url = this.path + '/job-log/count';
+
+  if (typeof params === 'function') {
+    done = params;
+    params = {};
+  }
+
+  return this.http.get(url, {
+    data: params,
+    done: done
+  });
+}
+
 History.externalTaskLogList = helpers.createSimpleGetQueryFunction(
   '/external-task-log'
 );
