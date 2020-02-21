@@ -34,7 +34,7 @@ public class CamundaFeelEngineFactory implements FeelEngineFactory {
   }
 
   public FeelEngine createInstance() {
-      return new CamundaFeelEngine(customFunctionProviders);
+      return new ScalaFeelEngine(customFunctionProviders);
    }
 
   public void setCustomFunctionProviders(List<FeelCustomFunctionProvider> customFunctionProviders) {

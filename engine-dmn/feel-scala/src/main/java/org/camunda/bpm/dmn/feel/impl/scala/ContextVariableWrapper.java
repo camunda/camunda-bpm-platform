@@ -33,7 +33,6 @@ public class ContextVariableWrapper implements VariableProvider {
 
   public ContextVariableWrapper(VariableContext context) {
     this.context = context;
-    VariableProvider.$init$(this);
   }
 
   public Option getVariable(String name) {

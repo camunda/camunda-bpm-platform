@@ -16,33 +16,37 @@
  */
 package org.camunda.bpm.dmn.engine.feel.function.helper;
 
-import org.camunda.feel.context.JavaFunction;
-import org.camunda.feel.context.JavaFunctionProvider;
-import org.camunda.feel.syntaxtree.ValString;
+import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunction;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class SpiFunctionProvider extends JavaFunctionProvider {
+public class FunctionProvider implements FeelCustomFunctionProvider {
 
-  protected Map<String, JavaFunction> functions = new HashMap<>();
+  protected Map<String, CustomFunction> functions = new HashMap<>();
 
-  public SpiFunctionProvider(String name, String value) {
-    functions.put(name, new JavaFunction(Collections.emptyList(),
-      (args) -> new ValString(value)));
+  public FunctionProvider() {
   }
 
   @Override
-  public Optional<JavaFunction> resolveFunction(String functionName) {
+  public Optional<CustomFunction> resolveFunction(String functionName) {
     return Optional.ofNullable(functions.get(functionName));
   }
 
   @Override
   public Collection<String> getFunctionNames() {
     return functions.keySet();
+  }
+
+  public void clear() {
+    functions.clear();
+  }
+
+  public void register(String functionName, CustomFunction function) {
+    functions.put(functionName, function);
   }
 
 }
