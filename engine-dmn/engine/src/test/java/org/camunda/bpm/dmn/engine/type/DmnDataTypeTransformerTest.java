@@ -40,7 +40,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
