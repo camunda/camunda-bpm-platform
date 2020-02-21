@@ -25,6 +25,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.feel.syntaxtree.ZonedTime;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -81,6 +82,9 @@ public class DateDataTypeTransformer implements DmnDataTypeTransformer {
       throw unsupportedType(value);
 
     } else if (value instanceof Period) {
+      throw unsupportedType(value);
+
+    } else if (value instanceof ZonedTime) {
       throw unsupportedType(value);
 
     } else {

@@ -24,6 +24,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformerRegistry;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.feel.syntaxtree.ZonedTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
+import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -293,6 +295,22 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
 
     // when
     typeTransformer.transform(localDate);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_ZonedTime() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    ZonedTime zonedTime = ZonedTime.parse("22:22:22@Europe/Berlin");
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'org.camunda.feel.syntaxtree.ZonedTime' " +
+                           "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(zonedTime);
   }
 
   @Test
