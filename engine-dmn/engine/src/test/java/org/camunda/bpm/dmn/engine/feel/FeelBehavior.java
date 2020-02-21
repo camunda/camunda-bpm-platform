@@ -19,6 +19,7 @@ package org.camunda.bpm.dmn.engine.feel;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
+import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -181,6 +182,27 @@ public abstract class FeelBehavior extends DmnEngineTest {
 
     // then
     assertThat(foo).isEqualTo("bar");
+  }
+
+  /**
+   * For expression languages, so-called context functions can be used [1].
+   *
+   * This test ensures that context functions cannot be called in the
+   * juel as well as the scala-based implementation.
+   *
+   * [1] https://docs.camunda.org/manual/7.12/user-guide/process-engine/expression-language/#internal-context-functions
+   */
+  @Test
+  @DecisionResource(resource = "context_function.dmn")
+  public void shouldFailOnInternalContextFunctions() {
+    // given
+    getVariables().putValue("myDate", new Date());
+
+    // then
+    thrown.expect(FeelException.class);
+
+    // when
+    evaluateDecision().getSingleEntry();
   }
 
   @Test
