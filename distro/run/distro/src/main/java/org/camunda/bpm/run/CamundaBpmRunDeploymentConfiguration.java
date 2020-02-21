@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDeploymentConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -34,30 +34,23 @@ import org.springframework.core.io.Resource;
 
 public class CamundaBpmRunDeploymentConfiguration extends DefaultDeploymentConfiguration {
 
-  private static final String DEPLOYMENT_DIR = "deploymentDir";
-  public static final String DEFAULT_RESOURCE_DIR = "config/resources/";
+  public static final String CAMUNDA_DEPLOYMENT_DIR_PROPERTY = "camunda.deploymentDir";
 
   @Autowired
   private Environment env;
 
   @Override
   public Set<Resource> getDeploymentResources() {
-    String deploymentDir = env.getProperty(DEPLOYMENT_DIR, DEFAULT_RESOURCE_DIR);
-    EnsureUtil.ensureNotEmpty(DEPLOYMENT_DIR, deploymentDir);
-    String binDir = System.getProperty("user.dir");
-    Path baseDir = Paths.get(binDir).getParent();
-    Path resourceDir = baseDir.resolve(Paths.get(deploymentDir));
+    String deploymentDir = env.getProperty(CAMUNDA_DEPLOYMENT_DIR_PROPERTY);
+    if (!StringUtils.isEmpty(deploymentDir)) {
+      Path resourceDir = Paths.get(deploymentDir);
 
-    try {
       try (Stream<Path> stream = Files.walk(resourceDir)) {
-        return stream.filter(file -> !Files.isDirectory(file))
-            .map(FileSystemResource::new)
-            .collect(Collectors.toSet());
+        return stream.filter(file -> !Files.isDirectory(file)).map(FileSystemResource::new).collect(Collectors.toSet());
+      } catch (IOException e) {
+        e.printStackTrace();
       }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
-
     return Collections.EMPTY_SET;
   }
 }

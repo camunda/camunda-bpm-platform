@@ -174,7 +174,7 @@
               <includeArtifactIds>camunda-bpm-run</includeArtifactIds>
               <overWriteSnapshots>true</overWriteSnapshots>
               <excludeTransitive>true</excludeTransitive>
-              <outputDirectory>${project.build.directory}/test-resources/camunda-rest-distro</outputDirectory>
+              <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
             </configuration>
           </execution>
         </executions>

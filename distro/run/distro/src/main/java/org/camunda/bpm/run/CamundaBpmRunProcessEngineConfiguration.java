@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.run;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -35,7 +36,10 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     // only path relative to the root deployment directory as identifier to
     // prevent re-deployments when the path changes (e.g. distro is moved)
     try {
-      String deploymentDir = env.getProperty("deploymentDir", CamundaBpmRunDeploymentConfiguration.DEFAULT_RESOURCE_DIR);
+      String deploymentDir = env.getProperty(CamundaBpmRunDeploymentConfiguration.CAMUNDA_DEPLOYMENT_DIR_PROPERTY);
+      if(File.separator.equals("\\")) {
+        deploymentDir = deploymentDir.replace("\\", "/");
+      }
       String resourceAbsolutePath = resource.getURI().toString();
       int startIndex = resourceAbsolutePath.indexOf(deploymentDir) + deploymentDir.length();
       return resourceAbsolutePath.substring(startIndex);

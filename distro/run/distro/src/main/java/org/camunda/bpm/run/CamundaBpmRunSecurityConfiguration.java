@@ -88,15 +88,15 @@ public class CamundaBpmRunSecurityConfiguration {
     return camundaBpmRunProperties.getLdap();
   }
   
-  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration() {
-    return new CamundaBpmRunDeploymentConfiguration();
-  }
-
-  @Bean
   public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins) {
     final SpringProcessEngineConfiguration configuration = new CamundaBpmRunProcessEngineConfiguration();
     configuration.getProcessEnginePlugins().add(new CompositeProcessEnginePlugin(processEnginePlugins));
     return configuration;
+  }
+  
+  @Bean
+  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration() {
+    return new CamundaBpmRunDeploymentConfiguration();
   }
 
 }
