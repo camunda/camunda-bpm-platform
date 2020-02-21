@@ -32,6 +32,7 @@ import org.junit.rules.ExpectedException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -465,6 +466,55 @@ public class CustomFunctionTest {
 
     // then
     assertThat(result).containsExactly(entry("foo", Collections.singletonMap("bar", "bazz")));
+  }
+
+  @Test
+  public void shouldPassVarargs() {
+    // given
+    CustomFunction myFunction = CustomFunction.create()
+      .enableVarargs()
+      .setFunction(args -> args)
+      .build();
+
+    functionProvider.register("myFunction", myFunction);
+
+    // when
+    List<String> result = evaluateExpression("myFunction(\"foo\", \"bar\", \"baz\")");
+
+    // then
+    assertThat(result).containsExactly("foo", "bar", "baz");
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToDisabledVarargs() {
+    // given
+    CustomFunction myFunction = CustomFunction.create()
+      .setFunction(args -> args)
+      .build();
+
+    functionProvider.register("myFunction", myFunction);
+
+    // then
+    thrown.expect(FeelException.class);
+    thrown.expectMessage("no function found with name 'myFunction' and 3 parameters");
+
+    // when
+    evaluateExpression("myFunction(\"foo\", \"bar\", \"baz\")");
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToVarargsAndParams() {
+    // given
+    CustomFunctionBuilder customFunctionBuilder = CustomFunction.create()
+      .enableVarargs()
+      .setParams("x", "y");
+
+    // then
+    thrown.expect(FeelException.class);
+    thrown.expectMessage("Only enable varargs or set params.");
+
+    // when
+    customFunctionBuilder.build();
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////

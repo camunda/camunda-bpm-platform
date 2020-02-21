@@ -27,6 +27,7 @@ public class CustomFunction {
 
   protected List<String> params;
   protected Function<List<Object>, Object> function;
+  protected boolean hasVarargs;
 
   public CustomFunction() {
     params = Collections.emptyList();
@@ -55,6 +56,14 @@ public class CustomFunction {
 
   public void setFunction(Function<List<Object>, Object> function) {
     this.function = function;
+  }
+
+  public boolean hasVarargs() {
+    return hasVarargs;
+  }
+
+  public void setHasVarargs(boolean hasVarargs) {
+    this.hasVarargs = hasVarargs;
   }
 
 }
