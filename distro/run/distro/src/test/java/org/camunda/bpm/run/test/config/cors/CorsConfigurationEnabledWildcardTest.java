@@ -20,15 +20,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.run.test.AbstractRestTest;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
-public class CorsConfigurationEnabledWildcardTest extends AbstractCorsConfigurationTest {
-  
+/**
+ * Note: To run this test via an IDE you must set the system property
+ * {@code sun.net.http.allowRestrictedHeaders} to {@code true}.
+ * 
+ * @see https://jira.camunda.com/browse/CAM-11290
+ */
+@ActiveProfiles(profiles = { "test-cors-enabled" }, inheritProfiles = true)
+public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
+
   @Test
   public void shouldPassSameOriginRequest() {
     // given
