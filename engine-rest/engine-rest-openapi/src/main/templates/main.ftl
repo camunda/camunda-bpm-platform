@@ -1,4 +1,4 @@
-<#import "/lib/macros.ftl" as lib>
+<#import "/lib/utils.ftl" as lib>
 {
   "openapi": "3.0.2",
   "info": {
