@@ -6,13 +6,14 @@
   ],
   "parameters" : [
 
+    <#assign last = false >
     <#assign sortByValues = ['"instanceId"', '"definitionKey"', '"definitionId"', '"tenantId"', '"businessKey"']>
-    <#include "/paths/commons/sort-params.ftl" >
+    <#include "/lib/commons/sort-params.ftl" >
 
-    <#include "/paths/commons/pagination-params.ftl" >
+    <#include "/lib/commons/pagination-params.ftl" >
 
     <#assign last = true >
-    <#include "/paths/commons/process-instance-query-params.ftl" >
+    <#include "/lib/commons/process-instance-query-params.ftl" >
 
   ],
   "responses" : {

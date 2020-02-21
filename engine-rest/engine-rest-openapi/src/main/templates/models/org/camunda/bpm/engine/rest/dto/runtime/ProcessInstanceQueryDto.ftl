@@ -174,7 +174,7 @@
 
         <#assign last = true >
         <#assign sortByValues = ['"instanceId"', '"definitionId"', '"definitionKey"', '"businessKey"', '"tenantId"']>
-        <#include "/paths/commons/sort-props.ftl" >
+        <#include "/lib/commons/sort-props.ftl" >
 
     }
   }

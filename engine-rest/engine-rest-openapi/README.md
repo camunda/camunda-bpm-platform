@@ -27,6 +27,11 @@ For the generation of the documentation, we use [Freemarker](https://freemarker.
  +--main.ftl
  +--lib
  | +--macros.ftl
+ | +--commons
+ | | +--pagination-params.ftl
+ | | +--process-instance-query-params.ftl
+ | | +--sort-params.ftl
+ | | +--sort-props.ftl
  +--models
  | +--org/camunda/bpm/engine/rest/dto
  | | +--ExceptionDto.ftl
@@ -38,11 +43,6 @@ For the generation of the documentation, we use [Freemarker](https://freemarker.
  | | +--runtime
  | | | +--ActivityInstanceDto.ftl
  +--paths
- | +--commons
- | | +--pagination-params.ftl
- | | +--process-instance-query-params.ftl
- | | +--sort-params.ftl
- | | +--sort-props.ftl
  | +--deployment
  | | +--all.ftl
  | | +--create
@@ -115,29 +115,29 @@ Contains common templates that can be reused when it's possible.
 
 ##### sorting
 
-* [sort-params.ftl](./src/main/templates/paths/commons/sort-params.ftl)
-* [sort-props.ftl](./src/main/templates/paths/commons/sort-props.ftl)
+* [sort-params.ftl](./src/main/templates/lib/commons/sort-params.ftl)
+* [sort-props.ftl](./src/main/templates/lib/commons/sort-props.ftl)
 
 Please set the `sortByValues` enumeration whenever the template is in use and do not forget to assign the `last = true` if this is the last parameter/property (taking care for the commas in the json):
 ```
 <#-- <#assign last = true >  --> <#-- remove comment if last param  -->
 <#assign sortByValues = ['"instanceId"', '"definitionId"', '"definitionKey"', '"definitionName"', '"definitionVersion"', '"businessKey"', '"startTime"', '"endTime"', '"duration"', '"tenantId"']>
-<#include "/paths/commons/sort-props.ftl" >
+<#include "/lib/commons/sort-props.ftl" >
 ```
 
 ##### pagination
 
-* [pagination-params.ftl](./src/main/templates/paths/commons/pagination-params.ftl)
+* [pagination-params.ftl](./src/main/templates/lib/commons/pagination-params.ftl)
 
 Use whenever `firstResult` and `maxResults` are part of the endpoint parameters. Do not forget to assigne `last=true` param in case those are the last parameters:
 ```
     <#-- <#assign last = true >  --> <#-- remove comment if last param  -->
-    <#include "/paths/commons/pagination-params.ftl" >
+    <#include "/lib/commons/pagination-params.ftl" >
 ```
 
 ##### more
 Sometimes the same bunch of parameters are used in multiple endpoint, feel free to create an template and reuse it.
-Example: [process-instance-query-params.ftl](./src/main/templates/paths/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
+Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
 
 ### Long descriptions
 TODO CAM-11377
