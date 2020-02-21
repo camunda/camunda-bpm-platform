@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.dmn.feel.impl.scala.function.builder;
 
-import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelLogger;
 import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunction;
 
 import java.util.Arrays;
@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class CustomFunctionBuilderImpl implements CustomFunctionBuilder {
+
+  protected static final ScalaFeelLogger LOGGER = ScalaFeelLogger.LOGGER;
 
   protected CustomFunction customFunction;
   protected int functionCount;
@@ -62,7 +64,7 @@ public class CustomFunctionBuilderImpl implements CustomFunctionBuilder {
 
   protected void checkHasFunction() {
     if (functionCount > 1) {
-      throw new FeelException("Only set one return value or a function.");
+      throw LOGGER.functionCountExceededException();
     }
   }
 

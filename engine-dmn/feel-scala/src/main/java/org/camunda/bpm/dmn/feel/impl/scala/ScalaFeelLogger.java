@@ -63,4 +63,19 @@ public class ScalaFeelLogger extends BaseLogger {
       "005", "Error while looking up or registering Spin value mapper", cause));
   }
 
+  public FeelException functionCountExceededException() {
+    return new FeelException(exceptionMessage(
+      "006", "Only set one return value or a function."));
+  }
+
+  public FeelException customFunctionNotFoundException() {
+    return new FeelException(exceptionMessage(
+      "007", "Custom function not available."));
+  }
+
+  public FeelException evaluationException(String message) {
+    return new FeelException(exceptionMessage(
+      "008", "Error while evaluating expression: {}", message));
+  }
+
 }

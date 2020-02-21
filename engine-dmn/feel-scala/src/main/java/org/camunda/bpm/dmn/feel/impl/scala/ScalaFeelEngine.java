@@ -17,7 +17,6 @@
 package org.camunda.bpm.dmn.feel.impl.scala;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
-import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunctionTransformer;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.spin.SpinValueMapperFactory;
@@ -43,6 +42,8 @@ import static org.camunda.feel.context.VariableProvider.CompositeVariableProvide
 import static scala.jdk.CollectionConverters.ListHasAsScala;
 
 public class ScalaFeelEngine implements FeelEngine {
+
+  protected static final ScalaFeelLogger LOGGER = ScalaFeelLogger.LOGGER;
 
   protected org.camunda.feel.FeelEngine feelEngine;
 
@@ -77,7 +78,7 @@ public class ScalaFeelEngine implements FeelEngine {
       Failure failure = (Failure) left.value();
       String message = failure.message();
 
-      throw new FeelException(message);
+      throw LOGGER.evaluationException(message);
 
     }
   }
@@ -110,7 +111,7 @@ public class ScalaFeelEngine implements FeelEngine {
       Failure failure = (Failure) left.value();
       String message = failure.message();
 
-      throw new FeelException(message);
+      throw LOGGER.evaluationException(message);
 
     }
   }
