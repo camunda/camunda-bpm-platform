@@ -54,6 +54,8 @@ public class DmnBusinessRuleTaskTest {
 
   public static final String DECISION_OKAY_DMN12 = "org/camunda/bpm/engine/test/dmn/businessruletask/dmn12/DmnBusinessRuleTaskTest.testDecisionOkay.dmn";
 
+  public static final String DECISION_OKAY_DMN13 = "org/camunda/bpm/engine/test/dmn/businessruletask/dmn13/DmnBusinessRuleTaskTest.testDecisionOkay.dmn";
+
   public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn.createExecutableProcess("process")
               .startEvent()
               .businessRuleTask()
@@ -98,6 +100,12 @@ public class DmnBusinessRuleTaskTest {
     decisionRef();
   }
 
+  @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN13 })
+  @Test
+  public void testDmn13Decision() {
+    decisionRef();
+  }
+  
   @Deployment(resources = DECISION_PROCESS)
   @Test
   public void noDecisionFound() {
