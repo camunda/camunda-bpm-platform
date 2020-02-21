@@ -48,6 +48,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
   protected static final String DMN = "org/camunda/bpm/dmn/engine/el/FeelIntegrationTest.dmn";
   protected static final String DMN_12 = "org/camunda/bpm/dmn/engine/el/dmn12/FeelIntegrationTest.dmn";
+  protected static final String DMN_13 = "org/camunda/bpm/dmn/engine/el/dmn13/FeelIntegrationTest.dmn";
 
   protected FeelEngine feelEngineSpy;
 
@@ -130,6 +131,12 @@ public class FeelIntegrationTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN_12)
   public void testFeelInputExpression_Dmn12() {
+    testFeelInputExpression();
+  }
+
+  @Test
+  @DecisionResource(resource = DMN_13)
+  public void testFeelInputExpression_Dmn13() {
     testFeelInputExpression();
   }
 

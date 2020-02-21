@@ -32,6 +32,7 @@ public class EvaluateDecisionTest extends DmnEngineTest {
   public static final String DATA_TYPE_DMN = "org/camunda/bpm/dmn/engine/api/DataType.dmn";
 
   public static final String DMN12_NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/api/dmn12/NoInput.dmn";
+  public static final String DMN13_NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/api/dmn13/NoInput.dmn";
 
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
@@ -124,6 +125,14 @@ public class EvaluateDecisionTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN12_NO_INPUT_DMN)
   public void shouldEvaluateRuleWithoutInput_Dmn12() {
+    assertThatDecisionTableResult()
+      .hasSingleResult()
+      .hasSingleEntry("ok");
+  }
+
+  @Test
+  @DecisionResource(resource = DMN13_NO_INPUT_DMN)
+  public void shouldEvaluateRuleWithoutInput_Dmn13() {
     assertThatDecisionTableResult()
       .hasSingleResult()
       .hasSingleEntry("ok");

@@ -45,6 +45,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
   public static final String FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE = "feel";
   public static final String FEEL_EXPRESSION_LANGUAGE_DMN12 = DmnModelConstants.FEEL12_NS;
+  public static final String FEEL_EXPRESSION_LANGUAGE_DMN13 = DmnModelConstants.FEEL13_NS;
   public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
 
   protected DmnEngineMetricCollector engineMetricCollector;

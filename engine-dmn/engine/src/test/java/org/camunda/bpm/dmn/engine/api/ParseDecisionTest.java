@@ -55,6 +55,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingDrdId.dmn";
 
   public static final String DMN12_NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/api/dmn12/NoInput.dmn";
+  public static final String DMN13_NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/api/dmn13/NoInput.dmn";
 
   @Test
   public void shouldParseDecisionFromInputStream() {
@@ -279,6 +280,13 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldParseDecisionFromInputStream_Dmn12() {
     InputStream inputStream = IoUtil.fileAsStream(DMN12_NO_INPUT_DMN);
+    decision = dmnEngine.parseDecision("decision", inputStream);
+    assertDecision(decision, "decision");
+  }
+
+  @Test
+  public void shouldParseDecisionFromInputStream_Dmn13() {
+    InputStream inputStream = IoUtil.fileAsStream(DMN13_NO_INPUT_DMN);
     decision = dmnEngine.parseDecision("decision", inputStream);
     assertDecision(decision, "decision");
   }
