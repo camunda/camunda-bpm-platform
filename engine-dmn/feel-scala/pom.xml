@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>camunda-engine-feel-scala</artifactId>
-  <name>camunda DMN - engine Integration FEEL - SCALA </name>
+  <name>camunda DMN - engine FEEL - SCALA</name>
 
   <dependencies>
 

@@ -28,7 +28,7 @@ import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
-import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -43,7 +43,7 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
-    configuration.setFeelEngineFactory(new CamundaFeelEngineFactory());
+    configuration.setFeelEngineFactory(new ScalaFeelEngineFactory());
     return configuration;
   }
 
@@ -129,33 +129,5 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
       .hasSingleResult()
       .hasSingleEntry("foo");
   }
-
-  /* TODO move to feel-scala-spin artifact
-  @Ignore("SPIN handling has changed")
-  @Test
-  @DecisionResource(resource = "breaking_spin.dmn")
-  public void shouldHandleSpinCorrectly() {
-    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
-    DmnEngine engine = configuration.buildEngine();
-
-    DmnDecisionResult decisionResult = engine.evaluateDecision(decision,
-        Variables.createVariables()
-            .putValue("foo", Spin.JSON("{ \"foo\": 7}")));
-
-    assertThat((String)decisionResult.getSingleEntry()).isEqualTo("foo");
-  }
-
-  @Test
-  @DecisionResource(resource = "breaking_spin_context.dmn")
-  public void shouldUseContextConversionForSpinValue() {
-    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
-    DmnEngine engine = configuration.buildEngine();
-
-    DmnDecisionResult decisionResult = engine.evaluateDecision(decision,
-        Variables.createVariables()
-            .putValue("foo", Spin.JSON("{ \"bar\": 7}")));
-
-    assertThat((String)decisionResult.getSingleEntry()).isEqualTo("bar");
-  }*/
 
 }

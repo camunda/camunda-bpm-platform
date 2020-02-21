@@ -22,14 +22,14 @@ import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 
 import java.util.List;
 
-public class CamundaFeelEngineFactory implements FeelEngineFactory {
+public class ScalaFeelEngineFactory implements FeelEngineFactory {
 
   protected List<FeelCustomFunctionProvider> customFunctionProviders;
 
-  public CamundaFeelEngineFactory() {
+  public ScalaFeelEngineFactory() {
   }
 
-  public CamundaFeelEngineFactory(List<FeelCustomFunctionProvider> customFunctionProviders) {
+  public ScalaFeelEngineFactory(List<FeelCustomFunctionProvider> customFunctionProviders) {
     this.customFunctionProviders = customFunctionProviders;
   }
 

@@ -18,14 +18,14 @@ package org.camunda.bpm.dmn.engine.feel;
 
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
-import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
 
 public class ScalaFeelBehaviorTest extends FeelBehavior {
 
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
-    configuration.setFeelEngineFactory(new CamundaFeelEngineFactory());
+    configuration.setFeelEngineFactory(new ScalaFeelEngineFactory());
     configuration.init();
     return configuration;
   }

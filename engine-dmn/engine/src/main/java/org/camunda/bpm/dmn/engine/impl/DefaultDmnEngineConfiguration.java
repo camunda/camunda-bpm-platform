@@ -36,7 +36,7 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
-import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
@@ -187,7 +187,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
       if (!enableFeelLegacyBehavior) {
-        feelEngineFactory = new CamundaFeelEngineFactory(feelCustomFunctionProviders);
+        feelEngineFactory = new ScalaFeelEngineFactory(feelCustomFunctionProviders);
 
       } else {
         feelEngineFactory = new FeelEngineFactoryImpl();

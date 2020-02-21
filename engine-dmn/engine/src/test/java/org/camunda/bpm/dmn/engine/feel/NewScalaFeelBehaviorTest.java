@@ -26,7 +26,7 @@ import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
-import org.camunda.bpm.dmn.feel.impl.scala.CamundaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -41,7 +41,7 @@ public class NewScalaFeelBehaviorTest extends DmnEngineTest {
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
-    configuration.setFeelEngineFactory(new CamundaFeelEngineFactory());
+    configuration.setFeelEngineFactory(new ScalaFeelEngineFactory());
     return configuration;
   }
 
