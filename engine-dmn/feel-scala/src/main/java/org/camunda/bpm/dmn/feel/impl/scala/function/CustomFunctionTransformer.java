@@ -58,7 +58,10 @@ public class CustomFunctionTransformer extends JavaFunctionProvider {
         List<String> params = customFunction.getParams();
 
         Function<List<Val>, Val> function = transformFunction(customFunction);
-        JavaFunction javaFunction = new JavaFunction(params, function);
+
+        boolean hasVarargs = customFunction.hasVarargs();
+
+        JavaFunction javaFunction = new JavaFunction(params, function, hasVarargs);
 
         this.functions.put(functionName, javaFunction);
       });

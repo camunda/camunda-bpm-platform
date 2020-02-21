@@ -31,10 +31,23 @@ public interface CustomFunctionBuilder {
   /**
    * Define the parameters of the custom function.
    *
+   * It is not possible to use this method together with
+   * {@link #enableVarargs}.
+   *
    * @param params of the custom function
    * @return the builder
    */
   CustomFunctionBuilder setParams(String... params);
+
+  /**
+   * Enable variable arguments
+   *
+   * It is not possible to use this method together with
+   * {@link #setParams}.
+   *
+   * @return the builder
+   */
+  CustomFunctionBuilder enableVarargs();
 
   /**
    * Define a custom function that only returns a value and
@@ -64,8 +77,9 @@ public interface CustomFunctionBuilder {
    * Returns the custom function to be registered in
    * {@link FeelCustomFunctionProvider}.
    *
-   * @throws FeelException when both {@link #setFunction} and {@link #setReturnValue}
-   *         were called or one of those methods were called more than once.
+   * @throws FeelException <ul>
+   *   <li>when both {@link #setFunction} and {@link #setReturnValue} were called
+   *   <li>when both {@link #enableVarargs} and {@link #setParams} were called.
    *
    * @return a custom function
    */

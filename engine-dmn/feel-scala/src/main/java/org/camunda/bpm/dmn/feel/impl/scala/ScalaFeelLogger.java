@@ -78,4 +78,9 @@ public class ScalaFeelLogger extends BaseLogger {
       "008", "Error while evaluating expression: {}", message));
   }
 
+  public FeelException hasVarargsException() {
+    return new FeelException(exceptionMessage(
+      "009", "Only enable varargs or set params."));
+  }
+
 }
