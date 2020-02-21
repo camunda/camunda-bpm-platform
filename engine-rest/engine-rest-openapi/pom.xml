@@ -197,7 +197,7 @@
             <phase>generate-test-sources</phase>
             <configuration>
               <sources>
-                <source>${project.build.directory}/openapi/src/main/java</source>
+                <source>${project.build.directory}/camunda-openapi-client/src/main/java</source>
               </sources>
             </configuration>
           </execution>
@@ -217,7 +217,7 @@
             </goals>
             <configuration>
               <inputSpec>${generated-directory}/${generated-file}</inputSpec>
-              <output>${project.build.directory}/openapi</output>
+              <output>${project.build.directory}/camunda-openapi-client</output>
               <generatorName>java</generatorName>
             </configuration>
           </execution>
