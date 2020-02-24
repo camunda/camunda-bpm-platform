@@ -6,7 +6,7 @@
   ],
   "parameters" : [
     <#assign last = true >
-    <#include "/paths/commons/pagination-params.ftl" >
+    <#include "/lib/commons/pagination-params.ftl" >
    ],
 
   <@lib.requestBody
