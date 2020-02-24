@@ -272,7 +272,7 @@
 
         <#assign last = true >
         <#assign sortByValues = ['"instanceId"', '"definitionId"', '"definitionKey"', '"definitionName"', '"definitionVersion"', '"businessKey"', '"startTime"', '"endTime"', '"duration"', '"tenantId"']>
-        <#include "/paths/commons/sort-props.ftl" >
+        <#include "/lib/commons/sort-props.ftl" >
 
     }
   }

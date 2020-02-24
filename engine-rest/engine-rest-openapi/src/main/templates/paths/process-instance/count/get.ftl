@@ -5,7 +5,8 @@
     "Process instance"
   ],
   "parameters": [
-    <#include "/paths/commons/process-instance-query-params.ftl">
+    <#assign last = true >
+    <#include "/lib/commons/process-instance-query-params.ftl">
   ],
   "responses": {
     <@lib.response

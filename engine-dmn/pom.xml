@@ -16,7 +16,6 @@
 
   <properties>
     <version.juel>2.2.7</version.juel>
-    <version.feel-scala>1.11.0-alpha1</version.feel-scala>
     <version.log4j>2.9.0</version.log4j>
   </properties>
 
@@ -85,11 +84,6 @@
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.scalatest</groupId>
-          <artifactId>scalatest-maven-plugin</artifactId>
-          <version>1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
