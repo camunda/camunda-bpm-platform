@@ -25,7 +25,6 @@
     <module>starter-rest</module>
     <module>starter-webapp-core</module>
     <module>starter-webapp</module>
-    <module>starter-webapp-ee</module>
     <module>starter-test</module>
   </modules>
 
