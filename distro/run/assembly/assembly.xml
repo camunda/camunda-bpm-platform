@@ -11,6 +11,16 @@
   
   <includeBaseDirectory>false</includeBaseDirectory>
 
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>internal/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-core</include>
+      </includes>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+    </dependencySet>
+  </dependencySets>
+
   <files>
     <file>
       <source>resources/application.yml</source>

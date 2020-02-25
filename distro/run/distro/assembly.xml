@@ -23,22 +23,13 @@
     </dependencySet>
 
     <dependencySet>
-      <outputDirectory>configuration/database</outputDirectory>
+      <outputDirectory>configuration/database/</outputDirectory>
       <includes>
         <include>com.h2database:h2</include>
       </includes>
     </dependencySet>
 
   </dependencySets>
-
-  <files>
-    <file>
-      <source>target/camunda-bpm-run-${project.version}.jar
-      </source>
-      <outputDirectory>internal/</outputDirectory>
-      <destName>camunda-bpm-run.jar</destName>
-    </file>
-  </files>
 
   <fileSets>
     <fileSet>
