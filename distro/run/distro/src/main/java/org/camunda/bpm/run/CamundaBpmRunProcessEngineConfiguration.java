@@ -28,8 +28,13 @@ import org.springframework.core.io.Resource;
 
 public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
+  
   @Inject
   private Environment env;
+  
+  public CamundaBpmRunProcessEngineConfiguration() {
+    setDeployChangedOnly(true);
+  }
 
   @Override
   protected String getFileResourceName(Resource resource) {

@@ -78,7 +78,7 @@ public class LoginITTest extends AbstractWebappUiIntegrationTest {
     URL distroBase = LoginITTest.class.getClassLoader().getResource("camunda-rest-distro");
     assertNotNull(distroBase);
     File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
+    container = new SpringBootManagedContainer(file.getAbsolutePath(), LoginITTest.class, commands);
     try {
       container.start();
     } catch (Exception e) {

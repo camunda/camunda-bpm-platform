@@ -166,6 +166,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <id>default</id>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
@@ -175,6 +176,21 @@
               <overWriteSnapshots>true</overWriteSnapshots>
               <excludeTransitive>true</excludeTransitive>
               <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
+              <excludes>configuration/application.yml</excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>subfolder</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <includeArtifactIds>camunda-bpm-run</includeArtifactIds>
+              <overWriteSnapshots>true</overWriteSnapshots>
+              <excludeTransitive>true</excludeTransitive>
+              <outputDirectory>${project.build.directory}/test-resources/subfolder/camunda-bpm-run-distro</outputDirectory>
+              <excludes>configuration/application.yml</excludes>
             </configuration>
           </execution>
         </executions>
