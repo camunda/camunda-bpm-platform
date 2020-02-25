@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -139,8 +140,8 @@ public class TemplateParser {
         new RegexFileFilter("^(.*?)"), 
         DirectoryFileFilter.DIRECTORY
         );
-    
-    Map<String, String> models = new HashMap<>();
+
+    Map<String, String> models = new TreeMap<>();
     for (File file : modelFiles) {
       String modelName = FilenameUtils.removeExtension(file.getName());
       String filePath = file.getAbsolutePath();
@@ -161,7 +162,7 @@ public class TemplateParser {
         DirectoryFileFilter.DIRECTORY
         );
 
-    Map<String, List<String>> endpoints = new HashMap<>();
+    Map<String, List<String>> endpoints = new TreeMap<>();
     for (File file : endpointsFiles) {
       String endpointMethod = FilenameUtils.removeExtension(file.getName());
       String filePath = file.getAbsolutePath();
