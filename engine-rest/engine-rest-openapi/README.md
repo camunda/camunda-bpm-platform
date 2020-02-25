@@ -116,6 +116,7 @@ Contains the endpoints definitions of the Rest API. Instructions:
 NOTE: The paths are resolved automatically from the folder structure, please keep the file structure of `/paths` clean, without any additional files, different than the endpoint definitions (for example the reusable templates should go in [commons](#commons), do not create empty folders and so on).
 * the dynamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`,
 then the path parameters (`id` and `varName`) should always be included in the endpoint definition and marked as `required`.
+* endpoints that are almost similar but have a different paths (e.g. [Get Activity Instance Statistics](https://docs.camunda.org/manual/7.12/reference/rest/process-definition/get-activity-statistics/)) needs to be separated in different files. A unique `operationId` should be assigne to each of them. You can consider adding the common parts of the endpoints in [lib/commons](#commons).
 * the name of the method's request (GET, POST, PUT, DELETE, OPTIONS) is the name of the template file (get.ftl, post.frl, etc.).
 * each endpoint definition has a unique `operationId` that will be used for the generation of clients.
 In most of the cases, the java method name should be used (e.g. `deleteProcessInstancesAsync`). When this is not possible, please define it according to the Java conventions.
