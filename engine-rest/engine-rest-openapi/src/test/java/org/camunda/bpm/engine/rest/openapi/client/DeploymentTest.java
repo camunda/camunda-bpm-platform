@@ -63,7 +63,7 @@ public class DeploymentTest {
                 "    \"id\": \"aDeploymentId\"," +
                 "    \"name\": \"" + deploymentName + "\"," +
                 "    \"source\": \"" + deploymentSource + "\"," +
-                "    \"deploymentTime\": \"2013-01-23T13:59:43+02:00\"," + // TODO Dates CAM-11407
+                "    \"deploymentTime\": \"2013-01-23T13:59:43.000+0200\"," +
                 "    \"tenantId\": null," +
                 "    \"deployedProcessDefinitions\": {" +
                 "        \"aProcDefId\": {" +

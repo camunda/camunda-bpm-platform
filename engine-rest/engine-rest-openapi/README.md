@@ -157,10 +157,23 @@ Use whenever `firstResult` and `maxResults` are part of the endpoint parameters.
 Sometimes the same bunch of parameters is used in multiple endpoints. In cases like there, feel free to create a template and reuse it.
 Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
 
-### TODOs
+### Parameters and properties
 
 #### Long descriptions
 TODO CAM-11377
-#### Dates
-TODO CAM-11407
 
+#### Formats
+
+The `format` fields define further what is the type of properties. For more information, please check the [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#dataTypeFormat). The common types used in the documentation are `int32`, `binary`, `date-time`.
+Example:
+Specify the `date-time` format of the date properties whenever is possible,
+```
+    <@lib.property
+        name = "startedBefore"
+        type = "string"
+        format = "date-time"
+        description = "Restrict to instances that were started before the given date.
+By default (https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
+```
+That will improve the clients that are generated from the OpenAPI documentation.
