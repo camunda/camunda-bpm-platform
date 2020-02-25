@@ -87,6 +87,7 @@
       <modules>
         <module>modules</module>
         <module>modules/rest</module>
+        <module>core</module>
         <module>assembly</module>
       </modules>
     </profile>

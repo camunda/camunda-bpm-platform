@@ -23,6 +23,13 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
   </dependencies>
 
   <build>
