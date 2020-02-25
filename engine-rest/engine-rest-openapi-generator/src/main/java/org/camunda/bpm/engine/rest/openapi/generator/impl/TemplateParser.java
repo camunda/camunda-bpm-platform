@@ -113,6 +113,9 @@ public class TemplateParser {
     return debugFile + "/intermediate-openapi-" + timeStampPattern.format(java.time.LocalDateTime.now()) + ".json";
   }
 
+  /**
+   * Resolve the Camunda BPM version and the respective documentation version used in the links.
+   */
   protected static void resolveVersions(Map<String, Object> templateData) {
     String version = TemplateParser.class.getPackage().getImplementationVersion();
   
@@ -132,7 +135,13 @@ public class TemplateParser {
       templateData.put("docsVersion", "develop");
     }
   }
-  
+
+  /**
+   * 
+   * @param sourceDirectory the template directory that stores the models
+   * @return a map of model name and file path to it,
+   * the map is ordered lexicographically by the model names
+   */
   protected static Map<String, String> resolveModels(String sourceDirectory) {
     File modelsDir = new File(sourceDirectory + "/models");
     Collection<File> modelFiles = FileUtils.listFiles(
@@ -153,6 +162,12 @@ public class TemplateParser {
     return models;
   }
 
+  /**
+   * 
+   * @param sourceDirectory the template directory that stores the endpoints
+   * @return a map of endpoint path and HTTP methods pairs,
+   * the map is ordered lexicographically by the endpoint paths
+   */
   protected static Map<String, List<String>> resolvePaths(String sourceDirectory) {
     File endpointsDir = new File(sourceDirectory + "/paths");
     int endpointStartAt = endpointsDir.getAbsolutePath().length();
