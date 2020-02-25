@@ -55,11 +55,9 @@ The structure of the template is:
  | | | +--ActivityInstanceDto.ftl
  +--paths
  | +--deployment
- | | +--all.ftl
  | | +--create
  | | | +--post.ftl
  | +--process-instance
- | | +--all.ftl
  | | +--get.ftl
  | | +--suspended
  | | | +--put.ftl
@@ -105,16 +103,17 @@ This folder contains all of the DTOs used in the request and response bodies. In
 * use the name and package structure of the Rest DTOs when possible
 ([org.camunda.bpm.engine.rest.dto.ExceptionDto.java](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest/src/main/java/org/camunda/bpm/engine/rest/dto/ExceptionDto.java) --> 
 [org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl))
-* use the macros from the previous section when possible
-* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the comas in the json file
+* the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders.
+* use the macros from the previous section when possible.
+* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the comas in the json file.
 * the DTOs that have sorting or pagination properties should use the [common templates](#commons).
 
 ### paths
 
 Contains the endpoints definitions of the Rest API. Instructions:
 * each resource has its own folder under /paths (e.g. `/process-instance`, `/deployment`)
-* each resource directory contains `all.ftl` file that contains endpoint paths, methods and includes endpoint definition templates.
 * the path of the endpoint is resolved to a folder structure (e.g. get process instance count `GET /process-instance/count` goes to `/paths/process-instance/count`).
+NOTE: The paths are resolved automatically from the folder structure, please keep the file structure of `/paths` clean, without any additional files, different than the endpoint definitions (for example the reusable templates should go in [commons](#commons), do not create empty folders and so on).
 * the dynamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`,
 then the path parameters (`id` and `varName`) should always be included in the endpoint definition and marked as `required`.
 * the name of the method's request (GET, POST, PUT, DELETE, OPTIONS) is the name of the template file (get.ftl, post.frl, etc.).
