@@ -2,11 +2,11 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Camunda Rest API",
-    "description": "OpenApi Spec for Camunda REST API.",
+    "title": "Camunda BPM REST API",
+    "description": "OpenApi Spec for Camunda BPM REST API.",
     "version": "${cambpmVersion}",
     "license": {
-      "name": "Apache 2.0",
+      "name": "Apache License 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
