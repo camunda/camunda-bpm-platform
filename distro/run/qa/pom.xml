@@ -149,6 +149,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -176,20 +182,6 @@
               <overWriteSnapshots>true</overWriteSnapshots>
               <excludeTransitive>true</excludeTransitive>
               <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
-              <excludes>configuration/application.yml</excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>subfolder</id>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <phase>generate-test-resources</phase>
-            <configuration>
-              <includeArtifactIds>camunda-bpm-run</includeArtifactIds>
-              <overWriteSnapshots>true</overWriteSnapshots>
-              <excludeTransitive>true</excludeTransitive>
-              <outputDirectory>${project.build.directory}/test-resources/subfolder/camunda-bpm-run-distro</outputDirectory>
               <excludes>configuration/application.yml</excludes>
             </configuration>
           </execution>

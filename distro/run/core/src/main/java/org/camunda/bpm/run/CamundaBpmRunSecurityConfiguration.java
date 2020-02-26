@@ -16,17 +16,24 @@
  */
 package org.camunda.bpm.run;
 
+import java.util.List;
+
 import javax.servlet.Filter;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.filters.CorsFilter;
+import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
+import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
 import org.camunda.bpm.run.property.CamundaBpmRunAuthenticationProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunCorsProperty;
 import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.CamundaDeploymentConfiguration;
 import org.camunda.bpm.spring.boot.starter.rest.CamundaBpmRestInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -79,5 +86,17 @@ public class CamundaBpmRunSecurityConfiguration {
   @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunLdapProperties.PREFIX)
   public LdapIdentityProviderPlugin ldapIdentityProviderPlugin() {
     return camundaBpmRunProperties.getLdap();
+  }
+
+  @Bean
+  public ProcessEngineConfigurationImpl processEngineConfigurationImpl(List<ProcessEnginePlugin> processEnginePlugins) {
+    final SpringProcessEngineConfiguration configuration = new CamundaBpmRunProcessEngineConfiguration();
+    configuration.getProcessEnginePlugins().add(new CompositeProcessEnginePlugin(processEnginePlugins));
+    return configuration;
+  }
+
+  @Bean
+  public static CamundaDeploymentConfiguration camundaDeploymentConfiguration() {
+    return new CamundaBpmRunDeploymentConfiguration();
   }
 }

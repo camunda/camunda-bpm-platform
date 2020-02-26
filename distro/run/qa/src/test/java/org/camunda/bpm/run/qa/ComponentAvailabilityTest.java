@@ -67,7 +67,7 @@ public class ComponentAvailabilityTest {
     URL distroBase = ComponentAvailabilityTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
     assertNotNull(distroBase);
     File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), ComponentAvailabilityTest.class, commands);
+    container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
     try {
       container.start();
     } catch (Exception e) {

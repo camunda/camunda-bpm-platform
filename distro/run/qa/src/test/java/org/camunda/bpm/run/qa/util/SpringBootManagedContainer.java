@@ -18,29 +18,22 @@ package org.camunda.bpm.run.qa.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.text.StringSubstitutor;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Files;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
@@ -52,22 +45,21 @@ import com.sun.jna.platform.win32.WinNT;
 public class SpringBootManagedContainer {
 
   private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
-  private static final String CONFIGURATION_APPLICATION_YML = "configuration/application.yml";
+  private static final String APPLICATION_YML_PATH = "configuration/application.yml";
+  private static final String RESOURCES_PATH = "configuration/resources";
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
 
   protected String baseDirectory;
   protected String baseUrl;
-  protected Class testClass;
   protected List<String> commands = new ArrayList<>();
 
   protected Thread shutdownThread;
   protected Process startupProcess;
 
-  public SpringBootManagedContainer(String baseDirectory, Class testClass, String... commands) {
+  public SpringBootManagedContainer(String baseDirectory, String... commands) {
     this.baseUrl = "http://localhost:8080";
     this.baseDirectory = baseDirectory;
-    this.testClass = testClass;
     this.commands.add(getScriptPath());
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
@@ -136,7 +128,7 @@ public class SpringBootManagedContainer {
       throw new RuntimeException("Could not stop managed Spring Boot application", e);
     }
 
-    cleanupTestYml();
+    cleanup();
   }
 
   public String getBaseUrl() {
@@ -276,42 +268,38 @@ public class SpringBootManagedContainer {
   }
 
   private void createTestYml() {
-    File baseDir = new File(baseDirectory);
-    while (!baseDir.getName().equals("test-classes")) {
-      baseDir = baseDir.getParentFile();
-    }
-    String dbDirPath = new File(baseDir, "db" + File.separator + testClass.getSimpleName()).getAbsolutePath();
-    dbDirPath = dbDirPath.replace(File.separatorChar, '/');
-
-    String baseYml = SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile();
-    File testYml = new File(new File(baseDirectory), CONFIGURATION_APPLICATION_YML);
-
-    try (PrintWriter printWriter = new PrintWriter(new FileWriter(testYml, false))) {
-      try (BufferedReader file = new BufferedReader(new FileReader(baseYml))) {
-        StringBuffer inputBuffer = new StringBuffer();
-        String line;
-        while ((line = file.readLine()) != null) {
-          if (line.contains("url: jdbc:h2:")) {
-            Map<String, String> values = new HashMap<>();
-            values.put("testclass", dbDirPath);
-            StringSubstitutor sub = new StringSubstitutor(values, "%(", ")");
-            line = sub.replace(line);
-          }
-          inputBuffer.append(line);
-          inputBuffer.append("\r\n");
-        }
-        printWriter.write(inputBuffer.toString());
-      } catch (FileNotFoundException e) {
-        throw new ProcessEngineException("Could not locate test application.yml for test " + testClass, e);
-      }
+    try {
+      File baseYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
+      File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
+      Files.copy(baseYml, testYml);
     } catch (IOException e) {
-      throw new ProcessEngineException("Could not write to " + testYml.getAbsolutePath(), e);
+      log.error("Could not copy application.yml", e);
     }
+
   }
 
-  private void cleanupTestYml() {
-    File testYml = new File(new File(baseDirectory), CONFIGURATION_APPLICATION_YML);
+  private void cleanup() {
+    // cleanup test YAML
+    File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
     testYml.delete();
+
+    // cleanup resources
+    File resourcesDir = new File(new File(baseDirectory), RESOURCES_PATH);
+    deleteDirectory(resourcesDir);
+  }
+  
+  private void deleteDirectory(File directory) {
+    File[] files = directory.listFiles();
+    if (files != null) {
+      for (File f : files) {
+        if (f.isDirectory()) {
+          deleteDirectory(f);
+        } else {
+          f.delete();
+        }
+      }
+    }
+    directory.delete();
   }
 
   // ---------------------------

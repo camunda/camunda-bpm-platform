@@ -17,6 +17,7 @@
 package org.camunda.bpm.run.qa;
 
 import static io.restassured.RestAssured.when;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -32,51 +34,18 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AutoDeploymentIntegrationTest {
-
   static final String PROCESS_DEFINITION_ENDPOINT = "/rest/process-definition";
-  static final String DEPLOYMENT_ENDPOINT = "/rest/deployment/count";
-  static final String PROCESS_DEFINITION_ID = "dummyProcDef";
+  static final String DEPLOYMENT_ENDPOINT = "/rest/deployment";
 
-  static SpringBootManagedContainer container;
   static URL distroBase = AutoDeploymentIntegrationTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
-  static URL subfolderDistroBase = AutoDeploymentIntegrationTest.class.getClassLoader().getResource("subfolder/camunda-bpm-run-distro");
   static List<File> dummyFiles = new ArrayList<>();
-  static BpmnModelInstance dummyModel;
-
-  @BeforeClass
-  public static void createFiles() throws IOException {
-    createBpmnFile(distroBase);
-    createBpmnFile(subfolderDistroBase);
-  }
-  
-  @AfterClass
-  public static void cleanup() {
-    for (File file : dummyFiles) {
-      file.delete();
-    }
-  }
-
-  public void runStartScript(URL base) throws IOException {
-    assertNotNull(base);
-
-    File file = new File(base.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), AutoDeploymentIntegrationTest.class);
-    try {
-      container.start();
-    } catch (Exception e) {
-      throw new RuntimeException("Cannot start managed Spring Boot application!", e);
-    }
-  }
+  static SpringBootManagedContainer container;
 
   @After
   public void stopApp() {
@@ -91,38 +60,37 @@ public class AutoDeploymentIntegrationTest {
     }
   }
 
-  private static void createBpmnFile(URL base) throws IOException {
-      File baseDir = new File(new File(base.getFile()), "/configuration/");
-      File resourcesDir = new File(baseDir, "resources/");
-      resourcesDir.mkdir();
-      File bpmnFile = new File(resourcesDir, "process.bpmn");
-      bpmnFile.createNewFile();
-      if(dummyModel == null) {
-        dummyModel = Bpmn.createExecutableProcess(PROCESS_DEFINITION_ID).startEvent().endEvent().done();
-      }
-      Bpmn.writeModelToFile(bpmnFile, dummyModel);
-      dummyFiles.add(bpmnFile);
+  public void runStartScript() throws IOException {
+    assertNotNull(distroBase);
+
+    File file = new File(distroBase.getFile());
+    container = new SpringBootManagedContainer(file.getAbsolutePath());
+    try {
+      container.start();
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot start managed Spring Boot application!", e);
+    }
+  }
+
+  public static void createBPMNFile(String path, String processDefinitionId) throws IOException {
+    File baseDir = new File(new File(distroBase.getFile()), "/configuration/");
+    File resourcesDir = new File(baseDir, "resources/" + path);
+    resourcesDir.mkdirs();
+    File bpmnFile = new File(resourcesDir, "process.bpmn");
+    bpmnFile.createNewFile();
+    BpmnModelInstance model = Bpmn.createExecutableProcess(processDefinitionId).startEvent().endEvent().done();
+    Bpmn.writeModelToFile(bpmnFile, model);
+    dummyFiles.add(bpmnFile);
   }
 
   @Test
-  public void test1_shouldAutoDeployProcessDefinition() throws IOException {
+  public void shouldAutoDeployProcessDefinition() throws IOException {
     // given
-    runStartScript(distroBase);
+    createBPMNFile("", "process1");
+    runStartScript();
 
-    assertOnlyOneDeploymentWasMade();
-  }
-
-  @Test
-  public void test2_shouldNotRedeployAfterMigration() throws IOException {
-    // given
-    runStartScript(subfolderDistroBase);
-
-    assertOnlyOneDeploymentWasMade();
-  }
-
-  private void assertOnlyOneDeploymentWasMade () {
     // when
-    Response deploymentResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT);
+    Response deploymentResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT + "/count");
 
     // then
     // one deployment was made
@@ -138,6 +106,48 @@ public class AutoDeploymentIntegrationTest {
     definitionResponse.then()
       .statusCode(Status.OK.getStatusCode())
       .body("size()", is(1))
-      .body("[0].key", is(PROCESS_DEFINITION_ID));
+      .body("[0].key", is("process1"));
+  }
+
+  @Test
+  public void shouldSetRelativePathAsResourceName() throws IOException {
+    // given
+    createBPMNFile("", "process1");
+    createBPMNFile("nested/", "process2");
+    runStartScript();
+
+    Response definitionResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT);
+    definitionResponse.then()
+      .body("size()", is(1));
+    String deploymentId = definitionResponse.then().extract().path("[0].id");
+
+    // when
+    Response resourcesResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT + "/" + deploymentId + "/resources");
+    List<String> resourceNames = extractResourceNames(resourcesResponse);
+    for (String name : resourceNames) {
+      assertThatResourceNameIsRelativePath(name);
+    }
+  }
+
+  private List<String> extractResourceNames(Response response) {
+    ExtractableResponse<Response> extract = response.then().extract();
+    int size = extract.path("size()");
+    ArrayList<String> resourceNames = new ArrayList<>();
+    for (int i = 0; i < size; i++) {
+      resourceNames.add(extract.path("[" + i + "].name"));
+    }
+    return resourceNames;
+  }
+
+  private void assertThatResourceNameIsRelativePath(String name) {
+    for (File file : dummyFiles) {
+      String path = file.getAbsolutePath().replace(File.separator, "/");
+      String[] split = path.split("resources");
+      String string = split[split.length - 1];
+      if (string.equals(name)) {
+        return;
+      }
+    }
+    fail("Expected file " + name + "to be any of " + dummyFiles.stream().map(f -> f.getName()).collect(Collectors.joining(", ")));
   }
 }
