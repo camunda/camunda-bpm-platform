@@ -7,7 +7,8 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "DeleteProcessInstancePIQDto" />
+      dto = "DeleteProcessInstancesDto"
+      requestDescription = "**Unallowed property**: `historicProcessInstanceQuery`" />
 
   "responses": {
 

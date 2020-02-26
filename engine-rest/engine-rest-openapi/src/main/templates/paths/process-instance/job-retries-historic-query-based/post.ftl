@@ -7,9 +7,10 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "SetJobRetriesByProcessHPIQDto"
+      dto = "SetJobRetriesByProcessDto"
       requestDescription = "Please note that if both processInstances and historicProcessInstanceQuery are provided,
-then the resulting execution will be performed on the union of these sets." />
+then the resulting execution will be performed on the union of these sets.
+**Unallowed property**: `processInstanceQuery`" />
 
   "responses" : {
 

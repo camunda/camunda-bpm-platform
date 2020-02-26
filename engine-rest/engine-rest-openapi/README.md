@@ -105,8 +105,10 @@ This folder contains all of the DTOs used in the request and response bodies. In
 * use the name and package structure of the Rest DTOs when possible
 ([org.camunda.bpm.engine.rest.dto.ExceptionDto.java](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest/src/main/java/org/camunda/bpm/engine/rest/dto/ExceptionDto.java) --> 
 [org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl))
+Keep the properties of OpenAPI doc as close as possible to the Java DTOs and add explicit description whenever a property is not applicable to a certain endpoint (e.g. [PUT /process-instance/suspended](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/paths/process-instance/suspended/put.ftl))
 * the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders. The models are ordered lexicographically.
 * use the [utils](#utils) from the previous section when possible.
+* in case of DTO's hierarchy (`TriggerVariableValueDto extends VariableValueDto`) you may use `allOf` syntax - [example](https://github.com/camunda/camunda-bpm-platform/blob/392d98b61e5e0eff3e1dad0ee15a5ad986e0d93c/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/runtime/TriggerVariableValueDto.ftl#L2-L19).
 * for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the commas in the json file.
 * the DTOs that have sorting or pagination properties should use the [common templates](#commons).
 
@@ -126,6 +128,8 @@ In most of the cases, the java method name should be used (e.g. `deleteProcessIn
 * each endpoint definition contains a tag of its resource (e.g. `Process instance`, `Deployment`).
 * each endpoint definition contains a description.
 * each endpoint definition contains at least one HTTP response object defined.
+* in the request body try to use a DTO when possible, always check the Java DTO for guidance;
+avoid constructing a request body without DTO and only with properties defined in the endpoint description.
 * use the [utils](#utils) from the previous section when possible
 * for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the commas in the json file
 * the endpoints that have sorting or pagination properties/parameter should use the [common templates](#commons).

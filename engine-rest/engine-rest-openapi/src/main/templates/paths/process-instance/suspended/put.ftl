@@ -1,6 +1,24 @@
 {
   "operationId" : "updateSuspensionState",
-  "description": "Activates or suspends process instances.",
+  "description": "Activates or suspends process instances by providing certain criteria:
+
+# Activate/Suspend Process Instance By Process Definition Id
+* `suspend`
+* `processDefinitionId`
+
+# Activate/Suspend Process Instance By Process Definition Key
+
+* `suspend`
+* `processDefinitionKey`
+* `processDefinitionTenantId`
+* `processDefinitionWithoutTenantId`
+
+# Activate/Suspend Process Instance In Group
+* `suspend`
+* `processInstanceIds`
+* `processInstanceQuery`
+* `historicProcessInstanceQuery`
+  ",
   "tags": [
     "Process instance"
   ],
