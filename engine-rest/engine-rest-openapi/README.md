@@ -161,7 +161,7 @@ Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/pr
 ### Parameters and properties
 
 #### Descriptions
-[CommonMark](https://spec.commonmark.org/) syntax may be used for rich text representation and markdown in general.
+Markdown can be used for text descriptions. OpenAPI Spec allows usage of [CommonMark](https://spec.commonmark.org/) syntax may be used for rich text representation.
 Recommendations:
 * use unix line endings
 * to add docs links use markdown, e.g. `[User guide](https://docs.camunda.org/manual/develop/user-guide/)`
@@ -181,7 +181,6 @@ Variables can be provided with every starting instruction.
 The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/process-instance-modification/)."
 ```
 
-
 #### Formats
 
 The `format` fields define further what is the type of properties. For more information, please check the [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#dataTypeFormat). The common types used in the documentation are `int32`, `binary`, `date-time`.
@@ -200,5 +199,5 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 #### Examples
 
-So far the OpenAPI documentation does not provide any examples.
+So far the documentation does not provide any examples.
 
