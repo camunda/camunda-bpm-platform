@@ -14,8 +14,10 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
  + [commons](#commons)
  + [sorting](#sorting)
  + [pagination](#pagination)
- + [more](#more)
- + [TODOs](#todos)
+ + [reuse](#reuse)
+ + [descriptions](#descriptions)
+ + [formats](#formats)
+ + [examples](#examples)
 
 
 ## Build and phases
@@ -154,7 +156,7 @@ Use whenever `firstResult` and `maxResults` are part of the endpoint parameters.
     <#include "/lib/commons/pagination-params.ftl" >
 ```
 
-##### more
+##### reuse
 Sometimes the same bunch of parameters is used in multiple endpoints. In cases like there, feel free to create a template and reuse it.
 Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
 
