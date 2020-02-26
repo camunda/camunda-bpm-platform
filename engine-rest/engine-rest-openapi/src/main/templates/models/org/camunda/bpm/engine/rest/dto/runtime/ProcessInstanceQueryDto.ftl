@@ -21,13 +21,15 @@
         name = "processDefinitionKeyIn"
         type = "array"
         itemType = "string"
-        description = "Filter by a list of process definition keys. A process instance must have one of the given process definition keys. Must be a JSON array of Strings." />
+        description = "Filter by a list of process definition keys.
+A process instance must have one of the given process definition keys. Must be a JSON array of Strings." />
 
     <@lib.property
         name = "processDefinitionKeyNotIn"
         type = "array"
         itemType = "string"
-        description = "Exclude instances by a list of process definition keys. A process instance must not have one of the given process definition keys. Must be a JSON array of Strings." />
+        description = "Exclude instances by a list of process definition keys.
+A process instance must not have one of the given process definition keys. Must be a JSON array of Strings." />
 
     <@lib.property
         name = "businessKey"
@@ -47,22 +49,26 @@
     <@lib.property
         name = "superProcessInstance"
         type = "string"
-        description = "Restrict query to all process instances that are sub process instances of the given process instance. Takes a process instance id." />
+        description = "Restrict query to all process instances that are sub process instances of the given process instance.
+Takes a process instance id." />
 
     <@lib.property
         name = "subProcessInstance"
         type = "string"
-        description = "Restrict query to all process instances that have the given process instance as a sub process instance. Takes a process instance id." />
+        description = "Restrict query to all process instances that have the given process instance as a sub process instance.
+Takes a process instance id." />
 
     <@lib.property
         name = "superCaseInstance"
         type = "string"
-        description = "Restrict query to all process instances that are sub process instances of the given case instance. Takes a case instance id." />
+        description = "Restrict query to all process instances that are sub process instances of the given case instance.
+Takes a case instance id." />
 
     <@lib.property
         name = "subCaseInstance"
         type = "string"
-        description = "Restrict query to all process instances that have the given case instance as a sub case instance. Takes a case instance id." />
+        description = "Restrict query to all process instances that have the given case instance as a sub case instance.
+Takes a case instance id." />
 
     <@lib.property
         name = "active"
@@ -109,12 +115,14 @@
         name = "tenantIdIn"
         type = "array"
         itemType = "string"
-        description = "Filter by a list of tenant ids. A process instance must have one of the given tenant ids. Must be a JSON array of Strings." />
+        description = "Filter by a list of tenant ids. A process instance must have one of the given tenant ids.
+Must be a JSON array of Strings." />
 
     <@lib.property
         name = "withoutTenantId"
         type = "boolean"
-        description = "Only include process instances which belong to no tenant. Value may only be true, as false is the default behavior." />
+        description = "Only include process instances which belong to no tenant.
+Value may only be true, as false is the default behavior." />
 
     <@lib.property
         name = "processDefinitionWithoutTenantId"
@@ -125,7 +133,8 @@
         name = "activityIdIn"
         type = "array"
         itemType = "string"
-        description = "Filter by a list of activity ids. A process instance must currently wait in a leaf activity with one of the given activity ids." />
+        description = "Filter by a list of activity ids.
+A process instance must currently wait in a leaf activity with one of the given activity ids." />
 
     <@lib.property
         name = "rootProcessInstances"
@@ -142,29 +151,35 @@
         type = "array"
         dto = "VariableQueryParameterDto"
         description = "A JSON array to only include process instances that have variables with certain values.
-        The array consists of objects with the three properties name, operator and value. name (String) is the variable name, operator (String) is the comparison operator to be used and value the variable value.
-        The value may be String, Number or Boolean.
-        Valid operator values are: eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like." />
+The array consists of objects with the three properties `name`, `operator` and `value`.
+`name` (String) is the variable name,
+`operator` (String) is the comparison operator to be used and `value` the variable value.
+The `value` may be String, Number or Boolean.
+
+Valid operator values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than;
+`gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or equal to; `like`." />
 
     <@lib.property
         name = "variableNamesIgnoreCase"
         type = "boolean"
-        description = "Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal." />
+        description = "Match all variable names in this query case-insensitively.
+If set to true variableName and variablename are treated as equal." />
 
     <@lib.property
         name = "variableValuesIgnoreCase"
         type = "boolean"
-        description = "Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal." />
+        description = "Match all variable values in this query case-insensitively.
+If set to true variableValue and variablevalue are treated as equal." />
 
     <@lib.property
         name = "orQueries"
         type = "array"
         dto = "ProcessInstanceQueryDto"
         description = "A JSON array of nested process instance queries with OR semantics.
-        A process instance matches a nested query if it fulfills at least one of the query's predicates.
-        With multiple nested queries, a process instance must fulfill at least one predicate of each query (Conjunctive Normal Form).
-        All process instance query properties can be used except for: sorting
-        See the User guide (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries." />
+A process instance matches a nested query if it fulfills at least one of the query's predicates.
+With multiple nested queries, a process instance must fulfill at least one predicate of each query (Conjunctive Normal Form).
+All process instance query properties can be used except for: `sorting`
+See the [User guide](https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries." />
 
 
     "sorting": {

@@ -20,6 +20,7 @@
         dto = "ExceptionDto"
         last = true
         description = "Bad Request
-        Returned if some of the request parameters are invalid, for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
+Returned if some of the request parameters are invalid,
+for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
   }
 }

@@ -3,8 +3,12 @@
   "tags": [
     "Deployment"
   ],
-  "description": "Creates a deployment. Security Consideration
-Deployments can contain custom code in form of scripts or EL expressions to customize process behavior. This may be abused for remote execution of arbitrary code.",
+  "description": "Creates a deployment.
+
+`Security Consideration`
+
+Deployments can contain custom code in form of scripts or EL expressions to customize process behavior.
+This may be abused for remote execution of arbitrary code.",
 
   <@lib.requestBody
       mediaType = "multipart/form-data"
@@ -20,8 +24,8 @@ Deployments can contain custom code in form of scripts or EL expressions to cust
         code = "400"
         dto = "ParseExceptionDto"
         last = true
-        description = "Bad Request\n
-        In case one of the bpmn resources cannot be parsed."/>
+        description = "Bad Request
+In case one of the bpmn resources cannot be parsed."/>
 
   }
 }

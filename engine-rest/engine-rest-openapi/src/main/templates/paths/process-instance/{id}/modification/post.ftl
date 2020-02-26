@@ -1,6 +1,18 @@
 {
   "operationId" : "modifyProcessInstance",
-  "description": "Submits a list of modification instructions to change a process instance's execution state. A modification instruction is one of the following:\n\nStarting execution before an activity\nStarting execution after an activity on its single outgoing sequence flow\nStarting execution on a specific sequence flow\nCancelling an activity instance, transition instance, or all instances (activity or transition) for an activity\nInstructions are executed immediately and in the order they are provided in this request's body. Variables can be provided with every starting instruction.\n\nThe exact semantics of modification can be read about in the User guide (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/process-instance-modification/).",
+  "description": "Submits a list of modification instructions to change a process instance's execution state.
+A modification instruction is one of the following:
+
+* Starting execution before an activity
+* Starting execution after an activity on its single outgoing sequence flow
+* Starting execution on a specific sequence flow
+* Canceling an activity instance, transition instance, or all instances (activity or transition) for an activity
+
+Instructions are executed immediately and in the order they are provided in this request's body.
+Variables can be provided with every starting instruction.
+
+The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/process-instance-modification/).
+  ",
   "tags": [
     "Process instance"
   ],

@@ -38,7 +38,8 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request\n\nThe variable value or type is invalid, for example if no filename is set."/>
+        description = "Bad Request
+The variable value or type is invalid, for example if no filename is set."/>
 
   }
 }

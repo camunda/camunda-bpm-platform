@@ -8,7 +8,8 @@
   <@lib.requestBody
       mediaType = "application/json"
       dto = "SetJobRetriesByProcessPIQDto"
-      requestDescription = "Please note that if both processInstances and processInstanceQuery are provided, then the resulting execution will be performed on the union of these sets." />
+      requestDescription = "Please note that if both processInstances and processInstanceQuery are provided,
+then the resulting execution will be performed on the union of these sets." />
 
   "responses" : {
 
@@ -22,7 +23,8 @@
         dto = "ExceptionDto"
         last = true
         description = "Bad Request
-        Returned if some of the query parameters are invalid, for example if neither processInstanceIds, nor processInstanceQuery is present. Or if the retry count is not specified."/>
+Returned if some of the query parameters are invalid, for example if neither processInstanceIds, nor processInstanceQuery is present.
+Or if the retry count is not specified."/>
 
   }
 }

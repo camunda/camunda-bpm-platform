@@ -21,7 +21,7 @@
         dto = "ExceptionDto"
         last = true
         description = "Bad Request
-        Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor processInstanceQuery is present"/>
+Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor processInstanceQuery is present"/>
 
   }
 }

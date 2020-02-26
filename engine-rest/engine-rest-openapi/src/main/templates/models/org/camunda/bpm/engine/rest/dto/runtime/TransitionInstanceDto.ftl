@@ -54,8 +54,8 @@
         dto="ActivityInstanceIncidentDto"
         last =true
         description="A list of JSON objects containing incident specific properties:
-* id: the id of the incident
-* activityId: the activity id in which the incident occurred"/>
+* `id`: the id of the incident
+* `activityId`: the activity id in which the incident occurred"/>
 
   }
 }

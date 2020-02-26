@@ -68,7 +68,8 @@
         type = "integer"
         format = "int32"
         minimum = 0
-        description = "History time to live value of the process definition. Is used within History cleanup (https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/history/#history-cleanup)." />
+        description = "History time to live value of the process definition.
+Is used within [History cleanup](https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/history/#history-cleanup)." />
 
     <@lib.property
         name = "startableInTasklist"
