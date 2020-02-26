@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +168,7 @@ public class TemplateParser {
    * @param sourceDirectory the template directory that stores the endpoints
    * @return a map of endpoint path and HTTP methods pairs,
    * the map is ordered lexicographically by the endpoint paths
+   * the list of methods is ordered as well
    */
   protected static Map<String, List<String>> resolvePaths(String sourceDirectory) {
     File endpointsDir = new File(sourceDirectory + "/paths");
@@ -192,6 +194,10 @@ public class TemplateParser {
         operations = new ArrayList<>();
         operations.add(endpointMethod);
         endpoints.put(endpointPath, operations);
+      }
+
+      if(operations.size() > 1) {
+        Collections.sort(operations);
       }
     }
 
