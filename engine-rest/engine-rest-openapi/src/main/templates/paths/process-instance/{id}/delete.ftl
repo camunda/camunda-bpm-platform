@@ -5,13 +5,13 @@
     "Process instance"
   ],
   "parameters": [
+
     <@lib.parameter
         name = "id"
         location = "path"
         type = "string"
         required = true
         description = "The id of the process instance to be deleted."/>
-
 
     <@lib.parameter
         name = "skipCustomListeners"

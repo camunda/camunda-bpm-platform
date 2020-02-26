@@ -13,7 +13,6 @@
         required = true
         description = "The id of the process instance to retrieve the variables from."/>
 
-
     <@lib.parameter
         name = "deserializeValue"
         location = "query"
