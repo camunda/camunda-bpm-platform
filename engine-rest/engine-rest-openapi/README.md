@@ -103,9 +103,9 @@ This folder contains all of the DTOs used in the request and response bodies. In
 * use the name and package structure of the Rest DTOs when possible
 ([org.camunda.bpm.engine.rest.dto.ExceptionDto.java](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest/src/main/java/org/camunda/bpm/engine/rest/dto/ExceptionDto.java) --> 
 [org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl))
-* the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders. The models are ordered lexicographical.
+* the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders. The models are ordered lexicographically.
 * use the macros from the previous section when possible.
-* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the comas in the json file.
+* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the commas in the json file.
 * the DTOs that have sorting or pagination properties should use the [common templates](#commons).
 
 ### paths
@@ -114,7 +114,7 @@ Contains the endpoints definitions of the Rest API. Instructions:
 * each resource has its own folder under /paths (e.g. `/process-instance`, `/deployment`)
 * the path of the endpoint is resolved to a folder structure (e.g. get process instance count `GET /process-instance/count` goes to `/paths/process-instance/count`).
 NOTE: The endpoints' paths are automatically resolved from the folder structure, please keep the file structure of `/paths` clean, without any additional files, different than the endpoint definitions (for example the reusable templates should go in [commons](#commons), do not create empty folders and so on).
-The endpoints' paths are ordered lexicographical. 
+The endpoints' paths are ordered lexicographically. 
 * the dynamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`,
 then the path parameters (`id` and `varName`) should always be included in the endpoint definition and marked as `required`.
 * endpoints that are almost similar but have a different paths (e.g. [Get Activity Instance Statistics](https://docs.camunda.org/manual/7.12/reference/rest/process-definition/get-activity-statistics/)) needs to be separated in different files. A unique `operationId` should be assigne to each of them. You can consider adding the common parts of the endpoints in [lib/commons](#commons).
@@ -125,7 +125,7 @@ In most of the cases, the java method name should be used (e.g. `deleteProcessIn
 * each endpoint definition contains a description.
 * each endpoint definition contains at least one HTTP response object defined.
 * use the macros from the previous section when possible
-* for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the comas in the json file
+* for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the commas in the json file
 * the endpoints that have sorting or pagination properties/parameter should use the [common templates](#commons).
 
 #### commons
