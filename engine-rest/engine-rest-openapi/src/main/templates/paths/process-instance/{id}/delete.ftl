@@ -53,8 +53,8 @@
         code = "404"
         dto = "ExceptionDto"
         last = true
-        description = "Not found\n\n
-                Process instance with given id does not exist. " />
+        description = "Not found
+Process instance with given id does not exist. " />
 
   }
 }

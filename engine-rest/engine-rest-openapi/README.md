@@ -14,8 +14,10 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
  + [commons](#commons)
  + [sorting](#sorting)
  + [pagination](#pagination)
- + [more](#more)
- + [TODOs](#todos)
+ + [reuse](#reuse)
+ + [descriptions](#descriptions)
+ + [formats](#formats)
+ + [examples](#examples)
 
 
 ## Build and phases
@@ -154,15 +156,32 @@ Use whenever `firstResult` and `maxResults` are part of the endpoint parameters.
     <#include "/lib/commons/pagination-params.ftl" >
 ```
 
-##### more
+##### reuse
 Sometimes the same bunch of parameters is used in multiple endpoints. In cases like there, feel free to create a template and reuse it.
 Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/process-instance-query-params.ftl) used in `getProcessInstancesCount` and `getProcessInstances`
 
 ### Parameters and properties
 
-#### Long descriptions
-TODO CAM-11377
+#### Descriptions
+Markdown can be used for text descriptions. OpenAPI Spec allows usage of [CommonMark](https://spec.commonmark.org/) syntax may be used for rich text representation.
+Recommendations:
+* use unix line endings
+* to add docs links use markdown, e.g. `[User guide](https://docs.camunda.org/manual/develop/user-guide/)`
+* avoid adding long descriptions on a single line, improve the readibility by splitting the next with single or multiple line breaks:
+```
+  "description": "Submits a list of modification instructions to change a process instance's execution state.
+A modification instruction is one of the following:
 
+* Starting execution before an activity
+* Starting execution after an activity on its single outgoing sequence flow
+* Starting execution on a specific sequence flow
+* Canceling an activity instance, transition instance, or all instances (activity or transition) for an activity
+
+Instructions are executed immediately and in the order they are provided in this request's body.
+Variables can be provided with every starting instruction.
+
+The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/process-instance-modification/)."
+```
 
 #### Formats
 
@@ -182,5 +201,5 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 #### Examples
 
-So far the OpenAPI documentation does not provide any examples.
+So far the documentation does not provide any examples.
 

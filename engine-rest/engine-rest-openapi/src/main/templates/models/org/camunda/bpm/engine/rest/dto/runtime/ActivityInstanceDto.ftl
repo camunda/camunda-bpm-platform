@@ -47,7 +47,8 @@
         name = "childTransitionInstances"
         type = "array"
         dto="TransitionInstanceDto"
-        description = "A list of child transition instances. A transition instance represents an execution waiting in an asynchronous continuation."/>
+        description = "A list of child transition instances.
+A transition instance represents an execution waiting in an asynchronous continuation."/>
 
     <@lib.property
         name = "executionIds"
@@ -67,7 +68,7 @@
         dto="ActivityInstanceIncidentDto"
         last = true
         description = "A list of JSON objects containing incident specific properties:
-* id: the id of the incident
-* activityId: the activity id in which the incident occurred"/>
+* `id`: the id of the incident
+* `activityId`: the activity id in which the incident occurred"/>
   }
 }

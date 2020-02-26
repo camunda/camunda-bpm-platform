@@ -37,6 +37,8 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request\n\n The variable value or type is invalid, for example if the value could not be parsed to an Integer value or the passed variable type is not supported."/>
+        description = "Bad Request
+The variable value or type is invalid, for example if the value could not be parsed to an Integer value or
+the passed variable type is not supported."/>
   }
 }

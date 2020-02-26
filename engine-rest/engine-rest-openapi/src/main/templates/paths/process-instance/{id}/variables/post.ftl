@@ -1,6 +1,7 @@
 {
   "operationId": "modifyProcessInstanceVariables",
-  "description": "Updates or deletes the variables of a process instance by id. Updates precede deletions. So, if a variable is updated AND deleted, the deletion overrides the update.",
+  "description": "Updates or deletes the variables of a process instance by id. Updates precede deletions.
+  So, if a variable is updated AND deleted, the deletion overrides the update.",
   "tags": [
     "Process instance"
   ],
@@ -29,7 +30,9 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        description = "Bad Request\n\nThe variable value or type is invalid, for example if the value could not be parsed to an Integer value or the passed variable type is not supported."/>
+        description = "Bad Request
+The variable value or type is invalid, for example if the value could not be parsed to an Integer value or
+the passed variable type is not supported."/>
 
     <@lib.response
         code = "500"

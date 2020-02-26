@@ -1,6 +1,8 @@
 {
   "operationId" : "getProcessInstances",
-  "description": "Queries for process instances that fulfill given parameters. Parameters may be static as well as dynamic runtime properties of process instances. The size of the result set can be retrieved by using the Get Instance Count method.",
+  "description": "Queries for process instances that fulfill given parameters.
+Parameters may be static as well as dynamic runtime properties of process instances.
+The size of the result set can be retrieved by using the Get Instance Count method.",
   "tags": [
     "Process instance"
   ],
@@ -27,6 +29,8 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request\n\nReturned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
+        description = "Bad Request
+Returned if some of the query parameters are invalid,
+for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
   }
 }

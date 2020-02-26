@@ -24,7 +24,10 @@
   ],
   "responses": {
     "200": {
-      "description": "Request successful.\n\nFor binary variables or files without any MIME type information, a byte stream is returned. File variables with MIME type information are returned as the saved type. Additionally, for file variables the Content-Disposition header will be set.",
+      "description": "Request successful.
+        For binary variables or files without any MIME type information, a byte stream is returned.
+        File variables with MIME type information are returned as the saved type.
+        Additionally, for file variables the Content-Disposition header will be set.",
       "content": {
         "application/octet-stream": {
           "schema": {
@@ -33,7 +36,8 @@
         },
         "text/plain": {
           "schema": {
-            "description": "File variables with MIME type information are returned as the saved type. Additionally, for file variables the Content-Disposition header will be set."
+            "description": "File variables with MIME type information are returned as the saved type.
+            Additionally, for file variables the Content-Disposition header will be set."
           }
         }
       }
@@ -42,13 +46,15 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        description = "Bad Request\n\nA Process Variable with the given id exists but does not serialize as binary data."/>
+        description = "Bad Request
+A Process Variable with the given id exists but does not serialize as binary data."/>
 
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
         last = true
-        description = "Not Found\n\nA Process Variable with the given id does not exist. "/>
+        description = "Not Found
+A Process Variable with the given id does not exist. "/>
 
   }
 }
