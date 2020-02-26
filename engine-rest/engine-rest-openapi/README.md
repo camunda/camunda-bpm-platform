@@ -128,7 +128,7 @@ In most of the cases, the java method name should be used (e.g. `deleteProcessIn
 * each endpoint definition contains a tag of its resource (e.g. `Process instance`, `Deployment`).
 * each endpoint definition contains a description.
 * each endpoint definition contains at least one HTTP response object defined.
-* in the request body try to use a DTO when possible, always check the Java DTO for a guidance;
+* in the request body try to use a DTO when possible, always check the Java DTO for guidance;
 avoid constructing a request body without DTO and only with properties defined in the endpoint description.
 * use the macros from the previous section when possible
 * for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the commas in the json file
