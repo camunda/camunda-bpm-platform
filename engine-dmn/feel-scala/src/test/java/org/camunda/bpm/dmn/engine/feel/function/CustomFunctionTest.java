@@ -32,7 +32,6 @@ import org.junit.rules.ExpectedException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -503,18 +502,39 @@ public class CustomFunctionTest {
   }
 
   @Test
-  public void shouldThrowExceptionDueToVarargsAndParams() {
+  public void shouldPassExplicitParamsAndVarargs() {
     // given
-    CustomFunctionBuilder customFunctionBuilder = CustomFunction.create()
+    CustomFunction customFunction = CustomFunction.create()
       .enableVarargs()
-      .setParams("x", "y");
+      .setParams("x", "y")
+      .setFunction(args -> args)
+      .build();
 
-    // then
-    thrown.expect(FeelException.class);
-    thrown.expectMessage("Only enable varargs or set params.");
+    functionProvider.register("myFunction", customFunction);
 
     // when
-    customFunctionBuilder.build();
+    List<Object> result = evaluateExpression("myFunction(\"foo\", \"bar\", \"baz\")");
+
+    // then
+    assertThat(result).containsExactly("foo", Arrays.asList("bar", "baz"));
+  }
+
+  @Test
+  public void shouldPassExplicitParamsWithVarargsEnabled() {
+    // given
+    CustomFunction customFunction = CustomFunction.create()
+      .enableVarargs()
+      .setParams("x", "y")
+      .setFunction(args -> args)
+      .build();
+
+    functionProvider.register("myFunction", customFunction);
+
+    // when
+    List<Object> result = evaluateExpression("myFunction(y: \"bar\", x: \"foo\")");
+
+    // then
+    assertThat(result).containsExactly("foo", "bar");
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////
