@@ -149,6 +149,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -166,6 +172,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <id>default</id>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
@@ -174,7 +181,8 @@
               <includeArtifactIds>camunda-bpm-run</includeArtifactIds>
               <overWriteSnapshots>true</overWriteSnapshots>
               <excludeTransitive>true</excludeTransitive>
-              <outputDirectory>${project.build.directory}/test-resources/camunda-rest-distro</outputDirectory>
+              <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
+              <excludes>configuration/application.yml</excludes>
             </configuration>
           </execution>
         </executions>

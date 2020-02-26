@@ -33,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Files;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
@@ -42,6 +43,10 @@ import com.sun.jna.platform.win32.WinNT;
  * the distro's startup scripts
  */
 public class SpringBootManagedContainer {
+
+  private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
+  private static final String APPLICATION_YML_PATH = "configuration/application.yml";
+  private static final String RESOURCES_PATH = "configuration/resources";
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
 
@@ -59,6 +64,7 @@ public class SpringBootManagedContainer {
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
+    createTestYml();
   }
 
   public void start() {
@@ -121,6 +127,8 @@ public class SpringBootManagedContainer {
     } catch (final Exception e) {
       throw new RuntimeException("Could not stop managed Spring Boot application", e);
     }
+
+    cleanup();
   }
 
   public String getBaseUrl() {
@@ -257,6 +265,41 @@ public class SpringBootManagedContainer {
       }
     }
     return null;
+  }
+
+  private void createTestYml() {
+    try {
+      File baseYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
+      File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
+      Files.copy(baseYml, testYml);
+    } catch (IOException e) {
+      log.error("Could not copy application.yml", e);
+    }
+
+  }
+
+  private void cleanup() {
+    // cleanup test YAML
+    File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
+    testYml.delete();
+
+    // cleanup resources
+    File resourcesDir = new File(new File(baseDirectory), RESOURCES_PATH);
+    deleteDirectory(resourcesDir);
+  }
+  
+  private void deleteDirectory(File directory) {
+    File[] files = directory.listFiles();
+    if (files != null) {
+      for (File f : files) {
+        if (f.isDirectory()) {
+          deleteDirectory(f);
+        } else {
+          f.delete();
+        }
+      }
+    }
+    directory.delete();
   }
 
   // ---------------------------

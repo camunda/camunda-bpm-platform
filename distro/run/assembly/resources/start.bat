@@ -1,6 +1,7 @@
 @echo off
 
-set BASEDIR=%~dp0
+SET BASEDIR=%~dp0
+SET deploymentDir=%BASEDIR%configuration/resources
 
 REM setup the JVM
 IF "x%JAVA_HOME%" == "x" (
@@ -60,4 +61,4 @@ ECHO classpath: %classPath%
 
 
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%BASEDIR%configuration\application.yml"
+call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%BASEDIR%configuration\application.yml"
