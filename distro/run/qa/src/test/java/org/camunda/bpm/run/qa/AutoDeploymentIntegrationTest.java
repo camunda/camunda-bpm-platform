@@ -17,6 +17,7 @@
 package org.camunda.bpm.run.qa;
 
 import static io.restassured.RestAssured.when;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +36,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.After;
 import org.junit.Test;
+
+import com.google.common.io.Files;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -107,6 +110,32 @@ public class AutoDeploymentIntegrationTest {
       .statusCode(Status.OK.getStatusCode())
       .body("size()", is(1))
       .body("[0].key", is("process1"));
+  }
+
+  @Test
+  public void shouldAutoDeployScriptAndForms() throws IOException {
+    // given
+    File formFile = new File(AutoDeploymentIntegrationTest.class.getClassLoader().getResource("deployment/form.html").getFile());
+    File scriptFile = new File(AutoDeploymentIntegrationTest.class.getClassLoader().getResource("deployment/script.js").getFile());
+    File resourcesDirectory = new File(new File(distroBase.getFile()), "configuration/resources");
+    resourcesDirectory.mkdirs();
+    Files.copy(formFile, new File(resourcesDirectory, "form.html"));
+    Files.copy(scriptFile, new File(resourcesDirectory, "script.js"));
+
+    // when
+    runStartScript();
+
+    Response definitionResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT);
+    definitionResponse.then()
+      .body("size()", is(1));
+    String deploymentId = definitionResponse.then().extract().path("[0].id");
+
+    // when
+    Response resourcesResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT + "/" + deploymentId + "/resources");
+    List<String> resourceNames = extractResourceNames(resourcesResponse);
+    
+    // then
+    assertThat(resourceNames).contains("/form.html", "/script.js");
   }
 
   @Test
