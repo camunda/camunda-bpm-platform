@@ -51,6 +51,6 @@ public class CamundaBpmRunDeploymentConfiguration extends DefaultDeploymentConfi
         e.printStackTrace();
       }
     }
-    return Collections.EMPTY_SET;
+    return Collections.emptySet();
   }
 }
