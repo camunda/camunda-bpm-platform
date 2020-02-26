@@ -31,9 +31,6 @@ public interface CustomFunctionBuilder {
   /**
    * Define the parameters of the custom function.
    *
-   * It is not possible to use this method together with
-   * {@link #enableVarargs}.
-   *
    * @param params of the custom function
    * @return the builder
    */
@@ -41,9 +38,6 @@ public interface CustomFunctionBuilder {
 
   /**
    * Enable variable arguments
-   *
-   * It is not possible to use this method together with
-   * {@link #setParams}.
    *
    * @return the builder
    */
@@ -77,9 +71,7 @@ public interface CustomFunctionBuilder {
    * Returns the custom function to be registered in
    * {@link FeelCustomFunctionProvider}.
    *
-   * @throws FeelException <ul>
-   *   <li>when both {@link #setFunction} and {@link #setReturnValue} were called
-   *   <li>when both {@link #enableVarargs} and {@link #setParams} were called.
+   * @throws FeelException when both {@link #setFunction} and {@link #setReturnValue} were called
    *
    * @return a custom function
    */

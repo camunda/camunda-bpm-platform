@@ -65,22 +65,12 @@ public class CustomFunctionBuilderImpl implements CustomFunctionBuilder {
   @Override
   public CustomFunction build() {
     checkHasFunction();
-    checkHasVarargs();
     return customFunction;
   }
 
   protected void checkHasFunction() {
     if (functionCount > 1) {
       throw LOGGER.functionCountExceededException();
-    }
-  }
-
-  protected void checkHasVarargs() {
-    boolean hasVarargs = customFunction.hasVarargs();
-    List<String> params = customFunction.getParams();
-
-    if (hasVarargs && (params != null && !params.isEmpty())) {
-      throw LOGGER.hasVarargsException();
     }
   }
 
