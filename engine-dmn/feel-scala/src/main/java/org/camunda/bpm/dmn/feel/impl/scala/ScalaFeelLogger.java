@@ -23,7 +23,7 @@ import org.camunda.commons.logging.BaseLogger;
 public class ScalaFeelLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "FEEL/SCALA";
-  public static final String PROJECT_LOGGER = "org.camunda.bpm.feel.impl.scala";
+  public static final String PROJECT_LOGGER = "org.camunda.bpm.dmn.feel.scala";
 
   public static final ScalaFeelLogger LOGGER = createLogger(ScalaFeelLogger.class,
     PROJECT_CODE, PROJECT_LOGGER, "01");

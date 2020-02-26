@@ -25,7 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelLogger;
 import org.camunda.bpm.dmn.feel.impl.scala.spin.SpinValueMapperFactory;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.camunda.feel.impl.DefaultValueMapper;
 import org.camunda.feel.syntaxtree.Val;
 import org.camunda.feel.syntaxtree.ValContext;
@@ -37,11 +40,15 @@ import org.camunda.spin.Spin;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class SpinValueMapperTest {
 
   protected static ValueMapper valueMapper;
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   @BeforeClass
   public static void setUp() {
@@ -253,6 +260,19 @@ public class SpinValueMapperTest {
   public void shouldEqualClassNameForSpinValueMapper() {
     assertThat(SpinValueMapper.class.getName())
         .isEqualTo(SpinValueMapperFactory.SPIN_VALUE_MAPPER_CLASS_NAME);
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {ScalaFeelLogger.PROJECT_LOGGER}, level = "INFO")
+  public void shouldLogValueMapperDetection() {
+    // given
+    SpinValueMapperFactory mapperFactory = new SpinValueMapperFactory();
+
+    // when
+    mapperFactory.createInstance();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("Spin value mapper detected").size()).isOne();
   }
 
 }
