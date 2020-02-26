@@ -55,11 +55,9 @@ The structure of the template is:
  | | | +--ActivityInstanceDto.ftl
  +--paths
  | +--deployment
- | | +--all.ftl
  | | +--create
  | | | +--post.ftl
  | +--process-instance
- | | +--all.ftl
  | | +--get.ftl
  | | +--suspended
  | | | +--put.ftl
@@ -105,18 +103,21 @@ This folder contains all of the DTOs used in the request and response bodies. In
 * use the name and package structure of the Rest DTOs when possible
 ([org.camunda.bpm.engine.rest.dto.ExceptionDto.java](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest/src/main/java/org/camunda/bpm/engine/rest/dto/ExceptionDto.java) --> 
 [org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl))
-* use the macros from the previous section when possible
-* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the comas in the json file
+* the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders. The models are ordered lexicographically.
+* use the macros from the previous section when possible.
+* for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the commas in the json file.
 * the DTOs that have sorting or pagination properties should use the [common templates](#commons).
 
 ### paths
 
 Contains the endpoints definitions of the Rest API. Instructions:
 * each resource has its own folder under /paths (e.g. `/process-instance`, `/deployment`)
-* each resource directory contains `all.ftl` file that contains endpoint paths, methods and includes endpoint definition templates.
 * the path of the endpoint is resolved to a folder structure (e.g. get process instance count `GET /process-instance/count` goes to `/paths/process-instance/count`).
+NOTE: The endpoints' paths are automatically resolved from the folder structure, please keep the file structure of `/paths` clean, without any additional files, different than the endpoint definitions (for example the reusable templates should go in [commons](#commons), do not create empty folders and so on).
+The endpoints' paths are ordered lexicographically. 
 * the dynamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`,
 then the path parameters (`id` and `varName`) should always be included in the endpoint definition and marked as `required`.
+* endpoints that are almost similar but have a different paths (e.g. [Get Activity Instance Statistics](https://docs.camunda.org/manual/7.12/reference/rest/process-definition/get-activity-statistics/)) needs to be separated in different files. A unique `operationId` should be assigne to each of them. You can consider adding the common parts of the endpoints in [lib/commons](#commons).
 * the name of the method's request (GET, POST, PUT, DELETE, OPTIONS) is the name of the template file (get.ftl, post.frl, etc.).
 * each endpoint definition has a unique `operationId` that will be used for the generation of clients.
 In most of the cases, the java method name should be used (e.g. `deleteProcessInstancesAsync`). When this is not possible, please define it according to the Java conventions.
@@ -124,7 +125,7 @@ In most of the cases, the java method name should be used (e.g. `deleteProcessIn
 * each endpoint definition contains a description.
 * each endpoint definition contains at least one HTTP response object defined.
 * use the macros from the previous section when possible
-* for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the comas in the json file
+* for the `property` and `param` macros DO NOT forget to put last = true param for the last property/parameter, that will take care for the commas in the json file
 * the endpoints that have sorting or pagination properties/parameter should use the [common templates](#commons).
 
 #### commons
@@ -162,6 +163,7 @@ Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/pr
 #### Long descriptions
 TODO CAM-11377
 
+
 #### Formats
 
 The `format` fields define further what is the type of properties. For more information, please check the [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#dataTypeFormat). The common types used in the documentation are `int32`, `binary`, `date-time`.
@@ -177,3 +179,8 @@ By default (https://docs.camunda.org/manual/${docsVersion}/reference/rest/overvi
 the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
 ```
 That will improve the clients that are generated from the OpenAPI documentation.
+
+#### Examples
+
+So far the OpenAPI documentation does not provide any examples.
+

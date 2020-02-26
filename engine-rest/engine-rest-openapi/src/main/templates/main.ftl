@@ -1,12 +1,12 @@
-<#import "/lib/macros.ftl" as lib>
+<#import "/lib/utils.ftl" as lib>
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Camunda Rest API",
-    "description": "OpenApi Spec for Camunda REST API.",
+    "title": "Camunda BPM REST API",
+    "description": "OpenApi Spec for Camunda BPM REST API.",
     "version": "${cambpmVersion}",
     "license": {
-      "name": "Apache 2.0",
+      "name": "Apache License 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -25,53 +25,23 @@
   ],
   "paths": {
 
-    <#include "/paths/process-instance/all.ftl">,
+    <#list endpoints as path, methods>
+        "${path}": {
+            <#list methods as method>
+                "${method}":
+                <#include "/paths${path}/${method}.ftl"><#sep>,
+            </#list>
+        }<#sep>,
+    </#list>
 
-    <#include "/paths/deployment/all.ftl">
-    <#-- TODO -->
   },
   "components": {
     "schemas": {
-      "DeleteProcessInstanceHPIQDto":              <#include "/models/org/camunda/bpm/engine/rest/dto/history/DeleteProcessInstanceHPIQDto.ftl">,
-      "HistoricProcessInstanceQueryDto":           <#include "/models/org/camunda/bpm/engine/rest/dto/history/HistoricProcessInstanceQueryDto.ftl">,
-      "SetJobRetriesByProcessHPIQDto":             <#include "/models/org/camunda/bpm/engine/rest/dto/history/SetJobRetriesByProcessHPIQDto.ftl">,
 
-      "DeploymentDto":                             <#include "/models/org/camunda/bpm/engine/rest/dto/repository/DeploymentDto.ftl">,
-      "CaseDefinitionDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/repository/CaseDefinitionDto.ftl">,
-      "DecisionDefinitionDto":                     <#include "/models/org/camunda/bpm/engine/rest/dto/repository/DecisionDefinitionDto.ftl">,
-      "DecisionRequirementsDefinitionDto":         <#include "/models/org/camunda/bpm/engine/rest/dto/repository/DecisionRequirementsDefinitionDto.ftl">,
-      "ProcessDefinitionDto":                      <#include "/models/org/camunda/bpm/engine/rest/dto/repository/ProcessDefinitionDto.ftl">,
+    <#list models as name, package>
+        "${name}": <#include "/models/${package}/${name}.ftl"><#sep>,
+    </#list>
 
-      "BatchDto":                                  <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/batch/BatchDto.ftl">,
-      "DeleteProcessInstancesDto":                 <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/batch/DeleteProcessInstancesDto.ftl">,
-
-      "ActivityInstanceDto":                       <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ActivityInstanceDto.ftl">,
-      "ActivityInstanceIncidentDto":               <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ActivityInstanceIncidentDto.ftl">,
-      "DeleteProcessInstancePIQDto":               <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/DeleteProcessInstancePIQDto.ftl">,
-      "ProcessInstanceSuspensionStateDto":         <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceSuspensionStateDto.ftl">,
-      "ProcessInstanceSuspensionStateQueriesDto":  <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceSuspensionStateQueriesDto.ftl">,
-      "ProcessInstanceDto":                        <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceDto.ftl">,
-      "ProcessInstanceQueryDto":                   <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/ProcessInstanceQueryDto.ftl">,
-      "SetJobRetriesByProcessDto":                 <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/SetJobRetriesByProcessDto.ftl">,
-      "SetJobRetriesByProcessPIQDto":              <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/SetJobRetriesByProcessPIQDto.ftl">,
-      "SingleProcessInstanceSuspensionStateDto":   <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/SingleProcessInstanceSuspensionStateDto.ftl">,
-      "TransitionInstanceDto":                     <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/TransitionInstanceDto.ftl">,
-      "TriggerVariableValueDto":                   <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/TriggerVariableValueDto.ftl">,
-
-      "ProcessInstanceModificationDto":            <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/modification/ProcessInstanceModificationDto.ftl">,
-      "ProcessInstanceModificationInstructionDto": <#include "/models/org/camunda/bpm/engine/rest/dto/runtime/modification/ProcessInstanceModificationInstructionDto.ftl">,
-
-      "AtomLink":                                  <#include "/models/org/camunda/bpm/engine/rest/dto/AtomLink.ftl">,
-      "CountResultDto":                            <#include "/models/org/camunda/bpm/engine/rest/dto/CountResultDto.ftl">,
-      "ExceptionDto":                              <#include "/models/org/camunda/bpm/engine/rest/dto/ExceptionDto.ftl">,
-      "MultiFormDeploymentDto":                    <#include "/models/org/camunda/bpm/engine/rest/dto/MultiFormDeploymentDto.ftl">,
-      "MultiFormVariableBinaryDto":                <#include "/models/org/camunda/bpm/engine/rest/dto/MultiFormVariableBinaryDto.ftl">,
-      "ParseExceptionDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/ParseExceptionDto.ftl">,
-      "PatchVariablesDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/PatchVariablesDto.ftl">,
-      "ProblemDto":                                <#include "/models/org/camunda/bpm/engine/rest/dto/ProblemDto.ftl">,
-      "ResourceReportDto":                         <#include "/models/org/camunda/bpm/engine/rest/dto/ResourceReportDto.ftl">,
-      "VariableQueryParameterDto":                 <#include "/models/org/camunda/bpm/engine/rest/dto/VariableQueryParameterDto.ftl">,
-      "VariableValueDto":                          <#include "/models/org/camunda/bpm/engine/rest/dto/VariableValueDto.ftl">
     }
   }
 }
