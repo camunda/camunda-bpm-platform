@@ -15,9 +15,18 @@
     "url": "https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/"
   },
   "servers": [
-    {
-      "url": "http://localhost:8080/engine-rest"
-    }
+
+  <@lib.server
+      url = "http://{host}:{port}/{contextPath}"
+      variables = {"host": "localhost", "port": "8080", "contextPath": "engine-rest"}
+      description = "The default API server" />
+
+  <@lib.server
+      url = "http://{host}:{port}/{contextPath}/engine/{engineName}"
+      variables = {"host": "localhost", "port": "8080", "contextPath": "engine-rest", "engineName": "default"}
+      description = "The Named Process Engine API server"
+      last = true />
+
   ],
   "tags": [
     {"name": "Process instance"},
