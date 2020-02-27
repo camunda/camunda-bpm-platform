@@ -116,7 +116,7 @@
   },
 </#macro>
 
-<#macro response code description 
+<#macro response code description
         dto="ExceptionDto"
         array=false
         additionalProperties=false 
@@ -152,5 +152,24 @@
        "description": "${description}"
      }
 
-    <#if !last> , </#if> <#-- if not a last response add a comma-->
+    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+</#macro>
+
+<#macro server
+        url
+        variables
+        description
+        last = false >
+    {
+      "url": "${url}",
+      "description":  "${description}",
+      "variables": {
+        <#list variables as name, default>
+          ${name}: {
+            "default": "${default}"
+          }<#sep>,
+        </#list>
+      }
+    }
+    <#if !last> , </#if> <#-- if not the last entry, add a comma -->
 </#macro>
