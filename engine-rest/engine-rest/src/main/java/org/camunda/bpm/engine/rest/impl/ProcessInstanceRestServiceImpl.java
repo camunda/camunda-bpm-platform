@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
@@ -37,6 +36,7 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
@@ -120,16 +121,11 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
-    if (dto.getProcessInstanceId() != null) {
-      String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    }
-
     dto.updateSuspensionState(getProcessEngine());
   }
 
   @Override
-  public BatchDto updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto){
+  public BatchDto updateSuspensionStateAsync(ProcessInstanceSuspensionStateAsyncDto dto){
     Batch batch = null;
     try {
       batch = dto.updateSuspensionStateAsync(getProcessEngine());
