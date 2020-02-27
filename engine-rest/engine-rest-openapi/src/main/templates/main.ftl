@@ -1,4 +1,6 @@
 <#import "/lib/utils.ftl" as lib>
+
+<#assign docsUrl = "https://docs.camunda.org/manual/${docsVersion}">
 {
   "openapi": "3.0.2",
   "info": {
@@ -12,7 +14,7 @@
   },
   "externalDocs": {
     "description": "Find out more about Camunda Rest API",
-    "url": "https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/"
+    "url": "${docsUrl}/reference/rest/overview/"
   },
   "servers": [
     {

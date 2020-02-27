@@ -1,6 +1,6 @@
 {
   "operationId" : "updateSuspensionStateById",
-  "description": "Activates or suspends a given process instance by id.",
+  "description": "Activates or suspends a given process instance by id. <@lib.docLink text = "default" path = "reference/rest/overview/date-format/" />",
   "tags": [
     "Process instance"
   ],
