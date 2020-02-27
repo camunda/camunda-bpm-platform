@@ -16,8 +16,7 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceSuspensionStateDto"
-      requestDescription = "**Only allowed property**: `suspended`, the others will be ignored" />
+      dto = "SuspensionStateDto" />
 
   "responses" : {
 
