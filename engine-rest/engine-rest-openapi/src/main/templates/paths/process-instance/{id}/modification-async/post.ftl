@@ -11,7 +11,7 @@ A modification instruction is one of the following:
 Instructions are executed asynchronous and in the order they are provided in this request's body.
 Variables can be provided with every starting instruction.
 
-The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/process-instance-modification/).
+The exact semantics of modification can be read about in the [User guide](${docsUrl}/user-guide/process-engine/process-instance-modification/).
   ",
   "tags": [
     "Process instance"

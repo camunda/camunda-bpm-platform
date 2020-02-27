@@ -167,10 +167,12 @@ Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/pr
 ### Parameters and properties
 
 #### Descriptions
-Markdown can be used for text descriptions. OpenAPI Spec allows usage of [CommonMark](https://spec.commonmark.org/) syntax may be used for rich text representation.
+Markdown can be used for text descriptions.
 Recommendations:
 * use unix line endings
-* to add docs links use markdown, e.g. `[User guide](https://docs.camunda.org/manual/develop/user-guide/)`
+* to add links use markdown, e.g. `[link](http://example.com)`
+* Add `docsUrl` to resolve doc link - [User guide](${docsUrl}/user-guide/process-engine/process-instance-modification/)
+`docsUrl="https://docs.camunda.org/manual/${docsVersion}"
 * avoid adding long descriptions on a single line, improve the readibility by splitting the next with single or multiple line breaks:
 ```
   "description": "Submits a list of modification instructions to change a process instance's execution state.

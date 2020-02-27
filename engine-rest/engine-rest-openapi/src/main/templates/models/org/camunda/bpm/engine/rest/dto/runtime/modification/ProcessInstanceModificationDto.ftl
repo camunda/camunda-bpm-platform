@@ -10,7 +10,7 @@
     <@lib.property
         name = "skipIoMappings"
         type = "boolean"
-        description = "Skip execution of [input/output variable mappings](https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/variables/#input-output-variable-mapping)
+        description = "Skip execution of [input/output variable mappings](${docsUrl}/user-guide/process-engine/variables/#input-output-variable-mapping)
 for activities that are started or ended as part of this request." />
 
     <@lib.property

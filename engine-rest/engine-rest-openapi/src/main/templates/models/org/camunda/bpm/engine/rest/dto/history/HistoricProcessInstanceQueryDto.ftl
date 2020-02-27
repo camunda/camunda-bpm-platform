@@ -91,7 +91,7 @@ Must be a JSON array of process definition keys."/>
         name = "incidentType"
         type = "string"
         description = "Filter by the incident type.
-See the [User Guide](https://docs.camunda.org/manual/${docsVersion}/user-guide/process-engine/incidents/#incident-types) for a list of incident types. " />
+See the [User Guide](${docsUrl}/user-guide/process-engine/incidents/#incident-types) for a list of incident types. " />
 
     <@lib.property
         name = "incidentStatus"
@@ -115,7 +115,7 @@ To get all process instances, use the query parameter withIncidents." />
         type = "string"
         format = "date-time"
         description = "Restrict to instances that were started before the given date.
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -123,7 +123,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that were started after the given date.
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -131,7 +131,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that were finished before the given date.
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -139,7 +139,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that were finished after the given date.
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -147,7 +147,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that executed an activity after the given date (inclusive).
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -155,7 +155,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that executed an activity before the given date (inclusive).
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -163,7 +163,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that executed an job after the given date (inclusive).
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
@@ -171,7 +171,7 @@ the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42
         type = "string"
         format = "date-time"
         description = "Restrict to instances that executed an job before the given date (inclusive).
-By [default](https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+By [default](${docsUrl}/reference/rest/overview/date-format/),
 the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
 
     <@lib.property
