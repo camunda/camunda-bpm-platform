@@ -34,7 +34,7 @@ import org.openapitools.client.ApiException;
 import org.openapitools.client.api.ProcessInstanceApi;
 import org.openapitools.client.model.CountResultDto;
 import org.openapitools.client.model.ProcessInstanceQueryDto;
-import org.openapitools.client.model.ProcessInstanceSuspensionStateDto;
+import org.openapitools.client.model.SuspensionStateDto;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
@@ -81,7 +81,7 @@ public class ProcessInstanceTest {
         );
 
     // when
-    ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
+    SuspensionStateDto dto = new SuspensionStateDto();
     dto.setSuspended(true);
     api.updateSuspensionStateById(id, dto);
 

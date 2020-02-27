@@ -8,7 +8,7 @@ a process instance query, and/or a historical process instance query.",
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceSuspensionStateDto" />
+      dto = "ProcessInstanceSuspensionStateAsyncDto" />
 
   "responses" : {
 
