@@ -21,12 +21,12 @@
   <@lib.server
       url = "http://{host}:{port}/{contextPath}"
       variables = {"host": "localhost", "port": "8080", "contextPath": "engine-rest"}
-      description = "The API server for the default process engine" />
+      desc = "The API server for the default process engine" />
 
   <@lib.server
       url = "http://{host}:{port}/{contextPath}/engine/{engineName}"
       variables = {"host": "localhost", "port": "8080", "contextPath": "engine-rest", "engineName": "default"}
-      description = "The API server for a named process engine"
+      desc = "The API server for a named process engine"
       last = true />
 
   ],

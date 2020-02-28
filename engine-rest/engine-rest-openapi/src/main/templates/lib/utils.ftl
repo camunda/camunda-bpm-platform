@@ -164,11 +164,11 @@
 <#macro server
         url
         variables
-        description
+        desc
         last = false >
     {
       "url": "${url}",
-      "description":  "${description}",
+      "description":  "${desc?replace('\n( ){2,}', '\n', 'r')}",
       "variables": {
         <#list variables as name, default>
           ${name}: {
