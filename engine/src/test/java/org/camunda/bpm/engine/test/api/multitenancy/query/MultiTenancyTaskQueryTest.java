@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTest {
 
   private static final String TENANT_ONE = "tenant1";
   private static final String TENANT_TWO = "tenant2";

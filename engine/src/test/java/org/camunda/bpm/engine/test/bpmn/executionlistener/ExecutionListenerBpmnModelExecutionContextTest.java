@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
@@ -32,7 +32,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 /**
  * @author Sebastian Menski
  */
-public class ExecutionListenerBpmnModelExecutionContextTest extends PluggableProcessEngineTestCase {
+public class ExecutionListenerBpmnModelExecutionContextTest extends PluggableProcessEngineTest {
 
   private static final String PROCESS_ID = "process";
   private static final String START_ID = "start";

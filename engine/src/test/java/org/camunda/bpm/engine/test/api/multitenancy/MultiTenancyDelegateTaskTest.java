@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener;
 import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener.DelegateTaskAsserter;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener.DelegateTa
  * Tests if a {@link DelegateTask} has the correct tenant-id. The
  * assertions are checked inside the task listener.
  */
-public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTest {
 
   protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/taskListener.bpmn";
 

@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class InitiatorTest extends PluggableProcessEngineTestCase {
+public class InitiatorTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testInitiator() {

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -31,7 +31,7 @@ import org.joda.time.Period;
 /**
  * @author Frederik Heremans
  */
-public class TaskDueDateExtensionsTest extends PluggableProcessEngineTestCase {
+public class TaskDueDateExtensionsTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testDueDateExtension() throws Exception {

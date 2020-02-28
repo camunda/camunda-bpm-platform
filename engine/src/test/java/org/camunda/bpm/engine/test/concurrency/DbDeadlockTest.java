@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class DbDeadlockTest extends ConcurrencyTestCase {
+public class DbDeadlockTest extends ConcurrencyTest {
 
   private ThreadControl thread1;
   private ThreadControl thread2;

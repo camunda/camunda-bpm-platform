@@ -21,7 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
+public class JobDefinitionPriorityTest extends PluggableProcessEngineTest {
 
   protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 

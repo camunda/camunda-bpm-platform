@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 
 
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.test.Deployment;
  *
  * @author Daniel Meyer
  */
-public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskVariablesTest extends PluggableProcessEngineTest {
   
   static boolean isNullInDelegate2;
   static boolean isNullInDelegate3;

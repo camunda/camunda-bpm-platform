@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.api.repository;
 
 import java.util.Collection;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.bpm.model.dmn.instance.Decision;
@@ -27,7 +27,7 @@ import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Rule;
 
-public class DmnModelElementInstanceCmdTest extends PluggableProcessEngineTestCase {
+public class DmnModelElementInstanceCmdTest extends PluggableProcessEngineTest {
 
   private final static String DECISION_KEY = "one";
 

@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
 /**
  *  @author Philipp Ossler
  */
-public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
+public class JdbcStatementTimeoutTest extends ConcurrencyTest {
 
   private static final int STATEMENT_TIMEOUT_IN_SECONDS = 1;
   // some databases (like mysql and oracle) need more time to cancel the statement

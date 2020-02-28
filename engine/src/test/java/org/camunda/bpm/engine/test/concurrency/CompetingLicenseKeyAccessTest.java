@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.cmd.SetLicenseKeyCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
-public class CompetingLicenseKeyAccessTest extends ConcurrencyTestCase {
+public class CompetingLicenseKeyAccessTest extends ConcurrencyTest {
 
   private ThreadControl asyncThread;
 

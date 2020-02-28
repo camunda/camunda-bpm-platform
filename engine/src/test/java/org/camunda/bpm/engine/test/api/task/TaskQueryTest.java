@@ -57,7 +57,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -79,7 +79,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Frederik Heremans
  * @author Falko Menge
  */
-public class TaskQueryTest extends PluggableProcessEngineTestCase {
+public class TaskQueryTest extends PluggableProcessEngineTest {
 
   private List<String> taskIds;
 

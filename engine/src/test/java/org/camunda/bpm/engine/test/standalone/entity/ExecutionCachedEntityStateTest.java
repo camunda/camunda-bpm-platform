@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.test.Deployment;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCase {
+public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testProcessInstanceTasks() {

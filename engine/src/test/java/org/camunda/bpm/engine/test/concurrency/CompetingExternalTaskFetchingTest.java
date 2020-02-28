@@ -24,14 +24,14 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.cmd.FetchExternalTasksCmd;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTestCase {
+public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTest {
 
   public class ExternalTaskFetcherThread extends ControllableThread {
 

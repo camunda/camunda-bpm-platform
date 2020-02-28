@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -55,7 +56,7 @@ import org.junit.rules.ExpectedException;
 public class TaskQueryOrTest {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

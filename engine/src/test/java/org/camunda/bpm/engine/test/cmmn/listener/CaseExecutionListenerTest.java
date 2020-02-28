@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstance;

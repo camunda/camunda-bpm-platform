@@ -21,7 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricActivityInstanceSequenceCounterTest extends PluggableProcessEngineTestCase {
+public class HistoricActivityInstanceSequenceCounterTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testSequence.bpmn20.xml"})
   public void testSequence() {

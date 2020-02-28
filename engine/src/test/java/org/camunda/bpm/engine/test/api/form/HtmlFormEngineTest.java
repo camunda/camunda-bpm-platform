@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlDocumentBuilder;
 import org.camunda.bpm.engine.impl.form.engine.HtmlElementWriter;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
+public class HtmlFormEngineTest extends PluggableProcessEngineTest {
 
   public void testIsDefaultFormEngine() {
 

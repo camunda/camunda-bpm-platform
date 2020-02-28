@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
  * @author Ionut Paduraru
  * @see TaskQueryTest 
  */
-public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
+public class SubTaskQueryTest extends PluggableProcessEngineTest {
 
   private List<String> taskIds;
 

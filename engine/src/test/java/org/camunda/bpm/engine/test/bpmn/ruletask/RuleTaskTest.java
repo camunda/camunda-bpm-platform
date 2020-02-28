@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.ruletask;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Bernd Ruecker
  */
-public class RuleTaskTest extends PluggableProcessEngineTestCase {
+public class RuleTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testJavaDelegate() {

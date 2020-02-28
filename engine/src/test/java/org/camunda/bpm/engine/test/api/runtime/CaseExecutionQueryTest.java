@@ -29,7 +29,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
+public class CaseExecutionQueryTest extends PluggableProcessEngineTest {
 
   private static String CASE_DEFINITION_KEY = "oneTaskCase";
   private static String CASE_DEFINITION_KEY_2 = "twoTaskCase";

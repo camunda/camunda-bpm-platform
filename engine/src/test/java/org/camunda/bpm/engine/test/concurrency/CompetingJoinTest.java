@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.concurrency;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 /**
  * @author Tom Baeyens
  */
-public class CompetingJoinTest extends PluggableProcessEngineTestCase {
+public class CompetingJoinTest extends PluggableProcessEngineTest {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 

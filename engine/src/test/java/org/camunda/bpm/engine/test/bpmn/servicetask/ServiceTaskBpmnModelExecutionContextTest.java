@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.bpmn.servicetask;
 
 import java.util.Collection;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Event;
@@ -32,7 +32,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 /**
  * @author Sebastian Menski
  */
-public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEngineTest {
 
   private static final String PROCESS_ID = "process";
   private String deploymentId;

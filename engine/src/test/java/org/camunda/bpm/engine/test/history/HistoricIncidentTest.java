@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
+public class HistoricIncidentTest extends PluggableProcessEngineTest {
 
   private static String PROCESS_DEFINITION_KEY = "oneFailingServiceTaskProcess";
 

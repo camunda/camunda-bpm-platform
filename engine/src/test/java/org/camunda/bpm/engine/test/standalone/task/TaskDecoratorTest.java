@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  * @author Roman Smirnov
  *
  */
-public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
+public class TaskDecoratorTest extends PluggableProcessEngineTest {
 
   protected TaskEntity task;
   protected TaskDefinition taskDefinition;

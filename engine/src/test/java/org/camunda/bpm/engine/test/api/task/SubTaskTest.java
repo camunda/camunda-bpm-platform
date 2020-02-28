@@ -22,14 +22,14 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 
 
 /**
  * @author Tom Baeyens
  */
-public class SubTaskTest extends PluggableProcessEngineTestCase {
+public class SubTaskTest extends PluggableProcessEngineTest {
 
   public void testSubTask() {
     Task gonzoTask = taskService.newTask();

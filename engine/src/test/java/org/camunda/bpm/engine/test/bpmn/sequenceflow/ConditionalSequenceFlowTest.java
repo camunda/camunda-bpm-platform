@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Joram Barrez
  * @author Falko Menge (camunda)
  */
-public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase {
+public class ConditionalSequenceFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testUelExpression() {

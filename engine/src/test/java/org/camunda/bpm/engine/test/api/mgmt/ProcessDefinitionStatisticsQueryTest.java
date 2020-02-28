@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.containsString;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngineTestCase {
+public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngineTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")

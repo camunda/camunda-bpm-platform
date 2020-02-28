@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.api.task;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Event;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -33,7 +33,7 @@ import junit.framework.AssertionFailedError;
  * @author Tom Baeyens
  * @author Falko Menge
  */
-public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
+public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
   public void testCandidateUserLink() {

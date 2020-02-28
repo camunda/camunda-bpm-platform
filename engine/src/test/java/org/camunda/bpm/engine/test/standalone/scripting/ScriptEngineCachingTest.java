@@ -26,14 +26,14 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ScriptEngineCachingTest extends PluggableProcessEngineTestCase {
+public class ScriptEngineCachingTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String SCRIPT_LANGUAGE = "groovy";

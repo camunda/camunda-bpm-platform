@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
  *
  * @author Daniel Meyer
  */
-public class AcquireJobsCmdTest extends PluggableProcessEngineTestCase {
+public class AcquireJobsCmdTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/standalone/jobexecutor/oneJobProcess.bpmn20.xml"})
   public void testJobsNotVisisbleToAcquisitionIfInstanceSuspended() {

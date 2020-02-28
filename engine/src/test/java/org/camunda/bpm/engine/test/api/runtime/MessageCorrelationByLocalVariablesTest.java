@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -44,7 +45,7 @@ import static org.junit.Assert.assertNotNull;
 public class MessageCorrelationByLocalVariablesTest {
 
   public static final String TEST_MESSAGE_NAME = "TEST_MSG";
-  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  @Rule public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
   @Rule public ExpectedException thrown = ExpectedException.none();
 

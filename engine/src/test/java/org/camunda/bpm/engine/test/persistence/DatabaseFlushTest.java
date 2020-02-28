@@ -26,13 +26,13 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class DatabaseFlushTest extends ConcurrencyTestCase {
+public class DatabaseFlushTest extends ConcurrencyTest {
 
   public static final BpmnModelInstance GW_PROCESS = Bpmn
       .createExecutableProcess("process")

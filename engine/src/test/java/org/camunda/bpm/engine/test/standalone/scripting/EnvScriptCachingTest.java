@@ -33,14 +33,14 @@ import org.camunda.bpm.engine.impl.scripting.SourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
+public class EnvScriptCachingTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String SCRIPT_LANGUAGE = "groovy";

@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -44,7 +44,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngineTest {
 
   protected static final String EXCLUSIVE_GATEWAY_ASYNC_BEFORE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
 

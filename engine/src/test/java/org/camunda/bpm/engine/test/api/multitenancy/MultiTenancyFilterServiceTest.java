@@ -26,11 +26,11 @@ import java.util.List;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
-public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";

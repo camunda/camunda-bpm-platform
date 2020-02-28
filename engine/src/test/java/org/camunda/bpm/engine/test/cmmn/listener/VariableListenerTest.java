@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.CaseExecutionContext;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class VariableListenerTest extends PluggableProcessEngineTestCase {
+public class VariableListenerTest extends PluggableProcessEngineTest {
 
   protected Map<Object, Object> beans = null;
 

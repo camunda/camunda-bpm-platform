@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,7 +25,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -41,7 +40,7 @@ import org.hamcrest.CoreMatchers;
 /**
  * @author Joram Barrez
  */
-public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
+public class ParallelGatewayTest extends PluggableProcessEngineTest {
 
   /**
    * Case where there is a parallel gateway that splits into 3 paths of

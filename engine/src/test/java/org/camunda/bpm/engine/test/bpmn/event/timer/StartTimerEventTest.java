@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -49,7 +49,7 @@ import org.joda.time.LocalDateTime;
 /**
  * @author Joram Barrez
  */
-public class StartTimerEventTest extends PluggableProcessEngineTestCase {
+public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testDurationStartTimerEvent() throws Exception {

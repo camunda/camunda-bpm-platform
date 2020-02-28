@@ -22,7 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author Falko Menge
  */
-public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
+public class ErrorEventSubProcessTest extends PluggableProcessEngineTest {
 
   @Deployment
   // an event subprocesses takes precedence over a boundary event

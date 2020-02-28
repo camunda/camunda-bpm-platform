@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -38,7 +38,7 @@ import org.junit.Test;
  * @author Ronny Bräunlich
  *
  */
-public class FileValueProcessSerializationTest extends PluggableProcessEngineTestCase {
+public class FileValueProcessSerializationTest extends PluggableProcessEngineTest {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/variables/oneTaskProcess.bpmn20.xml";
 

@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
+public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
 
   protected static final String WORKER_ID = "aWorkerId";
   protected static final String TOPIC_NAME = "externalTaskTopic";

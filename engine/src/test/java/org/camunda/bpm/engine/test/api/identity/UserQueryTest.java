@@ -22,13 +22,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
 /**
  * @author Joram Barrez
  */
-public class UserQueryTest extends PluggableProcessEngineTestCase {
+public class UserQueryTest extends PluggableProcessEngineTest {
 
   @Override
   protected void setUp() throws Exception {

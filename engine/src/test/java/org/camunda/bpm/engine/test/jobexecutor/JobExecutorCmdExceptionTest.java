@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -35,7 +35,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Tom Baeyens
  * @author Thorben Lindhauer
  */
-public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase {
+public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTest {
 
   protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
   protected TweetNestedCommandExceptionHandler nestedCommandExceptionHandler = new TweetNestedCommandExceptionHandler();

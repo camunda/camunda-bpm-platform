@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  * exclusive lock on table.</p>
  *
  */
-public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
+public class ConcurrentHistoryLevelTest extends ConcurrencyTest {
 
   @Override
   protected void setUp() throws Exception {

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -46,7 +47,7 @@ public abstract class AbstractVariableIgnoreCaseTest<T extends AbstractVariableQ
   }
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   public U instance;
 

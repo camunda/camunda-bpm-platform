@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -35,7 +35,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
+public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTest {
 
   private static final String tenant1 = "the-tenant-1";
   private static final String tenant2 = "the-tenant-2";

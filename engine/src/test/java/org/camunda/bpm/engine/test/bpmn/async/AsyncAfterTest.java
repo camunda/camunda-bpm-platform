@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -45,7 +45,7 @@ import org.junit.Assert;
  * @author Stefan Hentschel
  *
  */
-public class AsyncAfterTest extends PluggableProcessEngineTestCase {
+public class AsyncAfterTest extends PluggableProcessEngineTest {
 
   public void testTransitionIdRequired() {
 

@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.bpmn.job;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class DisabledJobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
+public class DisabledJobPrioritizationBpmnTest extends PluggableProcessEngineTest {
 
   protected void setUp() throws Exception {
     processEngineConfiguration.setProducePrioritizedJobs(false);

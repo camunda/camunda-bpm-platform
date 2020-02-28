@@ -17,14 +17,14 @@
 package org.camunda.bpm.engine.test.bpmn.exclusive;
 
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Stefan Hentschel
  */
-public class ExclusiveStartEventTest extends PluggableProcessEngineTestCase {
+public class ExclusiveStartEventTest extends PluggableProcessEngineTest {
   
   @Deployment
   public void testNonExclusiveStartEvent() {

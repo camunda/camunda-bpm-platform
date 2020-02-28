@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByPriority;
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author Christopher Zell
  */
-public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestCase {
+public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
   public void testOrderByPriority() {

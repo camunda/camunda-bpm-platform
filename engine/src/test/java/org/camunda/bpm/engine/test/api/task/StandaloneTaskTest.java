@@ -21,13 +21,13 @@ import java.util.List;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 
 /**
  * @author Joram Barrez
  */
-public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
+public class StandaloneTaskTest extends PluggableProcessEngineTest {
 
   public void setUp() throws Exception {
     super.setUp();

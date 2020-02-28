@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.StateTransitionCaseExecutionCmd;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
  * @author Roman Smirnov
  *
  */
-public class CompetingSentrySatisfactionTest extends PluggableProcessEngineTestCase {
+public class CompetingSentrySatisfactionTest extends PluggableProcessEngineTest {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 

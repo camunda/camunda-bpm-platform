@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedAcquisitionEvent;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;

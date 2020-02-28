@@ -28,7 +28,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -45,7 +45,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Daniel Meyer
  * @author Stefan Hentschel
  */
-public class AsyncTaskTest extends PluggableProcessEngineTestCase {
+public class AsyncTaskTest extends PluggableProcessEngineTest {
 
   public static boolean INVOCATION;
   public static int NUM_INVOCATIONS = 0;

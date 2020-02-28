@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
+public class CaseServiceCaseTaskTest extends PluggableProcessEngineTest {
 
   protected final String DEFINITION_KEY = "oneCaseTaskCase";
   protected final String DEFINITION_KEY_2 = "oneTaskCase";

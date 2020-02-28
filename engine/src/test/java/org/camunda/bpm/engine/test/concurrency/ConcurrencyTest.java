@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Daniel Meyer
  *
  */
-public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase {
+public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
 
   protected List<ControllableCommand<?>> controllableCommands;
 

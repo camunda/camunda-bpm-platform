@@ -26,12 +26,12 @@ import java.util.Arrays;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
-public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTest {
 
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/dmn/Example.dmn";
   protected static final String DMN_FILE_SECOND_VERSION = "org/camunda/bpm/engine/test/api/dmn/Example_v2.dmn";

@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 //import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -45,7 +45,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestCase {
+public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTest {
 
   @Override
   public void tearDown() throws Exception {

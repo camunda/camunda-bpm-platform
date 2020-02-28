@@ -42,7 +42,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  *
  * @author Daniel Meyer
  */
-public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
+public class ConcurrentDeploymentTest extends ConcurrencyTest {
 
   private static String processResource;
 

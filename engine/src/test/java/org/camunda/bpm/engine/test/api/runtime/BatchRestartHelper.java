@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.api.runtime;
 import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -31,7 +31,7 @@ public class BatchRestartHelper extends BatchHelper {
     super(engineRule);
   }
 
-  public BatchRestartHelper(PluggableProcessEngineTestCase testCase) {
+  public BatchRestartHelper(PluggableProcessEngineTest testCase) {
     super(testCase);
   }
 

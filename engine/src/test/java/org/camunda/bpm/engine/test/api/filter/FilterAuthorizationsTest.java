@@ -28,13 +28,13 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
+public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
 
   protected User testUser;
 

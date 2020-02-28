@@ -25,11 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -49,7 +48,7 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  * @author Thorben Lindhauer
  */
-public class ProcessInstanceModificationCancellationTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationCancellationTest extends PluggableProcessEngineTest {
 
   // the four patterns as described above
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  * @author Philipp Ossler
  */
-public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngineTestCase {
+public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngineTest {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.dmn11.xml";
   protected static final String CUSTOM_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.testCustomOutputMapping.bpmn20.xml";

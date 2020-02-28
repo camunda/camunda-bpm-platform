@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public abstract class AbstractUserOperationLogTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractUserOperationLogTest extends PluggableProcessEngineTest {
 
   public static final String USER_ID = "demo";
 

@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +51,7 @@ import org.junit.runners.Parameterized;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricBatchManagerBatchesForCleanupTest {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   public BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
 

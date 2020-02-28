@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.*;
@@ -57,7 +57,7 @@ import static org.junit.Assert.assertThat;
  * @author Christian Lipphardt (camunda)
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase {
+public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/history/orderProcess.bpmn20.xml",

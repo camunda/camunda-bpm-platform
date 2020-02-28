@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.test.bpmn.event;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-public class IntermediateNoneEventTest extends PluggableProcessEngineTestCase {
+public class IntermediateNoneEventTest extends PluggableProcessEngineTest {
   
   private static boolean listenerExcecuted = false;
   

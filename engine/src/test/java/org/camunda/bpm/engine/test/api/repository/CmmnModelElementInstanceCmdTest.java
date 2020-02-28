@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.api.repository;
 
 import java.util.Collection;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
@@ -30,7 +30,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  * @author Roman Smirnov
  *
  */
-public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTestCase {
+public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTest {
 
   private final static String CASE_KEY = "oneTaskCase";
 

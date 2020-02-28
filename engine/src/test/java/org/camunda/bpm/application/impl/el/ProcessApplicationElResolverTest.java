@@ -17,7 +17,7 @@
 package org.camunda.bpm.application.impl.el;
 
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.task.Task;
  * @author Thorben Lindhauer
  *
  */
-public class ProcessApplicationElResolverTest extends PluggableProcessEngineTestCase {
+public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest {
 
   RuntimeContainerDelegate runtimeContainerDelegate = null;
 

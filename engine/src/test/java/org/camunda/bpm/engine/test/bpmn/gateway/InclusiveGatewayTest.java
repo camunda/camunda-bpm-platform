@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -42,7 +42,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Tom Van Buskirk
  * @author Tijs Rademakers
  */
-public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
+public class InclusiveGatewayTest extends PluggableProcessEngineTest {
 
   private static final String TASK1_NAME = "Task 1";
   private static final String TASK2_NAME = "Task 2";

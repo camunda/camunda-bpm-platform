@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 
-public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineTest {
 
   protected static final String CASE_DEFINITION_KEY = "Case_1";
   protected static final String CMMN = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";

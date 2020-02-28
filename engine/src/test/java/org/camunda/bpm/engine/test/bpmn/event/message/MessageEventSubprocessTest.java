@@ -19,14 +19,12 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 import java.util.List;
 
@@ -44,7 +42,7 @@ import static org.junit.Assert.assertThat;
  * @author Falko Menge
  * @author Danny Gräf
  */
-public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
+public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
 
   @Override
   protected void tearDown() throws Exception {

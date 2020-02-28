@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class MultiTenancyProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyProcessDefinitionQueryTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_DEFINITION_KEY = "process";
   protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).done();

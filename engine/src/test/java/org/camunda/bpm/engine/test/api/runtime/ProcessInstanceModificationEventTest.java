@@ -23,7 +23,7 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class ProcessInstanceModificationEventTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationEventTest extends PluggableProcessEngineTest {
 
   protected static final String INTERMEDIATE_TIMER_CATCH_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.intermediateTimerCatch.bpmn20.xml";
   protected static final String MESSAGE_START_EVENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.messageStart.bpmn20.xml";

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.subprocess;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Roman Smirnov
  */
-public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestCase {
+public class InterruptingEventSubProcessTest extends PluggableProcessEngineTest {
 
   @Deployment(resources="org/camunda/bpm/engine/test/bpmn/subprocess/InterruptingEventSubProcessTest.testCancelEventSubscriptions.bpmn")
   public void testCancelEventSubscriptionsWhenReceivingAMessage() {

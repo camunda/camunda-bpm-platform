@@ -39,7 +39,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * <p>Ensures authorizations are properly
@@ -48,7 +48,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Daniel Meyer
  *
  */
-public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngineTestCase {
+public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngineTest {
 
   private final static String jonny2 = "jonny2";
 

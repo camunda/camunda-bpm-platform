@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Saeid Mirzaei
  */
 
-public class TimeExpressionTest extends PluggableProcessEngineTestCase {
+public class TimeExpressionTest extends PluggableProcessEngineTest {
 	
 	  
 	  private Date testExpression(String timeExpression) {

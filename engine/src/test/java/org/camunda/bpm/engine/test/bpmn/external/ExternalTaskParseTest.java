@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
+public class ExternalTaskParseTest extends PluggableProcessEngineTest {
 
   public void testParseExternalTaskWithoutTopic() {
     DeploymentBuilder deploymentBuilder = repositoryService

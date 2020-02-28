@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -45,7 +45,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  * @author Frederik Heremans
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
+public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testHistoricTaskInstance() throws Exception {

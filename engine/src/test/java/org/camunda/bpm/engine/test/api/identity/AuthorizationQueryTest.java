@@ -22,13 +22,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
+public class AuthorizationQueryTest extends PluggableProcessEngineTest {
 
   @Override
   protected void setUp() throws Exception {

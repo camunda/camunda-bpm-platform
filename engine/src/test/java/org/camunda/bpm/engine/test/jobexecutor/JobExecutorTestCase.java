@@ -20,12 +20,12 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Tom Baeyens
  */
-public class JobExecutorTestCase extends PluggableProcessEngineTestCase {
+public class JobExecutorTestCase extends PluggableProcessEngineTest {
 
   protected TweetHandler tweetHandler = new TweetHandler();
 

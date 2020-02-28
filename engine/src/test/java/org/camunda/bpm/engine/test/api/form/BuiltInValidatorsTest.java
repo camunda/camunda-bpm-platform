@@ -32,14 +32,14 @@ import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
+public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
   public void testDefaultFormFieldValidators() {
 

@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -59,7 +59,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
  * @author Bernd Ruecker
  * @author Falko Menge
  */
-public class CallActivityTest extends PluggableProcessEngineTestCase {
+public class CallActivityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",

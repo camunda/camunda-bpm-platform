@@ -31,9 +31,7 @@ import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -43,7 +41,7 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  * @author Thorben Lindhauer
  *
  */
-public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
+public class CompetingMessageCorrelationTest extends ConcurrencyTest {
 
   @Override
   public void tearDown() throws Exception {

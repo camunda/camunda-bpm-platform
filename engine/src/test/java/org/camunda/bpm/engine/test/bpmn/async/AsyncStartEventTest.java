@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.async;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -30,7 +30,7 @@ import java.util.Map;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
-public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
+public class AsyncStartEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testAsyncStartEvent() {

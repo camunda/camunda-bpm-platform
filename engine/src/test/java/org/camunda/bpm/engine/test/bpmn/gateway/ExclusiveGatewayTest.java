@@ -26,7 +26,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author Joram Barrez
  */
-public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
+public class ExclusiveGatewayTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testDivergingExclusiveGateway() {

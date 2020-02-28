@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 /**
  * @author Nico Rehwaldt
  */
-public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
+public class TerminateEndEventTest extends PluggableProcessEngineTest {
 
   public static int serviceTaskInvokedCount = 0;
 

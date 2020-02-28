@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.cmmn;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
+public class CaseServiceMilestoneTest extends PluggableProcessEngineTest {
 
   protected final String DEFINITION_KEY = "oneMilestoneCase";
   protected final String MILESTONE_KEY = "PI_Milestone_1";

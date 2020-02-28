@@ -26,9 +26,9 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
-public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
+public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTest {
 
   public void testUpdateCaseDefinitionIdInTask() {
     // given

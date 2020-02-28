@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -47,7 +47,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class HistoricProcessInstanceDurationReportTest extends PluggableProcessEngineTestCase {
+public class HistoricProcessInstanceDurationReportTest extends PluggableProcessEngineTest {
 
   private Random random = new Random();
 

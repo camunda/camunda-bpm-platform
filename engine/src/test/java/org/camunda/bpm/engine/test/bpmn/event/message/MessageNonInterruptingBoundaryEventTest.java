@@ -22,7 +22,7 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.util.ExecutionTree;
  *
  * @author Kristin Polenz
  */
-public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEngineTestCase {
+public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSingleNonInterruptingBoundaryMessageEvent() {

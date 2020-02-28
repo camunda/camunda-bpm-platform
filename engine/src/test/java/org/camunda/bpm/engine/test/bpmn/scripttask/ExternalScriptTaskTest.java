@@ -22,15 +22,14 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Sebastian Menski
  */
-public class ExternalScriptTaskTest extends PluggableProcessEngineTestCase {
+public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testDefaultExternalScript() {

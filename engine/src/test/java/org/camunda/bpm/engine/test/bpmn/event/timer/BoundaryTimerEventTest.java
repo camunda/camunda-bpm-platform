@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -37,7 +37,7 @@ import org.joda.time.LocalDateTime;
 /**
  * @author Joram Barrez
  */
-public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
+public class BoundaryTimerEventTest extends PluggableProcessEngineTest {
 
   /*
    * Test for when multiple boundary timer events are defined on the same user

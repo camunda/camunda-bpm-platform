@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.joda.time.LocalDateTime;
 
 
-public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
+public class IntermediateTimerEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testCatchingTimerEvent() throws Exception {

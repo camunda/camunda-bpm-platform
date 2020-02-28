@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
-public class CommandInvocationContextTest extends PluggableProcessEngineTestCase {
+public class CommandInvocationContextTest extends PluggableProcessEngineTest {
 
   /**
    * Test that the command invocation context always holds the correct command;

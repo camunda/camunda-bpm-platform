@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  *
  * @author Thorben Lindhauer
  */
-public class CompetingByteVariableAccessTest extends ConcurrencyTestCase {
+public class CompetingByteVariableAccessTest extends ConcurrencyTest {
 
   private ThreadControl asyncThread;
 

@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -54,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 public class HistoricTaskInstanceQueryOrTest {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

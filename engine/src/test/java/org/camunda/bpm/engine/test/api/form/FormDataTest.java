@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class FormDataTest extends PluggableProcessEngineTestCase {
+public class FormDataTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testGetFormFieldBasicProperties() {

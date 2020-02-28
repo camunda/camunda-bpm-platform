@@ -69,7 +69,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  * @author Daniel Meyer
  *
  */
-public class CompetingVariableFetchingAndDeletionTest extends ConcurrencyTestCase {
+public class CompetingVariableFetchingAndDeletionTest extends ConcurrencyTest {
 
   private ThreadControl asyncThread;
 

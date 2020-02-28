@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
@@ -32,7 +32,7 @@ import static junit.framework.TestCase.assertEquals;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class VariableInTransactionTest extends PluggableProcessEngineTestCase {
+public class VariableInTransactionTest extends PluggableProcessEngineTest {
 
   @Test
   public void testCreateAndDeleteVariableInTransaction() throws Exception {

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.tasklistener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Falko Menge <falko.menge@camunda.com>
  * @author Frederik Heremans
  */
-public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
+public class CustomTaskAssignmentTest extends PluggableProcessEngineTest {
   
   @Override
   protected void setUp() throws Exception {

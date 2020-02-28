@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.FieldInjectionTaskListener;
@@ -28,17 +28,14 @@ import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MySpecialTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MyTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.TaskDeleteListener;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskListenerTest extends PluggableProcessEngineTestCase {
+public class TaskListenerTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByClass.cmmn"})
   public void testCreateListenerByClass() {

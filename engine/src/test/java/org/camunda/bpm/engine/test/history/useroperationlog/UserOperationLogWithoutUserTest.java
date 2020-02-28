@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.history.useroperationlog;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  * @author Roman Smirnov
  *
  */
-public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestCase {
+public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String PROCESS_KEY = "oneTaskProcess";

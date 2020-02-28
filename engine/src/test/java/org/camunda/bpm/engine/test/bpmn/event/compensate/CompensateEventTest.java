@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -56,7 +56,7 @@ import org.junit.Assert;
 /**
  * @author Daniel Meyer
  */
-public class CompensateEventTest extends PluggableProcessEngineTestCase {
+public class CompensateEventTest extends PluggableProcessEngineTest {
 
   public void testCompensateOrder() {
     //given two process models, only differ in order of the activities

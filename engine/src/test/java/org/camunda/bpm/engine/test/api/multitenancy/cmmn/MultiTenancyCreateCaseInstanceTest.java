@@ -25,11 +25,11 @@ import java.util.Arrays;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 
-public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTest {
 
   protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 

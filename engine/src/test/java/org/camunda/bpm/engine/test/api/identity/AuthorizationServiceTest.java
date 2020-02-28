@@ -49,13 +49,13 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
+public class AuthorizationServiceTest extends PluggableProcessEngineTest {
 
   protected String userId = "test";
   protected String groupId = "accounting";

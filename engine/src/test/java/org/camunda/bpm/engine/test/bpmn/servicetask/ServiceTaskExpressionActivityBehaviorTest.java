@@ -24,14 +24,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Ronny Bräunlich
  *
  */
-public class ServiceTaskExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskExpressionActivityBehaviorTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testExceptionThrownBySecondScopeServiceTaskIsNotHandled(){

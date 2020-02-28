@@ -16,32 +16,44 @@
  */
 package org.camunda.bpm.engine.test.standalone.initialization;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineInfo;
 import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
-public class ProcessEnginesTest extends PvmTestCase {
-  
-  protected void setUp() throws Exception {
-    super.setUp();
+public class ProcessEnginesTest {
+
+  @Before
+  public void setUp() throws Exception {
     ProcessEngines.destroy();
     ProcessEngines.init();
   }
-  
-  protected void tearDown() throws Exception {
+
+  @After
+  public void tearDown() throws Exception {
     ProcessEngines.destroy();
-    super.tearDown();
   }
 
+  @Test
   public void testProcessEngineInfo() {
+    // given
+    ProcessEngines.init();
 
+    // when
     List<ProcessEngineInfo> processEngineInfos = ProcessEngines.getProcessEngineInfos();
+
+    // then
     assertEquals(1, processEngineInfos.size());
 
     ProcessEngineInfo processEngineInfo = processEngineInfos.get(0);

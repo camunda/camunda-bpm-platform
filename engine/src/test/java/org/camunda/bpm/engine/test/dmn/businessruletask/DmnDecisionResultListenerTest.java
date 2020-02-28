@@ -20,7 +20,7 @@ import java.util.Collections;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  * @author Philipp Ossler
  */
-public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCase {
+public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
 
   protected static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml";
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
