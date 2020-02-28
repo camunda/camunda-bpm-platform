@@ -31,7 +31,8 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<#macro property name type desc
+<#macro property name type
+        desc=""
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         minimum=""

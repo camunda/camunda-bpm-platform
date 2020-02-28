@@ -23,11 +23,16 @@
         type = "boolean"
         desc = "Skip deletion of the subprocesses related to deleted processes as part of this request." />
 
-     "processInstanceQuery": {
-       "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-     },
-     "historicProcessInstanceQuery": {
-       "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-     }
+    <@lib.property
+        name = "processInstanceQuery"
+        type = "ref"
+        dto = "ProcessInstanceQueryDto" />
+
+    <@lib.property
+        name = "historicProcessInstanceQuery"
+        type = "ref"
+        last = true
+        dto = "HistoricProcessInstanceQueryDto" />
+
   }
 }

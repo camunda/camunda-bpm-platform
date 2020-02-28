@@ -46,11 +46,16 @@
 
                 **Note**: This parameter can be used only with combination of `suspended`, `processInstanceQuery`, and `historicProcessInstanceQuery`." />
 
-    "processInstanceQuery": {
-      "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-    },
-    "historicProcessInstanceQuery": {
-      "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-    }
+    <@lib.property
+        name = "processInstanceQuery"
+        type = "ref"
+        dto = "ProcessInstanceQueryDto" />
+
+    <@lib.property
+        name = "historicProcessInstanceQuery"
+        type = "ref"
+        last = true
+        dto = "HistoricProcessInstanceQueryDto" />
+
   }
 }

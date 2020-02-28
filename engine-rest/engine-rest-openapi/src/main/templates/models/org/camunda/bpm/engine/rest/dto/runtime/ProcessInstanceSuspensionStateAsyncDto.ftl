@@ -15,11 +15,16 @@
         desc = "A list of process instance ids which defines a group of process instances
                 which will be activated or suspended by the operation." />
 
-    "processInstanceQuery": {
-      "$ref": "#/components/schemas/ProcessInstanceQueryDto"
-    },
-    "historicProcessInstanceQuery": {
-      "$ref": "#/components/schemas/HistoricProcessInstanceQueryDto"
-    }
+    <@lib.property
+        name = "processInstanceQuery"
+        type = "ref"
+        dto = "ProcessInstanceQueryDto" />
+
+    <@lib.property
+        name = "historicProcessInstanceQuery"
+        type = "ref"
+        last = true
+        dto = "HistoricProcessInstanceQueryDto" />
+
   }
 }
