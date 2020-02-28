@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author Frederik Heremans
  */
-public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
+public class ExpressionManagerTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testMethodExpressions() {

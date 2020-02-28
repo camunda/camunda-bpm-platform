@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import static org.camunda.bpm.engine.test.api.identity.TestPermissions.UPDATE;
 /**
  * @author Stefan Hentschel.
  */
-public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableProcessEngineTestCase {
+public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableProcessEngineTest {
 
   @Override
   public void setUp() throws Exception {

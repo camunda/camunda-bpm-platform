@@ -29,13 +29,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterQueryTest extends PluggableProcessEngineTestCase {
+public class FilterQueryTest extends PluggableProcessEngineTest {
 
   protected List<String> filterIds = new ArrayList<String>();
 

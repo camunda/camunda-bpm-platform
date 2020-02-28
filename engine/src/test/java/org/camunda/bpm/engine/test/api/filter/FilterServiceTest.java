@@ -22,14 +22,14 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterServiceTest extends PluggableProcessEngineTestCase {
+public class FilterServiceTest extends PluggableProcessEngineTest {
 
   protected Filter filter;
 

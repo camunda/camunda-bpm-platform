@@ -21,7 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Saeid Mirzaei
  * @author Tijs Rademakers
  */
-public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
+public class StartAuthorizationTest extends PluggableProcessEngineTest {
 
   IdentityService identityService;
 

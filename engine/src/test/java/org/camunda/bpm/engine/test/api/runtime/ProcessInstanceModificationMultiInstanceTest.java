@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.test.util.ExecutionTree;
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationMultiInstanceTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationMultiInstanceTest extends PluggableProcessEngineTest {
 
   public static final String PARALLEL_MULTI_INSTANCE_TASK_PROCESS =
       "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasks.bpmn20.xml";

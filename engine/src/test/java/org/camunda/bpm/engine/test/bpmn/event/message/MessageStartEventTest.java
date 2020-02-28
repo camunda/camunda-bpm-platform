@@ -26,7 +26,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class MessageStartEventTest extends PluggableProcessEngineTestCase {
+public class MessageStartEventTest extends PluggableProcessEngineTest {
 
   public void testDeploymentCreatesSubscriptions() {
     String deploymentId = repositoryService

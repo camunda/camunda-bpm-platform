@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
@@ -43,7 +43,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Joram Barrez
  * @author Thorben Lindhauer
  */
-public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
+public class BpmnDeploymentTest extends PluggableProcessEngineTest {
 
   DeploymentHandlerFactory defaultDeploymentHandlerFactory;
   DeploymentHandlerFactory customDeploymentHandlerFactory;

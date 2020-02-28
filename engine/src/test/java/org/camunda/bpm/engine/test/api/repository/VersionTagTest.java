@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Stefan Hentschel.
  */
-public class VersionTagTest extends PluggableProcessEngineTestCase {
+public class VersionTagTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testParsingVersionTag() {

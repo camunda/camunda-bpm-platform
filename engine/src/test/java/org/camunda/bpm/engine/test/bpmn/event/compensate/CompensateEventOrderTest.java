@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.IncreaseCurrentTimeServiceTask;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.AssociationDirection;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -43,8 +44,10 @@ import static org.junit.Assert.assertTrue;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class CompensateEventOrderTest {
 
-  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule(true);
-  @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  @Rule
+  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Test
   public void testTwoCompensateEventsInReverseOrder() {

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCase {
+public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTest {
 
   @Test
   public void testDeploymentStatisticsQuery() {

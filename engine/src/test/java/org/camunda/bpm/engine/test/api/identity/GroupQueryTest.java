@@ -21,13 +21,13 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
 /**
  * @author Joram Barrez
  */
-public class GroupQueryTest extends PluggableProcessEngineTestCase {
+public class GroupQueryTest extends PluggableProcessEngineTest {
 
   @Override
   protected void setUp() throws Exception {

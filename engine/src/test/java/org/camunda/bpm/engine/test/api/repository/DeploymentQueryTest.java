@@ -22,7 +22,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
  * @author Tom Baeyens
  * @author Ingo Richtsmeier
  */
-public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
+public class DeploymentQueryTest extends PluggableProcessEngineTest {
 
   private String deploymentOneId;
   private String deploymentTwoId;

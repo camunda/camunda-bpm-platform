@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  *
  * @author Svetlana Dorokhova
  */
-public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
+public class ConcurrentHistoryCleanupTest extends ConcurrencyTest {
 
   @Override
   public void tearDown() throws Exception {

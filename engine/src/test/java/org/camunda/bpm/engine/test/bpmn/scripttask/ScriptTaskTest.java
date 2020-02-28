@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -47,7 +47,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Christian Lipphardt (Groovy)
  *
  */
-public class ScriptTaskTest extends PluggableProcessEngineTestCase {
+public class ScriptTaskTest extends PluggableProcessEngineTest {
 
   private static final String JAVASCRIPT = "javascript";
   private static final String PYTHON = "python";

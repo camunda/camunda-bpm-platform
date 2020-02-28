@@ -42,7 +42,7 @@ import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -61,7 +61,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Sebastian Menski
  */
-public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
+public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
   protected Filter filter;
 

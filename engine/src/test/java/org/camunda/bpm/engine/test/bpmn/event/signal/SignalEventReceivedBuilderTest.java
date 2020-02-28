@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCase {
+public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTest {
 
   protected BpmnModelInstance signalStartProcess(String processId) {
     return Bpmn.createExecutableProcess(processId)

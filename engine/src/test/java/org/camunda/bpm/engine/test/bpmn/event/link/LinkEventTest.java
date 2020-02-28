@@ -24,7 +24,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Bernd Ruecker
  */
-public class LinkEventTest extends PluggableProcessEngineTestCase {
+public class LinkEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testValidEventLink() {

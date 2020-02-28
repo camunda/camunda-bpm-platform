@@ -26,9 +26,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest.ThreadControl;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -80,13 +80,6 @@ public class JobExecutorShutdownTest {
   protected ControllableJobExecutor jobExecutor;
   protected ThreadControl acquisitionThread;
   protected static ThreadControl executionThread;
-
-  protected static ControllableJobExecutor buildControllableJobExecutor() {
-    ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
-    jobExecutor.setMaxJobsPerAcquisition(2);
-    jobExecutor.proceedAndWaitOnShutdown(false);
-    return jobExecutor;
-  }
 
   @Before
   public void setUp() throws Exception {
@@ -191,6 +184,12 @@ public class JobExecutorShutdownTest {
     Assert.assertNull(jobEntity.getLockExpirationTime());
   }
 
+  protected static ControllableJobExecutor buildControllableJobExecutor() {
+    ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
+    jobExecutor.setMaxJobsPerAcquisition(2);
+    jobExecutor.proceedAndWaitOnShutdown(false);
+    return jobExecutor;
+  }
 
   public static class SyncDelegate implements JavaDelegate {
 
@@ -200,6 +199,5 @@ public class JobExecutorShutdownTest {
     }
 
   }
-
 
 }

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Danny Gräf
  * @author Falko Menge
  */
-public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
+public class ReceiveTaskTest extends PluggableProcessEngineTest {
 
   private List<EventSubscription> getEventSubscriptionList() {
     return runtimeService.createEventSubscriptionQuery()

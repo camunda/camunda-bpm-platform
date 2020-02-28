@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.test.Deployment;
@@ -34,7 +34,7 @@ import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
  * @author Roman Smirnov
  *
  */
-public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
+public class CmmnDeployerTest extends PluggableProcessEngineTest {
 
   public void testCmmnDeployment() {
     String deploymentId = processEngine

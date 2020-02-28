@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.variables;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Roman Smirnov
  *
  */
-public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
+public class ExecutionVariablesTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testTreeCompactionWithLocalVariableOnConcurrentExecution() {

@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 /**
  * @author Thorben Lindhauer
  */
-public class CompetingSuspensionTest extends PluggableProcessEngineTestCase {
+public class CompetingSuspensionTest extends PluggableProcessEngineTest {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 

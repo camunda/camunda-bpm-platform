@@ -53,7 +53,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assert;
 
@@ -61,7 +61,7 @@ import org.junit.Assert;
  * @author Daniel Meyer
  *
  */
-public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTestCase {
+public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTest {
 
   private final static String jonny2 = "jonny2";
 

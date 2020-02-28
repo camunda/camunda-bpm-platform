@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  *
  * @author Clint Manning
  */
-public class JobEntityTest extends PluggableProcessEngineTestCase {
+public class JobEntityTest extends PluggableProcessEngineTest {
 
   /**
    * Note: This does not test a message with 4-byte Unicode supplementary

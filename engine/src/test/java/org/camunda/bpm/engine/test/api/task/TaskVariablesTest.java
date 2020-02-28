@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 /**
  * @author Tom Baeyens
  */
-public class TaskVariablesTest extends PluggableProcessEngineTestCase {
+public class TaskVariablesTest extends PluggableProcessEngineTest {
 
   public void testStandaloneTaskVariables() {
     Task task = taskService.newTask();

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.test.bpmn.servicetask.util.GenderBean;
  * @author Joram Barrez
  * @author Frederik Heremans
  */
-public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
+public class JavaServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testJavaServiceDelegation() {

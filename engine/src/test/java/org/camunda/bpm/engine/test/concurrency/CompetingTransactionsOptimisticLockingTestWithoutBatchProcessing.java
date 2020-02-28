@@ -16,23 +16,23 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.slf4j.Logger;
-
-import java.util.List;
 
 /**
  * @author Nikola Koevski
  */
-public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing extends ResourceProcessEngineTestCase {
+public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing extends PluggableProcessEngineTest {
 
   private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   static ControllableThread activeThread;
@@ -40,7 +40,6 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing ex
   public CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing() {
     super("org/camunda/bpm/engine/test/concurrency/custombatchprocessing.camunda.cfg.xml");
   }
-
 
   public class TransactionThread extends ControllableThread {
     String taskId;

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 /**
  * @author Philipp Ossler
  */
-public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCase {
+public class EscalationEventSubprocessTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testCatchEscalationEventInsideSubprocess() {

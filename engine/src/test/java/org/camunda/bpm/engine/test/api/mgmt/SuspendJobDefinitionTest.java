@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author roman.smirnov
  */
-public class SuspendJobDefinitionTest extends PluggableProcessEngineTestCase {
+public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
 
   @Override
   public void tearDown() throws Exception {

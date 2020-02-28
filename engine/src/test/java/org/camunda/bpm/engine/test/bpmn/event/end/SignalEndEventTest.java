@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.event.end;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Kristin Polenz
  */
-public class SignalEndEventTest extends PluggableProcessEngineTestCase {
+public class SignalEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testCatchSignalEndEventInEmbeddedSubprocess() throws Exception {

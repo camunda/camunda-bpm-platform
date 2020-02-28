@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.runtime.Job;
  *
  * @author Nikola Koevski
  */
-public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends ConcurrencyTestCase {
+public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends ConcurrencyTest {
 
   private static final String PROCESS_ENGINE_NAME = "historyCleanupJobEngine";
 

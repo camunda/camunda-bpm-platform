@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.mail;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.slf4j.Logger;
 import org.subethamail.wiser.Wiser;
@@ -25,7 +25,7 @@ import org.subethamail.wiser.Wiser;
 /**
  * @author Joram Barrez
  */
-public abstract class EmailTestCase extends PluggableProcessEngineTestCase {
+public abstract class EmailTestCase extends PluggableProcessEngineTest {
 
   private final static Logger LOG = TestLogger.TEST_LOGGER.getLogger();
 

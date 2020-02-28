@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.event.escalation;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Philipp Ossler
  */
-public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTestCase {
+public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testThrowEscalationEventFromEmbeddedSubprocess.bpmn20.xml")
   public void testNonInterruptingEscalationBoundaryEvent(){

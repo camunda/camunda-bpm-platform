@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.variable.Variables;
 /**
  * @author roman.smirnov
  */
-public class SuspendJobTest extends PluggableProcessEngineTestCase {
+public class SuspendJobTest extends PluggableProcessEngineTest {
 
   public void testSuspensionById_shouldThrowProcessEngineException() {
     try {

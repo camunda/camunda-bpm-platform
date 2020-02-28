@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestCase {
+public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTest {
 
   protected void setUp() throws Exception {
     super.setUp();

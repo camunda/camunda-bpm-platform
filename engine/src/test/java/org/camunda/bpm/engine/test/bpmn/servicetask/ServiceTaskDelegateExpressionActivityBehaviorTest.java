@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author Ronny Bräunlich
  *
  */
-public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTest {
 
   @Deployment
   @Test

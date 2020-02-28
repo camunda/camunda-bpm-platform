@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -32,7 +32,7 @@ import org.junit.Assert;
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractProcessEngineServicesAccessTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractProcessEngineServicesAccessTest extends PluggableProcessEngineTest {
 
   private static final String TASK_DEF_KEY = "someTask";
 

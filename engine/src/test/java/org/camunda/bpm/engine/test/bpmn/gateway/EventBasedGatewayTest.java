@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ParseException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Daniel Meyer
  */
-public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
+public class EventBasedGatewayTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={
           "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",

@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.shell;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
-public class ShellTaskTest extends PluggableProcessEngineTestCase {
+public class ShellTaskTest extends PluggableProcessEngineTest {
 
   enum OsType {
     LINUX, WINDOWS, MAC, SOLARIS, UNKOWN

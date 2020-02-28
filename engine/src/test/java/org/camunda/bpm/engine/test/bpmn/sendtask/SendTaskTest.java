@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sendtask;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Kristin Polenz
  */
-public class SendTaskTest extends PluggableProcessEngineTestCase {
+public class SendTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testJavaDelegate() {

@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -45,7 +45,7 @@ import org.junit.Test;
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
+public class VariableInstanceQueryTest extends PluggableProcessEngineTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})

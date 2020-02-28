@@ -23,7 +23,7 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.test.util.ExecutionTree;
  * @author Roman Smirnov
  *
  */
-public class ProcessInstanceModificationEventSubProcessTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationEventSubProcessTest extends PluggableProcessEngineTest {
 
   protected static final String INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcess.bpmn20.xml";

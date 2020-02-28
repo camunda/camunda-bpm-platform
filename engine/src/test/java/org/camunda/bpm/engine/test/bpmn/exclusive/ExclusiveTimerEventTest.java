@@ -18,14 +18,14 @@ package org.camunda.bpm.engine.test.bpmn.exclusive;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 
-public class ExclusiveTimerEventTest extends PluggableProcessEngineTestCase {
+public class ExclusiveTimerEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testCatchingTimerEvent() throws Exception {

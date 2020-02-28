@@ -24,12 +24,12 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Kristin Polenz
  */
-public class CaseSentryPartEntityTest extends PluggableProcessEngineTestCase {
+public class CaseSentryPartEntityTest extends PluggableProcessEngineTest {
 
   public void testSentryWithTenantId() {
     CaseSentryPartEntity caseSentryPartEntity = new CaseSentryPartEntity();

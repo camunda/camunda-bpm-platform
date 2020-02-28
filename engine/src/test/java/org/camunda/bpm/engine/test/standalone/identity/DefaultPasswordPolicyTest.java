@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.identity.PasswordPolicySpecialCharacterRuleIm
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyUpperCaseRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyUserDataRuleImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +49,7 @@ import org.junit.rules.ExpectedException;
 public class DefaultPasswordPolicyTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(true);
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

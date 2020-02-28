@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -48,7 +48,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
+public class BoundaryErrorEventTest extends PluggableProcessEngineTest {
 
   @Override
   protected void setUp() throws Exception {

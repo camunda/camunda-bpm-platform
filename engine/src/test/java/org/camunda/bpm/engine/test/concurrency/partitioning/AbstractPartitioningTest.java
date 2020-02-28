@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -31,7 +31,7 @@ import java.util.Map;
  */
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
+public abstract class AbstractPartitioningTest extends ConcurrencyTest {
 
   protected CommandExecutor commandExecutor;
 

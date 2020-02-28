@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.property;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
  */
-public class PropertyTest extends PluggableProcessEngineTestCase {
+public class PropertyTest extends PluggableProcessEngineTest {
 
 
   @Deployment

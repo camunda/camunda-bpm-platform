@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
@@ -44,7 +44,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  * @author Roman Smirnov
  *
  */
-public class CaseServiceTest extends PluggableProcessEngineTestCase {
+public class CaseServiceTest extends PluggableProcessEngineTest {
 
   public void testCreateCaseInstanceQuery() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();

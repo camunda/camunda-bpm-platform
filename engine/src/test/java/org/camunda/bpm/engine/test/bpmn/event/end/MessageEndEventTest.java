@@ -21,7 +21,7 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Kristin Polenz
  * @author Nico Rehwaldt
  */
-public class MessageEndEventTest extends PluggableProcessEngineTestCase {
+public class MessageEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testMessageEndEvent() throws Exception {

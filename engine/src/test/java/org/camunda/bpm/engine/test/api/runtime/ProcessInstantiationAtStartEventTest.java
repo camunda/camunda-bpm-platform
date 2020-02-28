@@ -24,13 +24,13 @@ import static org.junit.Assert.assertThat;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
-public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngineTestCase {
+public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 

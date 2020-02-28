@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTestCase {
+public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest {
 
   protected AtomicReference<JobEntity> job = new AtomicReference<>();
 

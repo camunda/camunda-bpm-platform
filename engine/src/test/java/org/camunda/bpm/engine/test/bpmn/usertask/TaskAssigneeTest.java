@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.bpmn.usertask;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * 
  * @author Joram Barrez 
  */
-public class TaskAssigneeTest extends PluggableProcessEngineTestCase {
+public class TaskAssigneeTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testTaskAssignee() {    

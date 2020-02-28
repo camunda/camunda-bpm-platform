@@ -22,12 +22,12 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.SourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Stefan Hentschel.
  */
-public class ScriptCompilationTest extends PluggableProcessEngineTestCase {
+public class ScriptCompilationTest extends PluggableProcessEngineTest {
 
   protected static final String SCRIPT_LANGUAGE = "groovy";
   protected static final String EXAMPLE_SCRIPT = "println 'hello world'";

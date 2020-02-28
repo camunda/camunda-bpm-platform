@@ -23,12 +23,12 @@ import java.util.Map;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
-public class FormPropertyDefaultValueTest extends PluggableProcessEngineTestCase {
+public class FormPropertyDefaultValueTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testDefaultValue() throws Exception {

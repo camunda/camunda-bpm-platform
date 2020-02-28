@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import static junit.framework.TestCase.assertTrue;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Kristin Polenz
  * @author Nico Rehwaldt
  */
-public class MessageIntermediateThrowEventTest extends PluggableProcessEngineTestCase {
+public class MessageIntermediateThrowEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSingleIntermediateThrowMessageEvent() {

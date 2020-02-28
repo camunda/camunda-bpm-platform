@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.standalone.entity;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener.ActivitySequenceCounterMap;
@@ -28,7 +28,7 @@ import org.junit.Before;
  * @author Roman Smirnov
  *
  */
-public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase {
+public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
 
   @Before
   public void setUp() {

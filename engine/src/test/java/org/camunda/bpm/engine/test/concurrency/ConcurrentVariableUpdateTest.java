@@ -16,14 +16,13 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import java.sql.Connection;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ import org.slf4j.Logger;
  * @author Daniel Meyer
  *
  */
-public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase {
+public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTest {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 

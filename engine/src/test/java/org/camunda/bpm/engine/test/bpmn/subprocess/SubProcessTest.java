@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class SubProcessTest extends PluggableProcessEngineTestCase {
+public class SubProcessTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSimpleSubProcess() {

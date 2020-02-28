@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class SequenceFlowTest extends PluggableProcessEngineTestCase {
+public class SequenceFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testTakeAllOutgoingFlowsFromNonScopeTask() {

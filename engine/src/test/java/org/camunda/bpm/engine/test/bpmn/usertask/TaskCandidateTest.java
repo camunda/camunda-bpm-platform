@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Joram Barrez
  */
-public class TaskCandidateTest extends PluggableProcessEngineTestCase {
+public class TaskCandidateTest extends PluggableProcessEngineTest {
 
   private static final String MANAGEMENT = "management";
 

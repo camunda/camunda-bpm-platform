@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -27,7 +27,7 @@ import org.camunda.commons.utils.cache.Cache;
  * @author Roman Smirnov
  *
  */
-public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
+public class DeploymentRegistrationTest extends PluggableProcessEngineTest {
 
   protected static final String DEPLOYMENT_NAME = "my-deployment";
 

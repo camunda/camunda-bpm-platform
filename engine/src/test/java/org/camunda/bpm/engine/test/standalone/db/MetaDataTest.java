@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
 /**
  * @author Tom Baeyens
  */
-public class MetaDataTest extends PluggableProcessEngineTestCase {
+public class MetaDataTest extends PluggableProcessEngineTest {
 
   public void testMariaDbDatabaseType() {
     if (isMariaDbConfigured()) {

@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -39,7 +39,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Kristin Polenz (camunda)
  * @author Christian Lipphardt (camunda)
  */
-public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
+public class MessageBoundaryEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSingleBoundaryMessageEvent() {

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.api.variables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.history.RemoveAndUpdateValueDelegate;
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Thorben Lindhauer
  *
  */
-public class ImplicitVariableUpdateTest extends PluggableProcessEngineTestCase {
+public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
   public void testUpdate() {

@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 
-public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEngineTest {
 
   protected static final String DECISION_DEFINITION_KEY = "decision";
   protected static final String DMN = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";

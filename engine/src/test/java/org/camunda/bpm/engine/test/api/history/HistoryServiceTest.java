@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -61,7 +61,7 @@ import java.util.Map;
  * @author Falko Menge
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoryServiceTest extends PluggableProcessEngineTestCase {
+public class HistoryServiceTest extends PluggableProcessEngineTest {
 
   public static final String ONE_TASK_PROCESS = "oneTaskProcess";
   protected static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();

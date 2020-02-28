@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class CancelAcquiredJobTest extends PluggableProcessEngineTestCase {
+public class CancelAcquiredJobTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testBothJobsAcquiredAtSameTime() {

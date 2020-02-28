@@ -24,7 +24,7 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.Resource;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.repository.Resource;
  * @author Daniel Meyer
  *
  */
-public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCase {
+public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTest {
 
   protected RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
   protected boolean defaultEngineRegistered;

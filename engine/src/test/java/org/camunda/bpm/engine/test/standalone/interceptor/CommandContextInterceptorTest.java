@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -29,7 +29,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 /**
  * @author Tom Baeyens
  */
-public class CommandContextInterceptorTest extends PluggableProcessEngineTestCase {
+public class CommandContextInterceptorTest extends PluggableProcessEngineTest {
 
   public void testCommandContextGetCurrentAfterException() {
     try {

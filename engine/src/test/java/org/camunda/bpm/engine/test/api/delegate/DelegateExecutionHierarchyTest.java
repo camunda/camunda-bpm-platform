@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
@@ -27,7 +27,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Daniel Meyer
  *
  */
-public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCase {
+public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTest {
 
   @Override
   protected void tearDown() throws Exception {

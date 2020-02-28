@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 /**
  * @author Johannes Heinemann
  */
-public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCase {
+public class SignalEventExpressionNameTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSignalCatchIntermediate() {

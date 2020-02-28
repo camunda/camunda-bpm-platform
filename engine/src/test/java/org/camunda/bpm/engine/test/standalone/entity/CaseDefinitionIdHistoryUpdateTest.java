@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 import java.util.Date;
@@ -33,7 +33,7 @@ import java.util.UUID;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CaseDefinitionIdHistoryUpdateTest extends PluggableProcessEngineTestCase {
+public class CaseDefinitionIdHistoryUpdateTest extends PluggableProcessEngineTest {
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testUpdateCaseDefinitionIdInCaseExecutionEntity() {

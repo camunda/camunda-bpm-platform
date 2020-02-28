@@ -20,14 +20,14 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngineTestCase {
+public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngineTest {
 
   protected static final String EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE = "Expressions are forbidden in adhoc queries. "
       + "This behavior can be toggled in the process engine configuration";

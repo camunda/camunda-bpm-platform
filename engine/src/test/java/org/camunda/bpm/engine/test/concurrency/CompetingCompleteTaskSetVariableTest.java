@@ -22,15 +22,14 @@ import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.Ignore;
 
 /**
  * @author Svetlana Dorokhova
  *
  */
-public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
+public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTest {
 
-  protected static class ControllableCompleteTaskCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
+  protected static class ControllableCompleteTaskCommand extends ConcurrencyTest.ControllableCommand<Void> {
 
     protected String taskId;
 
@@ -52,7 +51,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
   }
 
-  public class ControllableSetTaskVariablesCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
+  public class ControllableSetTaskVariablesCommand extends ConcurrencyTest.ControllableCommand<Void> {
 
     protected String taskId;
 
@@ -82,11 +81,11 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
     final String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    ConcurrencyTestCase.ThreadControl thread1 = executeControllableCommand(new ControllableSetTaskVariablesCommand(taskId, Variables.createVariables().putValue("var", "value")));
+    ConcurrencyTest.ThreadControl thread1 = executeControllableCommand(new ControllableSetTaskVariablesCommand(taskId, Variables.createVariables().putValue("var", "value")));
     thread1.reportInterrupts();
     thread1.waitForSync();
 
-    ConcurrencyTestCase.ThreadControl thread2 = executeControllableCommand(new ControllableCompleteTaskCommand(taskId));
+    ConcurrencyTest.ThreadControl thread2 = executeControllableCommand(new ControllableCompleteTaskCommand(taskId));
     thread2.reportInterrupts();
     thread2.waitForSync();
 

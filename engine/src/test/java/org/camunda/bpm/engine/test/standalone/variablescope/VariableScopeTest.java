@@ -26,7 +26,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Christian Lipphardt
  *
  */
-public class VariableScopeTest extends PluggableProcessEngineTestCase {
+public class VariableScopeTest extends PluggableProcessEngineTest {
 
   /**
    * A testcase to produce and fix issue ACT-862.

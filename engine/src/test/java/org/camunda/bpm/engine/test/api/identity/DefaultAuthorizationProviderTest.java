@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * <p>Test authorizations provided by {@link DefaultAuthorizationProvider}</p>
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Daniel Meyer
  *
  */
-public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTestCase {
+public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest {
 
   protected void setUp() throws Exception {
     // we are jonny

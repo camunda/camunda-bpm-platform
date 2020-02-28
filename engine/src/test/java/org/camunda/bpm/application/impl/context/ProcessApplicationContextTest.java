@@ -36,14 +36,14 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessApplicationContextTest extends PluggableProcessEngineTestCase {
+public class ProcessApplicationContextTest extends PluggableProcessEngineTest {
 
   protected TestApplicationWithoutEngine pa;
 

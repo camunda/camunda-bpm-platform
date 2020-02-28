@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -50,7 +50,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class InputOutputTest extends PluggableProcessEngineTestCase {
+public class InputOutputTest extends PluggableProcessEngineTest {
 
   // Input parameters /////////////////////////////////////////
 

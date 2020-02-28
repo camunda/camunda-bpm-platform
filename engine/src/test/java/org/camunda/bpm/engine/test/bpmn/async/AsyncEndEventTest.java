@@ -21,7 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -30,7 +30,7 @@ import org.junit.Assert;
 /**
  * @author Stefan Hentschel
  */
-public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
+public class AsyncEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testAsyncEndEvent() {

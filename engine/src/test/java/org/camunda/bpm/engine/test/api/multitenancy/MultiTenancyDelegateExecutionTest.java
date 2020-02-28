@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
@@ -30,7 +30,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * Tests if a {@link DelegateExecution} has the correct tenant-id. The
  * assertions are checked inside the service tasks.
  */
-public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 

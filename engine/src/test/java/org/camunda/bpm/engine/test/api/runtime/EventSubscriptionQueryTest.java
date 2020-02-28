@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -38,7 +38,7 @@ import org.junit.Assert;
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
+public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
   public void testQueryByEventSubscriptionId() {
     createExampleEventSubscriptions();

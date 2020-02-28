@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.util;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 
 public class ProvidedProcessEngineRule extends ProcessEngineRule {
@@ -27,7 +26,7 @@ public class ProvidedProcessEngineRule extends ProcessEngineRule {
   protected Callable<ProcessEngine> processEngineProvider;
 
   public ProvidedProcessEngineRule() {
-    super(PluggableProcessEngineTestCase.getProcessEngine(), true);
+    super(PluggableProcessEngineTest.getProcessEngine(), true);
   }
 
   public ProvidedProcessEngineRule(final ProcessEngineBootstrapRule bootstrapRule) {

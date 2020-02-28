@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.servicetask.util.ValueBean;
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.test.bpmn.servicetask.util.ValueBean;
 /**
  * @author Christian Stettler
  */
-public class ExpressionServiceTaskTest extends PluggableProcessEngineTestCase {
+public class ExpressionServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   public void testSetServiceResultToProcessVariables() {
