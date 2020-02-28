@@ -179,3 +179,14 @@
     }
     <#if !last> , </#if> <#-- if not the last entry, add a comma -->
 </#macro>
+
+<#macro endpointInfo
+        id
+        tag
+        desc >
+    "operationId": "${id}",
+    "tags": [
+      "${tag}"
+    ],
+    "description": "${desc?replace('\n( ){2,}', '\n', 'r')}",
+</#macro>

@@ -1,10 +1,10 @@
 {
-  "operationId": "getProcessInstanceVariableBinary",
-  "description": "Retrieves the content of a Process Variable by the Process Instance id and the Process Variable name.
-                  Applicable for byte array or file Process Variables.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "getProcessInstanceVariableBinary"
+      tag = "Process instance"
+      desc = "Retrieves the content of a Process Variable by the Process Instance id and the Process Variable name.
+              Applicable for byte array or file Process Variables." />
+
   "parameters": [
 
     <@lib.parameter

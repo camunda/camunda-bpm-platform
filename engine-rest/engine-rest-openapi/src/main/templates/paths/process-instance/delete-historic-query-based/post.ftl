@@ -1,9 +1,9 @@
 {
-  "operationId": "deleteAsyncHistoricQueryBased",
-  "description": "Deletes a set of process instances asynchronously (batch) based on a historic process instance query.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "deleteAsyncHistoricQueryBased"
+      tag = "Process instance"
+      desc = "Deletes a set of process instances asynchronously (batch) based on a historic process instance query." />
+
 
   <@lib.requestBody
       mediaType = "application/json"

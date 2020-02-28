@@ -1,9 +1,8 @@
 {
-  "operationId": "deleteProcessInstancesAsync",
-  "description": "Deletes multiple process instances asynchronously (batch).",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "deleteProcessInstancesAsync"
+      tag = "Process instance"
+      desc = "Deletes multiple process instances asynchronously (batch)." />
 
   <@lib.requestBody
       mediaType = "application/json"

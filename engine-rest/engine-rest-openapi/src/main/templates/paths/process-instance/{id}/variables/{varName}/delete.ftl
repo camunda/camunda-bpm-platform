@@ -1,9 +1,9 @@
 {
-  "operationId": "deleteProcessInstanceVariable",
-  "description": "Deletes a variable of a process instance by id.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "deleteProcessInstanceVariable"
+      tag = "Process instance"
+      desc = "Deletes a variable of a process instance by id." />
+
   "parameters": [
 
     <@lib.parameter

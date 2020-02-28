@@ -1,9 +1,9 @@
 {
-  "operationId": "deleteProcessInstance",
-  "description": "Deletes a running process instance by id.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "deleteProcessInstance"
+      tag = "Process instance"
+      desc = "Deletes a running process instance by id." />
+
   "parameters": [
 
     <@lib.parameter

@@ -1,10 +1,12 @@
 {
-  "operationId" : "queryProcessInstances",
-  "description": "Queries for process instances that fulfill given parameters through a JSON object.
-                  This method is slightly more powerful than the Get Instances method because it allows filtering by multiple process variables of types String, Number or Boolean.",
-  "tags": [
-    "Process instance"
-  ],
+
+  <@lib.endpointInfo
+      id = "queryProcessInstances"
+      tag = "Process instance"
+      desc = "Queries for process instances that fulfill given parameters through a JSON object.
+              This method is slightly more powerful than the Get Instances method because
+              it allows filtering by multiple process variables of types `string`, `number` or `boolean`." />
+
   "parameters" : [
     <#assign last = true >
     <#include "/lib/commons/pagination-params.ftl" >

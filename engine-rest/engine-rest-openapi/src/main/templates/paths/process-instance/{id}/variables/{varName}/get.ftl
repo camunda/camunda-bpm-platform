@@ -1,9 +1,9 @@
 {
-  "operationId": "getProcessInstanceVariable",
-  "description": "Retrieves a variable of a given process instance by id.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "getProcessInstanceVariable"
+      tag = "Process instance"
+      desc = "Retrieves a variable of a given process instance by id." />
+
   "parameters": [
 
     <@lib.parameter

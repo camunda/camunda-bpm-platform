@@ -1,10 +1,10 @@
 {
-  "operationId" : "updateSuspensionStateAsync",
-  "description": "Activates or suspends process instances asynchronously with a list of process instance ids,
-                  a process instance query, and/or a historical process instance query.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "updateSuspensionStateAsync"
+      tag = "Process instance"
+      desc = "Activates or suspends process instances asynchronously with a list of process instance ids,
+              a process instance query, and/or a historical process instance query." />
+
 
   <@lib.requestBody
       mediaType = "application/json"

@@ -1,9 +1,8 @@
 {
-  "operationId" : "setRetriesByProcessHistoricQueryBased",
-  "description": "Create a batch to set retries of jobs asynchronously based on a historic process instance query.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "setRetriesByProcessHistoricQueryBased"
+      tag = "Process instance"
+      desc = "Create a batch to set retries of jobs asynchronously based on a historic process instance query." />
 
   <@lib.requestBody
       mediaType = "application/json"

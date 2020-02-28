@@ -1,9 +1,10 @@
 {
-  "operationId" : "updateSuspensionStateById",
-  "description": "Activates or suspends a given process instance by id.",
-  "tags": [
-    "Process instance"
-  ],
+
+  <@lib.endpointInfo
+      id = "updateSuspensionStateById"
+      tag = "Process instance"
+      desc = "Activates or suspends a given process instance by id." />
+
   "parameters" : [ 
       <@lib.parameter
         name = "id"

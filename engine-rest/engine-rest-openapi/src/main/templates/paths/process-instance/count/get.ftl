@@ -1,9 +1,9 @@
 {
-  "operationId": "getProcessInstancesCount",
-  "description": "Queries for the number of process instances that fulfill given parameters.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "getProcessInstancesCount"
+      tag = "Process instance"
+      desc = "Queries for the number of process instances that fulfill given parameters." />
+
   "parameters": [
     <#assign last = true >
     <#include "/lib/commons/process-instance-query-params.ftl">

@@ -1,14 +1,13 @@
 {
-  "operationId": "createDeployment",
-  "tags": [
-    "Deployment"
-  ],
-  "description": "Creates a deployment.
+  <@lib.endpointInfo
+      id = "createDeployment"
+      tag = "Deployment"
+      desc = "Creates a deployment.
 
-                  **Security Consideration**
+              **Security Consideration**
 
-                  Deployments can contain custom code in form of scripts or EL expressions to customize process behavior.
-                  This may be abused for remote execution of arbitrary code.",
+              Deployments can contain custom code in form of scripts or EL expressions to customize process behavior.
+              This may be abused for remote execution of arbitrary code." />
 
   <@lib.requestBody
       mediaType = "multipart/form-data"

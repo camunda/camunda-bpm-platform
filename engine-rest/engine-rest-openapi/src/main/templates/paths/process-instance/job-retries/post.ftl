@@ -1,9 +1,8 @@
 {
-  "operationId" : "setRetriesByProcess",
-  "description": "Create a batch to set retries of jobs associated with given processes asynchronously.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "setRetriesByProcess"
+      tag = "Process instance"
+      desc = "Create a batch to set retries of jobs associated with given processes asynchronously." />
 
   <@lib.requestBody
       mediaType = "application/json"

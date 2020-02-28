@@ -1,9 +1,9 @@
 {
-  "operationId": "setProcessInstanceVariableBinary",
-  "description": "Sets the serialized value for a binary variable or the binary value for a file variable.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "setProcessInstanceVariableBinary"
+      tag = "Process instance"
+      desc = "Sets the serialized value for a binary variable or the binary value for a file variable." />
+
   "parameters": [
 
     <@lib.parameter

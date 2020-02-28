@@ -1,9 +1,9 @@
 {
-  "operationId": "setProcessInstanceVariable",
-  "description": "Sets a variable of a given process instance by id.",
-  "tags": [
-    "Process instance"
-  ],
+  <@lib.endpointInfo
+      id = "setProcessInstanceVariable"
+      tag = "Process instance"
+      desc = "Sets a variable of a given process instance by id." />
+
   "parameters": [
 
     <@lib.parameter
