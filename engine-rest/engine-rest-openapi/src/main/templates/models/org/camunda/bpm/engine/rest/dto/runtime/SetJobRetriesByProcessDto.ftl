@@ -3,7 +3,7 @@
   "properties" : {
 
     <@lib.property
-        name = "processInstanceIds"
+        name = "processInstances"
         type = "array"
         itemType = "string"
         desc = "A list of process instance ids to fetch jobs, for which retries will be set." />

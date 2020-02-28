@@ -9,14 +9,38 @@
       dto = "SetJobRetriesByProcessDto"
       requestDesc = "Please note that if both processInstances and processInstanceQuery are provided,
                      then the resulting execution will be performed on the union of these sets.
-                     **Unallowed property**: `historicProcessInstanceQuery`" />
+                     **Unallowed property**: `historicProcessInstanceQuery`"
+      examples = ['"example-1": {
+                       "value": {
+                         "retries": 5,
+                         "processInstances": ["aProcess", "secondProcess"],
+                         "processInstanceQuery": {
+                           "processDefinitionId": "aProcessDefinitionId"
+                         }
+                       }
+                    }']/>
 
   "responses" : {
 
     <@lib.response
         code = "200"
         dto = "BatchDto"
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "value": {
+                         "id": "aBatchId",
+                         "type": "aBatchType",
+                         "totalJobs": 10,
+                         "batchJobsPerSeed": 100,
+                         "jobsCreated": 10,
+                         "invocationsPerBatchJob": 1,
+                         "seedJobDefinitionId": "aSeedJobDefinitionId",
+                         "monitorJobDefinitionId": "aMonitorJobDefinitionId",
+                         "batchJobDefinitionId": "aBatchJobDefinitionId",
+                         "suspened": false,
+                         "tenantId": "aTenantId"
+                       }
+                     }'] />
 
     <@lib.response
         code = "400"

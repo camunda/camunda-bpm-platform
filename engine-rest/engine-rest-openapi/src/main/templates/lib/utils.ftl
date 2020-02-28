@@ -105,7 +105,8 @@
 </#macro>
 
 <#macro requestBody mediaType dto
-        requestDesc="" >
+        requestDesc=""
+        examples=[] >
   "requestBody" : {
 
     <#if requestDesc?has_content >
@@ -114,9 +115,17 @@
 
     "content" : {
       "${mediaType}" : {
+
         "schema" : {
           "$ref" : "#/components/schemas/${dto}"
         }
+
+        <#if examples?size != 0>,
+          
+          "examples": {
+            ${examples?join(", ")}
+          }
+        </#if>
       }
     }
   },
@@ -125,7 +134,8 @@
 <#macro response code desc
         dto="ExceptionDto"
         array=false
-        additionalProperties=false 
+        additionalProperties=false
+        examples=[]
         last=false >
     "${code}": {
 
@@ -151,6 +161,11 @@
                </#if>
 
              }
+             <#if examples?size != 0>,
+               "examples": {
+                 ${examples?join(", ")}
+               }
+             </#if>
            }
          },
        </#if>

@@ -208,5 +208,27 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 #### Examples
 
-So far the documentation does not provide any examples.
+You can add an examples to `requestBody` or `response` as follows:
+* pass the example inside single quotes instead of quotes as the examples contain quotes and they should be escaped
+* multiple examples allow
+* each example should have a unique name
+* add descriptions/summary when necessary
+```
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "SetJobRetriesByProcessDto"
+      requestDesc = "Please note that if both processInstances and processInstanceQuery are provided,
+                     then the resulting execution will be performed on the union of these sets.
+                     **Unallowed property**: `historicProcessInstanceQuery`"
+      examples = ['"example-1": {
+                       "value": {
+                         "retries": numberOfRetries,
+                         "processInstances": ["aProcess", "secondProcess"],
+                         "processInstanceQuery": {
+                           "processDefinitionId": "aProcessDefinitionId"
+                         }
+                       }
+                    }']/>
+```
+
 
