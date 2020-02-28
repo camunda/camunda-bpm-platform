@@ -1,4 +1,4 @@
-<#macro parameter name location type description
+<#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         required=false
@@ -25,13 +25,13 @@
       "required": true,
     </#if>
 
-    "description": "${description}"
+    "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
   }
 
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<#macro property name type description
+<#macro property name type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         minimum=""
@@ -41,6 +41,7 @@
         itemType="string"
         dto=""
         format="none"
+        addProperty=""
         last=false >
     "${name}": {
 
@@ -91,7 +92,11 @@
           },
         </#if>
 
-        "description": "${description}"
+        <#if addProperty?has_content>
+          ${addProperty},
+        </#if>
+
+        "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
       </#if>
     }
 
@@ -99,11 +104,11 @@
 </#macro>
 
 <#macro requestBody mediaType dto
-        requestDescription="" >
+        requestDesc="" >
   "requestBody" : {
 
-    <#if requestDescription?has_content >
-      "description": "${requestDescription}",
+    <#if requestDesc?has_content >
+      "description": "${requestDesc?replace('\n( ){2,}', '\n', 'r')}",
     </#if>
 
     "content" : {
@@ -116,7 +121,7 @@
   },
 </#macro>
 
-<#macro response code description
+<#macro response code desc
         dto="ExceptionDto"
         array=false
         additionalProperties=false 
@@ -149,7 +154,7 @@
          },
        </#if>
 
-       "description": "${description}"
+       "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
      }
 
     <#if !last> , </#if> <#-- if not a last response, add a comma-->

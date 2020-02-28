@@ -11,20 +11,20 @@
         type = "string"
         required = true
         last = true
-        description = "The id of the process instance for which the activity instance should be retrieved."/>
+        desc = "The id of the process instance for which the activity instance should be retrieved."/>
   ],
   "responses": {
 
     <@lib.response
         code = "200"
         dto = "ActivityInstanceDto"
-        description = "Request successful." />
+        desc = "Request successful." />
 
     <@lib.response
         code = "500"
         dto = "ExceptionDto"
         last = true
-        description = "Process instance with given id does not exist."/>
+        desc = "Process instance with given id does not exist."/>
 
   }
 }

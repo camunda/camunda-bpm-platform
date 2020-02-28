@@ -11,7 +11,7 @@
         location = "path"
         type = "string"
         required = true
-        description = "The id of the process instance to retrieve the variable for."/>
+        desc = "The id of the process instance to retrieve the variable for."/>
 
     <@lib.parameter
         name = "varName"
@@ -19,27 +19,27 @@
         type = "string"
         required = true
         last = true
-        description = "The name of the variable to retrieve."/>
+        desc = "The name of the variable to retrieve."/>
 
   ],
 
   <@lib.requestBody
       mediaType = "multipart/form-data"
       dto = "MultiFormVariableBinaryDto"
-      requestDescription = "For binary variables a multipart form submit with the following parts:" />
+      requestDesc = "For binary variables a multipart form submit with the following parts:" />
 
   "responses": {
 
     <@lib.response
         code = "204"
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request
-The variable value or type is invalid, for example if no filename is set."/>
+        desc = "Bad Request
+                The variable value or type is invalid, for example if no filename is set."/>
 
   }
 }

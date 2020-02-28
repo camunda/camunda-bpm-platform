@@ -1,6 +1,7 @@
 {
   "operationId": "getProcessInstanceVariableBinary",
-  "description": "Retrieves the content of a Process Variable by the Process Instance id and the Process Variable name. Applicable for byte array or file Process Variables.",
+  "description": "Retrieves the content of a Process Variable by the Process Instance id and the Process Variable name.
+                  Applicable for byte array or file Process Variables.",
   "tags": [
     "Process instance"
   ],
@@ -11,7 +12,7 @@
         location = "path"
         type = "string"
         required = true
-        description = "The id of the process instance to retrieve the variable for."/>
+        desc = "The id of the process instance to retrieve the variable for."/>
 
     <@lib.parameter
         name = "varName"
@@ -19,7 +20,7 @@
         type = "string"
         required = true
         last = true
-        description = "The name of the variable to retrieve."/>
+        desc = "The name of the variable to retrieve."/>
 
   ],
   "responses": {
@@ -46,15 +47,15 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        description = "Bad Request
-A Process Variable with the given id exists but does not serialize as binary data."/>
+        desc = "Bad Request
+                A Process Variable with the given id exists but does not serialize as binary data."/>
 
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
         last = true
-        description = "Not Found
-A Process Variable with the given id does not exist. "/>
+        desc = "Not Found
+                A Process Variable with the given id does not exist. "/>
 
   }
 }

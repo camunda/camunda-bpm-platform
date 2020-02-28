@@ -31,14 +31,14 @@
 
     <@lib.response
         code = "204"
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request
-Returned if some of the request parameters are invalid,
-for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
+        desc = "Bad Request
+                Returned if some of the request parameters are invalid,
+                for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
   }
 }

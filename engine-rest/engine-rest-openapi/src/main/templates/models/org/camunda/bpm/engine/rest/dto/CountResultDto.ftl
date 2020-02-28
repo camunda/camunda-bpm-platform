@@ -7,7 +7,7 @@
         type = "integer"
         format = "int64"
         last = true
-        description = "The number of matching instances."/>
+        desc = "The number of matching instances."/>
 
   }
 }

@@ -173,20 +173,21 @@ Recommendations:
 * to add links use markdown, e.g. `[link](http://example.com)`
 * Add `docsUrl` to resolve doc link - [User guide](${docsUrl}/user-guide/process-engine/process-instance-modification/)
 `docsUrl="https://docs.camunda.org/manual/${docsVersion}"
-* avoid adding long descriptions on a single line, improve the readibility by splitting the next with single or multiple line breaks:
+* use indentation, avoid adding long descriptions on a single line,
+improve the readibility by splitting the next with single or multiple line breaks:
 ```
   "description": "Submits a list of modification instructions to change a process instance's execution state.
-A modification instruction is one of the following:
+                  A modification instruction is one of the following:
 
-* Starting execution before an activity
-* Starting execution after an activity on its single outgoing sequence flow
-* Starting execution on a specific sequence flow
-* Canceling an activity instance, transition instance, or all instances (activity or transition) for an activity
+                  * Starting execution before an activity
+                  * Starting execution after an activity on its single outgoing sequence flow
+                  * Starting execution on a specific sequence flow
+                  * Canceling an activity instance, transition instance, or all instances (activity or transition) for an activity
 
-Instructions are executed immediately and in the order they are provided in this request's body.
-Variables can be provided with every starting instruction.
+                  Instructions are executed immediately and in the order they are provided in this request's body.
+                  Variables can be provided with every starting instruction.
 
-The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/process-instance-modification/)."
+                  The exact semantics of modification can be read about in the [User guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/process-instance-modification/)."
 ```
 
 #### Formats
@@ -200,8 +201,8 @@ Specify the `date-time` format of the date properties whenever is possible,
         type = "string"
         format = "date-time"
         description = "Restrict to instances that were started before the given date.
-By default (https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
-the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
+                       By default (https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
+                       the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
 ```
 That will improve the clients that are generated from the OpenAPI documentation.
 

@@ -8,7 +8,7 @@
         additionalProperties = true
         dto = "ResourceReportDto"
         last = true
-        description = "A JSON Object containing list of errors and warnings occurred during deployment." />
+        desc = "A JSON Object containing list of errors and warnings occurred during deployment." />
 
   }
 }

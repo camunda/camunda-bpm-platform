@@ -8,21 +8,21 @@
   <@lib.requestBody
       mediaType = "application/json"
       dto = "DeleteProcessInstancesDto"
-      requestDescription = "**Unallowed property**: `processInstanceQuery`" />
+      requestDesc = "**Unallowed property**: `processInstanceQuery`" />
 
   "responses": {
 
     <@lib.response
         code = "200"
         dto = "BatchDto"
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request
-Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor historicProcessInstanceQuery is present"/>
+        desc = "Bad Request
+                Returned if some of the query parameters are invalid, i.e., neither processInstanceIds, nor historicProcessInstanceQuery is present"/>
 
   }
 }

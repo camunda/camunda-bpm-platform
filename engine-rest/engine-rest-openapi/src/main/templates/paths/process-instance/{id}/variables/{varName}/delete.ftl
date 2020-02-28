@@ -11,7 +11,7 @@
         location = "path"
         type = "string"
         required = true
-        description = "The id of the process instance to delete the variable from."/>
+        desc = "The id of the process instance to delete the variable from."/>
 
     <@lib.parameter
         name = "varName"
@@ -19,7 +19,7 @@
         type = "string"
         required = true
         last = true
-        description = "The name of the variable to delete."/>
+        desc = "The name of the variable to delete."/>
 
   ],
   "responses": {
@@ -27,7 +27,7 @@
     <@lib.response
         code = "204"
         last = true
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
   }
 }

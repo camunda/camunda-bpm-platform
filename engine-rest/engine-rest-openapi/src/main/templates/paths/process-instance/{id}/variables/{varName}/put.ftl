@@ -11,7 +11,7 @@
         location = "path"
         type = "string"
         required = true
-        description = "The id of the process instance to set the variable for." />
+        desc = "The id of the process instance to set the variable for." />
 
     <@lib.parameter
         name = "varName"
@@ -19,7 +19,7 @@
         type = "string"
         required = true
         last = true
-        description = "The name of the variable to set." />
+        desc = "The name of the variable to set." />
 
   ],
 
@@ -31,14 +31,14 @@
 
     <@lib.response
         code = "204"
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request
-The variable value or type is invalid, for example if the value could not be parsed to an Integer value or
-the passed variable type is not supported."/>
+        desc = "Bad Request
+                The variable value or type is invalid, for example if the value could not be parsed to an Integer value or
+                the passed variable type is not supported."/>
   }
 }

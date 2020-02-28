@@ -11,7 +11,7 @@
         type = "string"
         required = true
         last = true
-        description = "The id of the process instance to activate or suspend."/>
+        desc = "The id of the process instance to activate or suspend."/>
   ],
 
   <@lib.requestBody
@@ -23,7 +23,7 @@
     <@lib.response
         code = "204"
         last = true
-        description = "Request successful." />
+        desc = "Request successful." />
 
       }
 }

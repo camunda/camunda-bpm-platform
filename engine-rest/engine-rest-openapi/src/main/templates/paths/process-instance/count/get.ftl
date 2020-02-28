@@ -12,13 +12,13 @@
     <@lib.response
         code = "200"
         dto = "CountResultDto"
-        description = "Request successful."/>
+        desc = "Request successful."/>
 
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
         last = true
-        description = "Bad Request
-Returned if some of the query parameters are invalid, for example an invalid operator for variable comparison is used."/>
+        desc = "Bad Request
+                Returned if some of the query parameters are invalid, for example an invalid operator for variable comparison is used."/>
   }
 }

@@ -3,13 +3,14 @@
   "description": "An activity instance, incident pair.",
   "properties": {
     <@lib.property
-        name="id"
-        type="string"
-        description="The id of the incident."/>
+        name = "id"
+        type = "string"
+        desc = "The id of the incident."/>
 
-    <@lib.property name="parentActivityInstanceId"
-        type="string"
-        last =true
-        description="The activity id in which the incident happened."/>
+    <@lib.property
+        name="parentActivityInstanceId"
+        type = "string"
+        last = true
+        desc = "The activity id in which the incident happened."/>
   }
 }
