@@ -17,6 +17,9 @@
 
 'use strict';
 var fs = require('fs');
+
+var migrateDiagram = require('@bpmn-io/dmn-migrate').migrateDiagram;
+
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular');
 var Viewer = require('./lib/navigatedViewer').default;
 var Modeler = require('dmn-js/lib/Modeler').default;
@@ -32,7 +35,7 @@ var template = fs.readFileSync(
 var original = document.addEventListener;
 document.addEventListener = function(...args) {
   const event = args[0];
-  if(event === 'focusin') {
+  if (event === 'focusin') {
     return;
   }
   return original.apply(document, args);
@@ -201,8 +204,10 @@ module.exports = [
 
         $scope.$watch('xml', function(newValue) {
           if (newValue) {
-            xml = newValue;
-            renderTable();
+            migrateDiagram(newValue).then(dmn13Xml => {
+              xml = dmn13Xml;
+              renderTable();
+            });
           }
         });
 
@@ -299,7 +304,7 @@ module.exports = [
 
             viewer.importXML(correctedXML, function(err) {
               $scope.isDrd =
-                viewer.getDefinitions().drgElements.length > 1 && !$scope.table;
+                viewer.getDefinitions().drgElement.length > 1 && !$scope.table;
 
               if ($scope.isDrd) {
                 canvas = viewer.getActiveViewer().get('canvas');
