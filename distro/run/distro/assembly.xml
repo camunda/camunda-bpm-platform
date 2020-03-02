@@ -23,7 +23,7 @@
     </dependencySet>
 
     <dependencySet>
-      <outputDirectory>configuration/userlib/</outputDirectory>
+      <outputDirectory>configuration/database/</outputDirectory>
       <includes>
         <include>com.h2database:h2</include>
       </includes>
