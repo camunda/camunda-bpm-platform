@@ -19,7 +19,7 @@ fi
 # set environment parameters
 webappsPath=$BASEDIR/internal/webapps/
 restPath=$BASEDIR/internal/rest/
-classPath=$BASEDIR/configuration/database/,$BASEDIR/configuration/keystore/
+classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
 
 
