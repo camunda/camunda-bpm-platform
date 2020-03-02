@@ -47,7 +47,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(CamundaBpmRunProperties.class)
 @Configuration
 @AutoConfigureAfter({ CamundaBpmAutoConfiguration.class })
-public class CamundaBpmRunSecurityConfiguration {
+public class CamundaBpmRunConfiguration {
 
   @Autowired
   CamundaBpmRunProperties camundaBpmRunProperties;
@@ -66,7 +66,6 @@ public class CamundaBpmRunSecurityConfiguration {
     if (properties.getAuthentication() == null || CamundaBpmRunAuthenticationProperties.DEFAULT_AUTH.equals(properties.getAuthentication())) {
       registration.addInitParameter("authentication-provider", "org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider");
     }
-
     return registration;
   }
 
