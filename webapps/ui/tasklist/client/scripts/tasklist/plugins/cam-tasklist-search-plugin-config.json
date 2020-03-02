@@ -29,13 +29,13 @@
     },
     {
       "id": {
-        "key": "processInstanceId",
+        "key": "processInstanceIdIn",
         "value": "PROCESS_INSTANCE_ID"
       },
       "operators": [
         {
-          "key": "eq",
-          "value": "="
+          "key": "in",
+          "value": "in"
         }
       ]
     },    {
@@ -368,7 +368,7 @@
       "operators": [
         {
           "key": "in",
-          "value": "="
+          "value": "in"
         }
       ]
     },    {
