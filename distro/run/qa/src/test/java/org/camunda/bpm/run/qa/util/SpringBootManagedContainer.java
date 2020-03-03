@@ -25,6 +25,9 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +36,6 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Files;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
@@ -66,8 +68,11 @@ public class SpringBootManagedContainer {
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
-    File defaultYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
-    createConfigurationYml("configuration/default.yml", defaultYml);
+    InputStream defaultYml = SpringBootManagedContainer.class.getClassLoader().getResourceAsStream(BASE_TEST_APPLICATION_YML);
+    createConfigurationYml(APPLICATION_YML_PATH, defaultYml);
+
+    Path resourcesPath = Paths.get(baseDirectory, RESOURCES_PATH);
+    resourcesPath.toFile().mkdir();
   }
 
   public void start() {
@@ -270,13 +275,15 @@ public class SpringBootManagedContainer {
     return null;
   }
 
-  public void createConfigurationYml(String filePath, File source) {
+  public void createConfigurationYml(String filePath, InputStream source) {
     try {
-      File testYml = new File(new File(baseDirectory), filePath);
-      Files.copy(source, testYml);
-      configurationFiles.add(testYml);
+      
+      Path testYmlPath = Paths.get(baseDirectory, filePath);
+      
+      Files.copy(source, testYmlPath);
+      configurationFiles.add(testYmlPath.toFile());
     } catch (IOException e) {
-      log.error("Could not copy default.yml", e);
+      log.error("Could not create " + filePath, e);
     }
   }
 

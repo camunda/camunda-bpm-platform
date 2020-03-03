@@ -57,9 +57,9 @@ public class ProductionConfigurationIntegrationTest {
 
     File file = new File(distroBase.getFile());
     container = new SpringBootManagedContainer(file.getAbsolutePath(), "--production");
-    
+
     container.createConfigurationYml("configuration/production.yml",
-        new File(ProductionConfigurationIntegrationTest.class.getClassLoader().getResource("ProductionConfigurationIntegrationTest_production.yml").getFile()));
+        ProductionConfigurationIntegrationTest.class.getClassLoader().getResourceAsStream("ProductionConfigurationIntegrationTest_production.yml"));
 
     try {
       container.start();
