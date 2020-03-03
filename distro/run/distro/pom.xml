@@ -16,10 +16,22 @@
   <dependencies>
 
     <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-assembly</artifactId>
       <version>${project.version}</version>
       <type>tar.gz</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.distro</groupId>
+      <artifactId>camunda-sql-scripts</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
     </dependency>
 
   </dependencies>
