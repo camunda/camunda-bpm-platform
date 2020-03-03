@@ -45,7 +45,7 @@ import com.sun.jna.platform.win32.WinNT;
 public class SpringBootManagedContainer {
 
   private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
-  private static final String APPLICATION_YML_PATH = "configuration/application.yml";
+  private static final String APPLICATION_YML_PATH = "configuration/default.yml";
   private static final String RESOURCES_PATH = "configuration/resources";
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
@@ -56,6 +56,8 @@ public class SpringBootManagedContainer {
 
   protected Thread shutdownThread;
   protected Process startupProcess;
+  
+  private List<File> configurationFiles = new ArrayList<>();
 
   public SpringBootManagedContainer(String baseDirectory, String... commands) {
     this.baseUrl = "http://localhost:8080";
@@ -64,7 +66,8 @@ public class SpringBootManagedContainer {
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
-    createTestYml();
+    File defaultYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
+    createConfigurationYml("configuration/default.yml", defaultYml);
   }
 
   public void start() {
@@ -267,27 +270,27 @@ public class SpringBootManagedContainer {
     return null;
   }
 
-  private void createTestYml() {
+  public void createConfigurationYml(String filePath, File source) {
     try {
-      File baseYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
-      File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
-      Files.copy(baseYml, testYml);
+      File testYml = new File(new File(baseDirectory), filePath);
+      Files.copy(source, testYml);
+      configurationFiles.add(testYml);
     } catch (IOException e) {
-      log.error("Could not copy application.yml", e);
+      log.error("Could not copy default.yml", e);
     }
-
   }
 
   private void cleanup() {
     // cleanup test YAML
-    File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
-    testYml.delete();
+    for (File configFile : configurationFiles) {
+      configFile.delete();
+    }
 
     // cleanup resources
     File resourcesDir = new File(new File(baseDirectory), RESOURCES_PATH);
     deleteDirectory(resourcesDir);
   }
-  
+
   private void deleteDirectory(File directory) {
     File[] files = directory.listFiles();
     if (files != null) {
