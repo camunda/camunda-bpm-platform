@@ -8,7 +8,7 @@
         desc = "Variable name"/>
 
     <@lib.property
-        name = "opearator"
+        name = "operator"
         type = "string"
         enumValues = ['"eq"', '"neq"', '"gt"', '"gteq"', '"lt"', '"lteq"', '"like"']
         desc = "Comparison operator to be used"/>
