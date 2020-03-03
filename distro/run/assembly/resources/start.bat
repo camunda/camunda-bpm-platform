@@ -28,6 +28,7 @@ SET webappsPath=%BASEDIR%internal\webapps
 SET restPath=%BASEDIR%internal\rest
 SET classPath=%BASEDIR%configuration\userlib,%BASEDIR%configuration\keystore
 SET optionalComponentChosen=false
+SET configuration=%BASEDIR%configuration\default.yml
 
 
 REM inspect arguments
@@ -46,6 +47,11 @@ IF [%~1]==[--rest] (
   ECHO REST API enabled
 )
 
+IF [%~1]==[--production] (
+  SET configuration=%BASEDIR%configuration\production.yml
+)
+
+
 SHIFT
 GOTO Loop
 :Continue
@@ -61,4 +67,4 @@ ECHO classpath: %classPath%
 
 
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%BASEDIR%configuration\application.yml"
+call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"

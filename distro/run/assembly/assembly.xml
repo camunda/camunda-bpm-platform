@@ -23,7 +23,11 @@
 
   <files>
     <file>
-      <source>resources/application.yml</source>
+      <source>resources/default.yml</source>
+      <outputDirectory>configuration/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/production.yml</source>
       <outputDirectory>configuration/</outputDirectory>
     </file>
     <file>

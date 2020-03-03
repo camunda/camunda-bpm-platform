@@ -182,7 +182,8 @@
               <overWriteSnapshots>true</overWriteSnapshots>
               <excludeTransitive>true</excludeTransitive>
               <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
-              <excludes>configuration/application.yml</excludes>
+              <excludes>configuration/default.yml</excludes>
+              <excludes>configuration/production.yml</excludes>
             </configuration>
           </execution>
         </executions>
