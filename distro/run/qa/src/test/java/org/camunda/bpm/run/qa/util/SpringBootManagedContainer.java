@@ -25,6 +25,9 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +36,6 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Files;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
@@ -45,7 +47,7 @@ import com.sun.jna.platform.win32.WinNT;
 public class SpringBootManagedContainer {
 
   private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
-  private static final String APPLICATION_YML_PATH = "configuration/application.yml";
+  private static final String APPLICATION_YML_PATH = "configuration/default.yml";
   private static final String RESOURCES_PATH = "configuration/resources";
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
@@ -56,6 +58,8 @@ public class SpringBootManagedContainer {
 
   protected Thread shutdownThread;
   protected Process startupProcess;
+  
+  private List<File> configurationFiles = new ArrayList<>();
 
   public SpringBootManagedContainer(String baseDirectory, String... commands) {
     this.baseUrl = "http://localhost:8080";
@@ -64,7 +68,11 @@ public class SpringBootManagedContainer {
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
-    createTestYml();
+    InputStream defaultYml = SpringBootManagedContainer.class.getClassLoader().getResourceAsStream(BASE_TEST_APPLICATION_YML);
+    createConfigurationYml(APPLICATION_YML_PATH, defaultYml);
+
+    Path resourcesPath = Paths.get(baseDirectory, RESOURCES_PATH);
+    resourcesPath.toFile().mkdir();
   }
 
   public void start() {
@@ -267,27 +275,29 @@ public class SpringBootManagedContainer {
     return null;
   }
 
-  private void createTestYml() {
+  public void createConfigurationYml(String filePath, InputStream source) {
     try {
-      File baseYml = new File(SpringBootManagedContainer.class.getClassLoader().getResource(BASE_TEST_APPLICATION_YML).getFile());
-      File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
-      Files.copy(baseYml, testYml);
+      
+      Path testYmlPath = Paths.get(baseDirectory, filePath);
+      
+      Files.copy(source, testYmlPath);
+      configurationFiles.add(testYmlPath.toFile());
     } catch (IOException e) {
-      log.error("Could not copy application.yml", e);
+      log.error("Could not create " + filePath, e);
     }
-
   }
 
   private void cleanup() {
     // cleanup test YAML
-    File testYml = new File(new File(baseDirectory), APPLICATION_YML_PATH);
-    testYml.delete();
+    for (File configFile : configurationFiles) {
+      configFile.delete();
+    }
 
     // cleanup resources
     File resourcesDir = new File(new File(baseDirectory), RESOURCES_PATH);
     deleteDirectory(resourcesDir);
   }
-  
+
   private void deleteDirectory(File directory) {
     File[] files = directory.listFiles();
     if (files != null) {

@@ -21,20 +21,23 @@ webappsPath=$BASEDIR/internal/webapps/
 restPath=$BASEDIR/internal/rest/
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
+configuration=$BASEDIR/configuration/application.yml
 
 
 # inspect arguments
 while [ "$1" != "" ]; do
   case $1 in 
-    --webapps ) optionalComponentChosen=true
-                classPath=$webappsPath,$classPath
-                echo WebApps enabled
-                ;;
-    --rest )    optionalComponentChosen=true
-                classPath=$restPath,$classPath
-                echo REST API enabled
-                ;;
-    * )         exit 1
+    --webapps )    optionalComponentChosen=true
+                   classPath=$webappsPath,$classPath
+                   echo WebApps enabled
+                   ;;
+    --rest )       optionalComponentChosen=true
+                   classPath=$restPath,$classPath
+                   echo REST API enabled
+                   ;;
+    --production ) configuration=$BASEDIR/configuration/production.yml
+                   ;;
+    * )            exit 1
   esac
   shift
 done
@@ -49,4 +52,4 @@ fi
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$BASEDIR"/configuration/application.yml
+"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
