@@ -25,7 +25,7 @@
       "required": true,
     </#if>
 
-    "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
+    "description": "${removeIndentation(desc)}"
   }
 
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
@@ -97,7 +97,7 @@
           ${addProperty},
         </#if>
 
-        "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
+        "description": "${removeIndentation(desc)}"
       </#if>
     }
 
@@ -110,7 +110,7 @@
   "requestBody" : {
 
     <#if requestDesc?has_content >
-      "description": "${requestDesc?replace('\n( ){2,}', '\n', 'r')}",
+      "description": "${removeIndentation(requestDesc)}",
     </#if>
 
     "content" : {
@@ -170,7 +170,7 @@
          },
        </#if>
 
-       "description": "${desc?replace('\n( ){2,}', '\n', 'r')}"
+       "description": "${removeIndentation(desc)}"
      }
 
     <#if !last> , </#if> <#-- if not a last response, add a comma-->
@@ -183,7 +183,7 @@
         last = false >
     {
       "url": "${url}",
-      "description":  "${desc?replace('\n( ){2,}', '\n', 'r')}",
+      "description":  "${removeIndentation(desc)}",
       "variables": {
         <#list variables as name, default>
           ${name}: {
@@ -203,5 +203,9 @@
     "tags": [
       "${tag}"
     ],
-    "description": "${desc?replace('\n( ){2,}', '\n', 'r')}",
+    "description": "${removeIndentation(desc)}",
 </#macro>
+
+<#function removeIndentation text>
+  <#return text?replace('\n( ){2,}', '\n', 'r') >
+</#function>
