@@ -35,6 +35,7 @@
     {"name": "Engine"},
     {"name": "Condition"},
     {"name": "Process instance"},
+    {"name": "Signal"},
     {"name": "Schema Log"},
     {"name": "Version"}
   ],
