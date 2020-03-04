@@ -19,6 +19,13 @@
       </includes>
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
+     <dependencySet>
+      <outputDirectory />
+      <includes>
+        <include>org.camunda.bpm:license-book:zip</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
   </dependencySets>
 
   <files>
@@ -45,6 +52,18 @@
       <filtered>true</filtered>
       <outputDirectory />
       <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>../../license/LICENSE</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>../../license/NOTICE</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory></outputDirectory>
     </file>
   </files>
   
