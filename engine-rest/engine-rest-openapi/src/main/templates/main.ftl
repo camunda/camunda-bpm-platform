@@ -33,6 +33,7 @@
   "tags": [
     {"name": "Deployment"},
     {"name": "Engine"},
+    {"name": "Condition"},
     {"name": "Process instance"},
     {"name": "Version"}
   ],
