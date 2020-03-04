@@ -68,6 +68,7 @@
     <file>
       <source>resources/README.txt</source>
       <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
       <outputDirectory />
     </file>
   </files>
