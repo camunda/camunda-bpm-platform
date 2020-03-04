@@ -28,6 +28,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>license-book</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+
   </dependencies>
 
   <build>
