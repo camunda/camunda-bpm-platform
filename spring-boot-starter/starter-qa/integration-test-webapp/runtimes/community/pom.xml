@@ -7,7 +7,6 @@
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>qa-webapp-runtimes</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../</relativePath>
   </parent>
 
   <artifactId>qa-webapp-ce-runtime</artifactId>
@@ -24,24 +23,29 @@
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
+  <profiles>
+    <profile>
+      <id>integration-test-spring-boot-starter</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
 
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-  </build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
