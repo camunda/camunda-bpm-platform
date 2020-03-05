@@ -65,6 +65,12 @@
       <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
     </file>
+    <file>
+      <source>resources/README.txt</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory />
+    </file>
   </files>
   
   <fileSets>
