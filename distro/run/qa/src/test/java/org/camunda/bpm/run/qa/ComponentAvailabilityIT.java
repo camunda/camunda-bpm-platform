@@ -41,7 +41,7 @@ import io.restassured.response.Response;
  * Test cases for ensuring connectivity to REST API based on startup parameters
  */
 @RunWith(Parameterized.class)
-public class ComponentAvailabilityTest {
+public class ComponentAvailabilityIT {
 
   @Parameter(0)
   public String[] commands;
@@ -64,7 +64,7 @@ public class ComponentAvailabilityTest {
 
   @BeforeParam
   public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
-    URL distroBase = ComponentAvailabilityTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
+    URL distroBase = ComponentAvailabilityIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
     assertNotNull(distroBase);
     File file = new File(distroBase.getFile());
     container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);

@@ -24,11 +24,11 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-public class SqlAvailabilityIntegrationTest {
+public class SqlAvailabilityIT {
 
   @Test
   public void shouldFindSqlResources() throws URISyntaxException {
-    Path sqlDir = Paths.get(SqlAvailabilityIntegrationTest.class.getClassLoader().getResource("camunda-bpm-run-distro/configuration/sql/").toURI());
+    Path sqlDir = Paths.get(SqlAvailabilityIT.class.getClassLoader().getResource("camunda-bpm-run-distro/configuration/sql/").toURI());
 
     Path createDir = sqlDir.resolve("create");
     Path dropDir = sqlDir.resolve("drop");

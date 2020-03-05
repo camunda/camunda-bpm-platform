@@ -42,11 +42,11 @@ import com.google.common.io.Files;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
-public class AutoDeploymentIntegrationTest {
+public class AutoDeploymentIT {
   static final String PROCESS_DEFINITION_ENDPOINT = "/rest/process-definition";
   static final String DEPLOYMENT_ENDPOINT = "/rest/deployment";
 
-  static URL distroBase = AutoDeploymentIntegrationTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
+  static URL distroBase = AutoDeploymentIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
   static List<File> dummyFiles = new ArrayList<>();
   static SpringBootManagedContainer container;
 
@@ -115,8 +115,8 @@ public class AutoDeploymentIntegrationTest {
   @Test
   public void shouldAutoDeployScriptAndForms() throws IOException {
     // given
-    File formFile = new File(AutoDeploymentIntegrationTest.class.getClassLoader().getResource("deployment/form.html").getFile());
-    File scriptFile = new File(AutoDeploymentIntegrationTest.class.getClassLoader().getResource("deployment/script.js").getFile());
+    File formFile = new File(AutoDeploymentIT.class.getClassLoader().getResource("deployment/form.html").getFile());
+    File scriptFile = new File(AutoDeploymentIT.class.getClassLoader().getResource("deployment/script.js").getFile());
     File resourcesDirectory = new File(new File(distroBase.getFile()), "configuration/resources");
     resourcesDirectory.mkdirs();
     Files.copy(formFile, new File(resourcesDirectory, "form.html"));
