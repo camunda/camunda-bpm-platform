@@ -36,9 +36,9 @@ import java.util.logging.Logger;
  * <a href="https://github.com/camunda/camunda-bpm-platform/blob/master/qa/integration-tests-webapps/integration-tests/src/test/java/org/camunda/bpm/AbstractWebIntegrationTest.java">platform</a>,
  * might be removed with https://jira.camunda.com/browse/CAM-11379
  */
-public abstract class AbstractWebIntegrationTest {
+public abstract class AbstractWebIT {
 
-  private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
+  private final static Logger LOGGER = Logger.getLogger(AbstractWebIT.class.getName());
 
   protected String TASKLIST_PATH = "app/tasklist/default/";
   public static final String HOST_NAME = "localhost";

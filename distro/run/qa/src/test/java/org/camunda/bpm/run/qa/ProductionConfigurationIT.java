@@ -33,9 +33,9 @@ import org.junit.Before;
 
 import io.restassured.response.Response;
 
-public class ProductionConfigurationIntegrationTest {
+public class ProductionConfigurationIT {
 
-  static URL distroBase = ProductionConfigurationIntegrationTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
+  static URL distroBase = ProductionConfigurationIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
   static SpringBootManagedContainer container;
 
   @After
@@ -59,7 +59,7 @@ public class ProductionConfigurationIntegrationTest {
     container = new SpringBootManagedContainer(file.getAbsolutePath(), "--production");
 
     container.createConfigurationYml("configuration/production.yml",
-        ProductionConfigurationIntegrationTest.class.getClassLoader().getResourceAsStream("ProductionConfigurationIntegrationTest_production.yml"));
+        ProductionConfigurationIT.class.getClassLoader().getResourceAsStream("ProductionConfigurationIntegrationTest_production.yml"));
 
     try {
       container.start();

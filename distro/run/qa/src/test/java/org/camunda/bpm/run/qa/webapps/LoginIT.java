@@ -50,7 +50,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentI
  * and <code>@Parameters</code> for different setups, might be removed with https://jira.camunda.com/browse/CAM-11379
  */
 @RunWith(Parameterized.class)
-public class LoginITTest extends AbstractWebappUiIntegrationTest {
+public class LoginIT extends AbstractWebappUiIT {
 
   @Parameter
   public String[] commands;
@@ -75,7 +75,7 @@ public class LoginITTest extends AbstractWebappUiIntegrationTest {
 
   @BeforeParam
   public static void runStartScript(String[] commands) {
-    URL distroBase = LoginITTest.class.getClassLoader().getResource("camunda-bpm-run-distro");
+    URL distroBase = LoginIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
     assertNotNull(distroBase);
     File file = new File(distroBase.getFile());
     container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);

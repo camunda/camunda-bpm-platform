@@ -37,7 +37,7 @@ import java.util.Locale;
  * <a href="https://github.com/camunda/camunda-bpm-platform/blob/master/qa/integration-tests-webapps/integration-tests/src/test/java/org/camunda/bpm/AbstractWebappUiIntegrationTest.java">platform</a>,
  * might be removed with https://jira.camunda.com/browse/CAM-11379
  */
-public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest {
+public class AbstractWebappUiIT extends AbstractWebIT {
 
   protected static WebDriver driver;
 
