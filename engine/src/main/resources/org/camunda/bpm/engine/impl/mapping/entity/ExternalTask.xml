@@ -268,6 +268,11 @@
     ${limitAfter}
   </select>
 
+  <select id="selectTopicNamesByQuery" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultType="string">
+    select distinct RES.TOPIC_NAME_
+    <include refid="selectExternalTaskByQueryCriteriaSql"/>
+  </select>
+
   <select id="selectExternalTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultMap="externalTaskResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
