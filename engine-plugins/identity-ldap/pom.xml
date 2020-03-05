@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-plugins</artifactId>
-    <version>7.13.0-alpha2</version>
+    <version>7.13.0-alpha2-SNAPSHOT</version>
   </parent>
 
   <properties>

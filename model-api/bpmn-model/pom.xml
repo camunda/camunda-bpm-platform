@@ -5,7 +5,7 @@
     <groupId>org.camunda.bpm.model</groupId>
     <artifactId>camunda-model-apis</artifactId>
     <relativePath>../</relativePath>
-    <version>7.13.0-alpha2</version>
+    <version>7.13.0-alpha2-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-bpmn-model</artifactId>
