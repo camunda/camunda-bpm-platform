@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "camunda-commons-ui",
-  "version": "7.13.0-SNAPSHOT",
+  "version": "7.13.0-alpha2",
   "description": "Common files for camunda BPM platform UIs",
   "main": "index.js",
   "gruntConfig": {
