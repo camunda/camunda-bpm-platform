@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -271,14 +272,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
     try {
-      formService.submitStartFormData(processDefinition.getId(), new HashMap<String, String>());
+      formService.submitStartForm(processDefinition.getId(), new HashMap<>());
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
     try {
-      formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>());
+      formService.submitStartForm(processDefinition.getId(), "someKey", new HashMap<>());
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
@@ -324,6 +325,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // execute job
     Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
     managementService.executeJob(job.getId());
 
     // Try to start process instance. It should fail now.
@@ -377,6 +380,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // execute job
     Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
     managementService.executeJob(job.getId());
 
     // Try to start process instance. It should fail now.
@@ -431,6 +436,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // execute job
     Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
     managementService.executeJob(job.getId());
 
     // Starting a process instance should now succeed
@@ -508,8 +515,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
 
-    // execute job
+    // the job is associated with the deployment id of the latest version of the process definition
     Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    ProcessDefinitionQuery latestProcessDefinitionQuery = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion().desc();
+    ProcessDefinition latestProcessDefinition = latestProcessDefinitionQuery.list().get(0);
+    assertEquals(latestProcessDefinition.getDeploymentId(), job.getDeploymentId());
+    // execute job
     managementService.executeJob(job.getId());
 
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
@@ -524,8 +537,12 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
-    // execute job
+    // the job is associated with the deployment id of the latest version of the process definition
     job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    latestProcessDefinition = latestProcessDefinitionQuery.list().get(0);
+    assertEquals(latestProcessDefinition.getDeploymentId(), job.getDeploymentId());
+    // execute job
     managementService.executeJob(job.getId());
 
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
@@ -549,7 +566,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -591,7 +608,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -631,7 +648,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -671,7 +688,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -711,7 +728,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -751,7 +768,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -795,7 +812,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -861,7 +878,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -928,7 +945,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -995,7 +1012,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1061,7 +1078,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1100,7 +1117,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1139,7 +1156,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1182,7 +1199,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1242,7 +1259,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1295,7 +1312,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1344,7 +1361,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1393,7 +1410,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1442,7 +1459,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1491,7 +1508,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1540,7 +1557,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1593,7 +1610,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1668,7 +1685,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1744,7 +1761,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1820,7 +1837,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // a running process instance with a failed service task
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("fail", Boolean.TRUE);
     runtimeService.startProcessInstanceById(processDefinition.getId(), params);
 
@@ -1895,7 +1912,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1943,7 +1960,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -1992,7 +2009,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -2044,7 +2061,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -2113,7 +2130,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn").deploy();
 
       // a running process instance with a failed service task
-      Map<String, Object> params = new HashMap<String, Object>();
+      Map<String, Object> params = new HashMap<>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
     }
@@ -2327,6 +2344,48 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertFalse(processDefinition.isSuspended());
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
+  public void testDelayedSuspendAndActivateProcessDefinitionByKeyUsingBuilder() {
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertFalse(processDefinition.isSuspended());
+
+    // suspend process definition in one week from now
+    long oneWeekFromStartTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+
+    // suspend
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinition.getKey())
+      .executionDate(new Date(oneWeekFromStartTime))
+      .suspend();
+
+    // execute the suspension job
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
+    managementService.executeJob(job.getId());
+
+    processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertTrue(processDefinition.isSuspended());
+
+    // activate
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinition.getKey())
+      .executionDate(new Date(oneWeekFromStartTime))
+      .activate();
+
+    // execute the activation job
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
+    managementService.executeJob(job.getId());
+
+    processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertFalse(processDefinition.isSuspended());
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testDelayedSuspendProcessDefinitionUsingBuilder() {
 
@@ -2347,6 +2406,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // execute the suspension job
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
     managementService.executeJob(job.getId());
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -2379,6 +2439,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // execute the activation job
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
+    assertEquals(processDefinition.getDeploymentId(), job.getDeploymentId());
     managementService.executeJob(job.getId());
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
