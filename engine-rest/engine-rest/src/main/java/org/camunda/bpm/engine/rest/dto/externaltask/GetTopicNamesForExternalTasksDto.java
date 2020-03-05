@@ -7,8 +7,11 @@ import java.util.List;
 
 public class GetTopicNamesForExternalTasksDto {
 
-  public List<String> execute(ProcessEngine processEngine){
-    processEngine.getExternalTaskService();
-    return Collections.emptyList();
+  protected boolean withLockedTasks;
+  protected boolean withUnlockedTasks;
+  protected boolean withRetriesLeft;
+
+  public static List<String> execute(ProcessEngine processEngine){
+    return processEngine.getExternalTaskService().getTopicNames();
   }
 }
