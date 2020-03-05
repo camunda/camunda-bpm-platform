@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -23,6 +24,8 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -325,6 +328,8 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to suspend the process definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    List<String> expectedDeploymentIds = query.active().list().stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
+    assertThat(expectedDeploymentIds, hasItem(job.getDeploymentId()));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -350,6 +355,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to suspend the process definition
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    String expectedDeploymentId = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .active().tenantIdIn(TENANT_ONE).singleResult().getDeploymentId();
+    assertThat(job.getDeploymentId(), is(expectedDeploymentId));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -376,6 +384,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to suspend the process definition
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    String expectedDeploymentId = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .active().withoutTenantId().singleResult().getDeploymentId();
+    assertThat(job.getDeploymentId(), is(expectedDeploymentId));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -405,6 +416,8 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to activate the process definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    List<String> expectedDeploymentIds = query.suspended().list().stream().map(ProcessDefinition::getDeploymentId).collect(Collectors.toList());
+    assertThat(expectedDeploymentIds, hasItem(job.getDeploymentId()));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -434,6 +447,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to activate the process definition
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    String expectedDeploymentId = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .suspended().tenantIdIn(TENANT_ONE).singleResult().getDeploymentId();
+    assertThat(job.getDeploymentId(), is(expectedDeploymentId));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -464,6 +480,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     // when execute the job to activate the process definition
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    String expectedDeploymentId = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .suspended().withoutTenantId().singleResult().getDeploymentId();
+    assertThat(job.getDeploymentId(), is(expectedDeploymentId));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -619,7 +638,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
 
     // declare expected exception
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition '"+ processDefinition.getId() 
+    thrown.expectMessage("Cannot update the process definition '"+ processDefinition.getId()
       + "' because it belongs to no authenticated tenant");
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
