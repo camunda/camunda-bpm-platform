@@ -61,6 +61,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String EXTERNAL_TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/external-task";
   protected static final String EXTERNAL_TASK_COUNT_QUERY_URL = EXTERNAL_TASK_QUERY_URL + "/count";
+  protected static final String GET_EXTERNAL_TASK_TOPIC_NAMES_URL = EXTERNAL_TASK_QUERY_URL + "/topic-names";
+
   public static final long EXTERNAL_TASK_LOW_BOUND_PRIORITY = 3L;
   public static final long EXTERNAL_TASK_HIGH_BOUND_PRIORITY = 4L;
 
@@ -110,6 +112,17 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(EXTERNAL_TASK_QUERY_URL);
   }
+
+  @Test
+  public void testGetTopicNames(){
+    given()
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
+  }
+
 
   @Test
   public void testSimpleTaskQuery() {

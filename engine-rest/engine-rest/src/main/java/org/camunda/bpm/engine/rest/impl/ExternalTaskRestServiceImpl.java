@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
@@ -36,14 +37,10 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.*;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 import org.camunda.bpm.engine.rest.sub.externaltask.impl.ExternalTaskResourceImpl;
 
@@ -149,6 +146,10 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
 
+  }
+
+  @Override public List<String> getTopicNames(UriInfo uriInfo) {
+    return GetTopicNamesForExternalTasksDto.execute(false,false,false);
   }
 
   @Override

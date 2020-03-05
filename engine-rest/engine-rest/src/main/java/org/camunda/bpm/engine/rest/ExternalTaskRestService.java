@@ -32,11 +32,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.*;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 
 /**
@@ -90,5 +86,10 @@ public interface ExternalTaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto);
+
+  @GET
+  @Path("/topic-names")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<String> getTopicNames(@Context UriInfo uriInfo);
 
 }
