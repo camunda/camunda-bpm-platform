@@ -29,6 +29,7 @@ camunda.bpm:
 
 server:
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#https
+# do not use the provided certificate in production
   ssl:
     key-store: classpath:keystore.p12
     key-store-password: camunda
