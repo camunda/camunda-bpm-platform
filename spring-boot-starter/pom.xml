@@ -10,7 +10,6 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm.springboot.project</groupId>
@@ -83,10 +82,35 @@
       </build>
     </profile>
     <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>starter-qa</module>
+      </modules>
+    </profile>
+    <profile>
       <id>integration-test-spring-boot-starter</id>
       <modules>
         <module>starter-qa</module>
       </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
@@ -132,19 +156,6 @@
     </pluginManagement>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>

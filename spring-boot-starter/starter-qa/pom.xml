@@ -7,7 +7,6 @@
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../</relativePath>
   </parent>
 
   <packaging>pom</packaging>
@@ -20,5 +19,27 @@
     <module>integration-test-webapp</module>
     <module>integration-test-plugins</module>
   </modules>
+
+  <profiles>  
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <skipTests>true</skipTests>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
