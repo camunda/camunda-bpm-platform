@@ -55,7 +55,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
@@ -96,40 +95,77 @@ public class OptimizeServiceAuthorizationTest {
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][]{
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10)},
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+        }
+      }},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getCompletedHistoricProcessInstances(new Date(0L), null, 10)},
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getRunningHistoricProcessInstances(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getCompletedHistoricProcessInstances(new Date(0L), null, 10);
+        }
+      }},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getRunningHistoricProcessInstances(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10)},
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10);
+        }
+      }},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getHistoricIdentityLinkLogs(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getHistoricIdentityLinkLogs(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getHistoricVariableUpdates(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getHistoricVariableUpdates(new Date(0L), null, 10);
+        }
+      }},
 
-      {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10)},
+      {new Function<OptimizeService, List<?>>() {
+        @Override
+        public List<?> apply(final OptimizeService optimizeService) {
+          return optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10);
+        }
+      }},
     });
   }
 
-  private Function<OptimizeService, List<?>> methodToTest;
-
-  public OptimizeServiceAuthorizationTest(Function<OptimizeService, List<?>> methodToTest) {
-    this.methodToTest = methodToTest;
-  }
+  @Parameterized.Parameter
+  public Function<OptimizeService, List<?>> methodToTest;
 
   protected IdentityService identityService;
   protected RepositoryService repositoryService;
@@ -187,7 +223,7 @@ public class OptimizeServiceAuthorizationTest {
 
     try {
       // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+      methodToTest.apply(optimizeService);
       fail("Exception expected: It should not be possible to retrieve the data");
     } catch (AuthorizationException e) {
       // then
@@ -207,7 +243,7 @@ public class OptimizeServiceAuthorizationTest {
 
     try {
       // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+      methodToTest.apply(optimizeService);
       fail("Exception expected: It should not be possible to retrieve the data");
     } catch (AuthorizationException e) {
       // then
@@ -228,7 +264,7 @@ public class OptimizeServiceAuthorizationTest {
 
     try {
       // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+      methodToTest.apply(optimizeService);
       fail("Exception expected: It should not be possible to retrieve the data");
     } catch (AuthorizationException e) {
       // then
@@ -248,7 +284,7 @@ public class OptimizeServiceAuthorizationTest {
 
     try {
       // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+      methodToTest.apply(optimizeService);
       fail("Exception expected: It should not be possible to retrieve the data");
     } catch (AuthorizationException e) {
       // then
@@ -269,7 +305,7 @@ public class OptimizeServiceAuthorizationTest {
 
     try {
       // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+      methodToTest.apply(optimizeService);
       fail("Exception expected: It should not be possible to retrieve the data");
     } catch (AuthorizationException e) {
       // then
@@ -381,5 +417,14 @@ public class OptimizeServiceAuthorizationTest {
         engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
       }
     }
+  }
+
+  /**
+   * This class is just there to support code that's below java 8. Once
+   * only Java 8 is supported by every engine version that's maintained we
+   * can remove this interface.
+   */
+  private interface Function<T, T1> {
+    T1 apply(final T t);
   }
 }

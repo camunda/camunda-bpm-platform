@@ -217,12 +217,12 @@ public class OptimizeManager extends AbstractManager {
   }
 
   private void checkIsAuthorizedToReadHistoryAndTenants() {
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
+    CompositePermissionCheck necessaryPermissionsForOptimize = new PermissionCheckBuilder()
       .conjunctive()
       .atomicCheckForResourceId(PROCESS_DEFINITION, ANY, READ_HISTORY)
       .atomicCheckForResourceId(DECISION_DEFINITION, ANY, READ_HISTORY)
       .atomicCheckForResourceId(TENANT, ANY, READ)
       .build();
-    getAuthorizationManager().checkAuthorization(suspensionStatePermission);
+    getAuthorizationManager().checkAuthorization(necessaryPermissionsForOptimize);
   }
 }
