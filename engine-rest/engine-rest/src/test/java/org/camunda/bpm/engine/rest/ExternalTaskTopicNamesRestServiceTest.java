@@ -2,7 +2,6 @@ package org.camunda.bpm.engine.rest;
 
 import io.restassured.response.Response;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -100,6 +99,57 @@ public class ExternalTaskTopicNamesRestServiceTest extends AbstractRestServiceTe
         .statusCode(javax.ws.rs.core.Response.Status.OK.getStatusCode())
         .when()
         .get(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
+
+    String content = response.asString();
+    List<String> topicNames = from(content).getList("");
+
+    assertEquals("withRetriesLeft", topicNames.get(0));
+  }
+
+  @Test
+  public void testGetTopicNamesOfLockedTasksPost(){
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body("{\"withLockedTasks\": \"true\",\"withUnlockedTasks\":\"false\",\"withRetriesLeft\": \"false\"}")
+        .then()
+        .expect()
+        .statusCode(javax.ws.rs.core.Response.Status.OK.getStatusCode())
+        .when()
+        .post(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
+
+    String content = response.asString();
+    List<String> topicNames = from(content).getList("");
+
+    assertEquals("lockedTasks", topicNames.get(0));
+  }
+
+  @Test
+  public void testGetTopicNamesOfUnlockedTasksPost(){
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body("{\"withLockedTasks\": \"false\",\"withUnlockedTasks\":\"true\",\"withRetriesLeft\": \"false\"}")
+        .then()
+        .expect()
+        .statusCode(javax.ws.rs.core.Response.Status.OK.getStatusCode())
+        .when()
+        .post(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
+
+    String content = response.asString();
+    List<String> topicNames = from(content).getList("");
+
+    assertEquals("unlockedTasks", topicNames.get(0));
+  }
+
+  @Test
+  public void testGetTopicNamesOfTasksWithRetriesLeftPost(){
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body("{\"withLockedTasks\": \"false\",\"withUnlockedTasks\":\"false\",\"withRetriesLeft\": \"true\"}")
+        .then()
+        .expect()
+        .statusCode(javax.ws.rs.core.Response.Status.OK.getStatusCode())
+        .when()
+        .post(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
 
     String content = response.asString();
     List<String> topicNames = from(content).getList("");
