@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
@@ -148,8 +147,15 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
   }
 
-  @Override public List<String> getTopicNames(UriInfo uriInfo) {
-    return GetTopicNamesForExternalTasksDto.execute(false,false,false);
+  @Override
+  public List<String> getTopicNames(UriInfo uriInfo) {
+     GetTopicNamesForExternalTasksDto topicNamesDto = new GetTopicNamesForExternalTasksDto(objectMapper,uriInfo.getQueryParameters());
+     return topicNamesDto.execute(processEngine);
+  }
+
+  @Override
+  public List<String> getTopicNames(GetTopicNamesForExternalTasksDto topicNamesDto) {
+    return topicNamesDto.execute(processEngine);
   }
 
   @Override

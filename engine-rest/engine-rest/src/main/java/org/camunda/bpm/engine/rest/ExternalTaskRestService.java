@@ -92,4 +92,10 @@ public interface ExternalTaskRestService {
   @Produces(MediaType.APPLICATION_JSON)
   List<String> getTopicNames(@Context UriInfo uriInfo);
 
+  @POST
+  @Path("/topic-names")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  List<String> getTopicNames(GetTopicNamesForExternalTasksDto getTopicNamesForExternalTasksDto);
+
 }

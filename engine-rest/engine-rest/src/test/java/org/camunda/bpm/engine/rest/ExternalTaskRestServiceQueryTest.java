@@ -106,23 +106,9 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testSortOrderParameterOnly() {
-    given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
-      .when().get(EXTERNAL_TASK_QUERY_URL);
+    given().queryParam("sortOrder", "asc").then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON).body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required")).when().get(EXTERNAL_TASK_QUERY_URL);
   }
-
-  @Test
-  public void testGetTopicNames(){
-    given()
-        .then()
-        .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when()
-        .get(GET_EXTERNAL_TASK_TOPIC_NAMES_URL);
-  }
-
 
   @Test
   public void testSimpleTaskQuery() {
