@@ -168,3 +168,4 @@ So simply call
 mvn clean test -PtestExceptBpmn
 ```
 and all the bpmn testcases won't bother you any longer.
+
