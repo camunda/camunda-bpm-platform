@@ -16,7 +16,8 @@
  */
 package org.camunda.bpm.run.qa;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -34,12 +35,12 @@ public class SqlAvailabilityIT {
     Path dropDir = sqlDir.resolve("drop");
     Path upgradeDir = sqlDir.resolve("upgrade");
 
-    assertThat(sqlDir).isNotNull();
-    assertThat(createDir).isNotNull();
-    assertThat(dropDir).isNotNull();
-    assertThat(upgradeDir).isNotNull();
-    assertThat(createDir.toFile().list()).hasSizeGreaterThan(0);
-    assertThat(dropDir.toFile().list()).hasSizeGreaterThan(0);
-    assertThat(upgradeDir.toFile().list()).hasSizeGreaterThan(0);
+    assertThat(sqlDir, is(notNullValue()));
+    assertThat(createDir, is(notNullValue()));
+    assertThat(dropDir, is(notNullValue()));
+    assertThat(upgradeDir, is(notNullValue()));
+    assertThat(createDir.toFile().list().length, is(greaterThan(0)));
+    assertThat(dropDir.toFile().list().length, is(greaterThan(0)));
+    assertThat(upgradeDir.toFile().list().length, is(greaterThan(0)));
   }
 }
