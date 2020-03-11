@@ -16,7 +16,6 @@
 
   <modules>
     <module>community</module>
-    <module>enterprise</module>
   </modules>
 
   <properties>
