@@ -97,7 +97,6 @@
       <groupId>org.camunda.bpm.qa</groupId>
       <artifactId>camunda-qa-integration-tests-webapps</artifactId>
       <version>${project.version}</version>
-      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
 
