@@ -87,6 +87,7 @@
         <module>modules/rest</module>
         <module>core</module>
         <module>assembly</module>
+        <module>qa</module>
       </modules>
     </profile>
     <profile>
