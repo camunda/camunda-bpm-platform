@@ -31,9 +31,10 @@
 
   ],
   "tags": [
-    {"name": "Process instance"},
     {"name": "Deployment"},
-    {"name": "Engine"}
+    {"name": "Engine"},
+    {"name": "Process instance"},
+    {"name": "Version"}
   ],
   "paths": {
 
