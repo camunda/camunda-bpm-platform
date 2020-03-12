@@ -315,7 +315,10 @@ public class HistoricIncidentQueryTest {
   }
 
   @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
   public void testQueryByInvalidActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
 
     assertEquals(0, query.activityId("invalid").list().size());
@@ -324,6 +327,34 @@ public class HistoricIncidentQueryTest {
     try {
       query.activityId(null);
       fail("It was possible to set a null value as activityId.");
+    } catch (ProcessEngineException e) { }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByFailedActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .failedActivityId("theServiceTask");
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByFailedInvalidActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
+
+    assertEquals(0, query.failedActivityId("invalid").list().size());
+    assertEquals(0, query.failedActivityId("invalid").count());
+
+    try {
+      query.failedActivityId(null);
+      fail("It was possible to set a null value as failedActivityId.");
     } catch (ProcessEngineException e) { }
   }
 

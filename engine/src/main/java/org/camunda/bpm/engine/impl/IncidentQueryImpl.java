@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author roman.smirnov
@@ -39,6 +38,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String incidentMessage;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String[] processDefinitionKeys;
@@ -77,6 +77,11 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
 
   public IncidentQuery activityId(String activityId) {
     this.activityId = activityId;
+    return this;
+  }
+
+  public IncidentQuery failedActivityId(String activityId) {
+    this.failedActivityId = activityId;
     return this;
   }
 

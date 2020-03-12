@@ -83,11 +83,11 @@ public class Context {
     if (stack.isEmpty()) {
       // do not clear when called from JobExecutor, will be cleared there after logging
       if (getJobExecutorContext() == null) {
-        currentContext.getLoggingContext().clearMdc();
+        currentContext.getProcessDataContext().clearMdc();
       }
     } else {
       // reset the MDC to the logging context of the outer command invocation
-      stack.peek().getLoggingContext().update();
+      stack.peek().getProcessDataContext().updateMdc();
     }
   }
 

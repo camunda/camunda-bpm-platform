@@ -48,6 +48,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents which contain an activity with the given id. **/
   HistoricIncidentQuery activityId(String activityId);
 
+  /** Only select historic incidents which were created due to a failure at an activity with the given id. **/
+  HistoricIncidentQuery failedActivityId(String activityId);
+
   /** Only select historic incidents which contain the id of the cause incident. **/
   HistoricIncidentQuery causeIncidentId(String causeIncidentId);
 

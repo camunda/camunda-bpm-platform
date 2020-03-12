@@ -150,4 +150,9 @@ public interface HistoricIncident {
 
   /** The time the historic incident will be removed. */
   Date getRemovalTime();
+
+  /**
+   * Returns the id of the activity on which the last exception occurred.
+   */
+  String getFailedActivityId();
 }

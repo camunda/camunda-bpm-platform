@@ -64,6 +64,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   protected String tenantId;
   protected String jobDefinitionId;
   protected String historyConfiguration;
+  protected String failedActivityId;
 
   public List<IncidentEntity> createRecursiveIncidents() {
     List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
@@ -91,6 +92,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
         IncidentEntity newIncident = create(incidentType);
         newIncident.setExecution(superExecution);
         newIncident.setActivityId(superExecution.getCurrentActivityId());
+        newIncident.setFailedActivityId(superExecution.getCurrentActivityId());
         newIncident.setProcessDefinitionId(superExecution.getProcessDefinitionId());
         newIncident.setTenantId(superExecution.getTenantId());
 
@@ -121,6 +123,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     newIncident.setTenantId(context.getTenantId());
     newIncident.setJobDefinitionId(context.getJobDefinitionId());
     newIncident.setHistoryConfiguration(context.getHistoryConfiguration());
+    newIncident.setFailedActivityId(context.getFailedActivityId());
 
     if (context.getExecutionId() != null) {
       // fetch execution
@@ -475,6 +478,14 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.historyConfiguration = historyConfiguration;
   }
 
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -491,6 +502,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
            + ", tenantId=" + tenantId
            + ", incidentMessage=" + incidentMessage
            + ", jobDefinitionId=" + jobDefinitionId
+           + ", failedActivityId=" + failedActivityId
            + "]";
   }
 

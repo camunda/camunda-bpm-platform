@@ -17,16 +17,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
@@ -108,6 +107,7 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
     timer.setDuedate(executionDate);
     timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
     timer.setJobHandlerConfigurationRaw(jobHandlerConfiguration.toCanonicalString());
+    timer.setDeploymentId(getDeploymentId(commandContext));
 
     commandContext.getJobManager().schedule(timer);
   }
@@ -124,6 +124,16 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
     return null;
   }
 
+  /**
+   * @return the id of the associated deployment, only necessary if the command
+   *         can potentially be executed in a scheduled way (i.e. if an
+   *         {@link #executionDate} can be set) so the job executor responsible
+   *         for that deployment can execute the resulting job
+   */
+  protected String getDeploymentId(CommandContext commandContext) {
+    return null;
+  }
+
   protected abstract void checkAuthorization(CommandContext commandContext);
 
   protected abstract void checkParameters(CommandContext commandContext);
@@ -135,5 +145,43 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
   protected abstract String getLogEntryOperation();
 
   protected abstract SuspensionState getNewSuspensionState();
+
+  protected String getDeploymentIdByProcessDefinition(CommandContext commandContext, String processDefinitionId) {
+    ProcessDefinitionEntity definition = commandContext.getProcessDefinitionManager().getCachedResourceDefinitionEntity(processDefinitionId);
+    if (definition == null) {
+      definition = commandContext.getProcessDefinitionManager().findLatestDefinitionById(processDefinitionId);
+    }
+    if (definition != null) {
+      return definition.getDeploymentId();
+    }
+    return null;
+  }
+
+  protected String getDeploymentIdByProcessDefinitionKey(CommandContext commandContext, String processDefinitionKey,
+      boolean tenantIdSet, String tenantId) {
+    ProcessDefinitionEntity definition = null;
+    if (tenantIdSet) {
+      definition = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+    } else {
+      // randomly use a latest process definition's deployment id from one of the tenants
+      List<ProcessDefinitionEntity> definitions = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionsByKey(processDefinitionKey);
+      definition = definitions.isEmpty() ? null : definitions.get(0);
+    }
+    if (definition != null) {
+      return definition.getDeploymentId();
+    }
+    return null;
+  }
+
+  protected String getDeploymentIdByJobDefinition(CommandContext commandContext, String jobDefinitionId) {
+    JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+    JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
+    if (jobDefinition != null) {
+      if (jobDefinition.getProcessDefinitionId() != null) {
+        return getDeploymentIdByProcessDefinition(commandContext, jobDefinition.getProcessDefinitionId());
+      }
+    }
+    return null;
+  }
 
 }

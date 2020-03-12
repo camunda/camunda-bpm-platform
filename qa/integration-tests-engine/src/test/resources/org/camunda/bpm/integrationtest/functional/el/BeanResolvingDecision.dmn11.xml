@@ -8,7 +8,7 @@
     <decisionTable id="decisionTable">
 
       <input id="clause1" label="CustomerStatus">
-        <inputExpression id="inputExpression1">
+        <inputExpression id="inputExpression1" expressionLanguage="juel">
           <text>greeter.greet()</text>
         </inputExpression>
       </input>

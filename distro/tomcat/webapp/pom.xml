@@ -23,6 +23,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
+      <version>${version.resteasy3}</version>
     </dependency>
   </dependencies>
 
@@ -32,7 +33,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>       
+        <artifactId>maven-war-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

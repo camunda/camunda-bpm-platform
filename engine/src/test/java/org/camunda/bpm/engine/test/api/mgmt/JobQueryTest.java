@@ -576,6 +576,30 @@ public class JobQueryTest {
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testQueryByFailedActivityId(){
+    JobQuery query = managementService.createJobQuery().failedActivityId("theScriptTask");
+    verifyQueryResults(query, 0);
+
+    ProcessInstance processInstance = startProcessInstanceWithFailingJob();
+
+    query = managementService.createJobQuery().failedActivityId("theScriptTask");
+    verifyFailedJob(query, processInstance);
+  }
+
+  @Test
+  public void testQueryByInvalidFailedActivityId(){
+    JobQuery query = managementService.createJobQuery().failedActivityId("invalid");
+    verifyQueryResults(query, 0);
+
+    try {
+      managementService.createJobQuery().failedActivityId(null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+
+  @Test
   public void testJobQueryWithExceptions() throws Throwable {
 
     createJobWithoutExceptionMsg();

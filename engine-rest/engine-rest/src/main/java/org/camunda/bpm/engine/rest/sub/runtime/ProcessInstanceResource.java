@@ -27,10 +27,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
@@ -57,7 +57,7 @@ public interface ProcessInstanceResource {
   @PUT
   @Path("/suspended")
   @Consumes(MediaType.APPLICATION_JSON)
-  void updateSuspensionState(ProcessInstanceSuspensionStateDto dto);
+  void updateSuspensionState(SuspensionStateDto dto);
 
   @POST
   @Path("/modification")

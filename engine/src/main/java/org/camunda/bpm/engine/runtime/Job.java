@@ -77,6 +77,9 @@ public interface Job {
    */
   String getExceptionMessage();
 
+  /** Returns the id of the activity on which the last exception occurred. */
+  String getFailedActivityId();
+
   /**
    * Returns the id of the deployment in which context the job was created.
    */

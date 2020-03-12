@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.RuntimeSqlException;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -57,6 +58,7 @@ import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -106,6 +108,29 @@ public class HistoryByteArrayTest {
       // delete task
       taskService.deleteTask(taskId, true);
     }
+  }
+
+  @Before
+  public void enableDmnFeelLegacyBehavior() {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+  }
+
+  @After
+  public void disableDmnFeelLegacyBehavior() {
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
   }
 
   @Test

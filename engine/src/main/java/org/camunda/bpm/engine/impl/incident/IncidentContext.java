@@ -30,6 +30,7 @@ public class IncidentContext {
   protected String tenantId;
   protected String jobDefinitionId;
   protected String historyConfiguration;
+  protected String failedActivityId;
 
   public IncidentContext() {}
 
@@ -96,6 +97,14 @@ public class IncidentContext {
 
   public void setHistoryConfiguration(String historicConfiguration) {
     this.historyConfiguration = historicConfiguration;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
   }
 
 }

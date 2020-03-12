@@ -3210,6 +3210,70 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo("version X.Y");
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithLockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .execute();
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(true, false, false);
+
+    //then
+    assertThat(result).containsExactly("topic1");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithUnlockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .execute();
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(false,true,false);
+
+    //then
+    assertThat(result).containsExactlyInAnyOrder("topic2", "topic3");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithRetries(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    ExternalTask topic1Task = externalTaskService.createExternalTaskQuery().topicName("topic1").singleResult();
+    ExternalTask topic2Task = externalTaskService.createExternalTaskQuery().topicName("topic2").singleResult();
+    ExternalTask topic3Task = externalTaskService.createExternalTaskQuery().topicName("topic3").singleResult();
+    
+    externalTaskService.setRetries(topic1Task.getId(), 3);
+    externalTaskService.setRetries(topic2Task.getId(), 0);
+    externalTaskService.setRetries(topic3Task.getId(), 0);
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(false,false,true);
+
+    //then
+    assertThat(result).containsExactly("topic1");
+  }
+
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesisDistinct(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    // when
+    List<String> result = externalTaskService.getTopicNames();
+    
+    //then
+    assertThat(result).containsExactlyInAnyOrder("topic1", "topic2", "topic3");
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }

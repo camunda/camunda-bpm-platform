@@ -72,6 +72,8 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(incident.getConfiguration(), historicIncident.getConfiguration());
     assertEquals(incident.getJobDefinitionId(), historicIncident.getJobDefinitionId());
     assertEquals(jobLog.getId(), historicIncident.getHistoryConfiguration());
+    assertNotNull(historicIncident.getFailedActivityId());
+    assertEquals(incident.getFailedActivityId(), historicIncident.getFailedActivityId());
 
     assertTrue(historicIncident.isOpen());
     assertFalse(historicIncident.isDeleted());

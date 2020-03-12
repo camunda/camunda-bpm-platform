@@ -24,6 +24,7 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementsDefinitionTransformHandler;
@@ -48,6 +49,7 @@ public class DmnEngineConfigurationBuilder {
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected ExpressionManager expressionManager;
+  protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
 
   /**
    * Creates a new builder to modify the given DMN engine configuration.
@@ -72,6 +74,12 @@ public class DmnEngineConfigurationBuilder {
 
   public DmnEngineConfigurationBuilder expressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+
+    return this;
+  }
+
+  public DmnEngineConfigurationBuilder feelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    this.feelCustomFunctionProviders = feelCustomFunctionProviders;
 
     return this;
   }
@@ -104,6 +112,10 @@ public class DmnEngineConfigurationBuilder {
       dmnEngineConfiguration.setElProvider(elProvider);
     }
 
+    if (dmnEngineConfiguration.getFeelCustomFunctionProviders() == null) {
+      dmnEngineConfiguration.setFeelCustomFunctionProviders(feelCustomFunctionProviders);
+    }
+
     return dmnEngineConfiguration;
   }
 
@@ -119,6 +131,12 @@ public class DmnEngineConfigurationBuilder {
     customPostDecisionEvaluationListeners.add(historyDecisionEvaluationListener);
 
     return customPostDecisionEvaluationListeners;
+  }
+
+  public DmnEngineConfigurationBuilder enableFeelLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
+    dmnEngineConfiguration
+        .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
+    return this;
   }
 
 }

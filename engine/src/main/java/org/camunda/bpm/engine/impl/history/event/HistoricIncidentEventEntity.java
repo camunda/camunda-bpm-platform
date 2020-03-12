@@ -40,6 +40,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected String tenantId;
   protected String jobDefinitionId;
   protected String historyConfiguration;
+  protected String failedActivityId;
 
   public Date getCreateTime() {
     return createTime;
@@ -151,6 +152,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
   }
 
 }
