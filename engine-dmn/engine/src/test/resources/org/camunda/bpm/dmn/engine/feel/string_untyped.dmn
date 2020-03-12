@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable">
+      <input id="number">
+        <inputExpression id="inputExpression2" expressionLanguage="juel">
+          <text>stringInput</text>
+        </inputExpression>
+      </input>
+      <output id="output" name="output" />
+      <rule id="gte-rule">
+        <inputEntry id="gte-input" expressionLanguage="feel">
+          <text>"foo"</text>
+        </inputEntry>
+        <outputEntry id="gte-output" expressionLanguage="juel">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="lt-rule">
+        <inputEntry id="lt-input" expressionLanguage="feel">
+          <text>"bar"</text>
+        </inputEntry>
+        <outputEntry id="lt-output" expressionLanguage="juel">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

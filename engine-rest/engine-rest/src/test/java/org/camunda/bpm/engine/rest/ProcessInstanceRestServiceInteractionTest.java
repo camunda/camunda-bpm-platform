@@ -2073,28 +2073,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
-  public void testSuspendWithMultipleByParameters() {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("suspended", true);
-    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
-    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
-
-    String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
-      .contentType(ContentType.JSON)
-      .body(params)
-    .then()
-      .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is(message))
-      .when()
-        .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
-  }
-
-  @Test
   public void testSuspendThrowsAuthorizationException() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
     dto.setSuspended(true);
@@ -2472,7 +2450,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     params.put("suspended", false);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
-    String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
@@ -2492,7 +2470,28 @@ public class ProcessInstanceRestServiceInteractionTest extends
     params.put("suspended", true);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
-    String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendWithMultipleByParameters() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String message = "Only one of processDefinitionId or processDefinitionKey should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
@@ -2511,7 +2510,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
 
-    String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
  * This is a functional interface to pass a callback that
  * adjusts the {@link ProcessEngineConfigurationImpl} and configure the Process Engine,
  */
+@FunctionalInterface
 public interface ProcessEngineConfigurator {
 
   /**

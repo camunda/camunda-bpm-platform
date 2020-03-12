@@ -56,6 +56,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -564,6 +565,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // dmn
   protected DefaultDmnEngineConfiguration dmnEngineConfiguration;
   protected DmnEngine dmnEngine;
+
+  /**
+   * a list of DMN FEEL custom function providers
+   */
+  protected List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders;
+
+  /**
+   * Enable DMN FEEL legacy behavior
+   */
+  protected boolean dmnFeelEnableLegacyBehavior = false;
 
   protected HistoryLevel historyLevel;
 
@@ -2276,6 +2287,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
           .expressionManager(expressionManager)
+          .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
           .build();
 
       dmnEngine = dmnEngineConfiguration.buildEngine();
@@ -4558,6 +4571,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setLoggingContextTenantId(String loggingContextTenantId) {
     this.loggingContextTenantId = loggingContextTenantId;
+    return this;
+  }
+
+  public List<FeelCustomFunctionProvider> getDmnFeelCustomFunctionProviders() {
+    return dmnFeelCustomFunctionProviders;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders) {
+    this.dmnFeelCustomFunctionProviders = dmnFeelCustomFunctionProviders;
+    return this;
+  }
+
+  public boolean isDmnFeelEnableLegacyBehavior() {
+    return dmnFeelEnableLegacyBehavior;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnFeelEnableLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
+    this.dmnFeelEnableLegacyBehavior = dmnFeelEnableLegacyBehavior;
     return this;
   }
 

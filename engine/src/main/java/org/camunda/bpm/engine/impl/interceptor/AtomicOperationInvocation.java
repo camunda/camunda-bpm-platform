@@ -54,7 +54,7 @@ public class AtomicOperationInvocation {
     this.performAsync = performAsync;
   }
 
-  public void execute(BpmnStackTrace stackTrace, ProcessDataLoggingContext loggingContext) {
+  public void execute(BpmnStackTrace stackTrace, ProcessDataContext processDataContext) {
 
     if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
@@ -90,7 +90,7 @@ public class AtomicOperationInvocation {
     stackTrace.add(this);
 
 
-    boolean popSection = loggingContext.pushSection(execution);
+    boolean popProcessDataContextSection = processDataContext.pushSection(execution);
 
     try {
       Context.setExecutionContext(execution);
@@ -101,8 +101,8 @@ public class AtomicOperationInvocation {
       else {
         execution.scheduleAtomicOperationAsync(this);
       }
-      if (popSection) {
-        loggingContext.popSection();
+      if (popProcessDataContextSection) {
+        processDataContext.popSection();
       }
     } finally {
       Context.removeExecutionContext();

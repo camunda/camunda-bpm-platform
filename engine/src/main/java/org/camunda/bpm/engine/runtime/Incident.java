@@ -45,22 +45,22 @@ public interface Incident {
   /**
    * Handler type for incidents created on job execution failure
    */
-  public static final String FAILED_JOB_HANDLER_TYPE = "failedJob";
+  static final String FAILED_JOB_HANDLER_TYPE = "failedJob";
 
   /**
    * Handler type for incidents created on external task failure
    */
-  public static final String EXTERNAL_TASK_HANDLER_TYPE = "failedExternalTask";
+  static final String EXTERNAL_TASK_HANDLER_TYPE = "failedExternalTask";
 
   /**
    * Returns the unique identifier for this incident.
    */
-  public String getId();
+  String getId();
 
   /**
    * Time when the incident happened.
    */
-  public Date getIncidentTimestamp();
+  Date getIncidentTimestamp();
 
   /**
    * Returns the type of this incident to identify the
@@ -75,53 +75,58 @@ public interface Incident {
    * @see Incident#FAILED_JOB_HANDLER_TYPE
    * @see Incident#EXTERNAL_TASK_HANDLER_TYPE
    */
-  public String getIncidentType();
+  String getIncidentType();
 
   /**
    * Returns the incident message.
    */
-  public String getIncidentMessage();
+  String getIncidentMessage();
 
   /**
    * Returns the specific execution on which this
    * incident has happened.
    */
-  public String getExecutionId();
+  String getExecutionId();
 
   /**
    * Returns the id of the activity of the process instance
    * on which this incident has happened.
    */
-  public String getActivityId();
+  String getActivityId();
+
+  /**
+   * Returns the id of the activity on which the last exception occurred.
+   */
+  String getFailedActivityId();
 
   /**
    * Returns the specific process instance on which this
    * incident has happened.
    */
-  public String getProcessInstanceId();
+  String getProcessInstanceId();
 
   /**
    * Returns the id of the process definition of this
    * process instance on which the incident has happened.
    */
-  public String getProcessDefinitionId();
+  String getProcessDefinitionId();
 
   /**
    * Returns the id of the incident on which this incident
    * has been triggered.
    */
-  public String getCauseIncidentId();
+  String getCauseIncidentId();
 
   /**
    * Returns the id of the root incident on which
    * this transitive incident has been triggered.
    */
-  public String getRootCauseIncidentId();
+  String getRootCauseIncidentId();
 
   /**
    * Returns the payload of this incident.
    */
-  public String getConfiguration();
+  String getConfiguration();
 
   /**
    * Returns the id of the tenant this incident belongs to. Can be <code>null</code>

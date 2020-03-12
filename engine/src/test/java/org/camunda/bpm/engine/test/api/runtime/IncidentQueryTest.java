@@ -341,6 +341,29 @@ public class IncidentQueryTest {
   }
 
   @Test
+  public void testQueryByFailedActivityId() {
+    IncidentQuery query = runtimeService.createIncidentQuery().failedActivityId("task");
+    assertEquals(4, query.count());
+
+    List<Incident> incidents = query.list();
+    assertFalse(incidents.isEmpty());
+    assertEquals(4, incidents.size());
+  }
+
+  @Test
+  public void testQueryByInvalidFailedActivityId() {
+    IncidentQuery query = runtimeService.createIncidentQuery().failedActivityId("invalid");
+
+    assertEquals(0, query.count());
+
+    List<Incident> incidents = query.list();
+    assertTrue(incidents.isEmpty());
+
+    Incident incident = query.singleResult();
+    assertNull(incident);
+  }
+
+  @Test
   public void testQueryByConfiguration() {
     String jobId = managementService.createJobQuery().processInstanceId(processInstanceIds.get(0)).singleResult().getId();
 

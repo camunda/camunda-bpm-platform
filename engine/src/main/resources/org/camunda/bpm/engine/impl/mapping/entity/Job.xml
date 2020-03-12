@@ -120,6 +120,7 @@
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
     <result property="exceptionByteArrayId" column="EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
+    <result property="failedActivityId" column="FAILED_ACT_ID_" jdbcType="VARCHAR" />
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
@@ -359,6 +360,9 @@
       <if test="exceptionMessage">
       	and RES.EXCEPTION_MSG_ = #{exceptionMessage}
       </if>
+      <if test="failedActivityId != null">
+        and RES.FAILED_ACT_ID_ = #{failedActivityId}
+      </if>
       <if test="noRetriesLeft">
         and RES.RETRIES_ = 0
       </if>
@@ -423,6 +427,7 @@
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            FAILED_ACT_ID_,
             DUEDATE_,
             REPEAT_,
             REPEAT_OFFSET_,
@@ -449,6 +454,7 @@
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
+            #{failedActivityId, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
             #{repeatOffset, jdbcType=BIGINT},
@@ -477,6 +483,7 @@
        RETRIES_ = #{retries, jdbcType=INTEGER},
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+       FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
        REPEAT_ = #{repeat, jdbcType=VARCHAR},
        REPEAT_OFFSET_ = #{repeatOffset, jdbcType=BIGINT},
@@ -530,6 +537,7 @@
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            FAILED_ACT_ID_,
             DUEDATE_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
@@ -554,6 +562,7 @@
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
+            #{failedActivityId, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
@@ -579,6 +588,7 @@
        RETRIES_ = #{retries, jdbcType=INTEGER},
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+       FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
@@ -607,6 +617,7 @@
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
+        FAILED_ACT_ID_,
         DUEDATE_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
@@ -631,6 +642,7 @@
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayId, jdbcType=VARCHAR},
         #{exceptionMessage, jdbcType=VARCHAR},
+        #{failedActivityId, jdbcType=VARCHAR},
         #{duedate, jdbcType=TIMESTAMP},
         #{jobHandlerType, jdbcType=VARCHAR},
         #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
@@ -656,6 +668,7 @@
             RETRIES_ = #{retries, jdbcType=INTEGER},
             EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
             EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+            FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
             DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
             SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
             PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},

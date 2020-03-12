@@ -674,7 +674,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     verifyNoMoreInteractions(externalTaskService);
   }
 
-
   @Test
   public void testGetErrorDetails() {
     given()

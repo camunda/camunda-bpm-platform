@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="Definitions_1nnnwug" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.2.1">
+  <decision id="Decision_0t6a2jk" name="Decision 1">
+    <decisionTable id="decisionTable_1">
+      <input id="input_1">
+        <inputExpression id="inputExpression_1">
+          <text>date1</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" typeRef="string" />
+      <rule id="DecisionRule_1v9pdf9">
+        <inputEntry id="UnaryTests_1lfbp0q">
+          <text>&lt;= date and time("2019-09-12T13:00:00@Europe/Berlin")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ped8lt">
+          <text>"foo"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_11gkzh0">
+        <inputEntry id="UnaryTests_13a105y">
+          <text>&gt; date and time("2019-09-12T13:00:00@Europe/Berlin")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1fzjy3d">
+          <text>"bar"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -399,17 +399,22 @@ public interface ExternalTaskService {
   public ExternalTaskQuery createExternalTaskQuery();
 
   /**
-   * Returns a list of distinct topic names with ExternalTasks.
+   * Returns a list of distinct topic names of all currently existing external tasks.
    * Returns an empty list if no topics are found.
    */
   List<String> getTopicNames();
 
   /**
-   * Returns a list of distinct topics based on parameters given.
-   * Returns an empty list if no topics are found.
-   * Returns an empty list if both withLockedTasks and withUnlockedTasks are true
-   * @param withLockedTasks return only topic names containing unlocked tasks
-   * @param withUnlockedTasks return only topic names containing locked tasks
+   * Returns a list of distinct topic names of all currently existing external tasks
+   * restricted by the parameters.
+   * Returns an empty list if no matching tasks are found.
+   * Parameters are conjunctive, i.e. only tasks are returned that match all parameters
+   * with value <code>true</code>. Parameters with value <code>false</code> are effectively ignored.
+   * For example, this means that an empty list is returned if both <code>withLockedTasks</code>
+   * and <code>withUnlockedTasks</code> are true.
+   *
+   * @param withLockedTasks return only topic names of unlocked tasks
+   * @param withUnlockedTasks return only topic names of locked tasks
    * @param withRetriesLeft return only topic names of tasks with retries remaining
    */
 

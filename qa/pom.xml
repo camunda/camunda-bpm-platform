@@ -62,7 +62,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>jboss7-runtime</module>
         <module>wildfly-runtime</module>
         <module>tomcat-runtime</module>
         <module>vanilla-runtimes/tomcat</module>
@@ -75,6 +74,7 @@
         <module>test-db-rolling-update</module>
         <module>test-old-engine</module>
         <module>performance-tests-engine</module>
+        <module>large-data-tests</module>
       </modules>
     </profile>
 

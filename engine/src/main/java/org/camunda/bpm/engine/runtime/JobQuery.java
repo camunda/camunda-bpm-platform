@@ -121,6 +121,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs that failed due to an exception with the given message. */
   JobQuery exceptionMessage(String exceptionMessage);
 
+  /** Only select jobs that failed due to an exception at an activity with the given id. **/
+  JobQuery failedActivityId(String activityId);
+
   /** Only select jobs which have no retries left */
   JobQuery noRetriesLeft();
 

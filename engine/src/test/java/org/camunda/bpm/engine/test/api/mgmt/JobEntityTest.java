@@ -16,29 +16,33 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 /**
  * @author Tassilo Weidner
@@ -146,6 +150,62 @@ public class JobEntityTest {
 
     // cleanup
     jobIds.add(everLivingJob.getId());
+  }
+
+  @Test
+  public void shouldShowFailedActivityIdPropertyForFailingAsyncTask() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("theTask")
+        .camundaAsyncBefore()
+        .camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+
+    // when
+    try {
+      managementService.executeJob(job.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // exception expected
+    }
+
+    // then
+    job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
+    assertThat(job.getFailedActivityId(), is("theTask"));
+  }
+
+  @Test
+  public void shouldShowFailedActivityIdPropertyForAsyncTaskWithFailingFollowUp() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("theTask")
+        .camundaAsyncBefore()
+        .camundaClass(ChangeVariablesDelegate.class)
+      .serviceTask("theTask2").camundaClass(ChangeVariablesDelegate.class)
+      .serviceTask("theTask3").camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+
+    // when
+    try {
+      managementService.executeJob(job.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // exception expected
+    }
+
+    // then
+    job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
+    assertThat(job.getFailedActivityId(), is("theTask3"));
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////

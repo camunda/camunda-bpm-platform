@@ -17,9 +17,9 @@
     <!-- camunda.version.current>${project.version}</camunda.version.current-->
     <camunda.version.previous>7.3.0</camunda.version.previous>
   </properties>
-    
+
   <dependencyManagement>
-    <dependencies>     
+    <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
@@ -27,58 +27,14 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-bpmn-model</artifactId>
-        <version>7.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-cmmn-model</artifactId>
-        <version>7.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-dmn-model</artifactId>
-        <version>7.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-xml-model</artifactId>
-        <version>7.4.0</version>
-      </dependency>
-     </dependencies>
+    </dependencies>
    </dependencyManagement>
 
   <dependencies>
-    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
-      you declare them to be ${camunda.version.current} here -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.4.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-engine-dmn</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-engine-feel-api</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-engine-feel-juel</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-typed-values</artifactId>
-      <version>1.2.0</version>
-    </dependency>
-
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>

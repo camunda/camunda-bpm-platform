@@ -3,9 +3,9 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-bom</artifactId>
+    <artifactId>camunda-root</artifactId>
     <version>7.13.0-SNAPSHOT</version>
-    <relativePath>../bom</relativePath>
+    <relativePath>../</relativePath>
   </parent>
 
   <artifactId>camunda-parent</artifactId>
@@ -22,7 +22,7 @@
     <version.spring.framework>3.2.18.RELEASE</version.spring.framework>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
-    <version.resteasy3>3.0.26.Final</version.resteasy3>
+    <version.resteasy3>3.10.0.Final</version.resteasy3>
     <version.jersey2>2.25.1</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
@@ -49,6 +49,7 @@
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
     <version.selenium>2.45.0</version.selenium>
+    <version.freemarker>2.3.29</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
@@ -93,6 +94,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
@@ -447,7 +455,7 @@
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
-        <version>2.3.20</version>
+        <version>${version.freemarker}</version>
       </dependency>
 
     </dependencies>
@@ -468,6 +476,7 @@
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
             <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
         <plugin>
@@ -620,7 +629,7 @@
     <repository>
       <id>com.springsource.repository.bundles.external</id>
       <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>http://repository.springsource.com/maven/bundles/external</url>
+      <url>https://repository.springsource.com/maven/bundles/external</url>
     </repository>
   </repositories>
 
@@ -637,7 +646,6 @@
   </organization>
 
   <url>http://www.camunda.org</url>
-
 </project>
 
 

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.camunda.bpm.engine.HistoryService;
@@ -40,14 +41,18 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHan
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -56,8 +61,11 @@ import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -151,7 +159,7 @@ public class HistoricJobLogTest {
   public void testFailedHistoricJobLogProperties() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
+    JobEntity job = (JobEntity) managementService
         .createJobQuery()
         .singleResult();
 
@@ -161,6 +169,8 @@ public class HistoricJobLogTest {
     } catch (Exception e) {
       // expected
     }
+
+    job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
 
     HistoricJobLog historicJob = historyService
         .createHistoricJobLogQuery()
@@ -185,6 +195,7 @@ public class HistoricJobLogTest {
     assertThat(historicJob.getJobExceptionMessage()).isEqualTo(FailingDelegate.EXCEPTION_MESSAGE);
     assertThat(historicJob.getJobPriority()).isEqualTo(job.getPriority());
     assertThat(historicJob.getHostname()).containsIgnoringCase(CUSTOM_HOSTNAME);
+    assertThat(historicJob.getFailedActivityId()).isNotNull().isEqualTo(job.getFailedActivityId());
 
     assertThat(historicJob.isCreationLog()).isFalse();
     assertThat(historicJob.isFailureLog()).isTrue();
@@ -1330,6 +1341,51 @@ public class HistoricJobLogTest {
     assertThat(failedHistoricJobLog).isNotNull();
     assertThat(failedHistoricJobLog.getJobExceptionMessage())
         .isEqualToIgnoringCase(exceptionMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH));
+  }
+
+  @Test
+  @Ignore
+  public void testAsyncAfterJobDefinitionAfterEngineRestart() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .manualTask()
+      .camundaAsyncBefore()
+      .camundaAsyncAfter()
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    JobDefinition asyncBeforeJobDef = managementService.createJobDefinitionQuery()
+        .jobConfiguration("async-before").singleResult();
+    JobDefinition asyncAfterJobDef = managementService.createJobDefinitionQuery()
+        .jobConfiguration("async-after").singleResult();
+
+    // clearing the deployment cache as if the engine had restarted
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    deploymentCache.removeProcessDefinition(processInstance.getProcessDefinitionId());
+
+    // when
+    Job asyncBeforeJob = managementService.createJobQuery().singleResult();
+    managementService.executeJob(asyncBeforeJob.getId());
+
+    Job asyncAfterJob = managementService.createJobQuery().singleResult();
+    managementService.executeJob(asyncAfterJob.getId());
+
+    // then
+    assertThat(asyncBeforeJob.getJobDefinitionId()).isEqualTo(asyncBeforeJobDef.getId());
+    assertThat(asyncAfterJob.getJobDefinitionId()).isEqualTo(asyncAfterJobDef.getId());
+
+    HistoricJobLog asyncBeforeLog = historyService.createHistoricJobLogQuery()
+        .creationLog().jobId(asyncBeforeJob.getId()).singleResult();
+    assertThat(asyncBeforeLog.getJobDefinitionId()).isEqualTo(asyncBeforeJobDef.getId());
+
+    HistoricJobLog asyncAfterLog = historyService.createHistoricJobLogQuery()
+        .creationLog().jobId(asyncAfterJob.getId()).singleResult();
+    assertThat(asyncAfterLog.getJobDefinitionId()).isEqualTo(asyncAfterJobDef.getId());
   }
 
   /**

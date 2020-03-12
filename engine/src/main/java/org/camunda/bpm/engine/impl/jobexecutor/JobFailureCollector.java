@@ -25,6 +25,7 @@ public class JobFailureCollector implements CommandContextListener {
   protected Throwable failure;
   protected JobEntity job;
   protected String jobId;
+  protected String failedActivityId;
 
   public JobFailureCollector(String jobId) {
     this.jobId = jobId;
@@ -61,6 +62,14 @@ public class JobFailureCollector implements CommandContextListener {
 
   public String getJobId() {
     return jobId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String activityId) {
+    this.failedActivityId = activityId;
   }
 
 }

@@ -70,6 +70,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     configuration.setScriptEngineResolver(createScriptEngineResolver());
     configuration.setElProvider(createElProvider());
+    configuration.enableFeelLegacyBehavior(true);
 
     return configuration;
   }

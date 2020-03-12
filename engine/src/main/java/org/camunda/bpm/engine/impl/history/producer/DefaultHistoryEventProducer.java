@@ -366,6 +366,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
     evt.setHistoryConfiguration(incident.getHistoryConfiguration());
+    evt.setFailedActivityId(incident.getFailedActivityId());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
@@ -582,6 +583,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
+
+    if (executionEntity.isSuspended()) {
+      evt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+    } else {
+      evt.setState(HistoricProcessInstance.STATE_ACTIVE);
+    }
 
     return evt;
   }
@@ -1100,6 +1107,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     evt.setActivityId(jobEntity.getActivityId());
+    evt.setFailedActivityId(jobEntity.getFailedActivityId());
     evt.setExecutionId(jobEntity.getExecutionId());
     evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());
