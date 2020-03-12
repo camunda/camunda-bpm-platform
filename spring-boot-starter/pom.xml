@@ -191,4 +191,28 @@
     </plugins>
   </build>
 
+  <!-- All of the following can be removed with https://jira.camunda.com/browse/CAM-11422 if the starter
+       inherits from the camunda-parent -->
+  <repositories>
+    <repository>
+      <id>JBoss public</id>
+      <name>jboss</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>camunda services GmbH</name>
+    <url>http://www.camunda.com</url>
+  </organization>
+
+  <url>http://www.camunda.org</url>
+
 </project>
