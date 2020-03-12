@@ -90,12 +90,7 @@ public interface ExternalTaskRestService {
   @GET
   @Path("/topic-names")
   @Produces(MediaType.APPLICATION_JSON)
-  List<String> getTopicNames(@Context UriInfo uriInfo);
+  List<String> getTopicNames(@QueryParam("withLockedTasks") boolean withLockedTasks, @QueryParam("withUnlockedTasks") boolean withUnlockedTasks, @QueryParam("withRetriesLeft") boolean withRetriesLeft);
 
-  @POST
-  @Path("/topic-names")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  List<String> getTopicNames(GetTopicNamesForExternalTasksDto getTopicNamesForExternalTasksDto);
 
 }

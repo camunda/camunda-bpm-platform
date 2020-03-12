@@ -147,15 +147,8 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
   }
 
-  @Override
-  public List<String> getTopicNames(UriInfo uriInfo) {
-     GetTopicNamesForExternalTasksDto topicNamesDto = new GetTopicNamesForExternalTasksDto(objectMapper,uriInfo.getQueryParameters());
-     return topicNamesDto.execute(processEngine);
-  }
-
-  @Override
-  public List<String> getTopicNames(GetTopicNamesForExternalTasksDto topicNamesDto) {
-    return topicNamesDto.execute(processEngine);
+  @Override public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks, boolean withRetriesLeft) {
+    return processEngine.getExternalTaskService().getTopicNames(withLockedTasks,withUnlockedTasks,withRetriesLeft);
   }
 
   @Override
