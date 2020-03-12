@@ -5,7 +5,7 @@
     <@lib.property
         name = "tenant-id"
         type = "string"
-        desc = "The id of the activity instance." />
+        desc = "The tenant id for the deployment to be created." />
 
     <@lib.property
         name = "deployment-source"
