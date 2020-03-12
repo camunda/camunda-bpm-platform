@@ -46,7 +46,8 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
 
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return new TestDecisionTableEvaluationListenerConfiguration();
+    return new TestDecisionTableEvaluationListenerConfiguration()
+      .enableFeelLegacyBehavior(true);
   }
 
   @BeforeClass

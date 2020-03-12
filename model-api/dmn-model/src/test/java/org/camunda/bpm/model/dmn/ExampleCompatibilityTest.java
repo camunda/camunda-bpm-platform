@@ -60,7 +60,9 @@ public class ExampleCompatibilityTest extends DmnModelTest {
          // for compatibility reasons we gotta check the old namespace, too
          {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("ExampleCompatibility.dmn"))},
          // DMN 1.2
-         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.2.dmn"))}
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.2.dmn"))},
+         // DMN 1.3
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example-DMN-1.3.dmn"))}
      });
    }
 

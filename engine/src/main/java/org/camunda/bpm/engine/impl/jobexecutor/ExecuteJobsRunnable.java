@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.interceptor.ProcessDataLoggingContext;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataContext;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 import java.util.List;
@@ -79,7 +79,7 @@ public class ExecuteJobsRunnable implements Runnable {
              * that have not been cleared in Context#removeCommandInvocationContext()
              * in case of exceptions in command execution
              */
-            new ProcessDataLoggingContext(engineConfiguration).clearMdc();
+            new ProcessDataContext(engineConfiguration).clearMdc();
           }
         } else {
             try {

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- 
+    This distro cannot be a child of the camunda-parent due to the Spring dependencies defined there in
+    the dependencyManagement section. The distro needs to work with the Spring dependency versions defined
+    in the spring-boot-dependencies artifact which would be overriden by the versions defined in the camunda-parent.
+  -->
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
+  </parent>
+
+  <groupId>org.camunda.bpm.run</groupId>
+  <artifactId>camunda-bpm-run-root</artifactId>
+  <name>Camunda BPM - Run - Root</name>
+  <description>This is the root of Camunda BPM Run</description>
+  <packaging>pom</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${version.spring-boot}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${version.spring-boot}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.2</version>
+          <configuration>
+            <runOrder>hourly</runOrder>
+            <systemPropertyVariables>
+              <myWorkingDir>${project.build.directory}</myWorkingDir>
+            </systemPropertyVariables>
+            <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <failOnError>false</failOnError>
+            <additionalparam>-Xdoclint:none</additionalparam>
+            <quiet>true</quiet>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules</module>
+        <module>modules/rest</module>
+        <module>core</module>
+        <module>assembly</module>
+        <module>qa</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/webapps</module>
+        <module>distro</module>
+        <module>qa</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>integration-test-camunda-run</id>
+      <modules>
+        <module>qa</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>

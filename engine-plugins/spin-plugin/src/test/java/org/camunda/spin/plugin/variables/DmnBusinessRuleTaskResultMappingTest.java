@@ -17,16 +17,11 @@
 package org.camunda.spin.plugin.variables;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * The test is copied from the engine to check how JSON serialization will behave with DMN result object.

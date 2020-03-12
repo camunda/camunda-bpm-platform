@@ -62,6 +62,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected Long priorityLowerThanOrEqual;
   protected boolean withException;
   protected String exceptionMessage;
+  protected String failedActivityId;
   protected boolean noRetriesLeft;
   protected SuspensionState suspensionState;
 
@@ -208,6 +209,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQuery exceptionMessage(String exceptionMessage) {
     ensureNotNull("Provided exception message", exceptionMessage);
     this.exceptionMessage = exceptionMessage;
+    return this;
+  }
+
+  public JobQuery failedActivityId(String activityId){
+    ensureNotNull("Provided activity id", activityId);
+    this.failedActivityId = activityId;
     return this;
   }
 

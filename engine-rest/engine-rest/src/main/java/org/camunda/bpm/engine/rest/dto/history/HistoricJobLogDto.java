@@ -41,6 +41,7 @@ public class HistoricJobLogDto {
   protected String jobDefinitionConfiguration;
 
   protected String activityId;
+  protected String failedActivityId;
   protected String executionId;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -101,6 +102,10 @@ public class HistoricJobLogDto {
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
   public String getExecutionId() {
@@ -169,6 +174,7 @@ public class HistoricJobLogDto {
     result.jobDefinitionConfiguration = historicJobLog.getJobDefinitionConfiguration();
 
     result.activityId = historicJobLog.getActivityId();
+    result.failedActivityId = historicJobLog.getFailedActivityId();
     result.executionId = historicJobLog.getExecutionId();
     result.processInstanceId = historicJobLog.getProcessInstanceId();
     result.processDefinitionId = historicJobLog.getProcessDefinitionId();

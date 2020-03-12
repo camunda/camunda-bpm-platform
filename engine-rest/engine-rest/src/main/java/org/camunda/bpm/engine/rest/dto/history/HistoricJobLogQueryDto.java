@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,6 +85,7 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   protected String jobDefinitionType;
   protected String jobDefinitionConfiguration;
   protected String[] activityIds;
+  protected String[] failedActivityIds;
   protected String[] executionIds;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -140,6 +140,11 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   @CamundaQueryParam(value="activityIdIn", converter = StringArrayConverter.class)
   public void setActivityIdIn(String[] activityIds) {
     this.activityIds = activityIds;
+  }
+
+  @CamundaQueryParam(value="failedActivityIdIn", converter = StringArrayConverter.class)
+  public void setFailedActivityIdIn(String[] activityIds) {
+    this.failedActivityIds = activityIds;
   }
 
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
@@ -250,6 +255,10 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
 
     if (activityIds != null && activityIds.length > 0) {
       query.activityIdIn(activityIds);
+    }
+
+    if (failedActivityIds != null && failedActivityIds.length > 0) {
+      query.failedActivityIdIn(failedActivityIds);
     }
 
     if (executionIds != null && executionIds.length > 0) {

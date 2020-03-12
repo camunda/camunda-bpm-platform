@@ -23,6 +23,18 @@
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+
+    <!-- These properties are used in both the BOM as well as camunda-parent and subprojects -->
+    <version.mybatis>3.5.3</version.mybatis>
+    <version.joda-time>2.1</version.joda-time>
+    <version.uuid-generator>3.2.0</version.uuid-generator>
+    <version.camunda.commons>1.9.0</version.camunda.commons>
+    <version.camunda.connect>1.3.0</version.camunda.connect>
+    <version.camunda.spin>1.8.0</version.camunda.spin>
+    <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
+    <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
+    <version.spring-boot>2.2.1.RELEASE</version.spring-boot>
+    <version.feel-scala>1.11.0-alpha1</version.feel-scala>
   </properties>
 
   <build>
@@ -48,6 +60,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>spring-boot-starter</module>
+
         <module>qa</module>
 
         <module>webapps/h2-webapp</module>
@@ -74,6 +88,7 @@
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
+        <module>distro/run</module>
 
         <module>database</module>
         <module>parent</module>
@@ -90,6 +105,7 @@
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
+        <module>distro/run</module>
       </modules>
     </profile>
 
@@ -163,6 +179,16 @@
     </profile>
 
     <profile>
+      <id>distro-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/run</module>
+      </modules>
+    </profile>
+
+    <profile>
       <!-- profile for running process-engine unit tests in QA -->
       <id>check-engine</id>
       <modules>
@@ -189,6 +215,7 @@
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
+        <module>spring-boot-starter</module>
         <module>model-api</module>
 
         <module>engine</module>

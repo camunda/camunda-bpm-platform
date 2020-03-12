@@ -11,24 +11,16 @@
   <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - scenario util</name>
- 
+
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-bpmn-model</artifactId>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
         <version>7.2.0</version>
-    </dependency>    
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-cmmn-model</artifactId>
-      <version>7.2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-xml-model</artifactId>
-      <version>7.2.0</version>
-    </dependency>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -37,7 +29,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.2.0</version>
       <scope>provided</scope>
     </dependency>
 

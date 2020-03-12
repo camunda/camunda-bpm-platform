@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
 
 /**
  * @author Roman Smirnov
@@ -41,6 +40,7 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String incidentMessage;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String[] processDefinitionKeys;
@@ -87,6 +87,12 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery activityId(String activityId) {
     ensureNotNull("activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public HistoricIncidentQuery failedActivityId(String activityId) {
+    ensureNotNull("failedActivityId", activityId);
+    this.failedActivityId = activityId;
     return this;
   }
 
@@ -292,6 +298,10 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
   public String getProcessInstanceId() {

@@ -1,0 +1,27 @@
+camunda.bpm.run.ldap:
+  enabled: true
+  server-url: http://foo.bar
+  manager-dn: managerdn
+  manager-password: managerpw
+  base-dn: basedn
+  user-search-base: searchbase
+  user-search-filter: searchfilter
+  user-id-attribute: userid
+  user-firstname-attribute: userfirst
+  user-lastname-attribute: userlast
+  user-email-attribute: usermail
+  user-password-attribute: userpw
+  group-search-base: searchbase
+  group-search-filter: searchfilter
+  group-id-attribute: id
+  group-name-attribute: name
+  group-type-attribute: type
+  group-member-attribute: member
+  sort-control-supported: true
+  use-ssl: true
+  use-posix-groups: true
+  allow-anonymous-login: true
+  authorization-check-enabled: false
+  accept-untrusted-certificates: true
+  initial-context-factory: contextFactory
+  security-authentication: secAuth

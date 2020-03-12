@@ -481,6 +481,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
     String returnedJobDefinitionConfiguration = from(content).getString("[0].jobDefinitionConfiguration");
     String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedFailedActivityId = from(content).getString("[0].failedActivityId");
     String returnedExecutionId = from(content).getString("[0].executionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
@@ -505,6 +506,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_CONFIG, returnedJobDefinitionConfiguration);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_FAILED_ACTIVITY_ID, returnedFailedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_INST_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID, returnedProcessDefinitionId);
@@ -596,6 +598,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     given()
       .queryParam("activityIdIn", anActId + "," + anotherActId)
       .queryParam("executionIdIn", anExecutionId + "," + anotherExecutionId)
+      .queryParam("failedActivityIdIn", anActId + "," + anotherActId)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -604,6 +607,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
 
     verify(mockedQuery).activityIdIn(anActId, anotherActId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+    verify(mockedQuery).failedActivityIdIn(anActId, anotherActId);
     verify(mockedQuery).list();
   }
 
@@ -618,6 +622,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     Map<String, List<String>> json = new HashMap<String, List<String>>();
     json.put("activityIdIn", Arrays.asList(anActId, anotherActId));
     json.put("executionIdIn", Arrays.asList(anExecutionId, anotherExecutionId));
+    json.put("failedActivityIdIn", Arrays.asList(anActId, anotherActId));
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -630,6 +635,7 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
 
     verify(mockedQuery).activityIdIn(anActId, anotherActId);
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
+    verify(mockedQuery).failedActivityIdIn(anActId, anotherActId);
     verify(mockedQuery).list();
   }
 

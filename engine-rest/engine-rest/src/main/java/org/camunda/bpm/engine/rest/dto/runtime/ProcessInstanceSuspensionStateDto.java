@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuild
  */
 public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
-  protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
@@ -44,14 +43,6 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
   protected String processDefinitionTenantId;
   protected boolean processDefinitionWithoutTenantId;
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -107,17 +98,17 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
   @Override
   public void updateSuspensionState(ProcessEngine engine) {
-    int params = parameterCount(processInstanceId, processDefinitionId, processDefinitionKey);
+    int params = parameterCount(processDefinitionId, processDefinitionKey);
     int syncParams = parameterCount(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery);
 
     if (params >= 1 && syncParams >= 1) {
-      String message = "Choose either a single processInstance with processInstanceId, processDefinitionId or processDefinitionKey or a group of processInstances with processInstanceIds, procesInstanceQuery or historicProcessInstanceQuery.";
+      String message = "Choose either a single processInstance with processDefinitionId or processDefinitionKey or a group of processInstances with processInstanceIds, procesInstanceQuery or historicProcessInstanceQuery.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     } else if (params > 1) {
-      String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+      String message = "Only one of processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     } else if (params == 0 && syncParams == 0) {
-      String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+      String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
@@ -135,29 +126,10 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     }
   }
 
-  public Batch updateSuspensionStateAsync(ProcessEngine engine) {
-
-    int params = parameterCount(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery);
-
-    if (params == 0) {
-      String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    }
-
-    UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateGroupBuilder(engine);
-    if (getSuspended()) {
-      return updateSuspensionStateBuilder.suspendAsync();
-    } else {
-      return updateSuspensionStateBuilder.activateAsync();
-    }
-  }
-
   protected UpdateProcessInstanceSuspensionStateBuilder createUpdateSuspensionStateBuilder(ProcessEngine engine) {
     UpdateProcessInstanceSuspensionStateSelectBuilder selectBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState();
 
-    if (processInstanceId != null) {
-      return selectBuilder.byProcessInstanceId(processInstanceId);
-    } else if (processDefinitionId != null) {
+    if (processDefinitionId != null) {
       return selectBuilder.byProcessDefinitionId(processDefinitionId);
     } else { // processDefinitionKey != null
       UpdateProcessInstanceSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);

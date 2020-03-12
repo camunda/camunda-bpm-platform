@@ -37,6 +37,7 @@ public class HistoricIncidentDto {
   protected Date removalTime;
   protected String incidentType;
   protected String activityId;
+  protected String failedActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -92,6 +93,10 @@ public class HistoricIncidentDto {
     return activityId;
   }
 
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
   public String getCauseIncidentId() {
     return causeIncidentId;
   }
@@ -143,6 +148,7 @@ public class HistoricIncidentDto {
     dto.createTime = historicIncident.getCreateTime();
     dto.endTime = historicIncident.getEndTime();
     dto.incidentType = historicIncident.getIncidentType();
+    dto.failedActivityId = historicIncident.getFailedActivityId();
     dto.activityId = historicIncident.getActivityId();
     dto.causeIncidentId = historicIncident.getCauseIncidentId();
     dto.rootCauseIncidentId = historicIncident.getRootCauseIncidentId();

@@ -39,6 +39,7 @@ public class CustomDataTypeTransformerRegistryTest extends DmnEngineTest {
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
     configuration.getTransformer().setDataTypeTransformerRegistry(new CustomDataTypeTransformerRegistry());
+    configuration.enableFeelLegacyBehavior(true);
     return configuration;
   }
 

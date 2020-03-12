@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
@@ -92,6 +94,13 @@ public abstract class AbstractRemovalTimeTest {
     decisionService = engineRule.getDecisionService();
 
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
   }
 
   @AfterClass
@@ -106,6 +115,13 @@ public abstract class AbstractRemovalTimeTest {
       processEngineConfiguration.setBatchOperationsForHistoryCleanup(null);
 
       processEngineConfiguration.initHistoryCleanup();
+
+      DefaultDmnEngineConfiguration dmnEngineConfiguration =
+          processEngineConfiguration.getDmnEngineConfiguration();
+
+      ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+          .enableFeelLegacyBehavior(false)
+          .init();
     }
 
     ClockUtil.reset();

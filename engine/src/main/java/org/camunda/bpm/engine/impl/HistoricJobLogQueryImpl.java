@@ -47,6 +47,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected String jobDefinitionType;
   protected String jobDefinitionConfiguration;
   protected String[] activityIds;
+  protected String[] failedActivityIds;
   protected String[] executionIds;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -109,6 +110,14 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     ensureNotContainsNull("activityIds", activityIdList);
     ensureNotContainsEmptyString("activityIds", activityIdList);
     this.activityIds = activityIds;
+    return this;
+  }
+
+  public HistoricJobLogQuery failedActivityIdIn(String... activityIds) {
+    List<String> activityIdList = CollectionUtil.asArrayList(activityIds);
+    ensureNotContainsNull("activityIds", activityIdList);
+    ensureNotContainsEmptyString("activityIds", activityIdList);
+    this.failedActivityIds = activityIds;
     return this;
   }
 
@@ -321,6 +330,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public String[] getActivityIds() {
     return activityIds;
+  }
+
+  public String[] getFailedActivityIds() {
+    return failedActivityIds;
   }
 
   public String[] getExecutionIds() {

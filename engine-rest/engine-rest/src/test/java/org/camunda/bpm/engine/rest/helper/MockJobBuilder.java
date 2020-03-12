@@ -38,6 +38,7 @@ public class MockJobBuilder {
 	protected String jobDefinitionId;
 	protected String tenantId;
 	protected Date createTime;
+	protected String failedActivityId;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -104,6 +105,11 @@ public class MockJobBuilder {
 		return this;
 	}
 
+	public MockJobBuilder failedActivityId(String failedActivityId) {
+	  this.failedActivityId = failedActivityId;
+	  return this;
+	}
+
 	public Job build() {
 		Job mockJob = mock(Job.class);
 		when(mockJob.getId()).thenReturn(id);
@@ -119,6 +125,7 @@ public class MockJobBuilder {
 		when(mockJob.getJobDefinitionId()).thenReturn(jobDefinitionId);
 		when(mockJob.getTenantId()).thenReturn(tenantId);
 		when(mockJob.getCreateTime()).thenReturn(createTime);
+		when(mockJob.getFailedActivityId()).thenReturn(failedActivityId);
 		return mockJob;
 	}
 

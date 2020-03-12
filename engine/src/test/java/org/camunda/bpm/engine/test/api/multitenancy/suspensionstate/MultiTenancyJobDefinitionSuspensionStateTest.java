@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -23,12 +24,15 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -317,6 +321,7 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to suspend the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    assertThat(getDeploymentIds(query.active()), hasItem(job.getDeploymentId()));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -342,6 +347,9 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to suspend the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    JobDefinition expectedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery()
+        .active().tenantIdIn(TENANT_ONE).singleResult();
+    assertThat(job.getDeploymentId(), is(getDeploymentId(expectedJobDefinition)));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -368,6 +376,9 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to suspend the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    JobDefinition expectedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery()
+        .active().withoutTenantId().singleResult();
+    assertThat(job.getDeploymentId(), is(getDeploymentId(expectedJobDefinition)));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -397,6 +408,7 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to activate the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    assertThat(getDeploymentIds(query.suspended()), hasItem(job.getDeploymentId()));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -426,6 +438,9 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to activate the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    JobDefinition expectedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery()
+        .suspended().tenantIdIn(TENANT_ONE).singleResult();
+    assertThat(job.getDeploymentId(), is(getDeploymentId(expectedJobDefinition)));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -456,6 +471,9 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     // when execute the job to activate the job definitions
     Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
+    JobDefinition expectedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery()
+        .suspended().withoutTenantId().singleResult();
+    assertThat(job.getDeploymentId(), is(getDeploymentId(expectedJobDefinition)));
 
     engineRule.getManagementService().executeJob(job.getId());
 
@@ -532,6 +550,17 @@ public class MultiTenancyJobDefinitionSuspensionStateTest {
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.DAY_OF_YEAR, 1);
     return calendar.getTime();
+  }
+
+  protected List<String> getDeploymentIds(JobDefinitionQuery jobDefinitionQuery){
+    return jobDefinitionQuery.list().stream().map(this::getDeploymentId).collect(Collectors.toList());
+  }
+
+  protected String getDeploymentId(JobDefinition jobDefinition) {
+    return engineRule.getRepositoryService().createProcessDefinitionQuery()
+      .processDefinitionId(jobDefinition.getProcessDefinitionId())
+      .singleResult()
+      .getDeploymentId();
   }
 
   @After

@@ -111,6 +111,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .executionId(MockProvider.EXAMPLE_EXECUTION_ID)
       .retries(MockProvider.EXAMPLE_JOB_RETRIES)
       .exceptionMessage(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
+      .failedActivityId(MockProvider.EXAMPLE_JOB_FAILED_ACTIVITY_ID)
       .dueDate(new Date())
       .priority(MockProvider.EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
@@ -212,11 +213,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSimpleJobGet() {
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).then().expect().statusCode(Status.OK.getStatusCode())
+    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
       .body("id", equalTo(MockProvider.EXAMPLE_JOB_ID))
       .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
       .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
+      .body("failedActivityId", equalTo(MockProvider.EXAMPLE_JOB_FAILED_ACTIVITY_ID))
       .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
       .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
@@ -364,27 +368,27 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
     duedateVariableJson.put("duedate", newDuedate);
     duedateVariableJson.put("cascade", true);
-    
+
     given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
     .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
-    
+
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, true);
   }
-  
+
   @Test
   public void testSetJobDuedateNullCascade() {
     Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
     duedateVariableJson.put("duedate", null);
     duedateVariableJson.put("cascade", true);
-    
+
     given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
     .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
-    
+
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, true);
   }
-  
+
   @Test
   public void testSetJobDuedateNonExistentJob() {
     Date newDuedate = MockProvider.createMockDuedate();
@@ -1509,7 +1513,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(JOBS_SET_RETRIES_URL);
   }
-  
+
   @Test
   public void testRecalculateDuedateWithoutDateBase() {
     given()
@@ -1518,10 +1522,10 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
-    
+
     verify(mockManagementService).recalculateJobDuedate(MockProvider.EXAMPLE_JOB_ID, true);
   }
-  
+
   @Test
   public void testRecalculateDuedateCreationDateBased() {
     given()
@@ -1531,10 +1535,10 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
-    
+
     verify(mockManagementService).recalculateJobDuedate(MockProvider.EXAMPLE_JOB_ID, true);
   }
-  
+
   @Test
   public void testRecalculateDuedateCurrentDateBased() {
     given()
@@ -1544,10 +1548,10 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
-    
+
     verify(mockManagementService).recalculateJobDuedate(MockProvider.EXAMPLE_JOB_ID, false);
   }
-  
+
   @Test
   public void testRecalculateDuedateWithUnknownJobId() {
     String jobId = MockProvider.NON_EXISTING_JOB_ID;
@@ -1568,7 +1572,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(mockManagementService).recalculateJobDuedate(jobId, true);
     verifyNoMoreInteractions(mockManagementService);
   }
-  
+
   @Test
   public void testRecalculateDuedateUnauthorized() {
     String jobId = MockProvider.EXAMPLE_JOB_ID;
