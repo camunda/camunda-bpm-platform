@@ -10,7 +10,7 @@
       name = "sortOrder"
       location = "query"
       type = "string"
-      enumValues=['"asc"', '"desc"']
+      enumValues = ['"asc"', '"desc"']
       last = last
       desc = "Sort the results in a given order. Values may be asc for ascending order or desc for descending order.
               Must be used in conjunction with the sortBy parameter."/>
