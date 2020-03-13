@@ -777,6 +777,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // Default user permission for task
   protected Permission defaultUserPermissionForTask;
 
+  /**
+   * Historic instance permissions are disabled by default
+   */
+  protected boolean enableHistoricInstancePermissions = false;
+
   protected boolean isUseSharedSqlSessionFactory = false;
 
   //History cleanup configuration
@@ -2924,6 +2929,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setDefaultUserPermissionForTask(Permission defaultUserPermissionForTask) {
     this.defaultUserPermissionForTask = defaultUserPermissionForTask;
     return this;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableHistoricInstancePermissions(boolean enable) {
+    this.enableHistoricInstancePermissions = enable;
+    return this;
+  }
+
+  public boolean isEnableHistoricInstancePermissions() {
+    return enableHistoricInstancePermissions;
   }
 
   public Map<String, JobHandler> getJobHandlers() {
