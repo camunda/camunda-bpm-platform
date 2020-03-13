@@ -191,31 +191,39 @@ module.exports = [
                 resourceName: resource.name
               },
               function(err, res) {
-                if (res) {
-                  pages.total = res;
-
-                  Service.list(
-                    {
-                      deploymentId: deployment.id,
-                      resourceName: resource.name,
-                      maxResults: pages.size,
-                      firstResult: pages.size * (pages.current - 1)
-                    },
-                    function(err, res) {
-                      if (err) {
-                        $scope.loadingState = 'ERROR';
-                        $scope.textError =
-                          err.message ||
-                          $translate.instant(
-                            'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
-                          );
-                        return deferred.reject(err);
-                      }
-
-                      deferred.resolve(bpmnResource ? res.items : res);
-                    }
-                  );
+                if (err) {
+                  $scope.loadingState = 'ERROR';
+                  $scope.textError =
+                    err.message ||
+                    $translate.instant(
+                      'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
+                    );
+                  return deferred.reject(err);
                 }
+
+                pages.total = res;
+
+                Service.list(
+                  {
+                    deploymentId: deployment.id,
+                    resourceName: resource.name,
+                    maxResults: pages.size,
+                    firstResult: pages.size * (pages.current - 1)
+                  },
+                  function(err, res) {
+                    if (err) {
+                      $scope.loadingState = 'ERROR';
+                      $scope.textError =
+                        err.message ||
+                        $translate.instant(
+                          'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
+                        );
+                      return deferred.reject(err);
+                    }
+
+                    deferred.resolve(bpmnResource ? res.items : res);
+                  }
+                );
               }
             );
           }
