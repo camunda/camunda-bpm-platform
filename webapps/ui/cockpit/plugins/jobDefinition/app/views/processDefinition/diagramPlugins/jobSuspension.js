@@ -60,7 +60,6 @@ module.exports = [
                 .resource('job-definition')
                 .list({
                   processDefinitionId: processDefinition.id,
-                  suspended: true,
                   firstResult: 0,
                   maxResults: 2000
                 })
