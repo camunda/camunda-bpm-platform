@@ -26,6 +26,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
@@ -47,6 +48,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -681,7 +683,26 @@ public class AuthorizationManager extends AbstractManager {
   // historic task instance query ////////////////////////////////////
 
   public void configureHistoricTaskInstanceQuery(HistoricTaskInstanceQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(HISTORIC_TASK, "RES.ID_", HistoricTaskPermissions.READ)
+          .build();
+
+      addPermissionCheck(query.getAuthCheck(), permissionCheck);
+
+    }
   }
 
   // historic variable instance query ////////////////////////////////
@@ -915,6 +936,10 @@ public class AuthorizationManager extends AbstractManager {
 
   public boolean isEnsureSpecificVariablePermission() {
     return Context.getProcessEngineConfiguration().isEnforceSpecificVariablePermission();
+  }
+
+  protected boolean isHistoricInstancePermissionsEnabled() {
+    return Context.getProcessEngineConfiguration().isEnableHistoricInstancePermissions();
   }
 
 }
