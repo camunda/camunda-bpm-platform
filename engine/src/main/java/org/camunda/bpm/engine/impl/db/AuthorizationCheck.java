@@ -62,6 +62,8 @@ public class AuthorizationCheck implements Serializable {
 
   protected CompositePermissionCheck permissionChecks = new CompositePermissionCheck();
 
+  protected boolean historicInstancePermissionsEnabled = false;
+
   public AuthorizationCheck() {
   }
 
@@ -151,6 +153,17 @@ public class AuthorizationCheck implements Serializable {
 
   public void setRevokeAuthorizationCheckEnabled(boolean isRevokeAuthorizationCheckEnabled) {
     this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;
+  }
+
+  public void setHistoricInstancePermissionsEnabled(boolean historicInstancePermissionsEnabled) {
+    this.historicInstancePermissionsEnabled = historicInstancePermissionsEnabled;
+  }
+
+  /**
+   * Used in SQL mapping
+   */
+  public boolean isHistoricInstancePermissionsEnabled() {
+    return historicInstancePermissionsEnabled;
   }
 
 }
