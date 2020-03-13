@@ -181,13 +181,14 @@
         dto="ExceptionDto"
         array=false
         additionalProperties=false
+        mediaType="application/json"
         examples=[]
         last=false >
     "${code}": {
 
        <#if code!="204">
          "content": {
-           "application/json": {
+           "${mediaType}": {
              "schema": {
 
                <#if array>
