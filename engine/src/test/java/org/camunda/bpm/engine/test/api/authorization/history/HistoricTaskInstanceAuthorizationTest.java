@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -64,6 +66,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
   @Override
   public void tearDown() {
     super.tearDown();
+    processEngineConfiguration.setEnableHistoricInstancePermissions(false);
     deleteDeployment(deploymentId);
   }
 
@@ -543,6 +546,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCheckAllHistoricTaskPermissions() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_TASK, ANY, userId, HistoricTaskPermissions.ALL);
@@ -560,6 +564,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCheckReadHistoricTaskPermissions() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_TASK, ANY, userId, HistoricTaskPermissions.READ);
@@ -574,6 +579,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
   public void testCheckNoneHistoricTaskPermission() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_TASK, ANY, userId, HistoricTaskPermissions.NONE);
