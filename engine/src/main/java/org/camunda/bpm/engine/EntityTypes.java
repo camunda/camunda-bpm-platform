@@ -29,6 +29,7 @@ public class EntityTypes {
   public static final String GROUP_MEMBERSHIP = "Group membership";
   public static final String IDENTITY_LINK = "IdentityLink";
   public static final String TASK = "Task";
+  public static final String HISTORIC_TASK = "HistoricTask";
   public static final String USER = "User";
   public static final String PROCESS_INSTANCE = "ProcessInstance";
   public static final String PROCESS_DEFINITION = "ProcessDefinition";
