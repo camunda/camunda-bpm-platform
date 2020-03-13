@@ -16,13 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
@@ -80,12 +84,15 @@ public class MigratingVariableInstance implements MigratingInstance {
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
 
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE, this)) {
-      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-        @Override
-        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-          return producer.createHistoricVariableMigrateEvt(variable);
-        }
-      });
+      // postpone history creation if the variable is set on process instance start with asyncBefore flag set
+      if (!delayFireHistoricVariableEvents()) {
+        HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+          @Override
+          public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+            return producer.createHistoricVariableMigrateEvt(variable);
+          }
+        });
+      }
     }
   }
 
@@ -96,6 +103,19 @@ public class MigratingVariableInstance implements MigratingInstance {
 
   public String getVariableName() {
     return variable.getName();
+  }
+
+  protected boolean delayFireHistoricVariableEvents() {
+    ExecutionEntity execution = variable.getExecution();
+    if (execution != null && execution.getJobs() != null && !execution.getJobs().isEmpty()) {
+      List<JobEntity> jobs = execution.getJobs();
+      for (JobEntity job : jobs) {
+        if (job.getJobHandlerType().equals(AsyncContinuationJobHandler.TYPE)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
 }
