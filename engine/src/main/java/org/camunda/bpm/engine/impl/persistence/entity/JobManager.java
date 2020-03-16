@@ -135,15 +135,12 @@ public class JobManager extends AbstractManager {
       return;
     }
 
-    // Timer Jobs may be 'hinting', if they are due soon, but they shouldn't
-    // be executed immediately if a JobExecutorContext is available
-    boolean executeJobNow = isTimerJobAndDueDatePast(job);
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
     // add job to be executed in the current processor
     if(!job.isSuspended()
             && job.isExclusive()
-            && executeJobNow
+            && isJobDue(job)
             && jobExecutorContext != null
             && jobExecutorContext.isExecutingExclusiveJob()
             && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
@@ -385,13 +382,13 @@ public class JobManager extends AbstractManager {
   }
 
   /**
-   * Ensure that only Timer jobs with a past DueDate are executed in the current processor.
+   * Sometimes we get a notification of a job that is not yet due, so we 
+   * should not execute it immediately
    */
-  protected boolean isTimerJobAndDueDatePast(JobEntity job) {
-    if (TimerEntity.TYPE.equals(job.getType())) {
-      return job.getDuedate().getTime() <= ClockUtil.getCurrentTime().getTime();
-    }
-
-    return true;
+  protected boolean isJobDue(JobEntity job) {
+    Date duedate = job.getDuedate();
+    Date now = ClockUtil.getCurrentTime();
+    
+    return duedate == null || duedate.getTime() <= now.getTime();
   }
 }
