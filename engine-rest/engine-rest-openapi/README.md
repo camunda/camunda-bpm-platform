@@ -240,3 +240,4 @@ How to do reviews?
 * double check the path of the endpoints as they are not easy to see if they are not checked additionally
 * check for correct parameters, requests, and responses
 * check for compliance with the Java endpoints (operation id as close as possible the Java method), dto packages
+* you can compare the generated client (from the tests) with the actual REST API - most of the case they should look similar
