@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="callSimpleSubProcessWithEscalationEnd" isExecutable="true">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBeforeSubProcess" />
+    
+    <userTask id="taskBeforeSubProcess" name="Task before subprocess" />
+    
+    <sequenceFlow id="flow2" sourceRef="taskBeforeSubProcess" targetRef="callSubProcess" />
+  
+    <callActivity id="callSubProcess" calledElement="simpleSubProcessWithEscalationEnd" />
+    <boundaryEvent id="BoundaryEvent" attachedToRef="callSubProcess">
+      <outgoing>flow5</outgoing>
+      <escalationEventDefinition escalationRef="Escalation" />
+    </boundaryEvent>
+    
+    <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="taskAfterSubProcess" />
+    
+    <userTask id="taskAfterSubProcess" name="Task after subprocess" />
+    
+    <sequenceFlow id="flow4" sourceRef="taskAfterSubProcess" targetRef="theEnd" />
+    
+    <sequenceFlow id="flow5" sourceRef="BoundaryEvent" targetRef="theEnd" />
+     
+    <endEvent id="theEnd" />
+    
+  </process>
+  <escalation id="Escalation" name="Escalation" escalationCode="Escalation" />
+
+</definitions>
