@@ -1808,6 +1808,31 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
   
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithEscalationEnd.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessWithEscalationEnd.bpmn20.xml"
+  })
+  public void testCallSimpleSubProcessWithModificationEscalationEnd() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcessWithEscalationEnd");
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+    assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());
+    
+    runtimeService.createProcessInstanceModification(taskInSubProcess.getProcessInstanceId())
+    .cancelAllForActivity("task")
+    .startAfterActivity("task")
+    .execute();
+
+    assertProcessEnded(processInstance.getId());
+  }
+  
 
   protected BpmnModelInstance getModelWithCallActivityVersionTagBinding(String versionTag) {
     return Bpmn.createExecutableProcess("process")
