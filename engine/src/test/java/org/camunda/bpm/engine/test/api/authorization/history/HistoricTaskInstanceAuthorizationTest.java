@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -777,6 +778,86 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
 
     disableAuthorization();
+
+    // when
+    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testHistoricTaskReadPermissionGrantedWhenAssign() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    createGrantAuthorization(TASK, taskId, userId, TaskPermissions.TASK_ASSIGN);
+    enableAuthorization();
+
+    taskService.setAssignee(taskId, userId);
+
+    // when
+    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testHistoricTaskReadPermissionGrantedWhenSettingOwner() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    createGrantAuthorization(TASK, taskId, userId, TaskPermissions.TASK_ASSIGN);
+    enableAuthorization();
+
+    taskService.setOwner(taskId, userId);
+
+    // when
+    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testHistoricTaskReadPermissionGrantedWhenSettingCandidateUser() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    createGrantAuthorization(TASK, taskId, userId, TaskPermissions.TASK_ASSIGN);
+    enableAuthorization();
+
+    taskService.addCandidateUser(taskId, userId);
+
+    // when
+    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testHistoricTaskReadPermissionGrantedWhenSettingCandidateGroup() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    createGrantAuthorization(TASK, taskId, userId, TaskPermissions.TASK_ASSIGN);
+    enableAuthorization();
+
+    taskService.addCandidateGroup(taskId, groupId);
 
     // when
     List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
