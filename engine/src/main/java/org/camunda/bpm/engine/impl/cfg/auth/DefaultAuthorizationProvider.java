@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
@@ -181,17 +183,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
       String taskId = task.getId();
 
-      // fetch existing authorization
-      AuthorizationEntity authorization = getGrantAuthorizationByUserId(newAssignee, TASK, taskId);
-
-      // update authorization:
-      // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
-      // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
-      // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-      authorization = updateAuthorization(authorization, newAssignee, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
-
-      // return always created or updated authorization
-      return new AuthorizationEntity[]{ authorization };
+      return createOrUpdateAuthorizationByUserId(taskId, newAssignee);
     }
 
     return null;
@@ -206,17 +198,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       // create (or update) an authorization for the new owner.
       String taskId = task.getId();
 
-      // fetch existing authorization
-      AuthorizationEntity authorization = getGrantAuthorizationByUserId(newOwner, TASK, taskId);
-
-      // update authorization:
-      // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
-      // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
-      // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-      authorization = updateAuthorization(authorization, newOwner, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
-
-      // return always created or updated authorization
-      return new AuthorizationEntity[]{ authorization };
+      return createOrUpdateAuthorizationByUserId(taskId, newOwner);
     }
 
     return null;
@@ -231,17 +213,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
     String taskId = task.getId();
 
-    // fetch existing authorization
-    AuthorizationEntity authorization = getGrantAuthorizationByUserId(userId, TASK, taskId);
-
-    // update authorization:
-    // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
-    // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
-    // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-    authorization = updateAuthorization(authorization, userId, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
-
-    // return always created or updated authorization
-    return new AuthorizationEntity[]{ authorization };
+    return createOrUpdateAuthorizationByUserId(taskId, userId);
   }
 
   public AuthorizationEntity[] newTaskGroupIdentityLink(Task task, String groupId, String type) {
@@ -253,17 +225,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // whenever a new user identity link will be added
     String taskId = task.getId();
 
-    // fetch existing authorization
-    AuthorizationEntity authorization = getGrantAuthorizationByGroupId(groupId, TASK, taskId);
-
-    // update authorization:
-    // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
-    // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
-    // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-    authorization = updateAuthorization(authorization, null, groupId, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
-
-    // return always created or updated authorization
-    return new AuthorizationEntity[]{ authorization };
+    return createOrUpdateAuthorizationByGroupId(taskId, groupId);
   }
 
   public AuthorizationEntity[] deleteTaskUserIdentityLink(Task task, String userId, String type) {
@@ -288,9 +250,70 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
   // helper //////////////////////////////////////////////////////////////
 
+  protected AuthorizationEntity[] createOrUpdateAuthorizationByGroupId(String taskId,
+                                                                       String groupId) {
+    return createOrUpdateAuthorization(taskId, groupId, null);
+  }
+
+  protected AuthorizationEntity[] createOrUpdateAuthorizationByUserId(String taskId,
+                                                                      String userId) {
+    return createOrUpdateAuthorization(taskId, null, userId);
+  }
+
+  /**
+   * (1) Fetch existing runtime & history authorizations
+   * (2) Update authorizations:
+   *     (2a) fetched authorization == null
+   *         ->  create a new runtime authorization (with READ, (UPDATE/TASK_WORK) permission,
+   *             and READ_VARIABLE if enabled)
+   *         ->  create a new history authorization (with READ on HISTORIC_TASK)
+   *     (2b) fetched authorization != null
+   *         ->  Add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
+   *             UPDATE or TASK_WORK permission is configurable in camunda.cfg.xml and by default,
+   *             UPDATE permission is provided
+   *         ->  Add READ on HISTORIC_TASK
+   */
+  protected AuthorizationEntity[] createOrUpdateAuthorization(String taskId, String groupId,
+                                                              String userId) {
+    AuthorizationEntity runtimeAuthorization = getGrantAuthorization(taskId, userId, groupId, TASK);
+
+    runtimeAuthorization =
+        updateAuthorization(runtimeAuthorization, userId, groupId, TASK, taskId, READ,
+            getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
+
+    if (!isHistoricInstancePermissionsEnabled()) {
+      return new AuthorizationEntity[]{ runtimeAuthorization };
+
+    } else {
+      AuthorizationEntity historyAuthorization = getGrantAuthorization(taskId, userId,
+          groupId, HISTORIC_TASK);
+
+      historyAuthorization =
+          updateAuthorization(historyAuthorization, userId, groupId, HISTORIC_TASK,
+              taskId, HistoricTaskPermissions.READ);
+
+      return new AuthorizationEntity[]{ runtimeAuthorization, historyAuthorization };
+    }
+  }
+
+  protected boolean isHistoricInstancePermissionsEnabled() {
+    return Context.getProcessEngineConfiguration().isEnableHistoricInstancePermissions();
+  }
+
   protected AuthorizationManager getAuthorizationManager() {
     CommandContext commandContext = Context.getCommandContext();
     return commandContext.getAuthorizationManager();
+  }
+
+  protected AuthorizationEntity getGrantAuthorization(String taskId, String userId,
+                                                      String groupId, Resource resource) {
+    if (groupId != null) {
+      return getGrantAuthorizationByGroupId(groupId, resource, taskId);
+
+    } else {
+      return getGrantAuthorizationByUserId(userId, resource, taskId);
+
+    }
   }
 
   protected AuthorizationEntity getGrantAuthorizationByUserId(String userId, Resource resource, String resourceId) {
