@@ -40,6 +40,7 @@
     {"name": "Signal"},
     {"name": "Schema Log"},
     {"name": "Task"},
+    {"name": "Task Attachment"},
     {"name": "Task Comment"},
     {"name": "Task Identity Link"},
     {"name": "Version"}
