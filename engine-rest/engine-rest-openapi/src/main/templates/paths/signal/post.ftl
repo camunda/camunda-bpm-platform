@@ -35,12 +35,9 @@
     <@lib.response
         code = "400"
         desc = "Returned if: 
-
-                no name was given
-
-                or if the variable value or type is invalid, for example if the value could not be parsed to an integer value or the passed variable type is not supported
-
-                or if a tenant id and an execution id is specified."/>
+                * no name was given
+                * or if the variable value or type is invalid, for example if the value could not be parsed to an integer value or the passed variable type is not supported
+                * or if a tenant id and an execution id is specified."/>
 
     <@lib.response
         code = "403"
