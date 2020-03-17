@@ -34,6 +34,7 @@
     {"name": "Deployment"},
     {"name": "Engine"},
     {"name": "Condition"},
+    {"name": "Message"},
     {"name": "Process instance"},
     {"name": "Signal"},
     {"name": "Schema Log"},
