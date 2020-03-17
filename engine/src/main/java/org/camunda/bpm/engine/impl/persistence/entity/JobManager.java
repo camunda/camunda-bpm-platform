@@ -150,8 +150,8 @@ public class JobManager extends AbstractManager {
       job.setLockOwner(jobExecutor.getLockOwner());
       transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
     } else {
-      // schedule job for the next processor and reset Acquisition strategy
-      // notify job executor:
+      // reset Acquisition strategy and notify the JobExecutor that
+      // a new Job is available for execution on future runs
       transactionListener = new MessageAddedNotification(jobExecutor);
     }
     Context.getCommandContext()
