@@ -18,7 +18,7 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
  + [descriptions](#descriptions)
  + [formats](#formats)
  + [examples](#examples)
-3. Reviews(#reviews)
+3. [Reviews](#reviews)
 
 
 ## Build and phases
