@@ -184,6 +184,9 @@ drop index ACT_IDX_BATCH_JOB_DEF;
 
 drop index ACT_IDX_PROCDEF_VER_TAG;
 
+drop index ACT_IDX_AUTH_ROOT_PI;
+drop index ACT_IDX_AUTH_RM_TIME;
+
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;

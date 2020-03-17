@@ -160,6 +160,9 @@ drop index ACT_IDX_BATCH_JOB_DEF on ACT_RU_BATCH;
 drop index ACT_IDX_PROCDEF_VER_TAG on ACT_RE_PROCDEF;
 drop index ACT_IDX_JOB_HANDLER on ACT_RU_JOB;
 
+drop index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION;
+drop index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION;
+
 drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;
 drop table if exists ACT_GE_BYTEARRAY;
