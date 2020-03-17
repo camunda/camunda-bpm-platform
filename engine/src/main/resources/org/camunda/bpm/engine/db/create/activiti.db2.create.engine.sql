@@ -262,6 +262,8 @@ create table ACT_RU_AUTHORIZATION (
   RESOURCE_TYPE_ integer not null,
   RESOURCE_ID_ varchar(255),
   PERMS_ integer,
+  REMOVAL_TIME_ timestamp,
+  ROOT_PROC_INST_ID_ varchar(64),
   primary key (ID_),
   UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),
   UNI_GROUP_ID_ varchar (255) not null generated always as (case when "GROUP_ID_" is null then "ID_" else "GROUP_ID_" end),
@@ -541,3 +543,7 @@ create index ACT_IDX_EVENT_SUBSCR_EVT_NAME ON ACT_RU_EVENT_SUBSCR(EVENT_NAME_);
 create index ACT_IDX_PROCDEF_DEPLOYMENT_ID ON ACT_RE_PROCDEF(DEPLOYMENT_ID_);
 create index ACT_IDX_PROCDEF_TENANT_ID ON ACT_RE_PROCDEF(TENANT_ID_);
 create index ACT_IDX_PROCDEF_VER_TAG ON ACT_RE_PROCDEF(VERSION_TAG_);
+
+-- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
+create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
+create index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION(REMOVAL_TIME_);

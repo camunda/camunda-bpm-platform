@@ -262,6 +262,8 @@ create table ACT_RU_AUTHORIZATION (
   RESOURCE_TYPE_ integer not null,
   RESOURCE_ID_ varchar(255),
   PERMS_ integer,
+  REMOVAL_TIME_ timestamp,
+  ROOT_PROC_INST_ID_ varchar(64),
   primary key (ID_)
 );
 
@@ -532,3 +534,7 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
+
+-- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
+create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
+create index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION(REMOVAL_TIME_);
