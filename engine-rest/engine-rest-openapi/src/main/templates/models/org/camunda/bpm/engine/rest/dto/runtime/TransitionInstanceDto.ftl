@@ -1,7 +1,6 @@
-{
-  "type": "object",
-  "description": "A JSON object corresponding to the Activity Instance tree of the given process instance.",
-  "properties": {
+<@lib.dto
+    type = "object"
+    desc = "A JSON object corresponding to the Activity Instance tree of the given process instance." >
 
     <@lib.property
         name = "id"
@@ -58,5 +57,4 @@
                 * `id`: the id of the incident
                 * `activityId`: the activity id in which the incident occurred"/>
 
-  }
-}
+</@lib.dto>

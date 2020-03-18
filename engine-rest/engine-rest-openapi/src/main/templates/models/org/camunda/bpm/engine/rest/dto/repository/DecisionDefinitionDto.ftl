@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "id"
@@ -67,5 +66,4 @@
         last = true
         desc = "The version tag of the decision definition." />
 
-  }
-}
+</@lib.dto>

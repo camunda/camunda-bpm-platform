@@ -1,7 +1,6 @@
-{
-  "title": "ExceptionDto",
-  "type": "object",
-  "properties": {
+<@lib.dto
+    title="ExceptionDto"
+    type="object" >
 
     <@lib.property
         name = "type"
@@ -14,5 +13,4 @@
         last = true
         desc = "A detailed message of the error." />
 
-  }
-}
+</@lib.dto>

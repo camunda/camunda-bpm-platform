@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "version"
@@ -8,5 +7,4 @@
         last = true
         desc = "The version of the Rest API." />
 
-  }
-}
+</@lib.dto>

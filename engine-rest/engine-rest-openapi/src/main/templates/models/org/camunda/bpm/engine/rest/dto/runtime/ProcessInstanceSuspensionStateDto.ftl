@@ -1,5 +1,4 @@
-{
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "suspended"
@@ -57,5 +56,4 @@
         last = true
         dto = "HistoricProcessInstanceQueryDto" />
 
-  }
-}
+</@lib.dto>

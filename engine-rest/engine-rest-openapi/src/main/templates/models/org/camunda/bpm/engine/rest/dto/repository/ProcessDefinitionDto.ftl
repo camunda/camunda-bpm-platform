@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "id"
@@ -77,5 +76,4 @@
         last = true
         desc = "A flag indicating whether the process definition is startable in Tasklist or not." />
 
-  }
-}
+</@lib.dto>

@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "value"
@@ -29,5 +28,4 @@
                 * `mimetype`: The MIME type of the file that is being uploaded.
                 * `encoding`: The encoding of the file that is being uploaded."/>
 
-  }
-}
+</@lib.dto>

@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "version"
@@ -18,5 +17,5 @@
         <#assign sortByValues = ['"timestamp"']>
         <#include "/lib/commons/sort-props.ftl" >
     }
-  }
-}
+
+</@lib.dto>

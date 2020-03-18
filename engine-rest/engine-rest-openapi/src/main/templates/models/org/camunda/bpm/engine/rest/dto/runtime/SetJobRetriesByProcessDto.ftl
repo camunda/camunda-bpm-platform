@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "processInstances"
@@ -26,5 +25,4 @@
         last = true
         dto = "HistoricProcessInstanceQueryDto" />
 
-  }
-}
+</@lib.dto>

@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "skipCustomListeners"
@@ -25,5 +24,4 @@
         last = true
         desc = "An arbitrary text annotation set by a user for auditing reasons." />
 
-  }
-}
+</@lib.dto>

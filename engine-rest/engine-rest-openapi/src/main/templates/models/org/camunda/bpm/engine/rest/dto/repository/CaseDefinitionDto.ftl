@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "id"
@@ -52,6 +51,4 @@
         desc = "History time to live value of the case definition.
                 Is used within [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup)." />
 
-  }
- 
-}
+</@lib.dto>

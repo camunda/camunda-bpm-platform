@@ -1,5 +1,4 @@
-{
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "suspended"
@@ -9,5 +8,4 @@
                 the given process instance will be activated."
         last = true />
 
-  }
-}
+</@lib.dto>

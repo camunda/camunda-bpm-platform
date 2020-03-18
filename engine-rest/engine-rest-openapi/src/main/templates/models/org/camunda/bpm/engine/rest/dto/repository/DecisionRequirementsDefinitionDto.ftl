@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "id"
@@ -44,5 +43,4 @@
         last = true
         desc = "The tenant id of the decisionrequirements definition." />
 
-  }
-}
+</@lib.dto>

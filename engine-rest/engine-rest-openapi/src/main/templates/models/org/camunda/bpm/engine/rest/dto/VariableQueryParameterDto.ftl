@@ -1,6 +1,5 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "value"
@@ -19,5 +18,4 @@
         last = true
         desc = "The variable value, could be of type boolean, string or number"/>
 
-  }
-}
+</@lib.dto>

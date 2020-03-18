@@ -1,7 +1,7 @@
-{
-  "type": "object",
-  "description": "An activity instance, incident pair.",
-  "properties": {
+<@lib.dto
+    type = "object"
+    desc = "An activity instance, incident pair." >
+
     <@lib.property
         name = "id"
         type = "string"
@@ -12,5 +12,5 @@
         type = "string"
         last = true
         desc = "The activity id in which the incident happened."/>
-  }
-}
+
+</@lib.dto>

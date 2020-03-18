@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    type = "object" >
 
     <@lib.property
         name = "id"
@@ -19,5 +18,4 @@
         last = true
         desc = "The version of the schema." />
 
-  }
-}
+</@lib.dto>

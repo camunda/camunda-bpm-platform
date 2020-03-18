@@ -1,6 +1,5 @@
-{
-"type" : "object",
-"properties" : {
+<@lib.dto
+    type = "object" >
 
   <@lib.property
       name = "name"
@@ -8,5 +7,4 @@
       desc = "The name of the process engine."
       last=true />
 
-  }
-}
+</@lib.dto>

@@ -1,7 +1,6 @@
-{
-  "type": "object",
-  "description": "A historic process instance query which defines a group of historic process instances",
-  "properties": {
+<@lib.dto
+    type = "object"
+    desc = "A historic process instance query which defines a group of historic process instances" >
 
     <@lib.property
         name = "processInstanceId"
@@ -303,5 +302,5 @@
         <#include "/lib/commons/sort-props.ftl" >
 
     }
-  }
-}
+
+</@lib.dto>
