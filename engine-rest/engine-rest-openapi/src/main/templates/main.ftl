@@ -31,10 +31,11 @@
 
   ],
   "tags": [
-    {"name": "Deployment"},
-    {"name": "Engine"},
     {"name": "Comment"},
     {"name": "Condition"},
+    {"name": "Deployment"},
+    {"name": "Engine"},
+    {"name": "Identity Link"},
     {"name": "Message"},
     {"name": "Process instance"},
     {"name": "Signal"},
