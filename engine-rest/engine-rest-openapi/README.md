@@ -168,7 +168,13 @@ Example: [process-instance-query-params.ftl](./src/main/templates/lib/commons/pr
 ### Parameters and properties
 
 #### Descriptions
-Markdown can be used for text descriptions.
+Markdown can be used for text descriptions: 
+
+    `monospace` (code)
+    *italic* or _italic_ (cursive)
+    **bold** or __bold__
+    * bullet point
+
 Recommendations:
 * use unix line endings
 * to add links use markdown, e.g. `[link](http://example.com)`
