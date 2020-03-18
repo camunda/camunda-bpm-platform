@@ -31,6 +31,8 @@
       RESOURCE_TYPE_,
       RESOURCE_ID_,
       PERMS_,
+      ROOT_PROC_INST_ID_,
+      REMOVAL_TIME_,
       REV_
       )
     values (
@@ -41,6 +43,8 @@
       #{resourceType ,jdbcType=INTEGER},
       #{resourceId ,jdbcType=VARCHAR},
       #{permissions, jdbcType=INTEGER},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -55,9 +59,18 @@
       USER_ID_ = #{userId, jdbcType=VARCHAR},
       RESOURCE_TYPE_ = #{resourceType, jdbcType=INTEGER},
       RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
-      PERMS_ = #{permissions, jdbcType=INTEGER}
+      PERMS_ = #{permissions, jdbcType=INTEGER},
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateAuthorizationsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
@@ -87,6 +100,8 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="INTEGER" />
     <result property="resourceId" column="RESOURCE_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="permissions" column="PERMS_" jdbcType="INTEGER" />
   </resultMap>
 

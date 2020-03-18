@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -30,6 +31,7 @@ import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureValidIndividualResourceId;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -37,6 +39,7 @@ import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -44,10 +47,13 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -181,9 +187,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
       // create (or update) an authorization for the new assignee.
 
-      String taskId = task.getId();
-
-      return createOrUpdateAuthorizationByUserId(taskId, newAssignee);
+      return createOrUpdateAuthorizationsByUserId(task, newAssignee);
     }
 
     return null;
@@ -196,9 +200,8 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
           newOwner);
 
       // create (or update) an authorization for the new owner.
-      String taskId = task.getId();
 
-      return createOrUpdateAuthorizationByUserId(taskId, newOwner);
+      return createOrUpdateAuthorizationsByUserId(task, newOwner);
     }
 
     return null;
@@ -211,9 +214,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     ensureValidIndividualResourceId("Cannot grant default authorization for identity link to user " + userId,
         userId);
 
-    String taskId = task.getId();
-
-    return createOrUpdateAuthorizationByUserId(taskId, userId);
+    return createOrUpdateAuthorizationsByUserId(task, userId);
   }
 
   public AuthorizationEntity[] newTaskGroupIdentityLink(Task task, String groupId, String type) {
@@ -223,9 +224,8 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
     // create (or update) an authorization for the given group
     // whenever a new user identity link will be added
-    String taskId = task.getId();
 
-    return createOrUpdateAuthorizationByGroupId(taskId, groupId);
+    return createOrUpdateAuthorizationsByGroupId(task, groupId);
   }
 
   public AuthorizationEntity[] deleteTaskUserIdentityLink(Task task, String userId, String type) {
@@ -250,14 +250,12 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
   // helper //////////////////////////////////////////////////////////////
 
-  protected AuthorizationEntity[] createOrUpdateAuthorizationByGroupId(String taskId,
-                                                                       String groupId) {
-    return createOrUpdateAuthorization(taskId, groupId, null);
+  protected AuthorizationEntity[] createOrUpdateAuthorizationsByGroupId(Task task, String groupId) {
+    return createOrUpdateAuthorizations(task, groupId, null);
   }
 
-  protected AuthorizationEntity[] createOrUpdateAuthorizationByUserId(String taskId,
-                                                                      String userId) {
-    return createOrUpdateAuthorization(taskId, null, userId);
+  protected AuthorizationEntity[] createOrUpdateAuthorizationsByUserId(Task task, String userId) {
+    return createOrUpdateAuthorizations(task, null, userId);
   }
 
   /**
@@ -273,35 +271,103 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
    *             UPDATE permission is provided
    *         ->  Add READ on HISTORIC_TASK
    */
-  protected AuthorizationEntity[] createOrUpdateAuthorization(String taskId, String groupId,
-                                                              String userId) {
-    AuthorizationEntity runtimeAuthorization = getGrantAuthorization(taskId, userId, groupId, TASK);
+  protected AuthorizationEntity[] createOrUpdateAuthorizations(Task task, String groupId,
+                                                               String userId) {
 
     boolean enforceSpecificVariablePermission = isEnforceSpecificVariablePermission();
 
-    List<Permission> runtimePermissions = getRuntimePermissions(enforceSpecificVariablePermission);
-    runtimeAuthorization =
-        updateAuthorization(runtimeAuthorization, userId, groupId, TASK, taskId,
-            runtimePermissions);
+    Permission[] runtimeTaskPermissions = getRuntimePermissions(enforceSpecificVariablePermission);
+
+    AuthorizationEntity runtimeAuthorization = createOrUpdateAuthorization(task, userId, groupId,
+        TASK, false, runtimeTaskPermissions);
 
     if (!isHistoricInstancePermissionsEnabled()) {
       return new AuthorizationEntity[]{ runtimeAuthorization };
 
     } else {
-      AuthorizationEntity historyAuthorization = getGrantAuthorization(taskId, userId,
-          groupId, HISTORIC_TASK);
-
-      List<Permission> historicPermissions =
+      Permission[] historicTaskPermissions =
           getHistoricPermissions(enforceSpecificVariablePermission);
-      historyAuthorization =
-          updateAuthorization(historyAuthorization, userId, groupId, HISTORIC_TASK, taskId,
-              historicPermissions);
+
+      AuthorizationEntity historyAuthorization = createOrUpdateAuthorization(task, userId,
+          groupId, HISTORIC_TASK, true, historicTaskPermissions);
 
       return new AuthorizationEntity[]{ runtimeAuthorization, historyAuthorization };
     }
   }
 
-  protected List<Permission> getHistoricPermissions(boolean enforceSpecificVariablePermission) {
+  protected AuthorizationEntity createOrUpdateAuthorization(Task task, String userId,
+                                                            String groupId, Resource resource,
+                                                            boolean isHistoric,
+                                                            Permission... permissions) {
+
+    String taskId = task.getId();
+
+    AuthorizationEntity authorization = getGrantAuthorization(taskId, userId, groupId, resource);
+
+    if (authorization == null) {
+      authorization = createAuthorization(userId, groupId, resource, taskId, permissions);
+
+      if (isHistoric) {
+        provideRemovalTime(authorization, task);
+      }
+
+    } else {
+      addPermissions(authorization, permissions);
+
+    }
+
+    return authorization;
+  }
+
+  protected void provideRemovalTime(AuthorizationEntity authorization, Task task) {
+    String rootProcessInstanceId = getRootProcessInstanceId(task);
+
+    if (rootProcessInstanceId != null) {
+      authorization.setRootProcessInstanceId(rootProcessInstanceId);
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        HistoryEvent rootProcessInstance = findHistoricProcessInstance(rootProcessInstanceId);
+
+        Date removalTime = null;
+        if (rootProcessInstance != null) {
+          removalTime = rootProcessInstance.getRemovalTime();
+
+        }
+
+        authorization.setRemovalTime(removalTime);
+
+      }
+    }
+  }
+
+  protected String getRootProcessInstanceId(Task task) {
+    ExecutionEntity execution = (ExecutionEntity) ((DelegateTask) task).getExecution();
+
+    if (execution != null) {
+      return execution.getRootProcessInstanceId();
+
+    } else {
+      return null;
+
+    }
+  }
+
+  protected boolean isHistoryRemovalTimeStrategyStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy());
+  }
+
+  protected String getHistoryRemovalTimeStrategy() {
+    return Context.getProcessEngineConfiguration()
+        .getHistoryRemovalTimeStrategy();
+  }
+
+  protected HistoryEvent findHistoricProcessInstance(String rootProcessInstanceId) {
+    return Context.getCommandContext()
+        .getDbEntityManager()
+        .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+  }
+
+  protected Permission[] getHistoricPermissions(boolean enforceSpecificVariablePermission) {
     List<Permission> historicPermissions = new ArrayList<>();
     historicPermissions.add(HistoricTaskPermissions.READ);
 
@@ -309,10 +375,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       historicPermissions.add(HistoricTaskPermissions.READ_VARIABLE);
     }
 
-    return historicPermissions;
+    return historicPermissions.toArray(new Permission[0]);
   }
 
-  protected List<Permission> getRuntimePermissions(boolean enforceSpecificVariablePermission) {
+  protected Permission[] getRuntimePermissions(boolean enforceSpecificVariablePermission) {
     List<Permission> runtimePermissions = new ArrayList<>();
     runtimePermissions.add(READ);
 
@@ -323,7 +389,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       runtimePermissions.add(TaskPermissions.READ_VARIABLE);
     }
 
-    return runtimePermissions;
+    return runtimePermissions.toArray(new Permission[0]);
   }
 
   protected boolean isHistoricInstancePermissionsEnabled() {
@@ -356,15 +422,18 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return authorizationManager.findAuthorizationByGroupIdAndResourceId(AUTH_TYPE_GRANT, groupId, resource, resourceId);
   }
 
-  protected AuthorizationEntity updateAuthorization(AuthorizationEntity authorization,
-                                                    String userId, String groupId,
+  protected AuthorizationEntity createAuthorization(String userId, String groupId,
                                                     Resource resource, String resourceId,
-                                                    List<Permission> permissions) {
-    if (authorization == null) {
-      authorization = createGrantAuthorization(userId, groupId, resource, resourceId);
-      updateAuthorizationBasedOnCacheEntries(authorization, userId, groupId, resource, resourceId);
-    }
+                                                    Permission... permissions) {
+    AuthorizationEntity authorization =
+        createGrantAuthorization(userId, groupId, resource, resourceId, permissions);
 
+    updateAuthorizationBasedOnCacheEntries(authorization, userId, groupId, resource, resourceId);
+
+    return authorization;
+  }
+
+  protected void addPermissions(AuthorizationEntity authorization, Permission... permissions) {
     if (permissions != null) {
       for (Permission permission : permissions) {
         if (permission != null) {
@@ -372,11 +441,11 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
         }
       }
     }
-
-    return authorization;
   }
 
-  protected AuthorizationEntity createGrantAuthorization(String userId, String groupId, Resource resource, String resourceId, Permission... permissions) {
+  protected AuthorizationEntity createGrantAuthorization(String userId, String groupId,
+                                                         Resource resource, String resourceId,
+                                                         Permission... permissions) {
     // assuming that there are no default authorizations for *
     if (userId != null) {
       ensureValidIndividualResourceId("Cannot create authorization for user " + userId, userId);
@@ -391,11 +460,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     authorization.setResource(resource);
     authorization.setResourceId(resourceId);
 
-    if (permissions != null) {
-      for (Permission permission : permissions) {
-        authorization.addPermission(permission);
-      }
-    }
+    addPermissions(authorization, permissions);
 
     return authorization;
   }

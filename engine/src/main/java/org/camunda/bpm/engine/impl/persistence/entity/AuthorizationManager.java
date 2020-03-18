@@ -38,6 +38,7 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -990,6 +991,17 @@ public class AuthorizationManager extends AbstractManager {
 
   protected boolean isHistoricInstancePermissionsEnabled() {
     return Context.getProcessEngineConfiguration().isEnableHistoricInstancePermissions();
+  }
+
+  public void addRemovalTimeToAuthorizationsByRootProcessInstanceId(String rootProcessInstanceId,
+                                                                    Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+        .updatePreserveOrder(AuthorizationEntity.class,
+            "updateAuthorizationsByRootProcessInstanceId", parameters);
   }
 
 }
