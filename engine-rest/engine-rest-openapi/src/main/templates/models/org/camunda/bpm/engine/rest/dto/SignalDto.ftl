@@ -40,6 +40,6 @@
         desc = "If true the signal can only be received on executions or process definitions which
                 belongs to no tenant. Value may not be false as this is the default behavior.
 
-                **Note**: Cannot be used in combination with executionId."/>
+                **Note**: Cannot be used in combination with `executionId`."/>
   }
 }
