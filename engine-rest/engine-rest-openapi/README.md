@@ -18,6 +18,7 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
  + [descriptions](#descriptions)
  + [formats](#formats)
  + [examples](#examples)
+3. [Reviews](#reviews)
 
 
 ## Build and phases
@@ -231,4 +232,12 @@ You can add an examples to `requestBody` or `response` as follows:
                     }']/>
 ```
 
+## Reviews
 
+How to do reviews?
+
+* in case of changes of the macros, please compare the last build openapi.json version with one to review to ensure that the endpoins are complete after the new changes
+* double check the path of the endpoints as they are not easy to see if they are not checked additionally
+* check for correct parameters, requests, and responses
+* check for compliance with the Java endpoints (`endpointInfo` id should be as close as possible to the Java method in the DTO packages - check the `\*RestService.java` and `\*Resource.java` interfaces)
+* you can compare the generated client (from the tests) with the actual REST API - most of the case they should look similar
