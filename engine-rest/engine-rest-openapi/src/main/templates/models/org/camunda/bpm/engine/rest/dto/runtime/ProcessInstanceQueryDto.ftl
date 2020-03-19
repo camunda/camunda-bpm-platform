@@ -1,7 +1,6 @@
-{
-  "type": "object",
-  "description": "A process instance query which defines a group of process instances",
-  "properties": {
+<@lib.dto
+    desc = "A process instance query which defines a group of process instances" >
+
     <@lib.property
         name = "deploymentId"
         type = "string"
@@ -192,5 +191,5 @@
         <#include "/lib/commons/sort-props.ftl" >
 
     }
-  }
-}
+
+</@lib.dto>

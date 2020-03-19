@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "count"
@@ -9,5 +7,4 @@
         last = true
         desc = "The number of matching instances."/>
 
-  }
-}
+</@lib.dto>

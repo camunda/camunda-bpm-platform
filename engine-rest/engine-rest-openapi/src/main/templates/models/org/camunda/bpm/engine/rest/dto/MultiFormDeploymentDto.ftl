@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "tenant-id"
@@ -42,5 +40,4 @@
         desc = "The binary data to create the deployment resource.
                 It is possible to have more than one form part with different form part names for the binary data to create a deployment."/>
 
-  }
-}
+</@lib.dto>

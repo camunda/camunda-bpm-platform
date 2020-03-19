@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "details"
@@ -10,5 +8,4 @@
         last = true
         desc = "A JSON Object containing list of errors and warnings occurred during deployment." />
 
-  }
-}
+</@lib.dto>

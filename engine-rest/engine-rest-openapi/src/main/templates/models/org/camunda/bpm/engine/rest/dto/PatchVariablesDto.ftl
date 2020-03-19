@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "modifications"
@@ -15,5 +13,5 @@
         itemType = "string"
         last = true
         desc = "An array of String keys of variables to be deleted."/>
-  }
-}
+
+</@lib.dto>

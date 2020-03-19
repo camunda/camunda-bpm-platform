@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "rel"
@@ -18,5 +16,4 @@
         last = true
         desc = "The http method." />
 
-  }
-}
+</@lib.dto>

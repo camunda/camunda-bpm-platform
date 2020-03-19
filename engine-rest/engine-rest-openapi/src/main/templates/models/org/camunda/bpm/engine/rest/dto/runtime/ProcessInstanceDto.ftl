@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "id"
@@ -45,5 +43,4 @@
         last = true
         desc = "The links associated to the process instance." />
 
-  }
-}
+</@lib.dto>

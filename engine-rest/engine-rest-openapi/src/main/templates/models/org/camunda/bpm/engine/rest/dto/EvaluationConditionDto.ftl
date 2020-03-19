@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "variables"
@@ -32,5 +30,5 @@
         type = "string"
         last = true
         desc = "Used to evaluate conditions of the process definition with the given id."/>
-  }
-}
+
+</@lib.dto>

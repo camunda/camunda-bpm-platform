@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "errors"
@@ -15,5 +13,4 @@
         last = true
         desc = "A list of warnings occurred during parsing."/>
 
-  }
-}
+</@lib.dto>

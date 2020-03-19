@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
  
     <@lib.property
       name = "data"
@@ -33,6 +31,5 @@
       "description": "**Deprecated**: This only works if the REST API is aware of the involved Java classes.
                       A JSON representation of a serialized Java Object. Form part type (see below) must be provided."
     } -->
-  }
 
-}
+</@lib.dto>

@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "id"
@@ -69,5 +67,4 @@
         last = true
         desc = "The id of the user that created the batch." />
 
-  }
-}
+</@lib.dto>

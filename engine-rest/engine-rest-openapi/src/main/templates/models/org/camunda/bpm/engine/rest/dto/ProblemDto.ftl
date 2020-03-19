@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "message"
@@ -33,5 +31,4 @@
         last = true
         desc = "A list of element id affected by the problem."/>
 
-  }
-}
+</@lib.dto>

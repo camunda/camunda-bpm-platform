@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "name"
@@ -41,5 +39,5 @@
                 belongs to no tenant. Value may not be false as this is the default behavior.
 
                 **Note**: Cannot be used in combination with `executionId`."/>
-  }
-}
+
+</@lib.dto>

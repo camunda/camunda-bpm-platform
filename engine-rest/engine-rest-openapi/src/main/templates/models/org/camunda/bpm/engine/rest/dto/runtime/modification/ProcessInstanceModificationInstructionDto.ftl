@@ -1,6 +1,5 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto
+    required = [ "type" ] >
 
     <@lib.property
         name = "type"
@@ -59,12 +58,9 @@
         last = true
         desc = "Can be used with instructions of type cancel. Prevents the deletion of new created activity instances." />
 
-  },
 <#--  TODO CAM-11364
   "discriminator" : {
     "propertyName" : "type"
   }, -->
-  "required": [
-    "type"
-  ]
-}
+
+</@lib.dto>

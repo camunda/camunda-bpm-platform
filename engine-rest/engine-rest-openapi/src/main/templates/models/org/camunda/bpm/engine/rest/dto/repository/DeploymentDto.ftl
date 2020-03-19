@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "id"
@@ -71,5 +69,4 @@
                 which are successfully deployed with that deployment.
                 The key is the case definition id, the value is a JSON Object corresponding to the case definition." />
 
-  }
-}
+</@lib.dto>

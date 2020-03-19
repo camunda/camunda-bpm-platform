@@ -1,3 +1,4 @@
+<!-- Generates a Query Parameter JSON object -->
 <#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
@@ -31,12 +32,12 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
+<!-- Generates a DTO Property JSON object -->
 <#macro property name type
         desc=""
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         minimum=""
-        required=false
         deprecated=false
         additionalProperties=false
         itemType="string"
@@ -67,10 +68,6 @@
 
         <#if minimum?has_content>
           "minimum": ${minimum},
-        </#if>
-
-        <#if required>
-          "required": true,
         </#if>
 
         <#if deprecated>
@@ -104,6 +101,39 @@
     <#if !last> , </#if> <#-- if not a last property add a comma-->
 </#macro>
 
+<!-- Generates a DTO JSON object -->
+<#macro dto
+        type="object"
+        title=""
+        desc=""
+        required=[]>
+  {
+
+    <#if title?has_content>
+      "title": "${title}",
+    </#if>
+
+    <#if type?has_content>
+      "type": "${type}",
+    </#if>
+
+    <#if required?size != 0>
+      "required": [
+        ${required?join(", ")}
+      ],
+    </#if>
+
+    <#if desc?has_content>
+      "description": "${removeIndentation(desc)}",
+    </#if>
+
+    "properties": {
+      <#nested>
+    }
+  }
+</#macro>
+
+<!-- Generates a Request Body JSON object -->
 <#macro requestBody mediaType dto
         requestDesc=""
         examples=[] >
@@ -131,6 +161,7 @@
   },
 </#macro>
 
+<!-- Generates an HTTP Response JSON object -->
 <#macro response code desc
         dto="ExceptionDto"
         array=false
@@ -195,6 +226,7 @@
     <#if !last> , </#if> <#-- if not the last entry, add a comma -->
 </#macro>
 
+<!-- Generates an Operation Information JSON object -->
 <#macro endpointInfo
         id
         tag
@@ -206,6 +238,7 @@
     "description": "${removeIndentation(desc)}",
 </#macro>
 
+<!-- Removes source formatting indentations from descriptions -->
 <#function removeIndentation text>
   <#return text?replace('\n( ){2,}', '\n', 'r') >
 </#function>
