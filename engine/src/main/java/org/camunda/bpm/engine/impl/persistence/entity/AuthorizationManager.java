@@ -93,6 +93,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -1002,6 +1003,21 @@ public class AuthorizationManager extends AbstractManager {
     getDbEntityManager()
         .updatePreserveOrder(AuthorizationEntity.class,
             "updateAuthorizationsByRootProcessInstanceId", parameters);
+  }
+
+  public DbOperation deleteAuthorizationsByRemovalTime(Date removalTime, int minuteFrom,
+                                                      int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    return getDbEntityManager()
+        .deletePreserveOrder(AuthorizationEntity.class, "deleteAuthorizationsByRemovalTime",
+            new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }
