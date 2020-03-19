@@ -22,6 +22,7 @@
     <@lib.property
         name = "withoutTenantId"
         type = "boolean"
+        default = "false"
         desc = "A Boolean value that indicates whether the message should only be correlated to executions
                 and process definitions which belong to no tenant or not. Value may only be `true`, as `false`
                 is the default behavior."/>
@@ -72,6 +73,7 @@
     <@lib.property
         name = "all"
         type = "boolean"
+        default = "false"
         desc = "A Boolean value that indicates whether the message should be correlated to exactly one entity or multiple entities.
                 If the value is set to `false`, the message will be correlated to exactly one entity (execution or process definition).
                 If the value is set to `true`, the message will be correlated to multiple executions and a process definition that
@@ -80,6 +82,7 @@
     <@lib.property
         name = "resultEnabled"
         type = "boolean"
+        default = "false"
         desc = "A Boolean value that indicates whether the result of the correlation should be returned or not.
                 If this property is set to `true`, there will be returned a list of message correlation result objects. Depending on the
                 all property, there will be either one ore more returned results in the list.
@@ -89,6 +92,7 @@
     <@lib.property
         name = "variablesInResultEnabled"
         type = "boolean"
+        default = "false"
         last = true
         desc = "A Boolean value that indicates whether the result of the correlation should contain process variables or not.
                 The parameter resultEnabled should be set to `true` in order to use this it.

@@ -70,7 +70,9 @@
         code = "200"
         dto = "MessageCorrelationResultWithVariableDto"
         array = true
-        desc = "Request successful. The property `resultEnabled` in the request body was `true`."
+        desc = "Request successful. The property `resultEnabled` in the request body was `true`.
+                The `variables` property is only returned, if the property variablesInResultEnable`
+                was set to `true` in the request."
         examples = ['"example-1: {
                        "summary": "Status 200 Response. The property `variablesInResultEnabled` in the request body was `false` (Default).",
                        "description": "The Response content of a status 200",
