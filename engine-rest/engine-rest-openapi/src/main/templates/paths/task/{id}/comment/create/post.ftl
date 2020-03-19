@@ -20,6 +20,7 @@
   <@lib.requestBody
       mediaType = "application/json"
       dto = "CommentDto"
+      requestDesc = "**Note:** Only the `message` property will be used. Every other property passed to this endpoint will be ignored."
       examples = ['"example-1": {
                        "summary": "POST /task/aTaskId/comment/create",
                        "value": {
