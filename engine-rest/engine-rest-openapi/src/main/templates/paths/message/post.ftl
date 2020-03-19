@@ -23,7 +23,8 @@
                         },
                         "processVariables" : {
                           "aVariable" : {"value" : "aNewValue", "type": "String", 
-                                          "valueInfo" : { "transient" : true } },
+                                          "valueInfo" : { "transient" : true }
+                                        },
                           "anotherVariable" : {"value" : true, "type": "Boolean"}
                         }
                       }
@@ -39,7 +40,8 @@
                         },
                         "processVariables" : {
                           "aVariable" : {"value" : "aNewValue", "type": "String",
-                                          "valueInfo" : { "transient" : true } },
+                                          "valueInfo" : { "transient" : true }
+                                        },
                           "anotherVariable" : {"value" : true, "type": "Boolean"}
                         },
                         "resultEnabled" : true
@@ -56,13 +58,15 @@
                         },
                         "processVariables" : {
                           "aVariable" : {"value" : "aNewValue", "type": "String",
-                                          "valueInfo" : { "transient" : true } },
+                                          "valueInfo" : { "transient" : true }
+                                        },
                           "anotherVariable" : {"value" : true, "type": "Boolean"}
                         },
                         "resultEnabled" : true,
-                        "variablesInResultEnabled" : true,
+                        "variablesInResultEnabled" : true
                       }
-                     }']/>
+                     }']
+                     />
 
   "responses" : {
 
@@ -73,7 +77,7 @@
         desc = "Request successful. The property `resultEnabled` in the request body was `true`.
                 The `variables` property is only returned, if the property variablesInResultEnable`
                 was set to `true` in the request."
-        examples = ['"example-1: {
+      examples = ['"example-1": {
                        "summary": "Status 200 Response. The property `variablesInResultEnabled` in the request body was `false` (Default).",
                        "description": "The Response content of a status 200",
                        "value": [{
@@ -89,13 +93,13 @@
                              "suspended": false,
                              "tenantId": "aTenantId"
                          }
-                     }]
+                    }]
                    },
                    "example-2": {
                      "summary": "Status 200 Response. The property `variablesInResultEnabled` in the request body was `true`.",
                      "description": "The Response content of a status 200",
                      "value": [{
-                       "resultType": "Execution,
+                       "resultType": "Execution",
                        "execution": {
                          "id": "anExecutionId",
                          "processInstanceId": "aProcInstId",
@@ -105,9 +109,12 @@
                        "processInstance": null,
                        "variables" : {
                          "aVariable" : {"value" : "aNewValue", "type": "String",
-                                       "valueInfo" : { "transient" : true } },
+                                       "valueInfo" : { "transient" : true }
+                                     },
                          "anotherVariable" : {"value" : true, "type": "Boolean"}
-                   }]']/>
+                       }
+                     }]
+                   }']/>
 
     <@lib.response
         code = "204"
