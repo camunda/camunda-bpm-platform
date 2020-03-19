@@ -634,12 +634,15 @@
     <@lib.property
         name = "orQueries"
         type = "array"
-        dto = "ProcessInstanceQueryDto"
-        desc = "A JSON array of nested process instance queries with OR semantics.
-                A process instance matches a nested query if it fulfills at least one of the query's predicates.
-                With multiple nested queries, a process instance must fulfill at least one predicate of each query (Conjunctive Normal Form).
-                All process instance query properties can be used except for: `sorting`
-                See the [User guide](${docsUrl}/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries." />
+        dto = "TaskQueryDto"
+        desc = "A JSON array of nested task queries with OR semantics. A task matches a nested query if it fulfills
+                *at least one* of the query's predicates. With multiple nested queries, a task must fulfill at least one predicate of *each* query ([Conjunctive Normal Form](https://en.wikipedia.org/wiki/Conjunctive_normal_form)).
+
+                All task query properties can be used except for: `sorting`, `withCandidateGroups`,
+    `withoutCandidateGroups`, `withCandidateUsers`, `withoutCandidateUsers`
+
+                See the [User guide](${docsUrl}/user-guide/process-engine/process-engine-api/#or-queries)
+    for more information about OR queries." />
 
     "sorting": {
       "type": "array",
