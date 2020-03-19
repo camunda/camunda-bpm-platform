@@ -1,5 +1,4 @@
 <@lib.dto
-    type = "object"
     desc = "A JSON object corresponding to the Activity Instance tree of the given process instance." >
 
     <@lib.property

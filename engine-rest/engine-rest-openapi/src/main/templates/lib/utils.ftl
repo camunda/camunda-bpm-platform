@@ -103,7 +103,7 @@
 
 <!-- Generates a DTO JSON object -->
 <#macro dto
-        type=""
+        type="object"
         title=""
         desc=""
         required=[]>

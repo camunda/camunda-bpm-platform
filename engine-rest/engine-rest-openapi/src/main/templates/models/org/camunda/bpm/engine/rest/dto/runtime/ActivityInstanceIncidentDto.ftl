@@ -1,5 +1,4 @@
 <@lib.dto
-    type = "object"
     desc = "An activity instance, incident pair." >
 
     <@lib.property

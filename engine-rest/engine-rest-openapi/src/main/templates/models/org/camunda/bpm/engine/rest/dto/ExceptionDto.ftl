@@ -1,6 +1,5 @@
 <@lib.dto
-    title="ExceptionDto"
-    type="object" >
+    title="ExceptionDto">
 
     <@lib.property
         name = "type"

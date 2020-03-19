@@ -1,5 +1,4 @@
 <@lib.dto
-    type = "object"
     required = [ "type" ] >
 
     <@lib.property

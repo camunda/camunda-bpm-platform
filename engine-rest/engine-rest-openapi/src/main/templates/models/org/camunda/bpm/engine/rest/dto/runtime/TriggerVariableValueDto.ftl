@@ -3,8 +3,7 @@
     {
       "$ref": "#/components/schemas/VariableValueDto"
     },
-    <@lib.dto
-        type = "object" >
+    <@lib.dto>
 
         <@lib.property
             name = "local"

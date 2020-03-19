@@ -1,5 +1,4 @@
 <@lib.dto
-    type = "object"
     desc = "A process instance query which defines a group of process instances" >
 
     <@lib.property

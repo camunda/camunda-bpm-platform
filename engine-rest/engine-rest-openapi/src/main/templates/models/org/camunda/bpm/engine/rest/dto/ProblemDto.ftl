@@ -1,5 +1,4 @@
-<@lib.dto
-    type = "object" >
+<@lib.dto>
 
     <@lib.property
         name = "message"
