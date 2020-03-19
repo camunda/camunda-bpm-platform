@@ -25,23 +25,7 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful."
-        examples = ['"example-1": {
-                         "summary": "PUT /task/aTaskId/ Response",
-                         "value": {
-                           "name": "My Task",
-                           "description": "This have to be done very urgent",
-                           "priority" : 30,
-                           "assignee" : "peter",
-                           "owner" : "mary",
-                           "delegationState" : "PENDING",
-                           "due" : "2014-08-30T10:00:00.000+0200",
-                           "followUp" : "2014-08-25T10:00:00.000+0200",
-                           "parentTaskId" : "aParentTaskId",
-                           "caseInstanceId" : "aCaseInstanceId",
-                           "tenantId" : "tenantId"
-                         }
-                       }'] />
+        desc = "Request successful."  />
 
     <@lib.response
         code = "400"
