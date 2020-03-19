@@ -58,7 +58,7 @@
         code = "400"
         dto = "ExceptionDto"
         desc = "The task does not exist or no comment message was submitted. See the
-                [Introduction](/reference/rest/overview/#error-handling)
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
     <@lib.response
