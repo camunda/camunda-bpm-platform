@@ -60,7 +60,8 @@
       RESOURCE_TYPE_ = #{resourceType, jdbcType=INTEGER},
       RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
       PERMS_ = #{permissions, jdbcType=INTEGER},
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=TIMESTAMP}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

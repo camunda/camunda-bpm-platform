@@ -271,7 +271,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     state.put("resourceId", resourceId);
     state.put("permissions", permissions);
     state.put("removalTime", removalTime);
-    
+    state.put("rootProcessInstanceId", rootProcessInstanceId);
+
     return state;
   }
 
