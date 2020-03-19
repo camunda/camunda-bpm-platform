@@ -1,6 +1,4 @@
-{
-  "type" : "object",
-  "properties" : {
+<@lib.dto>
 
     <@lib.property
         name = "messageName"
@@ -98,5 +96,5 @@
                 The parameter resultEnabled should be set to `true` in order to use this it.
 
                 The default value is `false`, which means the variables will not be returned."/>
-  }
-}
+
+</@lib.dto>
