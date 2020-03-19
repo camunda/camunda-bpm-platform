@@ -26,11 +26,10 @@
         type = "string"
         desc = "The name of the deployment." />
 
-    <@lib.property
-        name = "links"
-        type = "array"
-        dto = "AtomLink"
-        desc = "Link to the newly created deployment with method, href and rel." />
+    <#-- DeploymentDto extends the abstract LinkableDto -->
+    <#assign last = false >
+    <#assign resource = "deployment" >
+    <#include "/lib/commons/linkable-dto-props.ftl" >
 
     <@lib.property
         name = "deployedProcessDefinitions"

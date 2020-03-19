@@ -36,11 +36,9 @@
         type = "string"
         desc = "The tenant id of the process instance." />
 
-    <@lib.property
-        name = "links"
-        type = "array"
-        dto = "AtomLink"
-        last = true
-        desc = "The links associated to the process instance." />
+    <#-- ProcessInstanceDto extends the abstract LinkableDto -->
+    <#assign last = true >
+    <#assign resource = "process instance" >
+    <#include "/lib/commons/linkable-dto-props.ftl" >
 
 </@lib.dto>

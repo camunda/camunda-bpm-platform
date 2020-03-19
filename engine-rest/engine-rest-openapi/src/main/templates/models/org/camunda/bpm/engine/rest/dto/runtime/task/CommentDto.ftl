@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "id"
@@ -42,12 +40,9 @@
         desc = "The process instance id of the root process instance that initiated the process
                 containing the task." />
 
-    <@lib.property
-        name = "links"
-        type = "array"
-        dto = "AtomLink"
-        last = true
-        desc = "Link to the newly created task comment with `method`, `href` and `rel`." />
+    <#-- CommentDto extends the abstract LinkableDto -->
+    <#assign last = true >
+    <#assign resource = "task comment" >
+    <#include "/lib/commons/linkable-dto-props.ftl" >
 
-  }
-}
+</@lib.dto>
