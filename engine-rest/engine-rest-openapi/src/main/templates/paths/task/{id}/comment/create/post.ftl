@@ -66,7 +66,7 @@
         dto = "ExceptionDto"
         last = true
         desc = "The history of the engine is disabled. See the
-                [Introduction](/reference/rest/overview/#error-handling)
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
   }
