@@ -50,7 +50,7 @@
         last = true
         desc = "The task or comment with given task and comment id does not exist, or the history of
                 the engine is disabled. See the
-                [Introduction](/reference/rest/overview/#error-handling)
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
   }
