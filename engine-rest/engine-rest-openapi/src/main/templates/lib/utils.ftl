@@ -1,4 +1,4 @@
-<!-- Generates a Query String Parameter JSON object -->
+<!-- Generates a Query Parameter JSON object -->
 <#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
