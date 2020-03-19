@@ -63,7 +63,7 @@
         dto = "ExceptionDto"
         last = true
         desc = "No task exists for the given task id. See the
-                [Introduction](/reference/rest/overview/#error-handling)
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
   }
