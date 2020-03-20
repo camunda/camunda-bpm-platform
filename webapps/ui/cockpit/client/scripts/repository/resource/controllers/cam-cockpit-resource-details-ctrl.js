@@ -191,17 +191,26 @@ module.exports = [
                 resourceName: resource.name
               },
               function(err, res) {
-                if (err) {
+                function handleError(err) {
                   $scope.loadingState = 'ERROR';
                   $scope.textError =
                     err.message ||
                     $translate.instant(
                       'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
                     );
+                }
+
+                if (err) {
+                  handleError(err);
                   return deferred.reject(err);
                 }
 
                 pages.total = res;
+
+                if (res === 0) {
+                  // There are no definitions in this resource
+                  return deferred.resolve([]);
+                }
 
                 Service.list(
                   {
@@ -212,12 +221,7 @@ module.exports = [
                   },
                   function(err, res) {
                     if (err) {
-                      $scope.loadingState = 'ERROR';
-                      $scope.textError =
-                        err.message ||
-                        $translate.instant(
-                          'REPOSITORY_DEPLOYMENT_RESOURCE_CTRL_MSN'
-                        );
+                      handleError(err);
                       return deferred.reject(err);
                     }
 
