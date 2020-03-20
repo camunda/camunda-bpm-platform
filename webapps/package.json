@@ -23,7 +23,7 @@
     "dependencies": "license-checker --production --json --relativeLicensePath"
   },
   "dependencies": {
-    "@bpmn-io/dmn-migrate": "0.4.2",
+    "@bpmn-io/dmn-migrate": "0.4.3",
     "angular-animate": "1.7.9",
     "angular-cookies": "1.7.9",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
@@ -42,7 +42,7 @@
     "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "clipboard": "2.0.4",
     "cmmn-js": "0.18.1",
-    "dmn-js": "8.0.1",
+    "dmn-js": "8.0.2",
     "dom4": "2.1.5",
     "events": "3.0.0",
     "fast-xml-parser": "^3.12.20",
