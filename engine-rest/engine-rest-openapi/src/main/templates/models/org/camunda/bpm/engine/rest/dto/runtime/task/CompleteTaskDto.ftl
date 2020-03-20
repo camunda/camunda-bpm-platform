@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "variables"
@@ -20,5 +18,4 @@
                 associated with a process instance (e.g. if it's part of a case instance) no
                 variables will be returned." />
 
-  }
-}
+</@lib.dto>

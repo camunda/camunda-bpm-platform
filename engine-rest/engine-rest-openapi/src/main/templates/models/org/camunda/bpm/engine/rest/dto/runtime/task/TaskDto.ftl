@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
     <@lib.property
         name = "id"
@@ -118,5 +116,5 @@
         type = "string"
         last = last
         desc = "If not `null`, the tenant id of the task." />
-  }
-}
+
+</@lib.dto>

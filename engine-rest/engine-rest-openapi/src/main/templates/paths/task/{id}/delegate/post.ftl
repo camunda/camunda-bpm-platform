@@ -17,10 +17,10 @@
 
   ],
 
-  <#assign action = "the task should be delegated to" >
   <@lib.requestBody
       mediaType = "application/json"
       dto = "UserIdDto"
+      requestDesc = "Provide the id of the user that the task should be delegated to."
       examples = ['"example-1": {
                      "summary": "Request Body",
                      "description": "POST `/task/anId/delegate`",

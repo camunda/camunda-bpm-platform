@@ -1,7 +1,5 @@
-{
-  "type": "object",
-  "description": "A Task query which defines a group of Tasks.",
-  "properties": {
+<@lib.dto
+    desc = "A Task query which defines a group of Tasks." >
   
     <@lib.property
         name = "processInstanceId"
@@ -152,8 +150,7 @@
     <@lib.property
         name = "assigneeExpression"
         type = "string"
-        desc = "Restrict to tasks that the user described by the given expression is assigned to. 
-                See the 
+        desc = "Restrict to tasks that the user described by the given expression is assigned to. See the
                 [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions) 
                 for more information on available functions." />
   
@@ -175,8 +172,7 @@
         name = "assigneeIn"
         type = "array"
         itemType = "string"
-        desc = "Only include tasks which are assigned to one of the passed and 
-                comma-separated user ids." />
+        desc = "Only include tasks which are assigned to one of the passed and comma-separated user ids." />
   
     <@lib.property
         name = "owner"
@@ -260,8 +256,7 @@
         name = "taskDefinitionKeyIn"
         type = "array"
         itemType = "string"
-        desc = "Restrict to tasks that have one of the given keys. The keys need to be in a
-                comma-separated list." />
+        desc = "Restrict to tasks that have one of the given keys. The keys need to be in a comma-separated list." />
   
     <@lib.property
         name = "taskDefinitionKeyLike"
@@ -322,9 +317,9 @@
         name = "dueDate"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that are due on the given date. By default*, the date must have the
-                format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.546+0200`." />
+        desc = "Restrict to tasks that are due on the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
+                `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.546+0200`." />
   
     <@lib.property
         name = "dueDateExpression"
@@ -338,9 +333,9 @@
         name = "dueAfter"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that are due after the given date. By default, the date must have
-                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.435+0200`." />
+        desc = "Restrict to tasks that are due after the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.435+0200`." />
   
     <@lib.property
         name = "dueAfterExpression"
@@ -355,9 +350,9 @@
         name = "dueBefore"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that are due before the given date. By default*, the date must have
-                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.243+0200`." />
+        desc = "Restrict to tasks that are due before the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.243+0200`." />
   
     <@lib.property
         name = "dueBeforeExpression"
@@ -372,9 +367,9 @@
         name = "followUpDate"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that have a followUp date on the given date. By default, the date
-                must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.342+0200`." />
+        desc = "Restrict to tasks that have a followUp date on the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date
+                must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.342+0200`." />
   
     <@lib.property
         name = "followUpDateExpression"
@@ -389,9 +384,9 @@
         name = "followUpAfter"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that have a followUp date after the given date. By default*, the
-                date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.542+0200`." />
+        desc = "Restrict to tasks that have a followUp date after the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.542+0200`." />
   
     <@lib.property
         name = "followUpAfterExpression"
@@ -405,9 +400,9 @@
     <@lib.property
         name = "followUpBefore"
         type = "string"
-        desc = "Restrict to tasks that have a followUp date before the given date. By default, the
-                date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.234+0200`." />
+        desc = "Restrict to tasks that have a followUp date before the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.234+0200`." />
   
     <@lib.property
         name = "followUpBeforeExpression"
@@ -423,9 +418,9 @@
         type = "string"
         format = "date-time"
         desc = "Restrict to tasks that have no followUp date or a followUp date before the given date.
-                By default, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-                e.g., `2013-01-23T14:42:45.432+0200`. The typical use case is to query
-                all `active` tasks for a user for a given date." />
+                By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.432+0200`. The typical use case
+                is to query all `active` tasks for a user for a given date." />
   
     <@lib.property
         name = "followUpBeforeOrNotExistentExpression"
@@ -440,9 +435,9 @@
         name = "createdOn"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that were created on the given date. By default, the date must have
-                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.324+0200`." />
+        desc = "Restrict to tasks that were created on the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must have
+                the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.324+0200`." />
   
     <@lib.property
         name = "createdOnExpression"
@@ -457,9 +452,9 @@
         name = "createdAfter"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that were created after the given date. By default, the date must
-                have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-                e.g., `2013-01-23T14:42:45.342+0200`." />
+        desc = "Restrict to tasks that were created after the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must
+                have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.342+0200`." />
   
     <@lib.property
         name = "createdAfterExpression"
@@ -474,9 +469,9 @@
         name = "createdBefore"
         type = "string"
         format = "date-time"
-        desc = "Restrict to tasks that were created before the given date. By default, the date must
-                have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g.,
-                `2013-01-23T14:42:45.332+0200`." />
+        desc = "Restrict to tasks that were created before the given date. By
+                [default](${docsUrl}/reference/rest/overview/date-format/), the date must
+                have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+0200`." />
   
     <@lib.property
         name = "createdBeforeExpression"
@@ -650,9 +645,13 @@
       "items":
 
         <#assign last = true >
-        <#assign sortByValues = ['"instanceId"', '"definitionId"', '"definitionKey"', '"businessKey"', '"tenantId"']>
+        <#assign sortByValues = [ '"instanceId"', '"caseInstanceId"', '"dueDate"', '"executionId"', '"caseExecutionId"',
+                                  '"assignee"', '"created"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
+                                  '"priority"', '"processVariable"', '"executionVariable"', '"taskVariable"',
+                                  '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
+        <#assign sortParamsDto = "SortTaskQueryParametersDto" >
         <#include "/lib/commons/sort-props.ftl" >
 
     }
-  }
-}
+
+</@lib.dto>

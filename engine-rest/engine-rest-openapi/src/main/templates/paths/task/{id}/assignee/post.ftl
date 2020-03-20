@@ -21,10 +21,10 @@
 
   ],
 
-  <#assign action = "will be the assignee of the task" >
   <@lib.requestBody
       mediaType = "application/json"
       dto = "UserIdDto"
+      requestDesc = "Provide the id of the user that will be the assignee of the task."
       examples = ['"example-1": {
                      "summary": "Request Body",
                      "description": "POST `/task/anId/assignee`",

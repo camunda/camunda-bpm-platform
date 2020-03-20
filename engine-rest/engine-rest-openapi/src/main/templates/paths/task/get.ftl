@@ -16,6 +16,11 @@
 
     <#assign last = false >
     <#include "/lib/commons/task-query-params.ftl" >
+
+    <#assign sortByValues = [ '"instanceId"', '"caseInstanceId"', '"dueDate"', '"executionId"', '"caseExecutionId"',
+                              '"assignee"', '"created"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
+                              '"priority"', '"processVariable"', '"executionVariable"', '"taskVariable"',
+                              '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
     <#include "/lib/commons/sort-params.ftl" >
 
     <#assign last = true >

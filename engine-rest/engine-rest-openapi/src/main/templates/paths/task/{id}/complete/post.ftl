@@ -21,9 +21,27 @@
       mediaType = "application/json"
       dto = "CompleteTaskDto"
       examples = ['"example-1": {
-                     "summary": "Request Body",
-                     "description": "POST `/task/anId/complete`",
-                     "value":     {
+                     "summary": "POST `/task/anId/complete`",
+                     "description": "Complete Task with variables in return",
+                     "value": {
+                       "variables": {
+                         "aVariable": {
+                           "value": "aStringValue"
+                         },
+                         "anotherVariable": {
+                           "value": 42
+                         },
+                         "aThirdVariable": {
+                           "value": true
+                         }
+                       },
+                       "withVariablesInReturn": true
+                     }
+                   }',
+                  '"example-2": {
+                     "summary": "POST `/task/anId/complete`",
+                     "description": "Complete Task without variables in return",
+                     "value": {
                        "variables": {
                          "aVariable": {
                            "value": "aStringValue"
@@ -36,13 +54,34 @@
                          }
                        }
                      }
-                   }'] />
+                   }'
+      ] />
 
   "responses" : {
 
     <@lib.response
         code = "200"
-        desc = "Request successful. The response contains the process variables." />
+        dto = "VariableValueDto"
+        additionalProperties = true
+        desc = "Request successful. The response contains the process variables."
+        examples = ['"example-1": {
+                       "summary": "POST `/task/anId/complete`",
+                       "description": "Response Body",
+                       "value": {
+                         "variables": {
+                           "aVariable": {
+                             "value": "aStringValue"
+                           },
+                           "anotherVariable": {
+                             "value": 42
+                           },
+                           "aThirdVariable": {
+                             "value": true
+                           }
+                         }
+                       }
+                     }'
+        ] />
 
     <@lib.response
         code = "204"

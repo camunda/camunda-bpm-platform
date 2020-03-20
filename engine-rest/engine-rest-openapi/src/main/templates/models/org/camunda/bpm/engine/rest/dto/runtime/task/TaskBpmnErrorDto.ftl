@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
   <@lib.property
       name = "errorCode"
@@ -13,13 +11,12 @@
       type = "string"
       desc = "An error message that describes the error." />
 
-    <@lib.property
-        name = "variables"
-        type = "object"
-        dto = "VariableValueDto"
-        additionalProperties = true
-        last =  true
-        desc = "A JSON object containing variable key-value pairs." />
+  <@lib.property
+      name = "variables"
+      type = "object"
+      dto = "VariableValueDto"
+      additionalProperties = true
+      last =  true
+      desc = "A JSON object containing variable key-value pairs." />
 
-  }
-}
+</@lib.dto>

@@ -77,6 +77,8 @@
 
     <@lib.response
         code = "200"
+        additionalProperties = true
+        dto = "VariableValueDto"
         desc = "Request successful. The response contains the process variables."
         examples = ['"example-1": {
                        "summary": "Response Body",
@@ -108,19 +110,20 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "The variable value or type is invalid, for example if the value could not be parsed
-                to an Integer value or the passed variable type is not supported. See the
-                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
-                for the error response format." />
+        desc = "The variable value or type is invalid, for example if the value could not be parsed to an Integer value
+                or the passed variable type is not supported.
+
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for
+                the error response format." />
 
     <@lib.response
         code = "500"
         dto = "ExceptionDto"
         last = true
-        desc = "If the task does not exist or the corresponding process instance could not be
-                resumed successfully. See the
-                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
-                for the error response format." />
+        desc = "If the task does not exist or the corresponding process instance could not be resumed successfully.
+
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for
+                the error response format." />
 
   }
 }

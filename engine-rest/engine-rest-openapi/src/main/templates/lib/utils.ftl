@@ -1,4 +1,4 @@
-<!-- Generates a Query Parameter JSON object -->
+<#-- Generates a Query Parameter JSON object -->
 <#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
@@ -32,7 +32,7 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<!-- Generates a DTO Property JSON object -->
+<#-- Generates a DTO Property JSON object -->
 <#macro property name type
         desc=""
         enumValues=[]
@@ -101,7 +101,7 @@
     <#if !last> , </#if> <#-- if not a last property add a comma-->
 </#macro>
 
-<!-- Generates a DTO JSON object -->
+<#-- Generates a DTO JSON object -->
 <#macro dto
         type="object"
         title=""
@@ -148,7 +148,7 @@
   }
 </#macro>
 
-<!-- Generates a Request Body JSON object -->
+<#-- Generates a Request Body JSON object -->
 <#macro requestBody mediaType dto
         requestDesc=""
         examples=[] >
@@ -176,7 +176,8 @@
   },
 </#macro>
 
-<!-- Generates an HTTP Response JSON object -->
+<#-- Generates an HTTP Response JSON object
+     * `dto` needs to be defined if `mediaType` is, the default, "application/json" -->
 <#macro response code desc
         dto="ExceptionDto"
         array=false
@@ -201,7 +202,11 @@
                  "additionalProperties": {
                </#if>
 
+               <#if mediaType != "application/xhtml+xml">
                  "$ref": "#/components/schemas/${dto}"
+               <#else>
+                 "description": "For `application/xhtml+xml` Responses, a byte stream is returned."
+               </#if>
 
                <#if array || additionalProperties >
                  }
@@ -242,7 +247,7 @@
     <#if !last> , </#if> <#-- if not the last entry, add a comma -->
 </#macro>
 
-<!-- Generates an Operation Information JSON object -->
+<#-- Generates an Operation Information JSON object -->
 <#macro endpointInfo
         id
         tag
@@ -254,7 +259,7 @@
     "description": "${removeIndentation(desc)}",
 </#macro>
 
-<!-- Removes source formatting indentations from descriptions -->
+<#-- Removes source formatting indentations from descriptions -->
 <#function removeIndentation text>
   <#return text?replace('\n( ){2,}', '\n', 'r') >
 </#function>

@@ -1,6 +1,4 @@
-{
-  "type": "object",
-  "properties": {
+<@lib.dto>
 
   <@lib.property
       name = "escalationCode"
@@ -16,5 +14,4 @@
         last =  true
         desc = "A JSON object containing variable key-value pairs." />
 
-  }
-}
+</@lib.dto>
