@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "LinkableDto" >
 
     <@lib.property
         name = "id"
@@ -34,13 +35,7 @@
     <@lib.property
         name = "tenantId"
         type = "string"
-        desc = "The tenant id of the process instance." />
-
-    <@lib.property
-        name = "links"
-        type = "array"
-        dto = "AtomLink"
         last = true
-        desc = "The links associated to the process instance." />
+        desc = "The tenant id of the process instance." />
 
 </@lib.dto>

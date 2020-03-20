@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "LinkableDto" >
 
     <@lib.property
         name = "id"
@@ -25,12 +26,6 @@
         name = "name"
         type = "string"
         desc = "The name of the deployment." />
-
-    <@lib.property
-        name = "links"
-        type = "array"
-        dto = "AtomLink"
-        desc = "Link to the newly created deployment with method, href and rel." />
 
     <@lib.property
         name = "deployedProcessDefinitions"
