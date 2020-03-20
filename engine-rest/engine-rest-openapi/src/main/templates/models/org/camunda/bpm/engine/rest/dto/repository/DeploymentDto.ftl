@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "LinkableDto" >
 
     <@lib.property
         name = "id"
@@ -25,11 +26,6 @@
         name = "name"
         type = "string"
         desc = "The name of the deployment." />
-
-    <#-- DeploymentDto extends the abstract LinkableDto -->
-    <#assign last = false >
-    <#assign resource = "deployment" >
-    <#include "/lib/commons/linkable-dto-props.ftl" >
 
     <@lib.property
         name = "deployedProcessDefinitions"

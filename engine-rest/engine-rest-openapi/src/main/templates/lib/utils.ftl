@@ -106,8 +106,14 @@
         type="object"
         title=""
         desc=""
-        required=[]>
+        required=[]
+        extends="" >
   {
+
+    <#if extends?has_content>
+      "allOf": [
+        {
+    </#if>
 
     <#if title?has_content>
       "title": "${title}",
@@ -130,6 +136,15 @@
     "properties": {
       <#nested>
     }
+
+    <#if extends?has_content>
+      },
+      {
+      "$ref": "#/components/schemas/${extends}"
+      }
+    ]
+    </#if>
+
   }
 </#macro>
 

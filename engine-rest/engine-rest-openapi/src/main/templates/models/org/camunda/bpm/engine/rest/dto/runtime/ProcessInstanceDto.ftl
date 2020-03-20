@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "LinkableDto" >
 
     <@lib.property
         name = "id"
@@ -34,11 +35,7 @@
     <@lib.property
         name = "tenantId"
         type = "string"
+        last = true
         desc = "The tenant id of the process instance." />
-
-    <#-- ProcessInstanceDto extends the abstract LinkableDto -->
-    <#assign last = true >
-    <#assign resource = "process instance" >
-    <#include "/lib/commons/linkable-dto-props.ftl" >
 
 </@lib.dto>

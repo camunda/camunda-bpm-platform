@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "LinkableDto" >
 
     <@lib.property
         name = "id"
@@ -37,12 +38,8 @@
     <@lib.property
         name = "rootProcessInstanceId"
         type = "string"
+        last = true
         desc = "The process instance id of the root process instance that initiated the process
                 containing the task." />
-
-    <#-- CommentDto extends the abstract LinkableDto -->
-    <#assign last = true >
-    <#assign resource = "task comment" >
-    <#include "/lib/commons/linkable-dto-props.ftl" >
 
 </@lib.dto>
