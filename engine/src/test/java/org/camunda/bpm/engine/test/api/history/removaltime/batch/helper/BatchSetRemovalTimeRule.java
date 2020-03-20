@@ -109,6 +109,9 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
     clearDatabase();
 
+    getProcessEngineConfiguration().setEnableHistoricInstancePermissions(false);
+    getProcessEngineConfiguration().setAuthorizationEnabled(false);
+
     super.finished(description);
   }
 
@@ -166,6 +169,24 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
       engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
     }
+  }
+
+  public void enableAuth() {
+    getProcessEngineConfiguration().setAuthorizationEnabled(true);
+  }
+
+  public void disableAuth() {
+    getProcessEngineConfiguration().setAuthorizationEnabled(false);
+  }
+
+  public void clearAuthorization() {
+    engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list()
+        .forEach(authorization -> {
+          engineRule.getAuthorizationService()
+              .deleteAuthorization(authorization.getId());
+        });
   }
 
   public class TestProcessBuilder {
