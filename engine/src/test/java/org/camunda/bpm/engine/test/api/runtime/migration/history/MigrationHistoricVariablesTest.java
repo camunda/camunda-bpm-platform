@@ -18,11 +18,14 @@ package org.camunda.bpm.engine.test.api.runtime.migration.history;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -40,9 +44,12 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstancePro
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -86,12 +93,14 @@ public class MigrationHistoricVariablesTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected HistoryService historyService;
+  protected ManagementService managementService;
 
   @Before
   public void initServices() {
     runtimeService = rule.getRuntimeService();
     taskService = rule.getTaskService();
     historyService = rule.getHistoryService();
+    managementService = rule.getManagementService();
   }
 
   @Test
@@ -258,5 +267,79 @@ public class MigrationHistoricVariablesTest {
       .variableId(eventScopeVariable.getId())
       .singleResult();
     Assert.assertEquals(targetDefinition.getId(), historicVariableInstance.getProcessDefinitionId());
+  }
+
+
+  @Test
+  @Ignore
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testMigrateHistoricVariablesAsyncBeforeStartEvent() {
+    //given
+    String userTask = "task";
+    BpmnModelInstance failing =
+        Bpmn.createExecutableProcess("Process")
+        .startEvent("startEvent")
+        .camundaAsyncBefore(true)
+        .serviceTask("failing")
+        .camundaClass("foo")
+        .userTask(userTask)
+        .endEvent("endEvent")
+        .done();
+    BpmnModelInstance passing =
+        Bpmn.createExecutableProcess("Process")
+        .startEvent("startEvent")
+        .camundaAsyncBefore(true)
+        .userTask(userTask)
+        .endEvent("endEvent")
+        .done();
+
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(failing);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(passing);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId(),
+        Variables.createVariables().putValue("foo", "bar"));
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    executeJob(job);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("startEvent", "startEvent")
+        .mapActivities(userTask, userTask)
+        .build();
+
+    // when migrate
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+    // then the failed job is also migrated
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    assertEquals(0, job.getRetries());
+    managementService.setJobRetries(job.getId(), 1);
+
+    // when the failed job is executed again
+    executeJob(managementService.createJobQuery().singleResult());
+
+    // then job succeeds
+    assertNull(managementService.createJobQuery().singleResult());
+    assertNotNull(runtimeService.createProcessInstanceQuery().activityIdIn(userTask).singleResult());
+  }
+
+  protected void executeJob(Job job) {
+    ManagementService managementService = rule.getManagementService();
+
+    while (job != null && job.getRetries() > 0) {
+      try {
+        managementService.executeJob(job.getId());
+      }
+      catch (Exception e) {
+        // ignore
+      }
+
+      job = managementService.createJobQuery().jobId(job.getId()).singleResult();
+    }
   }
 }
