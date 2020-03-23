@@ -3,6 +3,7 @@
     <@lib.property
         name = "resultType"
         type = "string"
+        enumValues = [ '"Execution"', '"ProcessDefinition"' ]
         desc = "Indicates if the message was correlated to a message start event or an 
                 intermediate message catching event. In the first case, the resultType is 
                 `ProcessDefinition` and otherwise `Execution`."/>
