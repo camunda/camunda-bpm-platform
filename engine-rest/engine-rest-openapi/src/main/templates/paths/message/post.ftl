@@ -1,7 +1,7 @@
 {
 
   <@lib.endpointInfo
-      id = "correlateMessage"
+      id = "deliverMessage"
       tag = "Message"
       desc = "Correlates a message to the process engine to either trigger a message start event or an intermediate message 
               catching event. Internally this maps to the engine's message correlation builder methods
@@ -78,8 +78,8 @@
                 The `variables` property is only returned, if the property variablesInResultEnable`
                 was set to `true` in the request."
       examples = ['"example-1": {
-                       "summary": "Status 200 Response. The property `variablesInResultEnabled` in the request body was `false` (Default).",
-                       "description": "The Response content of a status 200",
+                       "summary": "Status 200 Response.",
+                       "description": "The Response content of a status 200. The property `variablesInResultEnabled` in the request body was `false` (Default).",
                        "value": [{
                          "resultType": "ProcessDefinition",
                          "execution": null,
@@ -96,8 +96,8 @@
                     }]
                    },
                    "example-2": {
-                     "summary": "Status 200 Response. The property `variablesInResultEnabled` in the request body was `true`.",
-                     "description": "The Response content of a status 200",
+                     "summary": "Status 200 Response.",
+                     "description": "The Response content of a status 200. The property `variablesInResultEnabled` in the request body was `true`.",
                      "value": [{
                        "resultType": "Execution",
                        "execution": {
