@@ -7,7 +7,32 @@
 
   background-color: @body-bg;
 
-  border: 1px solid #e5e5e5;
+  // border: 1px solid #e5e5e5;
+
+  .login-header {
+    text-align: center;
+
+    margin: 25px 0 75px 0;
+
+    .login-logo {
+      fill: #666666;
+    }
+
+    .app-name {
+      width: 100%;
+      display: block;
+      font-size: 28px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      text-align: center;
+      color: #666666;
+
+      margin-top: 15px;
+    }
+  }
 
   .checkbox {
     margin-bottom: 10px;
@@ -17,17 +42,17 @@
     margin: 0 0 (@grid-gutter-width * 0.5) 0;
   }
 
-  input[type="text"],
-  input[type="password"] {
+  input[type='text'],
+  input[type='password'] {
     font-size: 18px;
     margin-bottom: (@grid-gutter-width * 0.5);
   }
 
   .btn-primary {
+    width: 100%;
     float: right;
   }
 }
-
 
 .form-signin-container {
   padding: @grid-gutter-width;

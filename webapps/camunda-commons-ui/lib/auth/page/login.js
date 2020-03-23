@@ -20,6 +20,7 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/login.html', 'utf8');
+var logo = fs.readFileSync(__dirname + '/logo.svg', 'utf8');
 
 var $ = require('jquery');
 
@@ -46,7 +47,11 @@ var Controller = [
     configuration,
     $http
   ) {
+    $scope.logo = $sce.trustAsHtml(logo);
+    console.log(logo, $scope.logo);
     $scope.status = 'INIT';
+    $scope.appName = configuration.getAppName();
+
     if ($rootScope.authentication) {
       return $location.path('/');
     }
