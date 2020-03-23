@@ -15,7 +15,8 @@
         name = "tenantId"
         type = "string"
         desc = "Used to correlate the message for a tenant with the given id.
-                Will only correlate to executions and process definitions which belong to the tenant."/>
+                Will only correlate to executions and process definitions which belong to the tenant.
+                Must not be supplied in conjunction with a `withoutTenantId`."/>
 
     <@lib.property
         name = "withoutTenantId"
@@ -23,13 +24,13 @@
         defaultValue = 'false'
         desc = "A Boolean value that indicates whether the message should only be correlated to executions
                 and process definitions which belong to no tenant or not. Value may only be `true`, as `false`
-                is the default behavior."/>
+                is the default behavior.
+                Must not be supplied in conjunction with a `tenantId`."/>
 
     <@lib.property
         name = "processInstanceId"
         type = "string"
-        desc = "Used to correlate the message to the process instance with the given id.
-                Must not be supplied in conjunction with a `tenantId`."/>
+        desc = "Used to correlate the message to the process instance with the given id."/>
 
     <@lib.property
         name = "correlationKeys"
