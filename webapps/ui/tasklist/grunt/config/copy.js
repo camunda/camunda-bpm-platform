@@ -125,7 +125,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor/fonts',
-        src: ['*.{eot,svg,ttf,woff,woff2}'],
+        src: ['*.{eot,svg,ttf,woff,woff2,otf}'],
         dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
       },
       {

@@ -19,7 +19,8 @@
 var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
-  template = fs.readFileSync(__dirname + '/cam-widget-header.html', 'utf8');
+  template = fs.readFileSync(__dirname + '/cam-widget-header.html', 'utf8'),
+  logo = fs.readFileSync(__dirname + '/logo-2020-round.svg', 'utf8');
 
 var apps = {
   welcome: {
@@ -74,7 +75,12 @@ module.exports = function() {
     controller: [
       '$scope',
       'AuthenticationService',
-      function($scope, AuthenticationService) {
+      '$sce',
+      function($scope, AuthenticationService, $sce) {
+        console.log('header', $scope);
+        $scope.logo = $sce.trustAsHtml(logo);
+        console.log($scope.logo);
+
         $scope.logout = AuthenticationService.logout;
         $scope.getTargetRoute = function() {
           return $scope.authentication ? '' : '#/login';

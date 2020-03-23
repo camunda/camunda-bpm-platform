@@ -4,9 +4,14 @@
         ng-submit="login()"
         name="signinForm"
         request-aware>
-    <h2 class="form-signin-heading">
-      {{ 'PAGE_LOGIN_PLEASE_SIGN_IN' | translate }}
-    </h2>
+
+    <div class="login-header">
+      <div class="login-logo" ng-bind-html="logo" />
+
+      <div class="app-name">
+        {{ appName }}
+      </div>
+    </div>
 
     <div notifications-panel
          ng-if="signinForm.$dirty"
