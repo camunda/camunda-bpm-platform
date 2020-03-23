@@ -32,13 +32,13 @@ window.camCockpitConf = {
   // },
   // historicActivityInstanceMetrics: {
   //   adjustablePeriod: true,
-  //   //select from the default time period: today, week, month, complete
+  //   //select from the default time period: day, week, month, complete
   //   period: {
   //     unit: 'week'
   //   }
   // },
-  // set if a user can change the default or no
-  // userCanChangePeriod: true/false
+  // runtimeActivityInstanceMetrics: {
+  //   display: true
   // },
   // 'locales': {
   //   'availableLocales': ['en', 'de'],

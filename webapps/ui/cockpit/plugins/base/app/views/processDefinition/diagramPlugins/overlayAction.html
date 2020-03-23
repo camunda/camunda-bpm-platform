@@ -2,6 +2,7 @@
   class="overlay-link"
   ng-click="toggleOverlay()"
   ng-disabled="isLoading"
+  ng-if="enabled"
   uib-tooltip="{{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS_TOOLTIP' | translate }}"
   tooltip-placement="bottom">
   {{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS' | translate }}

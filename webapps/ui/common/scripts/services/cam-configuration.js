@@ -136,7 +136,7 @@ module.exports = function(config, app) {
 
       this.getRuntimeActivityInstanceMetrics = function() {
         var param = 'runtimeActivityInstanceMetrics';
-        return angular.extend({}, defaultConfig[param], config[param]);
+        return angular.extend({}, defaultConfig[param], config[param]).display;
       };
 
       this.getActivityInstancePeriod = function() {
@@ -148,7 +148,9 @@ module.exports = function(config, app) {
 
       this.getActivityInstanceAdjustable = function() {
         var param = 'historicActivityInstanceMetrics';
-        return config[param] && config[param].adjustablePeriod
+
+        return config[param] &&
+          typeof config[param].adjustablePeriod !== 'undefined'
           ? config[param].adjustablePeriod
           : defaultConfig[param].adjustablePeriod;
       };
