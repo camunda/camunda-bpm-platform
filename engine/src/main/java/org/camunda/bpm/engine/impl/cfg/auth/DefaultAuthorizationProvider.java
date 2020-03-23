@@ -277,9 +277,12 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
                                                               String userId) {
     AuthorizationEntity runtimeAuthorization = getGrantAuthorization(taskId, userId, groupId, TASK);
 
+    boolean enforceSpecificVariablePermission = isEnforceSpecificVariablePermission();
+
+    List<Permission> runtimePermissions = getRuntimePermissions(enforceSpecificVariablePermission);
     runtimeAuthorization =
-        updateAuthorization(runtimeAuthorization, userId, groupId, TASK, taskId, READ,
-            getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
+        updateAuthorization(runtimeAuthorization, userId, groupId, TASK, taskId,
+            runtimePermissions);
 
     if (!isHistoricInstancePermissionsEnabled()) {
       return new AuthorizationEntity[]{ runtimeAuthorization };
@@ -288,12 +291,39 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       AuthorizationEntity historyAuthorization = getGrantAuthorization(taskId, userId,
           groupId, HISTORIC_TASK);
 
+      List<Permission> historicPermissions =
+          getHistoricPermissions(enforceSpecificVariablePermission);
       historyAuthorization =
-          updateAuthorization(historyAuthorization, userId, groupId, HISTORIC_TASK,
-              taskId, HistoricTaskPermissions.READ);
+          updateAuthorization(historyAuthorization, userId, groupId, HISTORIC_TASK, taskId,
+              historicPermissions);
 
       return new AuthorizationEntity[]{ runtimeAuthorization, historyAuthorization };
     }
+  }
+
+  protected List<Permission> getHistoricPermissions(boolean enforceSpecificVariablePermission) {
+    List<Permission> historicPermissions = new ArrayList<>();
+    historicPermissions.add(HistoricTaskPermissions.READ);
+
+    if (enforceSpecificVariablePermission) {
+      historicPermissions.add(HistoricTaskPermissions.READ_VARIABLE);
+    }
+
+    return historicPermissions;
+  }
+
+  protected List<Permission> getRuntimePermissions(boolean enforceSpecificVariablePermission) {
+    List<Permission> runtimePermissions = new ArrayList<>();
+    runtimePermissions.add(READ);
+
+    Permission defaultUserPermissionForTask = getDefaultUserPermissionForTask();
+    runtimePermissions.add(defaultUserPermissionForTask);
+
+    if (enforceSpecificVariablePermission) {
+      runtimePermissions.add(TaskPermissions.READ_VARIABLE);
+    }
+
+    return runtimePermissions;
   }
 
   protected boolean isHistoricInstancePermissionsEnabled() {
@@ -326,7 +356,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return authorizationManager.findAuthorizationByGroupIdAndResourceId(AUTH_TYPE_GRANT, groupId, resource, resourceId);
   }
 
-  protected AuthorizationEntity updateAuthorization(AuthorizationEntity authorization, String userId, String groupId, Resource resource, String resourceId, Permission... permissions) {
+  protected AuthorizationEntity updateAuthorization(AuthorizationEntity authorization,
+                                                    String userId, String groupId,
+                                                    Resource resource, String resourceId,
+                                                    List<Permission> permissions) {
     if (authorization == null) {
       authorization = createGrantAuthorization(userId, groupId, resource, resourceId);
       updateAuthorizationBasedOnCacheEntries(authorization, userId, groupId, resource, resourceId);
@@ -373,10 +406,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       .getDefaultUserPermissionForTask();
   }
 
-  protected Permission getSpecificReadVariablePermission() {
-    return Context
-      .getProcessEngineConfiguration()
-      .isEnforceSpecificVariablePermission() ? TaskPermissions.READ_VARIABLE : null;
+  protected boolean isEnforceSpecificVariablePermission() {
+    return Context.getProcessEngineConfiguration()
+        .isEnforceSpecificVariablePermission();
   }
 
   /**

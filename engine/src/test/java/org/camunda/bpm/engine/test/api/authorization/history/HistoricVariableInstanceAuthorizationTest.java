@@ -809,6 +809,150 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     assertEquals(1, result.size());
   }
 
+  public void testCheckReadVariablePermissionOnHistoricTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ_VARIABLE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testOnlyReadPermissionOnHistoricTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(0, result.size());
+  }
+
+  public void testIgnoreReadVariablePermissionOnHistoricTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(false);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ_VARIABLE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(0, result.size());
+  }
+
+  public void testCheckReadVariablePermissionOnStandaloneHistoricTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    String taskId = "aTaskId";
+    createTask(taskId);
+    disableAuthorization();
+    taskService.setVariable(taskId, "foo", "bar");
+    enableAuthorization();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ_VARIABLE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(1, result.size());
+
+    // clear
+    deleteTask(taskId, true);
+  }
+
+  public void testCheckReadVariablePermissionOnCompletedHistoricTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ_VARIABLE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testCheckReadVariablePermissionOnHistoricTaskAndNonePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.READ_VARIABLE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.NONE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testCheckNonePermissionOnHistoricTaskAndReadHistoryVariablePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, HistoricTaskPermissions.NONE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
+        .list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
   public void testHistoricTaskPermissionsAuthorizationDisabled() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
