@@ -480,6 +480,8 @@ public abstract class MockProvider {
   public static final Permission[] EXAMPLE_GRANT_PERMISSION_VALUES = new Permission[] { Permissions.NONE, Permissions.READ, Permissions.UPDATE };
   public static final Permission[] EXAMPLE_REVOKE_PERMISSION_VALUES = new Permission[] { Permissions.ALL, Permissions.READ, Permissions.UPDATE };
   public static final String[] EXAMPLE_PERMISSION_VALUES_STRING = new String[] { "READ", "UPDATE" };
+  public static final String EXAMPLE_AUTH_REMOVAL_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_AUTH_ROOT_PROCESS_INSTANCE_ID = "aRootProcessInstanceId";
 
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
   public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
@@ -1758,6 +1760,9 @@ public abstract class MockProvider {
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
     when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_GRANT_PERMISSION_VALUES);
+
+    when(mockAuthorization.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_AUTH_REMOVAL_TIME));
+    when(mockAuthorization.getRootProcessInstanceId()).thenReturn(EXAMPLE_AUTH_ROOT_PROCESS_INSTANCE_ID);
 
     return mockAuthorization;
   }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.dto.authorization;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -38,6 +39,8 @@ public class AuthorizationDto {
   protected String groupId;
   protected Integer resourceType;
   protected String resourceId;
+  protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   // transformers ///////////////////////////////////////
 
@@ -54,6 +57,8 @@ public class AuthorizationDto {
     authorizationDto.setGroupId(dbAuthorization.getGroupId());
     authorizationDto.setResourceType(dbAuthorization.getResourceType());
     authorizationDto.setResourceId(dbAuthorization.getResourceId());
+    authorizationDto.setRemovalTime(dbAuthorization.getRemovalTime());
+    authorizationDto.setRootProcessInstanceId(dbAuthorization.getRootProcessInstanceId());
 
     return authorizationDto;
   }
@@ -129,6 +134,18 @@ public class AuthorizationDto {
   }
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
+  }
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
   }
 
   private static Permission[] getPermissions(Authorization dbAuthorization, ProcessEngineConfiguration engineConfiguration) {
