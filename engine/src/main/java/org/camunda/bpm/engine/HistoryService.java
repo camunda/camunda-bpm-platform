@@ -494,7 +494,10 @@ public interface HistoryService {
   HistoricProcessInstanceReport createHistoricProcessInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a historic task instance report.
+   * <p>Creates a new programmatic query to create a historic task instance report.
+   *
+   * <p>Subsequent builder methods throw {@link AuthorizationException} when the user has no
+   * {@link Permissions#READ_HISTORY} permission on any {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.6
    */

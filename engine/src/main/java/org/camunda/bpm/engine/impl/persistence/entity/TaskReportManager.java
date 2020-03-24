@@ -59,7 +59,7 @@ public class TaskReportManager extends AbstractManager {
   }
 
   protected void configureQuery(HistoricTaskInstanceReportImpl parameter) {
-    getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.TASK, Authorization.ANY);
+    getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.PROCESS_DEFINITION, Authorization.ANY);
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }
 
