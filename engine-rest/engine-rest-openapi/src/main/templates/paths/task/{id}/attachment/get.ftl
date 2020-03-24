@@ -2,7 +2,7 @@
 
   <@lib.endpointInfo
       id = "getAttachments"
-      tag = "Attachment"
+      tag = "Task Attachment"
       desc = "Gets the attachments for a task." />
 
   "parameters" : [

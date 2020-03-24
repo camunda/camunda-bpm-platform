@@ -2,7 +2,7 @@
 
   <@lib.endpointInfo
       id = "deleteAttachment"
-      tag = "Attachment"
+      tag = "Task Attachment"
       desc = "Removes an attachment from a task by id." />
 
   "parameters" : [

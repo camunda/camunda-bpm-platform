@@ -2,7 +2,7 @@
 
   <@lib.endpointInfo
       id = "getAttachmentData"
-      tag = "Attachment"
+      tag = "Task Attachment"
       desc = "Retrieves the binary content of a task attachment by task id and attachment id." />
 
   "parameters" : [
@@ -31,11 +31,15 @@
       "content": {
         "application/octet-stream": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "For files without any MIME type information, a byte stream is returned."
           }
         },
         "text/plain": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "Files with MIME type information are returned as the saved type. Additionally, for file
                             responses, the Content-Disposition header will be set."
           }
