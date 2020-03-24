@@ -86,7 +86,12 @@ public enum Permissions implements Permission {
   /** Indicates that DELETE_INSTANCE interactions are permitted. */
   DELETE_INSTANCE("DELETE_INSTANCE", 2048, EnumSet.of(Resources.PROCESS_DEFINITION)),
 
-  /** Indicates that READ_HISTORY interactions are permitted. */
+  /**
+   * <p>Indicates that READ_HISTORY interactions are permitted.
+   *
+   * <p>There is no built-in functionality of Camunda BPM that uses the permission together
+   * with the resource {@link Resources#TASK}
+   * */
   READ_HISTORY("READ_HISTORY", 4096, EnumSet.of(Resources.BATCH, Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION, Resources.TASK)),
 
   /** Indicates that DELETE_HISTORY interactions are permitted. */

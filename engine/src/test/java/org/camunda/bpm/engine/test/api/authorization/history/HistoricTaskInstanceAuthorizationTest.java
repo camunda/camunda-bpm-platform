@@ -19,9 +19,7 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
-import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
 import java.util.List;
 
@@ -32,7 +30,6 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -458,7 +455,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testHistoricTaskInstanceReportWithoutAuthorization() {
+  public void testHistoricTaskInstanceDurationReportWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -493,7 +490,6 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    createGrantAuthorization(TASK, ANY, userId, READ_HISTORY);
 
     // when
     List<DurationReportResult> result = historyService
@@ -502,6 +498,33 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     assertEquals(1, result.size());
+  }
+
+  public void testHistoricTaskInstanceCountByProcessDefinitionReportWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    try {
+      // when
+      historyService
+          .createHistoricTaskInstanceReport()
+          .countByProcessDefinitionKey();
+      fail("Exception expected: It should not be possible " +
+          "to create a historic task instance report");
+    } catch (AuthorizationException e) {
+      // then
+      List<MissingAuthorization> missingAuthorizations = e.getMissingAuthorizations();
+      assertEquals(1, missingAuthorizations.size());
+
+      MissingAuthorization missingAuthorization = missingAuthorizations.get(0);
+      assertEquals(READ_HISTORY.toString(), missingAuthorization.getViolatedPermissionName());
+      assertEquals(PROCESS_DEFINITION.resourceName(), missingAuthorization.getResourceType());
+      assertEquals(ANY, missingAuthorization.getResourceId());
+    }
   }
 
   public void testHistoricTaskInstanceReportGroupedByProcessDefinitionKeyWithHistoryReadPermissionOnAny() {
@@ -513,7 +536,6 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    createGrantAuthorization(TASK, ANY, userId, READ_HISTORY);
 
     // when
     List<HistoricTaskInstanceReportResult> result = historyService
@@ -524,7 +546,34 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(1, result.size());
   }
 
-  public void testHistoricTaskInstanceReportGroupedByTaskNameWithHistoryReadPermissionOnAny() {
+  public void testHistoricTaskInstanceGroupedByTaskNameReportWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    try {
+      // when
+      historyService
+          .createHistoricTaskInstanceReport()
+          .countByTaskName();
+      fail("Exception expected: It should not be possible " +
+          "to create a historic task instance report");
+    } catch (AuthorizationException e) {
+      // then
+      List<MissingAuthorization> missingAuthorizations = e.getMissingAuthorizations();
+      assertEquals(1, missingAuthorizations.size());
+
+      MissingAuthorization missingAuthorization = missingAuthorizations.get(0);
+      assertEquals(READ_HISTORY.toString(), missingAuthorization.getViolatedPermissionName());
+      assertEquals(PROCESS_DEFINITION.resourceName(), missingAuthorization.getResourceType());
+      assertEquals(ANY, missingAuthorization.getResourceId());
+    }
+  }
+
+  public void testHistoricTaskInstanceGroupedByTaskNameReportWithHistoryReadPermissionOnAny() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -533,7 +582,6 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    createGrantAuthorization(TASK, ANY, userId, READ_HISTORY);
 
     // when
     List<HistoricTaskInstanceReportResult> result = historyService
