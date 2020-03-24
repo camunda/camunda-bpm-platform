@@ -43,6 +43,8 @@ import io.restassured.response.Response;
 @RunWith(Parameterized.class)
 public class ComponentAvailabilityIT {
 
+  private static final String RUN_HOME_VARIABLE = "camunda.run.home";
+  
   @Parameter(0)
   public String[] commands;
   @Parameter(1)
@@ -64,9 +66,13 @@ public class ComponentAvailabilityIT {
 
   @BeforeParam
   public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
-    URL distroBase = ComponentAvailabilityIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
-    assertNotNull(distroBase);
-    File file = new File(distroBase.getFile());
+    String runHomeDirectory = System.getProperty(RUN_HOME_VARIABLE);
+    if (runHomeDirectory == null || runHomeDirectory.isEmpty()) {
+      throw new RuntimeException("System property " + RUN_HOME_VARIABLE + " not set. This property must point "
+          + "to the root directory of the run distribution to test.");
+    }
+    
+    File file = new File(runHomeDirectory);
     container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
     try {
       container.start();
