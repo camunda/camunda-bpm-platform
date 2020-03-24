@@ -48,7 +48,6 @@ var Controller = [
     $http
   ) {
     $scope.logo = $sce.trustAsHtml(logo);
-    console.log(logo, $scope.logo);
     $scope.status = 'INIT';
     $scope.appName = configuration.getAppName();
 
