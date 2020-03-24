@@ -187,37 +187,44 @@
         last=false >
     "${code}": {
 
-       <#if code!="204">
+       <#if code != "204">
          "content": {
-           "${mediaType}": {
-             "schema": {
-
-               <#if array>
-                 "type" : "array",
-                 "items" : {
-               </#if>
-
-               <#if additionalProperties>
-                 "type" : "object",
-                 "additionalProperties": {
-               </#if>
-
-               <#if mediaType != "application/xhtml+xml">
-                 "$ref": "#/components/schemas/${dto}"
-               <#else>
+           <#if mediaType == "application/xhtml+xml">
+             "${mediaType}": {
+               "schema": {
+                 "type": "string",
+                 "format": "binary",
                  "description": "For `application/xhtml+xml` Responses, a byte stream is returned."
-               </#if>
-
-               <#if array || additionalProperties >
-                 }
-               </#if>
-
-             }
-             <#if examples?size != 0>,
-               "examples": {
-                 ${examples?join(", ")}
                }
-             </#if>
+           <#else>
+             "${mediaType}": {
+               "schema": {
+
+                 <#if array>
+                   "type" : "array",
+                   "items" : {
+                 </#if>
+
+                 <#if additionalProperties>
+                   "type" : "object",
+                   "additionalProperties": {
+                 </#if>
+
+                   "$ref": "#/components/schemas/${dto}"
+
+                 <#if array || additionalProperties >
+                   }
+                 </#if>
+
+               }
+           </#if>
+
+           <#if examples?size != 0>,
+             "examples": {
+               ${examples?join(", ")}
+             }
+           </#if>
+
            }
          },
        </#if>
