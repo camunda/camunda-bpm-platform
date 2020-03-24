@@ -13,9 +13,14 @@
     <@lib.property
         name = "type"
         type = "string"
-        enumValues = ['"assignee"', '"candidate"', '"owner"']
         last = true
-        desc = "The type of the identity link. Can be any defined type. `assignee` and `owner`
-                are reserved types for the task assignee and owner." />
+        desc = "The type of the identity link. The value of the this property can be user-defined. The Process Engine
+                provides three pre-defined Identity Link `type`s:
+
+                * `candidate`
+                * `assignee` - reserved for the task assignee
+                * `owner` - reserved for the task owner
+
+                **Note**: When adding or removing an Identity Link, the `type` property must be defined." />
 
 </@lib.dto>
