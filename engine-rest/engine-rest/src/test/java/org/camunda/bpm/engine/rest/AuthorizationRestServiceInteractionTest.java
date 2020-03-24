@@ -866,6 +866,8 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("groupId", equalTo(authorization.getGroupId()))
         .body("resourceType", equalTo(authorization.getResourceType()))
         .body("resourceId", equalTo(authorization.getResourceId()))
+        .body("removalTime", equalTo(MockProvider.EXAMPLE_AUTH_REMOVAL_TIME))
+        .body("rootProcessInstanceId", equalTo(authorization.getRootProcessInstanceId()))
     .when()
         .get(AUTH_RESOURCE_PATH);
 
