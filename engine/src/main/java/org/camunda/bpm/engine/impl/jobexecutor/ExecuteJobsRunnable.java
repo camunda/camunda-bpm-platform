@@ -68,7 +68,7 @@ public class ExecuteJobsRunnable implements Runnable {
         if (jobExecutor.isActive()) {
           JobFailureCollector jobFailureCollector = new JobFailureCollector(nextJobId);
           try {
-            ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(nextJobId, jobFailureCollector), engineConfiguration);
+            executeJob(nextJobId, commandExecutor, jobFailureCollector);
           } catch(Throwable t) {
             if (ProcessEngineLogger.shouldLogJobException(engineConfiguration, jobFailureCollector.getJob())) {
               ExecuteJobHelper.LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, t);
@@ -106,8 +106,8 @@ public class ExecuteJobsRunnable implements Runnable {
    * Note: this is a hook to be overridden by
    * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable.executeJob(String, CommandExecutor)
    */
-  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
-    ExecuteJobHelper.executeJob(nextJobId, commandExecutor);
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
+    ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(nextJobId, jobFailureCollector), processEngine.getProcessEngineConfiguration());
   }
 
   protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
