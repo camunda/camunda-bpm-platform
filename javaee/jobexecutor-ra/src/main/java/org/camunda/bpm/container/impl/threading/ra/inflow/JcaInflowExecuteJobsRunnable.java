@@ -55,7 +55,7 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
   }
 
   @Override
-  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
     JobExecutionHandlerActivation jobHandlerActivation = ra.getJobHandlerActivation();
     if(jobHandlerActivation == null) {
       // TODO: stop acquisition / only activate acquisition if MDB active?
@@ -73,7 +73,6 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       } catch (ResourceException e) {
         log.log(Level.WARNING, "ResourceException while invoking beforeDelivery() on MessageEndpoint '"+endpoint+"'", e);
       }
-      JobFailureCollector jobFailureCollector = null;
       try {
         jobFailureCollector = ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
       }catch (Exception e) {
