@@ -77,9 +77,7 @@ module.exports = function() {
       'AuthenticationService',
       '$sce',
       function($scope, AuthenticationService, $sce) {
-        console.log('header', $scope);
         $scope.logo = $sce.trustAsHtml(logo);
-        console.log($scope.logo);
 
         $scope.logout = AuthenticationService.logout;
         $scope.getTargetRoute = function() {
