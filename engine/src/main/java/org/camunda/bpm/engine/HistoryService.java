@@ -110,7 +110,14 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricTaskInstance}s. */
   HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricDetail}s. */
+  /** Creates a new programmatic query to search for {@link HistoricDetail}s.
+   * <p>
+   * The result of the query is empty:
+   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or</li>
+   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
+   * in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
+   * </p>
+   */
   HistoricDetailQuery createHistoricDetailQuery();
 
   /**

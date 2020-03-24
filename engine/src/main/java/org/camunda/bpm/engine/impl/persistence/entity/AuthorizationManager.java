@@ -697,7 +697,11 @@ public class AuthorizationManager extends AbstractManager {
   // historic detail query ////////////////////////////////
 
   public void configureHistoricDetailQuery(HistoricDetailQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    Permission readPermission = READ_HISTORY;
+    if (isEnsureSpecificVariablePermission()) {
+      readPermission = READ_HISTORY_VARIABLE;
+    }
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission);
   }
 
   // historic job log query ////////////////////////////////

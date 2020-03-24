@@ -23,6 +23,8 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -56,6 +58,7 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(false);
   }
 
   // historic variable update query (standalone task) /////////////////////////////////////////////
@@ -634,6 +637,54 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
+  }
+
+  public void testCheckReadHistoryVariablePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.READ_HISTORY_VARIABLE);
+
+    // when
+    List<HistoricDetail> result = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testOnlyReadPermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.READ);
+
+    // when
+    List<HistoricDetail> result = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertEquals(0, result.size());
+  }
+
+  public void testIgnoreReadHistoryVariablePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnforceSpecificVariablePermission(false);
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.READ_HISTORY_VARIABLE);
+
+    // when
+    List<HistoricDetail> result = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertEquals(0, result.size());
   }
 
   // helper ////////////////////////////////////////////////////////
