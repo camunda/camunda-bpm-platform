@@ -2,7 +2,7 @@
 
   <@lib.endpointInfo
       id = "deleteIdentityLink"
-      tag = "Identity Link"
+      tag = "Task Identity Link"
       desc = "Removes an identity link from a task by id" />
 
   "parameters" : [
