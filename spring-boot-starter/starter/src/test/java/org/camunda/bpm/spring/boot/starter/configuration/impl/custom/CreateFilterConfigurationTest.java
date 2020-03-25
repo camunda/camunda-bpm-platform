@@ -23,6 +23,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.filter.Filter;
@@ -30,10 +32,14 @@ import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.test.helper.StandaloneInMemoryTestConfiguration;
+import org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEngineLogger;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
 
 public class CreateFilterConfigurationTest {
 
@@ -55,6 +61,10 @@ public class CreateFilterConfigurationTest {
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch(SpringBootProcessEngineLogger.PACKAGE);
 
   @Test
   public void createAdminUser() throws Exception {
@@ -100,13 +110,20 @@ public class CreateFilterConfigurationTest {
     when(engine.getFilterService()).thenReturn(filterService);
     when(filterService.createFilterQuery()).thenReturn(filterQuery);
     when(filterQuery.filterName(anyString())).thenReturn(filterQuery);
-    when(filterQuery.singleResult()).thenReturn(filter);
+    when(filterQuery.count()).thenReturn(1L);
 
     configuration.postProcessEngineBuild(engine);
 
+    verifyLogs(Level.INFO, "the filter with this name already exists");
     verify(filterService).createFilterQuery();
     verify(filterQuery).filterName("All");
     verify(filterService, never()).newTaskFilter("All");
+  }
 
+  protected void verifyLogs(Level logLevel, String message) {
+    List<ILoggingEvent> logs = loggingRule.getLog();
+    assertThat(logs).hasSize(1);
+    assertThat(logs.get(0).getLevel()).isEqualTo(logLevel);
+    assertThat(logs.get(0).getMessage()).containsIgnoringCase(message);
   }
 }
