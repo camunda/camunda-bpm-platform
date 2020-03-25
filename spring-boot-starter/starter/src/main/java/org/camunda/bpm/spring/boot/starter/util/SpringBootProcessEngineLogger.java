@@ -25,9 +25,9 @@ import java.net.URL;
 import java.util.Set;
 
 public class SpringBootProcessEngineLogger extends BaseLogger {
-  static final String PROJECT_CODE = "STARTER";
-  static final String PROJECT_ID = "SB";
-  static final String PACKAGE = "org.camunda.bpm.spring.boot";
+  public static final String PROJECT_CODE = "STARTER";
+  public static final String PROJECT_ID = "SB";
+  public static final String PACKAGE = "org.camunda.bpm.spring.boot";
 
   public static final SpringBootProcessEngineLogger LOG = createLogger(SpringBootProcessEngineLogger.class, PROJECT_CODE, PACKAGE, PROJECT_ID);
 
@@ -41,6 +41,12 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
 
   public void createInitialFilter(Filter filter) {
     logInfo("015", "create initial filter: id={} name={}", filter.getId(), filter.getName());
+  }
+
+  public void skipCreateInitialFilter(String filterName) {
+    logInfo("016",
+        "Skip initial filter creation, the filter with this name already exists: {}",
+        filterName);
   }
 
   public void skipAutoDeployment() {
