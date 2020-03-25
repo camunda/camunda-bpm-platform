@@ -21,6 +21,7 @@ import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunctionTransformer;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.spin.SpinValueMapperFactory;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.feel.FeelEngine.Builder;
 import org.camunda.feel.FeelEngine.Failure;
 import org.camunda.feel.FeelEngine.UnaryTests$;
 import org.camunda.feel.context.CustomContext;
@@ -55,7 +56,7 @@ public class ScalaFeelEngine implements FeelEngine {
     CustomFunctionTransformer customFunctionTransformer =
       new CustomFunctionTransformer(functionProviders, compositeValueMapper);
 
-    feelEngine = new org.camunda.feel.FeelEngine(customFunctionTransformer, compositeValueMapper);
+    feelEngine = buildFeelEngine(customFunctionTransformer, compositeValueMapper);
   }
 
   public <T> T evaluateSimpleExpression(String expression, VariableContext variableContext) {
@@ -140,6 +141,15 @@ public class ScalaFeelEngine implements FeelEngine {
 
   protected <T> List<T> toList(java.util.List list) {
     return ListHasAsScala(list).asScala().toList();
+  }
+
+  protected org.camunda.feel.FeelEngine buildFeelEngine(CustomFunctionTransformer transformer,
+                                                        CompositeValueMapper valueMapper) {
+    return new Builder()
+      .functionProvider(transformer)
+      .valueMapper(valueMapper)
+      .enableExternalFunctions(false)
+      .build();
   }
 
 }
