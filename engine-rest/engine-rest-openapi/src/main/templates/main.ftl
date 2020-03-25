@@ -37,6 +37,7 @@
     {"name": "Engine"},
     {"name": "Identity Link"},
     {"name": "Message"},
+    {"name": "Metrics"},
     {"name": "Process instance"},
     {"name": "Signal"},
     {"name": "Schema Log"},
