@@ -200,7 +200,7 @@ improve the readibility by splitting the next with single or multiple line break
 
 #### Formats
 
-The `format` fields define further what is the type of properties. For more information, please check the [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#dataTypeFormat). The common types used in the documentation are `int32`, `binary`, `date-time`.
+The `format` fields further define the type of properties and parameters. For more information, please check the [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#dataTypeFormat). The common types used in the documentation are `int32`, `binary`, `date-time`.
 Example:
 Specify the `date-time` format of the date properties whenever is possible,
 ```
@@ -212,7 +212,7 @@ Specify the `date-time` format of the date properties whenever is possible,
                        By default (https://docs.camunda.org/manual/${docsVersion}/reference/rest/overview/date-format/),
                        the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
 ```
-That will improve the clients that are generated from the OpenAPI documentation.
+That will improve the clients that are generated from the OpenAPI documentation. **Note:** When using a 'date-time' in a 'GET' request (as URL parameter), it is important to use proper URL encoding as described in the [Date Format Overview](https://docs.camunda.org/manual/develop/reference/rest/overview/date-format/)
 
 #### Examples
 

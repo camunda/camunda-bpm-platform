@@ -46,7 +46,7 @@
         additionalProperties=false
         itemType="string"
         dto=""
-        format="none"
+        format=""
         addProperty=""
         last=false >
     "${name}": {
@@ -56,7 +56,7 @@
       <#else>
         "type": "${type}",
 
-        <#if format != "none">
+        <#if format?has_content>
           "format": "${format}",
         </#if>
 
