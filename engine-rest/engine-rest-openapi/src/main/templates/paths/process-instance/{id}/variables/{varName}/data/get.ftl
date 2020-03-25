@@ -32,6 +32,8 @@
       "content": {
         "application/octet-stream": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "For binary variables or files without any MIME type information, a byte stream is returned."
           },
           "examples": {
@@ -43,6 +45,8 @@
         },
         "text/plain": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "File variables with MIME type information are returned as the saved type.
             Additionally, for file variables the Content-Disposition header will be set."
           },
