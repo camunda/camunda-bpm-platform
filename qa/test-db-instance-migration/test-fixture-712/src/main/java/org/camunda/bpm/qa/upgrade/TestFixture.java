@@ -19,6 +19,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.batch.deploymentaware.DeploymentAwareBatchesScenario;
 import org.camunda.bpm.qa.upgrade.customretries.FailingIntermediateBoundaryTimerJobScenario;
 
 /**
@@ -40,6 +41,8 @@ public class TestFixture {
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
     runner.setupScenarios(FailingIntermediateBoundaryTimerJobScenario.class);
+    // batch deployment-awareness
+    runner.setupScenarios(DeploymentAwareBatchesScenario.class);
 
     processEngine.close();
   }

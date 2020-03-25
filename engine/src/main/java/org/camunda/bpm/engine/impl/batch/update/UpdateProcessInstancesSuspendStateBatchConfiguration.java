@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 
 public class UpdateProcessInstancesSuspendStateBatchConfiguration extends BatchConfiguration {
 
@@ -25,7 +27,12 @@ public class UpdateProcessInstancesSuspendStateBatchConfiguration extends BatchC
   protected final boolean suspended;
 
   public UpdateProcessInstancesSuspendStateBatchConfiguration(List<String> ids, boolean suspended) {
-    super(ids);
+    this(ids, null, suspended);
+  }
+
+  public UpdateProcessInstancesSuspendStateBatchConfiguration(List<String> ids,
+      DeploymentMappings mappings, boolean suspended) {
+    super(ids, mappings);
     this.suspended = suspended;
   }
 

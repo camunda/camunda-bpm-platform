@@ -52,8 +52,11 @@ public class DeleteProcessInstancesBatchTest {
     // assume
     assertThat(processInstances.size(), is(10));
 
+    String batchId = engineRule.getManagementService().getProperties()
+        .get("DeleteProcessInstancesBatchScenario.batchId");
     Batch batch = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_PROCESS_INSTANCE_DELETION)
+      .batchId(batchId)
       .singleResult();
 
     String jobId = engineRule.getManagementService().createJobQuery()

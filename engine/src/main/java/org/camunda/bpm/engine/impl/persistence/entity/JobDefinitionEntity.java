@@ -66,6 +66,8 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
 
   protected String tenantId;
 
+  protected String deploymentId;
+
   public JobDefinitionEntity() {
   }
 
@@ -76,7 +78,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
   }
 
   public Object getPersistentState() {
-    HashMap<String, Object> state = new HashMap<String, Object>();
+    HashMap<String, Object> state = new HashMap<>();
     state.put("processDefinitionId", processDefinitionId);
     state.put("processDefinitionKey", processDefinitionKey);
     state.put("activityId", activityId);
@@ -85,6 +87,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
     state.put("suspensionState", suspensionState);
     state.put("jobPriority", jobPriority);
     state.put("tenantId", tenantId);
+    state.put("deploymentId", deploymentId);
     return state;
   }
 
@@ -184,15 +187,24 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
     this.tenantId = tenantId;
   }
 
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
     return referenceIdAndClass;
   }
+
 }

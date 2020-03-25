@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.List;
+
+import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
@@ -26,24 +29,31 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
   public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
+  public static final String PROCESS_INSTANCE_ID_MAPPINGS = "processInstanceIdMappings";
   public static final String SUSPENDING = "suspended";
 
   public JsonObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
+    JsonUtil.addListField(json, PROCESS_INSTANCE_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addField(json, SUSPENDING, configuration.getSuspended());
     return json;
   }
 
   public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JsonObject json) {
     UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
-      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, SUSPENDING));
+      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), readMappings(json),
+          JsonUtil.getBoolean(json, SUSPENDING));
 
     return configuration;
   }
 
   protected List<String> readProcessInstanceIds(JsonObject jsonObject) {
     return JsonUtil.asStringList(JsonUtil.getArray(jsonObject, PROCESS_INSTANCE_IDS));
+  }
+
+  protected DeploymentMappings readMappings(JsonObject jsonObject) {
+    return JsonUtil.asList(JsonUtil.getArray(jsonObject, PROCESS_INSTANCE_ID_MAPPINGS), DeploymentMappingJsonConverter.INSTANCE, DeploymentMappings::new);
   }
 }

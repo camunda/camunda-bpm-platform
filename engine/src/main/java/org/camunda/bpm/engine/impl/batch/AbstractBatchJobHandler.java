@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonElement;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -41,19 +42,76 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
   @Override
   public boolean createJobs(BatchEntity batch) {
-    CommandContext commandContext = Context.getCommandContext();
-    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
-    JobManager jobManager = commandContext.getJobManager();
-
     T configuration = readConfiguration(batch.getConfigurationBytes());
+    String deploymentId = null;
+
+    DeploymentMappings idMappings = configuration.getIdMappings();
+    boolean deploymentAware = idMappings != null && !idMappings.isEmpty();
+
+    List<String> ids = configuration.getIds();
+
+    if (deploymentAware) {
+      sanitizeMappings(idMappings, ids);
+      DeploymentMapping mappingToProcess = idMappings.get(0);
+      ids = mappingToProcess.getIds(ids);
+      deploymentId = mappingToProcess.getDeploymentId();
+    }
 
     int batchJobsPerSeed = batch.getBatchJobsPerSeed();
     int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
 
-    List<String> ids = configuration.getIds();
     int numberOfItemsToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, ids.size());
+
     // view of process instances to process
     List<String> processIds = ids.subList(0, numberOfItemsToProcess);
+    createJobEntities(batch, configuration, deploymentId, processIds, invocationsPerBatchJob);
+    if (deploymentAware) {
+      if (ids.isEmpty()) {
+        // all ids of the deployment are handled
+        idMappings.remove(0);
+      } else {
+        idMappings.get(0).removeIds(numberOfItemsToProcess);
+      }
+    }
+
+    // update batch configuration
+    batch.setConfigurationBytes(writeConfiguration(configuration));
+
+    return deploymentAware ? idMappings.isEmpty() : ids.isEmpty();
+  }
+
+  protected void sanitizeMappings(DeploymentMappings idMappings, List<String> ids) {
+    // for mixed version SeedJob execution, there might be ids that have been processed
+    // without updating the mappings, this is corrected here,
+    // see https://jira.camunda.com/browse/CAM-11188
+    int elementsToRemove = idMappings.getOverallIdCount() - ids.size();
+    if (elementsToRemove > 0) {
+      for (Iterator<DeploymentMapping> iterator = idMappings.iterator(); iterator.hasNext();) {
+        DeploymentMapping deploymentMapping = iterator.next();
+        if (deploymentMapping.getCount() <= elementsToRemove) {
+          iterator.remove();
+          elementsToRemove -= deploymentMapping.getCount();
+          if (elementsToRemove == 0) {
+            break;
+          }
+        } else {
+          deploymentMapping.removeIds(elementsToRemove);
+          break;
+        }
+      }
+    }
+  }
+
+  protected void createJobEntities(BatchEntity batch, T configuration, String deploymentId,
+      List<String> processIds, int invocationsPerBatchJob) {
+
+    if (processIds == null || processIds.isEmpty()) {
+      return;
+    }
+
+    CommandContext commandContext = Context.getCommandContext();
+    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
+    JobManager jobManager = commandContext.getJobManager();
 
     int createdJobs = 0;
     while (!processIds.isEmpty()) {
@@ -65,6 +123,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);
+      job.setDeploymentId(deploymentId);
       postProcessJob(configuration, job);
       jobManager.insertAndHintJobExecutor(job);
 
@@ -74,11 +133,6 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
     // update created jobs for batch
     batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
-
-    // update batch configuration
-    batch.setConfigurationBytes(writeConfiguration(configuration));
-
-    return ids.isEmpty();
   }
 
   protected abstract T createJobConfiguration(T configuration, List<String> processIdsForJob);
@@ -86,7 +140,6 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
   protected void postProcessJob(T configuration, JobEntity job) {
     // do nothing as default
   }
-
 
   protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {
     BatchJobContext creationContext = new BatchJobContext(batch, configuration);

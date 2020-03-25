@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Collection;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
@@ -36,7 +35,7 @@ public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcess
   @Override
   public Void execute(CommandContext commandContext) {
 
-    Collection<String> processInstanceIds = collectProcessInstanceIds();
+    Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext).getIds();
 
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class,
         "No process instance ids given", "Process Instance ids", processInstanceIds);

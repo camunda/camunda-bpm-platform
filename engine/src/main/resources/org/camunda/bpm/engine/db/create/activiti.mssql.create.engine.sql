@@ -139,6 +139,7 @@ create table ACT_RU_JOBDEF (
     SUSPENSION_STATE_ tinyint,
     JOB_PRIORITY_ numeric(19,0),
     TENANT_ID_ nvarchar(64),
+    DEPLOYMENT_ID_ nvarchar(64),
     primary key (ID_)
 );
 

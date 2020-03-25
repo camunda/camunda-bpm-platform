@@ -17,15 +17,15 @@
 package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobsRetriesBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Askar Akhmerov
@@ -46,9 +46,8 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
     this.retries = retries;
   }
 
-  protected List<String> collectJobIds(CommandContext commandContext) {
-    List<String> collectedJobIds = new ArrayList<String>();
-    List<String> collectedProcessInstanceIds = new ArrayList<String>();
+  protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {
+    Set<String> collectedProcessInstanceIds = new HashSet<>();
 
     if (query != null) {
       collectedProcessInstanceIds.addAll(((ProcessInstanceQueryImpl)query).listIds());
@@ -64,13 +63,15 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
       collectedProcessInstanceIds.addAll(this.processInstanceIds);
     }
 
-    for (String process : collectedProcessInstanceIds) {
-      for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process)) {
-        collectedJobIds.add(job.getId());
-      }
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
+
+    if (!CollectionUtil.isEmpty(collectedProcessInstanceIds)) {
+      JobQueryImpl jobQuery = new JobQueryImpl();
+      jobQuery.processInstanceIds(collectedProcessInstanceIds);
+      elementConfiguration.addDeploymentMappings(commandContext.runWithoutAuthorization(jobQuery::listDeploymentIdMappings));
     }
 
-    return collectedJobIds;
+    return elementConfiguration;
   }
 
 }

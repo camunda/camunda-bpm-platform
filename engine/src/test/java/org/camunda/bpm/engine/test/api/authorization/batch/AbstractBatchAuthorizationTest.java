@@ -93,15 +93,23 @@ public abstract class AbstractBatchAuthorizationTest {
   }
 
   protected void executeSeedAndBatchJobs() {
-    Job job = engineRule.getManagementService().createJobQuery()
-        .jobDefinitionId(batch.getSeedJobDefinitionId())
-        .singleResult();
-    //seed job
-    managementService.executeJob(job.getId());
+    executeSeedJobs();
 
     for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
       managementService.executeJob(pending.getId());
     }
+  }
+
+  public void executeSeedJobs() {
+    while(getSeedJob() != null) {
+      managementService.executeJob(getSeedJob().getId());
+    }
+  }
+
+  public Job getSeedJob() {
+    return engineRule.getManagementService().createJobQuery()
+        .jobDefinitionId(batch.getSeedJobDefinitionId())
+        .singleResult();
   }
 
   protected abstract AuthorizationScenario getScenario();

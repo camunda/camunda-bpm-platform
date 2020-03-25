@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
@@ -43,8 +46,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   private static final long serialVersionUID = 1L;
   protected String activityId;
   protected String id;
+  protected Set<String> ids;
   protected String jobDefinitionId;
   protected String processInstanceId;
+  protected Set<String> processInstanceIds;
   protected String executionId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
@@ -83,6 +88,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
+  public JobQuery jobIds(Set<String> ids) {
+    ensureNotEmpty("Set of job ids", ids);
+    this.ids = ids;
+    return this;
+  }
+
   public JobQuery jobDefinitionId(String jobDefinitionId) {
     ensureNotNull("Provided job definition id", jobDefinitionId);
     this.jobDefinitionId = jobDefinitionId;
@@ -92,6 +103,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQueryImpl processInstanceId(String processInstanceId) {
     ensureNotNull("Provided process instance id", processInstanceId);
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public JobQuery processInstanceIds(Set<String> processInstanceIds) {
+    ensureNotEmpty("Set of process instance ids", processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
     return this;
   }
 
@@ -242,7 +259,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   private boolean hasExcludingDueDateParameters() {
-    List<Date> dueDates = new ArrayList<Date>();
+    List<Date> dueDates = new ArrayList<>();
     if (duedateHigherThan != null && duedateHigherThanOrEqual != null) {
       dueDates.add(CompareUtil.min(duedateHigherThan, duedateHigherThanOrEqual));
       dueDates.add(CompareUtil.max(duedateHigherThan, duedateHigherThanOrEqual));
@@ -338,10 +355,24 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
       .findJobsByQueryCriteria(this, page);
   }
 
+  @Override
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+      .getJobManager()
+      .findDeploymentIdMappingsByQueryCriteria(this);
+  }
+
   //getters //////////////////////////////////////////
 
+  public Set<String> getIds() {
+    return ids;
+  }
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+  public Set<String> getProcessInstanceIds() {
+    return processInstanceIds;
   }
   public String getExecutionId() {
     return executionId;

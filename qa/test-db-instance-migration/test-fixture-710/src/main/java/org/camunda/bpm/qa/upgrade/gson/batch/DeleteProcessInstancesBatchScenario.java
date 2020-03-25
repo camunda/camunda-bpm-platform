@@ -17,6 +17,7 @@
 package org.camunda.bpm.qa.upgrade.gson.batch;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
@@ -54,7 +55,8 @@ public class DeleteProcessInstancesBatchScenario {
           processInstanceIds.add(processInstance.getId());
         }
 
-        engine.getRuntimeService().deleteProcessInstancesAsync(processInstanceIds, null);
+        Batch batch = engine.getRuntimeService().deleteProcessInstancesAsync(processInstanceIds, null);
+        engine.getManagementService().setProperty("DeleteProcessInstancesBatchScenario.batchId", batch.getId());
       }
     };
   }

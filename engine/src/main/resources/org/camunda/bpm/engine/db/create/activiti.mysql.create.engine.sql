@@ -139,6 +139,7 @@ create table ACT_RU_JOBDEF (
     SUSPENSION_STATE_ integer,
     JOB_PRIORITY_ bigint,
     TENANT_ID_ varchar(64),
+    DEPLOYMENT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

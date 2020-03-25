@@ -44,6 +44,11 @@
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
+  
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
 
   <insert id="insertExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
     insert into ${prefix}ACT_RU_EXT_TASK (
@@ -299,6 +304,13 @@
     <include refid="selectExternalTaskByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
+  
+  <select id="selectExternalTaskDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultMap="deploymentIdMapping">
+    select distinct PD.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectExternalTaskByQueryCriteriaSql"/>
+    inner join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
+    ORDER BY PD.DEPLOYMENT_ID_ ASC
+  </select>
 
   <sql id="selectExternalTaskByQueryCriteriaSql">
     from (
@@ -322,6 +334,12 @@
     <where>
       <if test="externalTaskId != null">
         and RES.ID_ = #{externalTaskId}
+      </if>
+      <if test="externalTaskIds != null and !externalTaskIds.isEmpty()">
+        and
+        <bind name="listOfIds" value="externalTaskIds"/>
+        <bind name="fieldName" value="'RES.ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
       <if test="workerId != null">
         and RES.WORKER_ID_ = #{workerId}

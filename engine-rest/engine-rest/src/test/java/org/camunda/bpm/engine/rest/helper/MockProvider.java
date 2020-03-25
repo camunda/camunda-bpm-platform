@@ -450,6 +450,7 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = withTimezone("2013-04-23T13:42:43");
   public static final long EXAMPLE_JOB_DEFINITION_PRIORITY = Integer.MAX_VALUE + 52l;
+  public static final String EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID = "aDeploymentId";
 
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
@@ -2279,7 +2280,8 @@ public abstract class MockProvider {
       .jobPriority(EXAMPLE_JOB_DEFINITION_PRIORITY)
       .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
-      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .deploymentId(EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID);
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {

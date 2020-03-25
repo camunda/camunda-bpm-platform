@@ -391,9 +391,12 @@ public class CleanableHistoricBatchReportTest {
   }
 
   private List<String> createCancelationBatchList(int cancelationCountBatch) {
+    BpmnModelInstance instance = createModelInstance();
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    String pId = runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
     List<String> batchIds = new ArrayList<>();
     for (int i = 0; i < cancelationCountBatch; i++) {
-      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList("unknownId"), "create-deletion-batch").getId());
+      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList(pId), "create-deletion-batch").getId());
     }
     return batchIds;
   }

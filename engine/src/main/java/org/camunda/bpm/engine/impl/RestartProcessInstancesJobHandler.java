@@ -48,9 +48,12 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
 
   @Override
   protected void postProcessJob(RestartProcessInstancesBatchConfiguration configuration, JobEntity job) {
-    CommandContext commandContext = Context.getCommandContext();
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
-    job.setDeploymentId(processDefinitionEntity.getDeploymentId());
+    if (job.getDeploymentId() == null) {
+      CommandContext commandContext = Context.getCommandContext();
+      ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache()
+          .findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
+      job.setDeploymentId(processDefinitionEntity.getDeploymentId());
+    }
   }
 
   @Override

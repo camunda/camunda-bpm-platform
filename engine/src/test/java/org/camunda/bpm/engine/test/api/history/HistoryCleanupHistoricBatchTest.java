@@ -185,7 +185,7 @@ public class HistoryCleanupHistoricBatchTest {
 
     BatchEntity batch = (BatchEntity) createFailingMigrationBatch();
 
-    migrationHelper.executeSeedJob(batch);
+    migrationHelper.completeSeedJobs(batch);
 
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
@@ -391,7 +391,7 @@ public class HistoryCleanupHistoricBatchTest {
     }
 
     for (Batch batch : list) {
-      migrationHelper.executeSeedJob(batch);
+      migrationHelper.completeSeedJobs(batch);
       migrationHelper.executeJobs(batch);
 
       ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.addDays(startDate, ++daysInThePast), random.nextInt(60)));
@@ -435,8 +435,11 @@ public class HistoryCleanupHistoricBatchTest {
 
   private List<String> createCancelationBatchList(int cancelationCountBatch) {
     List<String> batchIds = new ArrayList<>();
+    BpmnModelInstance instance = createModelInstance();
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    String pId = runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
     for (int i = 0; i < cancelationCountBatch; i++) {
-      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList("unknownId"), "create-deletion-batch").getId());
+      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList(pId), "create-deletion-batch").getId());
     }
     return batchIds;
   }

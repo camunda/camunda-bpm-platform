@@ -135,6 +135,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
         .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
         .body("tenantId", equalTo(null))
+        .body("deploymentId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 

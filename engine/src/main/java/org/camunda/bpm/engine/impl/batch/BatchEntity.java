@@ -243,15 +243,16 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   @Override
   public Object getPersistentState() {
-    HashMap<String, Object> persistentState = new HashMap<String, Object>();
+    HashMap<String, Object> persistentState = new HashMap<>();
     persistentState.put("jobsCreated", jobsCreated);
     return persistentState;
   }
 
-  public JobDefinitionEntity createSeedJobDefinition() {
+  public JobDefinitionEntity createSeedJobDefinition(String deploymentId) {
     seedJobDefinition = new JobDefinitionEntity(BATCH_SEED_JOB_DECLARATION);
     seedJobDefinition.setJobConfiguration(id);
     seedJobDefinition.setTenantId(tenantId);
+    seedJobDefinition.setDeploymentId(deploymentId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(seedJobDefinition);
 
@@ -333,12 +334,14 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
     }
   }
 
-  public void delete(boolean cascadeToHistory) {
+  public void delete(boolean cascadeToHistory, boolean deleteJobs) {
     CommandContext commandContext = Context.getCommandContext();
 
     deleteSeedJob();
     deleteMonitorJob();
-    getBatchJobHandler().deleteJobs(this);
+    if (deleteJobs) {
+      getBatchJobHandler().deleteJobs(this);
+    }
 
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
     jobDefinitionManager.delete(getSeedJobDefinition());
@@ -403,13 +406,13 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (seedJobDefinitionId != null) {
       referenceIdAndClass.put(seedJobDefinitionId, JobDefinitionEntity.class);

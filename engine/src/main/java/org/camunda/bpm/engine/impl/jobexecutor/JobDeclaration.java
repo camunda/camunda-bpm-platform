@@ -90,6 +90,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
         job.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
         job.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
         job.setTenantId(jobDefinition.getTenantId());
+        job.setDeploymentId(jobDefinition.getDeploymentId());
       }
 
     }

@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.impl.dmn.batch;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
@@ -28,20 +30,26 @@ public class DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter exten
   public static final DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter();
 
   public static final String HISTORIC_DECISION_INSTANCE_IDS = "historicDecisionInstanceIds";
+  public static final String HISTORIC_DECISION_INSTANCE_ID_MAPPINGS = "historicDecisionInstanceIdMappingss";
 
   public JsonObject toJsonObject(BatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
     JsonUtil.addListField(json, HISTORIC_DECISION_INSTANCE_IDS, configuration.getIds());
+    JsonUtil.addListField(json, HISTORIC_DECISION_INSTANCE_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     return json;
   }
 
   public BatchConfiguration toObject(JsonObject json) {
-    BatchConfiguration configuration = new BatchConfiguration(readDecisionInstanceIds(json));
+    BatchConfiguration configuration = new BatchConfiguration(readDecisionInstanceIds(json), readMappings(json));
     return configuration;
   }
 
   protected List<String> readDecisionInstanceIds(JsonObject jsonNode) {
     return JsonUtil.asStringList(JsonUtil.getArray(jsonNode, HISTORIC_DECISION_INSTANCE_IDS));
+  }
+
+  protected DeploymentMappings readMappings(JsonObject jsonNode) {
+    return JsonUtil.asList(JsonUtil.getArray(jsonNode, HISTORIC_DECISION_INSTANCE_ID_MAPPINGS), DeploymentMappingJsonConverter.INSTANCE, DeploymentMappings::new);
   }
 
 }

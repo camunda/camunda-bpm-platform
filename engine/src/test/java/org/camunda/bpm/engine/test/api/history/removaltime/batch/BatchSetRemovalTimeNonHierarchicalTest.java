@@ -1356,7 +1356,8 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
   @Test
   public void shouldSetRemovalTimeToBatch_Incident() {
     // given
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList("aProcessInstanceId"), "aDeleteReason");
+    String processInstance = testRule.process().failingCustomListener().deploy().start();
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstance), "aDeleteReason");
 
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.setJobRetries(jobId, 0);
@@ -1383,6 +1384,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // clear database
     managementService.deleteBatch(batch.getId(), true);
+    runtimeService.deleteProcessInstance(processInstance, "", true);
   }
 
 }

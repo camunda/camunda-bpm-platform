@@ -162,7 +162,12 @@ public class BatchBuilder {
   protected void save(BatchEntity batch) {
     commandContext.getBatchManager().insertBatch(batch);
 
-    batch.createSeedJobDefinition();
+    String seedDeploymentId = null;
+    if (config.getIdMappings() != null && !config.getIdMappings().isEmpty()) {
+      seedDeploymentId = config.getIdMappings().get(0).getDeploymentId();
+    }
+
+    batch.createSeedJobDefinition(seedDeploymentId);
     batch.createMonitorJobDefinition();
     batch.createBatchJobDefinition();
 
