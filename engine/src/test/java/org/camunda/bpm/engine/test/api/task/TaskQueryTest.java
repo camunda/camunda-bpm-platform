@@ -429,6 +429,60 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testQueryByAssigneeNotInPositive() {
+    // given
+    String[] assignees = {"fozzie", "john", "mary"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeNotIn(assignees);
+
+    // then
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+  }
+
+  public void testQueryByAssigneeNotInNegative() {
+    // given
+    String[] assignees = {"gonzo_", "fozzie"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeNotIn(assignees);
+
+    // then
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
+  public void testQueryByAssigneeInAndAssigneeNotIn () {
+    // given
+    String[] assigneesIn = {"fozzie", "gonzo"};
+    String[] assigneesNotIn = {"john", "mary"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+            .taskAssigneeIn(assigneesIn).taskAssigneeNotIn(assigneesNotIn);
+
+    // then
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+  }
+
+  public void testQueryByAssigneeNotInNull() {
+    // given
+    String[] assignees = null;
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    try {
+        query.taskAssigneeNotIn(assignees);
+        fail("Exception expected");
+    } catch (Exception ex) {
+        assertEquals("Assignees is null", ex.getMessage());
+    }
+  }
+
   public void testQueryByUnassigned() {
     TaskQuery query = taskService.createTaskQuery().taskUnassigned();
     assertEquals(10, query.count());

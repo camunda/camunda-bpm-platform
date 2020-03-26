@@ -404,6 +404,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
       .queryParam("tenantIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("tenantIdIn")))
       .queryParam("assigneeIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("assigneeIn")))
+      .queryParam("assigneeNotIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("assigneeNotIn")))
       .queryParam("processInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceIdIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
@@ -444,6 +445,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String[] processInstanceBusinessKeys = { "aBusinessKey", "anotherBusinessKey" };
     String[] tenantIds = { MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID };
     String[] assigneeIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
+    String[] assigneeNotIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
     String[] processInstanceIds = { MockProvider.EXAMPLE_PROCESS_INSTANCE_ID , MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID };
 
 
@@ -453,6 +455,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
     parameters.put("tenantIdIn", tenantIds);
     parameters.put("assigneeIn", assigneeIn);
+    parameters.put("assigneeNotIn", assigneeNotIn);
     parameters.put("processInstanceIdIn", processInstanceIds);
 
     return parameters;
@@ -559,6 +562,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
     verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
     verify(mockQuery).taskAssigneeIn(stringArrayParameters.get("assigneeIn"));
+    verify(mockQuery).taskAssigneeNotIn(stringArrayParameters.get("assigneeNotIn"));
     verify(mockQuery).processInstanceIdIn(stringArrayParameters.get("processInstanceIdIn"));
   }
 

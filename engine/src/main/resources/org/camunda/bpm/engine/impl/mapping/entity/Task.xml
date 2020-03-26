@@ -361,6 +361,13 @@
                 #{assignee}
               </foreach>
             </if>
+            <if test="query.assigneeNotIn != null &amp;&amp; query.assigneeNotIn.size &gt; 0">
+              ${queryType} RES.ASSIGNEE_ NOT in
+              <foreach item="assignee" index="index" collection="query.assigneeNotIn"
+                       open="(" separator="," close=")">
+                #{assignee}
+              </foreach>
+            </if>
             <if test="query.owner != null">
               ${queryType} RES.OWNER_ = #{query.owner}
             </if>
