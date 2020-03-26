@@ -18,7 +18,8 @@
 
     <@lib.property
         name = "value"
-        type = "number"
+        type = "integer"
+        format = "int64"
         last = true
         desc = "The value of the metric aggregated by the interval."/>
 
