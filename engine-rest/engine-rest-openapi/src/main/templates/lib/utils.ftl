@@ -2,6 +2,7 @@
 <#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
+        format=""
         required=false
         last=false >
   {
@@ -20,6 +21,9 @@
       </#if>
 
       "type": "${type}"
+      <#if format?has_content>
+      ,"format": "${format}"
+      </#if>
     },
 
     <#if required>
@@ -42,7 +46,7 @@
         additionalProperties=false
         itemType="string"
         dto=""
-        format="none"
+        format=""
         addProperty=""
         last=false >
     "${name}": {
@@ -52,7 +56,7 @@
       <#else>
         "type": "${type}",
 
-        <#if format != "none">
+        <#if format?has_content>
           "format": "${format}",
         </#if>
 
