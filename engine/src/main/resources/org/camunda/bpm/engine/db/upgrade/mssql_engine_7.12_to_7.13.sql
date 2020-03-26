@@ -55,5 +55,9 @@ ALTER TABLE ACT_RU_JOBDEF
 
 
 -- https://jira.camunda.com/browse/CAM-10978
+
 ALTER TABLE ACT_RU_VARIABLE
   ADD PROC_DEF_ID_ nvarchar(64);
+
+ALTER TABLE ACT_HI_DETAIL
+  ADD INITIAL_ bit;

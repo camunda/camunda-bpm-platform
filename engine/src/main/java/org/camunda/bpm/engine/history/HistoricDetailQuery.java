@@ -127,6 +127,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic details that have occurred after the given date (inclusive). */
   HistoricDetailQuery occurredAfter(Date date);
 
+  /** Only select historic details that were set during the process start. */
+  HistoricDetailQuery initial();
+
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of historic details without tenant id is database-specific.

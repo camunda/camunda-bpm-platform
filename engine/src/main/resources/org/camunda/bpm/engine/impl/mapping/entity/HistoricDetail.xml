@@ -93,7 +93,8 @@
       SEQUENCE_COUNTER_,
       TENANT_ID_,
       OPERATION_ID_,
-      REMOVAL_TIME_
+      REMOVAL_TIME_,
+      INITIAL_
     )
     values (
       #{id, jdbcType=VARCHAR},
@@ -122,7 +123,8 @@
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
       #{userOperationId, jdbcType=VARCHAR},
-      #{removalTime, jdbcType=TIMESTAMP}
+      #{removalTime, jdbcType=TIMESTAMP},
+      #{initial, jdbcType=BOOLEAN}
     )
   </insert>
 
@@ -262,6 +264,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="userOperationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="initial" column="INITIAL_" javaType="java.lang.Boolean" jdbcType="BOOLEAN"/>
     <discriminator javaType="string" column="TYPE_">
       <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/>
       <case value="FormProperty" resultMap="historicFormPropertyResultMap"/>
@@ -417,6 +420,10 @@
       </if>
       <if test="occurredAfter != null">
         and RES.TIME_ &gt;= #{occurredAfter}
+      </if>
+
+      <if test="initial">
+        and RES.INITIAL_ = ${trueConstant}
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
