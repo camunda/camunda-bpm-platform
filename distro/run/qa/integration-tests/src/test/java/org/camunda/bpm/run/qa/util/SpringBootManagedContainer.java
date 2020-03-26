@@ -49,6 +49,7 @@ public class SpringBootManagedContainer {
   private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
   private static final String APPLICATION_YML_PATH = "configuration/default.yml";
   private static final String RESOURCES_PATH = "configuration/resources";
+  private static final String RUN_HOME_VARIABLE = "camunda.run.home";
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
 
@@ -58,21 +59,34 @@ public class SpringBootManagedContainer {
 
   protected Thread shutdownThread;
   protected Process startupProcess;
-  
+
   private List<File> configurationFiles = new ArrayList<>();
 
-  public SpringBootManagedContainer(String baseDirectory, String... commands) {
+  public SpringBootManagedContainer(String... commands) {
+    this.baseDirectory = getRunHome();
     this.baseUrl = "http://localhost:8080";
-    this.baseDirectory = baseDirectory;
     this.commands.add(getScriptPath());
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
     InputStream defaultYml = SpringBootManagedContainer.class.getClassLoader().getResourceAsStream(BASE_TEST_APPLICATION_YML);
     createConfigurationYml(APPLICATION_YML_PATH, defaultYml);
-
     Path resourcesPath = Paths.get(baseDirectory, RESOURCES_PATH);
     resourcesPath.toFile().mkdir();
+  }
+
+  /**
+   * @return the home directory of Camunda BPM Run based on the
+   *         "camunda.run.home" system property.
+   */
+  public static String getRunHome() {
+    String runHomeDirectory = System.getProperty(RUN_HOME_VARIABLE);
+    if (runHomeDirectory == null || runHomeDirectory.isEmpty()) {
+      throw new RuntimeException("System property " + RUN_HOME_VARIABLE + " not set. This property must point "
+          + "to the root directory of the run distribution to test.");
+    }
+
+    return Paths.get(runHomeDirectory).toAbsolutePath().toString();
   }
 
   public void start() {
@@ -277,9 +291,9 @@ public class SpringBootManagedContainer {
 
   public void createConfigurationYml(String filePath, InputStream source) {
     try {
-      
+
       Path testYmlPath = Paths.get(baseDirectory, filePath);
-      
+
       Files.copy(source, testYmlPath);
       configurationFiles.add(testYmlPath.toFile());
     } catch (IOException e) {

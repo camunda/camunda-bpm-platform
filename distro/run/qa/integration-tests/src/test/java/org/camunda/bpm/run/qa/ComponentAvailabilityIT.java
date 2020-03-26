@@ -18,11 +18,8 @@ package org.camunda.bpm.run.qa;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static io.restassured.RestAssured.*;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -43,8 +40,6 @@ import io.restassured.response.Response;
 @RunWith(Parameterized.class)
 public class ComponentAvailabilityIT {
 
-  private static final String RUN_HOME_VARIABLE = "camunda.run.home";
-  
   @Parameter(0)
   public String[] commands;
   @Parameter(1)
@@ -66,14 +61,7 @@ public class ComponentAvailabilityIT {
 
   @BeforeParam
   public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
-    String runHomeDirectory = System.getProperty(RUN_HOME_VARIABLE);
-    if (runHomeDirectory == null || runHomeDirectory.isEmpty()) {
-      throw new RuntimeException("System property " + RUN_HOME_VARIABLE + " not set. This property must point "
-          + "to the root directory of the run distribution to test.");
-    }
-    
-    File file = new File(runHomeDirectory);
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
+    container = new SpringBootManagedContainer(commands);
     try {
       container.start();
     } catch (Exception e) {

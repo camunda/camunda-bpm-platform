@@ -17,14 +17,17 @@
 package org.camunda.bpm.run.qa;
 
 import static io.restassured.RestAssured.when;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,8 +40,6 @@ import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.After;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -46,9 +47,9 @@ public class AutoDeploymentIT {
   static final String PROCESS_DEFINITION_ENDPOINT = "/rest/process-definition";
   static final String DEPLOYMENT_ENDPOINT = "/rest/deployment";
 
-  static URL distroBase = AutoDeploymentIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
   static List<File> dummyFiles = new ArrayList<>();
   static SpringBootManagedContainer container;
+  static String baseDirectory = SpringBootManagedContainer.getRunHome();
 
   @After
   public void stopApp() {
@@ -64,10 +65,7 @@ public class AutoDeploymentIT {
   }
 
   public void runStartScript() throws IOException {
-    assertNotNull(distroBase);
-
-    File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath());
+    container = new SpringBootManagedContainer();
     try {
       container.start();
     } catch (Exception e) {
@@ -75,11 +73,10 @@ public class AutoDeploymentIT {
     }
   }
 
-  public static void createBPMNFile(String path, String processDefinitionId) throws IOException {
-    File baseDir = new File(new File(distroBase.getFile()), "/configuration/");
-    File resourcesDir = new File(baseDir, "resources/" + path);
-    resourcesDir.mkdirs();
-    File bpmnFile = new File(resourcesDir, "process.bpmn");
+  public void createBPMNFile(String path, String processDefinitionId) throws IOException {
+    Path resourcesDir = Paths.get(baseDirectory, "configuration", "resources", path);
+    resourcesDir.toFile().mkdirs();
+    File bpmnFile = Paths.get(resourcesDir.toString(), "process.bpmn").toFile();
     bpmnFile.createNewFile();
     BpmnModelInstance model = Bpmn.createExecutableProcess(processDefinitionId).startEvent().endEvent().done();
     Bpmn.writeModelToFile(bpmnFile, model);
@@ -115,12 +112,12 @@ public class AutoDeploymentIT {
   @Test
   public void shouldAutoDeployScriptAndForms() throws IOException {
     // given
-    File formFile = new File(AutoDeploymentIT.class.getClassLoader().getResource("deployment/form.html").getFile());
-    File scriptFile = new File(AutoDeploymentIT.class.getClassLoader().getResource("deployment/script.js").getFile());
-    File resourcesDirectory = new File(new File(distroBase.getFile()), "configuration/resources");
+    InputStream formFile = AutoDeploymentIT.class.getClassLoader().getResourceAsStream("deployment/form.html");
+    InputStream  scriptFile = AutoDeploymentIT.class.getClassLoader().getResourceAsStream("deployment/script.js");
+    File resourcesDirectory = Paths.get(baseDirectory, "configuration", "resources").toFile();
     resourcesDirectory.mkdirs();
-    Files.copy(formFile, new File(resourcesDirectory, "form.html"));
-    Files.copy(scriptFile, new File(resourcesDirectory, "script.js"));
+    Files.copy(formFile, Paths.get(resourcesDirectory.getAbsolutePath(), "form.html"));
+    Files.copy(scriptFile, Paths.get(resourcesDirectory.getAbsolutePath(), "script.js"));
 
     // when
     runStartScript();
@@ -133,9 +130,9 @@ public class AutoDeploymentIT {
     // when
     Response resourcesResponse = when().get(container.getBaseUrl() + DEPLOYMENT_ENDPOINT + "/" + deploymentId + "/resources");
     List<String> resourceNames = extractResourceNames(resourcesResponse);
-    
+
     // then
-    assertThat(resourceNames).contains("/form.html", "/script.js");
+    assertThat(resourceNames, contains("/form.html", "/script.js"));
   }
 
   @Test

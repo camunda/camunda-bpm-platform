@@ -135,10 +135,6 @@
               <dependenciesToScan>
                 <dependenciesToScan>org.camunda.bpm.run:camunda-bpm-run-qa-integration-tests</dependenciesToScan>
               </dependenciesToScan>
-              <excludes>
-                <!-- https://jira.camunda.com/browse/CAM-11480 -->
-                <exclude>**/AutoDeploymentIT.java</exclude>
-              </excludes>
               <systemPropertyVariables>
                 <camunda.run.home>${run-home}</camunda.run.home>
               </systemPropertyVariables>
