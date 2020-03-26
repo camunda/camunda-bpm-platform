@@ -16,12 +16,17 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -43,18 +48,17 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     return "org/camunda/bpm/engine/test/api/repository/three_.cmmn";
   }
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     deploymentThreeId = repositoryService.createDeployment().name("thirdDeployment").addClasspathResource(getResourceThreePath()).deploy().getId();
-    super.setUp();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
     repositoryService.deleteDeployment(deploymentThreeId, true);
   }
 
+  @Test
   public void testCaseDefinitionProperties() {
     List<CaseDefinition> caseDefinitions = repositoryService
       .createCaseDefinitionQuery()
@@ -65,41 +69,42 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .list();
 
     CaseDefinition caseDefinition = caseDefinitions.get(0);
-    assertEquals("one", caseDefinition.getKey());
-    assertEquals("One", caseDefinition.getName());
-    assertTrue(caseDefinition.getId().startsWith("one:1"));
-    assertEquals("Examples", caseDefinition.getCategory());
-    assertEquals(1, caseDefinition.getVersion());
-    assertEquals("org/camunda/bpm/engine/test/repository/one.cmmn", caseDefinition.getResourceName());
-    assertEquals(deploymentOneId, caseDefinition.getDeploymentId());
+    assertThat(caseDefinition.getKey()).isEqualTo("one");
+    assertThat(caseDefinition.getName()).isEqualTo("One");
+    assertThat(caseDefinition.getId()).startsWith("one:1");
+    assertThat(caseDefinition.getCategory()).isEqualTo("Examples");
+    assertThat(caseDefinition.getVersion()).isEqualTo(1);
+    assertThat(caseDefinition.getResourceName()).isEqualTo("org/camunda/bpm/engine/test/repository/one.cmmn");
+    assertThat(caseDefinition.getDeploymentId()).isEqualTo(deploymentOneId);
 
     caseDefinition = caseDefinitions.get(1);
-    assertEquals("one", caseDefinition.getKey());
-    assertEquals("One", caseDefinition.getName());
-    assertTrue(caseDefinition.getId().startsWith("one:2"));
-    assertEquals("Examples", caseDefinition.getCategory());
-    assertEquals(2, caseDefinition.getVersion());
-    assertEquals("org/camunda/bpm/engine/test/repository/one.cmmn", caseDefinition.getResourceName());
-    assertEquals(deploymentTwoId, caseDefinition.getDeploymentId());
+    assertThat(caseDefinition.getKey()).isEqualTo("one");
+    assertThat(caseDefinition.getName()).isEqualTo("One");
+    assertThat(caseDefinition.getId()).startsWith("one:2");
+    assertThat(caseDefinition.getCategory()).isEqualTo("Examples");
+    assertThat(caseDefinition.getVersion()).isEqualTo(2);
+    assertThat(caseDefinition.getResourceName()).isEqualTo("org/camunda/bpm/engine/test/repository/one.cmmn");
+    assertThat(caseDefinition.getDeploymentId()).isEqualTo(deploymentTwoId);
 
     caseDefinition = caseDefinitions.get(2);
-    assertEquals("two", caseDefinition.getKey());
-    assertEquals("Two", caseDefinition.getName());
-    assertTrue(caseDefinition.getId().startsWith("two:1"));
-    assertEquals("Examples2", caseDefinition.getCategory());
-    assertEquals(1, caseDefinition.getVersion());
-    assertEquals("org/camunda/bpm/engine/test/repository/two.cmmn", caseDefinition.getResourceName());
-    assertEquals(deploymentOneId, caseDefinition.getDeploymentId());
+    assertThat(caseDefinition.getKey()).isEqualTo("two");
+    assertThat(caseDefinition.getName()).isEqualTo("Two");
+    assertThat(caseDefinition.getId()).startsWith("two:1");
+    assertThat(caseDefinition.getCategory()).isEqualTo("Examples2");
+    assertThat(caseDefinition.getVersion()).isEqualTo(1);
+    assertThat(caseDefinition.getResourceName()).isEqualTo("org/camunda/bpm/engine/test/repository/two.cmmn");
+    assertThat(caseDefinition.getDeploymentId()).isEqualTo(deploymentOneId);
   }
 
+  @Test
   public void testQueryByCaseDefinitionIds() {
     // empty list
-    assertTrue(repositoryService.createCaseDefinitionQuery().caseDefinitionIdIn("a", "b").list().isEmpty());
+    assertThat(repositoryService.createCaseDefinitionQuery().caseDefinitionIdIn("a", "b").list()).isEmpty();
 
     // collect all ids
     List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
     // no point of the test if the caseDefinitions is empty
-    assertFalse(caseDefinitions.isEmpty());
+    assertThat(caseDefinitions).isNotEmpty();
     List<String> ids = new ArrayList<String>();
     for (CaseDefinition caseDefinition : caseDefinitions) {
       ids.add(caseDefinition.getId());
@@ -109,19 +114,18 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .caseDefinitionIdIn(ids.toArray(new String[ids.size()]))
       .list();
 
-    assertEquals(ids.size(), caseDefinitions.size());
+    assertThat(ids.size()).isEqualTo(caseDefinitions.size());
     for (CaseDefinition caseDefinition : caseDefinitions) {
-      if (!ids.contains(caseDefinition.getId())) {
-        fail("Expected to find case definition "+ caseDefinition);
-      }
+      assertThat(ids).contains(caseDefinition.getId()).withFailMessage("Expected to find case definition " + caseDefinition);
     }
 
-    assertEquals(0, repositoryService.createCaseDefinitionQuery()
+    assertThat(repositoryService.createCaseDefinitionQuery()
         .caseDefinitionIdIn(ids.toArray(new String[ids.size()]))
         .caseDefinitionId("nonExistent")
-        .count());
+        .count()).isEqualTo(0);
   }
 
+  @Test
   public void testQueryByDeploymentId() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -131,6 +135,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryByInvalidDeploymentId() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -139,14 +144,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.deploymentId(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.deploymentId(null);
   }
 
+  @Test
   public void testQueryByName() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -161,6 +163,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryByInvalidName() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -169,14 +172,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionName(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionName(null);
   }
 
+  @Test
   public void testQueryByNameLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -190,6 +190,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidNameLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -198,14 +199,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionNameLike(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionNameLike(null);
   }
 
+  @Test
   public void testQueryByResourceNameLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -219,6 +217,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidResourceNameLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -227,14 +226,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionNameLike(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionNameLike(null);
   }
 
+  @Test
   public void testQueryByKey() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -251,6 +247,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidKey() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -259,14 +256,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionKey(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionKey(null);
   }
 
+  @Test
   public void testQueryByKeyLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -280,6 +274,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidKeyLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -288,14 +283,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionKeyLike(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionKeyLike(null);
   }
 
+  @Test
   public void testQueryByCategory() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -305,6 +297,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryByInvalidCategory() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -313,14 +306,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionCategory(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionCategory(null);
   }
 
+  @Test
   public void testQueryByCategoryLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -340,6 +330,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
   }
 
+  @Test
   public void testQueryByInvalidCategoryLike() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -348,14 +339,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionCategoryLike(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionCategoryLike(null);
   }
 
+  @Test
   public void testQueryByVersion() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -370,6 +358,7 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 3);
   }
 
+  @Test
   public void testQueryByInvalidVersion() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -378,21 +367,14 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    try {
-      query.caseDefinitionVersion(-1);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionVersion(-1);
 
-    try {
-      query.caseDefinitionVersion(null);
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query.caseDefinitionVersion(null);
   }
 
+  @Test
   public void testQueryByLatest() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -412,60 +394,43 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testInvalidUsageOfLatest() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
-    try {
-      query
-        .caseDefinitionId("test")
-        .latestVersion()
-        .list();
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query
+      .caseDefinitionId("test")
+      .latestVersion()
+      .list();
 
-    try {
-      query
-        .caseDefinitionName("test")
-        .latestVersion()
-        .list();
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
 
-    try {
-      query
-        .caseDefinitionNameLike("test")
-        .latestVersion()
-        .list();
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query
+      .caseDefinitionName("test")
+      .latestVersion()
+      .list();
 
-    try {
-      query
-        .caseDefinitionVersion(1)
-        .latestVersion()
-        .list();
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query
+      .caseDefinitionNameLike("test")
+      .latestVersion()
+      .list();
 
-    try {
-      query
-        .deploymentId("test")
-        .latestVersion()
-        .list();
-      fail();
-    } catch (NotValidException e) {
-      // Expected exception
-    }
+    exceptionRule.expect(NotValidException.class);
+    query
+      .caseDefinitionVersion(1)
+      .latestVersion()
+      .list();
+
+    exceptionRule.expect(NotValidException.class);
+    query
+      .deploymentId("test")
+      .latestVersion()
+      .list();
   }
 
+  @Test
   public void testQuerySorting() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -536,14 +501,14 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .desc();
 
     List<CaseDefinition> caseDefinitions = query.list();
-    assertEquals(4, caseDefinitions.size());
+    assertThat(caseDefinitions.size()).isEqualTo(4);
 
-    assertEquals("one", caseDefinitions.get(0).getKey());
-    assertEquals(2, caseDefinitions.get(0).getVersion());
-    assertEquals("one", caseDefinitions.get(1).getKey());
-    assertEquals(1, caseDefinitions.get(1).getVersion());
-    assertEquals("two", caseDefinitions.get(2).getKey());
-    assertEquals(1, caseDefinitions.get(2).getVersion());
+    assertThat(caseDefinitions.get(0).getKey()).isEqualTo("one");
+    assertThat(caseDefinitions.get(0).getVersion()).isEqualTo(2);
+    assertThat(caseDefinitions.get(1).getKey()).isEqualTo("one");
+    assertThat(caseDefinitions.get(1).getVersion()).isEqualTo(1);
+    assertThat(caseDefinitions.get(2).getKey()).isEqualTo("two");
+    assertThat(caseDefinitions.get(2).getVersion()).isEqualTo(1);
   }
 
 }
