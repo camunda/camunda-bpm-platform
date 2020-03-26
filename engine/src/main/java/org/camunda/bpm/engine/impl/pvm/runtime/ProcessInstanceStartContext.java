@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
 
 /**
@@ -73,10 +72,6 @@ public class ProcessInstanceStartContext extends ExecutionStartContext {
     }
 
     return instantiationStack;
-  }
-
-  public boolean isAsync() {
-    return initial.isAsyncBefore();
   }
 
 }

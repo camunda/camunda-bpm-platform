@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -152,7 +153,7 @@ public class FullHistoryTest {
     assertEquals("bytes", historicVariableUpdate.getVariableName());
     assertEquals(":-(", new String((byte[])historicVariableUpdate.getValue()));
     assertEquals(0, historicVariableUpdate.getRevision());
-    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
+    assertEquals(processInstance.getProcessInstanceId(), historicVariableUpdate.getActivityInstanceId());
 
     // Variable is updated when process was in waitstate
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(1);
@@ -165,13 +166,13 @@ public class FullHistoryTest {
     assertEquals("character", historicVariableUpdate.getVariableName());
     assertEquals("a", historicVariableUpdate.getValue());
     assertEquals(0, historicVariableUpdate.getRevision());
-    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
+    assertEquals(processInstance.getProcessInstanceId(), historicVariableUpdate.getActivityInstanceId());
 
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(3);
     assertEquals("number", historicVariableUpdate.getVariableName());
     assertEquals("one", historicVariableUpdate.getValue());
     assertEquals(0, historicVariableUpdate.getRevision());
-    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
+    assertEquals(processInstance.getProcessInstanceId(), historicVariableUpdate.getActivityInstanceId());
 
     // Variable is updated when process was in waitstate
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(4);
@@ -185,7 +186,7 @@ public class FullHistoryTest {
     assertEquals("zVar1", historicVariableUpdate.getVariableName());
     assertEquals("Event: start", historicVariableUpdate.getValue());
     assertEquals(0, historicVariableUpdate.getRevision());
-    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
+    assertEquals(processInstance.getProcessInstanceId(), historicVariableUpdate.getActivityInstanceId());
 
     // Variable set from transition take execution listener
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(6);
@@ -1335,6 +1336,20 @@ public class FullHistoryTest {
 
     HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
     assertNotNull(historicDetail.getActivityInstanceId());
+    assertNotEquals(pi.getId(), historicDetail.getActivityInstanceId());
+  }
+
+  @Test
+  @Deployment
+  public void testHistoricDetailActivityInstanceIdForInactiveScopeExecutionAsyncBefore() {
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.setVariable(pi.getId(), "foo", "bar");
+
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
+    assertNotNull(historicDetail.getActivityInstanceId());
+    assertNotEquals(pi.getId(), historicDetail.getActivityInstanceId());
   }
 
   @Test

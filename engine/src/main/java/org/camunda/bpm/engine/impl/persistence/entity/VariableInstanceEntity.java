@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueUpdateListener;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.repository.ResourceTypes;
@@ -690,5 +691,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     return referenceIdAndClass;
+  }
+
+  /**
+   * 
+   * @return <code>true</code> <code>processDefinitionId</code> is introduced in 7.13,
+   * the check is used to created missing history at {@link LegacyBehavior#createMissingHistoricVariables(org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl) LegacyBehavior#createMissingHistoricVariables}
+   */
+  public boolean wasCreatedBefore713() {
+    return this.getProcessDefinitionId() == null;
   }
 }
