@@ -52,3 +52,8 @@ create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
 -- https://jira.camunda.com/browse/CAM-11188
 ALTER TABLE ACT_RU_JOBDEF
   ADD DEPLOYMENT_ID_ varchar(64);
+
+
+-- https://jira.camunda.com/browse/CAM-10978
+ALTER TABLE ACT_RU_VARIABLE
+  ADD PROC_DEF_ID_ varchar(64);

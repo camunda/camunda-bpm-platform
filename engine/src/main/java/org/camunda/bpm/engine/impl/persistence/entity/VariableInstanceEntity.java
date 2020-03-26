@@ -60,6 +60,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected String name;
 
+  protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
   protected String taskId;
@@ -190,6 +191,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     persistentState.put("caseInstanceId", caseInstanceId);
     persistentState.put("tenantId", tenantId);
     persistentState.put("processInstanceId", processInstanceId);
+    persistentState.put("processDefinitionId", processDefinitionId);
 
     return persistentState;
   }
@@ -202,6 +204,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public void setExecutionId(String executionId) {
@@ -322,10 +328,12 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (execution == null) {
       this.executionId = null;
       this.processInstanceId = null;
+      this.processDefinitionId = null;
       this.tenantId = null;
     }
     else {
       setExecutionId(execution.getId());
+      this.processDefinitionId = execution.getProcessDefinitionId();
       this.processInstanceId = execution.getProcessInstanceId();
       this.tenantId = execution.getTenantId();
     }
@@ -360,6 +368,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public String getExecutionId() {
@@ -583,6 +595,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       + "[id=" + id
       + ", revision=" + revision
       + ", name=" + name
+      + ", processDefinitionId=" + processDefinitionId
       + ", processInstanceId=" + processInstanceId
       + ", executionId=" + executionId
       + ", caseInstanceId=" + caseInstanceId

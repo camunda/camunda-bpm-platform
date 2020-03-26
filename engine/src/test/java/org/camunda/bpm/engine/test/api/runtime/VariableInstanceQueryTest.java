@@ -2504,6 +2504,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertNull(result.getExecutionId());
     assertNull(result.getProcessInstanceId());
+    assertNull(result.getProcessDefinitionId());
 
   }
 
@@ -2569,6 +2570,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertNull(result.getExecutionId());
     assertNull(result.getProcessInstanceId());
+    assertNull(result.getProcessDefinitionId());
 
   }
 
@@ -2634,6 +2636,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     assertNull(result.getExecutionId());
     assertNull(result.getProcessInstanceId());
+    assertNull(result.getProcessDefinitionId());
 
   }
 
@@ -2732,6 +2735,21 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     for (ActivityInstance subProcessInstance : tree.getActivityInstances("miSubProcess")) {
       assertTrue(loopCounterActivityInstanceIds.contains(subProcessInstance.getId()));
     }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testVariablesProcessDefinitionId() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", 
+        Variables.createVariables().putValue("foo", "bar"));
+
+    // when
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    // then
+    assertNotNull(variable);
+    assertEquals(processInstance.getProcessDefinitionId(), variable.getProcessDefinitionId());
   }
 
 

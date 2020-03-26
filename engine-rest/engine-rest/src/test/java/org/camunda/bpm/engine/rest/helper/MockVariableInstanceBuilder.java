@@ -37,6 +37,7 @@ public class MockVariableInstanceBuilder {
   protected String id;
   protected String name;
   protected TypedValue typedValue;
+  protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
   protected String caseInstanceId;
@@ -58,6 +59,11 @@ public class MockVariableInstanceBuilder {
 
   public MockVariableInstanceBuilder typedValue(TypedValue value) {
     this.typedValue = value;
+    return this;
+  }
+  
+  public MockVariableInstanceBuilder processDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 
@@ -115,6 +121,10 @@ public class MockVariableInstanceBuilder {
 
   public TypedValue getTypedValue() {
     return typedValue;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public String getProcessInstanceId() {
@@ -189,6 +199,7 @@ public class MockVariableInstanceBuilder {
     }
 
     when(mockVariable.getTypedValue()).thenReturn(typedValue);
+    when(mockVariable.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
     when(mockVariable.getExecutionId()).thenReturn(executionId);
     when(mockVariable.getCaseInstanceId()).thenReturn(caseInstanceId);
