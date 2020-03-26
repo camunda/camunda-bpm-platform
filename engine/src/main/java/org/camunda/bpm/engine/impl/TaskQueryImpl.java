@@ -101,6 +101,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String assignee;
   protected String assigneeLike;
   protected Set<String> assigneeIn;
+  protected Set<String> assigneeNotIn;
   protected String involvedUser;
   protected String owner;
   protected Boolean unassigned;
@@ -271,6 +272,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
     this.assigneeIn = assigneeIn;
     expressions.remove("taskAssigneeIn");
+
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskAssigneeNotIn(String... assignees) {
+    ensureNotNull("Assignees", assignees);
+
+    Set<String> assigneeNotIn = new HashSet<>(assignees.length);
+    assigneeNotIn.addAll(Arrays.asList(assignees));
+
+    this.assigneeNotIn = assigneeNotIn;
+    expressions.remove("taskAssigneeNotIn");
 
     return this;
   }
@@ -1422,6 +1436,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return assigneeIn;
   }
 
+  public Set<String> getAssigneeNotIn() {
+    return assigneeNotIn;
+  }
+
   public String getInvolvedUser() {
     return involvedUser;
   }
@@ -1760,6 +1778,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     else if (this.getAssigneeIn() != null) {
       extendedQuery.taskAssigneeIn(this.getAssigneeIn()
                                        .toArray(new String[this.getAssigneeIn().size()]));
+    }
+    if (extendingQuery.getAssigneeNotIn() != null) {
+      extendedQuery.taskAssigneeNotIn(extendingQuery
+              .getAssigneeNotIn()
+              .toArray(new String[extendingQuery.getAssigneeNotIn().size()]));
+    }
+    else if (this.getAssigneeNotIn() != null) {
+      extendedQuery.taskAssigneeNotIn(this.getAssigneeNotIn()
+              .toArray(new String[this.getAssigneeNotIn().size()]));
     }
 
     if (extendingQuery.getInvolvedUser() != null) {
