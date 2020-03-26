@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import junit.framework.TestCase;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -118,6 +120,19 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
       @Override public String getProperty(ProcessInstance obj) {
         return obj.getBusinessKey();
+      }
+    });
+  }
+
+  // PROCESS DEFINITION
+
+  public static NullTolerantComparator<ProcessDefinition> processDefinitionByDeployTime(ProcessEngine processEngine){
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    return propertyComparator(new PropertyAccessor<ProcessDefinition, Date>() {
+      @Override
+      public Date getProperty(ProcessDefinition obj) {
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(obj.getDeploymentId()).singleResult();
+        return deployment.getDeploymentTime();
       }
     });
   }

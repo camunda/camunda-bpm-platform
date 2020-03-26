@@ -199,10 +199,11 @@
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -217,7 +218,7 @@
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">
     from ${prefix}ACT_RE_PROCDEF RES
     <if test="eventSubscriptionType != null">
-    	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
+      inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
     </if>
     <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_DEF_ID_
@@ -233,6 +234,9 @@
           </where>
           group by TENANT_ID_, KEY_) VER
         on RES.KEY_ = VER.KEY_
+    </if>
+    <if test="shouldJoinDeploymentTable">
+      inner join ${prefix}ACT_RE_DEPLOYMENT DEP on RES.DEPLOYMENT_ID_ = DEP.ID_
     </if>
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
@@ -294,6 +298,12 @@
       </if>
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="deployedAfter != null">
+        and DEP.DEPLOY_TIME_ &gt; #{deployedAfter}
+      </if>
+      <if test="deployedAt != null">
+        and DEP.DEPLOY_TIME_ = #{deployedAt}
       </if>
       <if test="latest">
        and RES.VERSION_ = VER.MAX_VERSION and
@@ -407,23 +417,5 @@
               select max(VERSION_)
               from ${prefix}ACT_RE_PROCDEF
               where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select ${distinct} RES.*
-    ${limitBetween}
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${countDistinctAfterEnd}
   </select>
 </mapper>
