@@ -10,7 +10,7 @@
         name = "name"
         location = "query"
         type = "string"
-        enum = ["activity-instance-start",
+        enumValues = ["activity-instance-start",
                 "activity-instance-end",
                 "job-acquisition-attempt",
                 "job-acquired-success",
