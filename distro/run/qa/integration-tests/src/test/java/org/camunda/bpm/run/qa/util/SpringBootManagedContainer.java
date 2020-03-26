@@ -139,7 +139,7 @@ public class SpringBootManagedContainer {
     }
     try {
       if (startupProcess != null) {
-        if (!gracefullyTerminateProcess(startupProcess) || isRunning()) {
+        if (/*!gracefullyTerminateProcess(startupProcess) ||*/ isRunning()) {
           if (!killProcess(startupProcess, false)) {
             throw new RuntimeException("Could not kill the application.");
           }
