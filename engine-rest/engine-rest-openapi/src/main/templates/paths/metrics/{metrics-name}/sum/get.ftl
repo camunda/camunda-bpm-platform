@@ -11,21 +11,21 @@
         location = "path"
         required = true
         type = "string"
-        desc = "The name of the metric. Supported names:
-                `activity-instance-start`,
-                `activity-instance-end`,
-                `job-acquisition-attempt`,
-                `job-acquired-success`,
-                `job-acquired-failure`,
-                `job-execution-rejected`,
-                `job-successful`,
-                `job-failed`,
-                `job-locked-exclusive`,
-                `executed-decision-elements`,
-                `history-cleanup-removed-process-instances`,
-                `history-cleanup-removed-case-instances`,
-                `history-cleanup-removed-decision-instances`,
-                `history-cleanup-removed-batch-operations`" />
+        enum = ["activity-instance-start",
+                "activity-instance-end",
+                "job-acquisition-attempt",
+                "job-acquired-success",
+                "job-acquired-failure",
+                "job-execution-rejected",
+                "job-successful",
+                "job-failed",
+                "job-locked-exclusive",
+                "executed-decision-elements",
+                "history-cleanup-removed-process-instances",
+                "history-cleanup-removed-case-instances",
+                "history-cleanup-removed-decision-instances",
+                "history-cleanup-removed-batch-operations"]
+        desc = "The name of the metric." />
 
     <@lib.parameter
         name = "startDate"
