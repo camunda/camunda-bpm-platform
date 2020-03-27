@@ -712,7 +712,27 @@ public class AuthorizationManager extends AbstractManager {
     if (isEnsureSpecificVariablePermission()) {
       readPermission = READ_HISTORY_VARIABLE;
     }
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_",  readPermission);
+
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission)
+          .atomicCheck(HISTORIC_TASK, "TI.ID_", HistoricTaskPermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // historic detail query ////////////////////////////////
