@@ -16,7 +16,7 @@
   "responses": {
     <@lib.response
         code = "200"
-        dto = "DeploymentDto"
+        dto = "DeploymentWithDefinitionsDto"
         desc = "Request successful."/>
 
     <@lib.response
