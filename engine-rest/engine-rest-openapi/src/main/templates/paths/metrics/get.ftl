@@ -47,6 +47,7 @@
         format = "date-time"
         desc = "The end date (exclusive)."/>
 
+    <#assign last = false />
     <#include "/lib/commons/pagination-params.ftl" >
 
     <@lib.parameter
