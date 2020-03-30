@@ -362,7 +362,6 @@ public class TaskReadVariablePermissionAuthorizationTest {
       verifyReadVariablePermission(runtimeUserAuthorization, TaskPermissions.READ_VARIABLE);
 
     } else if (AUTHORIZATION_TYP_HISTORIC.equals(authorizationType)) {
-      System.out.println("HISTORY!");
 
       Authorization historyUserAuthorization = authorizationService.createAuthorizationQuery()
           .resourceType(HISTORIC_TASK)
