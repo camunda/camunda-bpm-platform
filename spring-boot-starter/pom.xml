@@ -67,12 +67,6 @@
         <version>3.8.1</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.camunda.commons</groupId>
-        <artifactId>camunda-commons-testing</artifactId>
-        <version>${version.camunda.commons}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
   
