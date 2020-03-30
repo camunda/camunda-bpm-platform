@@ -43,7 +43,7 @@ public enum HistoricTaskPermissions implements Permission {
   READ("READ", 2),
 
   /** Indicates that READ_VARIABLE interactions are permitted. */
-  READ_VARIABLE("READ_VARIABLE", 4);
+  READ_VARIABLE("READ_VARIABLE", 64);
 
   protected static final Resource[] RESOURCES = new Resource[] { Resources.HISTORIC_TASK };
 
