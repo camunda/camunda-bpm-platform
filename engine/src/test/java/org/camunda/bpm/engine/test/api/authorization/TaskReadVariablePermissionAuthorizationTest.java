@@ -352,7 +352,6 @@ public class TaskReadVariablePermissionAuthorizationTest {
     authRule.disableAuthorization();
 
     if (AUTHORIZATION_TYP_RUNTIME.equals(authorizationType)) {
-      System.out.println("RUNTIME!");
       Authorization runtimeUserAuthorization = authorizationService.createAuthorizationQuery()
           .resourceType(TASK)
           .userIdIn(userId)
