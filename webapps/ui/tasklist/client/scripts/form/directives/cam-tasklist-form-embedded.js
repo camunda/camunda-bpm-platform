@@ -172,9 +172,10 @@ module.exports = [
           camForm.store();
 
           // manually trigger a mouseleave event to make the tooltip disappear
-          $timeout(function() {
-            angular.element(evt.target).triggerHandler($.Event('mouseleave'));
-          });
+          evt &&
+            $timeout(function() {
+              angular.element(evt.target).triggerHandler($.Event('mouseleave'));
+            });
         };
 
         formController.registerCompletionHandler(complete);
