@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.history;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -890,6 +892,76 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     assertEquals(1, result.size());
+  }
+
+  public void testStandaloneTaskClearHistoricAuthorization() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, userId, ALL);
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, ALL);
+
+    disableAuthorization();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(HISTORIC_TASK)
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+    assertNotNull(authorization);
+
+    // when
+    historyService.deleteHistoricTaskInstance(taskId);
+
+    // then
+    disableAuthorization();
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(HISTORIC_TASK)
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+
+    // clear
+    taskService.deleteTask(taskId);
+  }
+
+  public void testProcessTaskClearHistoricAuthorization() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, ALL);
+    createGrantAuthorization(HISTORIC_TASK, taskId, userId, ALL);
+
+    disableAuthorization();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(HISTORIC_TASK)
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+    assertNotNull(authorization);
+
+    taskService.complete(taskId);
+
+    // when
+    historyService.deleteHistoricTaskInstance(taskId);
+
+    // then
+    disableAuthorization();
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(HISTORIC_TASK)
+        .resourceId(taskId)
+        .singleResult();
+    enableAuthorization();
+
+    assertNull(authorization);
+
+    // clear
+    taskService.deleteTask(taskId);
   }
 
   // helper ////////////////////////////////////////////////////////
