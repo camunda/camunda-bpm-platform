@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
@@ -41,6 +43,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
+  private static final String SORT_BY_DEPLOY_TIME_VALUE = "deployTime";
   private static final String SORT_BY_CATEGORY_VALUE = "category";
   private static final String SORT_BY_TENANT_ID = "tenantId";
   private static final String SORT_BY_VERSION_TAG = "versionTag";
@@ -57,6 +60,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOY_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
     VALID_SORT_BY_VALUES.add(SORT_BY_DECISION_REQUIREMENTS_DEFINITION_KEY);
@@ -69,6 +73,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected String name;
   protected String nameLike;
   protected String deploymentId;
+  protected Date deployedAfter;
+  protected Date deployedAt;
   protected String key;
   protected String keyLike;
   protected String resourceName;
@@ -123,6 +129,16 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   @CamundaQueryParam("deploymentId")
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
+  }
+
+  @CamundaQueryParam(value = "deployedAfter", converter = DateConverter.class)
+  public void setDeployedAfter(Date deployedAfter) {
+    this.deployedAfter = deployedAfter;
+  }
+
+  @CamundaQueryParam(value = "deployedAt", converter = DateConverter.class)
+  public void setDeployedAt(Date deployedAt) {
+    this.deployedAt = deployedAt;
   }
 
   @CamundaQueryParam("key")
@@ -228,6 +244,12 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
     }
+    if (deployedAfter != null) {
+      query.deployedAfter(deployedAfter);
+    }
+    if (deployedAt != null) {
+      query.deployedAt(deployedAt);
+    }
     if (key != null) {
       query.decisionDefinitionKey(key);
     }
@@ -286,6 +308,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
       query.orderByDecisionDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_DEPLOY_TIME_VALUE)) {
+      query.orderByDeploymentTime();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {
