@@ -20,19 +20,23 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -43,7 +47,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -160,93 +163,103 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
   @Test
   public void testSortingParameters() {
     // asc
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionId();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionName();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("version", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionVersion();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("key", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionKey();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
+    executeAndVerifySorting("deployTime", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByDeploymentTime();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("decisionRequirementsDefinitionKey", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
     inOrder.verify(mockedQuery).asc();
 
     // desc
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionId();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("name", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionName();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionKey();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("category", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionDefinitionCategory();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
+    executeAndVerifySorting("deployTime", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByDeploymentTime();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("versionTag", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByVersionTag();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("versionTag", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByVersionTag();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySorting("decisionRequirementsDefinitionKey", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
     inOrder.verify(mockedQuery).desc();
@@ -315,7 +328,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
           .get(DECISION_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).list();
 
     String content = response.asString();
@@ -359,7 +372,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
         .get(DECISION_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).decisionDefinitionIdIn(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_DECISION_DEFINITION_ID);
     inOrder.verify(mockedQuery).list();
 
@@ -384,7 +397,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
         .get(DECISION_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery, never()).decisionDefinitionIdIn(Matchers.<String[]>anyVararg());
     inOrder.verify(mockedQuery).list();
   }
@@ -418,6 +431,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).versionTag(queryParameters.get("versionTag"));
     verify(mockedQuery).versionTagLike(queryParameters.get("versionTagLike"));
     verify(mockedQuery).withoutDecisionRequirementsDefinition();
+    verify(mockedQuery).deployedAfter(DateTimeUtil.parseDate(queryParameters.get("deployedAfter")));
+    verify(mockedQuery).deployedAt(DateTimeUtil.parseDate(queryParameters.get("deployedAt")));
     verify(mockedQuery).list();
   }
 
@@ -526,6 +541,32 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).list();
   }
 
+  @Test
+  public void testQueryByDeployTimeAfter() {
+    String deployTime = withTimezone("2020-03-27T00:00:00");
+    Date date = DateTimeUtil.parseDate(deployTime);
+
+    given().queryParam("deployedAfter", deployTime)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(DECISION_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).deployedAfter(date);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryByDeployTimeAt() {
+    String deployTime = withTimezone("2020-03-27T00:00:00");
+    Date date = DateTimeUtil.parseDate(deployTime);
+
+    given().queryParam("deployedAt", deployTime)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(DECISION_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).deployedAt(date);
+    verify(mockedQuery).list();
+  }
+
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
@@ -535,6 +576,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     parameters.put("name", "name");
     parameters.put("nameLike", "namelike");
     parameters.put("deploymentId", "depId");
+    parameters.put("deployedAfter", withTimezone("2020-03-27T00:00:00"));
+    parameters.put("deployedAt", withTimezone("2020-03-27T00:00:00"));
     parameters.put("key", "key");
     parameters.put("keyLike", "keylike");
     parameters.put("version", "1");
