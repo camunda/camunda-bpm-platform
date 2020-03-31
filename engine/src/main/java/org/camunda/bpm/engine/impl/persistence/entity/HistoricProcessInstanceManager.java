@@ -198,8 +198,10 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     commandContext.getByteArrayManager()
       .addRemovalTimeToByteArraysByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
-    commandContext.getAuthorizationManager()
-        .addRemovalTimeToAuthorizationsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+    if (isEnableHistoricInstancePermissions()) {
+      commandContext.getAuthorizationManager()
+          .addRemovalTimeToAuthorizationsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+    }
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
@@ -247,6 +249,11 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
     commandContext.getByteArrayManager()
       .addRemovalTimeToByteArraysByProcessInstanceId(processInstanceId, removalTime);
+
+    if (isEnableHistoricInstancePermissions()) {
+      commandContext.getAuthorizationManager()
+          .addRemovalTimeToAuthorizationsByProcessInstanceId(processInstanceId, removalTime);
+    }
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
@@ -341,6 +348,11 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     deleteOperations.put(deleteProcessInstances.getEntityType(), deleteProcessInstances);
 
     return deleteOperations;
+  }
+
+  protected boolean isEnableHistoricInstancePermissions() {
+    return Context.getProcessEngineConfiguration()
+        .isEnableHistoricInstancePermissions();
   }
 
 }
