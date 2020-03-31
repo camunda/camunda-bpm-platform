@@ -419,6 +419,44 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
+  // Validation test, can be refactored after fix
+  @Test
+  public void testUpdateTaskListenerOnUserIdLinkDeleteAfterIDLinkRemoval() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+                                  .startEvent()
+                                  .userTask("task")
+                                  .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, UpdateTaskListener.class)
+                                  .endEvent()
+                                  .done();
+    testRule.deploy(model);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.addUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
+
+    // when
+    taskService.deleteUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
+
+    // then
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  public static class UpdateTaskListener implements TaskListener {
+
+    public static int eventCount = 0;
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      eventCount++;
+      // first event adds ID Link
+      // second event removes ID Link
+      if (eventCount > 1) {
+        assertThat(delegateTask.getCandidates().size()).isZero();
+      }
+    }
+  }
+
   @Test
   public void testUpdateTaskListenerOnGroupIdLinkAdd() {
     // given
