@@ -326,6 +326,11 @@ module.exports = [
                   $scope.error = err;
                   return;
                 }
+
+                if ($scope.isDrd) {
+                  $scope.onLoad();
+                }
+
                 $scope.loaded = true;
               });
             });
