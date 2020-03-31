@@ -40,7 +40,7 @@
                          "type": "String"
                        }
                      }',
-                    '"example-1": {
+                    '"example-2": {
                        "summary": "PUT /task/aTaskId/variables/aVarName",
                        "description": "Status 204. No content.",
                        "value": {
