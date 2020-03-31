@@ -139,8 +139,9 @@ public class SpringBootManagedContainer {
     }
     try {
       if (startupProcess != null) {
-        if (/*!gracefullyTerminateProcess(startupProcess) ||*/ isRunning()) {
-          if (!killProcess(startupProcess, false)) {
+        if (isRunning()) {
+          killProcess(startupProcess, false);
+          if (isRunning()) {
             throw new RuntimeException("Could not kill the application.");
           }
         }
@@ -199,33 +200,13 @@ public class SpringBootManagedContainer {
   // kill processes
   // ---------------------------
 
-  protected static boolean gracefullyTerminateProcess(Process process) {
-    try {
-      if (isUnixLike()) {
-        return new ProcessBuilder("kill", "-15", String.valueOf(unixLikeProcessId(process))).start().waitFor() == 0;
-      } else {
-        // neither of the following "graceful" options seem to work reliably so far
-
-        // return Kernel32.INSTANCE.GenerateConsoleCtrlEvent(Wincon.CTRL_C_EVENT, windowsProcessId(process));
-        // return Kernel32.INSTANCE.GenerateConsoleCtrlEvent(Wincon.CTRL_BREAK_EVENT, windowsProcessId(process));
-        // return new ProcessBuilder("taskkill", "/T", "/pid", String.valueOf(windowsProcessId(process))).start().waitFor() == 0;
-
-        // therefore we are going to use "force"
-        return new ProcessBuilder("taskkill", "/F", "/T", "/pid", String.valueOf(windowsProcessId(process))).start().waitFor() == 0;
-      }
-    } catch (Exception e) {
-      log.error(String.format("Couldn't gracefully terminate process %s", process), e);
-      return false;
-    }
-  }
-
-  protected static boolean killProcess(Process process, boolean failOnException) {
+  protected static void killProcess(Process process, boolean failOnException) {
     try {
       Process p = null;
       Integer pid = null;
       if (isUnixLike()) {
         pid = unixLikeProcessId(process);
-        p = new ProcessBuilder("kill", "-9", String.valueOf(pid)).start();
+        p = new ProcessBuilder("pkill", "-TERM", "-P", String.valueOf(pid)).start();
       } else {
         pid = windowsProcessId(process);
         p = new ProcessBuilder("taskkill", "/F", "/T", "/pid", String.valueOf(pid)).start();
@@ -234,7 +215,6 @@ public class SpringBootManagedContainer {
       if (exitCode != 0) {
         log.warn("Attempt to terminate process with pid {} returned with exit code {}", pid, exitCode);
       }
-      return exitCode == 0;
     } catch (Exception e) {
       String message = String.format("Couldn't kill process %s", process);
       if (failOnException) {
@@ -242,7 +222,6 @@ public class SpringBootManagedContainer {
       } else {
         log.error(message, e);
       }
-      return false;
     }
   }
 
