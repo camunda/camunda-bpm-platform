@@ -127,7 +127,6 @@ module.exports = [
               'DELETE',
               'TASK_ASSIGN',
               'TASK_WORK',
-              'READ_HISTORY',
               'UPDATE_VARIABLE',
               'READ_VARIABLE'
             ],
