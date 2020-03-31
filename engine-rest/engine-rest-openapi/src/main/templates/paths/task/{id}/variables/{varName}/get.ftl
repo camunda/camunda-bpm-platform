@@ -22,7 +22,7 @@
         location = "path"
         type = "string"
         required = true
-        desc = "The name of the variable to get"/>
+        desc = "The name of the variable to get."/>
 
     <@lib.parameter
         name = "deserializeValue"
