@@ -141,6 +141,7 @@ public class SpringBootManagedContainer {
       if (startupProcess != null) {
         if (isRunning()) {
           killProcess(startupProcess, false);
+          Thread.sleep(4000L);// let the application shut down
           if (isRunning()) {
             throw new RuntimeException("Could not kill the application.");
           }
