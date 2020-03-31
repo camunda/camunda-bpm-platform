@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 
+import java.util.Date;
+
 /**
  * <p>An {@link Authorization} assigns a set of {@link Permission Permissions}
  * to an identity to interact with a given {@link Resource}.</p>
@@ -249,5 +251,32 @@ public interface Authorization {
    *
    */
   public int getAuthorizationType();
+
+  /**
+   * The removal time indicates the date a historic instance authorization is cleaned up
+   *
+   * A removal time can only be assigned to a historic instance authorization. An authorization
+   * belongs to a historic instance when its resource type is {@link Resources#HISTORIC_TASK}.
+   *
+   * @return  <ul>
+   *   <li>the date the historic instance authorization is cleaned up
+   *   <li>{@code null} if not related to a historic instance resource
+   *   <li>{@code null} if removal time strategy is end and the top-level instance is not finished
+   */
+  Date getRemovalTime();
+
+  /**
+   * The process instance id of the top-level (root) process instance the historic instance
+   * authorization is related to
+   *
+   * A root process instance id is only assigned to a historic instance authorization. An
+   * authorization is related to a historic instance when its resource type is
+   * {@link Resources#HISTORIC_TASK}.
+   *
+   * @return <ul>
+   *   <li>the process instance id of the top-level (root) process instance
+   *   <li>{@code null} if not related to a historic instance resource
+   */
+  String getRootProcessInstanceId();
 
 }

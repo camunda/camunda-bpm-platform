@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
@@ -78,6 +79,7 @@ public abstract class AbstractRemovalTimeTest {
   protected IdentityService identityService;
   protected ExternalTaskService externalTaskService;
   protected DecisionService decisionService;
+  protected AuthorizationService authorizationService;
 
   protected static ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -92,6 +94,7 @@ public abstract class AbstractRemovalTimeTest {
     identityService = engineRule.getIdentityService();
     externalTaskService = engineRule.getExternalTaskService();
     decisionService = engineRule.getDecisionService();
+    authorizationService = engineRule.getAuthorizationService();
 
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
@@ -122,6 +125,9 @@ public abstract class AbstractRemovalTimeTest {
       ResetDmnConfigUtil.reset(dmnEngineConfiguration)
           .enableFeelLegacyBehavior(false)
           .init();
+
+      processEngineConfiguration.setEnableHistoricInstancePermissions(false);
+      processEngineConfiguration.setAuthorizationEnabled(false);
     }
 
     ClockUtil.reset();
@@ -193,11 +199,24 @@ public abstract class AbstractRemovalTimeTest {
     });
   }
 
+  protected void clearAuthorization() {
+    authorizationService.createAuthorizationQuery().list()
+        .forEach(authorization -> authorizationService.deleteAuthorization(authorization.getId()));
+  }
+
   protected Date addDays(Date date, int amount) {
     Calendar c = Calendar.getInstance();
     c.setTime(date);
     c.add(Calendar.DATE, amount);
     return c.getTime();
+  }
+
+  protected void enabledAuth() {
+    processEngineConfiguration.setAuthorizationEnabled(true);
+  }
+
+  protected void disableAuth() {
+    processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
 }

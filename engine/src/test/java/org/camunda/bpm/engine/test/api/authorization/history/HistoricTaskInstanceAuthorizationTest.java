@@ -809,6 +809,29 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(1, result.size());
   }
 
+  public void testHistoricTaskReadPermissionGrantedWhenAddingIdentityLinkOnStandaloneTask() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String taskId = "aTaskId";
+    createTask(taskId);
+
+    disableAuthorization();
+    createGrantAuthorization(TASK, taskId, userId, TaskPermissions.TASK_ASSIGN);
+    enableAuthorization();
+
+    taskService.setAssignee(taskId, userId);
+
+    // when
+    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertEquals(1, result.size());
+
+    // clear
+    deleteTask(taskId, true);
+  }
+
   public void testHistoricTaskReadPermissionGrantedWhenSettingOwner() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
