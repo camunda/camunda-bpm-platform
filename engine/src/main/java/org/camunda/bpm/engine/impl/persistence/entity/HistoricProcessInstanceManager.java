@@ -321,6 +321,11 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
     deleteOperations.put(deleteByteArrays.getEntityType(), deleteByteArrays);
 
+    DbOperation deleteAuthorizations = commandContext.getAuthorizationManager()
+        .deleteAuthorizationsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+
+    deleteOperations.put(deleteAuthorizations.getEntityType(), deleteAuthorizations);
+
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
