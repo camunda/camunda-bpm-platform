@@ -43,6 +43,7 @@
     {"name": "Task Attachment"},
     {"name": "Task Comment"},
     {"name": "Task Identity Link"},
+    {"name": "Task Variable"},
     {"name": "Version"}
   ],
   "paths": {
