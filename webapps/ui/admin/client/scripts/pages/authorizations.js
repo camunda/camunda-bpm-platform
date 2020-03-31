@@ -170,7 +170,7 @@ module.exports = [
             ],
             14: ['READ'],
             17: ['READ', 'DELETE', 'UPDATE'],
-            19: ['READ']
+            19: ['READ', 'READ_VARIABLE']
           };
 
           $scope.typeMap = {
