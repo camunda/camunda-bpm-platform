@@ -97,7 +97,10 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.entity.util.AuthManagerUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.util.AuthManagerUtil.VariablePermissions;
 import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
+import org.camunda.bpm.engine.query.Query;
 
 /**
  * @author Daniel Meyer
@@ -708,51 +711,40 @@ public class AuthorizationManager extends AbstractManager {
   // historic variable instance query ////////////////////////////////
 
   public void configureHistoricVariableInstanceQuery(HistoricVariableInstanceQueryImpl query) {
-    Permission readPermission = READ_HISTORY;
-    if (isEnsureSpecificVariablePermission()) {
-      readPermission = READ_HISTORY_VARIABLE;
-    }
-
-    AuthorizationCheck authCheck = query.getAuthCheck();
-
-    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
-    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
-
-    if (!isHistoricInstancePermissionsEnabled) {
-      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission);
-
-    } else {
-      configureQuery(query);
-
-      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission)
-          .atomicCheck(HISTORIC_TASK, "TI.ID_", HistoricTaskPermissions.READ)
-          .build();
-
-      addPermissionCheck(authCheck, permissionCheck);
-
-    }
+    configureHistoricVariableAndDetailQuery(query);
   }
 
   // historic detail query ////////////////////////////////
 
   public void configureHistoricDetailQuery(HistoricDetailQueryImpl query) {
+    configureHistoricVariableAndDetailQuery(query);
+  }
+
+  protected void configureHistoricVariableAndDetailQuery(AbstractQuery query) {
+    boolean ensureSpecificVariablePermission = isEnsureSpecificVariablePermission();
+
+    VariablePermissions variablePermissions =
+        AuthManagerUtil.getVariablePermissions(ensureSpecificVariablePermission);
+
+    Permission processDefinitionPermission = variablePermissions.getProcessDefinitionPermission();
+
     AuthorizationCheck authCheck = query.getAuthCheck();
 
     boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
     authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
 
     if (!isHistoricInstancePermissionsEnabled) {
-      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", processDefinitionPermission);
 
     } else {
       configureQuery(query);
 
+      Permission historicTaskPermission = variablePermissions.getHistoricTaskPermission();
+
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
           .disjunctive()
-          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
-          .atomicCheck(HISTORIC_TASK, "TI.ID_", HistoricTaskPermissions.READ)
+          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", processDefinitionPermission)
+          .atomicCheck(HISTORIC_TASK, "TI.ID_", historicTaskPermission)
           .build();
 
       addPermissionCheck(authCheck, permissionCheck);

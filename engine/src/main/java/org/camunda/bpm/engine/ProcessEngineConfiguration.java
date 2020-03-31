@@ -372,7 +372,8 @@ public abstract class ProcessEngineConfiguration {
    * READ_HISTORY_VARIABLE, or
    * READ_TASK_VARIABLE on Process Definition resource, and
    * READ_VARIABLE on Task resource
-   * will be required to fetch variables when the autorizations are enabled.
+   * READ_VARIABLE on Historic Task Instance resource
+   * will be required to fetch variables when the authorizations are enabled.
    */
   protected boolean enforceSpecificVariablePermission = false;
 
