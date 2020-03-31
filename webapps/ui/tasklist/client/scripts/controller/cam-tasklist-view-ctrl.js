@@ -55,30 +55,40 @@ module.exports = [
     /**
      * Provides the list of filters
      */
-    tasklistData.provide('filterQuery', {maxResults: 50, firstResult: 0});
+    tasklistData.provide('filters', function() {
+      var deferred = $q.defer();
 
-    tasklistData.provide('filters', [
-      'filterQuery',
-      function(filterQuery) {
-        var deferred = $q.defer();
+      Filter.count({
+        itemCount: false,
+        resourceType: 'Task'
+      })
+        .then(function(count) {
+          var paginationSize = 2000;
 
-        Filter.list(
-          Object.assign({}, filterQuery, {
-            itemCount: false,
-            resourceType: 'Task'
-          }),
-          function(err, res) {
-            if (err) {
-              deferred.reject(err);
-            } else {
-              deferred.resolve(res);
-            }
+          var pages = Math.ceil(count / paginationSize);
+          var requests = [];
+          for (var i = 0; i < pages; i++) {
+            requests.push(
+              Filter.list({
+                firstResult: i * paginationSize,
+                maxResults: paginationSize,
+                itemCount: false,
+                resourceType: 'Task'
+              })
+            );
           }
-        );
 
-        return deferred.promise;
-      }
-    ]);
+          return $q.all(requests);
+        })
+        .then(function(res) {
+          deferred.resolve(res.flat(2));
+        })
+        .catch(function(err) {
+          deferred.reject(err);
+        });
+
+      return deferred.promise;
+    });
 
     tasklistData.provide('currentFilter', [
       'filters',

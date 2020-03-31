@@ -55,6 +55,13 @@ module.exports = [
             size: 50
           });
 
+          function updateView() {
+            $scope.filters = $scope.allFilters.slice(
+              (page.current - 1) * page.size,
+              page.current * page.size
+            );
+          }
+
           $scope.openModal = $scope.openModal() || noop;
 
           var filterResource = camAPI.resource('filter');
@@ -72,7 +79,7 @@ module.exports = [
            * observe list of filters to set the background-color on a filter
            */
           $scope.state = filtersData.observe('filters', function(filters) {
-            $scope.totalItems = filters.length;
+            page.total = $scope.totalItems = filters.length;
 
             for (var i = 0, filter; (filter = filters[i]); i++) {
               filter.style = {
@@ -80,20 +87,17 @@ module.exports = [
               };
             }
 
-            $scope.filters = filters;
-          });
-
-          filterResource.count({resoureType: 'Task'}).then(function(res) {
-            page.total = res;
-          });
-
-          $scope.onPaginationchange = function(page) {
-            filtersData.set('filterQuery', {
-              maxResults: page.size,
-              firstResult: (page.current - 1) * page.size
+            $scope.allFilters = filters.sort(function(a, b) {
+              return (
+                (a.properties.priority || 0) - (b.properties.priority || 0)
+              );
             });
-          };
+            updateView();
+          });
 
+          $scope.onPaginationchange = function() {
+            updateView();
+          };
           filtersData.observe('currentFilter', function(currentFilter) {
             $scope.currentFilter = currentFilter;
           });
