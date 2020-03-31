@@ -63,7 +63,7 @@
         code = "500"
         dto = "ExceptionDto"
         last = true
-        desc = "Update or delete could not be executed because the task is `null` or does not exist.. See the
+        desc = "Update or delete could not be executed because the task is `null` or does not exist. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
   }
