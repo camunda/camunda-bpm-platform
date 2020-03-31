@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByLockExpirationTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByProcessDefinitionId;
@@ -26,6 +27,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySor
 
 import java.util.*;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
@@ -234,7 +236,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testQueryByLargeListOfProcessInstanceIdIn() {
     // given
-    List<String> processInstances = new ArrayList<String>();
+    List<String> processInstances = new ArrayList<>();
     for (int i = 0; i < 1001; i++) {
       processInstances.add(runtimeService.startProcessInstanceByKey("oneExternalTaskProcess").getProcessInstanceId());
     }
@@ -539,14 +541,9 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testQueryById() {
     // given
-    List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 2);
+    startInstancesByKey("oneExternalTaskProcess", 2);
     List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
-
-    ProcessInstance firstInstance = processInstances.get(0);
     ExternalTask firstTask = tasks.get(0);
-    if (!firstTask.getProcessInstanceId().equals(firstInstance.getId())) {
-      firstTask = tasks.get(1);
-    }
 
     // when
     ExternalTask resultTask =
@@ -556,6 +553,45 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(firstTask.getId(), resultTask.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByIds() {
+    // given
+    startInstancesByKey("oneExternalTaskProcess", 3);
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    Set<String> ids = new HashSet<>();
+    Collections.addAll(ids, tasks.get(0).getId(), tasks.get(1).getId());
+    // when
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery().externalTaskIdIn(ids);
+    // then
+    assertThat(query.count()).isEqualTo(2L);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByIdsWithNull() {
+    // given
+    Set<String> ids = null;
+    try {
+      // when
+      externalTaskService.createExternalTaskQuery().externalTaskIdIn(ids).list();
+    } catch (ProcessEngineException e) {
+      // then
+      assertThat(e).hasMessage("Set of external task ids is null");
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByIdsWithEmptyList() {
+    // given
+    Set<String> ids = new HashSet<>();
+    try {
+      // when
+      externalTaskService.createExternalTaskQuery().externalTaskIdIn(ids).list();
+    } catch (ProcessEngineException e) {
+      // then
+      assertThat(e).hasMessage("Set of external task ids is empty");
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
@@ -587,7 +623,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
-    List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
+    List<ProcessInstance> processInstances = new ArrayList<>();
     for (int i = 0; i < number; i++) {
       processInstances.add(runtimeService.startProcessInstanceByKey(processDefinitionKey));
     }
@@ -596,7 +632,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected List<ProcessInstance> startInstancesById(String processDefinitionId, int number) {
-    List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
+    List<ProcessInstance> processInstances = new ArrayList<>();
     for (int i = 0; i < number; i++) {
       processInstances.add(runtimeService.startProcessInstanceById(processDefinitionId));
     }

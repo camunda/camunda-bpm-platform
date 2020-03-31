@@ -201,7 +201,7 @@ public class CustomHistoryLevelIncidentTest {
 
     BatchEntity batch = (BatchEntity) createFailingMigrationBatch();
 
-    migrationHelper.executeSeedJob(batch);
+    migrationHelper.completeSeedJobs(batch);
 
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
@@ -237,7 +237,7 @@ public class CustomHistoryLevelIncidentTest {
     // given
     BatchEntity batch = (BatchEntity) createFailingMigrationBatch();
 
-    migrationHelper.executeSeedJob(batch);
+    migrationHelper.completeSeedJobs(batch);
 
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {

@@ -200,6 +200,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
   </resultMap>
+  
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
@@ -244,12 +249,18 @@
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
+  
+  <select id="selectHistoricProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct RES.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ORDER BY RES.DEPLOYMENT_ID_ ASC
+  </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
 
     from (
 
-    SELECT SELF.*, DEF.NAME_, DEF.VERSION_
+    SELECT SELF.*, DEF.NAME_, DEF.VERSION_, DEF.DEPLOYMENT_ID_
     FROM ${prefix}ACT_HI_PROCINST SELF
 
     LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
@@ -318,11 +329,11 @@
             <if test="query.processInstanceId != null">
               ${queryType} SELF.PROC_INST_ID_ = #{query.processInstanceId}
             </if>
-            <if test="query.processInstanceIds != null &amp;&amp; !query.processInstanceIds.isEmpty()">
-              ${queryType} SELF.PROC_INST_ID_ in
-              <foreach item="item" index="index" collection="query.processInstanceIds" open="(" separator="," close=")">
-                #{item, jdbcType=VARCHAR}
-              </foreach>
+            <if test="query.processInstanceIds != null and !query.processInstanceIds.isEmpty()">
+              ${queryType}
+              <bind name="listOfIds" value="query.processInstanceIds" />
+              <bind name="fieldName" value="'SELF.PROC_INST_ID_'" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
             </if>
             <if test="query.caseInstanceId != null">
               ${queryType} SELF.CASE_INST_ID_ = #{query.caseInstanceId}

@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -145,8 +146,14 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+    configureQuery(processInstanceQuery);
+    return getDbEntityManager().selectList("selectProcessInstanceDeploymentIdMappingsByQueryCriteria", processInstanceQuery);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<ExecutionEntity> findEventScopeExecutionsByActivityId(String activityRef, String parentExecutionId) {
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
     parameters.put("activityId", activityRef);
     parameters.put("parentExecutionId", parentExecutionId);
     return getDbEntityManager().selectList("selectExecutionsByParentExecutionId", parameters);
@@ -167,21 +174,21 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void updateExecutionSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateExecutionSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateExecutionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
@@ -189,7 +196,7 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isTenantIdSet", true);
     parameters.put("tenantId", tenantId);

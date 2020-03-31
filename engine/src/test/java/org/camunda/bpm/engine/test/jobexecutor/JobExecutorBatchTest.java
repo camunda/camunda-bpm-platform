@@ -22,6 +22,11 @@ import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.DeploymentMapping;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -100,7 +105,7 @@ public class JobExecutorBatchTest {
     // when the seed job is executed
     helper.executeSeedJob(batch);
 
-    // then the job executor is hinted for the seed job and 10 execution jobs
+    // then the job executor is hinted for the monitor job and 10 execution jobs
     assertEquals(11, jobExecutor.getJobsAdded());
   }
 
@@ -115,6 +120,35 @@ public class JobExecutorBatchTest {
 
     // then the job executor is hinted for the monitor job and 3 execution jobs
     assertEquals(4, jobExecutor.getJobsAdded());
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
+  public void testMixedJobExecutorVersionSeedJobExecution() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(4);
+    // ... and there are more mappings than ids (simulating an intermediate execution of a SeedJob
+    // by an older version that only processes ids but does not update the mappings)
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute((context) -> {
+      BatchEntity batchEntity = context.getBatchManager().findBatchById(batch.getId());
+      BatchJobHandler batchJobHandler = context.getProcessEngineConfiguration().getBatchHandlers()
+          .get(batchEntity.getType());
+      BatchConfiguration config = (BatchConfiguration) batchJobHandler
+          .readConfiguration(batchEntity.getConfigurationBytes());
+      DeploymentMappings idMappings = config.getIdMappings();
+      DeploymentMapping firstMapping = idMappings.get(0);
+      idMappings.set(0, new DeploymentMapping(firstMapping.getDeploymentId(), firstMapping.getCount() + 2));
+      idMappings.add(0, new DeploymentMapping("foo", 2));
+      batchEntity.setConfigurationBytes(batchJobHandler.writeConfiguration(config));
+      return null;
+    });
+    jobExecutor.startRecord();
+
+    // when the seed job is executed
+    helper.executeSeedJob(batch);
+
+    // then the job executor is hinted for the monitor job and 4 execution jobs
+    assertEquals(5, jobExecutor.getJobsAdded());
   }
 
   public class CountingJobExecutor extends JobExecutor {

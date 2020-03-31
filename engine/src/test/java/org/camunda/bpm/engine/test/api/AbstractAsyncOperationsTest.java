@@ -21,18 +21,21 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.Before;
+import org.junit.After;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -47,21 +50,63 @@ public abstract class AbstractAsyncOperationsTest {
   protected ManagementService managementService;
   protected HistoryService historyService;
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected BatchHelper helper;
 
-  @Before
-  public void initServices() {
+  protected ProcessEngineConfigurationImpl engineConfiguration;
+
+  protected int defaultBatchJobsPerSeed;
+  protected int defaultInvocationsPerBatchJob;
+
+  protected void initDefaults(ProcessEngineRule engineRule) {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     historyService = engineRule.getHistoryService();
+
+    engineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    // save defaults
+    defaultBatchJobsPerSeed = engineConfiguration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
+  }
+
+  @After
+  public void cleanUpBatches() {
+    managementService.createBatchQuery().list().forEach(b -> managementService.deleteBatch(b.getId(), true));
+
+    historyService.createHistoricBatchQuery().list().forEach(b -> historyService.deleteHistoricBatch(b.getId()));
+
+    // restore default settings
+    engineConfiguration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    engineConfiguration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+  }
+
+  protected List<String> getJobIdsByDeployment(List<Job> jobs, String deploymentId) {
+    return jobs.stream().filter(j -> deploymentId.equals(j.getDeploymentId())).map(Job::getId).collect(Collectors.toList());
+  }
+
+  protected void completeSeedJobs(Batch batch) {
+    while (getSeedJob(batch) != null) {
+      executeSeedJob(batch);
+    }
   }
 
   protected void executeSeedJob(Batch batch) {
-    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    Job seedJob = getSeedJob(batch);
     assertNotNull(seedJob);
     managementService.executeJob(seedJob.getId());
+  }
+
+  protected void executeSeedJobs(Batch batch, int expectedSeedJobsCount) {
+    for (int i = 0; i < expectedSeedJobsCount; i++) {
+      executeSeedJob(batch);
+    }
+    assertNull(getSeedJob(batch));
+  }
+
+  protected Job getSeedJob(Batch batch) {
+    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
+    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    return seedJob;
   }
 
   /**
@@ -75,7 +120,7 @@ public abstract class AbstractAsyncOperationsTest {
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
     assertFalse(batchJobs.isEmpty());
 
-    List<Exception> catchedExceptions = new ArrayList<Exception>();
+    List<Exception> catchedExceptions = new ArrayList<>();
 
     for (Job batchJob : batchJobs) {
       try {
@@ -89,7 +134,7 @@ public abstract class AbstractAsyncOperationsTest {
   }
 
   protected List<String> startTestProcesses(int numberOfProcesses) {
-    ArrayList<String> ids = new ArrayList<String>();
+    ArrayList<String> ids = new ArrayList<>();
 
     for (int i = 0; i < numberOfProcesses; i++) {
       ids.add(runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS).getProcessInstanceId());

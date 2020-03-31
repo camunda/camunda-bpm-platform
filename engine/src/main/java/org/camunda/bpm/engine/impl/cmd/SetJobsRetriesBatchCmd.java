@@ -16,15 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Askar Akhmerov
@@ -40,20 +39,21 @@ public class SetJobsRetriesBatchCmd extends AbstractSetJobsRetriesBatchCmd {
     this.retries = retries;
   }
 
-  protected List<String> collectJobIds(CommandContext commandContext) {
-    Set<String> collectedJobIds = new HashSet<>();
+  protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
-    if (ids != null) {
-      collectedJobIds.addAll(ids);
+    if (!CollectionUtil.isEmpty(ids)) {
+      JobQueryImpl query = new JobQueryImpl();
+      query.jobIds(new HashSet<>(ids));
+      elementConfiguration.addDeploymentMappings(
+          commandContext.runWithoutAuthorization(query::listDeploymentIdMappings), ids);
     }
 
     if (jobQuery != null) {
-      for (Job job : jobQuery.list()) {
-        collectedJobIds.add(job.getId());
-      }
+      elementConfiguration.addDeploymentMappings(((JobQueryImpl) jobQuery).listDeploymentIdMappings());
     }
 
-    return new ArrayList<>(collectedJobIds);
+    return elementConfiguration;
   }
 
 }

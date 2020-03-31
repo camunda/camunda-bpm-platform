@@ -188,6 +188,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
   <!-- select -->
 
   <select id="selectHistoricDecisionInstancesByDecisionDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInstanceResultMap">
@@ -216,7 +221,14 @@
     <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
-  
+
+  <select id="selectHistoricDecisionInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct DD.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
+    left join ${prefix}ACT_RE_DECISION_DEF DD on RES.DEC_DEF_ID_ = DD.ID_
+    order by DD.DEPLOYMENT_ID_ ASC
+  </select>
+
   <!-- native queries -->
   
   <select id="selectHistoricDecisionInstancesByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionInstanceResultMap">
@@ -247,144 +259,144 @@
   
    <!-- sql query -->
 
-   <sql id="selectHistoricDecisionInstancesByQueryCriteriaSql">
+  <sql id="selectHistoricDecisionInstancesByQueryCriteriaSql">
+    from (
+    select RES.*
+    from ${prefix}ACT_HI_DECINST RES
 
-     from ${prefix}ACT_HI_DECINST RES
+    <if
+        test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include
+          refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.DEC_DEF_KEY_, '*'))
+    </if>
 
-     <if
-         test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-       <include
-           refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-       AUTH ON (AUTH.RESOURCE_ID_ in (RES.DEC_DEF_KEY_, '*'))
-     </if>
+    <where>
+      <if test="decisionInstanceId != null">
+        RES.ID_ = #{decisionInstanceId}
+      </if>
+      <if test="decisionInstanceIdIn != null and decisionInstanceIdIn.length > 0">
+        <bind name="listOfIds" value="decisionInstanceIdIn" />
+        <bind name="fieldName" value="'RES.ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedArray" />
+      </if>
+      <if test="decisionDefinitionId != null">
+        and RES.DEC_DEF_ID_ = #{decisionDefinitionId}
+      </if>
+      <if test="decisionDefinitionIdIn != null and decisionDefinitionIdIn.length > 0">
+        and RES.DEC_DEF_ID_ in
+        <foreach item="item" index="index" collection="decisionDefinitionIdIn" open="("
+                 separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="decisionDefinitionKey != null">
+        and RES.DEC_DEF_KEY_ = #{decisionDefinitionKey}
+      </if>
+      <if test="decisionDefinitionKeyIn != null and decisionDefinitionKeyIn.length > 0">
+        and RES.DEC_DEF_KEY_ in
+        <foreach item="item" index="index" collection="decisionDefinitionKeyIn" open="("
+                 separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="decisionDefinitionName != null">
+        and RES.DEC_DEF_NAME_ = #{decisionDefinitionName}
+      </if>
+      <if test="decisionDefinitionNameLike != null">
+        and RES.DEC_DEF_NAME_ like #{decisionDefinitionNameLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="caseDefinitionKey != null">
+        and RES.CASE_DEF_KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
 
-     <where>
-       <if test="decisionInstanceId != null">
-         RES.ID_ = #{decisionInstanceId}
-       </if>
-       <if test="decisionInstanceIdIn != null and decisionInstanceIdIn.length > 0">
-         and RES.ID_ in
-         <foreach item="item" index="index" collection="decisionInstanceIdIn" open="("
-                  separator="," close=")">
-           #{item}
-         </foreach>
-       </if>
-       <if test="decisionDefinitionId != null">
-         and RES.DEC_DEF_ID_ = #{decisionDefinitionId}
-       </if>
-       <if test="decisionDefinitionIdIn != null and decisionDefinitionIdIn.length > 0">
-         and RES.DEC_DEF_ID_ in
-         <foreach item="item" index="index" collection="decisionDefinitionIdIn" open="("
-                  separator="," close=")">
-           #{item}
-         </foreach>
-       </if>
-       <if test="decisionDefinitionKey != null">
-         and RES.DEC_DEF_KEY_ = #{decisionDefinitionKey}
-       </if>
-       <if test="decisionDefinitionKeyIn != null and decisionDefinitionKeyIn.length > 0">
-         and RES.DEC_DEF_KEY_ in
-         <foreach item="item" index="index" collection="decisionDefinitionKeyIn" open="("
-                  separator="," close=")">
-           #{item}
-         </foreach>
-       </if>
-       <if test="decisionDefinitionName != null">
-         and RES.DEC_DEF_NAME_ = #{decisionDefinitionName}
-       </if>
-       <if test="decisionDefinitionNameLike != null">
-         and RES.DEC_DEF_NAME_ like #{decisionDefinitionNameLike} ESCAPE ${escapeChar}
-       </if>
-       <if test="processDefinitionKey != null">
-         and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
-       </if>
-       <if test="processDefinitionId != null">
-         and RES.PROC_DEF_ID_ = #{processDefinitionId}
-       </if>
-       <if test="processInstanceId != null">
-         and RES.PROC_INST_ID_ = #{processInstanceId}
-       </if>
-       <if test="caseDefinitionKey != null">
-         and RES.CASE_DEF_KEY_ = #{caseDefinitionKey}
-       </if>
-       <if test="caseDefinitionId != null">
-         and RES.CASE_DEF_ID_ = #{caseDefinitionId}
-       </if>
-       <if test="caseInstanceId != null">
-         and RES.CASE_INST_ID_ = #{caseInstanceId}
-       </if>
+      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+        and RES.ACT_INST_ID_ in
+        <foreach item="activityInstanceId" index="index" collection="activityInstanceIds"
+                 open="(" separator="," close=")">
+          #{activityInstanceId}
+        </foreach>
+      </if>
 
-       <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-         and RES.ACT_INST_ID_ in
-         <foreach item="activityInstanceId" index="index" collection="activityInstanceIds"
-                  open="(" separator="," close=")">
-           #{activityInstanceId}
-         </foreach>
-       </if>
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="activityId" index="index" collection="activityIds" open="(" separator=","
+                 close=")">
+          #{activityId}
+        </foreach>
+      </if>
 
-       <if test="activityIds != null &amp;&amp; activityIds.length > 0">
-         and RES.ACT_ID_ in
-         <foreach item="activityId" index="index" collection="activityIds" open="(" separator=","
-                  close=")">
-           #{activityId}
-         </foreach>
-       </if>
+      <if test="evaluatedBefore != null">
+        and RES.EVAL_TIME_ &lt;= #{evaluatedBefore}
+      </if>
+      <if test="evaluatedAfter != null">
+        and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
+      </if>
 
-       <if test="evaluatedBefore != null">
-         and RES.EVAL_TIME_ &lt;= #{evaluatedBefore}
-       </if>
-       <if test="evaluatedAfter != null">
-         and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
-       </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
 
-       <if test="userId != null">
-         and RES.USER_ID_ = #{userId}
-       </if>
+      <if test="rootDecisionInstanceId != null">
+        and (RES.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId} or
+          (RES.ROOT_DEC_INST_ID_ is null and RES.ID_ = #{rootDecisionInstanceId}))
+      </if>
 
-       <if test="rootDecisionInstanceId != null">
-         and (RES.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId} or
-           (RES.ROOT_DEC_INST_ID_ is null and RES.ID_ = #{rootDecisionInstanceId}))
-       </if>
+      <if test="rootDecisionInstancesOnly">
+        and RES.ROOT_DEC_INST_ID_ is null
+      </if>
 
-       <if test="rootDecisionInstancesOnly">
-         and RES.ROOT_DEC_INST_ID_ is null
-       </if>
+      <if test="decisionRequirementsDefinitionId != null">
+        and RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
+      </if>
 
-       <if test="decisionRequirementsDefinitionId != null">
-         and RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
-       </if>
+      <if test="decisionRequirementsDefinitionKey != null">
+        and RES.DEC_REQ_KEY_ = #{decisionRequirementsDefinitionKey}
+      </if>
 
-       <if test="decisionRequirementsDefinitionKey != null">
-         and RES.DEC_REQ_KEY_ = #{decisionRequirementsDefinitionKey}
-       </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
 
-       <if test="isTenantIdSet">
-         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-           and RES.TENANT_ID_ in
-           <foreach item="tenantId" index="index" collection="tenantIds"
-                    open="(" separator="," close=")">
-             #{tenantId}
-           </foreach>
-         </if>
-         <if test="tenantIds == null">
-           and RES.TENANT_ID_ is null
-         </if>
-       </if>
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        and (
+          (RES.DEC_DEF_KEY_ is not null
+          <include
+              refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          ) or RES.DEC_DEF_KEY_ is null
+        )
+      </if>
 
-       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-         and (
-           (RES.DEC_DEF_KEY_ is not null
-           <include
-               refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-           ) or RES.DEC_DEF_KEY_ is null
-         )
-       </if>
+      <include
+          refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
-       <include
-           refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-
-     </where>
-   </sql>
+    </where>
+    ) RES
+  </sql>
 
   <!-- Select ids for async history cleanup -->
   <sql id="selectHistoricDecisionInstanceIdsForCleanupSql">

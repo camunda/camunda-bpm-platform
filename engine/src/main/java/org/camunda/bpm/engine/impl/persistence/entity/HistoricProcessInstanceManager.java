@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
  * @author Tom Baeyens
@@ -71,7 +72,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricProcessInstanceByIds(List<String> processInstanceIds) {
     if (isHistoryEnabled()) {
       CommandContext commandContext = Context.getCommandContext();
-  
+
       commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
       commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(processInstanceIds);
       commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(processInstanceIds);
@@ -81,7 +82,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(processInstanceIds);
       commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);
       commandContext.getHistoricExternalTaskLogManager().deleteHistoricExternalTaskLogsByProcessInstanceIds(processInstanceIds);
-  
+
       commandContext.getDbEntityManager().deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstances", processInstanceIds);
     }
   }
@@ -119,7 +120,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);
@@ -133,6 +134,12 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public List<String> findHistoricProcessInstanceIds(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     configureQuery(historicProcessInstanceQuery);
     return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+    configureQuery(historicProcessInstanceQuery);
+    return getDbEntityManager().selectList("selectHistoricProcessInstanceDeploymentIdMappingsByQueryCriteria", historicProcessInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
@@ -191,7 +198,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     commandContext.getByteArrayManager()
       .addRemovalTimeToByteArraysByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 

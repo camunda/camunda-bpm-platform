@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.impl.util.QueryMaxResultsLimitUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
@@ -56,15 +57,15 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public static final String SORTORDER_DESC = "desc";
 
   protected enum ResultType {
-    LIST, LIST_PAGE, LIST_IDS, SINGLE_RESULT, COUNT
+    LIST, LIST_PAGE, LIST_IDS, LIST_DEPLOYMENT_ID_MAPPINGS, SINGLE_RESULT, COUNT
   }
   protected transient CommandExecutor commandExecutor;
 
   protected ResultType resultType;
 
-  protected Map<String, String> expressions = new HashMap<String, String>();
+  protected Map<String, String> expressions = new HashMap<>();
 
-  protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
+  protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<>();
 
   protected boolean maxResultsLimitEnabled;
 
@@ -196,6 +197,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       return evaluateExpressionsAndExecuteList(commandContext, null);
     } else if (resultType == ResultType.LIST_IDS) {
       return evaluateExpressionsAndExecuteIdsList(commandContext);
+    } else if (resultType == ResultType.LIST_DEPLOYMENT_ID_MAPPINGS) {
+      return evaluateExpressionsAndExecuteDeploymentIdMappingsList(commandContext);
     } else {
       return evaluateExpressionsAndExecuteCount(commandContext);
     }
@@ -213,7 +216,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     checkMaxResultsLimit();
     validate();
     evaluateExpressions();
-    return !hasExcludingConditions() ? executeList(commandContext, page) : new ArrayList<U>();
+    return !hasExcludingConditions() ? executeList(commandContext, page) : new ArrayList<>();
   }
 
   /**
@@ -259,7 +262,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected void evaluateExpressions() {
     // we cannot iterate directly on the entry set cause the expressions
     // are removed by the setter methods during the iteration
-    ArrayList<Map.Entry<String, String>> entries = new ArrayList<Map.Entry<String, String>>(expressions.entrySet());
+    ArrayList<Map.Entry<String, String>> entries = new ArrayList<>(expressions.entrySet());
 
     for (Map.Entry<String, String> entry : entries) {
       String methodName = entry.getKey();
@@ -319,7 +322,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   protected void mergeExpressions(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
-    Map<String, String> mergedExpressions = new HashMap<String, String>(extendingQuery.getExpressions());
+    Map<String, String> mergedExpressions = new HashMap<>(extendingQuery.getExpressions());
     for (Map.Entry<String, String> entry : this.getExpressions().entrySet()) {
       if (!mergedExpressions.containsKey(entry.getKey())) {
         mergedExpressions.put(entry.getKey(), entry.getValue());
@@ -363,14 +366,41 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     return ids;
   }
 
+  @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> listDeploymentIdMappings() {
+    this.resultType = ResultType.LIST_DEPLOYMENT_ID_MAPPINGS;
+    List<ImmutablePair<String, String>> ids = null;
+    if (commandExecutor != null) {
+      ids = (List<ImmutablePair<String, String>>) commandExecutor.execute(this);
+    } else {
+      ids = evaluateExpressionsAndExecuteDeploymentIdMappingsList(Context.getCommandContext());
+    }
+
+    if (ids != null) {
+      QueryMaxResultsLimitUtil.checkMaxResultsLimit(ids.size());
+    }
+
+    return ids;
+  }
+
   public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
     validate();
     evaluateExpressions();
-    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<String>();
+    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<>();
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("executeIdsList not supported by " + getClass().getCanonicalName());
+  }
+
+  public List<ImmutablePair<String, String>> evaluateExpressionsAndExecuteDeploymentIdMappingsList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeDeploymentIdMappingsList(commandContext) : new ArrayList<>();
+  }
+
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    throw new UnsupportedOperationException("executeDeploymentIdMappingsList not supported by " + getClass().getCanonicalName());
   }
 
   protected void checkMaxResultsLimit() {

@@ -33,6 +33,7 @@
       JOB_PRIORITY_,
       SUSPENSION_STATE_,
       TENANT_ID_,
+      DEPLOYMENT_ID_,
       REV_
       )
     values (
@@ -45,6 +46,7 @@
       #{jobPriority, jdbcType=BIGINT},
       #{suspensionState, jdbcType=INTEGER},
       #{tenantId, jdbcType=VARCHAR},
+      #{deploymentId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -60,7 +62,8 @@
       JOB_TYPE_ = #{jobType, jdbcType=VARCHAR},
       JOB_CONFIGURATION_ = #{jobConfiguration, jdbcType=VARCHAR},
       JOB_PRIORITY_ = #{jobPriority, jdbcType=BIGINT},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+      DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -129,6 +132,7 @@
     <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="BIGINT" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- SELECTS -->

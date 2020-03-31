@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.Job;
 
 
@@ -256,6 +257,12 @@ public class JobManager extends AbstractManager {
   public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
     configureQuery(jobQuery);
     return getDbEntityManager().selectList("selectJobByQueryCriteria", jobQuery, page);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(JobQueryImpl jobQuery) {
+    configureQuery(jobQuery);
+    return getDbEntityManager().selectList("selectJobDeploymentIdMappingsByQueryCriteria", jobQuery);
   }
 
   @SuppressWarnings("unchecked")

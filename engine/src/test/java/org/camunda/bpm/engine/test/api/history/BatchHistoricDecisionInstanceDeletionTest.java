@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -52,6 +53,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -103,7 +105,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     ClockUtil.setCurrentTime(TEST_DATE);
     historyService = rule.getHistoryService();
     decisionService = rule.getDecisionService();
-    decisionInstanceIds = new ArrayList<String>();
+    decisionInstanceIds = new ArrayList<>();
   }
 
   @Before
@@ -218,6 +220,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // configuration
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     assertNotNull(seedJobDefinition);
+    assertNotNull(seedJobDefinition.getDeploymentId());
     assertEquals(batch.getId(), seedJobDefinition.getJobConfiguration());
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
 
@@ -231,7 +234,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
     assertEquals(currentTime, seedJob.getDuedate());
-    assertNull(seedJob.getDeploymentId());
+    assertEquals(seedJobDefinition.getDeploymentId(), seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
     assertNull(seedJob.getProcessInstanceId());
@@ -254,6 +257,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // configuration
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     assertNotNull(seedJobDefinition);
+    assertNotNull(seedJobDefinition.getDeploymentId());
     assertEquals(batch.getId(), seedJobDefinition.getJobConfiguration());
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
 
@@ -267,7 +271,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
     assertEquals(currentTime, seedJob.getDuedate());
-    assertNull(seedJob.getDeploymentId());
+    assertEquals(seedJobDefinition.getDeploymentId(), seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
     assertNull(seedJob.getProcessInstanceId());
@@ -290,6 +294,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // configuration
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     assertNotNull(seedJobDefinition);
+    assertNotNull(seedJobDefinition.getDeploymentId());
     assertEquals(batch.getId(), seedJobDefinition.getJobConfiguration());
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
 
@@ -303,7 +308,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
     assertEquals(currentTime, seedJob.getDuedate());
-    assertNull(seedJob.getDeploymentId());
+    assertEquals(seedJobDefinition.getDeploymentId(), seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
     assertNull(seedJob.getProcessInstanceId());
@@ -343,6 +348,81 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // and the seed job still exists
     Job seedJob = helper.getJobForDefinition(seedJobDefinition);
     assertNotNull(seedJob);
+  }
+
+  @Test
+  public void createDeletionJobsByIdsInDifferentDeployments() {
+    // given a second deployment and instances
+    executeDecisionInstances();
+
+    // assume
+    List<DecisionDefinition> definitions = rule.getRepositoryService().createDecisionDefinitionQuery().orderByDecisionDefinitionVersion().asc().list();
+    assertEquals(2, definitions.size());
+    String deploymentIdOne = definitions.get(0).getDeploymentId();
+    String deploymentIdTwo = definitions.get(1).getDeploymentId();
+
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
+    Job seedJob = helper.getSeedJob(batch);
+    assertEquals(deploymentIdOne, seedJob.getDeploymentId());
+
+    // when
+    helper.executeSeedJob(batch);
+
+    // then there is a second seed job with the same deployment id
+    Job seedJobTwo = helper.getSeedJob(batch);
+    assertNotNull(seedJobTwo);
+    assertEquals(seedJob.getDeploymentId(), seedJobTwo.getDeploymentId());
+
+    // when
+    helper.executeSeedJob(batch);
+
+    // then there is no seed job anymore and 10 deletion jobs for every deployment exist
+    assertNull(helper.getSeedJob(batch));
+    List<Job> deletionJobs = helper.getExecutionJobs(batch);
+    assertEquals(20, deletionJobs.size());
+    assertEquals(10L, getJobCountByDeployment(deletionJobs, deploymentIdOne));
+    assertEquals(10L, getJobCountByDeployment(deletionJobs, deploymentIdTwo));
+  }
+
+  @Test
+  public void createDeletionJobsByIdsWithDeletedDeployment() {
+    // given a second deployment and instances
+    executeDecisionInstances();
+
+    List<DecisionDefinition> definitions = rule.getRepositoryService().createDecisionDefinitionQuery().orderByDecisionDefinitionVersion().asc().list();
+    assertEquals(2, definitions.size());
+    String deploymentIdOne = definitions.get(0).getDeploymentId();
+    String deploymentIdTwo = definitions.get(1).getDeploymentId();
+
+    // ... and the second deployment is deleted
+    rule.getRepositoryService().deleteDeployment(deploymentIdTwo);
+
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
+    Job seedJob = helper.getSeedJob(batch);
+    assertEquals(deploymentIdOne, seedJob.getDeploymentId());
+
+    // when
+    helper.executeSeedJob(batch);
+
+    // then there is a second seed job with the same deployment id
+    Job seedJobTwo = helper.getSeedJob(batch);
+    assertNotNull(seedJobTwo);
+    assertEquals(seedJob.getDeploymentId(), seedJobTwo.getDeploymentId());
+
+    // when
+    helper.executeSeedJob(batch);
+
+    // then there is no seed job anymore
+    assertNull(helper.getSeedJob(batch));
+
+    // ...and 10 deletion jobs for the first deployment and 10 jobs for no deployment exist
+    List<Job> deletionJobs = helper.getExecutionJobs(batch);
+    assertEquals(20, deletionJobs.size());
+    assertEquals(10L, getJobCountByDeployment(deletionJobs, deploymentIdOne));
+    assertEquals(10L, getJobCountByDeployment(deletionJobs, null));
+
+    // cleanup
+    helper.executeJobs(batch);
   }
 
   @Test
@@ -417,7 +497,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
 
     // when
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the seed job definition still exists but the seed job is removed
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
@@ -441,7 +521,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     // when
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the seed job definition still exists but the seed job is removed
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
@@ -465,7 +545,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
 
     // when
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the seed job definition still exists but the seed job is removed
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
@@ -487,7 +567,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // given
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> deletionJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -506,7 +586,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> deletionJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -524,7 +604,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> deletionJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -562,6 +642,10 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     assertEquals(decisionInstanceCount, batch.getTotalJobs());
     assertEquals(defaultBatchJobsPerSeed, batch.getBatchJobsPerSeed());
     assertEquals(defaultInvocationsPerBatchJob, batch.getInvocationsPerBatchJob());
+  }
+
+  protected long getJobCountByDeployment(List<Job> jobs, String deploymentId) {
+    return jobs.stream().filter(j -> Objects.equals(deploymentId, j.getDeploymentId())).count();
   }
 
   class BatchDeletionHelper extends BatchHelper {

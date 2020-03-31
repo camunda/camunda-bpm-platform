@@ -21,11 +21,9 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
@@ -37,21 +35,21 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    Collection<String> collectedInstanceIds = collectExternalTaskIds();
+    BatchElementConfiguration elementConfiguration = collectExternalTaskIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "externalTaskIds",
-        collectedInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", elementConfiguration.getIds());
 
     return new BatchBuilder(commandContext)
         .type(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES)
-        .config(getConfiguration(collectedInstanceIds))
+        .config(getConfiguration(elementConfiguration))
         .permission(BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES)
         .operationLogHandler(this::writeUserOperationLogAsync)
         .build();
   }
 
-  public BatchConfiguration getConfiguration(Collection<String> instanceIds) {
-    return new SetRetriesBatchConfiguration(new ArrayList<>(instanceIds), builder.getRetries());
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(),
+        elementConfiguration.getMappings(), builder.getRetries());
   }
-  
+
 }

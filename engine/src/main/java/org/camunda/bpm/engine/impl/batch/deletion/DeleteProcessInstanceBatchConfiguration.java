@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.batch.deletion;
 
-import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-
 import java.util.List;
+
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 
 /**
  * Configuration object that is passed to the Job that will actually perform execution of
@@ -34,16 +35,16 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners, boolean skipSubprocesses) {
-    this(ids, null, skipCustomListeners, skipSubprocesses, true);
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, boolean skipCustomListeners, boolean skipSubprocesses) {
+    this(ids, mappings, null, skipCustomListeners, skipSubprocesses, true);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners) {
-    this(ids, deleteReason, skipCustomListeners, true, true);
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, String deleteReason, boolean skipCustomListeners) {
+    this(ids, mappings, deleteReason, skipCustomListeners, true, true);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
-    super(ids);
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, DeploymentMappings mappings, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
+    super(ids, mappings);
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;

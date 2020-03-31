@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -334,6 +335,15 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return commandContext
       .getExecutionManager()
       .findProcessInstancesIdsByQueryCriteria(this);
+  }
+
+  @Override
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    checkQueryOk();
+
+    return commandContext
+      .getExecutionManager()
+      .findDeploymentIdMappingsByQueryCriteria(this);
   }
 
   @Override

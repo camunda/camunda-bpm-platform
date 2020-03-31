@@ -157,6 +157,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
+  
   <!-- EXECUTION SELECT -->
   
   <select id="selectExecution" parameterType="string" resultMap="executionResultMap">
@@ -216,6 +221,12 @@
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
     select distinct RES.ID_
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+  </select>
+  
+  <select id="selectProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct P.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+    ORDER BY P.DEPLOYMENT_ID_ ASC
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">

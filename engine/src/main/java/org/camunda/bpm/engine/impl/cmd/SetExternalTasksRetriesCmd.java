@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -30,9 +31,9 @@ public class SetExternalTasksRetriesCmd extends AbstractSetExternalTaskRetriesCm
 
   @Override
   public Void execute(CommandContext commandContext) {
-    List<String> collectedIds = collectExternalTaskIds();
-    EnsureUtil.ensureNotEmpty(BadUserRequestException.class,
-        "externalTaskIds", collectedIds);
+    BatchElementConfiguration elementConfiguration = collectExternalTaskIds(commandContext);
+    List<String> collectedIds = elementConfiguration.getIds();
+    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", collectedIds);
 
     int instanceCount = collectedIds.size();
     writeUserOperationLog(commandContext, instanceCount, false);

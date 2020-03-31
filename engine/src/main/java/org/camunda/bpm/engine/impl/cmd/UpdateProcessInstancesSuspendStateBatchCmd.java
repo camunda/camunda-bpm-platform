@@ -22,13 +22,11 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.update.UpdateProcessInstancesSuspendStateBatchConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
 
@@ -40,24 +38,24 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    Collection<String> collectedInstanceIds = collectProcessInstanceIds();
+    BatchElementConfiguration elementConfiguration = collectProcessInstanceIds(commandContext);
 
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class,
-        "No process instance ids given", "process Instance Ids", collectedInstanceIds);
+        "No process instance ids given", "process Instance Ids", elementConfiguration.getIds());
     EnsureUtil.ensureNotContainsNull(BadUserRequestException.class,
-        "Cannot be null.", "Process Instance ids", collectedInstanceIds);
+        "Cannot be null.", "Process Instance ids", elementConfiguration.getIds());
 
     return new BatchBuilder(commandContext)
         .type(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE)
-        .config(getConfiguration(collectedInstanceIds))
+        .config(getConfiguration(elementConfiguration))
         .permission(BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND)
         .operationLogHandler(this::writeUserOperationLogAsync)
         .build();
   }
 
-  public BatchConfiguration getConfiguration(Collection<String> instanceIds) {
-    return new UpdateProcessInstancesSuspendStateBatchConfiguration(
-        new ArrayList<>(instanceIds), suspending);
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new UpdateProcessInstancesSuspendStateBatchConfiguration(elementConfiguration.getIds(),
+        elementConfiguration.getMappings(), suspending);
   }
 
 }

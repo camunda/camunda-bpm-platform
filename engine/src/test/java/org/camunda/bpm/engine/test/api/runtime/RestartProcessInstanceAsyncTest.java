@@ -197,7 +197,7 @@ public class RestartProcessInstanceAsyncTest {
         .startBeforeActivity("bar")
         .processInstanceIds("aaa")
         .executeAsync();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     try {
       helper.executeJobs(batch);
       fail("exception expected");
@@ -225,9 +225,16 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(),processInstance2.getId())
         .executeAsync();
 
-    helper.completeBatch(batch);
+    helper.completeSeedJobs(batch);
 
     // then
+    helper.getExecutionJobs(batch).forEach(j -> assertEquals(processDefinition.getDeploymentId(), j.getDeploymentId()));
+
+    // when
+    helper.completeExecutionJobs(batch);
+    helper.completeMonitorJobs(batch);
+
+    // and
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().active().list();
     ProcessInstance restartedProcessInstance = restartedProcessInstances.get(0);
     Task restartedTask = engineRule.getTaskService().createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
@@ -528,7 +535,7 @@ public class RestartProcessInstanceAsyncTest {
 
     // when the seed job creates the monitor job
     Date createDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
@@ -567,7 +574,7 @@ public class RestartProcessInstanceAsyncTest {
 
     // when the seed job creates the monitor job
     Date createDate = testDate;
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the monitor job has the create date as due date set
     Job monitorJob = helper.getMonitorJob(batch);
@@ -600,7 +607,7 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     helper.executeMonitorJob(batch);
@@ -629,7 +636,7 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     engineRule.getManagementService().deleteBatch(batch.getId(), true);
 
@@ -660,7 +667,7 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     engineRule.getManagementService().deleteBatch(batch.getId(), false);
 
@@ -719,7 +726,7 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incidents
     List<Job> executionJobs = helper.getExecutionJobs(batch);
@@ -751,7 +758,7 @@ public class RestartProcessInstanceAsyncTest {
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incident
     Job monitorJob = helper.getMonitorJob(batch);
@@ -787,7 +794,7 @@ public class RestartProcessInstanceAsyncTest {
           .startTransition("flow1")
           .processInstanceIds(list)
           .executeAsync();
-      helper.executeSeedJob(batch);
+      helper.completeSeedJobs(batch);
 
       testRule.waitForJobExecutorToProcessAllJobs();
 
