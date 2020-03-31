@@ -53,7 +53,7 @@
           "examples": {
             "example-1" :{
               "summary": "file variable: Status 200",
-              "value": "Content-Type: text/plain; charset=UTF-8. Content-Disposition: attachment; filename=“someFile.txt”"
+              "value": "Content-Type: text/plain; charset=UTF-8. Content-Disposition: attachment; filename=\"someFile.txt\""
             }
           }
         }
