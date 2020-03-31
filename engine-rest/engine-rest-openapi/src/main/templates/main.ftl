@@ -31,16 +31,17 @@
 
   ],
   "tags": [
-    {"name": "Comment"},
     {"name": "Condition"},
     {"name": "Deployment"},
     {"name": "Engine"},
-    {"name": "Identity Link"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process instance"},
     {"name": "Signal"},
     {"name": "Schema Log"},
+    {"name": "Task"},
+    {"name": "Task Comment"},
+    {"name": "Task Identity Link"},
     {"name": "Version"}
   ],
   "paths": {
