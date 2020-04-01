@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
@@ -50,7 +52,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_LOCK_EXPIRATION_TIME);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID);
@@ -61,6 +63,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   }
 
   protected String externalTaskId;
+  protected Set<String> externalTaskIds;
   protected String activityId;
   protected List<String> activityIdIn;
   protected Date lockExpirationBefore;
@@ -91,6 +94,11 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   @CamundaQueryParam("externalTaskId")
   public void setExternalTaskId(String externalTaskId) {
     this.externalTaskId = externalTaskId;
+  }
+
+  @CamundaQueryParam(value = "externalTaskIdIn", converter = StringSetConverter.class)
+  public void setExternalTaskIdIn(Set<String> externalTaskIds) {
+    this.externalTaskIds = externalTaskIds;
   }
 
   @CamundaQueryParam("activityId")
@@ -206,11 +214,14 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     if (externalTaskId != null) {
       query.externalTaskId(externalTaskId);
     }
+    if (externalTaskIds != null && !externalTaskIds.isEmpty()) {
+      query.externalTaskIdIn(externalTaskIds);
+    }
     if (activityId != null) {
       query.activityId(activityId);
     }
     if (activityIdIn != null && !activityIdIn.isEmpty()) {
-      query.activityIdIn(activityIdIn.toArray(new String[activityIdIn.size()]));
+      query.activityIdIn(activityIdIn.toArray(new String[0]));
     }
     if (lockExpirationBefore != null) {
       query.lockExpirationBefore(lockExpirationBefore);
@@ -234,7 +245,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
       query.processInstanceId(processInstanceId);
     }
     if (processInstanceIdIn != null && !processInstanceIdIn.isEmpty()) {
-      query.processInstanceIdIn(processInstanceIdIn.toArray(new String[processInstanceIdIn.size()]));
+      query.processInstanceIdIn(processInstanceIdIn.toArray(new String[0]));
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
@@ -261,7 +272,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
       query.workerId(workerId);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
-      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+      query.tenantIdIn(tenantIds.toArray(new String[0]));
     }
   }
 
