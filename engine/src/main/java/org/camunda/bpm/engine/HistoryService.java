@@ -152,6 +152,9 @@ public interface HistoryService {
    *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
    *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
    *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
    *   <li>The user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on
    *       {@link Resources#PROCESS_DEFINITION}
    *       ({@link ProcessEngineConfigurationImpl#enforceSpecificVariablePermission} must be set to
@@ -172,6 +175,9 @@ public interface HistoryService {
    *       {@link Resources#PROCESS_DEFINITION} OR
    *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
    *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
    *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
    *   <li>The user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on
    *       {@link Resources#PROCESS_DEFINITION}
