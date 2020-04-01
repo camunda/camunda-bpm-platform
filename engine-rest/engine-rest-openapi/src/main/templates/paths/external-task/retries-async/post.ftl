@@ -37,7 +37,9 @@
                          "seedJobDefinitionId": "aSeedJobDefinitionId",
                          "monitorJobDefinitionId": "aMonitorJobDefinitionId",
                          "batchJobDefinitionId": "aBatchJobDefinitionId",
-                         "tenantId": "aTenantId"
+                         "tenantId": "aTenantId",
+                         "suspended": false,
+                         "createUserId": "demo"
                        }
                      }'] />
 

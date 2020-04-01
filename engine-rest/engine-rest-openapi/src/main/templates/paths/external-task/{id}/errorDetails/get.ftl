@@ -41,6 +41,12 @@
       }
     },
 
+
+  <@lib.response
+      code = "204"
+      desc = "Request successful. In case the external task has no error details." />
+
+
     <@lib.response
         code = "500"
         dto = "ExceptionDto"

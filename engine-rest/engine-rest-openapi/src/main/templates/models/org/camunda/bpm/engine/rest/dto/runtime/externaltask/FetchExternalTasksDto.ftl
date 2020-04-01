@@ -22,7 +22,8 @@
 
     <@lib.property
         name = "asyncResponseTimeout"
-        type = "string"
+        type = "integer"
+        format = "int64"
         desc = "The [Long Polling](${docsUrl}/user-guide/process-engine/external-tasks/#long-polling-to-fetch-and-lock-external-tasks)
                 timeout in milliseconds.
 

@@ -8,7 +8,8 @@
 
     <@lib.property
         name = "lockDuration"
-        type = "string"
+        type = "integer"
+        format = "int64"
         desc = "**Mandatory.** The duration to lock the external tasks for in milliseconds." />
 
     <@lib.property

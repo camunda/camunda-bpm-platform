@@ -10,7 +10,7 @@
       mediaType = "application/json"
       dto = "SetRetriesForExternalTasksDto"
       examples = ['"example-1": {
-                       "summary": "PUT /external-task/retries-sync",
+                       "summary": "PUT /external-task/retries",
                        "value": {
                          "retries": 123,
                          "externalTaskIds": [

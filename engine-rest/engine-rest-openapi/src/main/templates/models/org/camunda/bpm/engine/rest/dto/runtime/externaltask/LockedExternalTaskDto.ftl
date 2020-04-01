@@ -71,6 +71,11 @@
       desc = "The number of retries the task currently has left." />
 
   <@lib.property
+      name = "suspended"
+      type = "boolean"
+      desc = "Whether the process instance the external task belongs to is suspended." />
+
+  <@lib.property
       name = "workerId"
       type = "string"
       desc = "The id of the worker that posesses or posessed the most recent lock." />
