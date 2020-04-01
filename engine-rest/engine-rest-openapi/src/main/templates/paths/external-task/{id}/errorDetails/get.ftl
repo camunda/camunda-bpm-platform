@@ -42,7 +42,7 @@
     },
 
     <@lib.response
-        code = "404"
+        code = "500"
         dto = "ExceptionDto"
         last = true
         desc = "An external task with the given id does not exist. See the
