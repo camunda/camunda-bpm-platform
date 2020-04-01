@@ -34,6 +34,7 @@
     {"name": "Condition"},
     {"name": "Deployment"},
     {"name": "Engine"},
+    {"name": "External Task"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process instance"},

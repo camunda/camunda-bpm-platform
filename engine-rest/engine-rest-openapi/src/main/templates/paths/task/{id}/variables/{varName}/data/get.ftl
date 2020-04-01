@@ -57,7 +57,7 @@
           "examples": {
             "example-1": {
               "summary": "GET /task/aTaskId/variables/aVarName/data",
-              "value": "file variable: Status 200. Content-Type: text/plain; charset=UTF-8. Content-Disposition: attachment; filename=“someFile.txt”"
+              "value": "file variable: Status 200. Content-Type: text/plain; charset=UTF-8. Content-Disposition: attachment; filename=\"someFile.txt\""
             }
           }
         }

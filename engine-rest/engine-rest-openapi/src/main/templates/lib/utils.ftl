@@ -3,6 +3,7 @@
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         format=""
+        itemType=""
         required=false
         last=false >
   {
@@ -21,8 +22,15 @@
       </#if>
 
       "type": "${type}"
-      <#if format?has_content>
-      ,"format": "${format}"
+
+      <#if type == "array">,
+        "items": {
+          "type": "${itemType}"
+        }
+      </#if>
+
+      <#if format?has_content>,
+        "format": "${format}"
       </#if>
     },
 
