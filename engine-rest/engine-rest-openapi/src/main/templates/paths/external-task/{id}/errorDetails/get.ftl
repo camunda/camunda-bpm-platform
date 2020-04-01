@@ -29,8 +29,7 @@
           },
           "examples": {
             "example-1": {
-              "value": "
-                org.apache.ibatis.jdbc.RuntimeSqlException: org.apache.ibatis.jdbc.RuntimeSqlException: test cause
+              "value": "org.apache.ibatis.jdbc.RuntimeSqlException: org.apache.ibatis.jdbc.RuntimeSqlException: test cause
                   at org.camunda.bpm.engine.test.api.externaltask.ExternalTaskServiceTest.testHandleFailureWithErrorDetails(ExternalTaskServiceTest.java:1424)
                   at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
                   at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
