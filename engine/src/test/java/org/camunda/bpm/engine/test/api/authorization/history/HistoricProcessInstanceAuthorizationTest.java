@@ -68,6 +68,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   @Override
   public void tearDown() {
     super.tearDown();
+    processEngineConfiguration.setEnableHistoricInstancePermissions(false);
     deleteDeployment(deploymentId);
   }
 
@@ -617,6 +618,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   public void testCheckAllHistoricProcessInstancePermissions() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
@@ -635,6 +637,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   public void testCheckReadHistoricProcessInstancePermissions() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
@@ -653,6 +656,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   public void testCheckNoneHistoricProcessInstancePermission() {
     // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
 
     // when
     createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
