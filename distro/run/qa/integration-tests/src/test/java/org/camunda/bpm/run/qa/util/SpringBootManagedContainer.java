@@ -216,6 +216,9 @@ public class SpringBootManagedContainer {
     try {
       Process p = null;
       Integer pid = null;
+      
+      // must kill a hierachy of processes: the script process (which corresponds to the pid value) 
+      // and the Java process it has spawned
       if (isUnixLike()) {
         pid = unixLikeProcessId(process);
         p = new ProcessBuilder("pkill", "-TERM", "-P", String.valueOf(pid)).start();
