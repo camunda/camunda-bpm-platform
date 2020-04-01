@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -110,8 +111,17 @@ public interface HistoryService {
   HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
 
   /**
-   * Query for the number of historic activity instances aggregated by activities of a single process definition.
-   */
+   * <p>Query for the number of historic activity instances aggregated by activities of a single
+   * process definition.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
 
   /**
