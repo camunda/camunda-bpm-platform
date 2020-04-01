@@ -28,8 +28,10 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -611,6 +613,60 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     assertEquals(0, reportResults.size());
+  }
+
+  public void testCheckAllHistoricProcessInstancePermissions() {
+    // given
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.ALL);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+  }
+
+  public void testCheckReadHistoricProcessInstancePermissions() {
+    // given
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
+  }
+
+  public void testCheckNoneHistoricProcessInstancePermission() {
+    // given
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.NONE);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
   }
 
   // helper ////////////////////////////////////////////////////////
