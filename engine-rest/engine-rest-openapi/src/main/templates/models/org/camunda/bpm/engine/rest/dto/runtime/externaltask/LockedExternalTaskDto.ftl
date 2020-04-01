@@ -50,6 +50,11 @@
       desc = "The key of the process definition the external task is defined in." />
 
   <@lib.property
+      name = "processDefinitionVersionTag"
+      type = "string"
+      desc = "The version tag of the process definition the external task is defined in." />
+
+  <@lib.property
       name = "processInstanceId"
       type = "string"
       desc = "The id of the process instance the external task belongs to." />
