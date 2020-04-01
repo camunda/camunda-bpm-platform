@@ -261,6 +261,7 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH ON (AUTH.RESOURCE_ID_ in (
         <if test="authCheck.isHistoricInstancePermissionsEnabled">
+          RES.PROC_INST_ID_,
           RES.ID_,
         </if>
         RES.PROC_DEF_KEY_, '*'))
