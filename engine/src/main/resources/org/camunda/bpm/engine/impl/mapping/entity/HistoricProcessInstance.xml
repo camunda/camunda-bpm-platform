@@ -269,7 +269,11 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ in (
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            SELF.ID_,
+        </if>
+        SELF.PROC_DEF_KEY_, '*'))
     </if>
 
     <bind name="INC_JOIN" value="false" />
@@ -543,11 +547,18 @@
       </foreach>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-        and (
-        (SELF.PROC_DEF_KEY_ is not null
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-        ) or SELF.PROC_DEF_KEY_ is null
-        )
+        <choose>
+          <when test="authCheck.isHistoricInstancePermissionsEnabled">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          </when>
+          <otherwise>
+            and (
+            (SELF.PROC_DEF_KEY_ is not null
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+            ) or SELF.PROC_DEF_KEY_ is null
+            )
+          </otherwise>
+        </choose>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
