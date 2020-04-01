@@ -46,10 +46,13 @@ import com.sun.jna.platform.win32.WinNT;
  */
 public class SpringBootManagedContainer {
 
-  private static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
-  private static final String APPLICATION_YML_PATH = "configuration/default.yml";
-  private static final String RESOURCES_PATH = "configuration/resources";
-  private static final String RUN_HOME_VARIABLE = "camunda.run.home";
+  protected static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
+  protected static final String APPLICATION_YML_PATH = "configuration/default.yml";
+  protected static final String RESOURCES_PATH = "configuration/resources";
+  protected static final String RUN_HOME_VARIABLE = "camunda.run.home";
+
+  protected static final long RAMP_UP_SECONDS = 40;
+  protected static final long RAMP_DOWN_SECONDS = 10;
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
 
@@ -60,7 +63,7 @@ public class SpringBootManagedContainer {
   protected Thread shutdownThread;
   protected Process startupProcess;
 
-  private List<File> configurationFiles = new ArrayList<>();
+  protected List<File> configurationFiles = new ArrayList<>();
 
   public SpringBootManagedContainer(String... commands) {
     this.baseDirectory = getRunHome();
@@ -111,22 +114,11 @@ public class SpringBootManagedContainer {
       });
       Runtime.getRuntime().addShutdownHook(shutdownThread);
 
-      final long startupTimeoutSeconds = 20;
-      long timeout = startupTimeoutSeconds * 1000;
-      boolean serverAvailable = false;
-      while (timeout > 0 && serverAvailable == false) {
-        serverAvailable = isRunning();
-        if (!serverAvailable) {
-          Thread.sleep(100);
-          timeout -= 100;
-        }
-      }
-      if (!serverAvailable) {
+      if (!isStarted(RAMP_UP_SECONDS * 1000)) {
         killProcess(startupProcess, false);
-        throw new TimeoutException(String.format("Managed Spring Boot application was not started within [%d] s", startupTimeoutSeconds));
+        throw new TimeoutException(String.format("Managed Spring Boot application was not started within [%d] s", RAMP_UP_SECONDS));
       }
     } catch (final Exception ex) {
-
       throw new RuntimeException("Could not start managed Spring Boot application!", ex);
     }
   }
@@ -141,8 +133,7 @@ public class SpringBootManagedContainer {
       if (startupProcess != null) {
         if (isRunning()) {
           killProcess(startupProcess, false);
-          Thread.sleep(4000L);// let the application shut down
-          if (isRunning()) {
+          if (!isShutDown(RAMP_DOWN_SECONDS * 1000)) {
             throw new RuntimeException("Could not kill the application.");
           }
         }
@@ -166,6 +157,26 @@ public class SpringBootManagedContainer {
   // ---------------------------
   // determine server status
   // ---------------------------
+
+  protected boolean isStarted(long millisToWait) throws InterruptedException {
+    return waitForServerStatus(millisToWait, true);
+  }
+
+  protected boolean isShutDown(long millisToWait) throws InterruptedException {
+    return waitForServerStatus(millisToWait, false);
+  }
+
+  protected boolean waitForServerStatus(long millisToWait, boolean shouldBeRunning) throws InterruptedException {
+    boolean serverAvailable = !shouldBeRunning;
+    while (millisToWait > 0 && serverAvailable == !shouldBeRunning) {
+      serverAvailable = isRunning();
+      if (shouldBeRunning ^ serverAvailable) {
+        Thread.sleep(100);
+        millisToWait -= 100;
+      }
+    }
+    return serverAvailable == shouldBeRunning;
+  }
 
   protected boolean isRunning() {
     try {
