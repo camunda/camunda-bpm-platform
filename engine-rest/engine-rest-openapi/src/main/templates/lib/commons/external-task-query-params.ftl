@@ -5,6 +5,13 @@
       desc = "Filter by an external task's id." />
 
   <@lib.parameter
+      name = "externalTaskIdIn"
+      location = "query"
+      type = "array"
+      itemType = "string"
+      desc = "Filter by the comma-separated list of external task ids." />
+
+  <@lib.parameter
       name = "topicName"
       location = "query"
       type = "string"
