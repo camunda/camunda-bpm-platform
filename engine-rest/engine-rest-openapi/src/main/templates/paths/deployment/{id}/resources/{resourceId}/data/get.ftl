@@ -31,11 +31,15 @@
       "content": {
         "application/octet-stream": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "For files without any MIME type information, a byte stream is returned."
           }
         },
-        "application/xml": {
+        "*/*": {
           "schema": {
+            "type": "string",
+            "format": "binary",
             "description": "Files with MIME type information are returned as the saved type. For example, a
                             `process.bpmn` resource will have the media type `application/xml`."
           }

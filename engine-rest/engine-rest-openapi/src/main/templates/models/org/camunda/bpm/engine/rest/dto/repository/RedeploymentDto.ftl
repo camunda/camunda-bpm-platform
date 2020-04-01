@@ -4,12 +4,14 @@
 
     <@lib.property
         name = "resourceIds"
-        type = "string"
+        type = "array"
+        itemType = "string"
         desc = "A list of deployment resource ids to re-deploy." />
 
     <@lib.property
         name = "resourceNames"
-        type = "string"
+        type = "array"
+        itemType = "string"
         desc = "A list of deployment resource names to re-deploy." />
 
     <@lib.property
