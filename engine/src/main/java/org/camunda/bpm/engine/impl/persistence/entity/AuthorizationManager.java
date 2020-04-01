@@ -788,6 +788,8 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
           .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", processDefinitionPermission)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
           .atomicCheck(HISTORIC_TASK, "TI.ID_", historicTaskPermission)
           .build();
 
