@@ -51,7 +51,7 @@ public class SpringBootManagedContainer {
   protected static final String RESOURCES_PATH = "configuration/resources";
   protected static final String RUN_HOME_VARIABLE = "camunda.run.home";
 
-  protected static final long RAMP_UP_SECONDS = 40;
+  protected static final long RAMP_UP_SECONDS = 20;
   protected static final long RAMP_DOWN_SECONDS = 10;
 
   protected static final Logger log = LoggerFactory.getLogger(SpringBootManagedContainer.class.getName());
@@ -168,11 +168,11 @@ public class SpringBootManagedContainer {
 
   protected boolean waitForServerStatus(long millisToWait, boolean shouldBeRunning) throws InterruptedException {
     boolean serverAvailable = !shouldBeRunning;
-    while (millisToWait > 0 && serverAvailable == !shouldBeRunning) {
+    long targetTime = System.currentTimeMillis() + millisToWait;
+    while (System.currentTimeMillis() < targetTime && serverAvailable == !shouldBeRunning) {
       serverAvailable = isRunning();
       if (shouldBeRunning ^ serverAvailable) {
         Thread.sleep(100);
-        millisToWait -= 100;
       }
     }
     return serverAvailable == shouldBeRunning;
