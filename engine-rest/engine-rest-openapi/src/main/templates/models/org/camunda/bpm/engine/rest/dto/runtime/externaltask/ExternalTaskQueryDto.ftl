@@ -124,7 +124,9 @@
     "type": "array",
     "description": "A JSON array of criteria to sort the result by. Each element of the array is a JSON object that
                     specifies one ordering. The position in the array identifies the rank of an ordering, i.e., whether
-                    it is primary, secondary, etc. The ordering objects have the following properties:",
+                    it is primary, secondary, etc. The ordering objects have the following properties:
+
+                    **Note:** The `sorting` properties will not be applied to the External Task count query.",
     "items":
 
     <#assign last = true>
