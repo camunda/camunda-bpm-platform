@@ -55,16 +55,16 @@
     </dependency>
 
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
     </dependency>
 
     <!-- Testing -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -97,10 +97,6 @@
             <exclude>
               <groupId>org.camunda.bpm.springboot</groupId>
               <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-            </exclude>
-            <exclude>
-              <groupId>com.h2database</groupId>
-              <artifactId>h2</artifactId>
             </exclude>
           </excludes>
         </configuration>
