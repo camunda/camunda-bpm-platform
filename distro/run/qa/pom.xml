@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.run</groupId>
+    <artifactId>camunda-bpm-run-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>camunda-bpm-run-qa</artifactId>
+  <name>Camunda BPM - Run - QA</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <!-- default os -->
+    <os.type>linux64</os.type>
+
+    <version.selenium>2.45.0</version.selenium>
+    <version.jersey-json>1.15</version.jersey-json>
+    <version.jersey-apache-client>1.15</version.jersey-apache-client>
+    <version.httpcomponents>4.5.10</version.httpcomponents>
+    <version.junit>4.13</version.junit>
+    <version.chromedriver>78.0.3904.70</version.chromedriver>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcomponents-client</artifactId>
+        <version>${version.httpcomponents}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client4</artifactId>
+        <version>${version.jersey-apache-client}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-java</artifactId>
+        <version>${version.selenium}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-json</artifactId>
+        <version>${version.jersey-json}</version>
+      </dependency>
+
+      <!-- using 4.13 in order to have @BeforeParam/@AfterParam for parameterized 
+        tests to correctly start and tear down the Spring Boot container before each 
+        parameter run -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>integration-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>runtime</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>integration-test-camunda-run</id>
+      <modules>
+        <module>integration-tests</module>
+        <module>runtime</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>

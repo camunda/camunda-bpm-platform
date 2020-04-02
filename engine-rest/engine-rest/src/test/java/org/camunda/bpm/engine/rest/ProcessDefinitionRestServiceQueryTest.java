@@ -466,6 +466,19 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
 
   @Test
+  public void testProcessDefinitionWithoutVersionTag() {
+    given()
+      .queryParam("withoutVersionTag", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).withoutVersionTag();
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testNotStartableInTasklist() {
     List<ProcessDefinition> processDefinitions = Arrays.asList(
       MockProvider.mockDefinition().isStartableInTasklist(false).build());

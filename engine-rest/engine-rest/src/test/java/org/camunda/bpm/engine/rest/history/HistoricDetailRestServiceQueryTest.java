@@ -1155,6 +1155,76 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     verifyTenantIdListParameterResponse(response);
   }
 
+  @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+
+    historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate(null);
+    historicUpdateMock = historicUpdateBuilder.build();
+    historicFormFieldMock = MockProvider.createMockHistoricFormField(null);
+
+    details.add(historicUpdateMock);
+    details.add(historicFormFieldMock);
+
+    mockedQuery = setUpMockedDetailsQuery(details);
+
+    // when
+    Response response = given()
+        .queryParam("withoutTenantId", true)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
+  public void testQueryWithoutTenantIdPostParameter() {
+    // given
+    List<HistoricDetail> details = new ArrayList<HistoricDetail>();
+
+    historicUpdateBuilder = MockProvider.mockHistoricVariableUpdate(null);
+    historicUpdateMock = historicUpdateBuilder.build();
+    historicFormFieldMock = MockProvider.createMockHistoricFormField(null);
+
+    details.add(historicUpdateMock);
+    details.add(historicFormFieldMock);
+
+    mockedQuery = setUpMockedDetailsQuery(details);
+    Map<String, Object> queryParameters = Collections.singletonMap("withoutTenantId", (Object) true);
+
+    // when
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
   private void verifyTenantIdListParameterResponse(Response response) {
     String content = response.asString();
     List<String> historicDetails = from(content).getList("");

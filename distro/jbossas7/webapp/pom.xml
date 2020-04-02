@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -33,7 +33,7 @@
           <archive>
             <manifestEntries>
               <!-- module dependencies for deployment on AS 7 -->
-              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model</Dependencies>
+              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging</Dependencies>
             </manifestEntries>
           </archive>          
         </configuration>

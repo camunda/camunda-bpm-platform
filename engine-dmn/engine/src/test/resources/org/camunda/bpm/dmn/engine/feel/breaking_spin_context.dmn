@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="Definitions_0ymj5db" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <decision id="Decision_1b17tzp" name="Decision 1">
+    <extensionElements>
+      <biodi:bounds x="157" y="81" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="input_1">
+        <inputExpression id="inputExpression_1" expressionLanguage="juel">
+          <text>true</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" typeRef="string" />
+      <rule id="DecisionRule_1fhucab">
+        <inputEntry id="UnaryTests_0kpj628" expressionLanguage="feel">
+          <text>(foo.bar &gt; 7)</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ymvc87" expressionLanguage="juel">
+          <text>"foo"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0qko49g">
+        <inputEntry id="UnaryTests_0nogxjd" expressionLanguage="feel">
+          <text>(foo.bar &lt;= 7)</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_19ehhrb" expressionLanguage="juel">
+          <text>"bar"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

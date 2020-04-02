@@ -39,8 +39,8 @@ public class DoubleValueSerializer extends PrimitiveValueSerializer<DoubleValue>
     valueFields.setDoubleValue(value.getValue());
   }
 
-  public DoubleValue readValue(ValueFields valueFields) {
-    return Variables.doubleValue(valueFields.getDoubleValue());
+  public DoubleValue readValue(ValueFields valueFields, boolean asTransientValue) {
+    return Variables.doubleValue(valueFields.getDoubleValue(), asTransientValue);
   }
 
 }

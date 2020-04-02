@@ -30,6 +30,9 @@ public class HistoricActivityStatisticsImpl implements HistoricActivityStatistic
   protected long finished;
   protected long canceled;
   protected long completeScope;
+  protected long openIncidents;
+  protected long resolvedIncidents;
+  protected long deletedIncidents;
 
   public String getId() {
     return id;
@@ -71,4 +74,27 @@ public class HistoricActivityStatisticsImpl implements HistoricActivityStatistic
     this.completeScope = completeScope;
   }
 
+  public long getOpenIncidents() {
+    return openIncidents;
+  }
+
+  public void setOpenIncidents(long openIncidents) {
+    this.openIncidents = openIncidents;
+  }
+
+  public long getResolvedIncidents() {
+    return resolvedIncidents;
+  }
+
+  public void setResolvedIncidents(long resolvedIncidents) {
+    this.resolvedIncidents = resolvedIncidents;
+  }
+
+  public long getDeletedIncidents() {
+    return deletedIncidents;
+  }
+
+  public void setDeletedIncidents(long closedIncidents) {
+    this.deletedIncidents = closedIncidents;
+  }
 }

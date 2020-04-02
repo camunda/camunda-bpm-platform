@@ -52,7 +52,7 @@ public interface UserRestService {
 
   @POST
   @Path("/create")
-  @Consumes
+  @Consumes(MediaType.APPLICATION_JSON)
   void createUser(UserDto userDto);
 
   @OPTIONS

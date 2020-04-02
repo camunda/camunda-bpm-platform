@@ -25,6 +25,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 
@@ -70,9 +71,11 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   protected String incidentType;
   protected String incidentMessage;
   protected String processDefinitionId;
+  protected String[] processDefinitionKeyIn;
   protected String processInstanceId;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -105,6 +108,11 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     this.processDefinitionId = processDefinitionId;
   }
 
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringArrayConverter.class)
+  public void setProcessDefinitionKeyIn(String[] processDefinitionKeyIn) {
+    this.processDefinitionKeyIn = processDefinitionKeyIn;
+  }
+
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
@@ -118,6 +126,11 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam("failedActivityId")
+  public void setFailedActivityId(String activityId) {
+    this.failedActivityId = activityId;
   }
 
   @CamundaQueryParam("causeIncidentId")
@@ -170,6 +183,9 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
+    if (processDefinitionKeyIn != null && processDefinitionKeyIn.length > 0) {
+      query.processDefinitionKeyIn(processDefinitionKeyIn);
+    }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
@@ -178,6 +194,9 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     }
     if (activityId != null) {
       query.activityId(activityId);
+    }
+    if (failedActivityId != null) {
+      query.failedActivityId(failedActivityId);
     }
     if (causeIncidentId != null) {
       query.causeIncidentId(causeIncidentId);

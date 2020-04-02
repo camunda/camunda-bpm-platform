@@ -38,6 +38,8 @@ public class JobExecutionHandlerActivationSpec implements ActivationSpec, Serial
   private static final long serialVersionUID = 1L;
   
   private ResourceAdapter ra;
+  /** Please check #CAM-9811  */
+  private String dummyPojo;
 
   public void validate() throws InvalidPropertyException {
     // nothing to do (the endpoint has no activation properties)
@@ -49,6 +51,14 @@ public class JobExecutionHandlerActivationSpec implements ActivationSpec, Serial
 
   public void setResourceAdapter(ResourceAdapter ra) {
     this.ra = ra;
+  }
+
+  public void setDummyPojo(String dummyPojo) {
+    this.dummyPojo = dummyPojo;
+  }
+
+  public String getDummyPojo() {
+    return dummyPojo;
   }
 
 }

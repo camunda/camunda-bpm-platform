@@ -84,7 +84,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testEmptyQueryAsPost() {
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new HashMap<>();
     params.put("jobDefinitionId", "");
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(params)
@@ -221,7 +221,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
   @Test
   public void testSecondarySortingAsPost() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("sorting", OrderingBuilder.create()
       .orderBy("jobType").desc()
       .orderBy("jobConfiguration").asc()
@@ -301,6 +301,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedJobConfiguration = from(content).getString("[0].jobConfiguration");
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
     Long returnedJobPriority = from(content).getObject("[0].overridingJobPriority", Long.class);
+    String returnedDeploymentId = from(content).getString("[0].deploymentId");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     assertThat(returnedProcessDefinitionId).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
@@ -310,12 +311,13 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedJobConfiguration).isEqualTo(MockProvider.EXAMPLE_JOB_CONFIG);
     assertThat(returnedSuspensionState).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED);
     assertThat(returnedJobPriority).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+    assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID);
   }
 
   @Test
   public void testJobDefinitionRetrievalAsPost() {
     String queryJobDefinitionId = "aJobDefId";
-    Map<String, String> queryParameter = new HashMap<String, String>();
+    Map<String, String> queryParameter = new HashMap<>();
     queryParameter.put("jobDefinitionId", queryJobDefinitionId);
 
     Response response = given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameter)
@@ -340,6 +342,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedJobType = from(content).getString("[0].jobType");
     String returnedJobConfiguration = from(content).getString("[0].jobConfiguration");
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
+    String returnedDeploymentId = from(content).getString("[0].deploymentId");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     assertThat(returnedProcessDefinitionId).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
@@ -348,11 +351,12 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedJobType).isEqualTo(MockProvider.EXAMPLE_JOB_TYPE);
     assertThat(returnedJobConfiguration).isEqualTo(MockProvider.EXAMPLE_JOB_CONFIG);
     assertThat(returnedSuspensionState).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED);
+    assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID);
   }
 
   @Test
   public void testMultipleParameters() {
-    Map<String, String> queryParameters = new HashMap<String, String>();
+    Map<String, String> queryParameters = new HashMap<>();
 
     queryParameters.put("jobDefinitionId", "aJobDefId");
     queryParameters.put("processDefinitionId", "aProcDefId");
@@ -390,7 +394,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     String aJobType = "aJobType";
     String aJobConfig = "aJobConfig";
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
 
     queryParameters.put("jobDefinitionId", aJobDefId);
     queryParameters.put("processDefinitionId", aProcDefId);
@@ -401,7 +405,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     queryParameters.put("active", "true");
     queryParameters.put("withOverridingJobPriority", "true");
 
-    List<String> activityIdIn = new ArrayList<String>();
+    List<String> activityIdIn = new ArrayList<>();
     activityIdIn.add(aActId);
     activityIdIn.add(anotherActId);
     queryParameters.put("activityIdIn", activityIdIn);
@@ -520,7 +524,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
   public void testTenantIdListPostParameter() {
     mockedQuery = setUpMockDefinitionQuery(createMockJobDefinitionsTwoTenants());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
 
     Response response = given()
@@ -547,7 +551,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testWithoutTenantIdPostParameter() {
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("withoutTenantId", true);
 
     Response response = given()
@@ -576,7 +580,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
         MockProvider.mockJobDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = setUpMockDefinitionQuery(jobDefinitions);
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("tenantIdIn", new String[] { MockProvider.EXAMPLE_TENANT_ID });
     queryParameters.put("includeJobDefinitionsWithoutTenantId", true);
 

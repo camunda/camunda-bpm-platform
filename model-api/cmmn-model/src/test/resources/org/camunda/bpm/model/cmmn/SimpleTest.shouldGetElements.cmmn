@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<cmmn:definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="http://camunda.org/test">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1">
+      <cmmn:planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <cmmn:humanTask id="HumanTask_1" name="A HumanTask" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+</cmmn:definitions>

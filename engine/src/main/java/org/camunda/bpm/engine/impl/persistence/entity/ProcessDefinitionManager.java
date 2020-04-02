@@ -66,8 +66,7 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
    * @see #findLatestProcessDefinitionByKeyAndTenantId(String, String)
    */
   public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
-    @SuppressWarnings("unchecked")
-    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", configureParameterizedQuery(processDefinitionKey));
+    List<ProcessDefinitionEntity> processDefinitions = findLatestProcessDefinitionsByKey(processDefinitionKey);
 
     if (processDefinitions.isEmpty()) {
       return null;
@@ -78,6 +77,18 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     } else {
       throw LOG.multipleTenantsForProcessDefinitionKeyException(processDefinitionKey);
     }
+  }
+
+  /**
+   * @return the latest versions of the process definition with the given key (from any tenant),
+   *         contains multiple elements if more than one tenant has a process definition with
+   *         the given key
+   *
+   * @see #findLatestProcessDefinitionByKey(String)
+   */
+  @SuppressWarnings("unchecked")
+  public List<ProcessDefinitionEntity> findLatestProcessDefinitionsByKey(String processDefinitionKey) {
+    return getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", configureParameterizedQuery(processDefinitionKey));
   }
 
   /**

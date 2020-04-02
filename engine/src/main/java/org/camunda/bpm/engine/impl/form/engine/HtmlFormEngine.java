@@ -65,7 +65,7 @@ public class HtmlFormEngine implements FormEngine {
 
   /* datepicker attributes*/
   protected static final String IS_OPEN_ATTRIBUTE = "is-open";
-  protected static final String DATEPICKER_POPUP_ATTRIBUTE = "datepicker-popup";
+  protected static final String DATEPICKER_POPUP_ATTRIBUTE = "uib-datepicker-popup";
 
   /* camunda attributes */
   protected static final String CAM_VARIABLE_TYPE_ATTRIBUTE = "cam-variable-type";

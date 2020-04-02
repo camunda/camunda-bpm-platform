@@ -165,7 +165,7 @@
       <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
       <!-- https://app.camunda.com/jira/browse/CAM-9436 -->
       <!-- null filter to speed up the history cleanup -->
-      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
         and D.TASK_ID_ is not null
       </if>
       <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
@@ -312,9 +312,24 @@
   <sql id="selectHistoricDetailsByQueryCriteriaSql">
     from ${prefix}ACT_HI_DETAIL RES
 
-    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.isHistoricInstancePermissionsEnabled">
+        left join ${prefix}ACT_HI_PROCINST PI
+          on PI.ID_ = RES.PROC_INST_ID_
+
+        left join ${prefix}ACT_HI_TASKINST TI
+          on TI.PROC_INST_ID_ = PI.ID_ <!-- Include process tasks -->
+          or TI.ID_ = RES.TASK_ID_ <!-- Include standalone tasks -->
+      </if>
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH ON (AUTH.RESOURCE_ID_ in (
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+        TI.ID_,
+        </if>
+        RES.PROC_DEF_KEY_, '*'
+        ))
+      </if>
     </if>
 
     <where>
@@ -376,12 +391,17 @@
         and RES.TYPE_ = #{type}
       </if>
 
-      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and RES.TENANT_ID_ in
-        <foreach item="tenantId" index="index" collection="tenantIds"
-                 open="(" separator="," close=")">
-          #{tenantId}
-        </foreach>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
       </if>
 
       <if test="userOperationId != null">
@@ -400,11 +420,20 @@
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-        and (
-        (RES.EXECUTION_ID_ is not null
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-        ) or RES.EXECUTION_ID_ is null
-        )
+        <choose>
+          <when test="authCheck.isHistoricInstancePermissionsEnabled">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          </when>
+          <otherwise>
+            and (
+            (RES.EXECUTION_ID_ is not null
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+            )
+            <!-- Auth check is skipped for standalone tasks -->
+            or RES.EXECUTION_ID_ is null
+            )
+          </otherwise>
+        </choose>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
@@ -413,13 +442,13 @@
   </sql>
 
   <sql id="selectHistoricDetailsProcessAndCaseInstanceByIdsSql">
-    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size > 0">
       and
         <bind name="listOfIds" value="processInstanceIds"/>
         <bind name="fieldName" value="'PROC_INST_ID_'"/>
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
-    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size > 0">
       and
         <bind name="listOfIds" value="caseInstanceIds"/>
         <bind name="fieldName" value="'CASE_INST_ID_'"/>
@@ -428,7 +457,7 @@
   </sql>
 
   <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -438,7 +467,7 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       )
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       and TASK_ID_ in (
         select ID_
         from ${prefix}ACT_HI_TASKINST
@@ -451,7 +480,7 @@
   </sql>
 
   <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql">
-    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and
@@ -459,7 +488,7 @@
           <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
-    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size > 0">
       inner join ${prefix}ACT_HI_TASKINST T
         on TASK_ID_ = T.ID_
         and

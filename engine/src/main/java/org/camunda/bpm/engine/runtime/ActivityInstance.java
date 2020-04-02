@@ -61,4 +61,10 @@ public interface ActivityInstance extends ProcessElementInstance {
    */
   TransitionInstance[] getTransitionInstances(String activityId);
 
+  /** the ids of currently open incidents */
+  String[] getIncidentIds();
+
+  /** the list of currently open incidents */
+  Incident[] getIncidents();
+
 }

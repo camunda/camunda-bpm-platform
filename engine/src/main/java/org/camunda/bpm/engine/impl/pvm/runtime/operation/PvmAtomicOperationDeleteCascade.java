@@ -37,11 +37,20 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
     do {
       nextLeaf = findNextLeaf(execution);
 
-      // propagate skipCustomListeners property
+      // nextLeaf can already be removed, if it was the concurrent parent of the previous leaf.
+      // In that case, DELETE_CASCADE_FIRE_ACTIVITY_END on the previousLeaf already removed
+      // nextLeaf, so calling DELETE_CASCADE_FIRE_ACTIVITY_END again would incorrectly
+      // invoke execution listeners
+      if (nextLeaf.isDeleteRoot() && nextLeaf.isRemoved()) {
+        return;
+      }
+
+      // propagate properties
       PvmExecutionImpl deleteRoot = getDeleteRoot(execution);
       if (deleteRoot != null) {
         nextLeaf.setSkipCustomListeners(deleteRoot.isSkipCustomListeners());
         nextLeaf.setSkipIoMappings(deleteRoot.isSkipIoMappings());
+        nextLeaf.setExternallyTerminated(deleteRoot.isExternallyTerminated());
       }
 
       PvmExecutionImpl subProcessInstance = nextLeaf.getSubProcessInstance();
@@ -49,7 +58,8 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
         if (deleteRoot.isSkipSubprocesses()) {
           subProcessInstance.setSuperExecution(null);
         } else {
-          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
+          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings(),
+              nextLeaf.isExternallyTerminated(), nextLeaf.isSkipSubprocesses());
         }
       }
 

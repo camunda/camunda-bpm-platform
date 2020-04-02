@@ -58,6 +58,10 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new CdiEventListener());
   }
 
+  protected void addTaskUpdateListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_UPDATE, new CdiEventListener());
+  }
+
   protected void addTaskDeleteListeners(TaskDefinition taskDefinition) {
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new CdiEventListener());
   }
@@ -129,6 +133,7 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
     addTaskCreateListeners(taskDefinition);
     addTaskAssignmentListeners(taskDefinition);
     addTaskCompleteListeners(taskDefinition);
+    addTaskUpdateListeners(taskDefinition);
     addTaskDeleteListeners(taskDefinition);
   }
 

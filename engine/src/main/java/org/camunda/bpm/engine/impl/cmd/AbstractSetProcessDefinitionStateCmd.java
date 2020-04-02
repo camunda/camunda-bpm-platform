@@ -194,6 +194,16 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     return getNextCommand(processInstanceCommandBuilder);
   }
 
+  @Override
+  protected String getDeploymentId(CommandContext commandContext) {
+    if (processDefinitionId != null) {
+      return getDeploymentIdByProcessDefinition(commandContext, processDefinitionId);
+    } else if (processDefinitionKey != null) {
+      return getDeploymentIdByProcessDefinitionKey(commandContext, processDefinitionKey, isTenantIdSet, tenantId);
+    }
+    return null;
+  }
+
   protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);
 
 }

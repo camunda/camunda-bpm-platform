@@ -21,6 +21,7 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
 
@@ -31,7 +32,7 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected Attachment attachment;
-  
+
   public SaveAttachmentCmd(Attachment attachment) {
     this.attachment = attachment;
   }
@@ -40,10 +41,19 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
     AttachmentEntity updateAttachment = commandContext
       .getDbEntityManager()
       .selectById(AttachmentEntity.class, attachment.getId());
-    
+
     updateAttachment.setName(attachment.getName());
     updateAttachment.setDescription(attachment.getDescription());
-    
+
+    String taskId = attachment.getTaskId();
+    if (taskId != null) {
+      TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
+
+      if (task != null) {
+        task.triggerUpdateEvent();
+      }
+    }
+
     return null;
   }
 }

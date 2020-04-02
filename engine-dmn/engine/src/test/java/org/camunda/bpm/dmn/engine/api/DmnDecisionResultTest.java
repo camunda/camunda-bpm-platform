@@ -52,8 +52,8 @@ public class DmnDecisionResultTest extends DmnEngineTest {
     assertThat(results.getFirstResult()).isNull();
     assertThat(results.getSingleResult()).isNull();
 
-    assertThat(results.getSingleEntry()).isNull();
-    assertThat(results.getSingleEntryTyped()).isNull();
+    assertThat((Object) results.getSingleEntry()).isNull();
+    assertThat((Object) results.getSingleEntryTyped()).isNull();
   }
 
   @Test
@@ -66,7 +66,7 @@ public class DmnDecisionResultTest extends DmnEngineTest {
     assertSingleOutputValue(results.getFirstResult());
     assertSingleOutputValue(results.getSingleResult());
 
-    assertThat(results.getSingleEntry()).isEqualTo("singleValue");
+    assertThat((String) results.getSingleEntry()).isEqualTo("singleValue");
   }
 
   @Test
@@ -118,7 +118,7 @@ public class DmnDecisionResultTest extends DmnEngineTest {
 
     assertNoOutputValue(decisionResult.getFirstResult());
 
-    assertThat(decisionResult.getSingleEntry()).isNull();
+    assertThat((Object) decisionResult.getSingleEntry()).isNull();
   }
 
   @Test
@@ -129,7 +129,7 @@ public class DmnDecisionResultTest extends DmnEngineTest {
 
     assertSingleOutputValue(decisionResult.getFirstResult());
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("singleValue");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("singleValue");
   }
 
   @Test
@@ -139,10 +139,10 @@ public class DmnDecisionResultTest extends DmnEngineTest {
     assertThat(decisionResult).hasSize(1);
 
     assertThat(decisionResult.getFirstResult()).hasSize(1);
-    assertThat(decisionResult.getFirstResult().getSingleEntry()).isEqualTo("outputValue");
+    assertThat((String) decisionResult.getFirstResult().getSingleEntry()).isEqualTo("outputValue");
     assertThat(decisionResult.getFirstResult().get(null)).isEqualTo("outputValue");
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("outputValue");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("outputValue");
   }
 
   @Test

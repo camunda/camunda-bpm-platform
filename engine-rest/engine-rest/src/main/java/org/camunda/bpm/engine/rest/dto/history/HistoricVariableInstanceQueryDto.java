@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] caseActivityIdIn;
   protected String[] processInstanceIdIn;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
   protected boolean includeDeleted;
 
   public HistoricVariableInstanceQueryDto() {
@@ -159,6 +162,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   public boolean isIncludeDeleted() {
     return includeDeleted;
   }
@@ -209,10 +217,10 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     if (variableTypeIn != null && variableTypeIn.length > 0) {
       query.variableTypeIn(variableTypeIn);
     }
-    if (Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+    if (TRUE.equals(variableNamesIgnoreCase)) {
       query.matchVariableNamesIgnoreCase();
     }
-    if (Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+    if (TRUE.equals(variableValuesIgnoreCase)) {
       query.matchVariableValuesIgnoreCase();
     }
     if (executionIdIn != null && executionIdIn.length > 0) {
@@ -235,6 +243,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (includeDeleted) {
       query.includeDeleted();

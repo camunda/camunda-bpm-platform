@@ -16,8 +16,12 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
@@ -26,7 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
  * @author Thorben Lindhauer
@@ -37,6 +41,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   private static final long serialVersionUID = 1L;
 
   protected String externalTaskId;
+  protected Set<String> externalTaskIds;
   protected String workerId;
   protected Date lockExpirationBefore;
   protected Date lockExpirationAfter;
@@ -65,6 +70,13 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery externalTaskId(String externalTaskId) {
     ensureNotNull("externalTaskId", externalTaskId);
     this.externalTaskId = externalTaskId;
+    return this;
+  }
+
+  @Override
+  public ExternalTaskQuery externalTaskIdIn(Set<String> externalTaskIds) {
+    ensureNotEmpty("Set of external task ids", externalTaskIds);
+    this.externalTaskIds = externalTaskIds;
     return this;
   }
 
@@ -231,6 +243,14 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return commandContext
       .getExternalTaskManager()
       .findExternalTaskIdsByQueryCriteria(this);
+  }
+
+  @Override
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+        .getExternalTaskManager()
+        .findDeploymentIdMappingsByQueryCriteria(this);
   }
 
   public String getExternalTaskId() {

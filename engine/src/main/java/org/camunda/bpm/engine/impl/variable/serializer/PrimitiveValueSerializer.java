@@ -38,12 +38,12 @@ public abstract class PrimitiveValueSerializer<T extends PrimitiveValue<?>> exte
     return valueType.getName();
   }
 
-  public T readValue(ValueFields valueFields, boolean deserializeObjectValue) {
+  public T readValue(ValueFields valueFields, boolean deserializeObjectValue, boolean asTransientValue) {
     // primitive values are always deserialized
-    return readValue(valueFields);
+    return readValue(valueFields, asTransientValue);
   }
 
-  public abstract T readValue(ValueFields valueFields);
+  public abstract T readValue(ValueFields valueFields, boolean asTransientValue);
 
   public PrimitiveValueType getType() {
     return (PrimitiveValueType) super.getType();

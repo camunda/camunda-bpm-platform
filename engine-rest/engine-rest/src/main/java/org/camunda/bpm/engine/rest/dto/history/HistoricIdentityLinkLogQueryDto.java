@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
@@ -76,6 +79,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   protected String operationType;
   protected String assignerId;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   public HistoricIdentityLinkLogQueryDto() {
   }
@@ -149,6 +153,11 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @Override
   protected void applyFilters(HistoricIdentityLinkLogQuery query) {
     if (dateBefore != null) {
@@ -183,6 +192,9 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
   }
 

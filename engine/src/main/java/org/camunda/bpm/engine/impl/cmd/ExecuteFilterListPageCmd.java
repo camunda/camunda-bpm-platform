@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.List;
+
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.query.Query;
@@ -45,6 +47,7 @@ public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implement
 
   public List<?> execute(CommandContext commandContext) {
     Query<?, ?> query = getFilterQuery(commandContext);
+    ((AbstractQuery) query).enableMaxResultsLimit();
     return query.listPage(firstResult, maxResults);
   }
 

@@ -31,7 +31,9 @@ import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
@@ -53,13 +55,17 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   public static final String ONE_RULE_DMN = "org/camunda/bpm/dmn/engine/api/OneRule.dmn";
   public static final String NOT_A_DMN_FILE = "org/camunda/bpm/dmn/engine/api/NotADmnFile.bpmn";
-  public static final String INVOCATION_DMN = "org/camunda/bpm/dmn/engine/api/InvocationDecision.dmn";
   public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/api/DecisionWithLiteralExpression.dmn";
 
   public static final String INPUT_VALUE = "ok";
   public static final String EXPECTED_OUTPUT_VALUE = "ok";
   public static final String DECISION_KEY = "decision";
 
+  @Override
+  public DmnEngineConfiguration getDmnEngineConfiguration() {
+    return new DefaultDmnEngineConfiguration()
+      .enableFeelLegacyBehavior(true);
+  }
 
   @Test
   public void shouldFailParsingIfInputStreamIsNull() {
@@ -756,7 +762,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionWithVariableMap() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
@@ -766,7 +772,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionWithVariableContext() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
@@ -776,7 +782,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public void shouldEvaluateDecisionLiteralExpression() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
 
-    assertThat(results.getSingleEntry())
+    assertThat((String) results.getSingleEntry())
       .isNotNull()
       .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }

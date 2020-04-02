@@ -107,6 +107,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks which are assigned to one of the given users. */
   TaskQuery taskAssigneeIn(String... assignees);
 
+  /** Only select tasks which are not assigned to any of the given users. */
+  TaskQuery taskAssigneeNotIn(String... assignees);
+
   /** Only select tasks for which the given user is the owner. */
   TaskQuery taskOwner(String owner);
 
@@ -329,6 +332,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /** Only select tasks for the given process instance id. */
   TaskQuery processInstanceId(String processInstanceId);
+
+  /** Only select tasks for the given process instance ids. */
+  TaskQuery processInstanceIdIn(String... processInstanceIds);
 
   /** Only select tasks for the given process instance business key */
   TaskQuery processInstanceBusinessKey(String processInstanceBusinessKey);

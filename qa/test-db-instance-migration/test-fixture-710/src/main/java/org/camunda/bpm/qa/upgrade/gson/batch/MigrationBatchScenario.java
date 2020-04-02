@@ -17,6 +17,7 @@
 package org.camunda.bpm.qa.upgrade.gson.batch;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
@@ -63,11 +64,12 @@ public class MigrationBatchScenario {
             .updateEventTrigger()
           .build();
 
-        engine.getRuntimeService().newMigration(migrationPlan)
+        Batch batch = engine.getRuntimeService().newMigration(migrationPlan)
           .processInstanceIds(processInstanceIds)
           .skipIoMappings()
           .skipCustomListeners()
           .executeAsync();
+        engine.getManagementService().setProperty("MigrationBatchScenario.batchId", batch.getId());
       }
     };
   }

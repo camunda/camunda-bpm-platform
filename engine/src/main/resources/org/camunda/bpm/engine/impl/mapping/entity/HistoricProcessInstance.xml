@@ -200,6 +200,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
   </resultMap>
+  
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
@@ -244,12 +249,18 @@
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
   </select>
+  
+  <select id="selectHistoricProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct RES.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ORDER BY RES.DEPLOYMENT_ID_ ASC
+  </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
 
     from (
 
-    SELECT SELF.*, DEF.NAME_, DEF.VERSION_
+    SELECT SELF.*, DEF.NAME_, DEF.VERSION_, DEF.DEPLOYMENT_ID_
     FROM ${prefix}ACT_HI_PROCINST SELF
 
     LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
@@ -286,7 +297,21 @@
       LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
       ON HAI.PROC_INST_ID_ = SELF.ID_
     </if>
+    
+    <!-- actual value conditions are checked in the WHERE part; 
+       however here we must join once for every variable condition.
+       It is important that in the WHERE part we use the same table
+       names for the respective conditions (i.e. VI0, VI1, VI2, ...) -->
+    <bind name="variableConditionCounter" value="0" />
+    <foreach collection="queries" item="query">
+      <foreach collection="query.queryVariableValues" item="value">
+        LEFT JOIN ${prefix}ACT_HI_VARINST VI${variableConditionCounter}
+        ON SELF.PROC_INST_ID_ = VI${variableConditionCounter}.PROC_INST_ID_
+        <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
+      </foreach>
+    </foreach>
 
+    <bind name="variableConditionCounter" value="0" />
     <where>
       <foreach collection="queries" item="query" index="i">
         <choose>
@@ -304,11 +329,11 @@
             <if test="query.processInstanceId != null">
               ${queryType} SELF.PROC_INST_ID_ = #{query.processInstanceId}
             </if>
-            <if test="query.processInstanceIds != null &amp;&amp; !query.processInstanceIds.isEmpty()">
-              ${queryType} SELF.PROC_INST_ID_ in
-              <foreach item="item" index="index" collection="query.processInstanceIds" open="(" separator="," close=")">
-                #{item, jdbcType=VARCHAR}
-              </foreach>
+            <if test="query.processInstanceIds != null and !query.processInstanceIds.isEmpty()">
+              ${queryType}
+              <bind name="listOfIds" value="query.processInstanceIds" />
+              <bind name="fieldName" value="'SELF.PROC_INST_ID_'" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
             </if>
             <if test="query.caseInstanceId != null">
               ${queryType} SELF.CASE_INST_ID_ = #{query.caseInstanceId}
@@ -360,7 +385,7 @@
               )
             </if>
             <if test="query.state != null">
-              ${queryType} STATE_ = #{query.state}
+              ${queryType} SELF.STATE_ = #{query.state}
             </if>
 
 
@@ -434,21 +459,18 @@
               CASE_INST_ID_ = #{query.subCaseInstanceId})
             </if>
             <foreach collection="query.queryVariableValues" index="index" item="queryVariableValue">
-              ${queryType} EXISTS (
-              select
-              ID_
-              from
-              ${prefix}ACT_HI_VARINST
-              WHERE
+              <bind name="varPrefix" value="'VI' + variableConditionCounter + '.'"/>
+              ${queryType} (${varPrefix}ID_ IS NOT NULL
+              AND 
+              
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
-              AND PROC_INST_ID_ = SELF.PROC_INST_ID_
-
+              
               <bind name="varTypeField" value="'VAR_TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
               </if>
               )
+              <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
             </foreach>
 
             <if test="query.executedActivityAfter != null || query.executedActivityBefore != null">

@@ -62,7 +62,7 @@ public interface TypedValueSerializer<T extends TypedValue> {
    *
    * @return the {@link TypedValue}
    */
-  T readValue(ValueFields valueFields, boolean deserializeValue);
+  T readValue(ValueFields valueFields, boolean deserializeValue, boolean isTransient);
 
   /**
    * Used for auto-detecting the value type of a variable.

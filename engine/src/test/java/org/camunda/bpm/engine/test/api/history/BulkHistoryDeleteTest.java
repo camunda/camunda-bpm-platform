@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.EntityTypes;
@@ -58,6 +59,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
@@ -116,6 +118,29 @@ public class BulkHistoryDeleteTest {
 
     identityService = engineRule.getIdentityService();
     identityService.setAuthenticatedUserId(USER_ID);
+  }
+
+  @Before
+  public void enableDmnFeelLegacyBehavior() {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+        .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+  }
+
+  @After
+  public void disableDmnFeelLegacyBehavior() {
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        engineRule.getProcessEngineConfiguration()
+            .getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
   }
 
   @After

@@ -25,6 +25,7 @@ import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
@@ -47,9 +48,11 @@ public class CommandInvocationContext {
   protected boolean isExecuting = false;
   protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
   protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
+  protected ProcessDataContext processDataContext;
 
-  public CommandInvocationContext(Command<?> command) {
+  public CommandInvocationContext(Command<?> command, ProcessEngineConfigurationImpl configuration) {
     this.command = command;
+    this.processDataContext = new ProcessDataContext(configuration);
   }
 
   public Throwable getThrowable() {
@@ -125,9 +128,8 @@ public class CommandInvocationContext {
   protected void invokeNext() {
     AtomicOperationInvocation invocation = queuedInvocations.remove(0);
     try {
-      invocation.execute(bpmnStackTrace);
-    }
-    catch(RuntimeException e) {
+      invocation.execute(bpmnStackTrace, processDataContext);
+    } catch(RuntimeException e) {
       // log bpmn stacktrace
       bpmnStackTrace.printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
       // rethrow
@@ -155,5 +157,9 @@ public class CommandInvocationContext {
         throw new ProcessEngineException("exception while executing command " + command, throwable);
       }
     }
+  }
+
+  public ProcessDataContext getProcessDataContext() {
+    return processDataContext;
   }
 }

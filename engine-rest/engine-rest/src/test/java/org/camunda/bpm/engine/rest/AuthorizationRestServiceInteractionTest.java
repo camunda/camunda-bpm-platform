@@ -866,6 +866,8 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("groupId", equalTo(authorization.getGroupId()))
         .body("resourceType", equalTo(authorization.getResourceType()))
         .body("resourceId", equalTo(authorization.getResourceId()))
+        .body("removalTime", equalTo(MockProvider.EXAMPLE_AUTH_REMOVAL_TIME))
+        .body("rootProcessInstanceId", equalTo(authorization.getRootProcessInstanceId()))
     .when()
         .get(AUTH_RESOURCE_PATH);
 
@@ -1109,7 +1111,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     List<Group> groupMocks = MockProvider.createMockGroups();
     when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
     when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
-    when(mockGroupQuery.list()).thenReturn(groupMocks);
+    when(mockGroupQuery.unlimitedList()).thenReturn(groupMocks);
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groupMocks) {
       groupIds.add(group.getId());

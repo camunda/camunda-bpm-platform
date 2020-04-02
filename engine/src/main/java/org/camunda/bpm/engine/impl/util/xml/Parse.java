@@ -27,6 +27,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
 import org.camunda.bpm.engine.impl.util.io.StringStreamSource;
 import org.camunda.bpm.engine.impl.util.io.UrlStreamSource;
+import org.camunda.bpm.engine.impl.xml.ProblemImpl;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -191,15 +193,23 @@ public class Parse extends DefaultHandler {
   }
 
   public void addError(SAXParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e));
   }
 
   public void addError(String errorMessage, Element element) {
-    errors.add(new Problem(errorMessage, name, element));
+    errors.add(new ProblemImpl(errorMessage, element));
   }
 
+  public void addError(String errorMessage, Element element, String... elementIds) {
+    errors.add(new ProblemImpl(errorMessage, element, elementIds));
+  }
+  
   public void addError(BpmnParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e));
+  }
+
+  public void addError(BpmnParseException e, String elementId) {
+    errors.add(new ProblemImpl(e, elementId));
   }
 
   public boolean hasErrors() {
@@ -207,11 +217,15 @@ public class Parse extends DefaultHandler {
   }
 
   public void addWarning(SAXParseException e) {
-    warnings.add(new Problem(e, name));
+    warnings.add(new ProblemImpl(e));
   }
 
   public void addWarning(String errorMessage, Element element) {
-    warnings.add(new Problem(errorMessage, name, element));
+    warnings.add(new ProblemImpl(errorMessage, element));
+  }
+
+  public void addWarning(String errorMessage, Element element, String... elementIds) {
+    warnings.add(new ProblemImpl(errorMessage, element, elementIds));
   }
 
   public boolean hasWarnings() {
@@ -222,6 +236,8 @@ public class Parse extends DefaultHandler {
     StringBuilder builder = new StringBuilder();
     for (Problem warning : warnings) {
       builder.append("\n* ");
+      builder.append(warning.getMessage());
+      builder.append(" | resource " + name);
       builder.append(warning.toString());
     }
     LOG.logParseWarnings(builder.toString());
@@ -231,9 +247,11 @@ public class Parse extends DefaultHandler {
     StringBuilder strb = new StringBuilder();
     for (Problem error : errors) {
       strb.append("\n* ");
+      strb.append(error.getMessage());
+      strb.append(" | resource " + name);
       strb.append(error.toString());
     }
-    throw LOG.exceptionDuringParsing(strb.toString());
+    throw LOG.exceptionDuringParsing(strb.toString(), name, errors, warnings);
   }
 
   public void setSchemaResource(String schemaResource) {

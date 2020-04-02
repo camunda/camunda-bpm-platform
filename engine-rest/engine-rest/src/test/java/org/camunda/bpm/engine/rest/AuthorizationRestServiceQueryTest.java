@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultPermissionProvider;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -163,6 +164,10 @@ public class AuthorizationRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(mockAuthorization.getGroupId(), from(content).getString("[0].groupId"));
     Assert.assertEquals(mockAuthorization.getResourceType(), from(content).getInt("[0].resourceType"));
     Assert.assertEquals(mockAuthorization.getResourceId(), from(content).getString("[0].resourceId"));
+    Assert.assertEquals(mockAuthorization.getRemovalTime(),
+        DateTimeUtil.parseDate(from(content).getString("[0].removalTime")));
+    Assert.assertEquals(mockAuthorization.getRootProcessInstanceId(),
+        from(content).getString("[0].rootProcessInstanceId"));
 
   }
 

@@ -31,12 +31,22 @@ import org.junit.runner.Description;
 public class ProcessEngineBootstrapRule extends TestWatcher {
 
   private ProcessEngine processEngine;
+  protected ProcessEngineConfigurator processEngineConfigurator;
 
   public ProcessEngineBootstrapRule() {
     this("camunda.cfg.xml");
   }
 
   public ProcessEngineBootstrapRule(String configurationResource) {
+    this(configurationResource, null);
+  }
+
+  public ProcessEngineBootstrapRule(ProcessEngineConfigurator processEngineConfigurator) {
+    this("camunda.cfg.xml", processEngineConfigurator);
+  }
+
+  public ProcessEngineBootstrapRule(String configurationResource, ProcessEngineConfigurator processEngineConfigurator) {
+    this.processEngineConfigurator = processEngineConfigurator;
     this.processEngine = bootstrapEngine(configurationResource);
   }
 
@@ -48,6 +58,9 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
   }
 
   public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    if (processEngineConfigurator != null) {
+      processEngineConfigurator.configureEngine(configuration);
+    }
     return configuration;
   }
 

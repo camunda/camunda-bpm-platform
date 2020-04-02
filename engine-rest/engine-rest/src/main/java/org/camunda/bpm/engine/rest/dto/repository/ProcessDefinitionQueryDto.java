@@ -58,35 +58,36 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
   }
 
-  private String processDefinitionId;
-  private List<String> processDefinitionIdIn;
-  private String category;
-  private String categoryLike;
-  private String name;
-  private String nameLike;
-  private String deploymentId;
-  private String key;
-  private String keyLike;
-  private Integer version;
-  private Boolean latestVersion;
-  private String resourceName;
-  private String resourceNameLike;
-  private String startableBy;
-  private Boolean active;
-  private Boolean suspended;
-  private String incidentId;
-  private String incidentType;
-  private String incidentMessage;
-  private String incidentMessageLike;
-  private List<String> tenantIds;
-  private Boolean withoutTenantId;
-  private Boolean includeDefinitionsWithoutTenantId;
-  private String versionTag;
-  private String versionTagLike;
-  private List<String> keys;
-  private Boolean startableInTasklist;
-  private Boolean notStartableInTasklist;
-  private Boolean startablePermissionCheck;
+  protected String processDefinitionId;
+  protected List<String> processDefinitionIdIn;
+  protected String category;
+  protected String categoryLike;
+  protected String name;
+  protected String nameLike;
+  protected String deploymentId;
+  protected String key;
+  protected String keyLike;
+  protected Integer version;
+  protected Boolean latestVersion;
+  protected String resourceName;
+  protected String resourceNameLike;
+  protected String startableBy;
+  protected Boolean active;
+  protected Boolean suspended;
+  protected String incidentId;
+  protected String incidentType;
+  protected String incidentMessage;
+  protected String incidentMessageLike;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeDefinitionsWithoutTenantId;
+  protected String versionTag;
+  protected String versionTagLike;
+  protected Boolean withoutVersionTag;
+  protected List<String> keys;
+  protected Boolean startableInTasklist;
+  protected Boolean notStartableInTasklist;
+  protected Boolean startablePermissionCheck;
 
   public ProcessDefinitionQueryDto() {
 
@@ -245,6 +246,11 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.versionTagLike = versionTagLike;
   }
 
+  @CamundaQueryParam(value = "withoutVersionTag", converter = BooleanConverter.class)
+  public void setWithoutVersionTag(Boolean withoutVersionTag) {
+    this.withoutVersionTag = withoutVersionTag;
+  }
+
   @CamundaQueryParam(value = "startableInTasklist", converter = BooleanConverter.class)
   public void setStartableInTasklist(Boolean startableInTasklist) {
     this.startableInTasklist = startableInTasklist;
@@ -350,6 +356,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if( versionTagLike != null) {
       query.versionTagLike(versionTagLike);
+    }
+    if (TRUE.equals(withoutVersionTag)) {
+      query.withoutVersionTag();
     }
     if (TRUE.equals(startableInTasklist)) {
       query.startableInTasklist();

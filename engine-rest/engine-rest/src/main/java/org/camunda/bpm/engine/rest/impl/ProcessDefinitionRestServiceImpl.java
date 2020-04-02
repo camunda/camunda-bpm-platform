@@ -172,7 +172,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       query.includeRootIncidents();
     }
 
-    List<ProcessDefinitionStatistics> queryResults = query.list();
+    List<ProcessDefinitionStatistics> queryResults = query.unlimitedList();
 
     List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
     for (ProcessDefinitionStatistics queryResult : queryResults) {

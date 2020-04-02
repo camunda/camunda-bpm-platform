@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="_MfigsCxYEeWjfbjoc0vmBQ" targetNamespace="http://camunda.org/schema/1.0/bpmn" exporter="Camunda Modeler" exporterVersion="3.4.1" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="process" isExecutable="true">
+    <bpmn2:startEvent id="timerStart1">
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDuration>PT2H</bpmn2:timeDuration>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:startEvent>
+    <bpmn2:startEvent id="timerStart2">
+      <bpmn2:timerEventDefinition>
+        <bpmn2:timeDuration>PT2H</bpmn2:timeDuration>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:startEvent>
+    <bpmn2:startEvent id="plainStart1" />
+    <bpmn2:startEvent id="plainStart2" />
+    <bpmn2:subProcess id="subProcess1">
+      <bpmn2:startEvent id="plainStartInSub2" />
+      <bpmn2:startEvent id="plainStartInSub1" />
+    </bpmn2:subProcess>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process">
+      <bpmndi:BPMNShape id="StartEvent_0wwvwoh_di" bpmnElement="timerStart1">
+        <dc:Bounds x="322" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0khr7nm_di" bpmnElement="timerStart2">
+        <dc:Bounds x="322" y="244" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_14zj01h_di" bpmnElement="plainStart1">
+        <dc:Bounds x="152" y="244" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1vz9u7i_di" bpmnElement="plainStart2">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1590mj4_di" bpmnElement="subProcess1" isExpanded="true">
+        <dc:Bounds x="460" y="80" width="310" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_02cit59_di" bpmnElement="plainStartInSub2">
+        <dc:Bounds x="500" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0vghmuk_di" bpmnElement="plainStartInSub1">
+        <dc:Bounds x="500" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -16,24 +16,32 @@
  */
 package org.camunda.bpm.dmn.engine.type;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformerRegistry;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.feel.syntaxtree.ZonedTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests the build-in {@link DmnDataTypeTransformer}s.
@@ -225,6 +233,118 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
   }
 
   @Test
+  public void shouldTransformZonedDateTime() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    Date date = toDate("2015-09-18T12:00:00");
+    TypedValue dateValue = Variables.dateValue(date);
+    ZonedDateTime zonedDateTime = ZonedDateTime.of(2015, 9, 18, 12, 0, 0, 0, ZoneId.of("Europe/Berlin"));
+
+    // when
+    TypedValue transformedFromZonedDateTime = typeTransformer.transform(zonedDateTime);
+
+    // then
+    assertThat(transformedFromZonedDateTime, is(dateValue));
+  }
+
+  @Test
+  public void shouldTransformLocalDateTime() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    Date date = toDate("2015-09-18T15:00:00");
+    TypedValue dateValue = Variables.dateValue(date);
+    LocalDateTime localDateTime = LocalDateTime.parse("2015-09-18T15:00:00");
+
+    // when
+    TypedValue transformedFromLocalDateTime = typeTransformer.transform(localDateTime);
+
+    // then
+    assertThat(transformedFromLocalDateTime, is(dateValue));
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_LocalTime() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    java.time.LocalTime localTime = java.time.LocalTime.now();
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'java.time.LocalTime' " +
+      "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(localTime);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_LocalDate() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    LocalDate localDate = LocalDate.now();
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'java.time.LocalDate' " +
+      "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(localDate);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_ZonedTime() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    ZonedTime zonedTime = ZonedTime.parse("22:22:22@Europe/Berlin");
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'org.camunda.feel.syntaxtree.ZonedTime' " +
+                           "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(zonedTime);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_Duration() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    Duration duration = Duration.ofMillis(5);
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'java.time.Duration' " +
+      "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(duration);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnsupportedType_Period() {
+    // given
+    DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
+
+    Period period = Period.ofDays(5);
+
+    // then
+    thrown.expect(DmnEngineException.class);
+    thrown.expectMessage("Unsupported type: 'java.time.Period' " +
+      "cannot be converted to 'java.util.Date'");
+
+    // when
+    typeTransformer.transform(period);
+  }
+
+  @Test
   public void invalidStringForDateType() {
     DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
 
@@ -233,9 +353,16 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
     typeTransformer.transform("18.09.2015 12:00:00");
   }
 
-  protected Date toDate(String date) throws ParseException {
+  protected Date toDate(String date) {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    return format.parse(date);
+
+    try {
+      return format.parse(date);
+
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+
+    }
   }
 
 }

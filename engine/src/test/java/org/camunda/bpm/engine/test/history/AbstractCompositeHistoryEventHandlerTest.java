@@ -18,16 +18,32 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public abstract class AbstractCompositeHistoryEventHandlerTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractCompositeHistoryEventHandlerTest {
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected HistoryService historyService;
 
   protected HistoryEventHandler originalHistoryEventHandler;
 
@@ -39,18 +55,21 @@ public abstract class AbstractCompositeHistoryEventHandlerTest extends Pluggable
   /**
    * Perform common setup.
    */
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
+
     // save current history event handler
     originalHistoryEventHandler = processEngineConfiguration.getHistoryEventHandler();
     // clear the event counter
     countCustomHistoryEventHandler = 0;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
     // reset original history event handler
     processEngineConfiguration.setHistoryEventHandler(originalHistoryEventHandler);
   }

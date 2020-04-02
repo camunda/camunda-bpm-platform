@@ -48,12 +48,14 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
   protected static final String DMN = "org/camunda/bpm/dmn/engine/el/FeelIntegrationTest.dmn";
   protected static final String DMN_12 = "org/camunda/bpm/dmn/engine/el/dmn12/FeelIntegrationTest.dmn";
+  protected static final String DMN_13 = "org/camunda/bpm/dmn/engine/el/dmn13/FeelIntegrationTest.dmn";
 
   protected FeelEngine feelEngineSpy;
 
   @Override
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
+    configuration.enableFeelLegacyBehavior(true);
     configuration.setFeelEngineFactory(new TestFeelEngineFactory());
     return configuration;
   }
@@ -63,7 +65,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
   public void testFeelInputEntry() {
     DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy, atLeastOnce()).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
@@ -77,7 +79,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy, atLeastOnce()).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
@@ -133,6 +135,12 @@ public class FeelIntegrationTest extends DmnEngineTest {
   }
 
   @Test
+  @DecisionResource(resource = DMN_13)
+  public void testFeelInputExpression_Dmn13() {
+    testFeelInputExpression();
+  }
+
+  @Test
   @DecisionResource(resource = DMN)
   public void testFeelOutputEntry() {
     DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
@@ -162,7 +170,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = engine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy).evaluateSimpleExpression(anyString(), any(VariableContext.class));
   }
@@ -179,7 +187,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
     DmnDecisionResult decisionResult = engine.evaluateDecision(decision, Variables.createVariables().putValue("score", 3));
 
-    assertThat(decisionResult.getSingleEntry()).isEqualTo("a");
+    assertThat((String) decisionResult.getSingleEntry()).isEqualTo("a");
 
     verify(feelEngineSpy).evaluateSimpleExpression(anyString(), any(VariableContext.class));
   }

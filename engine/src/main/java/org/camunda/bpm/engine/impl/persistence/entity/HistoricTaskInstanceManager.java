@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -149,6 +150,8 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
         commandContext
           .getHistoricIdentityLinkManager()
           .deleteHistoricIdentityLinksLogByTaskId(taskId);
+
+        deleteAuthorizations(Resources.HISTORIC_TASK, taskId);
 
         getDbEntityManager().delete(historicTaskInstance);
       }

@@ -43,7 +43,6 @@ import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -56,6 +55,8 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Sebastian Menski
@@ -71,6 +72,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected String[] testActivityInstances = new String[] {"a", "b", "c"};
   protected String[] testKeys = new String[] {"d", "e"};
   protected List<String> testCandidateGroups = new ArrayList<String>();
+  protected String[] testInstances = new String[] {"x", "y", "z"};
 
   protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
   protected Object[] variableValues = new Object[] {1, 2, "3", "4", 5, 6};
@@ -151,6 +153,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskAssigneeLike(testString);
     query.taskAssigneeLikeExpression(testString);
     query.taskAssigneeIn(testString);
+    query.taskAssigneeNotIn(testString);
     query.taskInvolvedUser(testString);
     query.taskInvolvedUserExpression(testString);
     query.taskOwner(testString);
@@ -165,6 +168,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.withCandidateUsers();
     query.withoutCandidateUsers();
     query.processInstanceId(testString);
+    query.processInstanceIdIn(testInstances);
     query.executionId(testString);
     query.activityInstanceIdIn(testActivityInstances);
     query.taskCreatedOn(testDate);
@@ -249,6 +253,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testString, query.getAssigneeLike());
     assertEquals(testString, query.getExpressions().get("taskAssigneeLike"));
     assertTrue(query.getAssigneeIn().contains(testString));
+    assertTrue(query.getAssigneeNotIn().contains(testString));
     assertEquals(testString, query.getInvolvedUser());
     assertEquals(testString, query.getExpressions().get("taskInvolvedUser"));
     assertEquals(testString, query.getOwner());
@@ -263,6 +268,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(query.isWithoutCandidateUsers());
     assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertEquals(testString, query.getProcessInstanceId());
+    assertEquals(testInstances.length, query.getProcessInstanceIdIn().length);
+    for (int i = 0; i < query.getProcessInstanceIdIn().length; i++) {
+      assertEquals(testInstances[i], query.getProcessInstanceIdIn()[i]);
+    }
     assertEquals(testString, query.getExecutionId());
     assertEquals(testActivityInstances.length, query.getActivityInstanceIdIn().length);
     for (int i = 0; i < query.getActivityInstanceIdIn().length; i++) {
@@ -736,6 +745,30 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, origQueryTasks.size());
     assertEquals(1, selfExtendQueryTasks.size());
     assertEquals(2, extendingQueryTasks.size());
+  }
+
+  public void testExtendingTaskQueryWithAssigneeNotIn() {
+    // given
+    Task task = taskService.newTask("assigneeTask");
+    task.setName("Task 5");
+    task.setOwner(testUser.getId());
+    taskService.saveTask(task);
+    taskService.setAssignee(task.getId(), "john");
+
+    // then
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeNotIn("kermit");
+    saveQuery(query);
+    List<Task> origQueryTasks = filterService.list(filter.getId());
+    List<Task> selfExtendQueryTasks = filterService.list(filter.getId(), query);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.taskAssigneeNotIn("john", "kermit");
+    List<Task> extendingQueryTasks = filterService.list(filter.getId(), extendingQuery);
+
+    // then
+    assertEquals(1, origQueryTasks.size());
+    assertEquals(1, selfExtendQueryTasks.size());
+    assertEquals(0, extendingQueryTasks.size());
   }
 
   public void testExtendingTaskQueryListWithCandidateGroups() {
@@ -1388,7 +1421,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
-    
+
     ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1403,48 +1436,48 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     TaskQuery query = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess");
     saveQuery(query);
-    
+
     // all tasks
     List<Task> tasks = filterService.list(filter.getId(), query);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertTrue(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-sensitive for comparison
     TaskQuery extendingQuery = taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().taskVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().taskVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
@@ -1466,7 +1499,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testExtendTaskQueryByCaseInstanceVariableIgnoreCase() {
     String variableName = "variableName";
@@ -1475,149 +1508,149 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
 
     String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
-    
+
     variables.put(variableName, variableValueCamelCase);
     CaseInstance instanceCamelCase = caseService.createCaseInstanceById(caseDefinitionId, variables);
     variables.put(variableName, variableValueLowerCase);
     CaseInstance instanceLowerCase = caseService.createCaseInstanceById(caseDefinitionId, variables);
     CaseInstance instanceWithoutVariables = caseService.createCaseInstanceById(caseDefinitionId);
-    
+
     Task taskCamelCase = taskService.createTaskQuery().caseInstanceId(instanceCamelCase.getId()).singleResult();
     Task taskLowerCase = taskService.createTaskQuery().caseInstanceId(instanceLowerCase.getId()).singleResult();
     Task taskWithNoVariable = taskService.createTaskQuery().caseInstanceId(instanceWithoutVariables.getId()).singleResult();
-    
+
     TaskQuery query = taskService.createTaskQuery().caseDefinitionId(caseDefinitionId);
     saveQuery(query);
-    
+
     // all tasks
     List<Task> tasks = filterService.list(filter.getId(), query);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertTrue(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-sensitive for comparison
     TaskQuery extendingQuery = taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().caseInstanceVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().caseInstanceVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // variable name case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableNamesIgnoreCase().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValueCamelCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     //variable name and variable value case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValueCamelCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // cleanup
     caseService.terminateCaseExecution(instanceCamelCase.getId());
     caseService.terminateCaseExecution(instanceLowerCase.getId());
     caseService.terminateCaseExecution(instanceWithoutVariables.getId());
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testExtendTaskQueryByProcessVariableIgnoreCase() {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
     Map<String, Object> variables = new HashMap<String, Object>();
-    
+
     variables.put(variableName, variableValueCamelCase);
     ProcessInstance instanceCamelCase = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     variables.put(variableName, variableValueLowerCase);
     ProcessInstance instanceLowerCase = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     ProcessInstance instanceWithoutVariables = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
+
     Task taskCamelCase = taskService.createTaskQuery().processInstanceId(instanceCamelCase.getId()).singleResult();
     Task taskLowerCase = taskService.createTaskQuery().processInstanceId(instanceLowerCase.getId()).singleResult();
     Task taskWithNoVariable = taskService.createTaskQuery().processInstanceId(instanceWithoutVariables.getId()).singleResult();
-    
+
     TaskQuery query = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess");
     saveQuery(query);
-    
+
     // all tasks
     List<Task> tasks = filterService.list(filter.getId(), query);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertTrue(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-sensitive for comparison
     TaskQuery extendingQuery = taskService.createTaskQuery().processVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().processVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // not equals case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotEquals(variableName, variableValueLowerCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-sensitive for comparison
     extendingQuery = taskService.createTaskQuery().processVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertFalse(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
     // like case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike(variableName, "somevariable%");
     tasks = filterService.list(filter.getId(), extendingQuery);
@@ -1638,7 +1671,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
-    
+
   }
 
   public void testExtendTaskQuery_ORInExtendingQuery() {
@@ -1917,6 +1950,24 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(taskQuery.getAssigneeIn().contains(testString));
   }
 
+  public void testAssigneeNotInPositive() {
+    // given
+    TaskQueryImpl taskQuery = new TaskQueryImpl();
+    taskQuery.taskAssigneeNotIn(testString);
+
+    // when
+    // save filter
+    filter.setQuery(taskQuery);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+    taskQuery = filter.getQuery();
+
+    // then
+    assertTrue(taskQuery.getAssigneeNotIn().contains(testString));
+  }
+
   public void testAssigneeInNegative() {
     // given
     TaskQueryImpl taskQuery = new TaskQueryImpl();
@@ -1934,6 +1985,25 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // then
     assertNull(taskQuery.getAssigneeIn());
+  }
+
+  public void testAssigneeNotInNegative() {
+    // given
+    TaskQueryImpl taskQuery = new TaskQueryImpl();
+
+    // when
+    // save filter
+    filter.setQuery(taskQuery);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    taskQuery = filter.getQuery();
+
+    // then
+    assertNull(taskQuery.getAssigneeNotIn());
   }
 
   /**
@@ -2024,6 +2094,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // then
     assertThat(filterService.count(filter.getId()), is(1L));
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testExtendingTaskQueryWithProcessInstanceIn() {
+    // given
+    String firstId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getProcessInstanceId();
+    String secondId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getProcessInstanceId();
+
+    // then
+    TaskQuery query = taskService.createTaskQuery().processInstanceIdIn(firstId);
+    saveQuery(query);
+    List<Task> origQueryTasks = filterService.list(filter.getId());
+    List<Task> selfExtendQueryTasks = filterService.list(filter.getId(), query);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.processInstanceIdIn(firstId, secondId);
+    List<Task> extendingQueryTasks = filterService.list(filter.getId(), extendingQuery);
+
+    // then
+    assertEquals(1, origQueryTasks.size());
+    assertEquals(1, selfExtendQueryTasks.size());
+    assertEquals(2, extendingQueryTasks.size());
+  }
+
 
   protected void saveQuery(Query query) {
     filter.setQuery(query);

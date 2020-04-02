@@ -3,9 +3,9 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-bom</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
-    <relativePath>../bom</relativePath>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
   </parent>
 
   <artifactId>camunda-parent</artifactId>
@@ -22,7 +22,7 @@
     <version.spring.framework>3.2.18.RELEASE</version.spring.framework>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
-    <version.resteasy3>3.0.26.Final</version.resteasy3>
+    <version.resteasy3>3.10.0.Final</version.resteasy3>
     <version.jersey2>2.25.1</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
@@ -39,20 +39,19 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly8>8.2.1.Final</version.wildfly8>
-    <version.wildfly>16.0.0.Final</version.wildfly>
-    <version.wildfly.core>8.0.0.Final</version.wildfly.core>
+    <version.wildfly>18.0.0.Final</version.wildfly>
+    <version.wildfly.core>10.0.0.Final</version.wildfly.core>
 
-    <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>9.0.19</version.tomcat>
+    <!-- This version is mirrored in the external task client.
+    If you change it here, also change it there -->
+    <version.tomcat>9.0.33</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
     <version.selenium>2.45.0</version.selenium>
+    <version.freemarker>2.3.29</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
-
-    <version.java.wildfly>1.8</version.java.wildfly>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -96,6 +95,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>${version.gson}</version>
@@ -116,10 +122,10 @@
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
       </dependency>
-	  <dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
-		<artifactId>commons-lang3</artifactId>
-		<version>3.8.1</version>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.8.1</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -227,6 +233,11 @@
         <artifactId>hamcrest-library</artifactId>
         <scope>test</scope>
         <version>1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.6.2</version>
       </dependency>
 
       <dependency>
@@ -444,7 +455,7 @@
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
-        <version>2.3.20</version>
+        <version>${version.freemarker}</version>
       </dependency>
 
     </dependencies>
@@ -458,13 +469,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.0</version>
+          <version>2.22.2</version>
           <configuration>
             <runOrder>hourly</runOrder>
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-XX:MaxPermSize=160m -Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
         <plugin>
@@ -497,7 +509,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>2.2</version>
+          <version>3.2.1</version>
           <configuration>
             <createSourcesJar>true</createSourcesJar>
           </configuration>
@@ -579,7 +591,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.4.0</version>
         </plugin>
-        
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -617,7 +629,7 @@
     <repository>
       <id>com.springsource.repository.bundles.external</id>
       <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>http://repository.springsource.com/maven/bundles/external</url>
+      <url>https://repository.springsource.com/maven/bundles/external</url>
     </repository>
   </repositories>
 
@@ -634,7 +646,6 @@
   </organization>
 
   <url>http://www.camunda.org</url>
-
 </project>
 
 

@@ -42,6 +42,9 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
    */
   HistoricActivityStatisticsQuery includeCompleteScope();
 
+  /** Include an aggregation of the incidents in the result. */
+  HistoricActivityStatisticsQuery includeIncidents();
+
   /** Only select historic activities of process instances that were started before the given date. */
   HistoricActivityStatisticsQuery startedBefore(Date date);
 
@@ -53,6 +56,9 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
 
   /** Only select historic activities of process instances that were finished after the given date. */
   HistoricActivityStatisticsQuery finishedAfter(Date date);
+
+  /** Only select historic activities of process instances with the given IDs */
+  HistoricActivityStatisticsQuery processInstanceIdIn(String... processInstanceIds);
 
   /**
    * Order by activity id (needs to be followed by {@link #asc()} or {@link #desc()}).

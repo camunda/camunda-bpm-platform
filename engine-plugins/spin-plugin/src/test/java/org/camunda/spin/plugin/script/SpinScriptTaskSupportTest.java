@@ -16,48 +16,103 @@
  */
 package org.camunda.spin.plugin.script;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class SpinScriptTaskSupportTest extends PluggableProcessEngineTestCase {
+@RunWith(Parameterized.class)
+public class SpinScriptTaskSupportTest {
 
-  public void testSpinAvailableInGroovy() {
-    deployProcess("groovy", "execution.setVariable('name',  S('<test />').name() )\n");
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule();
 
-    String var = (String) runtimeService.getVariable(pi.getId(), "name");
-    assertEquals("test", var);
+  @Parameters(name = "{index}: {0}")
+  public static Object[] data() {
+      return new Object[][] {
+               { "groovy", "" },
+               { "javascript", "" },
+               { "python", "" },
+               { "ruby", "$" }
+         };
   }
 
-  public void testSpinAvailableInJavascript() {
-    deployProcess("javascript", "execution.setVariable('name',  S('<test />').name() )\n");
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+  @Parameter(0)
+  public String language;
 
-    String var = (String) runtimeService.getVariable(pi.getId(), "name");
-    assertEquals("test", var);
+  @Parameter(1)
+  public String variablePrefix;
+
+  private RuntimeService runtimeService;
+  private RepositoryService repositoryService;
+
+
+  @Before
+  public void setUp() {
+    this.runtimeService = engineRule.getRuntimeService();
+    this.repositoryService = engineRule.getRepositoryService();
   }
 
-  public void testSpinAvailableInPython() {
-    deployProcess("python", "execution.setVariable('name',  S('<test />').name() )\n");
+  @Test
+  public void testSpinAvailable() {
+    deployProcess(language, setVariableScript("name", "S('<test />').name()"));
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
     String var = (String) runtimeService.getVariable(pi.getId(), "name");
-    assertEquals("test", var);
+    assertThat(var).isEqualTo("test");
   }
 
-  public void testSpinAvailableInRuby() {
-    deployProcess("ruby", "$execution.setVariable('name',  S('<test />').name() )\n");
+  @Test
+  public void testTwoScriptTasks() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .scriptTask()
+        .scriptFormat(language)
+        .scriptText(setVariableScript("task1Name", "S('<task1 />').name()"))
+      .scriptTask()
+        .scriptFormat(language)
+        .scriptText(setVariableScript("task2Name", "S('<task2 />').name()"))
+      .userTask()
+      .endEvent()
+    .done();
+
+    Deployment deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy();
+    engineRule.manageDeployment(deployment);
+
+    // when
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    String var = (String) runtimeService.getVariable(pi.getId(), "name");
-    assertEquals("test", var);
+    // then
+    Object task1Name = runtimeService.getVariable(pi.getId(), "task1Name");
+    assertThat(task1Name).isEqualTo("task1");
+
+    Object task2Name = runtimeService.getVariable(pi.getId(), "task2Name");
+    assertThat(task2Name).isEqualTo("task2");
+  }
+
+  protected String setVariableScript(String name, String valueExpression) {
+    return scriptVariableName("execution") + ".setVariable('" + name + "',  " + valueExpression + ")";
+  }
+
+  protected String scriptVariableName(String name) {
+    return variablePrefix + name;
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {
@@ -65,7 +120,8 @@ public class SpinScriptTaskSupportTest extends PluggableProcessEngineTestCase {
     Deployment deployment = repositoryService.createDeployment()
       .addModelInstance("testProcess.bpmn", process)
       .deploy();
-    deploymentId = deployment.getId();
+
+    engineRule.manageDeployment(deployment);
   }
 
   protected BpmnModelInstance createProcess(String scriptFormat, String scriptText) {

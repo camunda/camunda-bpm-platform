@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.digest.SecurityLogger;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskLogger;
+import org.camunda.bpm.engine.impl.identity.IndentityLogger;
 import org.camunda.bpm.engine.impl.incident.IncidentLogger;
 import org.camunda.bpm.engine.impl.interceptor.ContextLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
@@ -132,6 +133,9 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final IncidentLogger INCIDENT_LOGGER = BaseLogger.createLogger(
       IncidentLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.incident", "26");
 
+  public static final IndentityLogger INDENTITY_LOGGER = BaseLogger.createLogger(
+      IndentityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.identity", "27");
+
   public static boolean shouldLogJobException(ProcessEngineConfiguration processEngineConfiguration, JobEntity currentJob) {
     boolean enableReducedJobExceptionLogging = processEngineConfiguration.isEnableReducedJobExceptionLogging();
     return currentJob == null || !enableReducedJobExceptionLogging || enableReducedJobExceptionLogging && currentJob.getRetries() <= 1;
@@ -177,6 +181,11 @@ public class ProcessEngineLogger extends BaseLogger {
       "History Cleanup Job reconfiguration failed on Process Engine Bootstrap. Possible concurrent execution with the JobExecutor: {}",
       exception.getMessage()
     );
+  }
+
+  public void couldNotDetermineIp(Exception e) {
+    logWarn(
+        "009", "Could not determine local IP address for generating a host name", e);
   }
 
 }

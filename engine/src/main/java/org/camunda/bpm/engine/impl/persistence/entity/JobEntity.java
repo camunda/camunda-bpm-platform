@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -101,6 +102,12 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   // sequence counter //////////////////////////
   protected long sequenceCounter = 1;
+
+  // last failure log id ///////////////////////
+  protected String lastFailureLogId;
+
+  // last failing activity id ///////////////////////
+  protected String failedActivityId;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -313,6 +320,17 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
             .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
 
         if (!failedJobIncidents.isEmpty()) {
+          // update the historic job log id in the historic incidents (if available)
+          for (Incident incident : failedJobIncidents) {
+            HistoricIncidentEntity historicIncidentEvent = Context
+                .getCommandContext()
+                .getHistoricIncidentManager()
+                .findHistoricIncidentById(incident.getId());
+            if (historicIncidentEvent != null) {
+              historicIncidentEvent.setHistoryConfiguration(getLastFailureLogId());
+              Context.getCommandContext().getDbEntityManager().merge(historicIncidentEvent);
+            }
+          }
           return;
         }
 
@@ -320,6 +338,8 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
+      incidentContext.setHistoryConfiguration(getLastFailureLogId());
+      incidentContext.setFailedActivityId(getFailedActivityId());
 
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
@@ -493,6 +513,21 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
+  protected void clearFailedJobException() {
+    ByteArrayEntity byteArray = getExceptionByteArray();
+
+    // Avoid NPE when the job was reconfigured by another
+    // node in the meantime
+    if (byteArray != null) {
+      Context.getCommandContext()
+          .getDbEntityManager()
+          .delete(byteArray);
+    }
+
+    this.exceptionByteArrayId = null;
+    this.exceptionMessage = null;
+  }
+
   @Override
   public String getDeploymentId() {
     return deploymentId;
@@ -610,6 +645,39 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     return referenceIdAndClass;
   }
 
+  public String getLastFailureLogId() {
+    if (lastFailureLogId == null) {
+      // try to find the last failure log in the database,
+      // can occur if setRetries is called manually since
+      // otherwise the failure handling ensures that a log
+      // entry is written before the incident is created
+      List<HistoricJobLog> logEntries = Context.getCommandContext()
+        .getProcessEngineConfiguration()
+        .getHistoryService()
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .jobId(id)
+        .orderPartiallyByOccurrence().desc()
+        .list();
+      if (!logEntries.isEmpty()) {
+        lastFailureLogId = logEntries.get(0).getId();
+      }
+    }
+    return lastFailureLogId;
+  }
+
+  public void setLastFailureLogId(String lastFailureLogId) {
+    this.lastFailureLogId = lastFailureLogId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -628,9 +696,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
            + ", exceptionByteArray=" + exceptionByteArray
            + ", exceptionByteArrayId=" + exceptionByteArrayId
            + ", exceptionMessage=" + exceptionMessage
+           + ", failedActivityId=" + failedActivityId
            + ", deploymentId=" + deploymentId
            + ", priority=" + priority
            + ", tenantId=" + tenantId
            + "]";
   }
+
 }

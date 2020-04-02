@@ -1003,7 +1003,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     }
 
     public Long get(CaseExecutionState state) {
-      return state != null && containsKey(state) ? super.get(state) : 0;
+      return state != null && containsKey(state) ? super.get(state) : 0l;
     }
 
     public Long count() {

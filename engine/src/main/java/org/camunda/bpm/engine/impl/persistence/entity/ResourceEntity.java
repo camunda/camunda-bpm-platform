@@ -123,4 +123,5 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
            + ", createTime=" + createTime
            + "]";
   }
+
 }

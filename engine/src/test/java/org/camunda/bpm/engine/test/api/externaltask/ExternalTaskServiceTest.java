@@ -16,11 +16,26 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -31,6 +46,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -52,21 +68,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.joda.time.DateTime;
 import org.junit.Assert;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * @author Thorben Lindhauer
@@ -93,12 +94,12 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/externalTaskInvalidPriority.bpmn20.xml")
         .deploy();
       fail("deploying a process with malformed priority should not succeed");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresentIgnoreCase("value 'NOTaNumber' for attribute 'taskPriority' "
           + "is not a valid number", e.getMessage());
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("externalTaskWithPrio");
     }
   }
-
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testFetch() {
@@ -1476,6 +1477,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     // and an incident has been created
     Incident incident = runtimeService.createIncidentQuery().singleResult();
 
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      assertNotNull(historicIncident);
+      assertEquals(incident.getId(), historicIncident.getId());
+      assertTrue(historicIncident.isOpen());
+      assertEquals(getHistoricTaskLogOrdered(incident.getConfiguration()).get(0).getId(), historicIncident.getHistoryConfiguration());
+    }
+
     assertNotNull(incident);
     assertNotNull(incident.getId());
     assertEquals(errorMessage, incident.getIncidentMessage());
@@ -1489,6 +1498,53 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     AssertUtil.assertEqualsSecondPrecision(nowMinus(4000L), incident.getIncidentTimestamp());
     assertEquals(task.getId(), incident.getConfiguration());
     assertNull(incident.getJobDefinitionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureZeroRetriesAfterIncidentsAreResolved() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    LockedExternalTask task = tasks.get(0);
+    String errorMessage = "errorMessage";
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+    externalTaskService.setRetries(task.getId(), 5);
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    ClockUtil.setCurrentTime(nowPlus(4000L));
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 1, 3000L);
+
+    // when reporting a failure and setting retries to 0
+    ClockUtil.setCurrentTime(nowPlus(5000L));
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+
+    // another incident has been created
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+    assertNotNull(incident.getId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      // there are two incidents in the history
+      List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery()
+          .configuration(task.getId())
+          .orderByCreateTime().asc()
+          .list();
+      assertEquals(2, historicIncidents.size());
+      // there are 3 failure logs for external tasks
+      List<HistoricExternalTaskLog> logs = getHistoricTaskLogOrdered(task.getId());
+      assertEquals(3, logs.size());
+      // the oldest incident is resolved and correlates to the oldest external task log entry
+      assertTrue(historicIncidents.get(0).isResolved());
+      assertEquals(logs.get(2).getId(), historicIncidents.get(0).getHistoryConfiguration());
+      // the latest incident is open and correlates to the latest external task log entry
+      assertTrue(historicIncidents.get(1).isOpen());
+      assertEquals(logs.get(0).getId(), historicIncidents.get(1).getHistoryConfiguration());
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
@@ -1761,11 +1817,65 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(incident);
     assertEquals(lockedTask.getId(), incident.getConfiguration());
 
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      assertNotNull(historicIncident);
+      assertEquals(incident.getId(), historicIncident.getId());
+      assertTrue(historicIncident.isOpen());
+      assertNull(historicIncident.getHistoryConfiguration());
+    }
+
     // and resetting the retries removes the incident again
     externalTaskService.setRetries(lockedTask.getId(), 5);
 
     assertEquals(0, runtimeService.createIncidentQuery().count());
 
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesToZeroAfterFailureWithRetriesLeft() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    LockedExternalTask task = tasks.get(0);
+    String errorMessage = "errorMessage";
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 2, 3000L);
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    ClockUtil.setCurrentTime(nowPlus(5000L));
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 1, 3000L);
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+
+    // when setting retries to 0
+    ClockUtil.setCurrentTime(nowPlus(7000L));
+    externalTaskService.setRetries(task.getId(), 0);
+
+    // an incident has been created
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+    assertNotNull(incident.getId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      // there are one incident in the history
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().configuration(task.getId()).singleResult();
+      assertNotNull(historicIncident);
+      // there are two failure logs for external tasks
+      List<HistoricExternalTaskLog> logs = getHistoricTaskLogOrdered(task.getId());
+      assertEquals(2, logs.size());
+      HistoricExternalTaskLog log = logs.get(0);
+      // the incident is open and correlates to the oldest external task log entry
+      assertTrue(historicIncident.isOpen());
+      assertEquals(log.getId(), historicIncident.getHistoryConfiguration());
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
@@ -3100,6 +3210,70 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo("version X.Y");
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithLockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .execute();
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(true, false, false);
+
+    //then
+    assertThat(result).containsExactly("topic1");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithUnlockedTasks(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .execute();
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(false,true,false);
+
+    //then
+    assertThat(result).containsExactlyInAnyOrder("topic2", "topic3");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesWithRetries(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    ExternalTask topic1Task = externalTaskService.createExternalTaskQuery().topicName("topic1").singleResult();
+    ExternalTask topic2Task = externalTaskService.createExternalTaskQuery().topicName("topic2").singleResult();
+    ExternalTask topic3Task = externalTaskService.createExternalTaskQuery().topicName("topic3").singleResult();
+    
+    externalTaskService.setRetries(topic1Task.getId(), 3);
+    externalTaskService.setRetries(topic2Task.getId(), 0);
+    externalTaskService.setRetries(topic3Task.getId(), 0);
+
+    //when
+    List<String> result = externalTaskService.getTopicNames(false,false,true);
+
+    //then
+    assertThat(result).containsExactly("topic1");
+  }
+
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
+  public void testGetTopicNamesisDistinct(){
+    //given
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    // when
+    List<String> result = externalTaskService.getTopicNames();
+    
+    //then
+    assertThat(result).containsExactlyInAnyOrder("topic1", "topic2", "topic3");
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }
@@ -3114,6 +3288,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
     return ids;
+  }
+
+  protected List<HistoricExternalTaskLog> getHistoricTaskLogOrdered(String taskId) {
+    return historyService.createHistoricExternalTaskLogQuery()
+        .failureLog()
+        .externalTaskId(taskId)
+        .orderByTimestamp().desc()
+        .list();
   }
 
   public static class ReadLocalVariableListenerImpl implements ExecutionListener {

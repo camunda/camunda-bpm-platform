@@ -71,7 +71,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
     updateTypedValue(value, serializedStringValue);
   }
 
-  public T readValue(ValueFields valueFields, boolean deserializeObjectValue) {
+  public T readValue(ValueFields valueFields, boolean deserializeObjectValue, boolean asTransientValue) {
 
     byte[] serializedByteValue = readSerializedValueFromFields(valueFields);
     String serializedStringValue = getSerializedStringValue(serializedByteValue);
@@ -85,17 +85,17 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
           throw new ProcessEngineException("Cannot deserialize object in variable '"+valueFields.getName()+"': "+e.getMessage(), e);
         }
       }
-      T value = createDeserializedValue(deserializedObject, serializedStringValue, valueFields);
+      T value = createDeserializedValue(deserializedObject, serializedStringValue, valueFields, asTransientValue);
       return value;
     }
     else {
-      return createSerializedValue(serializedStringValue, valueFields);
+      return createSerializedValue(serializedStringValue, valueFields, asTransientValue);
     }
   }
 
-  protected abstract T createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields);
+  protected abstract T createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields, boolean asTransientValue);
 
-  protected abstract T createSerializedValue(String serializedStringValue, ValueFields valueFields);
+  protected abstract T createSerializedValue(String serializedStringValue, ValueFields valueFields, boolean asTransientValue);
 
   protected abstract void writeToValueFields(T value, ValueFields valueFields, byte[] serializedValue);
 

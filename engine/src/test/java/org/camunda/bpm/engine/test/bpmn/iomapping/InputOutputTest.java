@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -779,9 +781,10 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInterruptingEventSubprocessIoSupport.bpmn")
         .deploy();
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       // happy path
       assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("SubProcess_1");
     }
   }
 
@@ -956,8 +959,9 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
       .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testMIOutputMappingDisallowed.bpmn20.xml")
       .deploy();
       fail("Exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("miTask");
     }
 
   }

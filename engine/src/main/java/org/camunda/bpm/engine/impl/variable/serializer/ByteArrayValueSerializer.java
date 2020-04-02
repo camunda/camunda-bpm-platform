@@ -45,8 +45,8 @@ public class ByteArrayValueSerializer extends PrimitiveValueSerializer<BytesValu
     }
   }
 
-  public BytesValue readValue(ValueFields valueFields) {
-    return Variables.byteArrayValue(valueFields.getByteArrayValue());
+  public BytesValue readValue(ValueFields valueFields, boolean asTransientValue) {
+    return Variables.byteArrayValue(valueFields.getByteArrayValue(), asTransientValue);
   }
 
   public void writeValue(BytesValue variableValue, ValueFields valueFields) {

@@ -40,7 +40,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -57,6 +56,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -183,6 +183,9 @@ import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
+import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
+import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
@@ -224,6 +227,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.DefaultBatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupBatch;
@@ -232,7 +236,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelp
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
-import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
+import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -319,6 +323,7 @@ import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
+import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
@@ -353,6 +358,7 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -378,6 +384,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/camunda/bpm/engine/impl/mapping/mappings.xml";
 
   public static final int DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES = 3;
+
+  public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
   public static SqlSessionFactory cachedSqlSessionFactory;
 
@@ -489,7 +497,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /**
    * Number of invocations executed by a single batch job
    */
-  protected int invocationsPerBatchJob = 1;
+  protected int invocationsPerBatchJob = DEFAULT_INVOCATIONS_PER_BATCH_JOB;
+
+  /**
+   * Map to set an individual value for each batch type to
+   * control the invocations per batch job. Unless specified
+   * in this map, value of 'invocationsPerBatchJob' is used.
+   */
+  protected Map<String, Integer> invocationsPerBatchJobByBatchType;
+
   /**
    * seconds to wait between polling for batch completion
    */
@@ -549,6 +565,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // dmn
   protected DefaultDmnEngineConfiguration dmnEngineConfiguration;
   protected DmnEngine dmnEngine;
+
+  /**
+   * a list of DMN FEEL custom function providers
+   */
+  protected List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders;
+
+  /**
+   * Enable DMN FEEL legacy behavior
+   */
+  protected boolean dmnFeelEnableLegacyBehavior = false;
 
   protected HistoryLevel historyLevel;
 
@@ -628,7 +654,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
+  /**
+   * As an instance of {@link org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler}
+   * it contains all the provided history event handlers that process history events.
+   */
   protected HistoryEventHandler historyEventHandler;
+
+  /**
+   *  Allows users to add additional {@link HistoryEventHandler}
+   *  instances to process history events.
+   */
+  protected List<HistoryEventHandler> customHistoryEventHandlers = new ArrayList<>();
+
+  /**
+   * If true, the default {@link DbHistoryEventHandler} will be included in the list
+   * of history event handlers.
+   */
+  protected boolean enableDefaultDbHistoryEventHandler = true;
 
   protected PermissionProvider permissionProvider;
 
@@ -676,6 +718,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDbMetricsReporterActivate = true;
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
+
+  /**
+   * the historic job log host name
+   */
+  protected String hostname;
+  protected HostnameProvider hostnameProvider;
 
   /**
    * handling of expressions submitted via API; can be used as guards against remote code execution
@@ -728,6 +776,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // Default user permission for task
   protected Permission defaultUserPermissionForTask;
+
+  /**
+   * Historic instance permissions are disabled by default
+   */
+  protected boolean enableHistoricInstancePermissions = false;
 
   protected boolean isUseSharedSqlSessionFactory = false;
 
@@ -784,6 +837,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private boolean historyCleanupMetricsEnabled = true;
 
+  /**
+   * Controls whether engine participates in history cleanup or not.
+   */
+  protected boolean historyCleanupEnabled = true;
+
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   protected String failedJobRetryTimeCycle;
@@ -793,6 +851,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int loginDelayFactor = 2;
   protected int loginDelayMaxTime = 60;
   protected int loginDelayBase = 3;
+
+  // max results limit
+  protected int queryMaxResultsLimit = Integer.MAX_VALUE;
+
+  // logging context property names (with default values)
+  protected String loggingContextActivityId = "activityId";
+  protected String loggingContextApplicationName = "applicationName";
+  protected String loggingContextBusinessKey;// default == null => disabled by default
+  protected String loggingContextProcessDefinitionId = "processDefinitionId";
+  protected String loggingContextProcessInstanceId = "processInstanceId";
+  protected String loggingContextTenantId = "tenantId";
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -840,6 +909,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdentityProviderSessionFactory();
     initSessionFactories();
     initValueTypeResolver();
+    initTypeValidator();
     initSerialization();
     initJpa();
     initDelegateInterceptor();
@@ -853,16 +923,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentHandlerFactory();
     initResourceAuthorizationProvider();
     initPermissionProvider();
+    initHostName();
     initMetrics();
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
     initHistoryRemovalTime();
     initHistoryCleanup();
+    initInvocationsPerBatchJobByBatchType();
     initAdminUser();
     initAdminGroups();
     initPasswordPolicy();
     invokePostInit();
+  }
+
+  protected void initTypeValidator() {
+    if (deserializationTypeValidator == null) {
+      deserializationTypeValidator = new DefaultDeserializationTypeValidator();
+    }
+    if (deserializationTypeValidator instanceof WhitelistingDeserializationTypeValidator) {
+      WhitelistingDeserializationTypeValidator validator = (WhitelistingDeserializationTypeValidator) deserializationTypeValidator;
+      validator.setAllowedClasses(deserializationAllowedClasses);
+      validator.setAllowedPackages(deserializationAllowedPackages);
+    }
   }
 
   public void initHistoryRemovalTime() {
@@ -968,6 +1051,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     if (sundayHistoryCleanupBatchWindowStartTime != null || sundayHistoryCleanupBatchWindowEndTime != null) {
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
+    }
+  }
+
+  protected void initInvocationsPerBatchJobByBatchType() {
+    if (invocationsPerBatchJobByBatchType == null) {
+      invocationsPerBatchJobByBatchType = new HashMap<>();
+
+    } else {
+      Set<String> batchTypes = invocationsPerBatchJobByBatchType.keySet();
+      batchTypes.stream()
+          // batchHandlers contains custom & built-in batch handlers
+          .filter(batchType -> !batchHandlers.containsKey(batchType))
+          .forEach(LOG::invalidBatchTypeForInvocationsPerBatchJob);
     }
   }
 
@@ -1898,6 +1994,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
     jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
 
+    TimerTaskListenerJobHandler taskListenerJobHandler = new TimerTaskListenerJobHandler();
+    jobHandlers.put(taskListenerJobHandler.getType(), taskListenerJobHandler);
+
     BatchSeedJobHandler batchSeedJobHandler = new BatchSeedJobHandler();
     jobHandlers.put(batchSeedJobHandler.getType(), batchSeedJobHandler);
 
@@ -2041,10 +2140,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initMetrics() {
     if (isMetricsEnabled) {
 
-      if (metricsReporterIdProvider == null) {
-        metricsReporterIdProvider = new SimpleIpBasedProvider();
-      }
-
       if (metricsRegistry == null) {
         metricsRegistry = new MetricsRegistry();
       }
@@ -2054,6 +2149,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (dbMetricsReporter == null) {
         dbMetricsReporter = new DbMetricsReporter(metricsRegistry, commandExecutorTxRequired);
       }
+    }
+  }
+
+  protected void initHostName() {
+    if (hostname == null) {
+      if (hostnameProvider == null) {
+        hostnameProvider = new SimpleIpBasedProvider();
+      }
+      hostname = hostnameProvider.getHostname(this);
     }
   }
 
@@ -2188,6 +2292,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
           .expressionManager(expressionManager)
+          .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
           .build();
 
       dmnEngine = dmnEngineConfiguration.buildEngine();
@@ -2343,7 +2449,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initHistoryEventHandler() {
     if (historyEventHandler == null) {
-      historyEventHandler = new DbHistoryEventHandler();
+      if (enableDefaultDbHistoryEventHandler) {
+        historyEventHandler = new CompositeDbHistoryEventHandler(customHistoryEventHandlers);
+      } else {
+        historyEventHandler = new CompositeHistoryEventHandler(customHistoryEventHandlers);
+      }
     }
   }
 
@@ -2819,6 +2929,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setDefaultUserPermissionForTask(Permission defaultUserPermissionForTask) {
     this.defaultUserPermissionForTask = defaultUserPermissionForTask;
     return this;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableHistoricInstancePermissions(boolean enable) {
+    this.enableHistoricInstancePermissions = enable;
+    return this;
+  }
+
+  public boolean isEnableHistoricInstancePermissions() {
+    return enableHistoricInstancePermissions;
   }
 
   public Map<String, JobHandler> getJobHandlers() {
@@ -3344,6 +3463,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return historyEventHandler;
   }
 
+  public boolean isEnableDefaultDbHistoryEventHandler() {
+    return enableDefaultDbHistoryEventHandler;
+  }
+
+  public void setEnableDefaultDbHistoryEventHandler(boolean enableDefaultDbHistoryEventHandler) {
+    this.enableDefaultDbHistoryEventHandler = enableDefaultDbHistoryEventHandler;
+  }
+
+  public List<HistoryEventHandler> getCustomHistoryEventHandlers() {
+    return customHistoryEventHandlers;
+  }
+
+  public void setCustomHistoryEventHandlers(List<HistoryEventHandler> customHistoryEventHandlers) {
+    this.customHistoryEventHandlers = customHistoryEventHandlers;
+  }
+
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
@@ -3386,6 +3521,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchJobsPerSeed(int batchJobsPerSeed) {
     this.batchJobsPerSeed = batchJobsPerSeed;
+  }
+
+  public Map<String, Integer> getInvocationsPerBatchJobByBatchType() {
+    return invocationsPerBatchJobByBatchType;
+  }
+
+  public ProcessEngineConfigurationImpl setInvocationsPerBatchJobByBatchType(Map<String, Integer> invocationsPerBatchJobByBatchType) {
+    this.invocationsPerBatchJobByBatchType = invocationsPerBatchJobByBatchType;
+    return this;
   }
 
   public int getInvocationsPerBatchJob() {
@@ -3784,12 +3928,39 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  /**
+   * @deprecated use {@link #getHostnameProvider()} instead.
+   */
+  @Deprecated
   public MetricsReporterIdProvider getMetricsReporterIdProvider() {
     return metricsReporterIdProvider;
   }
 
-  public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
+  /**
+   * @deprecated use {@link #setHostnameProvider(HostnameProvider)} instead.
+   */
+  @Deprecated
+  public ProcessEngineConfigurationImpl setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+    return this;
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public ProcessEngineConfigurationImpl setHostname(String hostname) {
+    this.hostname = hostname;
+    return this;
+  }
+
+  public HostnameProvider getHostnameProvider() {
+    return hostnameProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setHostnameProvider(HostnameProvider hostnameProvider) {
+    this.hostnameProvider = hostnameProvider;
+    return this;
   }
 
   public boolean isEnableScriptEngineCaching() {
@@ -4206,6 +4377,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
   }
 
+  public boolean isHistoryCleanupEnabled() {
+    return historyCleanupEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupEnabled(boolean historyCleanupEnabled) {
+    this.historyCleanupEnabled = historyCleanupEnabled;
+    return this;
+  }
+
   public String getHistoryTimeToLive() {
     return historyTimeToLive;
   }
@@ -4343,6 +4523,87 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setAdminUsers(List<String> adminUsers) {
     this.adminUsers = adminUsers;
+  }
+
+  public int getQueryMaxResultsLimit() {
+    return queryMaxResultsLimit;
+  }
+
+  public ProcessEngineConfigurationImpl setQueryMaxResultsLimit(int queryMaxResultsLimit) {
+    this.queryMaxResultsLimit = queryMaxResultsLimit;
+    return this;
+  }
+
+  public String getLoggingContextActivityId() {
+    return loggingContextActivityId;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextActivityId(String loggingContextActivityId) {
+    this.loggingContextActivityId = loggingContextActivityId;
+    return this;
+  }
+
+  public String getLoggingContextApplicationName() {
+    return loggingContextApplicationName;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextApplicationName(String loggingContextApplicationName) {
+    this.loggingContextApplicationName = loggingContextApplicationName;
+    return this;
+  }
+
+  public String getLoggingContextBusinessKey() {
+    return loggingContextBusinessKey;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextBusinessKey(String loggingContextBusinessKey) {
+    this.loggingContextBusinessKey = loggingContextBusinessKey;
+    return this;
+  }
+
+  public String getLoggingContextProcessDefinitionId() {
+    return loggingContextProcessDefinitionId;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextProcessDefinitionId(String loggingContextProcessDefinitionId) {
+    this.loggingContextProcessDefinitionId = loggingContextProcessDefinitionId;
+    return this;
+  }
+
+  public String getLoggingContextProcessInstanceId() {
+    return loggingContextProcessInstanceId;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextProcessInstanceId(String loggingContextProcessInstanceId) {
+    this.loggingContextProcessInstanceId = loggingContextProcessInstanceId;
+    return this;
+  }
+
+  public String getLoggingContextTenantId() {
+    return loggingContextTenantId;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextTenantId(String loggingContextTenantId) {
+    this.loggingContextTenantId = loggingContextTenantId;
+    return this;
+  }
+
+  public List<FeelCustomFunctionProvider> getDmnFeelCustomFunctionProviders() {
+    return dmnFeelCustomFunctionProviders;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> dmnFeelCustomFunctionProviders) {
+    this.dmnFeelCustomFunctionProviders = dmnFeelCustomFunctionProviders;
+    return this;
+  }
+
+  public boolean isDmnFeelEnableLegacyBehavior() {
+    return dmnFeelEnableLegacyBehavior;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnFeelEnableLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
+    this.dmnFeelEnableLegacyBehavior = dmnFeelEnableLegacyBehavior;
+    return this;
   }
 
 }

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -61,6 +62,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -283,6 +285,7 @@ public class BatchMigrationTest {
     assertNotNull(seedJobDefinition);
     assertEquals(batch.getId(), seedJobDefinition.getJobConfiguration());
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
+    assertEquals(helper.sourceProcessDefinition.getDeploymentId(), seedJobDefinition.getDeploymentId());
 
     // and there exists a migration job definition
     JobDefinition migrationJobDefinition = helper.getExecutionJobDefinition(batch);
@@ -294,7 +297,7 @@ public class BatchMigrationTest {
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
     assertEquals(currentTime, seedJob.getDuedate());
-    assertNull(seedJob.getDeploymentId());
+    assertEquals(seedJobDefinition.getDeploymentId(), seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
     assertNull(seedJob.getProcessInstanceId());
@@ -344,7 +347,7 @@ public class BatchMigrationTest {
     Batch batch = helper.migrateProcessInstancesAsync(10);
 
     // when
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the seed job definition still exists but the seed job is removed
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
@@ -364,7 +367,7 @@ public class BatchMigrationTest {
   @Test
   public void testMigrationJobsExecution() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> migrationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -391,7 +394,7 @@ public class BatchMigrationTest {
 
     try {
       Batch batch = helper.migrateProcessInstancesAsyncForTenant(10, "someTenantId");
-      helper.executeSeedJob(batch);
+      helper.completeSeedJobs(batch);
 
       testRule.waitForJobExecutorToProcessAllJobs();
 
@@ -483,7 +486,7 @@ public class BatchMigrationTest {
 
     // when the seed job creates the monitor job
     Date createDate = TEST_DATE;
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
@@ -502,7 +505,7 @@ public class BatchMigrationTest {
   @Test
   public void testMonitorJobRemovesBatchAfterCompletion() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // when
@@ -518,7 +521,7 @@ public class BatchMigrationTest {
   @Test
   public void testBatchDeletionWithCascade() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     managementService.deleteBatch(batch.getId(), true);
@@ -536,7 +539,7 @@ public class BatchMigrationTest {
   @Test
   public void testBatchDeletionWithoutCascade() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     managementService.deleteBatch(batch.getId(), false);
@@ -570,7 +573,7 @@ public class BatchMigrationTest {
   @Test
   public void testBatchWithFailedMigrationJobDeletionWithCascade() {
     Batch batch = helper.migrateProcessInstancesAsync(2);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incidents
     List<Job> migrationJobs = helper.getExecutionJobs(batch);
@@ -589,7 +592,7 @@ public class BatchMigrationTest {
   @Test
   public void testBatchWithFailedMonitorJobDeletionWithCascade() {
     Batch batch = helper.migrateProcessInstancesAsync(2);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incident
     Job monitorJob = helper.getMonitorJob(batch);
@@ -606,7 +609,7 @@ public class BatchMigrationTest {
   @Test
   public void testBatchExecutionFailureWithMissingProcessInstance() {
     Batch batch = helper.migrateProcessInstancesAsync(2);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
     String deletedProcessInstanceId = processInstances.get(0).getId();
@@ -713,7 +716,7 @@ public class BatchMigrationTest {
     Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -752,7 +755,7 @@ public class BatchMigrationTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .skipCustomListeners()
       .executeAsync();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -781,7 +784,7 @@ public class BatchMigrationTest {
     Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -817,7 +820,7 @@ public class BatchMigrationTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .skipIoMappings()
       .executeAsync();
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -846,7 +849,7 @@ public class BatchMigrationTest {
       .processInstanceIds(Collections.singletonList(processInstance.getId()))
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -860,7 +863,7 @@ public class BatchMigrationTest {
   public void testDeleteBatchJobManually() {
     // given
     Batch batch = helper.createMigrationBatchWithSize(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     JobEntity migrationJob = (JobEntity) helper.getExecutionJobs(batch).get(0);
     String byteArrayId = migrationJob.getJobHandlerConfigurationRaw();
@@ -895,13 +898,29 @@ public class BatchMigrationTest {
       .processInstanceIds(processInstance1.getId(), processInstance2.getId())
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
 
     // then
     Assert.assertEquals(2, runtimeService.createProcessInstanceQuery()
         .processDefinitionId(targetDefinition.getId()).count());
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    configuration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, 42);
+
+    // when
+    Batch batch = helper.migrateProcessInstancesAsync(15);
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

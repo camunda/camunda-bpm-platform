@@ -21,3 +21,14 @@ values ('100', CURRENT_TIMESTAMP, '7.12.0');
 -- https://app.camunda.com/jira/browse/CAM-10665
 ALTER TABLE ACT_HI_OP_LOG
   ADD ANNOTATION_ nvarchar(4000);
+
+-- https://app.camunda.com/jira/browse/CAM-9855
+ALTER TABLE ACT_RU_JOB
+  ADD REPEAT_OFFSET_ numeric(19,0) default 0;
+
+-- https://app.camunda.com/jira/browse/CAM-10672
+ALTER TABLE ACT_HI_INCIDENT
+  ADD HISTORY_CONFIGURATION_ nvarchar(255);
+
+-- https://app.camunda.com/jira/browse/CAM-10600
+create index ACT_IDX_HI_DETAIL_VAR_INST_ID on ACT_HI_DETAIL(VAR_INST_ID_);

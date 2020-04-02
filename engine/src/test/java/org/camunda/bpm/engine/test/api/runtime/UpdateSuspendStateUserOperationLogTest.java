@@ -79,7 +79,7 @@ public class UpdateSuspendStateUserOperationLogTest {
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
     rule.getIdentityService().clearAuthentication();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
 
     // then
@@ -125,7 +125,7 @@ public class UpdateSuspendStateUserOperationLogTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
 
     // when
     rule.getIdentityService().setAuthenticatedUserId("userId");

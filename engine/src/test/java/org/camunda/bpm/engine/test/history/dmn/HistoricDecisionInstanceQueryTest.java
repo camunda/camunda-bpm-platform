@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.dmn;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -25,16 +25,15 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
-import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
@@ -42,7 +41,6 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * @author Philipp Ossler
@@ -63,6 +61,30 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
   protected static final String DECISION_DEFINITION_KEY = "testDecision";
   protected static final String DISH_DECISION = "dish-decision";
+
+  @Override
+  protected void setUp() throws Exception {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+
+    super.setUp();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
+
+    super.tearDown();
+  }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryIncludeInputsForNonExistingDecision() {

@@ -46,6 +46,7 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   protected Long priorityHigherThanOrEqual;
   protected Long priorityLowerThanOrEqual;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected ExternalTaskState state;
 
   public HistoricExternalTaskLogQueryImpl(CommandExecutor commandExecutor) {
@@ -144,6 +145,14 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   public HistoricExternalTaskLogQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricExternalTaskLogQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -282,9 +291,13 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
         .findHistoricExternalTaskLogsByQueryCriteria(this, page);
   }
 
-  // setters ////////////////////////////////////////////////////////////
+  // getters & setters ////////////////////////////////////////////////////////////
 
   protected void setState(ExternalTaskState state) {
     this.state = state;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 }

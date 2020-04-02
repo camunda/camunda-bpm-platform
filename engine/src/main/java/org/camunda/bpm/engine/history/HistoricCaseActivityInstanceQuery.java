@@ -97,6 +97,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances with one of the given tenant ids. */
   HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic case activity instances that have no tenant id. */
+  HistoricCaseActivityInstanceQuery withoutTenantId();
+
   // ordering /////////////////////////////////////////////////////////////////
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByHistoricCaseActivityInstanceId();

@@ -77,14 +77,14 @@ public class FileValueSerializerTest {
     String filename = "";
     FileValue fileValue = Variables.fileValue(filename).create();
     ValueFields valueFields = new MockValueFields();
-    
+
     serializer.writeValue(fileValue, valueFields);
-    
+
     assertThat(valueFields.getByteArrayValue(), is(nullValue()));
     assertThat(valueFields.getTextValue(), is(filename));
     assertThat(valueFields.getTextValue2(), is(nullValue()));
   }
-  
+
   @Test
   public void testWriteMimetypeAndFilenameValue() {
     String filename = "test.txt";
@@ -162,7 +162,7 @@ public class FileValueSerializerTest {
     String mimeType = "text/plain";
     valueFields.setTextValue2(mimeType + SEPARATOR);
 
-    FileValue fileValue = serializer.readValue(valueFields, true);
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(mimeType));
@@ -183,7 +183,7 @@ public class FileValueSerializerTest {
     String encoding = SEPARATOR + "UTF-8";
     valueFields.setTextValue2(encoding);
 
-    FileValue fileValue = serializer.readValue(valueFields, true);
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getEncoding(), is("UTF-8"));
@@ -206,7 +206,7 @@ public class FileValueSerializerTest {
     String encoding = "UTF-16";
     valueFields.setTextValue2(mimeType + SEPARATOR + encoding);
 
-    FileValue fileValue = serializer.readValue(valueFields, true);
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(mimeType));
@@ -227,7 +227,7 @@ public class FileValueSerializerTest {
     valueFields.setTextValue(filename);
     valueFields.setByteArrayValue(data);
 
-    FileValue fileValue = serializer.readValue(valueFields, true);
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(nullValue()));
@@ -240,7 +240,7 @@ public class FileValueSerializerTest {
     String filename = "file.txt";
     valueFields.setTextValue(filename);
 
-    FileValue fileValue = serializer.readValue(valueFields, true);
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(nullValue()));
@@ -252,22 +252,22 @@ public class FileValueSerializerTest {
     MockValueFields valueFields = new MockValueFields();
     String filename = "";
     valueFields.setTextValue(filename);
-  
-    FileValue fileValue = serializer.readValue(valueFields, true);
-  
+
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
+
     assertThat(fileValue.getFilename(), is(""));
     assertThat(fileValue.getMimeType(), is(nullValue()));
     assertThat(fileValue.getValue(), is(nullValue()));
   }
-  
+
   @Test
   public void testReadNullFilenameValue() {
     MockValueFields valueFields = new MockValueFields();
     String filename = null;
     valueFields.setTextValue(filename);
-  
-    FileValue fileValue = serializer.readValue(valueFields, true);
-  
+
+    FileValue fileValue = serializer.readValue(valueFields, true, false);
+
     assertThat(fileValue.getFilename(), is(""));
     assertThat(fileValue.getMimeType(), is(nullValue()));
     assertThat(fileValue.getValue(), is(nullValue()));

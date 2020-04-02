@@ -16,29 +16,70 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
-import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.*;
-import org.camunda.bpm.model.bpmn.instance.Process;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngineTestCase {
+public class UserTaskBpmnModelExecutionContextTest {
 
   private static final String PROCESS_ID = "process";
   private static final String USER_TASK_ID = "userTask";
-  private String deploymentId;
 
-  public void testGetBpmnModelElementInstanceOnCreate() {
+  private RepositoryService repositoryService;
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
+
+  @Before
+  public void setup() {
+    runtimeService = rule.getRuntimeService();
+    repositoryService = rule.getRepositoryService();
+    taskService = rule.getTaskService();
+  }
+
+  @After
+  public void tearDown() {
+    ModelExecutionContextTaskListener.clear();
+  }
+
+  @Test
+  public void shouldGetBpmnModelElementInstanceOnCreate() {
     String eventName = TaskListener.EVENTNAME_CREATE;
     deployProcess(eventName);
 
@@ -46,12 +87,10 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
 
     assertModelInstance();
     assertUserTask(eventName);
-
-    String taskId = taskService.createTaskQuery().active().singleResult().getId();
-    taskService.complete(taskId);
   }
 
-  public void testGetBpmnModelElementInstanceOnAssignment() {
+  @Test
+  public void shouldGetBpmnModelElementInstanceOnAssignment() {
     String eventName = TaskListener.EVENTNAME_ASSIGNMENT;
     deployProcess(eventName);
 
@@ -65,11 +104,10 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
 
     assertModelInstance();
     assertUserTask(eventName);
-
-    taskService.complete(taskId);
   }
 
-  public void testGetBpmnModelElementInstanceOnComplete() {
+  @Test
+  public void shouldGetBpmnModelElementInstanceOnComplete() {
     String eventName = TaskListener.EVENTNAME_COMPLETE;
     deployProcess(eventName);
 
@@ -88,6 +126,43 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
 
     assertModelInstance();
     assertUserTask(eventName);
+  }
+
+  @Test
+  public void shouldGetBpmnModelElementInstanceOnUpdateAfterAssignment() {
+    String eventName = TaskListener.EVENTNAME_UPDATE;
+    deployProcess(eventName);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_ID);
+
+    assertNull(ModelExecutionContextTaskListener.modelInstance);
+    assertNull(ModelExecutionContextTaskListener.userTask);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setAssignee(taskId, "demo");
+
+    assertNotNull(ModelExecutionContextTaskListener.modelInstance);
+    assertNotNull(ModelExecutionContextTaskListener.userTask);
+
+    taskService.complete(taskId);
+
+    assertModelInstance();
+    assertUserTask(eventName);
+  }
+
+  @Test
+  @Deployment
+  public void shouldGetBpmnModelElementInstanceOnTimeout() {
+    runtimeService.startProcessInstanceByKey(PROCESS_ID);
+
+    assertNull(ModelExecutionContextTaskListener.modelInstance);
+    assertNull(ModelExecutionContextTaskListener.userTask);
+
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    assertModelInstance();
+    assertUserTask(TaskListener.EVENTNAME_TIMEOUT);
   }
 
   private void assertModelInstance() {
@@ -122,22 +197,11 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
       .startEvent()
       .userTask(USER_TASK_ID)
+        .camundaTaskListenerClass(eventName, ModelExecutionContextTaskListener.class)
       .endEvent()
       .done();
 
-    ExtensionElements extensionElements = modelInstance.newInstance(ExtensionElements.class);
-    ModelElementInstance taskListener = extensionElements.addExtensionElement(CAMUNDA_NS, "taskListener");
-    taskListener.setAttributeValueNs(CAMUNDA_NS, "class", ModelExecutionContextTaskListener.class.getName());
-    taskListener.setAttributeValueNs(CAMUNDA_NS, "event", eventName);
-
-    UserTask userTask = modelInstance.getModelElementById(USER_TASK_ID);
-    userTask.setExtensionElements(extensionElements);
-
-    deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+    rule.manageDeployment(repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy());
   }
 
-  public void tearDown() {
-    ModelExecutionContextTaskListener.clear();
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
 }

@@ -16,12 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.fail;
-
-import junit.framework.AssertionFailedError;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -32,6 +33,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * Parse an invalid process definition and assert the error message.
@@ -46,12 +49,12 @@ public class SignalEventParseInvalidProcessTest {
   @Parameters(name = "{index}: process definition = {0}, expected error message = {1}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        { "InvalidProcessWithDuplicateSignalNames.bpmn20.xml", "duplicate signal name" },
-        { "InvalidProcessWithNoSignalName.bpmn20.xml", "signal with id 'alertSignal' has no name" },
-        { "InvalidProcessWithSignalNoId.bpmn20.xml", "signal must have an id" },
-        { "InvalidProcessWithSignalNoRef.bpmn20.xml", "signalEventDefinition does not have required property 'signalRef'" },
-        { "InvalidProcessWithMultipleSignalStartEvents.bpmn20.xml", "Cannot have more than one signal event subscription with name 'signal'" },
-        { "InvalidProcessWithMultipleInterruptingSignalEventSubProcesses.bpmn20.xml", "Cannot have more than one signal event subscription with name 'alert'" }
+        { "InvalidProcessWithDuplicateSignalNames.bpmn20.xml", "duplicate signal name", "alertSignal2" },
+        { "InvalidProcessWithNoSignalName.bpmn20.xml", "signal with id 'alertSignal' has no name", "alertSignal" },
+        { "InvalidProcessWithSignalNoId.bpmn20.xml", "signal must have an id", null },
+        { "InvalidProcessWithSignalNoRef.bpmn20.xml", "signalEventDefinition does not have required property 'signalRef'", "signalEvent" },
+        { "InvalidProcessWithMultipleSignalStartEvents.bpmn20.xml", "Cannot have more than one signal event subscription with name 'signal'" , "start2" },
+        { "InvalidProcessWithMultipleInterruptingSignalEventSubProcesses.bpmn20.xml", "Cannot have more than one signal event subscription with name 'alert'", "subprocessStartEvent2" }
     });
   }
 
@@ -60,6 +63,9 @@ public class SignalEventParseInvalidProcessTest {
 
   @Parameter(1)
   public String expectedErrorMessage;
+
+  @Parameter(2)
+  public String elementIds;
 
   @Rule
   public ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -79,8 +85,9 @@ public class SignalEventParseInvalidProcessTest {
         .deploy();
 
       fail("exception expected: " + expectedErrorMessage);
-    } catch (Exception e) {
+    } catch (ParseException e) {
       assertTextPresent(expectedErrorMessage, e.getMessage());
+      assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo(elementIds);
     }
   }
 

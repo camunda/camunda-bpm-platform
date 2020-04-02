@@ -16,22 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.util.BatchUtil;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetriesCmd<Batch> {
 
@@ -41,55 +35,21 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    List<String> externalTaskIds = collectExternalTaskIds();
+    BatchElementConfiguration elementConfiguration = collectExternalTaskIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", externalTaskIds);
+    ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", elementConfiguration.getIds());
 
-    checkPermissions(commandContext);
-
-    writeUserOperationLog(commandContext,
-        builder.getRetries(),
-        externalTaskIds.size(),
-        true);
-
-    BatchEntity batch = createBatch(commandContext, externalTaskIds);
-
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-
-    return batch;
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES)
+        .config(getConfiguration(elementConfiguration))
+        .permission(BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES)
+        .operationLogHandler(this::writeUserOperationLogAsync)
+        .build();
   }
 
-  protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES);
-    }
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(),
+        elementConfiguration.getMappings(), builder.getRetries());
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, Collection<String> processInstanceIds) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<SetRetriesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
-
-    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(new ArrayList<String>(processInstanceIds), builder.getRetries());
-
-    BatchEntity batch = new BatchEntity();
-    batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
-    batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
-    batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
-    batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
-    commandContext.getBatchManager().insertBatch(batch);
-
-    return batch;
-  }
-
-
-  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
-  }
 }

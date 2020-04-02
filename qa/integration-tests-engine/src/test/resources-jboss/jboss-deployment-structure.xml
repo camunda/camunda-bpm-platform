@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jboss-deployment-structure>
-  <deployment>
-    <dependencies>
-      <module name="org.camunda.bpm.camunda-engine" />
-      <module name="org.mybatis.mybatis"/>
-    </dependencies>
-  </deployment>
-</jboss-deployment-structure>

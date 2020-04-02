@@ -20,10 +20,14 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.ResourceReport;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.bpmn.parser.ResourceReportImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.*;
@@ -1304,6 +1308,48 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
       .post(CREATE_DEPLOYMENT_URL);
   }
 
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testCreateDeploymentThrowsParseException() {
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+    String message = "expected exception";
+    List<Problem> mockErrors = mockProblems(EXAMPLE_PROBLEM_COLUMN, EXAMPLE_PROBLEM_LINE, message, EXAMPLE_PROBLEM_ELEMENT_ID);
+    List<Problem> mockWarnings = mockProblems(EXAMPLE_PROBLEM_COLUMN_2, EXAMPLE_PROBLEM_LINE_2, EXAMPLE_EXCEPTION_MESSAGE, EXAMPLE_PROBLEM_ELEMENT_ID_2);
+    ParseException mockParseException = createMockParseException(mockErrors, mockWarnings, message);
+    when(mockDeploymentBuilder.deployWithResult()).thenThrow(mockParseException);
+
+    Response response = given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(ParseException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+    
+    String content = response.asString();
+
+    Map<String, ResourceReport> details = from(content).getMap("details");
+    HashMap<String, List<HashMap<String, Object>>> problems = (HashMap<String, List<HashMap<String, Object>>>) details.get("abc");
+
+    List<HashMap<String, Object>> errors = problems.get("errors");
+    HashMap<String, Object> error = errors.get(0);
+    assertEquals(EXAMPLE_PROBLEM_COLUMN, error.get("column"));
+    assertEquals(EXAMPLE_PROBLEM_LINE, error.get("line"));
+    assertEquals(message, error.get("message"));
+    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID, error.get("mainElementId"));
+    assertEquals(EXAMPLE_ELEMENT_IDS, error.get("еlementIds"));
+
+    List<HashMap<String, Object>> warnings = problems.get("warnings");
+    HashMap<String, Object> warning = warnings.get(0);
+    assertEquals(EXAMPLE_PROBLEM_COLUMN_2, warning.get("column"));
+    assertEquals(EXAMPLE_PROBLEM_LINE_2, warning.get("line"));
+    assertEquals(EXAMPLE_EXCEPTION_MESSAGE, warning.get("message"));
+    assertEquals(EXAMPLE_PROBLEM_ELEMENT_ID_2, warning.get("mainElementId"));
+    assertEquals(EXAMPLE_ELEMENT_IDS, warning.get("еlementIds"));
+  }
+
   @Test
   public void testDeleteDeployment() {
 
@@ -1997,6 +2043,35 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     assertEquals(mockDeploymentResource.getId(), returnedId);
     assertEquals(mockDeploymentResource.getName(), returnedName);
     assertEquals(mockDeploymentResource.getDeploymentId(), returnedDeploymentId);
+  }
+
+  private List<Problem> mockProblems(int column, int line, String message, String elementId) {
+    Problem mockProblem = mock(Problem.class);
+    when(mockProblem.getColumn()).thenReturn(column);
+    when(mockProblem.getLine()).thenReturn(line);
+    when(mockProblem.getMessage()).thenReturn(message);
+    when(mockProblem.getMainElementId()).thenReturn(elementId);
+    when(mockProblem.getElementIds()).thenReturn(EXAMPLE_ELEMENT_IDS);
+    List<Problem> mockProblems = new ArrayList<>();
+    mockProblems.add(mockProblem);
+    return mockProblems;
+  }
+
+  private ParseException createMockParseException(List<Problem> mockErrors,
+      List<Problem> mockWarnings, String message) {
+    ParseException mockParseException = mock(ParseException.class);
+    when(mockParseException.getMessage()).thenReturn(message);
+
+    ResourceReportImpl report = mock(ResourceReportImpl.class);
+    when(report.getResourceName()).thenReturn(EXAMPLE_RESOURCE_NAME);
+    when(report.getErrors()).thenReturn(mockErrors);
+    when(report.getWarnings()).thenReturn(mockWarnings);
+
+    List<ResourceReport> reports = new ArrayList<>();
+    reports.add(report);
+
+    when(mockParseException.getResorceReports()).thenReturn(reports);
+    return mockParseException;
   }
 
 }

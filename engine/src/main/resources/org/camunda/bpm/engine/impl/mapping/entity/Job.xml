@@ -120,6 +120,7 @@
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
     <result property="exceptionByteArrayId" column="EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
+    <result property="failedActivityId" column="FAILED_ACT_ID_" jdbcType="VARCHAR" />
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
@@ -144,6 +145,7 @@
 
   <resultMap id="timerResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity" extends="jobResultMap">
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
+    <result property="repeatOffset" column="REPEAT_OFFSET_" jdbcType="BIGINT" />
   </resultMap>
 
   <resultMap id="acquirableJobResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
@@ -152,6 +154,11 @@
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
+  </resultMap>
+
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
   </resultMap>
 
 
@@ -195,6 +202,10 @@
       </if>
 
       and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
+
+      <if test="!parameter.historyCleanupEnabled">
+        and HANDLER_TYPE_ != 'history-cleanup'
+      </if>
 
     <if test="parameter.applyOrdering">
       ${orderBy}
@@ -276,6 +287,12 @@
     ${countDistinctAfterEnd}
   </select>
 
+  <select id="selectJobDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="deploymentIdMapping">
+    select distinct RES.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectJobByQueryCriteriaSql"/>
+    ORDER BY RES.DEPLOYMENT_ID_ ASC
+  </select>
+
   <sql id="selectJobByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOB RES
     <if test="executable">
@@ -288,6 +305,11 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
+      <if test="ids != null and !ids.isEmpty()">
+        <bind name="listOfIds" value="ids" />
+        <bind name="fieldName" value="'RES.ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
+      </if>
       <if test="jobDefinitionId != null">
         RES.JOB_DEF_ID_ = #{jobDefinitionId}
       </if>
@@ -296,6 +318,11 @@
       </if>
       <if test="processInstanceId != null">
         and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
+      </if>
+      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+        <bind name="listOfIds" value="processInstanceIds" />
+        <bind name="fieldName" value="'RES.PROCESS_INSTANCE_ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
@@ -353,6 +380,9 @@
       </if>
       <if test="exceptionMessage">
       	and RES.EXCEPTION_MSG_ = #{exceptionMessage}
+      </if>
+      <if test="failedActivityId != null">
+        and RES.FAILED_ACT_ID_ = #{failedActivityId}
       </if>
       <if test="noRetriesLeft">
         and RES.RETRIES_ = 0
@@ -418,8 +448,10 @@
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            FAILED_ACT_ID_,
             DUEDATE_,
             REPEAT_,
+            REPEAT_OFFSET_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
@@ -443,8 +475,10 @@
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
+            #{failedActivityId, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
+            #{repeatOffset, jdbcType=BIGINT},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
@@ -470,8 +504,10 @@
        RETRIES_ = #{retries, jdbcType=INTEGER},
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+       FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
        REPEAT_ = #{repeat, jdbcType=VARCHAR},
+       REPEAT_OFFSET_ = #{repeatOffset, jdbcType=BIGINT},
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
@@ -522,6 +558,7 @@
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            FAILED_ACT_ID_,
             DUEDATE_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
@@ -546,6 +583,7 @@
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
+            #{failedActivityId, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
@@ -571,6 +609,7 @@
        RETRIES_ = #{retries, jdbcType=INTEGER},
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+       FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
@@ -599,6 +638,7 @@
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
+        FAILED_ACT_ID_,
         DUEDATE_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
@@ -623,6 +663,7 @@
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayId, jdbcType=VARCHAR},
         #{exceptionMessage, jdbcType=VARCHAR},
+        #{failedActivityId, jdbcType=VARCHAR},
         #{duedate, jdbcType=TIMESTAMP},
         #{jobHandlerType, jdbcType=VARCHAR},
         #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
@@ -648,6 +689,7 @@
             RETRIES_ = #{retries, jdbcType=INTEGER},
             EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
             EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+            FAILED_ACT_ID_ = #{failedActivityId, jdbcType=VARCHAR},
             DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
             SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
             PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},

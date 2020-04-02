@@ -43,7 +43,8 @@ public class UpdateEventTriggersValidator implements MigrationInstructionValidat
 
     if (eventScope != null) {
       return TimerDeclarationImpl.getDeclarationsForScope(eventScope).containsKey(activity.getId())
-          || EventSubscriptionDeclaration.getDeclarationsForScope(eventScope).containsKey(activity.getId());
+          || EventSubscriptionDeclaration.getDeclarationsForScope(eventScope).containsKey(activity.getId())
+          || TimerDeclarationImpl.getTimeoutListenerDeclarationsForScope(eventScope).containsKey(activity.getId());
     }
     else {
       return false;

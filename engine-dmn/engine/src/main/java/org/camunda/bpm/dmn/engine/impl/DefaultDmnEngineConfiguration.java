@@ -36,6 +36,8 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
+import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
 public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
@@ -43,6 +45,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
   public static final String FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE = "feel";
   public static final String FEEL_EXPRESSION_LANGUAGE_DMN12 = DmnModelConstants.FEEL12_NS;
+  public static final String FEEL_EXPRESSION_LANGUAGE_DMN13 = DmnModelConstants.FEEL13_NS;
   public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
 
   protected DmnEngineMetricCollector engineMetricCollector;
@@ -61,10 +64,20 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected FeelEngineFactory feelEngineFactory;
   protected FeelEngine feelEngine;
 
-  protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
-  protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
-  protected String defaultOutputEntryExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
-  protected String defaultLiteralExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  /**
+   * a list of DMN FEEL custom function providers
+   */
+  protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
+
+  /**
+   * Enable FEEL legacy behavior
+   */
+  protected boolean enableFeelLegacyBehavior = false;
+
+  protected String defaultInputExpressionExpressionLanguage = null;
+  protected String defaultInputEntryExpressionLanguage = null;
+  protected String defaultOutputEntryExpressionLanguage = null;
+  protected String defaultLiteralExpressionLanguage = null;
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
 
@@ -79,8 +92,41 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     initDecisionTableEvaluationListener();
     initDecisionEvaluationListener();
     initScriptEngineResolver();
+    initElDefaults();
     initElProvider();
     initFeelEngine();
+  }
+
+  public void initElDefaults() {
+    if (enableFeelLegacyBehavior) {
+      if (defaultInputExpressionExpressionLanguage == null) {
+        defaultInputExpressionExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultInputEntryExpressionLanguage == null) {
+        defaultInputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultOutputEntryExpressionLanguage == null) {
+        defaultOutputEntryExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultLiteralExpressionLanguage == null) {
+        defaultLiteralExpressionLanguage(JUEL_EXPRESSION_LANGUAGE);
+      }
+
+    } else {
+      if (defaultInputExpressionExpressionLanguage == null) {
+        defaultInputExpressionExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultInputEntryExpressionLanguage == null) {
+        defaultInputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultOutputEntryExpressionLanguage == null) {
+        defaultOutputEntryExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+      if (defaultLiteralExpressionLanguage == null) {
+        defaultLiteralExpressionLanguage(FEEL_EXPRESSION_LANGUAGE);
+      }
+
+    }
   }
 
   protected void initMetricCollector() {
@@ -141,7 +187,13 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
-      feelEngineFactory = new FeelEngineFactoryImpl();
+      if (!enableFeelLegacyBehavior) {
+        feelEngineFactory = new ScalaFeelEngineFactory(feelCustomFunctionProviders);
+
+      } else {
+        feelEngineFactory = new FeelEngineFactoryImpl();
+
+      }
     }
 
     if (feelEngine == null) {
@@ -494,6 +546,60 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public DefaultDmnEngineConfiguration transformer(DmnTransformer transformer) {
     setTransformer(transformer);
+    return this;
+  }
+
+  /**
+   * @return the list of FEEL Custom Function Providers
+   */
+  public List<FeelCustomFunctionProvider> getFeelCustomFunctionProviders() {
+    return feelCustomFunctionProviders;
+  }
+
+  /**
+   * Set a list of FEEL Custom Function Providers.
+   *
+   * @param feelCustomFunctionProviders a list of FEEL Custom Function Providers
+   */
+  public void setFeelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    this.feelCustomFunctionProviders = feelCustomFunctionProviders;
+  }
+
+  /**
+   * Set a list of FEEL Custom Function Providers.
+   *
+   * @param feelCustomFunctionProviders a list of FEEL Custom Function Providers
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration feelCustomFunctionProviders(List<FeelCustomFunctionProvider> feelCustomFunctionProviders) {
+    setFeelCustomFunctionProviders(feelCustomFunctionProviders);
+    return this;
+  }
+
+  /**
+   * @return whether FEEL legacy behavior is enabled or not
+   */
+  public boolean isEnableFeelLegacyBehavior() {
+    return enableFeelLegacyBehavior;
+  }
+
+  /**
+   * Controls whether the FEEL legacy behavior is enabled or not
+   *
+   * @param enableFeelLegacyBehavior the FEEL legacy behavior
+   */
+  public void setEnableFeelLegacyBehavior(boolean enableFeelLegacyBehavior) {
+    this.enableFeelLegacyBehavior = enableFeelLegacyBehavior;
+  }
+
+  /**
+   * Controls whether the FEEL legacy behavior is enabled or not
+   *
+   * @param enableFeelLegacyBehavior the FEEL legacy behavior
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration enableFeelLegacyBehavior(boolean enableFeelLegacyBehavior) {
+    setEnableFeelLegacyBehavior(enableFeelLegacyBehavior);
     return this;
   }
 

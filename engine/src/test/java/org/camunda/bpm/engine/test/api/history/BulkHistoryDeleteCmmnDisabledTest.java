@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -51,7 +52,8 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class BulkHistoryDeleteCmmnDisabledTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setCmmnEnabled(false);
       return configuration;
@@ -62,7 +64,7 @@ public class BulkHistoryDeleteCmmnDisabledTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   private RuntimeService runtimeService;
   private HistoryService historyService;
@@ -124,7 +126,7 @@ public class BulkHistoryDeleteCmmnDisabledTest {
 
   private void prepareHistoricProcesses(int instanceCount) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
-    List<String> processInstanceIds = new ArrayList<String>();
+    List<String> processInstanceIds = new ArrayList<>();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
     for (int i = 0; i < instanceCount; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

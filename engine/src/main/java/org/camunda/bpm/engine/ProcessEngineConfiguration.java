@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 
@@ -372,7 +372,8 @@ public abstract class ProcessEngineConfiguration {
    * READ_HISTORY_VARIABLE, or
    * READ_TASK_VARIABLE on Process Definition resource, and
    * READ_VARIABLE on Task resource
-   * will be required to fetch variables when the autorizations are enabled.
+   * READ_VARIABLE on Historic Task Instance resource
+   * will be required to fetch variables when the authorizations are enabled.
    */
   protected boolean enforceSpecificVariablePermission = false;
 
@@ -397,6 +398,18 @@ public abstract class ProcessEngineConfiguration {
    * on logging level WARN.
    */
   protected boolean enableReducedJobExceptionLogging = false;
+
+  /** Specifies which classes are allowed for deserialization */
+  protected String deserializationAllowedClasses;
+
+  /** Specifies which packages are allowed for deserialization */
+  protected String deserializationAllowedPackages;
+
+  /** Validates types before deserialization */
+  protected DeserializationTypeValidator deserializationTypeValidator;
+
+  /** Indicates whether type validation should be done before deserialization */
+  protected boolean deserializationTypeValidationEnabled = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -1005,4 +1018,41 @@ public abstract class ProcessEngineConfiguration {
     this.enableReducedJobExceptionLogging = enableReducedJobExceptionLogging;
     return this;
   }
+
+  public String getDeserializationAllowedClasses() {
+    return deserializationAllowedClasses;
+  }
+
+  public ProcessEngineConfiguration setDeserializationAllowedClasses(String deserializationAllowedClasses) {
+    this.deserializationAllowedClasses = deserializationAllowedClasses;
+    return this;
+  }
+
+  public String getDeserializationAllowedPackages() {
+    return deserializationAllowedPackages;
+  }
+
+  public ProcessEngineConfiguration setDeserializationAllowedPackages(String deserializationAllowedPackages) {
+    this.deserializationAllowedPackages = deserializationAllowedPackages;
+    return this;
+  }
+
+  public DeserializationTypeValidator getDeserializationTypeValidator() {
+    return deserializationTypeValidator;
+  }
+
+  public ProcessEngineConfiguration setDeserializationTypeValidator(DeserializationTypeValidator deserializationTypeValidator) {
+    this.deserializationTypeValidator = deserializationTypeValidator;
+    return this;
+  }
+
+  public boolean isDeserializationTypeValidationEnabled() {
+    return deserializationTypeValidationEnabled;
+  }
+
+  public ProcessEngineConfiguration setDeserializationTypeValidationEnabled(boolean deserializationTypeValidationEnabled) {
+    this.deserializationTypeValidationEnabled = deserializationTypeValidationEnabled;
+    return this;
+  }
+
 }

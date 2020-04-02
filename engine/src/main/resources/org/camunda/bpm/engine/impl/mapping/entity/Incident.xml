@@ -37,6 +37,7 @@
       INCIDENT_TYPE_, 
       EXECUTION_ID_, 
       ACTIVITY_ID_, 
+      FAILED_ACTIVITY_ID_, 
       PROC_INST_ID_, 
       PROC_DEF_ID_, 
       CAUSE_INCIDENT_ID_, 
@@ -52,6 +53,7 @@
       #{incidentType, jdbcType=VARCHAR},
       #{executionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
+      #{failedActivityId ,jdbcType=VARCHAR},
       #{processInstanceId ,jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{causeIncidentId ,jdbcType=VARCHAR},
@@ -72,6 +74,7 @@
     <result property="incidentMessage" column="INCIDENT_MSG_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="failedActivityId" column="FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
@@ -127,7 +130,8 @@
   <sql id="selectIncidentByQueryCriteriaSql">
     from ${prefix}ACT_RU_INCIDENT RES
 
-    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+    <if test="(processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0)
+        || (authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null)">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
@@ -148,11 +152,21 @@
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
       </if>
+      <if test="failedActivityId != null">
+        and RES.FAILED_ACTIVITY_ID_ = #{failedActivityId}
+      </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+	      and PROCDEF.KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="causeIncidentId != null">
         and RES.CAUSE_INCIDENT_ID_ = #{causeIncidentId}
@@ -211,6 +225,7 @@
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+      FAILED_ACTIVITY_ID_ = #{failedActivityId, jdbcType=VARCHAR},
       JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     </set>
     <where>

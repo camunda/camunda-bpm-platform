@@ -289,12 +289,17 @@
       <if test="activityInstanceState != null">
         and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
       </if>
-      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and RES.TENANT_ID_ in
-        <foreach item="tenantId" index="index" collection="tenantIds"
-                 open="(" separator="," close=")">
-          #{tenantId}
-        </foreach>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">

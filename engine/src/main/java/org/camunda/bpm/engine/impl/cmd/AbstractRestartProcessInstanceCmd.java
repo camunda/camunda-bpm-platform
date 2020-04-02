@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-public abstract class AbstractRestartProcessInstanceCmd<T> implements Command<T>{
+public abstract class AbstractRestartProcessInstanceCmd<T> implements Command<T> {
 
   protected CommandExecutor commandExecutor;
   protected RestartProcessInstanceBuilderImpl builder;

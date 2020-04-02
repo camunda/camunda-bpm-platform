@@ -17,10 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
@@ -28,10 +25,10 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMapping;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -48,8 +45,8 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
 
   protected ProcessInstanceModificationBuilderImpl builder;
 
-  public ModifyProcessInstanceAsyncCmd(ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder) {
-    this.builder = processInstanceModificationBuilder;
+  public ModifyProcessInstanceAsyncCmd(ProcessInstanceModificationBuilderImpl builder) {
+    this.builder = builder;
   }
 
   @Override
@@ -58,67 +55,28 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
 
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
+
     ensureProcessInstanceExists(processInstanceId, processInstance);
 
-    checkPermissions(commandContext);
-
-    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
-      processInstanceId,
-      null,
-      null,
-      Collections.singletonList(PropertyChange.EMPTY_CHANGE));
-
-    List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
-    BatchEntity batch = createBatch(commandContext, instructions, processInstance);
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-    return batch;
-  }
-
-  protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
-    }
-  }
-
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
-      ExecutionEntity processInstance) {
-
-    String processInstanceId = processInstance.getProcessInstanceId();
     String processDefinitionId = processInstance.getProcessDefinitionId();
     String tenantId = processInstance.getTenantId();
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+    String deploymentId = commandContext.getProcessEngineConfiguration().getDeploymentCache()
+      .findDeployedProcessDefinitionById(processDefinitionId)
+      .getDeploymentId();
 
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(Arrays.asList(processInstanceId), processDefinitionId, instructions,
-        builder.isSkipCustomListeners(), builder.isSkipIoMappings());
-
-    BatchEntity batch = new BatchEntity();
-
-    batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(1);
-    batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
-    batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
-    batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
-    batch.setTenantId(tenantId);
-    commandContext.getBatchManager().insertBatch(batch);
-
-    return batch;
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION)
+        .config(getConfiguration(processDefinitionId, deploymentId))
+        .tenantId(tenantId)
+        .totalJobs(1)
+        .permission(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
+        .operationLogHandler(this::writeOperationLog)
+        .build();
   }
 
-  @SuppressWarnings("unchecked")
-  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
-  }
-
-  protected void ensureProcessInstanceExists(String processInstanceId, ExecutionEntity processInstance) {
+  protected void ensureProcessInstanceExists(String processInstanceId,
+                                             ExecutionEntity processInstance) {
     if (processInstance == null) {
       throw LOG.processInstanceDoesNotExist(processInstanceId);
     }
@@ -126,6 +84,25 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
 
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE;
+  }
+
+  protected void writeOperationLog(CommandContext commandContext) {
+    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
+        builder.getProcessInstanceId(),
+        null,
+        null,
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE),
+        builder.getAnnotation());
+  }
+
+  public BatchConfiguration getConfiguration(String processDefinitionId, String deploymentId) {
+    return new ModificationBatchConfiguration(
+        Collections.singletonList(builder.getProcessInstanceId()),
+        DeploymentMappings.of(new DeploymentMapping(deploymentId, 1)),
+        processDefinitionId,
+        builder.getModificationOperations(),
+        builder.isSkipCustomListeners(),
+        builder.isSkipIoMappings());
   }
 
 }

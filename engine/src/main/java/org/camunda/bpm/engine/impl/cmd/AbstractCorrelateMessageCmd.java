@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Thorben Lindhauer
@@ -78,9 +80,9 @@ public abstract class AbstractCorrelateMessageCmd {
       variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false, deserializeVariableValues);
     }
 
-    processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
+    VariableMap startVariables = resolveStartVariables();
 
-    processInstance.start(builder.getPayloadProcessInstanceVariables());
+    processInstance.start(startVariables);
 
     return processInstance;
   }
@@ -124,6 +126,13 @@ public abstract class AbstractCorrelateMessageCmd {
   protected ExecutionEntity findProcessInstanceExecution(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
     ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(handlerResult.getExecution().getProcessInstanceId());
     return execution;
+  }
+
+  protected VariableMap resolveStartVariables() {
+    VariableMap mergedVariables = Variables.createVariables();
+    mergedVariables.putAll(builder.getPayloadProcessInstanceVariables());
+    mergedVariables.putAll(builder.getPayloadProcessInstanceVariablesLocal());
+    return mergedVariables;
   }
 
 }

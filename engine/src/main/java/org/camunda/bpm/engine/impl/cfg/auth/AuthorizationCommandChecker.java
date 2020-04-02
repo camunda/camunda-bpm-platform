@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
-import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -158,9 +157,9 @@ public class AuthorizationCommandChecker implements CommandChecker {
         CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
             .disjunctive()
               .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, ProcessInstancePermissions.RETRY_JOB)
-              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, ProcessDefinitionPermissions.RETRY_JOB)
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.RETRY_JOB)
               .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, UPDATE)
-              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, UPDATE_INSTANCE)
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
             .build();
 
         getAuthorizationManager().checkAuthorization(retryJobPermission);
@@ -607,10 +606,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   public void checkReadHistoryProcessDefinition(String processDefinitionKey) {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
-  }
-
-  public void checkReadHistoryAnyTaskInstance() {
-    getAuthorizationManager().checkAuthorization(READ_HISTORY, TASK, ANY);
   }
 
   @Override

@@ -123,7 +123,7 @@
       ${limitAfter}
     ) RES
     INNER JOIN ${prefix}ACT_RU_FILTER J ON RES.ID_ = J.ID_
-    <if test="orderingProperties.size() > 0">
+    <if test="orderingProperties.size > 0">
       ORDER BY
       <foreach item="orderingProperty" index="index" collection="orderingProperties" separator=",">
         ${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)}

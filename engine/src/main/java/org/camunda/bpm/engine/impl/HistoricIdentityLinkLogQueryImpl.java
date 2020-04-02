@@ -45,8 +45,9 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   protected String operationType;
   protected String assignerId;
   protected String[] tenantIds;
-  
-  public HistoricIdentityLinkLogQueryImpl() {
+  protected boolean isTenantIdSet;
+
+   public HistoricIdentityLinkLogQueryImpl() {
   }
 
   public HistoricIdentityLinkLogQueryImpl(CommandExecutor commandExecutor) {
@@ -85,13 +86,25 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
     return assignerId;
   }
 
-  public HistoricIdentityLinkLogQuery tenantIdIn(String... tenantIds) {
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+   public HistoricIdentityLinkLogQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
     return this;
   }
 
-  public Date getDateBefore() {
+   @Override
+   public HistoricIdentityLinkLogQuery withoutTenantId() {
+     this.tenantIds = null;
+     this.isTenantIdSet = true;
+     return this;
+   }
+
+   public Date getDateBefore() {
     return dateBefore;
   }
 

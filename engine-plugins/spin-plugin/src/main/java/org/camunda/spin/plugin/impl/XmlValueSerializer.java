@@ -45,13 +45,17 @@ public class XmlValueSerializer extends SpinValueSerializer {
     return SpinValues.xmlValue((SpinXmlElement) untypedValue.getValue()).create();
   }
 
-  protected SpinValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields) {
+  protected SpinValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields, boolean asTransientValue) {
     SpinXmlElement value = (SpinXmlElement) deserializedObject;
-    return new XmlValueImpl(value, serializedStringValue, value.getDataFormatName(), true);
+    XmlValueImpl xmlValue = new XmlValueImpl(value, serializedStringValue, value.getDataFormatName(), true);
+    xmlValue.setTransient(asTransientValue);
+    return xmlValue;
   }
 
-  protected SpinValue createSerializedValue(String serializedStringValue, ValueFields valueFields) {
-    return new XmlValueImpl(serializedStringValue, serializationDataFormat);
+  protected SpinValue createSerializedValue(String serializedStringValue, ValueFields valueFields, boolean asTransientValue) {
+    XmlValueImpl xmlValue = new XmlValueImpl(serializedStringValue, serializationDataFormat);
+    xmlValue.setTransient(asTransientValue);
+    return xmlValue;
   }
 
 }

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.pvm;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
@@ -38,10 +38,10 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 public class ProcessDefinitionBuilder {
 
   protected ProcessDefinitionImpl processDefinition;
-  protected Stack<ScopeImpl> scopeStack = new Stack<ScopeImpl>();
+  protected Deque<ScopeImpl> scopeStack = new ArrayDeque<>();
   protected CoreModelElement processElement = processDefinition;
   protected TransitionImpl transition;
-  protected List<Object[]> unresolvedTransitions = new ArrayList<Object[]>();
+  protected List<Object[]> unresolvedTransitions = new ArrayList<>();
 
   public ProcessDefinitionBuilder() {
     this(null);

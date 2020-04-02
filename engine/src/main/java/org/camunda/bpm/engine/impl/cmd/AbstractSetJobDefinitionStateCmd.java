@@ -194,5 +194,17 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
     return getNextCommand(jobCommandBuilder);
   }
 
+  @Override
+  protected String getDeploymentId(CommandContext commandContext) {
+    if (jobDefinitionId != null) {
+      return getDeploymentIdByJobDefinition(commandContext, jobDefinitionId);
+    } else if (processDefinitionId != null) {
+      return getDeploymentIdByProcessDefinition(commandContext, processDefinitionId);
+    } else if (processDefinitionKey != null) {
+      return getDeploymentIdByProcessDefinitionKey(commandContext, processDefinitionKey, isProcessDefinitionTenantIdSet, processDefinitionTenantId);
+    }
+    return null;
+  }
+
   protected abstract AbstractSetJobStateCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
 }

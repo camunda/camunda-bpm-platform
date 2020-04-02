@@ -46,6 +46,7 @@ public class UserOperationLogContextEntry {
   protected String category;
   protected String rootProcessInstanceId;
   protected String externalTaskId;
+  protected String annotation;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
@@ -194,6 +195,14 @@ public class UserOperationLogContextEntry {
   
   public void setExternalTaskId(String externalTaskId) {
     this.externalTaskId = externalTaskId;
+  }
+
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
   }
 
 }

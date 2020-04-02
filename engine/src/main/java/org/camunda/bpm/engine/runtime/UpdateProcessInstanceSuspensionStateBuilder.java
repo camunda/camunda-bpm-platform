@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.runtime;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -47,6 +48,12 @@ public interface UpdateProcessInstanceSuspensionStateBuilder {
    *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
    *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   * @throws BadUserRequestException
+   *           When the affected instances count exceeds the maximum results limit. A maximum results
+   *           limit can be specified with the process engine configuration property
+   *           <code>queryMaxResultsLimit</code> (default {@link Integer#MAX_VALUE}).
+   *           Please use the batch operation
+   *           {@link UpdateProcessInstancesSuspensionStateBuilder#activateAsync()} instead.
    */
   void activate();
 
@@ -91,7 +98,12 @@ public interface UpdateProcessInstanceSuspensionStateBuilder {
    *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
    *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
-
+   * @throws BadUserRequestException
+   *           When the affected instances count exceeds the maximum results limit. A maximum results
+   *           limit can be specified with the process engine configuration property
+   *           <code>queryMaxResultsLimit</code> (default {@link Integer#MAX_VALUE}).
+   *           Please see the batch operation
+   *           {@link UpdateProcessInstancesSuspensionStateBuilder#suspendAsync()} instead.
    */
   void suspend();
 

@@ -17,14 +17,17 @@
 package org.camunda.bpm.engine.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
+import org.camunda.bpm.engine.rest.dto.ParseExceptionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigratingProcessInstanceValidationExceptionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptionDto;
 
@@ -33,13 +36,27 @@ import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptio
  */
 public class ExceptionHandlerHelper {
 
-  private static ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
+  protected static final ExceptionLogger LOGGER = ExceptionLogger.REST_LOGGER;
+  protected static ExceptionHandlerHelper INSTANCE = new ExceptionHandlerHelper();
 
   private ExceptionHandlerHelper() {
   }
 
   public static ExceptionHandlerHelper getInstance(){
     return INSTANCE;
+  }
+
+  public Response getResponse(Throwable throwable) {
+    LOGGER.log(throwable);
+
+    Response.Status responseStatus = getStatus(throwable);
+    ExceptionDto exceptionDto = fromException(throwable);
+
+    return Response
+        .status(responseStatus)
+        .entity(exceptionDto)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
   }
 
   public ExceptionDto fromException(Throwable e) {
@@ -49,6 +66,8 @@ public class ExceptionHandlerHelper {
       return MigrationPlanValidationExceptionDto.from((MigrationPlanValidationException)e);
     } else if (e instanceof AuthorizationException) {
       return AuthorizationExceptionDto.fromException((AuthorizationException)e);
+    } else if (e instanceof ParseException){
+      return ParseExceptionDto.fromException((ParseException) e);
     } else {
       return ExceptionDto.fromException(e);
     }
@@ -80,7 +99,8 @@ public class ExceptionHandlerHelper {
     }
     else if (exception instanceof MigrationPlanValidationException
       || exception instanceof MigratingProcessInstanceValidationException
-      || exception instanceof BadUserRequestException) {
+      || exception instanceof BadUserRequestException
+      || exception instanceof ParseException) {
       responseStatus = Response.Status.BAD_REQUEST;
     }
     return responseStatus;

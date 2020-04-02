@@ -63,7 +63,7 @@ create table ACT_GE_SCHEMA_LOG (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.12.0');
+values ('0', CURRENT_TIMESTAMP, '7.13.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -112,8 +112,10 @@ create table ACT_RU_JOB (
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
+    FAILED_ACT_ID_ varchar(255),
     DUEDATE_ datetime NULL,
     REPEAT_ varchar(255),
+    REPEAT_OFFSET_ bigint DEFAULT 0,
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     DEPLOYMENT_ID_ varchar(64),
@@ -137,6 +139,7 @@ create table ACT_RU_JOBDEF (
     SUSPENSION_STATE_ integer,
     JOB_PRIORITY_ bigint,
     TENANT_ID_ varchar(64),
+    DEPLOYMENT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -240,6 +243,7 @@ create table ACT_RU_INCIDENT (
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
   ACTIVITY_ID_ varchar(255),
+  FAILED_ACTIVITY_ID_ varchar(255),
   PROC_INST_ID_ varchar(64),
   PROC_DEF_ID_ varchar(64),
   CAUSE_INCIDENT_ID_ varchar(64),
@@ -259,6 +263,8 @@ create table ACT_RU_AUTHORIZATION (
   RESOURCE_TYPE_ integer not null,
   RESOURCE_ID_ varchar(255),
   PERMS_ integer,
+  REMOVAL_TIME_ datetime,
+  ROOT_PROC_INST_ID_ varchar(64),
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -530,3 +536,7 @@ create index ACT_IDX_EVENT_SUBSCR_EVT_NAME ON ACT_RU_EVENT_SUBSCR(EVENT_NAME_);
 create index ACT_IDX_PROCDEF_DEPLOYMENT_ID ON ACT_RE_PROCDEF(DEPLOYMENT_ID_);
 create index ACT_IDX_PROCDEF_TENANT_ID ON ACT_RE_PROCDEF(TENANT_ID_);
 create index ACT_IDX_PROCDEF_VER_TAG ON ACT_RE_PROCDEF(VERSION_TAG_);
+
+-- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
+create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
+create index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION(REMOVAL_TIME_);

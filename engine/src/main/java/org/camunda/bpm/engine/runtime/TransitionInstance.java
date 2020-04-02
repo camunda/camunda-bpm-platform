@@ -64,4 +64,10 @@ public interface TransitionInstance extends ProcessElementInstance {
    */
   String getActivityName();
 
+  /** the ids of currently open incidents */
+  String[] getIncidentIds();
+
+  /** the list of currently open incidents */
+  Incident[] getIncidents();
+
 }

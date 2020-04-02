@@ -32,6 +32,7 @@ public class ProcessInstanceModificationDto {
   protected boolean skipCustomListeners = false;
   protected boolean skipIoMappings = false;
   protected List<ProcessInstanceModificationInstructionDto> instructions;
+  protected String annotation;
 
   public boolean isSkipCustomListeners() {
     return skipCustomListeners;
@@ -63,4 +64,13 @@ public class ProcessInstanceModificationDto {
       instruction.applyTo(builder, engine, objectMapper);
     }
   }
+
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
+  }
+
 }

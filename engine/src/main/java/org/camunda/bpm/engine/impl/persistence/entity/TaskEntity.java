@@ -16,17 +16,35 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagationException;
+import org.camunda.bpm.engine.impl.bpmn.helper.EscalationHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -48,6 +66,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
+import org.camunda.bpm.engine.impl.interceptor.CommandInvocationContext;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -63,21 +82,6 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -86,10 +90,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, HasDbReferences, CommandContextListener, VariablesProvider<VariableInstanceEntity> {
 
+  protected static final List<VariableInstanceLifecycleListener<CoreVariableInstance>> DEFAULT_VARIABLE_LIFECYCLE_LISTENERS =
+    Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
+      (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
+    );
+
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public static final String DELETE_REASON_COMPLETED = "completed";
-  public static final String DELETE_REASON_DELETED = "deleted";
+  public static final String DELETE_REASON_DELETED   = "deleted";
 
   private static final long serialVersionUID = 1L;
 
@@ -110,6 +121,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected Date dueDate;
   protected Date followUpDate;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
+  protected TaskState lifecycleState = TaskState.STATE_INIT;
   protected String tenantId;
 
   protected boolean isIdentityLinksInitialized = false;
@@ -156,6 +168,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected transient List<PropertyChange> identityLinkChanges = new ArrayList<>();
 
+  protected List<VariableInstanceLifecycleListener<VariableInstanceEntity>> customLifecycleListeners;
+
   // name references of tracked properties
   public static final String ASSIGNEE = "assignee";
   public static final String DELEGATION = "delegation";
@@ -169,46 +183,51 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String PRIORITY = "priority";
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
 
+
+  /**
+   * Mybatis constructor
+   */
   public TaskEntity() {
-    this(null);
+    this.lifecycleState = TaskState.STATE_CREATED;
   }
 
-  public TaskEntity(String taskId) {
-    this.id = taskId;
+  /**
+   * Standalone task constructor
+   */
+  public TaskEntity(String id) {
+    this(TaskState.STATE_INIT);
+    this.id = id;
   }
 
-  /** creates and initializes a new persistent task. */
-  public static TaskEntity createAndInsert(VariableScope execution) {
-    TaskEntity task = create();
-
-    if (execution instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) execution;
-      task.setExecution(executionEntity);
-      task.skipCustomListeners = executionEntity.isSkipCustomListeners();
-      task.insert(executionEntity);
-      return task;
-
-    }
-    else if (execution instanceof CaseExecutionEntity) {
-      task.setCaseExecution((DelegateCaseExecution) execution);
-    }
-
-    task.insert(null);
-    return task;
+  protected TaskEntity(TaskState initialState) {
+    this.isIdentityLinksInitialized = true;
+    this.setCreateTime(ClockUtil.getCurrentTime());
+    this.lifecycleState = initialState;
   }
 
-  public void insert(ExecutionEntity execution) {
-    ensureParentTaskActive();
-    propagateExecutionTenantId(execution);
-    propagateParentTaskTenantId();
+  /**
+   * BPMN execution constructor
+   */
+  public TaskEntity(ExecutionEntity execution) {
+    this(TaskState.STATE_INIT);
+    setExecution(execution);
+    this.skipCustomListeners = execution.isSkipCustomListeners();
+    setTenantId(execution.getTenantId());
+    execution.addTask(this);
+  }
 
+  /**
+   * CMMN execution constructor
+   */
+  public TaskEntity(CaseExecutionEntity caseExecution) {
+    this(TaskState.STATE_INIT);
+    setCaseExecution(caseExecution);
+  }
+
+  public void insert() {
     CommandContext commandContext = Context.getCommandContext();
     TaskManager taskManager = commandContext.getTaskManager();
     taskManager.insertTask(this);
-
-    if(execution != null) {
-      execution.addTask(this);
-    }
   }
 
   protected void propagateExecutionTenantId(ExecutionEntity execution) {
@@ -217,7 +236,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  protected void propagateParentTaskTenantId() {
+  public void propagateParentTaskTenantId() {
     if (parentTaskId != null) {
 
       final TaskEntity parentTask = Context
@@ -269,23 +288,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  /** new task.  Embedded state and create time will be initialized.
-   * But this task still will have to be persisted with
-   * TransactionContext
-   *     .getCurrent()
-   *     .getPersistenceSession()
-   *     .insert(task);
-   */
-  public static TaskEntity create() {
-    TaskEntity task = new TaskEntity();
-    task.isIdentityLinksInitialized = true;
-    task.setCreateTime(ClockUtil.getCurrentTime());
-    return task;
-  }
-
   public void complete() {
 
-    if (TaskListener.EVENTNAME_COMPLETE.equals(this.eventName) || TaskListener.EVENTNAME_DELETE.equals(this.eventName)) {
+    if (TaskState.STATE_COMPLETED.equals(this.lifecycleState)
+        || TaskListener.EVENTNAME_COMPLETE.equals(this.eventName)
+        || TaskListener.EVENTNAME_DELETE.equals(this.eventName)) {
+
       throw LOG.invokeTaskListenerException(new IllegalStateException("invalid task state"));
     }
     // if the task is associated with a case
@@ -304,11 +312,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
 
     // trigger TaskListener.complete event
-    final boolean listenersSuccessful = fireEvent(TaskListener.EVENTNAME_COMPLETE);
+    final boolean shouldDeleteTask = transitionTo(TaskState.STATE_COMPLETED);
 
-    if (listenersSuccessful)
+    // shouldn't attempt to delete the task if the COMPLETE Task listener failed,
+    // or managed to cancel the Process or Task Instance
+    if (shouldDeleteTask)
     {
       // delete the task
+      // this method call doesn't invoke additional task listeners
       Context
       .getCommandContext()
       .getTaskManager()
@@ -331,8 +342,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     // ensure the the Task is not suspended
     ensureTaskActive();
 
-    // trigger TaskListener.complete event
-    fireEvent(TaskListener.EVENTNAME_COMPLETE);
+    // trigger TaskListener.complete event for a case execution associated task
+    transitionTo(TaskState.STATE_COMPLETED);
 
     // delete the task
     Context
@@ -343,7 +354,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void delete(String deleteReason, boolean cascade) {
     this.deleteReason = deleteReason;
-    fireEvent(EVENTNAME_DELETE);
+
+    // only fire lifecycle events if task is actually cancelled/deleted
+    if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)
+        && !TaskState.STATE_DELETED.equals(lifecycleState)) {
+      transitionTo(TaskState.STATE_DELETED);
+    }
 
     Context
       .getCommandContext()
@@ -429,7 +445,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return revision+1;
   }
 
-  protected void ensureParentTaskActive() {
+  public void ensureParentTaskActive() {
     if (parentTaskId != null) {
       TaskEntity parentTask = Context
           .getCommandContext()
@@ -497,11 +513,34 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
-    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
-        (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
-      );
+    if (customLifecycleListeners == null || customLifecycleListeners.isEmpty()) {
+      return DEFAULT_VARIABLE_LIFECYCLE_LISTENERS;
+    } else {
+      List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<>();
+      listeners.addAll(DEFAULT_VARIABLE_LIFECYCLE_LISTENERS);
+      listeners.addAll((List) customLifecycleListeners);
+      return listeners;
+    }
+  }
+
+  public void addCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners == null) {
+      customLifecycleListeners = new ArrayList<>();
+    }
+
+    this.customLifecycleListeners.add(customLifecycleListener);
+  }
+
+  public VariableInstanceLifecycleListener<VariableInstanceEntity> removeCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners != null) {
+      customLifecycleListeners.remove(customLifecycleListener);
+    }
+
+    return customLifecycleListener;
   }
 
   @Override
@@ -608,10 +647,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void setCaseExecution(DelegateCaseExecution caseExecution) {
+  public void setCaseExecution(CaseExecutionEntity caseExecution) {
     if (caseExecution!=null) {
 
-      this.caseExecution = (CaseExecutionEntity) caseExecution;
+      this.caseExecution = caseExecution;
       this.caseExecutionId = this.caseExecution.getId();
       this.caseInstanceId = this.caseExecution.getCaseInstanceId();
       this.caseDefinitionId = this.caseExecution.getCaseDefinitionId();
@@ -645,11 +684,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void setCaseInstanceId(String caseInstanceId) {
     registerCommandContextCloseListener();
     propertyChanged(CASE_INSTANCE_ID, this.caseInstanceId, caseInstanceId);
-    this.caseInstanceId = caseInstanceId;
-  }
-
-  /* plain setter for persistence */
-  public void setCaseInstanceIdWithoutCascade(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
   }
 
@@ -714,12 +748,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void deleteIdentityLinks(boolean withHistory) {
+  public void deleteIdentityLinks() {
     List<IdentityLinkEntity> identityLinkEntities = getIdentityLinks();
     for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
       fireDeleteIdentityLinkAuthorizationProvider(identityLinkEntity.getType(),
         identityLinkEntity.getUserId(), identityLinkEntity.getGroupId());
-      identityLinkEntity.delete(withHistory);
+      identityLinkEntity.delete(false);
     }
     isIdentityLinksInitialized = false;
   }
@@ -834,20 +868,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.name = taskName;
   }
 
-  /* plain setter for persistence */
-  public void setNameWithoutCascade(String taskName) {
-    this.name = taskName;
-  }
-
   @Override
   public void setDescription(String description) {
     registerCommandContextCloseListener();
     propertyChanged(DESCRIPTION, this.description, description);
-    this.description = description;
-  }
-
-  /* plain setter for persistence */
-  public void setDescriptionWithoutCascade(String description) {
     this.description = description;
   }
 
@@ -869,17 +893,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     // if there is no command context, then it means that the user is calling the
     // setAssignee outside a service method.  E.g. while creating a new task.
     if (commandContext != null) {
-      fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
       if (commandContext.getDbEntityManager().contains(this)) {
         fireAssigneeAuthorizationProvider(oldAssignee, assignee);
         fireHistoricIdentityLinks();
       }
     }
-  }
-
-  /* plain setter for persistence */
-  public void setAssigneeWithoutCascade(String assignee) {
-    this.assignee = assignee;
   }
 
   @Override
@@ -906,19 +924,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   }
 
-  /* plain setter for persistence */
-  public void setOwnerWithoutCascade(String owner) {
-    this.owner = owner;
-  }
-
   @Override
   public void setDueDate(Date dueDate) {
     registerCommandContextCloseListener();
     propertyChanged(DUE_DATE, this.dueDate, dueDate);
-    this.dueDate = dueDate;
-  }
-
-  public void setDueDateWithoutCascade(Date dueDate) {
     this.dueDate = dueDate;
   }
 
@@ -929,15 +938,44 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.priority = priority;
   }
 
-  public void setPriorityWithoutCascade(int priority) {
-    this.priority = priority;
-  }
-
   @Override
   public void setParentTaskId(String parentTaskId) {
     registerCommandContextCloseListener();
     propertyChanged(PARENT_TASK, this.parentTaskId, parentTaskId);
     this.parentTaskId = parentTaskId;
+  }
+
+  /* plain setter for persistence */
+  public void setNameWithoutCascade(String taskName) {
+    this.name = taskName;
+  }
+
+  /* plain setter for persistence */
+  public void setDescriptionWithoutCascade(String description) {
+    this.description = description;
+  }
+
+  /* plain setter for persistence */
+  public void setAssigneeWithoutCascade(String assignee) {
+    this.assignee = assignee;
+  }
+
+  /* plain setter for persistence */
+  public void setOwnerWithoutCascade(String owner) {
+    this.owner = owner;
+  }
+
+  public void setDueDateWithoutCascade(Date dueDate) {
+    this.dueDate = dueDate;
+  }
+
+  public void setPriorityWithoutCascade(int priority) {
+    this.priority = priority;
+  }
+
+  /* plain setter for persistence */
+  public void setCaseInstanceIdWithoutCascade(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
   }
 
   public void setParentTaskIdWithoutCascade(String parentTaskId) {
@@ -946,6 +984,27 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void setTaskDefinitionKeyWithoutCascade(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
+  }
+
+  public void setDelegationStateWithoutCascade(DelegationState delegationState) {
+    this.delegationState = delegationState;
+  }
+
+  /**
+   * Setter for mybatis mapper.
+   *
+   * @param delegationState  the delegation state as string
+   */
+  public void setDelegationStateString(String delegationState) {
+    if (delegationState == null) {
+      setDelegationStateWithoutCascade(null);
+    } else {
+      setDelegationStateWithoutCascade(DelegationState.valueOf(delegationState));
+    }
+  }
+
+  public void setFollowUpDateWithoutCascade(Date followUpDate) {
+    this.followUpDate = followUpDate;
   }
 
   /**
@@ -959,26 +1018,63 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     if (taskEventListeners != null) {
       for (TaskListener taskListener : taskEventListeners) {
-        CoreExecution execution = getExecution();
-        if (execution == null) {
-          execution = getCaseExecution();
-        }
-
-        if (execution != null) {
-          setEventName(taskEventName);
-        }
-        try {
-          boolean success = invokeListener(execution, taskEventName, taskListener);
-          if (!success) {
-            return false;
-          }
-        } catch (Exception e) {
-          throw LOG.invokeTaskListenerException(e);
+        if (!invokeListener(taskEventName, taskListener)){
+          return false;
         }
       }
     }
 
     return true;
+  }
+
+  protected List<TaskListener> getListenersForEvent(String event) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition != null) {
+      if (skipCustomListeners) {
+        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
+      }
+      else {
+        return resolvedTaskDefinition.getTaskListeners(event);
+      }
+
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected TaskListener getTimeoutListener(String timeoutId) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition == null) {
+      return null;
+    } else {
+      return resolvedTaskDefinition.getTimeoutTaskListener(timeoutId);
+    }
+  }
+
+  protected boolean invokeListener(String taskEventName, TaskListener taskListener) {
+    boolean popProcessDataContext = false;
+    CommandInvocationContext commandInvocationContext = Context.getCommandInvocationContext();
+    CoreExecution execution = getExecution();
+    if (execution == null) {
+      execution = getCaseExecution();
+    } else {
+      if (commandInvocationContext != null) {
+        popProcessDataContext = commandInvocationContext.getProcessDataContext().pushSection((ExecutionEntity) execution);
+      }
+    }
+    if (execution != null) {
+      setEventName(taskEventName);
+    }
+    try {
+      boolean result = invokeListener(execution, taskEventName, taskListener);
+      if (popProcessDataContext) {
+        commandInvocationContext.getProcessDataContext().popSection();
+      }
+      return result;
+    } catch (Exception e) {
+      throw LOG.invokeTaskListenerException(e);
+    }
   }
 
   /**
@@ -1011,22 +1107,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       }
     }
     return true;
-  }
-
-  protected List<TaskListener> getListenersForEvent(String event) {
-    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
-    if (resolvedTaskDefinition != null) {
-      if (skipCustomListeners) {
-        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
-      }
-      else {
-        return resolvedTaskDefinition.getTaskListeners(event);
-      }
-
-    }
-    else {
-      return null;
-    }
   }
 
   /**
@@ -1073,11 +1153,60 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void fireEvents() {
+  public boolean transitionTo(TaskState state) {
+    this.lifecycleState = state;
+
+    switch (state) {
+      case STATE_CREATED:
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+          commandContext.getHistoricTaskInstanceManager().createHistoricTask(this);
+        }
+        return fireEvent(TaskListener.EVENTNAME_CREATE) && fireAssignmentEvent();
+
+      case STATE_COMPLETED:
+        return fireEvent(TaskListener.EVENTNAME_COMPLETE) && TaskState.STATE_COMPLETED.equals(this.lifecycleState);
+
+      case STATE_DELETED:
+        return fireEvent(EVENTNAME_DELETE);
+
+      case STATE_INIT:
+      default:
+        throw new ProcessEngineException(String.format("Task %s cannot transition into state %s.", id, state));
+    }
+  }
+
+  public boolean triggerUpdateEvent() {
+    if (lifecycleState == TaskState.STATE_CREATED) {
+      return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
+    }
+    else {
+      // silently ignore; no events are triggered in the other states
+      return true;
+    }
+  }
+
+  /**
+   * @return true if invoking the listener was successful;
+   *   if not successful, either false is returned (case: BPMN error propagation)
+   *   or an exception is thrown
+   */
+  public boolean triggerTimeoutEvent(String timeoutId) {
+    TaskListener taskListener = getTimeoutListener(timeoutId);
+    if (taskListener == null) {
+      throw LOG.invokeTaskListenerException(new NotFoundException("Cannot find timeout taskListener with id '"
+                                                                      + timeoutId + "' for task " + this.id));
+    }
+    return invokeListener(TaskListener.EVENTNAME_TIMEOUT, taskListener);
+  }
+
+  protected boolean fireAssignmentEvent() {
     PropertyChange assigneePropertyChange = propertyChanges.get(ASSIGNEE);
     if (assigneePropertyChange != null) {
-      fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
+      return fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
     }
+
+    return true;
   }
 
   protected void fireAssigneeAuthorizationProvider(String oldAssignee, String newAssignee) {
@@ -1356,25 +1485,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.delegationState = delegationState;
   }
 
-  public void setDelegationStateWithoutCascade(DelegationState delegationState) {
-    this.delegationState = delegationState;
-  }
-
   public String getDelegationStateString() {
     return (delegationState!=null ? delegationState.toString() : null);
-  }
-
-  /**
-   * Setter for mybatis mapper.
-   *
-   * @param delegationState  the delegation state as string
-   */
-  public void setDelegationStateString(String delegationState) {
-    if (delegationState == null) {
-      setDelegationStateWithoutCascade(null);
-    } else {
-      setDelegationStateWithoutCascade(DelegationState.valueOf(delegationState));
-    }
   }
 
   public boolean isDeleted() {
@@ -1387,9 +1499,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public void setDeleted(boolean isDeleted) {
-    propertyChanged(DELETE, this.isDeleted, isDeleted);
     this.isDeleted = isDeleted;
   }
+
   @Override
   public String getParentTaskId() {
     return parentTaskId;
@@ -1401,16 +1513,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void setSuspensionState(int suspensionState) {
     this.suspensionState = suspensionState;
   }
+
   @Override
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
-
   @Override
   public Date getFollowUpDate() {
     return followUpDate;
   }
-
   @Override
   public String getTenantId() {
     return tenantId;
@@ -1425,10 +1536,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void setFollowUpDate(Date followUpDate) {
     registerCommandContextCloseListener();
     propertyChanged(FOLLOW_UP_DATE, this.followUpDate, followUpDate);
-    this.followUpDate = followUpDate;
-  }
-
-  public void setFollowUpDateWithoutCascade(Date followUpDate) {
     this.followUpDate = followUpDate;
   }
 
@@ -1459,7 +1566,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return propertyChanges;
   }
 
-  public void createHistoricTaskDetails(String operation) {
+  public void logUserOperation(String operation) {
+    if (UserOperationLogEntry.OPERATION_TYPE_COMPLETE.equals(operation) ||
+        UserOperationLogEntry.OPERATION_TYPE_DELETE.equals(operation)) {
+      propertyChanged(DELETE, false, true);
+    }
+
     final CommandContext commandContext = Context.getCommandContext();
     if (commandContext != null) {
       List<PropertyChange> values = new ArrayList<>(propertyChanges.values());
@@ -1564,5 +1676,42 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
 
     return referenceIdAndClass;
+  }
+
+  public void bpmnError(String errorCode, String errorMessage, Map<String, Object> variables) {
+    ensureTaskActive();
+    ActivityExecution activityExecution = getExecution();
+    BpmnError bpmnError = null;
+    if (errorMessage != null) {
+      bpmnError = new BpmnError(errorCode, errorMessage);
+    } else {
+      bpmnError = new BpmnError(errorCode);
+    }
+    try {
+      if (variables != null && !variables.isEmpty()) {
+        activityExecution.setVariables(variables);
+      }
+      BpmnExceptionHandler.propagateBpmnError(bpmnError, activityExecution);
+    } catch (Exception ex) {
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
+    }
+  }
+
+  public void escalation(String escalationCode, Map<String, Object> variables) {
+    ensureTaskActive();
+    ActivityExecution activityExecution = getExecution();
+
+    if (variables != null && !variables.isEmpty()) {
+      activityExecution.setVariables(variables);
+    }
+    EscalationHandler.propagateEscalation(activityExecution, escalationCode);
+  }
+
+  public static enum TaskState {
+
+    STATE_INIT,
+    STATE_CREATED,
+    STATE_COMPLETED,
+    STATE_DELETED
   }
 }

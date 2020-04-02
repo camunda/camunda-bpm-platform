@@ -16,55 +16,44 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Askar Akhmerov
  */
 public class SetJobsRetriesBatchCmd extends AbstractSetJobsRetriesBatchCmd {
-  protected final List<String> jobIds;
-  protected final JobQuery jobQuery;
 
-  public SetJobsRetriesBatchCmd(List<String> jobIds, JobQuery jobQuery, int retries) {
+  protected List<String> ids;
+  protected JobQuery jobQuery;
+
+  public SetJobsRetriesBatchCmd(List<String> ids, JobQuery jobQuery, int retries) {
     this.jobQuery = jobQuery;
-    this.jobIds = jobIds;
+    this.ids = ids;
     this.retries = retries;
   }
 
-  protected List<String> collectJobIds(CommandContext commandContext) {
-    Set<String> collectedJobIds = new HashSet<String>();
+  protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
-    List<String> jobIds = this.getJobIds();
-    if (jobIds != null) {
-      collectedJobIds.addAll(jobIds);
+    if (!CollectionUtil.isEmpty(ids)) {
+      JobQueryImpl query = new JobQueryImpl();
+      query.jobIds(new HashSet<>(ids));
+      elementConfiguration.addDeploymentMappings(
+          commandContext.runWithoutAuthorization(query::listDeploymentIdMappings), ids);
     }
 
-    final JobQuery jobQuery = this.jobQuery;
     if (jobQuery != null) {
-      for (Job job : jobQuery.list()) {
-        collectedJobIds.add(job.getId());
-      }
+      elementConfiguration.addDeploymentMappings(((JobQueryImpl) jobQuery).listDeploymentIdMappings());
     }
 
-    return new ArrayList<String>(collectedJobIds);
+    return elementConfiguration;
   }
 
-  public List<String> getJobIds() {
-    return jobIds;
-  }
-
-  public int getRetries() {
-    return retries;
-  }
-
-  public JobQuery getJobQuery() {
-    return jobQuery;
-  }
 }

@@ -110,7 +110,7 @@ public class HistoricBatchQueryTest {
     // given
     ClockUtil.setCurrentTime(startDate);
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     ClockUtil.setCurrentTime(endDate);

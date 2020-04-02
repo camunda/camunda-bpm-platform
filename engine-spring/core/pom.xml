@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -77,6 +77,11 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -151,7 +156,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <argLine>-XX:MaxPermSize=160m -Xmx768m</argLine>
+            <argLine>-Xmx768m</argLine>
         </configuration>
       </plugin>
 

@@ -636,9 +636,9 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testSetJobRetriesByJobDefinitionIdWithRevokeRetryJobPermission() {
     // given
-    String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, processInstanceId, userId, UPDATE);
-    createRevokeAuthorization(PROCESS_DEFINITION, processInstanceId, userId, ProcessDefinitionPermissions.RETRY_JOB);
+    startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE);
+    createRevokeAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, ProcessDefinitionPermissions.RETRY_JOB);
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
 
     try {
@@ -652,7 +652,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
       assertTextPresent(UPDATE.getName(), message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(jobDefinition.getProcessDefinitionKey(), message);
+      assertTextPresent("'" + jobDefinition.getProcessDefinitionKey() + "'", message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
       assertTextPresent(ProcessInstancePermissions.RETRY_JOB.getName(), message);
       assertTextPresent(ProcessDefinitionPermissions.RETRY_JOB.getName(), message);
@@ -728,7 +728,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     disableAuthorization();
@@ -749,7 +749,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithRetryJobPermissionOnProcessDefinition() {
     // given
     ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     disableAuthorization();

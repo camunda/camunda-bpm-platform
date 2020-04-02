@@ -20,8 +20,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -36,9 +39,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Askar Akhmerov
@@ -111,6 +116,55 @@ public class TaskListenerDelegateCompletionTest {
     //then
     task = taskService.createTaskQuery().singleResult();
     assertThat(task, is(nullValue()));
+  }
+
+  @Test
+  public void testCompletionIsPossibleAfterAssignmentUpdate () {
+    //given
+    createProcessWithListener(TaskListener.EVENTNAME_UPDATE);
+
+    //when
+    runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setAssignee(task.getId(),"test assignee");
+
+    //then
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task, is(nullValue()));
+  }
+
+  @Test
+  public void testCompletionIsPossibleAfterPropertyUpdate () {
+    //given
+    createProcessWithListener(TaskListener.EVENTNAME_UPDATE);
+
+    //when
+    runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setOwner(task.getId(),"ownerId");
+
+    //then
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task, is(nullValue()));
+  }
+
+  @Test
+  @Deployment
+  public void testCompletionIsPossibleOnTimeout() {
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    // assume
+    assertThat(taskQuery.count(), is(1L));
+
+    // when
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testHelper.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    assertThat(taskQuery.count(), is(0L));
   }
 
   @Test

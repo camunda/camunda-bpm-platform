@@ -21,15 +21,19 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.junit.Ignore;
 
 /**
  *
@@ -895,6 +899,84 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryByProcessInstanceIds() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(3);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstance = processInstances.get(0).getId();
+    String completedInstance = processInstances.get(1).getId();
+
+    runtimeService.deleteProcessInstance(cancelledInstance, "test");
+    Task task = taskService.createTaskQuery().processInstanceId(completedInstance).singleResult();
+    taskService.complete(task.getId());
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .processInstanceIdIn(cancelledInstance, completedInstance) // excluding the third running instance
+        .includeFinished()
+        .includeCompleteScope()
+        .includeCanceled()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    // end
+    HistoricActivityStatistics endStats = statistics.get(0);
+
+    assertEquals("end", endStats.getId());
+    assertEquals(0, endStats.getInstances());
+    assertEquals(0, endStats.getCanceled());
+    assertEquals(1, endStats.getFinished());
+    assertEquals(1, endStats.getCompleteScope());
+
+    // start
+    HistoricActivityStatistics startStats = statistics.get(1);
+
+    assertEquals("start", startStats.getId());
+    assertEquals(0, startStats.getInstances());
+    assertEquals(0, startStats.getCanceled());
+    assertEquals(2, startStats.getFinished());
+    assertEquals(0, startStats.getCompleteScope());
+
+    // task
+    HistoricActivityStatistics taskStats = statistics.get(2);
+
+    assertEquals("task", taskStats.getId());
+    assertEquals(0, taskStats.getInstances());
+    assertEquals(1, taskStats.getCanceled());
+    assertEquals(2, taskStats.getFinished());
+    assertEquals(0, taskStats.getCompleteScope());
+  }
+
+  public void testCheckProcessInstanceIdsForNull() {
+    // given
+    HistoricActivityStatisticsQuery query = historyService
+    .createHistoricActivityStatisticsQuery("foo");
+
+    // when 1
+    try {
+      query.processInstanceIdIn((String[]) null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // then 1
+      assertTextPresent("processInstanceIds is null", e.getMessage());
+    }
+
+    // when 2
+    try {
+      query.processInstanceIdIn((String) null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // then 2
+      assertTextPresent("processInstanceIds contains null value", e.getMessage());
+    }
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testSorting() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -946,6 +1028,357 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryIncludeIncidents() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(4);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String processInstanceWithResolvedIncidents = processInstances.get(1).getId();
+    String processInstanceWithDeletedIncident = processInstances.get(2).getId();
+    String processInstanceWithOpenIncident = processInstances.get(3).getId();
+
+    Incident resolvedIncident = createIncident(processInstanceWithResolvedIncidents);
+    runtimeService.resolveIncident(resolvedIncident.getId());
+    resolvedIncident = createIncident(processInstanceWithResolvedIncidents);
+    runtimeService.resolveIncident(resolvedIncident.getId());
+
+    createIncident(processInstanceWithDeletedIncident);
+    runtimeService.deleteProcessInstance(processInstances.get(2).getId(), "test");
+
+    createIncident(processInstanceWithOpenIncident);
+
+    // when
+    final HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeFinished()
+        .includeCanceled()
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(2, statistics.size());
+
+    // start
+    assertActivityStatistics(statistics.get(0), "start", 0, 0, 4, 0, 0, 0);
+
+    // task
+    assertActivityStatistics(statistics.get(1), "task", 3, 1, 1, 1, 2, 1);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryIncludeIncidentsDeletedOnlyAndProcessInstanceIds() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(3);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String processInstanceWithResolvedIncident = processInstances.get(1).getId();
+    String processInstanceWithDeletedIncident = processInstances.get(2).getId();
+
+    runtimeService.resolveIncident(createIncident(processInstanceWithResolvedIncident).getId());
+
+    createIncident(processInstanceWithDeletedIncident);
+    createIncident(processInstanceWithDeletedIncident);
+    createIncident(processInstanceWithDeletedIncident);
+    runtimeService.deleteProcessInstance(processInstanceWithDeletedIncident, "test");
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .processInstanceIdIn(processInstanceWithDeletedIncident)
+        .includeFinished()
+        .includeCompleteScope()
+        .includeCanceled()
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(2, statistics.size());
+
+    // start
+    assertActivityStatistics(statistics.get(0), "start", 0, 0, 1, 0, 0, 0);
+
+    // task
+    assertActivityStatistics(statistics.get(1), "task", 0, 1, 1, 0, 0, 3);
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryIncludeIncidentsWhenNoIncidents() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(2);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+
+    runtimeService.deleteProcessInstance(processInstances.get(0).getId(), null);
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeFinished()
+        .includeCompleteScope()
+        .includeCanceled()
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(2, statistics.size());
+
+    // start
+    assertActivityStatistics(statistics.get(0), "start", 0, 0, 2, 0, 0, 0);
+
+    // task
+    assertActivityStatistics(statistics.get(1), "task", 1, 1, 1, 0, 0, 0);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
+  public void testQueryIncludeIncidentsMultipleRunningTasksDeletedOnly() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(2);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstanceWithIncident = processInstances.get(0).getId();
+
+     List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(cancelledInstanceWithIncident)
+        .activityId("innerTask").active().list();
+    runtimeService.createIncident("foo1", executions.get(0).getId(), ((ExecutionEntity) executions.get(0)).getActivityId(), "bar1");
+    runtimeService.createIncident("foo2", executions.get(1).getId(), ((ExecutionEntity) executions.get(1)).getActivityId(), "bar2");
+    runtimeService.deleteProcessInstance(cancelledInstanceWithIncident, "test");
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeFinished()
+        .includeCompleteScope()
+        .includeCanceled()
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(7, statistics.size());
+
+    assertActivityStatistics(statistics.get(0), "gtw", 0, 0, 2, 0, 0, 0);
+    assertActivityStatistics(statistics.get(1), "innerStart", 0, 0, 10, 0, 0, 0);
+    assertActivityStatistics(statistics.get(2), "innerTask", 5, 5, 5, 0, 0, 2);
+    assertActivityStatistics(statistics.get(3), "start", 0, 0, 2, 0, 0, 0);
+    assertActivityStatistics(statistics.get(4), "subprocess", 5, 5, 5, 0, 0, 0);
+    assertActivityStatistics(statistics.get(5), "subprocess#multiInstanceBody", 1, 1, 1, 0, 0, 0);
+    assertActivityStatistics(statistics.get(6), "task", 1, 1, 1, 0, 0, 0);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
+  public void testQueryIncludeIncidentsMultipleRunningTasksOpenOnly() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(2);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstanceWithIncident = processInstances.get(0).getId();
+
+     List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(cancelledInstanceWithIncident)
+        .activityId("innerTask").active().list();
+    runtimeService.createIncident("foo1", executions.get(0).getId(), ((ExecutionEntity) executions.get(0)).getActivityId(), "bar1");
+    runtimeService.createIncident("foo1", executions.get(0).getId(), ((ExecutionEntity) executions.get(0)).getActivityId(), "bar1");
+    runtimeService.createIncident("foo2", executions.get(1).getId(), ((ExecutionEntity) executions.get(1)).getActivityId(), "bar2");
+
+    executions = runtimeService.createExecutionQuery()
+        .processInstanceId(cancelledInstanceWithIncident)
+        .activityId("task").active().list();
+    runtimeService.createIncident("foo", executions.get(0).getId(), ((ExecutionEntity) executions.get(0)).getActivityId(), "bar");
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(4, statistics.size());
+
+    assertActivityStatistics(statistics.get(0), "innerTask", 10, 0, 0, 3, 0, 0);
+    assertActivityStatistics(statistics.get(1), "subprocess", 10, 0, 0, 0, 0, 0);
+    assertActivityStatistics(statistics.get(2), "subprocess#multiInstanceBody", 2, 0, 0, 0, 0, 0);
+    assertActivityStatistics(statistics.get(3), "task", 2, 0, 0, 1, 0, 0);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryCancelledIncludeIncidentsDeletedOnly() throws ParseException {
+    try {
+      // given
+      String processDefinitionId = getProcessDefinitionId();
+
+      // start two instances with one incident and cancel them
+      ClockUtil.setCurrentTime(sdf.parse("5.10.2019 12:00:00"));
+      startProcessesByKey(2, "process");
+      List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+      String firstInstance = processInstances.get(0).getId();
+      createIncident(firstInstance);
+      cancelProcessInstances();
+
+      // start another two instances with two incidents and cancel them
+      ClockUtil.setCurrentTime(sdf.parse("20.10.2019 12:00:00"));
+      startProcessesByKey(2, "process");
+      processInstances = runtimeService.createProcessInstanceQuery().list();
+      String thirdInstance = processInstances.get(0).getId();
+      String fourthInstance = processInstances.get(1).getId();
+      createIncident(thirdInstance);
+      createIncident(fourthInstance);
+      cancelProcessInstances();
+
+      // when
+      final HistoricActivityStatisticsQuery query = historyService
+          .createHistoricActivityStatisticsQuery(processDefinitionId)
+          .startedAfter(sdf.parse("01.10.2019 12:00:00"))
+          .startedBefore(sdf.parse("10.10.2019 12:00:00"))
+          .includeFinished()
+          .includeCompleteScope()
+          .includeCanceled()
+          .includeIncidents()
+          .orderByActivityId()
+          .asc();
+      List<HistoricActivityStatistics> statistics = query.list();
+
+      // then results only from the first two instances
+      assertEquals(2, statistics.size());
+      assertActivityStatistics(statistics.get(0), "start", 0, 0, 2, 0, 0, 0);
+      assertActivityStatistics(statistics.get(1), "task", 0, 2, 2, 0, 0, 1);
+    } finally {
+      ClockUtil.reset();
+    }
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryCompletedIncludeIncidentsDeletedOnly() throws ParseException {
+    try {
+      // given
+      String processDefinitionId = getProcessDefinitionId();
+
+      // start two instances with one incident and complete them
+      ClockUtil.setCurrentTime(sdf.parse("5.10.2019 12:00:00"));
+      startProcessesByKey(2, "process");
+      List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+      String firstInstance = processInstances.get(0).getId();
+      createIncident(firstInstance);
+      completeProcessInstances();
+
+      // start another two instances with two incidents and complete them
+      ClockUtil.setCurrentTime(sdf.parse("20.10.2019 12:00:00"));
+      startProcessesByKey(2, "process");
+      processInstances = runtimeService.createProcessInstanceQuery().list();
+      String thirdInstance = processInstances.get(0).getId();
+      createIncident(thirdInstance);
+      completeProcessInstances();
+
+      // when
+      final HistoricActivityStatisticsQuery query = historyService
+          .createHistoricActivityStatisticsQuery(processDefinitionId)
+          .finishedAfter(sdf.parse("10.10.2019 12:00:00"))
+          .finishedBefore(sdf.parse("30.10.2019 12:00:00"))
+          .includeFinished()
+          .includeCompleteScope()
+          .includeCanceled()
+          .includeIncidents()
+          .orderByActivityId()
+          .asc();
+      List<HistoricActivityStatistics> statistics = query.list();
+
+      // then results only from the second two instances
+      assertEquals(3, statistics.size());
+      assertActivityStatistics(statistics.get(0), "end", 0, 0, 2, 0, 0, 0);
+      assertActivityStatistics(statistics.get(1), "start", 0, 0, 2, 0, 0, 0);
+      assertActivityStatistics(statistics.get(2), "task", 0, 0, 2, 0, 0, 1);
+    } finally {
+      ClockUtil.reset();
+    }
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
+  public void testQueryIncludeIncidentsWhenNoHistoricActivityInstanceDeletedOnly() {
+    // given
+    startProcessesByKey(3, "failingProcess");
+
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      managementService.setJobRetries(job.getId(), 0);
+    }
+
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstance1 = processInstances.get(1).getId();
+    String cancelledInstance2 = processInstances.get(2).getId();
+    String processDefinitionId = processInstances.get(0).getProcessDefinitionId();
+
+    runtimeService.deleteProcessInstances(java.util.Arrays.asList(cancelledInstance1, cancelledInstance2), "test", false, false);
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeFinished()
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(2, statistics.size());
+
+    assertActivityStatistics(statistics.get(0), "serviceTask", 0, 0, 0, 1, 0, 2);
+    assertActivityStatistics(statistics.get(1), "start", 0, 0, 3, 0, 0, 0);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources="org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml")
+  public void testQueryIncludeIncidentsWhenNoHistoricActivityInstanceWithoutFilters() {
+    // given
+    startProcessesByKey(3, "failingProcess");
+
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      managementService.setJobRetries(job.getId(), 0);
+    }
+
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstance1 = processInstances.get(1).getId();
+    String cancelledInstance2 = processInstances.get(2).getId();
+    String processDefinitionId = processInstances.get(0).getProcessDefinitionId();
+
+    runtimeService.deleteProcessInstances(java.util.Arrays.asList(cancelledInstance1, cancelledInstance2), "test", false, false);
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .includeIncidents()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    assertEquals(1, statistics.size());
+
+    assertActivityStatistics(statistics.get(0), "serviceTask", 0, 0, 0, 1, 0, 2);
+  }
+
   protected void completeProcessInstances() {
     List<Task> tasks = taskService.createTaskQuery().list();
     for (Task task : tasks) {
@@ -976,6 +1409,18 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
   protected String getProcessDefinitionId() {
     return getProcessDefinitionIdByKey("process");
+  }
+
+  protected Incident createIncident(String instanceId) {
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(instanceId).active().singleResult();
+    return runtimeService.createIncident("foo", execution.getId(), execution.getActivityId(), "exec" + execution.getId());
+  }
+
+  protected void assertActivityStatistics(HistoricActivityStatistics activity, String activityName, int instances, int canceled, int finished, int openIncidents, int resolvedIncidents, int deletedIncidents) {
+    assertActivityStatistics(activity, activityName, instances, canceled, finished);
+    assertEquals(openIncidents, activity.getOpenIncidents());
+    assertEquals(resolvedIncidents, activity.getResolvedIncidents());
+    assertEquals(deletedIncidents, activity.getDeletedIncidents());
   }
 
 }

@@ -49,6 +49,8 @@ public class DurationHelper {
 
   int times;
 
+  long repeatOffset;
+
   DatatypeFactory datatypeFactory;
 
   public DurationHelper(String expressions) throws Exception {
@@ -112,12 +114,19 @@ public class DurationHelper {
   }
 
   private Date getDateAfterRepeat(Date date) {
+    // use date without the current offset for due date calculation to get the
+    // next due date as it would be without any modifications, later add offset
+    Date dateWithoutOffset = new Date(date.getTime() - repeatOffset);
     if (start != null) {
       Date cur = start;
-      for (int i=0;i<times && !cur.after(date);i++) {
+      for (int i = 0; i < times && !cur.after(dateWithoutOffset); i++) {
         cur = add(cur, period);
       }
-      return cur.before(date) ? null : cur;
+      if (cur.before(dateWithoutOffset)) {
+        return null;
+      }
+      // add offset to calculated due date
+      return repeatOffset == 0L ? cur : new Date(cur.getTime() + repeatOffset);
     }
     Date cur = add(end, period.negate());
     Date next = end;
@@ -151,6 +160,10 @@ public class DurationHelper {
 
   private boolean isDuration(String time) {
     return time.startsWith("P");
+  }
+
+  public void setRepeatOffset(long repeatOffset) {
+    this.repeatOffset = repeatOffset;
   }
 
 }

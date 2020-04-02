@@ -195,6 +195,11 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).asc();
 
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("decisionRequirementsDefinitionKey", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
+    inOrder.verify(mockedQuery).asc();
+
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
@@ -240,6 +245,11 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     executeAndVerifySorting("versionTag", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByVersionTag();
     inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("decisionRequirementsDefinitionKey", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test

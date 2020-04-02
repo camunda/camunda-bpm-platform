@@ -79,6 +79,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Boolean messages;
   protected Boolean withException;
   protected String exceptionMessage;
+  protected String failedActivityId;
   protected Boolean noRetriesLeft;
   protected Boolean active;
   protected Boolean suspended;
@@ -101,6 +102,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam("failedActivityId")
+  public void setFailedActivityId(String activityId) {
+    this.failedActivityId = activityId;
   }
 
   @CamundaQueryParam("jobId")
@@ -257,7 +263,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
     abstract void setLowerThan(Date date);
   }
-  
+
   @Override
   protected void applyFilters(final JobQuery query) {
     if (activityId != null){
@@ -312,6 +318,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
     if (exceptionMessage != null) {
       query.exceptionMessage(exceptionMessage);
+    }
+
+    if (failedActivityId != null) {
+      query.failedActivityId(failedActivityId);
     }
 
     if (TRUE.equals(noRetriesLeft)) {

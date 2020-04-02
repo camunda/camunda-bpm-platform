@@ -16,7 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 
 public class SuspensionStateDto {
 
@@ -37,4 +41,21 @@ public class SuspensionStateDto {
   }
 
   public void updateSuspensionState(ProcessEngine engine) {}
+
+  public void updateSuspensionState(ProcessEngine engine, String processInstanceId) {
+    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = null;
+    if (processInstanceId != null) {
+      updateSuspensionStateBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState()
+                                                               .byProcessInstanceId(processInstanceId);
+    } else {
+      String message = "Specify processInstance with processInstanceId";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    if (getSuspended()) {
+      updateSuspensionStateBuilder.suspend();
+    } else {
+      updateSuspensionStateBuilder.activate();
+    }
+  }
 }

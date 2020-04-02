@@ -120,11 +120,13 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionName;
   private String processDefinitionNameLike;
   private String processInstanceId;
+  private String[] processInstanceIdIn;
   private String assignee;
   private String assigneeExpression;
   private String assigneeLike;
   private String assigneeLikeExpression;
   private String[] assigneeIn;
+  private String[] assigneeNotIn;
   private String candidateGroup;
   private String candidateGroupExpression;
   private String candidateUser;
@@ -291,6 +293,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.processInstanceId = processInstanceId;
   }
 
+  @CamundaQueryParam(value = "processInstanceIdIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceIdIn(String[] processInstanceIdIn) {
+    this.processInstanceIdIn = processInstanceIdIn;
+  }
+
   @CamundaQueryParam("assignee")
   public void setAssignee(String assignee) {
     this.assignee = assignee;
@@ -309,6 +316,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "assigneeIn", converter = StringArrayConverter.class)
   public void setAssigneeIn(String[] assigneeIn) {
     this.assigneeIn = assigneeIn;
+  }
+
+  @CamundaQueryParam(value = "assigneeNotIn", converter = StringArrayConverter.class)
+  public void setAssigneeNotIn(String[] assigneeNotIn) {
+    this.assigneeNotIn = assigneeNotIn;
   }
 
   @CamundaQueryParam("assigneeLikeExpression")
@@ -734,6 +746,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return processInstanceId;
   }
 
+  public String[] getProcessInstanceIdIn() {
+    return processInstanceIdIn;
+  }
+
   public String getAssignee() {
     return assignee;
   }
@@ -748,6 +764,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String[] getAssigneeIn() {
     return assigneeIn;
+  }
+
+  public String[] getAssigneeNotIn() {
+    return assigneeNotIn;
   }
 
   public String getAssigneeLikeExpression() {
@@ -1057,6 +1077,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
+    if (processInstanceIdIn != null && processInstanceIdIn.length > 0) {
+      query.processInstanceIdIn(processInstanceIdIn);
+    }
     if (assignee != null) {
       query.taskAssignee(assignee);
     }
@@ -1071,6 +1094,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (assigneeIn != null && assigneeIn.length > 0) {
       query.taskAssigneeIn(assigneeIn);
+    }
+    if (assigneeNotIn != null && assigneeNotIn.length > 0) {
+      query.taskAssigneeNotIn(assigneeNotIn);
     }
     if (candidateGroup != null) {
       query.taskCandidateGroup(candidateGroup);
@@ -1474,6 +1500,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processDefinitionName = taskQuery.getProcessDefinitionName();
     dto.processDefinitionNameLike = taskQuery.getProcessDefinitionNameLike();
     dto.processInstanceId = taskQuery.getProcessInstanceId();
+    if(taskQuery.getProcessInstanceIdIn() != null) {
+      dto.processInstanceIdIn = taskQuery.getProcessInstanceIdIn();
+    }
+
     dto.assignee = taskQuery.getAssignee();
 
     if (taskQuery.getAssigneeIn() != null) {

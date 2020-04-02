@@ -197,7 +197,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
     Batch batch = runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("user1").processInstanceIds(processInstance.getId()).executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     rule.getIdentityService().setAuthenticatedUserId("userId");

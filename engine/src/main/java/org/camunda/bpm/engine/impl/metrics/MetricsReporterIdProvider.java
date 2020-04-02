@@ -17,10 +17,15 @@
 package org.camunda.bpm.engine.impl.metrics;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.history.event.HostnameProvider;
 
 /**
+ * @deprecated Please use {@link HostnameProvider}
+ * for providing the Metrics Reporter id.
+ *
  * @author Thorben Lindhauer
  */
+@Deprecated
 public interface MetricsReporterIdProvider {
 
   /**

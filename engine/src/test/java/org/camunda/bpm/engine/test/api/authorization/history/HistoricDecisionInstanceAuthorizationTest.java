@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.history;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.Variables;
 
 import java.util.Date;
@@ -56,12 +58,28 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml")
         .getId();
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(true)
+        .init();
+
     super.setUp();
   }
 
   @Override
   public void tearDown() {
     super.tearDown();
+
+    DefaultDmnEngineConfiguration dmnEngineConfiguration =
+        processEngineConfiguration.getDmnEngineConfiguration();
+
+    ResetDmnConfigUtil.reset(dmnEngineConfiguration)
+        .enableFeelLegacyBehavior(false)
+        .init();
+
     deleteDeployment(deploymentId);
   }
 

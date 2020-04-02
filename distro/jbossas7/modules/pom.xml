@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-jboss-modules</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>camunda BPM - jBoss7 Modules</name>
 
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -64,7 +64,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-connect</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
@@ -74,7 +74,7 @@
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
-    
+
     <!-- script engine dependencies -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -203,6 +203,10 @@
                   <include name="**/module.xml" />
                 </replace>
 
+                <replace dir="target/modules" token="@version.freemarker@" value="${version.freemarker}">
+                  <include name="**/module.xml" />
+                </replace>
+
                 <replace dir="target/modules" token="@version.mybatis@" value="${version.mybatis}">
                   <include name="**/module.xml" />
                 </replace>
@@ -240,6 +244,29 @@
         <configuration>
           <classesDirectory>${project.build.directory}/modules/</classesDirectory>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <attach>true</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

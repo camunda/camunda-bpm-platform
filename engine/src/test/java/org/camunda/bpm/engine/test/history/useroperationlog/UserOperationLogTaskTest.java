@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELEGATE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_RESOLVE;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_OWNER;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
@@ -256,6 +259,48 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, log.getCategory());
 
     completeTestProcess();
+  }
+
+  public void testDeleteTask() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    // when
+    taskService.deleteTask(task.getId());
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_DELETE);
+    assertEquals(1, query.count());
+
+    // assert: details
+    UserOperationLogEntry log = query.singleResult();
+    assertThat(log.getProperty()).isEqualTo("delete");
+    assertThat(log.getOrgValue()).isEqualTo("false");
+    assertThat(log.getNewValue()).isEqualTo("true");
+    assertThat(log.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+
+    historyService.deleteHistoricTaskInstance(task.getId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testCompleteTask() {
+    // given
+    startTestProcess();
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_COMPLETE);
+    assertEquals(1, query.count());
+
+    // assert: details
+    UserOperationLogEntry log = query.singleResult();
+    assertThat(log.getProperty()).isEqualTo("delete");
+    assertThat(log.getOrgValue()).isEqualTo("false");
+    assertThat(log.getNewValue()).isEqualTo("true");
+    assertThat(log.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

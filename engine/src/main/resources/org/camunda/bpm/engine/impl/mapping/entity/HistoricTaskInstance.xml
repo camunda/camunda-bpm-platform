@@ -259,7 +259,11 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+          RES.ID_,
+        </if>
+        RES.PROC_DEF_KEY_, '*'))
     </if>
 
     <bind name="HPI_JOIN" value="false" />
@@ -498,12 +502,17 @@
                 and RES.FOLLOW_UP_DATE_ is not null
               </trim>
             </if>
-            <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
-              ${queryType} RES.TENANT_ID_ in
-              <foreach item="tenantId" index="index" collection="query.tenantIds"
-                       open="(" separator="," close=")">
-                #{tenantId}
-              </foreach>
+            <if test="query.isTenantIdSet">
+              <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
+                ${queryType} RES.TENANT_ID_ in
+                <foreach item="tenantId" index="index" collection="query.tenantIds"
+                         open="(" separator="," close=")">
+                  #{tenantId}
+                </foreach>
+              </if>
+              <if test="query.tenantIds == null">
+                ${queryType} RES.TENANT_ID_ is null
+              </if>
             </if>
             <foreach collection="query.variables" index="index" item="queryVariableValue">
               ${queryType} exists (
@@ -512,7 +521,10 @@
                 from
                   ${prefix}ACT_HI_VARINST VAR
                 WHERE
+                <bind name="varPrefix" value="''"/>
+
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+
                 <choose>
                   <when test="queryVariableValue.local">
                     and TASK_ID_ = RES.ID_
@@ -523,7 +535,6 @@
                 </choose>
 
               <bind name="varTypeField" value="'VAR_TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
@@ -536,11 +547,20 @@
       </foreach>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-        and (
-        (RES.EXECUTION_ID_ is not null
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-        ) or RES.EXECUTION_ID_ is null
-        )
+        <choose>
+          <when test="authCheck.isHistoricInstancePermissionsEnabled">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          </when>
+          <otherwise>
+            and (
+              (RES.EXECUTION_ID_ is not null
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+              )
+              <!-- Auth check is skipped for standalone tasks -->
+              or RES.EXECUTION_ID_ is null
+            )
+          </otherwise>
+        </choose>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />

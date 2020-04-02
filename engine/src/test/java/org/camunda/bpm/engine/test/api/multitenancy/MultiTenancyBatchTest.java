@@ -162,7 +162,7 @@ public class MultiTenancyBatchTest {
     Job seedJob = batchHelper.getSeedJob(batch);
     Assert.assertEquals(TENANT_ONE, seedJob.getTenantId());
 
-    batchHelper.executeSeedJob(batch);
+    batchHelper.completeSeedJobs(batch);
 
     List<Job> migrationJob = batchHelper.getExecutionJobs(batch);
     Assert.assertEquals(TENANT_ONE, migrationJob.get(0).getTenantId());

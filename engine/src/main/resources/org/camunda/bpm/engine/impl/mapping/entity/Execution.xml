@@ -157,6 +157,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
+  
   <!-- EXECUTION SELECT -->
   
   <select id="selectExecution" parameterType="string" resultMap="executionResultMap">
@@ -216,6 +221,12 @@
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
     select distinct RES.ID_
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+  </select>
+  
+  <select id="selectProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct P.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+    ORDER BY P.DEPLOYMENT_ID_ ASC
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">
@@ -339,7 +350,10 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
+              <bind name="varPrefix" value="''"/>
+
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+
               <choose>
                 <when test="queryVariableValue.local">
                   and RES.ID_ = EXECUTION_ID_
@@ -351,7 +365,6 @@
               </choose>
 
               <bind name="varTypeField" value="'TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
@@ -451,6 +464,8 @@
         from
         ${prefix}ACT_RU_VARIABLE
         WHERE
+        <bind name="varPrefix" value="''"/>
+
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
 
         <choose>
@@ -464,7 +479,6 @@
         </choose>
 
         <bind name="varTypeField" value="'TYPE_'"/>
-        <bind name="varPrefix" value="''"/>
         <if test="queryVariableValue.valueConditions != null">
           and
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>

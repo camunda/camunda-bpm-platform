@@ -70,6 +70,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     configuration.setScriptEngineResolver(createScriptEngineResolver());
     configuration.setElProvider(createElProvider());
+    configuration.enableFeelLegacyBehavior(true);
 
     return configuration;
   }
@@ -257,7 +258,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext());
 
-    assertThat(result.getSingleEntry()).isEqualTo("B_FROM_MAP");
+    assertThat((String) result.getSingleEntry()).isEqualTo("B_FROM_MAP");
   }
 
   @Test
@@ -272,7 +273,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(decision, inputs.asVariableContext());
 
-    assertThat(result.getSingleEntry()).isEqualTo("0_FROM_LIST");
+    assertThat((String) result.getSingleEntry()).isEqualTo("0_FROM_LIST");
   }
 
   protected DmnEngine createEngineWithDefaultExpressionLanguage(String expressionLanguage) {

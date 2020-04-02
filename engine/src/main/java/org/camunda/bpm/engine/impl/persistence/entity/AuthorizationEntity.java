@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +55,9 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   protected String userId;
   protected String groupId;
   protected Integer resourceType;
-  protected String resourceId;  
+  protected String resourceId;
+  protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   private Set<Permission> cachedPermissions = new HashSet<>();
 
@@ -267,8 +270,28 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     state.put("resourceType", resourceType);
     state.put("resourceId", resourceId);
     state.put("permissions", permissions);
-    
+    state.put("removalTime", removalTime);
+    state.put("rootProcessInstanceId", rootProcessInstanceId);
+
     return state;
+  }
+
+  @Override
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
+  @Override
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   @Override

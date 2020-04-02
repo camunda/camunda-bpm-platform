@@ -24,10 +24,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
@@ -107,9 +107,9 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
     return result;
   }
 
-  public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
-    dto.setProcessInstanceId(processInstanceId);
-    dto.updateSuspensionState(engine);
+  @Override
+  public void updateSuspensionState(SuspensionStateDto dto) {
+    dto.updateSuspensionState(engine, processInstanceId);
   }
 
   @Override
@@ -119,6 +119,12 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
           engine.getRuntimeService().createProcessInstanceModification(processInstanceId);
 
       dto.applyTo(modificationBuilder, engine, objectMapper);
+
+      if (dto.getAnnotation() != null) {
+        modificationBuilder.setAnnotation(dto.getAnnotation());
+      }
+
+      modificationBuilder.cancellationSourceExternal(true);
 
       modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
     }
@@ -132,6 +138,12 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
           engine.getRuntimeService().createProcessInstanceModification(processInstanceId);
 
       dto.applyTo(modificationBuilder, engine, objectMapper);
+
+      if (dto.getAnnotation() != null) {
+        modificationBuilder.setAnnotation(dto.getAnnotation());
+      }
+
+      modificationBuilder.cancellationSourceExternal(true);
 
       try {
         batch = modificationBuilder.executeAsync(dto.isSkipCustomListeners(), dto.isSkipIoMappings());

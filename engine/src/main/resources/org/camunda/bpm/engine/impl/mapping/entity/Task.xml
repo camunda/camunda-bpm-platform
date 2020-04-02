@@ -354,9 +354,16 @@
             <if test="query.assigneeLike != null">
               ${queryType} RES.ASSIGNEE_ like #{query.assigneeLike} ESCAPE ${escapeChar}
             </if>
-            <if test="query.assigneeIn != null &amp;&amp; query.assigneeIn.size() &gt; 0">
+            <if test="query.assigneeIn != null &amp;&amp; query.assigneeIn.size &gt; 0">
               ${queryType} RES.ASSIGNEE_ in
               <foreach item="assignee" index="index" collection="query.assigneeIn"
+                       open="(" separator="," close=")">
+                #{assignee}
+              </foreach>
+            </if>
+            <if test="query.assigneeNotIn != null &amp;&amp; query.assigneeNotIn.size &gt; 0">
+              ${queryType} RES.ASSIGNEE_ NOT in
+              <foreach item="assignee" index="index" collection="query.assigneeNotIn"
                        open="(" separator="," close=")">
                 #{assignee}
               </foreach>
@@ -378,6 +385,13 @@
             </if>
             <if test="query.processInstanceId != null">
               ${queryType} RES.PROC_INST_ID_ = #{query.processInstanceId}
+            </if>
+            <if test="query.processInstanceIdIn != null &amp;&amp; query.processInstanceIdIn.length > 0">
+              ${queryType} RES.PROC_INST_ID_ in
+              <foreach item="item" index="index" collection="query.processInstanceIdIn"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
             </if>
             <if test="query.processInstanceBusinessKey != null">
               ${queryType} E.BUSINESS_KEY_ = #{query.processInstanceBusinessKey}
@@ -535,10 +549,10 @@
                   <if test="query.candidateUser != null">
                     I.USER_ID_ = #{query.candidateUser}
                   </if>
-                  <if test="query.candidateUser != null &amp;&amp; query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                  <if test="query.candidateUser != null &amp;&amp; query.candidateGroups != null &amp;&amp; query.candidateGroups.size &gt; 0">
                     or
                   </if>
-                  <if test="query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                  <if test="query.candidateGroups != null &amp;&amp; query.candidateGroups.size &gt; 0">
                     I.GROUP_ID_ IN
                     <foreach item="group" index="index" collection="query.candidateGroups"
                              open="(" separator="," close=")">
@@ -564,26 +578,25 @@
                 <if test="!query.includeAssignedTasks">
                   and RES.ASSIGNEE_ is null
                 </if>
-                and RES.ID_ not in (
-                select
-                TASK_ID_
-                from
-                ${prefix}ACT_RU_IDENTITYLINK ARIEL
-                <where>
-                  ARIEL.TYPE_ = 'candidate'
-                  <if test="query.withoutCandidateGroups">
-                    and ARIEL.GROUP_ID_ is not null
-                  </if>
-                  <if test="query.withoutCandidateUsers">
-                    and ARIEL.USER_ID_ is not null
-                  </if>
-                </where>
+                and NOT EXISTS (
+                  select 1
+                  from ${prefix}ACT_RU_IDENTITYLINK I
+                  <where>
+                    I.TYPE_ = 'candidate'
+                    <if test="query.withoutCandidateGroups">
+                      and I.GROUP_ID_ is not null
+                    </if>
+                    <if test="query.withoutCandidateUsers">
+                      and I.USER_ID_ is not null
+                    </if>
+                    AND I.TASK_ID_ = RES.ID_
+                  </where>
                 )
               </trim>
             </if>
 
             <if test="query.involvedUser != null">
-              ${queryType} I.USER_ID_ = #{involvedUser}
+              ${queryType} I.USER_ID_ = #{query.involvedUser}
             </if>
 
 
@@ -596,7 +609,10 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
+              <bind name="varPrefix" value="''"/>
+
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+
               <choose>
                 <when test="queryVariableValue.local">
                   and RES.ID_ = TASK_ID_
@@ -617,7 +633,6 @@
                 </otherwise>
               </choose>
               <bind name="varTypeField" value="'TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>

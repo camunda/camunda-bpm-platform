@@ -16,21 +16,39 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.*;
+import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_DELIMITER;
+import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.impl.JobQueryProperty;
+import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
-import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.engine.impl.jobexecutor.ExclusiveJobAddedNotification;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.Job;
-
-import java.util.*;
-
-import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_DELIMITER;
-import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -120,8 +138,10 @@ public class JobManager extends AbstractManager {
 
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
+    // add job to be executed in the current processor
     if(!job.isSuspended()
             && job.isExclusive()
+            && isJobDue(job)
             && jobExecutorContext != null
             && jobExecutorContext.isExecutingExclusiveJob()
             && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
@@ -131,7 +151,8 @@ public class JobManager extends AbstractManager {
       job.setLockOwner(jobExecutor.getLockOwner());
       transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
     } else {
-      // notify job executor:
+      // reset Acquisition strategy and notify the JobExecutor that
+      // a new Job is available for execution on future runs
       transactionListener = new MessageAddedNotification(jobExecutor);
     }
     Context.getCommandContext()
@@ -167,26 +188,30 @@ public class JobManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<AcquirableJobEntity> findNextJobsToExecute(Page page) {
-    Map<String,Object> params = new HashMap<String, Object>();
+    ProcessEngineConfigurationImpl engineConfiguration = Context.getProcessEngineConfiguration();
+
+    Map<String,Object> params = new HashMap<>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
     params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
-    params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
-    if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
-      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+    params.put("deploymentAware", engineConfiguration.isJobExecutorDeploymentAware());
+    if (engineConfiguration.isJobExecutorDeploymentAware()) {
+      Set<String> registeredDeployments = engineConfiguration.getRegisteredDeployments();
       if (!registeredDeployments.isEmpty()) {
         params.put("deploymentIds", registeredDeployments);
       }
     }
 
-    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
-    if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByPriority()) {
+    params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
+
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
+    if (engineConfiguration.isJobExecutorAcquireByPriority()) {
       orderingProperties.add(JOB_PRIORITY_ORDERING_PROPERTY);
     }
-    if (Context.getProcessEngineConfiguration().isJobExecutorPreferTimerJobs()) {
+    if (engineConfiguration.isJobExecutorPreferTimerJobs()) {
       orderingProperties.add(JOB_TYPE_ORDERING_PROPERTY);
     }
-    if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByDueDate()) {
+    if (engineConfiguration.isJobExecutorAcquireByDueDate()) {
       orderingProperties.add(JOB_DUEDATE_ORDERING_PROPERTY);
     }
 
@@ -235,8 +260,14 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(JobQueryImpl jobQuery) {
+    configureQuery(jobQuery);
+    return getDbEntityManager().selectList("selectJobDeploymentIdMappingsByQueryCriteria", jobQuery);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId) {
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new HashMap<>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);
     params.put("tenantId", tenantId);
@@ -259,35 +290,35 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateJobSuspensionStateById(String jobId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobId", jobId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateJobSuspensionStateByJobDefinitionId(String jobDefinitionId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateJobSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateStartTimerJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
@@ -295,7 +326,7 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
@@ -303,7 +334,7 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
@@ -312,7 +343,7 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateStartTimerJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
@@ -321,7 +352,7 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
@@ -331,14 +362,14 @@ public class JobManager extends AbstractManager {
   }
 
   public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("retries", retries);
     getDbEntityManager().update(JobEntity.class, "updateFailedJobRetriesByParameters", parameters);
   }
 
   public void updateJobPriorityByDefinitionId(String jobDefinitionId, long priority) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("priority", priority);
     getDbEntityManager().update(JobEntity.class, "updateJobPriorityByDefinitionId", parameters);
@@ -355,5 +386,16 @@ public class JobManager extends AbstractManager {
 
   protected boolean isEnsureJobDueDateNotNull() {
     return Context.getProcessEngineConfiguration().isEnsureJobDueDateNotNull();
+  }
+
+  /**
+   * Sometimes we get a notification of a job that is not yet due, so we 
+   * should not execute it immediately
+   */
+  protected boolean isJobDue(JobEntity job) {
+    Date duedate = job.getDuedate();
+    Date now = ClockUtil.getCurrentTime();
+    
+    return duedate == null || duedate.getTime() <= now.getTime();
   }
 }

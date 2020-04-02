@@ -16,21 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.helper.EscalationHandler;
 import org.camunda.bpm.engine.impl.bpmn.parser.Escalation;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
-import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
-import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
-import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 
 /**
  * The activity behavior for an intermediate throwing escalation event and an escalation end event.
@@ -50,51 +41,10 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
   public void execute(ActivityExecution execution) throws Exception {
     final PvmActivity currentActivity = execution.getActivity();
 
-    final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(escalation.getEscalationCode(), currentActivity);
-    ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
-
-    ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
-    walker.addScopePreVisitor(escalationEventDefinitionFinder);
-    walker.addExecutionPreVisitor(activityExecutionMappingCollector);
-    walker.addExecutionPreVisitor(new OutputVariablesPropagator());
-
-    walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
-
-      @Override
-      public boolean isFulfilled(ActivityExecutionTuple element) {
-        return escalationEventDefinitionFinder.getEscalationEventDefinition() != null || element == null;
-      }
-    });
-
-    EscalationEventDefinition escalationEventDefinition = escalationEventDefinitionFinder.getEscalationEventDefinition();
-    if (escalationEventDefinition != null) {
-      executeEscalationHandler(escalationEventDefinition, activityExecutionMappingCollector);
-    }
+    EscalationEventDefinition escalationEventDefinition = EscalationHandler.executeEscalation(execution, escalation.getEscalationCode());
 
     if (escalationEventDefinition == null || !escalationEventDefinition.isCancelActivity()) {
       leaveExecution(execution, currentActivity, escalationEventDefinition);
-    }
-  }
-
-  protected void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition, ActivityExecutionMappingCollector activityExecutionMappingCollector) {
-
-    PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
-    PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
-    ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
-
-    if (escalationEventDefinition.getEscalationCodeVariable() != null) {
-      escalationExecution.setVariable(escalationEventDefinition.getEscalationCodeVariable(), escalation.getEscalationCode());
-    }
-
-    escalationExecution.executeActivity(escalationHandler);
-  }
-
-  protected PvmScope getScopeForEscalation(EscalationEventDefinition escalationEventDefinition) {
-    PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
-    if (escalationEventDefinition.isCancelActivity()) {
-      return escalationHandler.getEventScope();
-    } else {
-      return escalationHandler.getFlowScope();
     }
   }
 
@@ -105,49 +55,6 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
     ExecutionEntity leavingExecution = (ExecutionEntity) (replacingExecution != null ? replacingExecution : execution);
     leave(leavingExecution);
-  }
-
-  protected class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {
-
-    protected EscalationEventDefinition escalationEventDefinition;
-
-    protected final String escalationCode;
-    protected final PvmActivity throwEscalationActivity;
-
-    public EscalationEventDefinitionFinder(String escalationCode, PvmActivity throwEscalationActivity) {
-      this.escalationCode = escalationCode;
-      this.throwEscalationActivity = throwEscalationActivity;
-    }
-
-    @Override
-    public void visit(PvmScope scope) {
-      List<EscalationEventDefinition> escalationEventDefinitions = scope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS);
-      this.escalationEventDefinition = findMatchingEscalationEventDefinition(escalationEventDefinitions);
-    }
-
-    protected EscalationEventDefinition findMatchingEscalationEventDefinition(List<EscalationEventDefinition> escalationEventDefinitions) {
-      for (EscalationEventDefinition escalationEventDefinition : escalationEventDefinitions) {
-        if (isMatchingEscalationCode(escalationEventDefinition) && !isReThrowingEscalationEventSubprocess(escalationEventDefinition)) {
-          return escalationEventDefinition;
-        }
-      }
-      return null;
-    }
-
-    protected boolean isMatchingEscalationCode(EscalationEventDefinition escalationEventDefinition) {
-      String escalationCode = escalationEventDefinition.getEscalationCode();
-      return escalationCode == null || escalationCode.equals(this.escalationCode);
-    }
-
-    protected boolean isReThrowingEscalationEventSubprocess(EscalationEventDefinition escalationEventDefinition) {
-      PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
-      return escalationHandler.isSubProcessScope() && escalationHandler.equals(throwEscalationActivity.getFlowScope());
-    }
-
-    public EscalationEventDefinition getEscalationEventDefinition() {
-      return escalationEventDefinition;
-    }
-
   }
 
 }

@@ -37,9 +37,11 @@ public class HistoricIncidentDto {
   protected Date removalTime;
   protected String incidentType;
   protected String activityId;
+  protected String failedActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String historyConfiguration;
   protected String incidentMessage;
   protected String tenantId;
   protected String jobDefinitionId;
@@ -91,6 +93,10 @@ public class HistoricIncidentDto {
     return activityId;
   }
 
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
   public String getCauseIncidentId() {
     return causeIncidentId;
   }
@@ -101,6 +107,10 @@ public class HistoricIncidentDto {
 
   public String getConfiguration() {
     return configuration;
+  }
+
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
   }
 
   public String getIncidentMessage() {
@@ -138,10 +148,12 @@ public class HistoricIncidentDto {
     dto.createTime = historicIncident.getCreateTime();
     dto.endTime = historicIncident.getEndTime();
     dto.incidentType = historicIncident.getIncidentType();
+    dto.failedActivityId = historicIncident.getFailedActivityId();
     dto.activityId = historicIncident.getActivityId();
     dto.causeIncidentId = historicIncident.getCauseIncidentId();
     dto.rootCauseIncidentId = historicIncident.getRootCauseIncidentId();
     dto.configuration = historicIncident.getConfiguration();
+    dto.historyConfiguration = historicIncident.getHistoryConfiguration();
     dto.incidentMessage = historicIncident.getIncidentMessage();
     dto.open = historicIncident.isOpen();
     dto.deleted = historicIncident.isDeleted();

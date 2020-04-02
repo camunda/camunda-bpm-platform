@@ -67,8 +67,8 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
       // Task should be assigned to no one
       task.setAssignee(null);
     }
-
-    task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_CLAIM);
+    task.triggerUpdateEvent();
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_CLAIM);
 
     return null;
   }

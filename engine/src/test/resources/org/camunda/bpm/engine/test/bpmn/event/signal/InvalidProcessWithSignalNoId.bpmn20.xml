@@ -10,13 +10,7 @@
 
 		<startEvent id="start" />
 
-		<sequenceFlow sourceRef="start" targetRef="signalEvent" />
-
-		<intermediateCatchEvent id="signalEvent" name="Alert">
-			<signalEventDefinition signalRef="alertSignal" />
-		</intermediateCatchEvent>
-
-		<sequenceFlow sourceRef="signalEvent" targetRef="end" />
+		<sequenceFlow sourceRef="start" targetRef="end" />
 
 		<endEvent id="end" />
 

@@ -103,6 +103,11 @@ public interface HistoricJobLog {
   String getActivityId();
 
   /**
+   * Returns the id of the activity on which the last exception occurred.
+   */
+  String getFailedActivityId();
+
+  /**
    * Returns the specific execution id on which the associated job was created.
    */
   String getExecutionId();
@@ -137,7 +142,12 @@ public interface HistoricJobLog {
    * Returns the id of the tenant this job log entry belongs to. Can be <code>null</code>
    * if the job log entry belongs to no single tenant.
    */
-  public String getTenantId();
+  String getTenantId();
+
+  /**
+   * Returns the name of the host where the Process Engine that added this job log runs.
+   */
+  String getHostname();
 
   /**
    * Returns <code>true</code> when <code>this</code> log represents

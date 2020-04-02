@@ -26,7 +26,9 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.commons.utils.IoUtil;
@@ -51,6 +53,12 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
 
   public static final String DRG_COLLECT_DMN = "org/camunda/bpm/dmn/engine/transform/DrgCollectTest.dmn";
   public static final String DRG_RULE_ORDER_DMN = "org/camunda/bpm/dmn/engine/transform/DrgRuleOrderTest.dmn";
+
+  @Override
+  public DmnEngineConfiguration getDmnEngineConfiguration() {
+    return new DefaultDmnEngineConfiguration()
+      .enableFeelLegacyBehavior(true);
+  }
 
   @Test
   public void shouldEvaluateDrdDishDecisionExample() {
@@ -274,7 +282,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
 
     assertThat(result.getSingleResult().keySet()).containsOnly("c");
 
-    assertThat(result.getSingleEntry())
+    assertThat((int) result.getSingleEntry())
       .isNotNull()
       .isEqualTo(5);
   }
@@ -298,7 +306,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
           .putValue("x", 2)
           .putValue("bean", new TestBean(3)));
 
-    assertThat(result.getSingleEntry())
+    assertThat((int) result.getSingleEntry())
       .isNotNull()
       .isEqualTo(6);
   }
@@ -310,7 +318,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
     variables.putValue("dayType","WeekDay");
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
-    assertThat(result.getSingleEntry())
+    assertThat((String) result.getSingleEntry())
       .isNotNull()
       .isEqualTo("Steak");
   }
@@ -322,7 +330,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
     variables.putValue("dayType","WeekDay");
 
     DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
-    assertThat(result.getSingleEntry())
+    assertThat((String) result.getSingleEntry())
       .isNotNull()
       .isEqualTo("Steak");
   }

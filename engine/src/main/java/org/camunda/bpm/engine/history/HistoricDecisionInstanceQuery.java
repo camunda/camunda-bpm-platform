@@ -131,6 +131,9 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   /** Only select historic decision instances with one of the given tenant ids. */
   HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic decision instances that have no tenant id. */
+  HistoricDecisionInstanceQuery withoutTenantId();
+
   /** Order by the time when the decisions was evaluated
    * (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricDecisionInstanceQuery orderByEvaluationTime();

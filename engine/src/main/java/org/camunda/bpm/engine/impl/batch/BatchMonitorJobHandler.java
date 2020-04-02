@@ -49,7 +49,7 @@ public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfigu
       batch.createMonitorJob(true);
     }
     else {
-      batch.delete(false);
+      batch.delete(false, false);
     }
   }
 

@@ -20,10 +20,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.feel.syntaxtree.ZonedTime;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * Transform values of type {@link Date} and {@link String} into
@@ -45,6 +56,37 @@ public class DateDataTypeTransformer implements DmnDataTypeTransformer {
       Date date = transformString((String) value);
       return Variables.dateValue(date);
 
+    } if (value instanceof ZonedDateTime) {
+      Instant instant = ((ZonedDateTime) value).toInstant();
+      Date date = Date.from(instant);
+
+      return Variables.dateValue(date);
+
+    } else if (value instanceof LocalDateTime) {
+      ZoneId defaultTimeZone = ZoneId.systemDefault();
+      Instant instant = ((LocalDateTime) value)
+        .atZone(defaultTimeZone)
+        .toInstant();
+
+      Date date = Date.from(instant);
+
+      return Variables.dateValue(date);
+
+    } else if (value instanceof LocalDate) {
+      throw unsupportedType(value);
+
+    } else if (value instanceof LocalTime) {
+      throw unsupportedType(value);
+
+    } else if (value instanceof Duration) {
+      throw unsupportedType(value);
+
+    } else if (value instanceof Period) {
+      throw unsupportedType(value);
+
+    } else if (value instanceof ZonedTime) {
+      throw unsupportedType(value);
+
     } else {
       throw new IllegalArgumentException();
     }
@@ -56,6 +98,12 @@ public class DateDataTypeTransformer implements DmnDataTypeTransformer {
     } catch (ParseException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  protected DmnEngineException unsupportedType(Object value) {
+    String className = value.getClass().getName();
+    return new DmnEngineException("Unsupported type: '" + className +
+      "' cannot be converted to 'java.util.Date'");
   }
 
 }

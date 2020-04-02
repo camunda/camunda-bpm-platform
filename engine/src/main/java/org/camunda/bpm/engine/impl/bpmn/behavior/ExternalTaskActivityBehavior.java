@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.PriorityProvider;
-import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
@@ -65,16 +63,6 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
 
   public ParameterValueProvider getPriorityValueProvider() {
     return priorityValueProvider;
-  }
-
-  /**
-   * It's used to propagate the bpmn error from an external task.
-   * @param error the error which should be propagated
-   * @param execution the current activity execution
-   * @throws Exception throws an exception if no handler was found
-   */
-  public void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
-    BpmnExceptionHandler.propagateBpmnError(error, execution);
   }
 
   @Override

@@ -16,66 +16,52 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-
 /**
  * @author Askar Akhmerov
  */
-public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatchCmd<Batch> {
+public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
+
   protected int retries;
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    List<String> jobIds = collectJobIds(commandContext);
+    BatchElementConfiguration elementConfiguration = collectJobIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
+    ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES);
-    writeUserOperationLog(commandContext,
-        retries,
-        jobIds.size(),
-        true);
 
-    BatchEntity batch = createBatch(commandContext, jobIds);
-
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-
-    return batch;
+    return new BatchBuilder(commandContext)
+        .config(getConfiguration(elementConfiguration))
+        .type(Batch.TYPE_SET_JOB_RETRIES)
+        .permission(BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
+        .operationLogHandler(this::writeUserOperationLog)
+        .build();
   }
 
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
 
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       int retries,
-                                       int numInstances,
-                                       boolean async) {
-
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances",
         null,
         numInstances));
-    propertyChanges.add(new PropertyChange("async", null, async));
+    propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("retries", null, retries));
 
     commandContext.getOperationLogManager()
@@ -88,15 +74,10 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
             propertyChanges);
   }
 
-  protected abstract List<String> collectJobIds(CommandContext commandContext);
+  protected abstract BatchElementConfiguration collectJobIds(CommandContext commandContext);
 
-  @Override
-  protected SetRetriesBatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
-    return new SetRetriesBatchConfiguration(ids, retries);
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries);
   }
 
-  @Override
-  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_JOB_RETRIES);
-  }
 }

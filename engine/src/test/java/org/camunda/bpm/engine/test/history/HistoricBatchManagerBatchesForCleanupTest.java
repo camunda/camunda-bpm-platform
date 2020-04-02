@@ -143,13 +143,13 @@ public class HistoricBatchManagerBatchesForCleanupTest {
 
     Batch batch1 = list.get(0);
     String batchType = batch1.getType();
-    helper.executeSeedJob(batch1);
+    helper.completeSeedJobs(batch1);
     helper.executeJobs(batch1);
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, batch1EndTime));
     helper.executeMonitorJob(batch1);
 
     Batch batch2 = list.get(1);
-    helper.executeSeedJob(batch2);
+    helper.completeSeedJobs(batch2);
     helper.executeJobs(batch2);
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, batch2EndTime));
     helper.executeMonitorJob(batch2);

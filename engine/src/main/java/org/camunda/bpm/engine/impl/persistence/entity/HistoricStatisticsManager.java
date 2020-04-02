@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;

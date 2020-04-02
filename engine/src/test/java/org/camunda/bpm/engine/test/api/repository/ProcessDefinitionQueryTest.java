@@ -707,6 +707,14 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .count());
   }
 
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByNoVersionTag() {
+    // 4 definitions without and 1 definition with version tag are deployed
+    assertEquals(4, repositoryService.createProcessDefinitionQuery()
+      .withoutVersionTag()
+      .count());
+  }
+
   @org.camunda.bpm.engine.test.Deployment(resources={
     "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/repository/VersionTagTest.testParsingVersionTag.bpmn20.xml"

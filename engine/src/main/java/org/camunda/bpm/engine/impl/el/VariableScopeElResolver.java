@@ -96,6 +96,7 @@ public class VariableScopeElResolver extends ELResolver {
         VariableScope variableScope = (VariableScope) object;
         if (variableScope.hasVariable(variable)) {
           variableScope.setVariable(variable, value);
+          context.setPropertyResolved(true);
         }
       }
     }

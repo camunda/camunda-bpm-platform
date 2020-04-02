@@ -67,11 +67,13 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
 
   @Override
   protected void postProcessJob(MigrationBatchConfiguration configuration, JobEntity job) {
-    CommandContext commandContext = Context.getCommandContext();
-    String sourceProcessDefinitionId = configuration.getMigrationPlan().getSourceProcessDefinitionId();
+    if (job.getDeploymentId() == null) {
+      CommandContext commandContext = Context.getCommandContext();
+      String sourceProcessDefinitionId = configuration.getMigrationPlan().getSourceProcessDefinitionId();
 
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, sourceProcessDefinitionId);
-    job.setDeploymentId(processDefinition.getDeploymentId());
+      ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, sourceProcessDefinitionId);
+      job.setDeploymentId(processDefinition.getDeploymentId());
+    }
   }
 
   @Override

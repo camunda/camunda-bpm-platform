@@ -30,17 +30,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.HistoryLevelFull;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -147,6 +143,19 @@ public class ProcessEngineTestRule extends TestWatcher {
 
   public ProcessDefinition deployAndGetDefinition(BpmnModelInstance bpmnModel) {
     return deployForTenantAndGetDefinition(null, bpmnModel);
+  }
+
+  public ProcessDefinition deployAndGetDefinition(String classpathResource) {
+    return deployForTenantAndGetDefinition(null, classpathResource);
+  }
+
+  public ProcessDefinition deployForTenantAndGetDefinition(String tenant, String classpathResource) {
+    Deployment deployment = deploy(createDeploymentBuilder().tenantId(tenant), Collections.<BpmnModelInstance>emptyList(), Collections.singletonList(classpathResource));
+
+    return processEngineRule.getRepositoryService()
+      .createProcessDefinitionQuery()
+      .deploymentId(deployment.getId())
+      .singleResult();
   }
 
   public ProcessDefinition deployForTenantAndGetDefinition(String tenant, BpmnModelInstance bpmnModel) {

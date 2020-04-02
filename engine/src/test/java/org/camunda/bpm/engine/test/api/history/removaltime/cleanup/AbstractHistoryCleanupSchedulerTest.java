@@ -51,7 +51,7 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
 
   protected Class<?> thisClass = this.getClass();
 
-  protected HistoryLevel customHistoryLevel = new CustomHistoryLevelRemovalTime();
+  protected static HistoryLevel customHistoryLevel = new CustomHistoryLevelRemovalTime();
 
   protected static ProcessEngineConfigurationImpl engineConfiguration;
 
@@ -161,14 +161,14 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
       });
   }
 
-  protected List<HistoryLevel> setCustomHistoryLevel(HistoryEventTypes... eventType) {
+  protected static List<HistoryLevel> setCustomHistoryLevel(HistoryEventTypes... eventType) {
     ((CustomHistoryLevelRemovalTime)customHistoryLevel).setEventTypes(eventType);
 
     return Collections.singletonList(customHistoryLevel);
   }
 
-  public ProcessEngineConfiguration configure(ProcessEngineConfigurationImpl configuration, HistoryEventTypes... historyEventTypes) {
-    configuration.setJdbcUrl("jdbc:h2:mem:" + thisClass.getSimpleName());
+  public static ProcessEngineConfiguration configure(ProcessEngineConfigurationImpl configuration, HistoryEventTypes... historyEventTypes) {
+    configuration.setJdbcUrl("jdbc:h2:mem:" + AbstractHistoryCleanupSchedulerTest.class.getSimpleName());
     configuration.setCustomHistoryLevels(setCustomHistoryLevel(historyEventTypes));
     configuration.setHistory(customHistoryLevel.getName());
     configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);

@@ -38,8 +38,10 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String incidentMessage;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String[] processDefinitionKeys;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -78,6 +80,11 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return this;
   }
 
+  public IncidentQuery failedActivityId(String activityId) {
+    this.failedActivityId = activityId;
+    return this;
+  }
+
   public IncidentQuery processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
     return this;
@@ -85,6 +92,12 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
 
   public IncidentQuery processDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public IncidentQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("processDefinitionKeys", (Object[]) processDefinitionKeys);
+    this.processDefinitionKeys = processDefinitionKeys;
     return this;
   }
 
@@ -192,6 +205,10 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return commandContext
       .getIncidentManager()
       .findIncidentByQueryCriteria(this, page);
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
   }
 
 }

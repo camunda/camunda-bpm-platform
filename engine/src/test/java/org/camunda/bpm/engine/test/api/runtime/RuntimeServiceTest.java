@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
@@ -75,6 +76,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
@@ -99,6 +101,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -113,7 +116,8 @@ public class RuntimeServiceTest {
   public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
   public static final String A_STREAM = "aStream";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
@@ -123,7 +127,7 @@ public class RuntimeServiceTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -273,8 +277,8 @@ public class RuntimeServiceTest {
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
     assertEquals(10, recordedEvents.size());
 
-    Set<RecordedEvent> startEvents = new HashSet<RecordedEvent>();
-    Set<RecordedEvent> endEvents = new HashSet<RecordedEvent>();
+    Set<RecordedEvent> startEvents = new HashSet<>();
+    Set<RecordedEvent> endEvents = new HashSet<>();
     for (RecordedEvent event : recordedEvents) {
       if(event.getEventName().equals(ExecutionListener.EVENTNAME_START)){
         startEvents.add(event);
@@ -527,7 +531,7 @@ public class RuntimeServiceTest {
   @Test
   public void testDeleteProcessInstancesWithFake() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
+
     try {
       runtimeService.deleteProcessInstances(Arrays.asList(instance.getId(), "aFake"), "test", false, false, false);
       fail("ProcessEngineException expected");
@@ -776,7 +780,7 @@ public class RuntimeServiceTest {
   public void testSignalWithProcessVariables() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
-    Map<String, Object> processVariables = new HashMap<String, Object>();
+    Map<String, Object> processVariables = new HashMap<>();
     processVariables.put("variable", "value");
 
     // signal the execution while passing in the variables
@@ -793,7 +797,7 @@ public class RuntimeServiceTest {
   public void testSignalWithSignalNameAndData() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
-    Map<String, Object> processVariables = new HashMap<String, Object>();
+    Map<String, Object> processVariables = new HashMap<>();
     processVariables.put("variable", "value");
 
     // signal the execution while passing in the variables
@@ -810,7 +814,7 @@ public class RuntimeServiceTest {
   public void testSignalWithoutSignalNameAndData() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
-    Map<String, Object> processVariables = new HashMap<String, Object>();
+    Map<String, Object> processVariables = new HashMap<>();
     processVariables.put("variable", "value");
 
     // signal the execution while passing in the variables
@@ -925,7 +929,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testSetVariables() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -940,7 +944,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testGetVariablesTyped() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -985,7 +989,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testGetVariablesLocalTyped() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1077,7 +1081,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariable() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1097,7 +1101,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariableInParentScope() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1127,7 +1131,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariableLocal() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1145,7 +1149,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariableLocalWithParentScope() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1184,7 +1188,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariables() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1209,7 +1213,7 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariablesWithParentScope() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
@@ -1252,14 +1256,14 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
   @Test
   public void testRemoveVariablesLocalWithParentScope() {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("variable1", "value1");
     vars.put("variable2", "value2");
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", vars);
 
     Task currentTask = taskService.createTaskQuery().singleResult();
-    Map<String, Object> varsToDelete = new HashMap<String, Object>();
+    Map<String, Object> varsToDelete = new HashMap<>();
     varsToDelete.put("variable3", "value3");
     varsToDelete.put("variable4", "value4");
     varsToDelete.put("variable5", "value5");
@@ -1310,14 +1314,14 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testUpdateVariables() {
-    Map<String, Object> modifications = new HashMap<String, Object>();
+    Map<String, Object> modifications = new HashMap<>();
     modifications.put("variable1", "value1");
     modifications.put("variable2", "value2");
 
-    List<String> deletions = new ArrayList<String>();
+    List<String> deletions = new ArrayList<>();
     deletions.add("variable1");
 
-    Map<String, Object> initialVariables = new HashMap<String, Object>();
+    Map<String, Object> initialVariables = new HashMap<>();
     initialVariables.put("variable1", "initialValue");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", initialVariables);
     ((RuntimeServiceImpl) runtimeService).updateVariables(processInstance.getId(), modifications, deletions);
@@ -1330,22 +1334,22 @@ public class RuntimeServiceTest {
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
   @Test
   public void testUpdateVariablesLocal() {
-    Map<String, Object> globalVars = new HashMap<String, Object>();
+    Map<String, Object> globalVars = new HashMap<>();
     globalVars.put("variable4", "value4");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", globalVars);
 
     Task currentTask = taskService.createTaskQuery().singleResult();
-    Map<String, Object> localVars = new HashMap<String, Object>();
+    Map<String, Object> localVars = new HashMap<>();
     localVars.put("variable1", "value1");
     localVars.put("variable2", "value2");
     localVars.put("variable3", "value3");
     runtimeService.setVariablesLocal(currentTask.getExecutionId(), localVars);
 
-    Map<String, Object> modifications = new HashMap<String, Object>();
+    Map<String, Object> modifications = new HashMap<>();
     modifications.put("variable1", "anotherValue1");
     modifications.put("variable2", "anotherValue2");
 
-    List<String> deletions = new ArrayList<String>();
+    List<String> deletions = new ArrayList<>();
     deletions.add("variable2");
     deletions.add("variable3");
     deletions.add("variable4");
@@ -1842,7 +1846,7 @@ public class RuntimeServiceTest {
   protected void assertActivityInstances(ActivityInstance[] instances, int expectedAmount, String expectedActivityId) {
     assertEquals(expectedAmount, instances.length);
 
-    Set<String> instanceIds = new HashSet<String>();
+    Set<String> instanceIds = new HashSet<>();
 
     for (ActivityInstance instance : instances) {
       assertEquals(expectedActivityId, instance.getActivityId());
@@ -1853,6 +1857,318 @@ public class RuntimeServiceTest {
     assertEquals(expectedAmount, instanceIds.size());
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceNoIncidents() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    // when
+    assertNotNull(tree);
+
+    Incident[] incidents = tree.getActivityInstances("theTask")[0].getIncidents();
+
+    // then
+    assertEquals(0, incidents.length);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceIncidents() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).active().singleResult().getId();
+    Incident incident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // assume
+    assertThat(tree).hasTotalIncidents(1);
+
+    Incident[] incidents = tree.getActivityInstances("theTask")[0].getIncidents();
+
+    // then
+    assertEquals(1, incidents.length);
+    assertEquals(incident, incidents[0]);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceNoIncidentIds() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // then
+    String[] incidentIds = tree.getActivityInstances("theTask")[0].getIncidentIds();
+    assertEquals(0, incidentIds.length);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceIncidentIds() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).active().singleResult().getId();
+    Incident incident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // then
+    assertThat(tree).hasTotalIncidents(1);
+
+    assertEquals(1, tree.getActivityInstances("theTask").length);
+    String[] incidentIds = tree.getActivityInstances("theTask")[0].getIncidentIds();
+    assertEquals(1, incidentIds.length);
+    assertEquals(incident.getId(), incidentIds[0]);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testActivityInstanceTreeForConcurrentAsyncAfterTask.bpmn20.xml"})
+  public void testActivityInstanceIncidentConcurrentTasksProcess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentTasksProcess");
+    String executionId = runtimeService.createExecutionQuery().activityId("theTask").active().singleResult().getId();
+    Incident theTaskIncident = runtimeService.createIncident("foo", executionId, "bar");
+
+    executionId = runtimeService.createExecutionQuery().activityId("asyncTask").active().singleResult().getId();
+    Incident asyncTaskIncident = runtimeService.createIncident("foo", executionId, "bar");
+    Incident anotherIncident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // then
+    assertThat(tree).hasTotalIncidents(3);
+
+    assertEquals(1, tree.getActivityInstances("theTask").length);
+    String[] incidentIds = tree.getActivityInstances("theTask")[0].getIncidentIds();
+    assertEquals(1, incidentIds.length);
+    assertEquals(theTaskIncident.getId(), incidentIds[0]);
+
+    assertEquals(1, tree.getActivityInstances("asyncTask").length);
+    incidentIds = tree.getActivityInstances("asyncTask")[0].getIncidentIds();
+    assertEquals(2, incidentIds.length);
+    for (String incidentId : incidentIds) {
+      if (!incidentId.equals(asyncTaskIncident.getId())
+          && !incidentId.equals(anotherIncident.getId())) {
+        fail("Expected: " + asyncTaskIncident.getId() + " or " + anotherIncident.getId()
+            + " but it was " + incidentId);
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testActivityInstanceForConcurrentSubprocess.bpmn20.xml"})
+  public void testActivityInstanceIncidentConcurrentSubProcess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentSubProcess");
+    String executionId = runtimeService.createExecutionQuery().activityId("outerTask").active().singleResult().getId();
+    Incident outerTaskIncident = runtimeService.createIncident("foo", executionId, "bar");
+    executionId = runtimeService.createExecutionQuery().activityId("innerTask").active().singleResult().getId();
+    Incident innerTaskIncident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // then
+    assertThat(tree).hasTotalIncidents(2);
+
+    assertEquals(1, tree.getActivityInstances("outerTask").length);
+    String[] incidentIds = tree.getActivityInstances("outerTask")[0].getIncidentIds();
+    assertEquals(1, incidentIds.length);
+    assertEquals(outerTaskIncident.getId(), incidentIds[0]);
+
+    assertEquals(1, tree.getActivityInstances("innerTask").length);
+    incidentIds = tree.getActivityInstances("innerTask")[0].getIncidentIds();
+    assertEquals(1, incidentIds.length);
+    assertEquals(innerTaskIncident.getId(), incidentIds[0]);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetActivityInstancesForActivity.bpmn20.xml"})
+  public void testActivityInstanceIncidentMultiInstance() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSubprocess");
+    Execution execution = runtimeService.createExecutionQuery().activityId("innerTask").active().list().get(0);
+    String executionId = execution.getId();
+    Incident incident = runtimeService.createIncident("foo", executionId, "bar");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+
+    // then
+    assertThat(tree).hasTotalIncidents(1);
+
+    boolean innerTaskMatched = false;
+
+    for (ActivityInstance activityInstance : tree.getActivityInstances("innerTask")) {
+      if(activityInstance.getExecutionIds()[0].equals(executionId)) {
+        String[] incidentIds = activityInstance.getIncidentIds();
+        assertEquals(1, incidentIds.length);
+        assertEquals(incident.getId(), incidentIds[0]);
+        innerTaskMatched = true;
+      } else {
+        assertEquals(0, activityInstance.getIncidentIds().length);
+      }
+    }
+
+    assertTrue(innerTaskMatched);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneAsyncTask.bpmn")
+  public void testActivityInstanceIncidentFailedJob() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 0);
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasTotalIncidents(1);
+
+    TransitionInstance transitionInstance = activityInstance.getTransitionInstances("theTask")[0];
+    String[] incidents = transitionInstance.getIncidentIds();
+
+    assertThat(incidents).containsExactly(incident.getId());
+  }
+
+
+  @Test
+  public void testActivityInstanceIncidentFailedJobInSubProcess() {
+    // given
+    BpmnModelInstance process = ProcessModels.newModel("process")
+      .startEvent()
+      .subProcess("subProcess")
+      .embeddedSubProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaAsyncBefore()
+      .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 0);
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasTotalIncidents(1);
+
+    TransitionInstance transitionInstance = activityInstance.getTransitionInstances("task")[0];
+    String[] incidents = transitionInstance.getIncidentIds();
+
+    assertThat(incidents).containsExactly(incident.getId());
+  }
+
+  /**
+   * It is debatable if the premise of this test (incident on non-leaf execution) is
+   * intended behavior; if we decide that it is not (and enforce it),
+   * then it is perfectly fine to change this test or remove it
+   */
+  @Test
+  public void testActivityInstanceIncidentOnNonLeafWithScopeActivity() {
+    // given
+    BpmnModelInstance process = ProcessModels.newModel("process")
+      .startEvent()
+      .subProcess("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, CreateIncidentDelegate.class)
+      .embeddedSubProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaInputParameter("foo", "bar")
+      .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasTotalIncidents(1);
+
+    ActivityInstance subProcessInstance = activityInstance.getActivityInstances("subProcess")[0];
+    String[] incidents = subProcessInstance.getIncidentIds();
+
+    assertThat(incidents).containsExactly(incident.getId());
+  }
+
+  @Test
+  public void testActivityInstanceIncidentOnNonLeafWithNonScopeActivity() {
+    // given
+    BpmnModelInstance process = ProcessModels.newModel("process")
+      .startEvent()
+      .subProcess("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, CreateIncidentDelegate.class)
+      .embeddedSubProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasTotalIncidents(1);
+
+    // while the incident references the sub process, the sub process
+    // execution represents both the sub process and the user task (compacted tree).
+    // In that case, incidents are always assigned to the leaf instance
+    ActivityInstance subProcessInstance = activityInstance.getActivityInstances("task")[0];
+    String[] incidents = subProcessInstance.getIncidentIds();
+
+    assertThat(incidents).containsExactly(incident.getId());
+  }
+
+  public static class CreateIncidentDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
+      runtimeService.createIncident("foo", execution.getId(), null);
+    }
+
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
@@ -2302,7 +2618,7 @@ public class RuntimeServiceTest {
   public void testVariableScope() {
 
     // After starting the process, the task in the subprocess should be active
-    Map<String, Object> varMap = new HashMap<String, Object>();
+    Map<String, Object> varMap = new HashMap<>();
     varMap.put("test", "test");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
     Task subProcessTask = taskService.createTaskQuery()
@@ -2348,7 +2664,7 @@ public class RuntimeServiceTest {
   public void testBasicVariableOperations() {
 
     Date now = new Date();
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -2356,7 +2672,7 @@ public class RuntimeServiceTest {
     byte[] streamBytes = "morebytes".getBytes();
 
     // Start process instance with different types of variables
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("longVar", 928374L);
     variables.put("shortVar", (short) 123);
     variables.put("integerVar", 1234);
@@ -2427,7 +2743,7 @@ public class RuntimeServiceTest {
     assertTrue(Arrays.equals(streamBytes, (byte[]) variables.get("byteStreamVar")));
     assertEquals(10, variables.size());
 
-    Collection<String> varFilter = new ArrayList<String>(2);
+    Collection<String> varFilter = new ArrayList<>(2);
     varFilter.add("stringVar");
     varFilter.add("integerVar");
 
@@ -2456,7 +2772,7 @@ public class RuntimeServiceTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
   @Test
   public void testOnlyChangeType() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aVariable", 1234);
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
@@ -2478,7 +2794,7 @@ public class RuntimeServiceTest {
   @Test
   public void testChangeTypeFromSerializableUsingApi() {
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aVariable", new SerializableVariable("foo"));
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
@@ -2509,7 +2825,7 @@ public class RuntimeServiceTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
   @Test
   public void testChangeToSerializableUsingApi() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aVariable", "test");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
@@ -2881,4 +3197,5 @@ public class RuntimeServiceTest {
           .done();
     return calling;
   }
+
 }

@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -48,7 +49,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 
 public class CreateAndResolveIncidentTest {
 
-  protected ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler()));
       return configuration;
@@ -61,7 +63,7 @@ public class CreateAndResolveIncidentTest {
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(processEngineBootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;

@@ -56,7 +56,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] caseExecutionIds;
   protected String[] caseActivityIds;
   protected String[] activityInstanceIds;
+
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
+
   protected String[] processInstanceIds;
   protected boolean includeDeleted = false;
 
@@ -208,6 +211,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -298,6 +309,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getCaseActivityIds() {
     return caseActivityIds;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
   public String getVariableName() {

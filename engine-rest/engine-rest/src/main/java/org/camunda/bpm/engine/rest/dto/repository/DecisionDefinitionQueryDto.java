@@ -44,6 +44,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   private static final String SORT_BY_CATEGORY_VALUE = "category";
   private static final String SORT_BY_TENANT_ID = "tenantId";
   private static final String SORT_BY_VERSION_TAG = "versionTag";
+  private static final String SORT_BY_DECISION_REQUIREMENTS_DEFINITION_KEY = "decisionRequirementsDefinitionKey";
 
   private static final List<String> VALID_SORT_BY_VALUES;
 
@@ -58,6 +59,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DECISION_REQUIREMENTS_DEFINITION_KEY);
   }
 
   protected String decisionDefinitionId;
@@ -288,6 +290,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {
       query.orderByVersionTag();
+    } else if (sortBy.equals(SORT_BY_DECISION_REQUIREMENTS_DEFINITION_KEY)) {
+      query.orderByDecisionRequirementsDefinitionKey();
     }
   }
 

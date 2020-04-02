@@ -223,7 +223,7 @@ public final class BpmnParseUtil {
   public static ExecutableScript parseCamundaScript(Element scriptElement) {
     String scriptLanguage = scriptElement.attribute("scriptFormat");
     if (scriptLanguage == null || scriptLanguage.isEmpty()) {
-      throw new BpmnParseException("Missing attribute 'scriptFormatAttribute' for 'script' element", scriptElement);
+      throw new BpmnParseException("Missing attribute 'scriptFormat' for 'script' element", scriptElement);
     }
     else {
       String scriptResource = scriptElement.attribute("resource");

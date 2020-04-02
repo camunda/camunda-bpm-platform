@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -68,8 +69,10 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   private static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
-  HistoryLevel customHistoryLevelFullWUOL = new CustomHistoryLevelFullWithoutUserOperationLog();
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  static HistoryLevel customHistoryLevelFullWUOL = new CustomHistoryLevelFullWithoutUserOperationLog();
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelWithoutUserOperationLogTest");
       configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFullWUOL));
@@ -84,7 +87,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testRule);
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -270,7 +273,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryByEntityTypes() {
@@ -289,9 +292,9 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
 
     assertEquals(0, query.count());
   }
-  
+
   // ----- DELETE VARIABLE HISTORY -----
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableHistoryOperationOnRunningInstance() {
@@ -307,7 +310,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableHistoryOperationOnHistoryInstance() {
@@ -323,7 +326,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryDeleteVariableHistoryOperationOnCase() {
@@ -333,14 +336,14 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     caseService.setVariable(caseInstance.getId(), "myVariable", 2);
     caseService.setVariable(caseInstance.getId(), "myVariable", 3);
     HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
-    
+
     // when
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
 
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
     // given
@@ -349,16 +352,16 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     taskService.setVariable(task.getId(), "testVariable", "testValue");
     taskService.setVariable(task.getId(), "testVariable", "testValue2");
     HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
-    
+
     // when
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
-    
+
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
-    
+
     taskService.deleteTask(task.getId(), true);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariablesHistoryOperationOnRunningInstance() {
@@ -376,7 +379,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariablesHistoryOperationOnHistoryInstance() {
@@ -414,7 +417,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableAndVariablesHistoryOperationOnHistoryInstance() {
@@ -433,7 +436,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   // --------------- CMMN --------------------
 
   @Test
@@ -490,7 +493,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   protected Map<String, Object> createMapForVariableAddition() {
-    Map<String, Object> variables =  new HashMap<String, Object>();
+    Map<String, Object> variables =  new HashMap<>();
     variables.put("testVariable1", "THIS IS TESTVARIABLE!!!");
     variables.put("testVariable2", "OVER 9000!");
 
@@ -498,7 +501,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   protected Collection<String> createCollectionForVariableDeletion() {
-    Collection<String> variables = new ArrayList<String>();
+    Collection<String> variables = new ArrayList<>();
     variables.add("testVariable3");
     variables.add("testVariable4");
 

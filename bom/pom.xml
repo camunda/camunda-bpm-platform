@@ -3,16 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>0.2</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
-  <version>7.12.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Bom</name>
   <url>http://camunda.org</url>
@@ -30,17 +27,6 @@
     <name>camunda services GmbH</name>
     <url>http://www.camunda.com</url>
   </organization>
-
-  <properties>
-    <version.mybatis>3.4.4</version.mybatis>
-    <version.joda-time>2.1</version.joda-time>
-    <version.uuid-generator>3.2.0</version.uuid-generator>
-    <version.camunda.commons>1.8.0</version.camunda.commons>
-    <version.camunda.connect>1.2.1</version.camunda.connect>
-    <version.camunda.spin>1.7.1</version.camunda.spin>
-    <version.camunda.template-engines>1.1.0</version.camunda.template-engines>
-    <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -157,6 +143,31 @@
         <artifactId>camunda-webapp-webjar-ee</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.springboot</groupId>
+        <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
@@ -173,6 +184,11 @@
       <dependency>
         <groupId>org.camunda.bpm.dmn</groupId>
         <artifactId>camunda-engine-feel-juel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.dmn</groupId>
+        <artifactId>camunda-engine-feel-scala</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -224,32 +240,4 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <developers>
-    <developer>
-      <id>camunda.org</id>
-      <name>camunda BPM Community</name>
-      <organization>camunda.org</organization>
-      <organizationUrl>http://camunda.org</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <url>https://github.com/camunda/camunda-bpm-platform</url>
-    <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <issueManagement>
-    <system>Jira</system>
-    <url>https://app.camunda.com/jira/browse/CAM/</url>
-  </issueManagement>
-
-  <repositories>
-    <repository>
-      <id>fix-maven-snapshots-issue-with-nexus</id>
-      <url>allow-parent-pom-resolving-when-snapshot</url>
-    </repository>
-  </repositories>
 </project>

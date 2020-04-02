@@ -50,6 +50,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String variableInstanceId;
   protected String[] variableTypes;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected String[] processInstanceIds;
   protected String userOperationId;
   protected Long sequenceCounter;
@@ -147,6 +148,14 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricDetailQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -321,5 +330,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public Date getOccurredAfter() {
     return occurredAfter;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 }
