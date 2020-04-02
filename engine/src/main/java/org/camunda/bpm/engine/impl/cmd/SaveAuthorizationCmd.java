@@ -29,14 +29,19 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class SaveAuthorizationCmd implements Command<Authorization> {
-  
+
   protected AuthorizationEntity authorization;
 
   public SaveAuthorizationCmd(Authorization authorization) {
@@ -55,11 +60,7 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
 
     authorizationManager.validateResourceCompatibility(authorization);
 
-    if (isHistoricTaskInstanceResource()) {
-      HistoryEvent historicTaskInstance = getHistoricTaskInstance(commandContext);
-
-      provideRemovalTime(historicTaskInstance);
-    }
+    provideRemovalTime(commandContext);
 
     String operationType = null;
     AuthorizationEntity previousValues = null;
@@ -74,6 +75,33 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
     commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization, previousValues);
     
     return authorization;
+  }
+
+  protected void provideRemovalTime(CommandContext commandContext) {
+    for (Entry<Resources, Supplier<HistoryEvent>> resourceEntry :
+        getHistoricInstanceResources(commandContext)) {
+      Resources resource = resourceEntry.getKey();
+      if (isResourceEqualTo(resource)) {
+
+        Supplier<HistoryEvent> historyEventSupplier = resourceEntry.getValue();
+
+        HistoryEvent historyEvent = historyEventSupplier.get();
+        provideRemovalTime(historyEvent);
+
+        break;
+      }
+    }
+  }
+
+  protected Set<Entry<Resources, Supplier<HistoryEvent>>> getHistoricInstanceResources(
+      CommandContext commandContext) {
+    Map<Resources, Supplier<HistoryEvent>> resources = new HashMap<>();
+
+    resources.put(Resources.HISTORIC_PROCESS_INSTANCE, () ->
+        getHistoricProcessInstance(commandContext));
+    resources.put(Resources.HISTORIC_TASK, () -> getHistoricTaskInstance(commandContext));
+
+    return resources.entrySet();
   }
 
   protected void provideRemovalTime(HistoryEvent historicInstance) {
@@ -92,10 +120,21 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
     }
   }
 
+  protected HistoryEvent getHistoricProcessInstance(CommandContext commandContext) {
+    String historicProcessInstanceId = authorization.getResourceId();
+
+    if (isNullOrAny(historicProcessInstanceId)) {
+      return null;
+    }
+
+    return commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstance(historicProcessInstanceId);
+  }
+
   protected HistoryEvent getHistoricTaskInstance(CommandContext commandContext) {
     String historicTaskInstanceId = authorization.getResourceId();
 
-    if (historicTaskInstanceId == null || isAny(historicTaskInstanceId)) {
+    if (isNullOrAny(historicTaskInstanceId)) {
       return null;
     }
 
@@ -103,12 +142,16 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
         .findHistoricTaskInstanceById(historicTaskInstanceId);
   }
 
-  protected boolean isAny(String historicTaskInstanceId) {
-    return Objects.equals(Authorization.ANY, historicTaskInstanceId);
+  protected boolean isNullOrAny(String resourceId) {
+    return resourceId == null || isAny(resourceId);
   }
 
-  protected boolean isHistoricTaskInstanceResource() {
-    return Objects.equals(Resources.HISTORIC_TASK.resourceType(), authorization.getResource());
+  protected boolean isAny(String resourceId) {
+    return Objects.equals(Authorization.ANY, resourceId);
+  }
+
+  protected boolean isResourceEqualTo(Resources resource) {
+    return Objects.equals(resource.resourceType(), authorization.getResource());
   }
 
 }
