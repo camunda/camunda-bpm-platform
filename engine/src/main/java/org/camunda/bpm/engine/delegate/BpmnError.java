@@ -53,6 +53,14 @@ public class BpmnError extends ProcessEngineException {
     setMessage(message);
   }
 
+	public BpmnError(String errorCode, String message, Throwable cause) {
+		this(errorCode, message + (cause != null ? "; details: " + cause.getMessage() : ""));
+	}
+
+	public BpmnError(String errorCode, Throwable cause) {
+		this(errorCode, cause.getMessage());
+	}
+
   protected void setErrorCode(String errorCode) {
     ensureNotEmpty("Error Code", errorCode);
     this.errorCode = errorCode;
