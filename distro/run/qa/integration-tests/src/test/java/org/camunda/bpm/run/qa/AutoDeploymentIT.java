@@ -17,9 +17,8 @@
 package org.camunda.bpm.run.qa;
 
 import static io.restassured.RestAssured.when;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -132,7 +131,7 @@ public class AutoDeploymentIT {
     List<String> resourceNames = extractResourceNames(resourcesResponse);
 
     // then
-    assertThat(resourceNames, contains("/form.html", "/script.js"));
+    assertThat(resourceNames).contains("/form.html", "/script.js");
   }
 
   @Test

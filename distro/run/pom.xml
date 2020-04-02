@@ -20,6 +20,11 @@
   <description>This is the root of Camunda BPM Run</description>
   <packaging>pom</packaging>
 
+  <properties>
+    <!-- keep compatible version to camunda-parent until we can directly inherit from it -->
+    <version.assertj>2.9.1</version.assertj>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
 
@@ -37,6 +42,12 @@
         <version>${project.version}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
       </dependency>
 
     </dependencies>
