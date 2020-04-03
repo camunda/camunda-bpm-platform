@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -35,6 +36,7 @@ import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -55,7 +57,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
@@ -71,6 +73,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected String jobId;
   protected String executionId;
   protected String processInstanceId;
+  protected Set<String> processInstanceIds;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected Boolean withRetriesLeft;
@@ -122,6 +125,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam(value = "processInstanceIds", converter = StringSetConverter.class)
+  public void setProcessInstanceIds(Set<String> processInstanceIds) {
+    this.processInstanceIds = processInstanceIds;
   }
 
   @CamundaQueryParam("processDefinitionId")
@@ -282,6 +290,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.processInstanceId(processInstanceId);
     }
 
+    if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
+      query.processInstanceIds(processInstanceIds);
+    }
+
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
@@ -387,7 +399,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     }
 
     if (tenantIds != null && !tenantIds.isEmpty()) {
-      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+      query.tenantIdIn(tenantIds.toArray(new String[0]));
     }
     if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
