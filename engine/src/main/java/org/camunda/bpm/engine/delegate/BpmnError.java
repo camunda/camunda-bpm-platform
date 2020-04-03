@@ -43,14 +43,36 @@ public class BpmnError extends ProcessEngineException {
   private String errorMessage;
 
   public BpmnError(String errorCode) {
-    super("");
+    super(exceptionMessage(errorCode, null));
     setErrorCode(errorCode);
   }
           
   public BpmnError(String errorCode, String message) {
-    super(message + " (errorCode='" + errorCode + "')");
+    super(exceptionMessage(errorCode, message));
     setErrorCode(errorCode);
     setMessage(message);
+  }
+
+  public BpmnError(String errorCode, String message, Throwable cause) {
+    super(exceptionMessage(errorCode, message), cause);
+    setErrorCode(errorCode);
+    setMessage(exceptionMessage(errorCode, message) + (cause != null ? "; details: " + cause.getMessage() : ""));
+  }
+
+  public BpmnError(String errorCode, Throwable cause) {
+    super(exceptionMessage(errorCode, null), cause);
+    setErrorCode(errorCode);
+    if (cause != null) {
+      setMessage(cause.getMessage());
+    }
+  }
+
+  private static String exceptionMessage(String errorCode, String message) {
+    if (message == null) {
+      return "errorCode='" + errorCode + "'";
+    } else {
+      return message + " (errorCode='" + errorCode + "')";
+    }
   }
 
   protected void setErrorCode(String errorCode) {
@@ -62,6 +84,7 @@ public class BpmnError extends ProcessEngineException {
     return errorCode;
   }
 
+  @Override
   public String toString() {
     return super.toString() + " (errorCode='" + errorCode + "')";
   }
@@ -71,6 +94,7 @@ public class BpmnError extends ProcessEngineException {
     this.errorMessage = errorMessage;
   }
 
+  @Override
   public String getMessage() {
     return errorMessage;
   }
