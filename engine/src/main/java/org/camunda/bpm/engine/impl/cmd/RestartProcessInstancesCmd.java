@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.RestartProcessInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -197,17 +196,28 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     HistoryService historyService = commandContext.getProcessEngineConfiguration()
         .getHistoryService();
 
-    HistoricActivityInstance startActivityInstance = resolveStartActivityInstance(processInstance);
-
-    HistoricDetailQueryImpl query =
-        (HistoricDetailQueryImpl) historyService.createHistoricDetailQuery()
-            .variableUpdates()
-            .executionId(processInstance.getId())
-            .activityInstanceId(startActivityInstance.getId());
-
-    List<HistoricDetail> historicDetails = query
-        .sequenceCounter(1)
+    List<HistoricDetail> historicDetails =
+        historyService.createHistoricDetailQuery()
+        .variableUpdates()
+        .executionId(processInstance.getId())
+        .initial()
         .list();
+
+    // legacy behavior < 7.13: the initial flag is never set for instances started
+    // in these versions. We must perform the old logic of finding initial variables
+    if (historicDetails.size() == 0) {
+      HistoricActivityInstance startActivityInstance = resolveStartActivityInstance(processInstance);
+
+      if (startActivityInstance != null) {
+        HistoricDetailQueryImpl queryWithStartActivities = (HistoricDetailQueryImpl) historyService.createHistoricDetailQuery()
+                .variableUpdates()
+                .activityInstanceId(startActivityInstance.getId())
+                .executionId(processInstance.getId());
+        historicDetails = queryWithStartActivities
+               .sequenceCounter(1)
+               .list();
+      }
+    }
 
     VariableMap variables = new VariableMapImpl();
     for (HistoricDetail detail : historicDetails) {

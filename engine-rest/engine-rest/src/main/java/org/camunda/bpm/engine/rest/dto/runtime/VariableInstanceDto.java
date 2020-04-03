@@ -26,6 +26,7 @@ public class VariableInstanceDto extends VariableValueDto {
 
   protected String id;
   protected String name;
+  protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
   protected String caseInstanceId;
@@ -51,6 +52,14 @@ public class VariableInstanceDto extends VariableValueDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public String getProcessInstanceId() {
@@ -110,6 +119,7 @@ public class VariableInstanceDto extends VariableValueDto {
 
     dto.id = variableInstance.getId();
     dto.name = variableInstance.getName();
+    dto.processDefinitionId = variableInstance.getProcessDefinitionId();
     dto.processInstanceId = variableInstance.getProcessInstanceId();
     dto.executionId = variableInstance.getExecutionId();
 

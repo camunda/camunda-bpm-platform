@@ -23,13 +23,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.Test;
 
 public class SqlAvailabilityIT {
 
   @Test
   public void shouldFindSqlResources() throws URISyntaxException {
-    Path sqlDir = Paths.get(SqlAvailabilityIT.class.getClassLoader().getResource("camunda-bpm-run-distro/configuration/sql/").toURI());
+    Path sqlDir = Paths.get(SpringBootManagedContainer.getRunHome(), "configuration", "sql");
 
     Path createDir = sqlDir.resolve("create");
     Path dropDir = sqlDir.resolve("drop");

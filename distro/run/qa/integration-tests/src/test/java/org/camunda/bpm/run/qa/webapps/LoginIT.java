@@ -31,14 +31,11 @@ import org.junit.runners.Parameterized.Parameters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertNotNull;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
 
@@ -75,10 +72,7 @@ public class LoginIT extends AbstractWebappUiIT {
 
   @BeforeParam
   public static void runStartScript(String[] commands) {
-    URL distroBase = LoginIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
-    assertNotNull(distroBase);
-    File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
+    container = new SpringBootManagedContainer(commands);
     try {
       container.start();
     } catch (Exception e) {

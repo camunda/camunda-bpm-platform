@@ -21,7 +21,7 @@ webappsPath=$BASEDIR/internal/webapps/
 restPath=$BASEDIR/internal/rest/
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
-configuration=$BASEDIR/configuration/application.yml
+configuration=$BASEDIR/configuration/default.yml
 
 
 # inspect arguments

@@ -238,13 +238,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     initialize();
 
+    fireHistoricProcessStartEvent();
+
     if (variables != null) {
       setVariables(variables);
     }
 
     initializeTimerDeclarations();
-
-    fireHistoricProcessStartEvent();
 
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
@@ -850,7 +850,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
 
-    ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
+    ExecutionStartContext executionStartContext = new ExecutionStartContext();
 
     InstantiationStack instantiationStack = new InstantiationStack(new LinkedList<>(activityStack));
     executionStartContext.setInstantiationStack(instantiationStack);
@@ -894,7 +894,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.isEnded = false;
 
     if (!activityStack.isEmpty()) {
-      ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
+      ExecutionStartContext executionStartContext = new ExecutionStartContext();
 
       InstantiationStack instantiationStack = new InstantiationStack(activityStack, targetActivity, targetTransition);
       executionStartContext.setInstantiationStack(instantiationStack);

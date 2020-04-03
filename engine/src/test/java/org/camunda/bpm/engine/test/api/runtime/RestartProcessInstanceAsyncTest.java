@@ -1088,7 +1088,7 @@ public class RestartProcessInstanceAsyncTest {
     // then
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).list();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstances.get(0).getId(), restartedProcessInstances.get(1).getId()).list();
-    Assert.assertEquals(0, variables.size());
+    assertEquals(0, variables.size());
   }
 
   @Test

@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityMode
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
@@ -1693,6 +1695,59 @@ public class HistoricProcessInstanceTest {
     }
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
+  public void testShouldStoreHistoricProcessInstanceVariableOnAsyncBefore() {
+    // given definition with asyncBefore startEvent
+
+    // when trigger process instance with variables
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableName("foo").singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("bar", historicVariable.getValue());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
+  public void testShouldStoreInitialHistoricProcessInstanceVariableOnAsyncBefore() {
+    // given definition with asyncBefore startEvent
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables().putValue("foo", "bar"));
+
+    runtimeService.setVariable(processInstance.getId(), "goo", "car");
+
+    // when
+    executeJob(managementService.createJobQuery().singleResult());
+
+    // then
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableName("foo").singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("bar", historicVariable.getValue());
+    historicVariable = historyService.createHistoricVariableInstanceQuery().variableName("goo").singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("car", historicVariable.getValue());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
+  public void testShouldSetVariableBeforeAsyncBefore() {
+    // given definition with asyncBefore startEvent
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    runtimeService.setVariable(processInstance.getId(), "goo", "car");
+
+    // when
+    executeJob(managementService.createJobQuery().singleResult());
+
+    // then
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableName("goo").singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("car", historicVariable.getValue());
+  }
+
   protected void deployment(String... resources) {
     testHelper.deploy(resources);
   }
@@ -1700,4 +1755,18 @@ public class HistoricProcessInstanceTest {
   protected void deployment(BpmnModelInstance... modelInstances) {
     testHelper.deploy(modelInstances);
   }
+
+  protected void executeJob(Job job) {
+    while (job != null && job.getRetries() > 0) {
+      try {
+        managementService.executeJob(job.getId());
+      }
+      catch (Exception e) {
+        // ignore
+      }
+
+      job = managementService.createJobQuery().jobId(job.getId()).singleResult();
+    }
+  }
+
 }

@@ -18,11 +18,8 @@ package org.camunda.bpm.run.qa;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static io.restassured.RestAssured.*;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -64,10 +61,7 @@ public class ComponentAvailabilityIT {
 
   @BeforeParam
   public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
-    URL distroBase = ComponentAvailabilityIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
-    assertNotNull(distroBase);
-    File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), commands);
+    container = new SpringBootManagedContainer(commands);
     try {
       container.start();
     } catch (Exception e) {

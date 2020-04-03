@@ -49,6 +49,7 @@ public class MockHistoricVariableUpdateBuilder {
   protected String caseExecutionId;
   protected String tenantId;
   protected String userOperationId;
+  protected boolean initial;
 
   public MockHistoricVariableUpdateBuilder id(String id) {
     this.id = id;
@@ -145,6 +146,11 @@ public class MockHistoricVariableUpdateBuilder {
     return this;
   }
 
+  public MockHistoricVariableUpdateBuilder initial(boolean initial) {
+    this.initial = initial;
+    return this;
+  }
+
   public HistoricVariableUpdate build() {
     HistoricVariableUpdate mockVariable = mock(HistoricVariableUpdate.class);
     when(mockVariable.getId()).thenReturn(id);
@@ -180,6 +186,7 @@ public class MockHistoricVariableUpdateBuilder {
     when(mockVariable.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockVariable.getTenantId()).thenReturn(tenantId);
     when(mockVariable.getUserOperationId()).thenReturn(userOperationId);
+    when(mockVariable.isInitial()).thenReturn(initial);
 
     return mockVariable;
   }
@@ -264,4 +271,7 @@ public class MockHistoricVariableUpdateBuilder {
     return tenantId;
   }
 
+  public boolean isInitial() {
+    return initial;
+  }
 }
