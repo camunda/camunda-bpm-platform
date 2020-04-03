@@ -30,10 +30,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -246,14 +249,14 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   private void testInvalidDateComparatorAsPost(DateParameters parameters) {
     String invalidComparator = "bt";
 
-    Map<String, Object> conditionJson = new HashMap<String, Object>();
+    Map<String, Object> conditionJson = new HashMap<>();
     conditionJson.put("operator", invalidComparator);
     conditionJson.put("value", withTimezone("2013-05-05T00:00:00"));
 
-    List<Map<String, Object>> conditions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> conditions = new ArrayList<>();
     conditions.add(conditionJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put(parameters.name(), conditions);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
@@ -273,14 +276,14 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private void testInvalidDateAsPost(DateParameters parameters) {
-    Map<String, Object> conditionJson = new HashMap<String, Object>();
+    Map<String, Object> conditionJson = new HashMap<>();
     conditionJson.put("operator", "lt");
     conditionJson.put("value", "invalidValue");
 
-    List<Map<String, Object>> conditions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> conditions = new ArrayList<>();
     conditions.add(conditionJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put(parameters.name(), conditions);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
@@ -343,7 +346,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testMessagesParameter() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("messages", MockProvider.EXAMPLE_MESSAGES);
 
     given().queryParams(parameters)
@@ -356,7 +359,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testMessagesTimersParameter() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("messages", MockProvider.EXAMPLE_MESSAGES);
     parameters.put("timers", MockProvider.EXAMPLE_TIMERS);
 
@@ -370,7 +373,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testMessagesTimersParameterAsPost() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("messages", MockProvider.EXAMPLE_MESSAGES);
     parameters.put("timers", MockProvider.EXAMPLE_TIMERS);
 
@@ -384,7 +387,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testMessagesParameterAsPost() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("messages", MockProvider.EXAMPLE_MESSAGES);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(parameters)
@@ -396,7 +399,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, Object> getCompleteParameters() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
 
     parameters.put("activityId", MockProvider.EXAMPLE_ACTIVITY_ID);
     parameters.put("jobId", MockProvider.EXAMPLE_JOB_ID);
@@ -481,19 +484,19 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     Date date = DateTimeUtil.parseDate(value);
     Date anotherDate = DateTimeUtil.parseDate(anotherValue);
 
-    Map<String, Object> conditionJson = new HashMap<String, Object>();
+    Map<String, Object> conditionJson = new HashMap<>();
     conditionJson.put("operator", "lt");
     conditionJson.put("value", value);
 
-    Map<String, Object> anotherConditionJson = new HashMap<String, Object>();
+    Map<String, Object> anotherConditionJson = new HashMap<>();
     anotherConditionJson.put("operator", "gt");
     anotherConditionJson.put("value", anotherValue);
 
-    List<Map<String, Object>> conditions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> conditions = new ArrayList<>();
     conditions.add(conditionJson);
     conditions.add(anotherConditionJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put(parameters.name(), conditions);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.OK.getStatusCode()).when().post(JOBS_RESOURCE_URL);
@@ -603,7 +606,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   @Test
   public void testSecondarySortingAsPost() {
     InOrder inOrder = Mockito.inOrder(mockQuery);
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("sorting", OrderingBuilder.create()
       .orderBy("jobRetries").desc()
       .orderBy("jobDueDate").asc()
@@ -738,7 +741,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   public void testTenantIdListPostParameter() {
     mockQuery = setUpMockJobQuery(createMockJobsTwoTenants());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
 
     Response response = given()
@@ -768,7 +771,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     Job mockJob = MockProvider.mockJob().tenantId(null).build();
     mockQuery = setUpMockJobQuery(Arrays.asList(mockJob));
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("withoutTenantId", true);
 
     Response response = given()
@@ -794,7 +797,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
         MockProvider.mockJob().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockQuery = setUpMockJobQuery(jobs);
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("tenantIdIn", new String[] { MockProvider.EXAMPLE_TENANT_ID });
     queryParameters.put("includeJobsWithoutTenantId", true);
 
@@ -825,6 +828,70 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     return Arrays.asList(
         MockProvider.mockJob().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
         MockProvider.mockJob().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
+  }
+
+  @Test
+  public void testProcessInstanceIdListParameter() {
+    mockQuery = setUpMockJobQuery(createMockJobsTwoProcessInstances());
+
+    Response response = given()
+      .queryParam("processInstanceIds", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(JOBS_RESOURCE_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockQuery).processInstanceIds(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].processInstanceId");
+    String returnedTenantId2 = from(content).getString("[1].processInstanceId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
+  public void testProcessInstanceIdListPostParameter() {
+    mockQuery = setUpMockJobQuery(createMockJobsTwoProcessInstances());
+
+    Map<String, Object> queryParameters = new HashMap<>();
+    queryParameters.put("processInstanceIds", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST.split(","));
+
+    Response response = given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(JOBS_RESOURCE_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockQuery).processInstanceIds(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].processInstanceId");
+    String returnedTenantId2 = from(content).getString("[1].processInstanceId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  private List<Job> createMockJobsTwoProcessInstances() {
+    return Arrays.asList(
+        MockProvider.mockJob().processInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).build(),
+        MockProvider.mockJob().processInstanceId(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID).build());
   }
 
 }
