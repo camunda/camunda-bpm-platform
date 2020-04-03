@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -60,7 +60,17 @@ public class ByteArrayManager extends AbstractManager {
     parameters.put("removalTime", removalTime);
 
     getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByProcessInstanceId", parameters);
+      .updatePreserveOrder(ByteArrayEntity.class, "updateVariableByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionInputsByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateDecisionOutputsByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateJobLogByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateExternalTaskLogByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateAttachmentByteArraysByProcessInstanceId", parameters);
   }
 
   public DbOperation deleteByteArraysByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
