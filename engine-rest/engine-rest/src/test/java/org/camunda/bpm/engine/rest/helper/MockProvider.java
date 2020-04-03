@@ -455,6 +455,8 @@ public abstract class MockProvider {
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
   public static final String EXAMPLE_JOB_ID = "aJobId";
+  public static final String ANOTHER_EXAMPLE_JOB_ID = "anotherJobId";
+  public static final String EXAMPLE_JOB_ID_LIST = EXAMPLE_JOB_ID + "," + ANOTHER_EXAMPLE_JOB_ID;
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3;
   public static final int EXAMPLE_JOB_RETRIES = 3;

@@ -881,11 +881,11 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     List<String> jobs = from(content).getList("");
     assertThat(jobs).hasSize(2);
 
-    String returnedTenantId1 = from(content).getString("[0].processInstanceId");
-    String returnedTenantId2 = from(content).getString("[1].processInstanceId");
+    String returnedProcessInstaneId1 = from(content).getString("[0].processInstanceId");
+    String returnedProcessInstaneId2 = from(content).getString("[1].processInstanceId");
 
-    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+    assertThat(returnedProcessInstaneId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    assertThat(returnedProcessInstaneId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
   }
 
   private List<Job> createMockJobsTwoProcessInstances() {
@@ -894,4 +894,67 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
         MockProvider.mockJob().processInstanceId(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID).build());
   }
 
+  @Test
+  public void testJobIdListParameter() {
+    mockQuery = setUpMockJobQuery(createMockJobsTwoJobIds());
+
+    Response response = given()
+      .queryParam("jobIds", MockProvider.EXAMPLE_JOB_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(JOBS_RESOURCE_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXAMPLE_JOB_ID, MockProvider.ANOTHER_EXAMPLE_JOB_ID);
+    verify(mockQuery).jobIds(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(2);
+
+    String returnedJobId1 = from(content).getString("[0].id");
+    String returnedJobId2 = from(content).getString("[1].id");
+
+    assertThat(returnedJobId1).isEqualTo(MockProvider.EXAMPLE_JOB_ID);
+    assertThat(returnedJobId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_JOB_ID);
+  }
+
+  @Test
+  public void testJobIdListPostParameter() {
+    mockQuery = setUpMockJobQuery(createMockJobsTwoJobIds());
+
+    Map<String, Object> queryParameters = new HashMap<>();
+    queryParameters.put("jobIds", MockProvider.EXAMPLE_JOB_ID_LIST.split(","));
+
+    Response response = given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(JOBS_RESOURCE_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXAMPLE_JOB_ID, MockProvider.ANOTHER_EXAMPLE_JOB_ID);
+    verify(mockQuery).jobIds(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(2);
+
+    String returnedJobId1 = from(content).getString("[0].id");
+    String returnedJobId2 = from(content).getString("[1].id");
+
+    assertThat(returnedJobId1).isEqualTo(MockProvider.EXAMPLE_JOB_ID);
+    assertThat(returnedJobId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_JOB_ID);
+  }
+
+  private List<Job> createMockJobsTwoJobIds() {
+    return Arrays.asList(
+        MockProvider.mockJob().build(),
+        MockProvider.mockJob().id(MockProvider.ANOTHER_EXAMPLE_JOB_ID).build());
+  }
 }

@@ -28,6 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto;
@@ -71,6 +72,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
   protected String activityId;
   protected String jobId;
+  protected Set<String> jobIds;
   protected String executionId;
   protected String processInstanceId;
   protected Set<String> processInstanceIds;
@@ -115,6 +117,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam("jobId")
   public void setJobId(String jobId) {
     this.jobId = jobId;
+  }
+
+  @CamundaQueryParam(value = "jobIds", converter = StringSetConverter.class)
+  public void setJobIds(Set<String> jobIds) {
+    this.jobIds = jobIds;
   }
 
   @CamundaQueryParam("executionId")
@@ -282,6 +289,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.jobId(jobId);
     }
 
+    if (!CollectionUtil.isEmpty(jobIds)) {
+      query.jobIds(jobIds);
+    }
+
     if (executionId != null) {
       query.executionId(executionId);
     }
@@ -290,7 +301,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.processInstanceId(processInstanceId);
     }
 
-    if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
+    if (!CollectionUtil.isEmpty(processInstanceIds)) {
       query.processInstanceIds(processInstanceIds);
     }
 
@@ -398,7 +409,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       }.run(createTimes);
     }
 
-    if (tenantIds != null && !tenantIds.isEmpty()) {
+    if (!CollectionUtil.isEmpty(tenantIds)) {
       query.tenantIdIn(tenantIds.toArray(new String[0]));
     }
     if (TRUE.equals(withoutTenantId)) {
