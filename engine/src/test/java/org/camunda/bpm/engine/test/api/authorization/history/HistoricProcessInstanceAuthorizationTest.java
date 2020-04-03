@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
@@ -28,6 +29,7 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -788,6 +790,41 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     assertThat(result.size()).isEqualTo(1);
+  }
+
+  public void testDeleteHistoricAuthorizationRelatedToHistoricProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_HISTORY);
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // assume
+    List<Authorization> authorizations = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+        .resourceId(processInstanceId)
+        .list();
+
+    assertThat(authorizations.size()).isEqualTo(1);
+
+    // when
+    historyService.deleteHistoricProcessInstance(processInstanceId);
+
+    // then
+    authorizations = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+        .resourceId(processInstanceId)
+        .list();
+
+    assertThat(authorizations.size()).isEqualTo(0);
   }
 
   // helper ////////////////////////////////////////////////////////

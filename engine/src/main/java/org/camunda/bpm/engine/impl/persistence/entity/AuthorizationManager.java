@@ -433,6 +433,18 @@ public class AuthorizationManager extends AbstractManager {
 
   // delete authorizations //////////////////////////////////////////////////
 
+  public void deleteAuthorizationsByResourceIds(Resources resource,
+                                                List<String> resourceIds) {
+
+    if(resourceIds == null) {
+      throw new IllegalArgumentException("Resource ids cannot be null");
+    }
+
+    resourceIds.forEach(resourceId ->
+        deleteAuthorizationsByResourceId(resource, resourceId));
+
+  }
+
   public void deleteAuthorizationsByResourceId(Resource resource, String resourceId) {
 
     if(resourceId == null) {
