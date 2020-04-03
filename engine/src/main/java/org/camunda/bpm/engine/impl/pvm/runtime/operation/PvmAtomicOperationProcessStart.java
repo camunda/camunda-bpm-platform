@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -32,8 +33,7 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
 
   @Override
   public boolean isAsync(PvmExecutionImpl execution) {
-    ProcessInstanceStartContext startContext = execution.getProcessInstanceStartContext();
-    return startContext != null && startContext.isAsync();
+    return execution.getActivity().isAsyncBefore();
   }
 
   public boolean isAsyncCapable() {
@@ -53,6 +53,11 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
     // "processInstanceStartContext" on the given execution.
     // Do not remove it!
     execution.getProcessInstanceStartContext();
+
+    if (execution.getActivity() != null && execution.getActivity().isAsyncBefore()) {
+      LegacyBehavior.createMissingHistoricVariables(execution);
+    }
+
     return execution;
   }
 
@@ -79,6 +84,7 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
           execution.performOperation(ACTIVITY_INIT_STACK);
 
         }
+
         return null;
       }
     }, execution);

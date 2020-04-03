@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -30,12 +29,6 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     super.eventNotificationsCompleted(execution);
-
-    ExecutionStartContext executionStartContext = execution.getExecutionStartContext();
-    if (executionStartContext != null) {
-      executionStartContext.executionStarted(execution);
-      execution.disposeExecutionStartContext();
-    }
 
     execution.dispatchDelayedEventsAndPerformOperation(ACTIVITY_EXECUTE);
   }

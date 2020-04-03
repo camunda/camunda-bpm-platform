@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.history;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,6 +26,7 @@ import static org.junit.Assert.fail;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,17 +41,23 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.bpmn.async.AsyncListener;
 import org.camunda.bpm.engine.test.cmmn.decisiontask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -544,6 +552,228 @@ public class HistoricDetailQueryTest {
     // then
     assertThat(detail.getCaseInstanceId(), is(caseInstanceId));
     assertThat(detail.getCaseExecutionId(), is(caseInstanceId));
+  }
+
+  @Test
+  public void testInitialFlagAsyncBeforeUserTask() {
+    //given
+    BpmnModelInstance model = AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS;
+
+    testHelper.deployAndGetDefinition(model);
+
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY,
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String localValue = "bar";
+    runtimeService.setVariableLocal(processInstance.getId(), "local", localValue);
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+      String variableValue = detail.getTextValue();
+      if (variableValue.equals(initalValue)) {
+        assertTrue(detail.isInitial());
+      } else if (variableValue.equals(localValue)) {
+        assertFalse(detail.isInitial());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
+  }
+
+  @Test
+  public void testInitialFlagAsyncBeforeStartEvent() {
+    //given
+    BpmnModelInstance model = AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS;
+
+    testHelper.deployAndGetDefinition(model);
+
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY,
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String secondValue = "second";
+    runtimeService.setVariable(processInstance.getId(), "foo", secondValue);
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+
+      String variableValue = detail.getTextValue();
+
+      if (variableValue.equals(initalValue)) {
+        assertTrue(detail.isInitial());
+      } else if (variableValue.equals(secondValue)) {
+        assertFalse(detail.isInitial());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
+  }
+
+  @Test
+  public void testInitialFlagAsyncBeforeSubprocess() {
+    //given
+    BpmnModelInstance model = AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS;
+
+    testHelper.deployAndGetDefinition(model);
+
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY,
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String secondValue = "second";
+    runtimeService.setVariable(processInstance.getId(), "foo", secondValue);
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+
+      String variableValue = detail.getTextValue();
+
+      if (variableValue.equals(initalValue)) {
+        assertTrue(detail.isInitial());
+      } else if (variableValue.equals(secondValue)) {
+        assertFalse(detail.isInitial());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEventListeners.bpmn20.xml"})
+  public void testInitialFlagAsyncBeforeStartEventGlobalExecutionListener() {
+    // given
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncStartEvent",
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+
+      assertTrue(detail.isInitial());
+
+      String variableValue = detail.getTextValue();
+      if (variableValue.equals(initalValue)) {
+        assertEquals("foo", detail.getVariableName());
+      } else if (variableValue.equals("listener invoked")) {
+        assertEquals("listener", detail.getVariableName());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
+  }
+
+  @Test
+  public void testInitialFlagAsyncBeforeStartEventExecutionListener() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .camundaAsyncBefore()
+        .camundaExecutionListenerClass("start", AsyncListener.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testHelper.deployAndGetDefinition(model);
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+      String variableValue = detail.getTextValue();
+      assertTrue(detail.isInitial());
+      if (variableValue.equals(initalValue)) {
+        assertEquals("foo", detail.getVariableName());
+      } else if (variableValue.equals("listener invoked")) {
+        assertEquals("listener", detail.getVariableName());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
+  }
+
+  @Test
+  public void testInitialFlagAsyncBeforeStartEventEndExecutionListener() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .camundaAsyncBefore()
+        .camundaExecutionListenerClass("end", AsyncListener.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testHelper.deployAndGetDefinition(model);
+    String initalValue = "initial";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("foo", initalValue));
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+
+    // when
+    List<HistoricDetail> details = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstance.getId())
+        .list();
+
+    // then
+    assertEquals(2, details.size());
+    for (HistoricDetail historicDetail : details) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
+      String variableValue = detail.getTextValue();
+      assertTrue(detail.isInitial());
+      if (variableValue.equals(initalValue)) {
+        assertEquals("foo", detail.getVariableName());
+      } else if (variableValue.equals("listener invoked")) {
+        assertEquals("listener", detail.getVariableName());
+      } else {
+        fail("illegal variable value:" + variableValue);
+      }
+    }
   }
 
   protected VariableMap getVariables() {

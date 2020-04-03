@@ -1960,17 +1960,12 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
       if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
 
-        String startEventId = historyService
-          .createHistoricActivityInstanceQuery()
-          .activityId("startEvent")
-          .singleResult()
-          .getId();
-
         HistoricDetail historicDetail = historyService
           .createHistoricDetailQuery()
           .singleResult();
 
-        assertEquals(startEventId, historicDetail.getActivityInstanceId());
+        assertNotNull(historicDetail);
+        assertEquals(historicDetail.getProcessInstanceId(), historicDetail.getActivityInstanceId());
       }
     }
   }
@@ -2011,19 +2006,12 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
       assertEquals(processInstanceId, variable.getActivityInstanceId());
 
       if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-
-        String theStartActivityInstanceId = historyService
-          .createHistoricActivityInstanceQuery()
-          .activityId("messageStartEvent")
-          .singleResult()
-          .getId();
-
         HistoricDetail historicDetail = historyService
           .createHistoricDetailQuery()
           .singleResult();
 
-        assertEquals(theStartActivityInstanceId, historicDetail.getActivityInstanceId());
-
+        assertNotNull(historicDetail);
+        assertEquals(historicDetail.getProcessInstanceId(), historicDetail.getActivityInstanceId());
       }
     }
   }
@@ -2143,12 +2131,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
       if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
 
-        String theStartActivityInstanceId = historyService
-          .createHistoricActivityInstanceQuery()
-          .activityId("startEvent")
-          .singleResult()
-          .getId();
-
         HistoricFormField historicFormUpdate = (HistoricFormField) historyService
           .createHistoricDetailQuery()
           .formFields()
@@ -2163,7 +2145,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
           .singleResult();
 
         assertNotNull(historicVariableUpdate);
-        assertEquals(theStartActivityInstanceId, historicVariableUpdate.getActivityInstanceId());
+        assertEquals(historicVariableUpdate.getProcessInstanceId(), historicVariableUpdate.getActivityInstanceId());
         assertEquals("bar", historicVariableUpdate.getValue());
 
       }

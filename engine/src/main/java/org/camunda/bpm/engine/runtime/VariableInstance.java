@@ -65,6 +65,11 @@ public interface VariableInstance {
   String getExecutionId();
 
   /**
+   * Return the corresponding process definition id.
+   */
+  String getProcessDefinitionId();
+
+  /**
    * Returns the corresponding case instance id.
    */
   String getCaseInstanceId();

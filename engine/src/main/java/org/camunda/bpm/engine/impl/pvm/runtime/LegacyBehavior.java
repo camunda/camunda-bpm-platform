@@ -44,6 +44,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceHistoryListener;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
@@ -53,7 +55,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 
 /**
  * This class encapsulates legacy runtime behavior for the process engine.
@@ -633,6 +634,30 @@ public class LegacyBehavior {
     });
 
     return walker.getCurrentElement();
+  }
+
+  /**
+   * See #CAM-10978
+   * Use case process instance with <code>asyncBefore</code> startEvent
+   * After unifying the history variable's creation<br>
+   * The following changed:<br>
+   *   * variables will receive the <code>processInstanceId</code> as <code>activityInstanceId</code> in such cases (previously was the startEvent id)<br>
+   *   * historic details have new <code>initial</code> property to track initial variables that process is started with<br>
+   * The jobs created prior <code>7.13</code> and not executed before do not have historic information of variables.
+   * This method takes care of that.
+   */
+  public static void createMissingHistoricVariables(PvmExecutionImpl execution) {
+    Collection<VariableInstanceEntity> variables = ((ExecutionEntity) execution).getVariablesInternal();
+
+    if (variables != null && variables.size() > 0) {
+      // trigger historic creation if the history is not presented already
+      for (VariableInstanceEntity variable : variables) {
+
+        if (variable.wasCreatedBefore713()) {
+          VariableInstanceHistoryListener.INSTANCE.onCreate(variable, variable.getExecution());
+        }
+      }
+    }
   }
 
 }
