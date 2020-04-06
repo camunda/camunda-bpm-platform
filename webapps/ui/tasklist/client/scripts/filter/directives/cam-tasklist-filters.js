@@ -51,7 +51,7 @@ module.exports = [
 
           var page = ($scope.page = {
             total: 0,
-            current: 1,
+            current: search().filterPage || 1,
             size: 50
           });
 
@@ -60,6 +60,9 @@ module.exports = [
               (page.current - 1) * page.size,
               page.current * page.size
             );
+            search.updateSilently({
+              filterPage: page.current === 1 ? null : page.current
+            });
           }
 
           $scope.openModal = $scope.openModal() || noop;
