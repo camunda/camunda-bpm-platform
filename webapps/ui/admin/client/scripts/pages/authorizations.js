@@ -78,7 +78,8 @@ module.exports = [
               'AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION'
             ),
             17: $translate.instant('AUTHORIZATION_OPERATION_LOG'),
-            19: $translate.instant('AUTHORIZATION_HISTORIC_TASK')
+            19: $translate.instant('AUTHORIZATION_HISTORIC_TASK'),
+            20: $translate.instant('AUTHORIZATION_HISTORIC_PROCESS_INSTANCE')
           };
 
           pageService.breadcrumbsAdd([
@@ -169,7 +170,8 @@ module.exports = [
             ],
             14: ['READ'],
             17: ['READ', 'DELETE', 'UPDATE'],
-            19: ['READ', 'READ_VARIABLE']
+            19: ['READ', 'READ_VARIABLE'],
+            20: ['READ']
           };
 
           $scope.typeMap = {
