@@ -1,0 +1,47 @@
+.modal {
+  cursor: auto;
+  &:after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    cursor: pointer;
+    z-index: 1;
+  }
+}
+
+.modal-backdrop {
+  background-color: fade(@body-bg, 85%);
+  bottom: 0;
+  cursor: pointer;
+  &.in {
+    opacity: 1;
+    filter: alpha(opacity=100);
+  }
+}
+
+.modal-dialog {
+  position: relative;
+  z-index: 2;
+}
+
+.modal-content {
+  background-color: @gray-lighter;
+}
+
+.modal-body {
+  background-color: @body-bg;
+  border: 1px solid darken(@gray-lighter, 15%);
+  border-width: 1px 0;
+
+  > form {
+    overflow: hidden;
+    padding: (@grid-gutter-width / 2);
+    > fieldset {
+      max-width: 100%;
+    }
+  }
+}

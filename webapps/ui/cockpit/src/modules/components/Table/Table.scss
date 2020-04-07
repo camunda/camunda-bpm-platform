@@ -1,0 +1,25 @@
+.Table {
+  width: 100%;
+  max-width: 100%;
+
+  .TableRow {
+    &:nth-of-type(odd) {
+      background-color: #f9f9f9;
+    }
+    &:hover {
+      background-color: #eaf0f8;
+    }
+  }
+
+  .TableHead {
+    padding: 5px;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .TableCell {
+    padding: 5px;
+    line-height: 1.5;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+  }
+}

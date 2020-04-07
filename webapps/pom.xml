@@ -27,6 +27,7 @@
 
     <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
     <frontend.development.tasklist.path>${frontend.app.path}</frontend.development.tasklist.path>
+    <frontend.react.path>ui/cockpit</frontend.react.path>
 
     <exec.shell>bash</exec.shell>
     <exec.arg>-c</exec.arg>
@@ -944,11 +945,16 @@
                       <arg value="install" />
                     </exec>
                     -->
-                    <exec executable="cmd" failonerror="true">
+                    <exec dir="./ui/cockpit" executable="cmd" failonerror="true">
                       <arg value="/c" />
-                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="npm" />
+                      <arg value="install" />
+                    </exec>
+                    <exec dir="./ui/cockpit" executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="run" />
                       <arg value="build" />
-                      <arg value="--color=false" />
                     </exec>
                   </target>
                 </configuration>
@@ -994,6 +1000,22 @@
                     <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
                       <arg value="build" />
                       <arg value="--color=false" />
+                    </exec>
+                    <exec dir="${frontend.react.path}" executable="npm" failonerror="true">
+                      <arg value="install" />
+                    </exec>
+                    <exec dir="${frontend.react.path}" executable="npm" failonerror="true">
+                      <arg value="run" />
+                      <arg value="buildCE" />
+                    </exec>
+                    <exec executable="rm" failonerror="true">
+                      <arg value="${project.build.directory}/webapp/app/cockpit/" />
+                      <arg value="-rf" />
+                    </exec>
+                    <exec executable="cp" failonerror="true">
+                      <arg value="${frontend.react.path}/build/" />
+                      <arg value="${project.build.directory}/webapp/app/cockpit/" />
+                      <arg value="-r" />
                     </exec>
                   </target>
                 </configuration>
