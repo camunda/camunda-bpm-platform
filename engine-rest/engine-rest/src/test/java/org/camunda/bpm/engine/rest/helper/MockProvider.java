@@ -455,6 +455,8 @@ public abstract class MockProvider {
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
   public static final String EXAMPLE_JOB_ID = "aJobId";
+  public static final String ANOTHER_EXAMPLE_JOB_ID = "anotherJobId";
+  public static final String EXAMPLE_JOB_ID_LIST = EXAMPLE_JOB_ID + "," + ANOTHER_EXAMPLE_JOB_ID;
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3;
   public static final int EXAMPLE_JOB_RETRIES = 3;
@@ -864,6 +866,8 @@ public abstract class MockProvider {
 
   // external task
   public static final String EXTERNAL_TASK_ID = "anExternalTaskId";
+  public static final String EXTERNAL_TASK_ANOTHER_ID = "anotherExternalTaskId";
+  public static final String EXTERNAL_TASK_ID_LIST = EXTERNAL_TASK_ID + "," + EXTERNAL_TASK_ANOTHER_ID;
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
   public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = withTimezone("2015-10-05T13:25:00");
   public static final Integer EXTERNAL_TASK_RETRIES = new Integer(5);

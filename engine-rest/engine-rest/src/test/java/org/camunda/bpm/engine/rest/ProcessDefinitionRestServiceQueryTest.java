@@ -20,7 +20,9 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,12 +31,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -47,7 +51,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -146,7 +149,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
 
   @Test
   public void testProcessDefinitionRetrieval() {
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
 
     String queryKey = "Key";
     Response response = given().queryParam("keyLike", queryKey)
@@ -199,7 +202,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
         .get(PROCESS_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).processDefinitionIdIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
     inOrder.verify(mockedQuery).list();
 
@@ -226,7 +229,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
         .get(PROCESS_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery, never()).processDefinitionIdIn(Matchers.<String[]>anyVararg());
     inOrder.verify(mockedQuery).list();
 
@@ -514,52 +517,57 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
 
   @Test
   public void testSortingParameters() {
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    InOrder inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionName();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("deployTime", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByDeploymentTime();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("tenantId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("versionTag", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByVersionTag();
     inOrder.verify(mockedQuery).asc();
 
-    inOrder = Mockito.inOrder(mockedQuery);
+    inOrder = inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("versionTag", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByVersionTag();
     inOrder.verify(mockedQuery).asc();
@@ -611,4 +619,29 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     verify(mockedQuery).count();
   }
 
+  @Test
+  public void testQueryByDeployTimeAfter() {
+    String deployTime = withTimezone("2020-03-27T01:23:45");
+    Date date = DateTimeUtil.parseDate(deployTime);
+    
+    given().queryParam("deployedAfter", deployTime)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).deployedAfter(date);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryByDeployTimeAt() {
+    String deployTime = withTimezone("2020-03-27T05:43:21");
+    Date date = DateTimeUtil.parseDate(deployTime);
+    
+    given().queryParam("deployedAt", deployTime)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).deployedAt(date);
+    verify(mockedQuery).list();
+  }
 }

@@ -8,6 +8,12 @@
       desc = "Filter by an external task's id." />
 
   <@lib.property
+    name = "externalTaskIdIn"
+    type = "array"
+    itemType = "string"
+    desc = "Filter by the comma-separated list of external task ids." />
+
+  <@lib.property
       name = "topicName"
       type = "string"
       desc = "Filter by an external task topic." />

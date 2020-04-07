@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.db.sql;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -38,6 +37,7 @@ public class MybatisJoinHelper {
     mappings.put(QueryOrderingProperty.RELATION_VARIABLE, new VariableTableMapping());
     mappings.put(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, new ProcessDefinitionTableMapping());
     mappings.put(QueryOrderingProperty.RELATION_CASE_DEFINITION, new CaseDefinitionTableMapping());
+    mappings.put(QueryOrderingProperty.RELATION_DEPLOYMENT, new DeploymentTableMapping());
   }
 
   public static String tableAlias(String relation, int index) {
