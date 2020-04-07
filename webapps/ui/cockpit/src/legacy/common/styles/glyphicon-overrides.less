@@ -1,0 +1,36 @@
+
+.glyphicon {
+  &.glyphicon-plus-sign,
+  &.glyphicon-minus-sign,
+  &.glyphicon-remove,
+  &.glyphicon-remove-sign {
+    min-width: 1em;
+    text-align: center;
+    &:before {
+      vertical-align: text-bottom;
+      font-family: @font-family-base;
+    }
+  }
+
+  &.glyphicon-plus-sign,
+  &.glyphicon-minus-sign {
+    &:before {
+      line-height: 0.8;
+      font-size: 140%;
+    }
+  }
+  &.glyphicon-plus-sign:before {
+    content: '+';
+  }
+  &.glyphicon-minus-sign:before {
+    content: '-';
+  }
+
+  &.glyphicon-remove,
+  &.glyphicon-remove-sign {
+    &:before {
+      content: '\002A2F';
+      font-weight: 900;
+    }
+  }
+}
