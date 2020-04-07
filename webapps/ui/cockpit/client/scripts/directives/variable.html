@@ -40,15 +40,15 @@
          autofocus="autofocus"
          required />
 
-  <input ng-if="isDate(variable)"
-         class="form-control"
-         date
-         name="editDateValue"
-         ng-model="variable.value"
-         type="text"
-         ng-class="{'in-place-edit': isInPlaceEdit() }"
-         autofocus="autofocus"
-         required />
+  <span cam-widget-inline-field
+        class="form-control-static"
+        type="datetime"
+        value="variable.value"
+        ng-if="isDate(variable)"
+        flexible="true"
+        required>
+           <a>{{variable.value || 'VARIABLE_SELECT_DATE' | translate}}</a>
+  </span>
 
   <textarea ng-if="isString(variable) || isJSON(variable) || isXML(variable)"
             id="value"
