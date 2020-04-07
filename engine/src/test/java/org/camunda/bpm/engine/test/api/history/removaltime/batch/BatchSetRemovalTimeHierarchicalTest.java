@@ -622,7 +622,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  public void shouldSetRemovalTime_TaskInstanceAuthorization() {
+  public void shouldSetRemovalTime_HistoricTaskInstanceAuthorization() {
     // given
     testRule.getProcessEngineConfiguration()
         .setEnableHistoricInstancePermissions(true);
@@ -658,13 +658,10 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
     // then
     assertThat(authorization.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
-
-    // clear
-    testRule.clearAuthorization();
   }
 
   @Test
-  public void shouldNotSetRemovalTime_HistoricInstancePermissionsDisabled() {
+  public void shouldNotSetRemovalTime_HistoricTaskInstancePermissionsDisabled() {
     // given
     testRule.getProcessEngineConfiguration()
         .setEnableHistoricInstancePermissions(true);
@@ -697,9 +694,87 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
     // then
     assertThat(authorization.getRemovalTime()).isNull();
+  }
 
-    // clear
-    testRule.clearAuthorization();
+  @Test
+  public void shouldSetRemovalTime_HistoricProcessInstanceAuthorization() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = testRule.process().call().userTask().deploy().start();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+    authorization.setResourceId(processInstanceId);
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    // assume
+    authorization = authorizationService.createAuthorizationQuery().singleResult();
+
+    assertThat(authorization.getRemovalTime()).isNull();
+
+    // when
+    testRule.updateHistoryTimeToLive("rootProcess", 5);
+
+    HistoricProcessInstanceQuery query =
+        historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
+
+    testRule.syncExec(
+        historyService.setRemovalTimeToHistoricProcessInstances()
+            .calculatedRemovalTime()
+            .byQuery(query)
+            .hierarchical()
+            .executeAsync()
+    );
+
+    // then
+    authorization = authorizationService.createAuthorizationQuery()
+            .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+            .singleResult();
+
+    assertThat(authorization.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  public void shouldNotSetRemovalTime_HistoricProcessInstancePermissionsDisabled() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(false);
+
+    String processInstanceId = testRule.process().call().userTask().deploy().start();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+    authorization.setResourceId(processInstanceId);
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    testRule.updateHistoryTimeToLive("rootProcess", 5);
+
+    // when
+    HistoricProcessInstanceQuery query =
+        historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
+
+    testRule.syncExec(
+        historyService.setRemovalTimeToHistoricProcessInstances()
+            .calculatedRemovalTime()
+            .byQuery(query)
+            .hierarchical()
+            .executeAsync()
+    );
+
+    // then
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+        .singleResult();
+
+    assertThat(authorization.getRemovalTime()).isNull();
   }
 
   @Test
