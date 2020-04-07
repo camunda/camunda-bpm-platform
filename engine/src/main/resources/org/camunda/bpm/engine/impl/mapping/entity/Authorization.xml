@@ -79,11 +79,15 @@
     update ${prefix}ACT_RU_AUTHORIZATION set
     REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
-    where RESOURCE_ID_ IN (
-      SELECT ID_
-      FROM ${prefix}ACT_HI_TASKINST
-      WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-    )
+    where
+      <!-- task instances -->
+      RESOURCE_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+      <!-- process instances -->
+      or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
