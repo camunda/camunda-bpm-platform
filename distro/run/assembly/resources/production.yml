@@ -15,12 +15,12 @@ camunda.bpm:
 
   generic-properties.properties:
 # https://docs.camunda.org/manual/latest/user-guide/security/#variable-values-from-untrusted-sources
-    deserializationTypeValidationEnabled: true
-    deserializationAllowedPackages:
-    deserializationAllowedClasses:
+    deserialization-type-validationEnabled: true
+    deserialization-allowed-packages:
+    deserialization-allowed-classes:
 # https://docs.camunda.org/manual/latest/user-guide/security/#password-policy
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/password-policy/
-    enablePasswordPolicy: true
+    enable-password-policy: true
 
   run:
 # https://docs.camunda.org/manual/latest/user-guide/security/#authentication
