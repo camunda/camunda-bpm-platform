@@ -71,6 +71,19 @@ module.exports = [
 
           // observe ////////////////////////////////////////////////////////////////////////////////
 
+          $scope.$on('$locationChangeSuccess', function locationChange() {
+            var params = search();
+
+            if (
+              params &&
+              params.filterPage &&
+              params.filterPage !== page.current
+            ) {
+              page.current = params.filterPage;
+              updateView();
+            }
+          });
+
           /**
            * observe the count for the current filter
            */
