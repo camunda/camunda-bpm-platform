@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_05aqf66" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.1">
+  <bpmn:process id="ProcessInstanceAssert-isWaitingForJoinAt3" name="Nested inclusive" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_14ejaqg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_14ejaqg" sourceRef="StartEvent_1" targetRef="SplitInclusiveGateway" />
+    <bpmn:sequenceFlow id="Flow_0eohxgr" sourceRef="SplitInclusiveGateway" targetRef="Task1" />
+    <bpmn:endEvent id="Event_08gj8a8">
+      <bpmn:incoming>Flow_11ayi3o</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dv8qw9" sourceRef="Task1" targetRef="JoinInclusiveGateway1" />
+    <bpmn:userTask id="Task1" name="Task 1">
+      <bpmn:incoming>Flow_0eohxgr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dv8qw9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1ct2mkv" sourceRef="JoinInclusiveGateway1" targetRef="JoinInclusiveGateway2" />
+    <bpmn:sequenceFlow id="Flow_1e4019d" sourceRef="SplitInclusiveGateway" targetRef="Task2" />
+    <bpmn:sequenceFlow id="Flow_1ucifke" sourceRef="SplitInclusiveGateway" targetRef="Task3" />
+    <bpmn:sequenceFlow id="Flow_1ywxe5m" sourceRef="Task2" targetRef="JoinInclusiveGateway1" />
+    <bpmn:sequenceFlow id="Flow_11ayi3o" sourceRef="JoinInclusiveGateway2" targetRef="Event_08gj8a8" />
+    <bpmn:sequenceFlow id="Flow_05qtxwe" sourceRef="Task3" targetRef="JoinInclusiveGateway2" />
+    <bpmn:userTask id="Task2" name="Task 2">
+      <bpmn:incoming>Flow_1e4019d</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ywxe5m</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task3" name="Task 3">
+      <bpmn:incoming>Flow_1ucifke</bpmn:incoming>
+      <bpmn:outgoing>Flow_05qtxwe</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:inclusiveGateway id="SplitInclusiveGateway" name="Split">
+      <bpmn:incoming>Flow_14ejaqg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0eohxgr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1e4019d</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ucifke</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    <bpmn:inclusiveGateway id="JoinInclusiveGateway1" name="Join 1">
+      <bpmn:incoming>Flow_0dv8qw9</bpmn:incoming>
+      <bpmn:incoming>Flow_1ywxe5m</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ct2mkv</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    <bpmn:inclusiveGateway id="JoinInclusiveGateway2" name="Join 2">
+      <bpmn:incoming>Flow_1ct2mkv</bpmn:incoming>
+      <bpmn:incoming>Flow_05qtxwe</bpmn:incoming>
+      <bpmn:outgoing>Flow_11ayi3o</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ProcessInstanceAssert-isWaitingForJoinAt3">
+      <bpmndi:BPMNEdge id="Flow_05qtxwe_di" bpmnElement="Flow_05qtxwe">
+        <di:waypoint x="470" y="410" />
+        <di:waypoint x="640" y="410" />
+        <di:waypoint x="640" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11ayi3o_di" bpmnElement="Flow_11ayi3o">
+        <di:waypoint x="665" y="177" />
+        <di:waypoint x="702" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ywxe5m_di" bpmnElement="Flow_1ywxe5m">
+        <di:waypoint x="470" y="290" />
+        <di:waypoint x="540" y="290" />
+        <di:waypoint x="540" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ucifke_di" bpmnElement="Flow_1ucifke">
+        <di:waypoint x="290" y="202" />
+        <di:waypoint x="290" y="410" />
+        <di:waypoint x="370" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e4019d_di" bpmnElement="Flow_1e4019d">
+        <di:waypoint x="290" y="202" />
+        <di:waypoint x="290" y="290" />
+        <di:waypoint x="370" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ct2mkv_di" bpmnElement="Flow_1ct2mkv">
+        <di:waypoint x="565" y="177" />
+        <di:waypoint x="615" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dv8qw9_di" bpmnElement="Flow_0dv8qw9">
+        <di:waypoint x="470" y="177" />
+        <di:waypoint x="515" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0eohxgr_di" bpmnElement="Flow_0eohxgr">
+        <di:waypoint x="315" y="177" />
+        <di:waypoint x="370" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14ejaqg_di" bpmnElement="Flow_14ejaqg">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="265" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_08gj8a8_di" bpmnElement="Event_08gj8a8">
+        <dc:Bounds x="702" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08lh5aw_di" bpmnElement="Task1">
+        <dc:Bounds x="370" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13bhz1p_di" bpmnElement="Task2">
+        <dc:Bounds x="370" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1swfmrm_di" bpmnElement="Task3">
+        <dc:Bounds x="370" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0dljb5q_di" bpmnElement="SplitInclusiveGateway">
+        <dc:Bounds x="265" y="152" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="279" y="122" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wpc5js_di" bpmnElement="JoinInclusiveGateway1">
+        <dc:Bounds x="515" y="152" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="525" y="122" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0xqrijd_di" bpmnElement="JoinInclusiveGateway2">
+        <dc:Bounds x="615" y="152" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="122" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
