@@ -45,7 +45,7 @@ public abstract class ProcessAssertTestCase {
         System.out.println(String.format("AssertionError caught with message '%s' and expected content '%s'", e.getMessage(), messageContent));
         return;
       } else {
-        fail("Error message should include '" + messageContent + "'");
+        fail("Error message should include '" + messageContent + "' but was: " + e.getMessage());
       }
     }
   }
