@@ -97,7 +97,7 @@ ngModule.config([
     var window = $windowProvider.$get();
     var uri = window.location.href;
 
-    var match = uri.match(/\/app\/([\w-]+)\/([\w-]+)\//);
+    var match = uri.match(/\/(?:app)(?!.*\/app\/)\/([\w-]+)\/([\w-]+)\//);
     if (match) {
       $httpProvider.defaults.headers.get = {'X-Authorized-Engine': match[2]};
     } else {
