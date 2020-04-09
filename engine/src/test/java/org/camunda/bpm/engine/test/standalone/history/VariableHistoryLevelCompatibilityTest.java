@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
 /**
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
  *
  * @author Daniel Meyer
  */
-public class VariableHistoryLevelCompatibilityTest extends ResourceProcessEngineTestCase {
+public class VariableHistoryLevelCompatibilityTest extends PluggableProcessEngineTest {
 
   public VariableHistoryLevelCompatibilityTest() {
     super("org/camunda/bpm/engine/test/standalone/history/variablehistory.camunda.cfg.xml");

@@ -16,15 +16,14 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Tom Baeyens
  */
-public class ScriptBeanAccessTest extends ResourceProcessEngineTestCase {
+public class ScriptBeanAccessTest extends PluggableProcessEngineTest {
 
   public ScriptBeanAccessTest() {
     super("org/camunda/bpm/engine/test/standalone/scripting/camunda.cfg.xml");

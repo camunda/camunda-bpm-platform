@@ -19,11 +19,11 @@ package org.camunda.bpm.engine.test.api.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
-public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
+public class IdGeneratorDataSourceTest extends PluggableProcessEngineTest {
 
   public IdGeneratorDataSourceTest() {
     super("org/camunda/bpm/engine/test/api/cfg/IdGeneratorDataSourceTest.camunda.cfg.xml");

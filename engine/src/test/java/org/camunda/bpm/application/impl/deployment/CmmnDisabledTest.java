@@ -19,11 +19,11 @@ package org.camunda.bpm.application.impl.deployment;
 import java.util.List;
 
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class CmmnDisabledTest extends ResourceProcessEngineTestCase {
+public class CmmnDisabledTest extends PluggableProcessEngineTest {
 
   protected EmbeddedProcessApplication processApplication;
 

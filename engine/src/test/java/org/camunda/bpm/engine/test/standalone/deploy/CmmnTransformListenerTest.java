@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 
 import static org.camunda.bpm.engine.test.standalone.deploy.TestCmmnTransformListener.numberOfRegistered;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
@@ -37,7 +37,7 @@ import org.junit.After;
 /**
  * @author Sebastian Menski
  */
-public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
+public class CmmnTransformListenerTest extends PluggableProcessEngineTest {
 
   public CmmnTransformListenerTest() {
     super("org/camunda/bpm/engine/test/standalone/deploy/cmmn.transform.listener.camunda.cfg.xml");

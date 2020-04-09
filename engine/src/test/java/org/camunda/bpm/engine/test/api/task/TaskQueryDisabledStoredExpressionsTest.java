@@ -25,14 +25,14 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngineTestCase {
+public class TaskQueryDisabledStoredExpressionsTest extends PluggableProcessEngineTest {
 
 
   protected static final String EXPECTED_STORED_QUERY_FAILURE_MESSAGE =

@@ -32,15 +32,15 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTestCase {
+public class ResourceAuthorizationProviderTest extends PluggableProcessEngineTest {
 
   protected String userId = "test";
   protected String groupId = "accounting";
