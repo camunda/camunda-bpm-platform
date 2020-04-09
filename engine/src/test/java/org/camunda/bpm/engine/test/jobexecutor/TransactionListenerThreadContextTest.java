@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -31,7 +31,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class TransactionListenerThreadContextTest extends ResourceProcessEngineTestCase {
+public class TransactionListenerThreadContextTest extends PluggableProcessEngineTest {
 
   public TransactionListenerThreadContextTest() {
     super("org/camunda/bpm/engine/test/jobexecutor/TransactionListenerThreadContextTest.cfg.xml");

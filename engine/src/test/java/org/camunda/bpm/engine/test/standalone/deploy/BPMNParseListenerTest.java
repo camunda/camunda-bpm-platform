@@ -19,14 +19,14 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Frederik Heremans
  */
-public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
+public class BPMNParseListenerTest extends PluggableProcessEngineTest {
 
   public BPMNParseListenerTest() {
     super("org/camunda/bpm/engine/test/standalone/deploy/bpmn.parse.listener.camunda.cfg.xml");

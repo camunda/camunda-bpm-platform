@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Frederik Heremans
  */
-public class BoundaryTimerEventFullHistoryTest extends ResourceProcessEngineTestCase {
+public class BoundaryTimerEventFullHistoryTest extends PluggableProcessEngineTest {
 
   public BoundaryTimerEventFullHistoryTest() {
     super("org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");

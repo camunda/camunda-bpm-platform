@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Stefan Hentschel.
  */
-public class JobRetryCmdWithDefaultPropertyTest extends ResourceProcessEngineTestCase {
+public class JobRetryCmdWithDefaultPropertyTest extends PluggableProcessEngineTest {
 
   public JobRetryCmdWithDefaultPropertyTest() {
     super("org/camunda/bpm/engine/test/bpmn/async/default.job.retry.property.camunda.cfg.xml");

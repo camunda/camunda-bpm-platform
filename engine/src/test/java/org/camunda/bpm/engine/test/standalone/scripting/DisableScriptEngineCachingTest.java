@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class DisableScriptEngineCachingTest extends ResourceProcessEngineTestCase {
+public class DisableScriptEngineCachingTest extends PluggableProcessEngineTest {
 
   public DisableScriptEngineCachingTest() {
     super("org/camunda/bpm/engine/test/standalone/scripting/disable.script.engine.caching.cfg.xml");

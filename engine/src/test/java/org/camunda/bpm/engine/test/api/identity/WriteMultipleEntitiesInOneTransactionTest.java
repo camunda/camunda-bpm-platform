@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
 
 /**
  * @author Simon Jonischkeit
  *
  */
-public class WriteMultipleEntitiesInOneTransactionTest extends ResourceProcessEngineTestCase {
+public class WriteMultipleEntitiesInOneTransactionTest extends PluggableProcessEngineTest {
 
   public WriteMultipleEntitiesInOneTransactionTest() {
     super("org/camunda/bpm/engine/test/api/identity/WriteMultipleEntitiesInOneTransactionTest.camunda.cfg.xml");

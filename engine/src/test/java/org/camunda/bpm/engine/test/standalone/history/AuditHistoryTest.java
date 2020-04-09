@@ -18,18 +18,16 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class AuditHistoryTest extends ResourceProcessEngineTestCase {
+public class AuditHistoryTest extends PluggableProcessEngineTest {
 
   public AuditHistoryTest() {
     super("org/camunda/bpm/engine/test/standalone/history/audithistory.camunda.cfg.xml");

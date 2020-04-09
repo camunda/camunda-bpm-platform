@@ -18,15 +18,15 @@ package org.camunda.bpm.engine.test.standalone.el;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 
 /**
  * @author Frederik Heremans
  */
-public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
+public class ExpressionBeanAccessTest extends PluggableProcessEngineTest {
 
   public ExpressionBeanAccessTest() {
     super("org/camunda/bpm/engine/test/standalone/el/camunda.cfg.xml");
