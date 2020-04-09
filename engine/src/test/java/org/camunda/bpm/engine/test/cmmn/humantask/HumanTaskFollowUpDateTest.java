@@ -21,16 +21,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.joda.time.Period;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
+public class HumanTaskFollowUpDateTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn"})
   public void testHumanTaskFollowUpDateExtension() throws Exception {

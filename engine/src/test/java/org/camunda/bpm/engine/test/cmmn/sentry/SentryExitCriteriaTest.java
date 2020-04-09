@@ -17,16 +17,16 @@
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTask.cmmn"})
   public void testExitTask() {

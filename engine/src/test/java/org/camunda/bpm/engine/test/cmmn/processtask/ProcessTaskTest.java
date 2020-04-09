@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
@@ -34,6 +33,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Roman Smirnov
  *
  */
-public class ProcessTaskTest extends CmmnProcessEngineTestCase {
+public class ProcessTaskTest extends PluggableProcessEngineTest {
 
   protected final String PROCESS_TASK = "PI_ProcessTask_1";
   protected final String ONE_PROCESS_TASK_CASE = "oneProcessTaskCase";

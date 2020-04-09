@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -59,6 +58,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.hamcrest.Matcher;
 
@@ -66,7 +66,7 @@ import org.hamcrest.Matcher;
  * @author Sebastian Menski
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase {
+public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testHistoricCaseActivityInstanceProperties() {

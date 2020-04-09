@@ -17,19 +17,19 @@
 package org.camunda.bpm.engine.test.cmmn.cmmn10;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
+public class Cmmn10CompatibilityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRequiredRule.cmmn")
   public void testRequiredRule() {

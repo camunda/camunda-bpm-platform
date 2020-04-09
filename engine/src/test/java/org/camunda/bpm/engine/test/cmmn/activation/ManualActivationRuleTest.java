@@ -16,21 +16,21 @@
  */
 package org.camunda.bpm.engine.test.cmmn.activation;
 
-import java.util.Collections;
-
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.test.Deployment;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+
+import java.util.Collections;
+
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
+public class ManualActivationRuleTest extends PluggableProcessEngineTest {
 
   /**
    * CAM-3170

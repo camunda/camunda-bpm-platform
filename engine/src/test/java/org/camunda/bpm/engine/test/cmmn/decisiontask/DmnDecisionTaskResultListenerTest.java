@@ -18,16 +18,16 @@ package org.camunda.bpm.engine.test.cmmn.decisiontask;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase {
+public class DmnDecisionTaskResultListenerTest extends PluggableProcessEngineTest {
 
   protected static final String TEST_CASE = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskResultListenerTest.cmmn";
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";

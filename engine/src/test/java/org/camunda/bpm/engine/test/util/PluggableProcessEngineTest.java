@@ -22,7 +22,15 @@ import java.util.function.Function;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 
 /**
@@ -82,5 +90,204 @@ public abstract class PluggableProcessEngineTest extends AbstractProcessEngineTe
       processEngine = null;
     }
     super.closeDownProcessEngine();
+  }
+
+  // CMMN METHODS
+
+  // create case instance
+  protected CaseInstance createCaseInstance() {
+    return createCaseInstance(null);
+  }
+
+  protected CaseInstance createCaseInstance(String businessKey) {
+    String caseDefinitionKey = repositoryService.
+        createCaseDefinitionQuery()
+        .singleResult()
+        .getKey();
+
+    return createCaseInstanceByKey(caseDefinitionKey, businessKey);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, null, null);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, businessKey, null);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, VariableMap variables) {
+    return createCaseInstanceByKey(caseDefinitionKey, null, variables);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, VariableMap variables) {
+    return caseService
+        .withCaseDefinitionByKey(caseDefinitionKey)
+        .businessKey(businessKey)
+        .setVariables(variables)
+        .create();
+  }
+
+  // queries
+
+  protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
+    return caseService
+        .createCaseExecutionQuery()
+        .activityId(activityId)
+        .singleResult();
+  }
+
+  protected CaseExecution queryCaseExecutionById(String caseExecutionId) {
+    return caseService
+        .createCaseExecutionQuery()
+        .caseExecutionId(caseExecutionId)
+        .singleResult();
+  }
+
+  protected CaseSentryPartQueryImpl createCaseSentryPartQuery() {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+    return new CaseSentryPartQueryImpl(commandExecutor);
+  }
+
+  // transition methods
+
+  protected void close(final String caseExecutionId) {
+    caseService
+        .withCaseExecution(caseExecutionId)
+        .close();
+  }
+
+  protected void complete(final String caseExecutionId) {
+    caseService
+        .withCaseExecution(caseExecutionId)
+        .complete();
+  }
+
+  protected CaseInstance create(final String caseDefinitionId) {
+    return caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create();
+  }
+
+  protected CaseInstance create(final String caseDefinitionId, final String businessKey) {
+    return caseService
+        .withCaseDefinition(caseDefinitionId)
+        .businessKey(businessKey)
+        .create();
+  }
+
+  protected void disable(final String caseExecutionId) {
+    caseService
+        .withCaseExecution(caseExecutionId)
+        .disable();
+  }
+
+  protected void exit(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).exit();
+      }
+    });
+  }
+
+  protected void manualStart(final String caseExecutionId) {
+    caseService
+        .withCaseExecution(caseExecutionId)
+        .manualStart();
+  }
+
+  protected void occur(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).occur();
+      }
+    });
+  }
+
+  protected void parentResume(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).parentResume();
+      }
+    });
+  }
+
+  protected void parentSuspend(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).parentSuspend();
+
+      }
+    });
+  }
+
+  protected void parentTerminate(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).parentTerminate();
+      }
+    });
+  }
+
+  protected void reactivate(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).reactivate();
+      }
+    });
+  }
+
+  protected void reenable(final String caseExecutionId) {
+    caseService
+        .withCaseExecution(caseExecutionId)
+        .reenable();
+  }
+
+  protected void resume(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).resume();
+      }
+    });
+  }
+
+  protected void suspend(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).suspend();
+      }
+    });
+  }
+
+  protected void terminate(final String caseExecutionId) {
+    executeHelperCaseCommand(new HelperCaseCommand() {
+      public void execute() {
+        getExecution(caseExecutionId).terminate();
+      }
+    });
+  }
+
+  protected void executeHelperCaseCommand(HelperCaseCommand command) {
+    processEngineConfiguration
+        .getCommandExecutorTxRequired()
+        .execute(command);
+  }
+
+  protected abstract class HelperCaseCommand implements Command<Void> {
+
+    protected CmmnExecution getExecution(String caseExecutionId) {
+      return (CmmnExecution) caseService
+          .createCaseExecutionQuery()
+          .caseExecutionId(caseExecutionId)
+          .singleResult();
+    }
+
+    public Void execute(CommandContext commandContext) {
+      execute();
+      return null;
+    }
+
+    public abstract void execute();
+
   }
 }
