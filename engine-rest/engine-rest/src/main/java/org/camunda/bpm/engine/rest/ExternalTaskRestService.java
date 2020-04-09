@@ -16,7 +16,14 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
+import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -29,15 +36,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.*;
-import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
+import java.util.List;
 
 /**
  * @author Thorben Lindhauer
- *
  */
 public interface ExternalTaskRestService {
 
@@ -46,15 +48,13 @@ public interface ExternalTaskRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<ExternalTaskDto> getExternalTasks(@Context UriInfo uriInfo,
-      @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   List<ExternalTaskDto> queryExternalTasks(ExternalTaskQueryDto query,
-      @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
@@ -90,7 +90,8 @@ public interface ExternalTaskRestService {
   @GET
   @Path("/topic-names")
   @Produces(MediaType.APPLICATION_JSON)
-  List<String> getTopicNames(@QueryParam("withLockedTasks") boolean withLockedTasks, @QueryParam("withUnlockedTasks") boolean withUnlockedTasks, @QueryParam("withRetriesLeft") boolean withRetriesLeft);
-
+  List<String> getTopicNames(@QueryParam("withLockedTasks") boolean withLockedTasks,
+      @QueryParam("withUnlockedTasks") boolean withUnlockedTasks,
+      @QueryParam("withRetriesLeft") boolean withRetriesLeft);
 
 }
