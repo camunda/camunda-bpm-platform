@@ -191,7 +191,8 @@
 <#-- Generates an HTTP Response JSON object
      * `dto` needs to be defined if `mediaType` is, the default, "application/json" -->
 <#macro response code desc
-        dto="ExceptionDto"
+        flatType=""
+        dto=""
         array=false
         additionalProperties=false
         mediaType="application/json"
@@ -222,12 +223,17 @@
                    "additionalProperties": {
                  </#if>
 
+                 <#if dto?has_content>
                    "$ref": "#/components/schemas/${dto}"
+                 </#if>
+
+                 <#if flatType?has_content>
+                  "type": "${flatType}"
+                 </#if>
 
                  <#if array || additionalProperties >
                    }
                  </#if>
-
                }
            </#if>
 
