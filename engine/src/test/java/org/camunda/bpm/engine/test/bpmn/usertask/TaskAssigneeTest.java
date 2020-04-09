@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -32,6 +35,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class TaskAssigneeTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testTaskAssignee() {    
     
     // Start process instance
@@ -50,7 +54,7 @@ public class TaskAssigneeTest extends PluggableProcessEngineTest {
     // Complete task. Process is now finished
     taskService.complete(myTask.getId());
     // assert if the process instance completed
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
 }

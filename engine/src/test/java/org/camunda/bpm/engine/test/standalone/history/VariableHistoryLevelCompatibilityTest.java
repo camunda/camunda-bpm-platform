@@ -16,9 +16,15 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 
 /**
@@ -28,12 +34,22 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
  *
  * @author Daniel Meyer
  */
-public class VariableHistoryLevelCompatibilityTest extends PluggableProcessEngineTest {
+public class VariableHistoryLevelCompatibilityTest {
 
-  public VariableHistoryLevelCompatibilityTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/variablehistory.camunda.cfg.xml");
+  @Rule
+  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/history/variablehistory.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
 
+  @Test
   public void testCompatibilty() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     assertEquals(ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY, historyLevel);

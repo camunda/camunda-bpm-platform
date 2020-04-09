@@ -17,15 +17,20 @@
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
@@ -38,8 +43,9 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
 
   private static final String GONZO = "gonzo";
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
+
 
     Group accountants = identityService.newGroup("accountancy");
     identityService.saveGroup(accountants);
@@ -59,6 +65,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
     identityService.createMembership(GONZO, "sales");
   }
 
+  @After
   public void tearDown() throws Exception {
     identityService.deleteUser(KERMIT);
     identityService.deleteUser(GONZO);
@@ -66,10 +73,11 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup(MANAGEMENT);
 
-    super.tearDown();
+
   }
 
   @Deployment
+  @Test
   public void testSingleCandidateGroup() {
 
     // Deploy and start process
@@ -113,10 +121,11 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
     // Completing the task ends the process
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testMultipleCandidateGroups() {
 
     // Deploy and start process
@@ -167,10 +176,11 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
     // Completing the task ends the process
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testMultipleCandidateUsers() {
     runtimeService.startProcessInstanceByKey("multipleCandidateUsersExample");
 
@@ -179,6 +189,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMixedCandidateUserAndGroup() {
     runtimeService.startProcessInstanceByKey("mixedCandidateUserAndGroupExample");
 
@@ -187,6 +198,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/usertask/groupTest.bpmn")
+  @Test
   public void testInvolvedUserQuery() {
 
     // given
@@ -203,6 +215,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/usertask/groupTest.bpmn")
+  @Test
   public void testInvolvedUserQueryOr() {
 
     // given

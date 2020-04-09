@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,20 +53,20 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
+    super.setUp();
   }
 
-  @Override
+  @After
   public void tearDown() {
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
@@ -105,7 +110,7 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 Required admin authenticated group or user.", message);
+      testRule.assertTextPresent("ENGINE-03029 Required admin authenticated group or user.", message);
     }
   }
 

@@ -16,18 +16,22 @@
  */
 package org.camunda.bpm.engine.test.bpmn.exclusive;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 public class ExclusiveTimerEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testCatchingTimerEvent() throws Exception {
 
     // Set the clock fixed
@@ -40,10 +44,10 @@ public class ExclusiveTimerEventTest extends PluggableProcessEngineTest {
 
     // After setting the clock to time '50minutes and 5 seconds', the timers should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, jobQuery.count());
-    assertProcessEnded(pi.getProcessInstanceId());
+    testRule.assertProcessEnded(pi.getProcessInstanceId());
 
 
   }

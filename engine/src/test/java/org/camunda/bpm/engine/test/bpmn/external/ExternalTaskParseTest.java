@@ -17,14 +17,17 @@
 package org.camunda.bpm.engine.test.bpmn.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -32,6 +35,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class ExternalTaskParseTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testParseExternalTaskWithoutTopic() {
     DeploymentBuilder deploymentBuilder = repositoryService
       .createDeployment()
@@ -41,13 +45,14 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTest {
       deploymentBuilder.deploy();
       fail("exception expected");
     } catch (ParseException e) {
-      assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
+      testRule.assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().size()).isEqualTo(1);
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("externalTask");
     }
   }
 
   @Deployment
+  @Test
   public void testParseExternalTaskWithExpressionTopic() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("topicName", "testTopicExpression");
@@ -58,6 +63,7 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testParseExternalTaskWithStringTopic() {
     Map<String, Object> variables = new HashMap<String, Object>();
 

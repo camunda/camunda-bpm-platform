@@ -19,6 +19,11 @@ package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +32,6 @@ import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -35,7 +39,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 
 /**
@@ -45,6 +51,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})
+  @Test
   public void testSimpleCaseTxSuccessful() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -93,12 +100,13 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     // end the process instance
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})
+  @Test
   public void testActivityInstanceTreeAfterSuccessfulCompletion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
@@ -119,6 +127,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testWaitstateCompensationHandler.bpmn20.xml"})
+  @Test
   public void testWaitstateCompensationHandler() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -177,11 +186,12 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     // end the process instance
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})
+  @Test
   public void testSimpleCaseTxCancelled() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -234,12 +244,13 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     // end the process instance
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
 
   @Deployment
+  @Test
   public void testCancelEndConcurrent() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -287,11 +298,12 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     // end the process instance
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testNestedCancelInner() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -350,11 +362,12 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     // end the process instance (signal the execution still sitting in afterInnerCancellation)
     runtimeService.signal(runtimeService.createExecutionQuery().activityId("afterInnerCancellation").singleResult().getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testNestedCancelOuter() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -392,7 +405,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     // end the process instance (signal the execution still sitting in afterOuterCancellation)
     runtimeService.signal(runtimeService.createExecutionQuery().activityId("afterOuterCancellation").singleResult().getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
   }
@@ -405,6 +418,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
    * cancelled (in case of a multi-instance, all its instances are cancelled);"
    */
   @Deployment
+  @Test
   public void testMultiInstanceTx() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -431,10 +445,11 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     runtimeService.signal(runtimeService.createExecutionQuery().activityId("afterCancellation").singleResult().getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultiInstanceTx.bpmn20.xml"})
+  @Test
   public void testMultiInstanceTxSuccessful() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
@@ -464,11 +479,12 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     runtimeService.signal(runtimeService.createExecutionQuery().activityId("afterSuccess").singleResult().getId());
 
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testCompensateSubprocess() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
@@ -492,10 +508,11 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     Task afterBoundaryTask = taskService.createTaskQuery().singleResult();
     assertEquals("afterCancel", afterBoundaryTask.getTaskDefinitionKey());
     taskService.complete(afterBoundaryTask.getId());
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensateTransactionWithEventSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("txProcess");
@@ -511,11 +528,12 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     taskService.complete(compensationHandler.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateTransactionWithEventSubprocess.bpmn20.xml")
+  @Test
   public void testCompensateTransactionWithEventSubprocessActivityInstanceTree() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("txProcess");
@@ -538,6 +556,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateSubprocess.bpmn20.xml")
+  @Test
   public void testCompensateSubprocessNotTriggered() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
@@ -557,10 +576,11 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     // and the process has ended
     taskService.complete(afterTxTask.getId());
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateSubprocess.bpmn20.xml")
+  @Test
   public void testCompensateSubprocessAfterTxCompletion() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
@@ -585,7 +605,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     taskService.complete(compensationTask.getId());
 
     // and the process has ended
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment
@@ -609,6 +629,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     assertEquals(expected, actual);
   }
 
+  @Test
   public void testMultipleCancelBoundaryFails() {
     try {
       repositoryService.createDeployment()
@@ -621,6 +642,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testCancelBoundaryNoTransactionFails() {
     try {
       repositoryService.createDeployment()
@@ -633,6 +655,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testCancelEndNoTransactionFails() {
     try {
       repositoryService.createDeployment()
@@ -646,6 +669,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testParseWithDI() {
 
     // this test simply makes sure we can parse a transaction subprocess with DI information
@@ -660,7 +684,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
 
     ////// success case
@@ -672,7 +696,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTest {
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   protected List<Execution> collectExecutionsFor(String... activityIds) {

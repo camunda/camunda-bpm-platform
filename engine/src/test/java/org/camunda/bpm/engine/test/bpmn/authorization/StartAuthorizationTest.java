@@ -16,16 +16,22 @@
  */
 package org.camunda.bpm.engine.test.bpmn.authorization;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -97,6 +103,7 @@ public class StartAuthorizationTest extends PluggableProcessEngineTest {
   }
   
   @Deployment
+  @Test
   public void testIdentityLinks() throws Exception {
     
     setUpUsersAndGroups();
@@ -143,6 +150,7 @@ public class StartAuthorizationTest extends PluggableProcessEngineTest {
   }
   
   @Deployment
+  @Test
   public void testAddAndRemoveIdentityLinks() throws Exception {
     
     setUpUsersAndGroups();
@@ -199,6 +207,7 @@ public class StartAuthorizationTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testPotentialStarter() throws Exception {
     // first check an unauthorized user. An exception is expected
 
@@ -218,7 +227,7 @@ public class StartAuthorizationTest extends PluggableProcessEngineTest {
 	    // check with an authorized user obviously it should be no problem starting the process
 	    identityService.setAuthenticatedUserId("user1");
 	    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarter");
-	    assertProcessEnded(processInstance.getId());
+	    testRule.assertProcessEnded(processInstance.getId());
 	    assertTrue(processInstance.isEnded());
     } finally {
 
@@ -231,18 +240,20 @@ public class StartAuthorizationTest extends PluggableProcessEngineTest {
    * done. This ensures backward compatibility
    */
   @Deployment
+  @Test
   public void testPotentialStarterNoDefinition() throws Exception {
     identityService = processEngine.getIdentityService();
 
     identityService.setAuthenticatedUserId("someOneFromMars");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarterNoDefinition");
     assertNotNull(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(processInstance.isEnded());
   }
   
   // this test checks the list without user constraint
   @Deployment
+  @Test
 	public void testProcessDefinitionList() throws Exception {
 	  
     setUpUsersAndGroups();

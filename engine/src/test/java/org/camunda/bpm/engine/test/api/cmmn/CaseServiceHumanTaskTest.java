@@ -16,20 +16,28 @@
  */
 package org.camunda.bpm.engine.test.api.cmmn;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -38,6 +46,7 @@ import org.camunda.bpm.engine.variable.Variables;
 public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStart() {
     // given:
     // a deployed case definition
@@ -84,6 +93,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithVariable() {
     // given:
     // a deployed case definition
@@ -160,6 +170,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithVariables() {
     // given:
     // a deployed case definition
@@ -240,6 +251,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testStart() {
     // given:
     // a deployed case definition
@@ -283,6 +295,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testStartWithVariable() {
     // given:
     // a deployed case definition
@@ -356,6 +369,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testStartWithVariables() {
     // given:
     // a deployed case definition
@@ -430,6 +444,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithLocalVariable() {
     // given:
     // a deployed case definition
@@ -506,6 +521,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithLocalVariables() {
     // given:
     // a deployed case definition
@@ -586,6 +602,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testReenableAnEnabledHumanTask() {
     // given:
     // a deployed case definition
@@ -617,6 +634,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testReenableAnDisabledHumanTask() {
     // given:
     // a deployed case definition
@@ -657,6 +675,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testReenableAnActiveHumanTask() {
     // given:
     // a deployed case definition
@@ -687,6 +706,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testDisableAnEnabledHumanTask() {
     // given:
     // a deployed case definition
@@ -722,6 +742,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testDisableADisabledHumanTask() {
     // given:
     // a deployed case definition
@@ -758,6 +779,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testDisableAnActiveHumanTask() {
     // given:
     // a deployed case definition
@@ -788,6 +810,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testManualStartOfADisabledHumanTask() {
     // given:
     // a deployed case definition
@@ -822,6 +845,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testManualStartOfAnActiveHumanTask() {
     // given:
     // a deployed case definition
@@ -852,6 +876,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testComplete() {
     // given:
     // a deployed case definition
@@ -917,6 +942,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCompleteShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
@@ -978,6 +1004,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testCompleteShouldCompleteCaseInstanceViaTaskService() {
     // given:
     // a deployed case definition
@@ -1041,6 +1068,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testDisableShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
@@ -1089,6 +1117,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testCompleteAnEnabledHumanTask() {
     // given:
     // a deployed case definition
@@ -1118,6 +1147,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteADisabledHumanTask() {
     // given:
     // a deployed case definition
@@ -1151,6 +1181,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteWithSetVariable() {
     // given:
     // a deployed case definition
@@ -1244,6 +1275,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteWithSetVariableLocal() {
     // given:
     // a deployed case definition
@@ -1318,6 +1350,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteWithRemoveVariable() {
     // given:
     // a deployed case definition
@@ -1392,6 +1425,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteWithRemoveVariableLocal() {
     // given:
     // a deployed case definition
@@ -1466,6 +1500,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testClose() {
     // given:
     // a deployed case definition
@@ -1497,6 +1532,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testTerminate() {
     // given:
     // a deployed case definition
@@ -1523,6 +1559,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testTerminateNonFluent() {
     // given:
     // a deployed case definition
@@ -1547,6 +1584,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testTerminateNonActiveHumanTask() {
     // given:
     // a deployed case definition
@@ -1572,6 +1610,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testManualStartNonFluent() {
     // given:
     // a deployed case definition
@@ -1613,6 +1652,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testManualStartWithVariablesNonFluent() {
     // given:
     // a deployed case definition
@@ -1670,6 +1710,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testDisableNonFluent() {
     // given:
     // a deployed case definition
@@ -1703,6 +1744,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testDisableNonFluentWithVariables() {
     // given:
     // a deployed case definition
@@ -1747,6 +1789,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testReenableNonFluent() {
     // given:
     // a deployed case definition
@@ -1785,6 +1828,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testReenableNonFluentWithVariables() {
     // given:
     // a deployed case definition
@@ -1834,6 +1878,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteNonFluent() {
     // given:
     // a deployed case definition
@@ -1897,6 +1942,7 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  @Test
   public void testCompleteWithVariablesNonFluent() {
     // given:
     // a deployed case definition

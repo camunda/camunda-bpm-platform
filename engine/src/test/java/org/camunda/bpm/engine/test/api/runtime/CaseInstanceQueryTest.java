@@ -16,18 +16,28 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -44,8 +54,9 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
    * Setup starts 4 case instances of oneTaskCase
    * and 1 instance of oneTaskCase2
    */
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
     repositoryService.createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
       .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn")
@@ -70,11 +81,12 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     caseInstanceIds.add(id);
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-    super.tearDown();
+
   }
 
   private void verifyQueryResults(CaseInstanceQuery query, int countExpected) {
@@ -97,6 +109,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testCaseInstanceProperties() {
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()
@@ -121,12 +134,14 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryWithoutQueryParameter() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     verifyQueryResults(query, 5);
   }
 
+  @Test
   public void testQueryByCaseDefinitionKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -135,6 +150,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidCaseDefinitionKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -149,6 +165,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByCaseDefinitionId() {
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()
@@ -163,6 +180,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 4);
   }
 
+  @Test
   public void testQueryByInvalidCaseDefinitionId() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -177,6 +195,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByActive() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -185,6 +204,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 5);
   }
 
+  @Test
   public void testQueryByCompleted() {
 
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
@@ -224,6 +244,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/CaseInstanceQueryTest.testQueryByTerminated.cmmn"})
+  @Test
   public void testQueryByTerminated() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("termination")
@@ -248,6 +269,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByCaseInstanceBusinessKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -256,6 +278,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryByInvalidCaseInstanceBusinessKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -270,6 +293,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByCaseInstanceBusinessKeyAndCaseDefinitionKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -305,6 +329,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByCaseInstanceId() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -316,6 +341,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByInvalidCaseInstanceId() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -330,6 +356,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByNullVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -343,6 +370,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByStringVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -356,6 +384,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByBooleanVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -369,6 +398,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByShortVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -382,6 +412,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByIntegerVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -395,6 +426,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByLongVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -408,6 +440,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByDateVariableValueEquals() {
     Date now = new Date();
     caseService
@@ -422,6 +455,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByDoubleVariableValueEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -435,6 +469,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueEquals() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -451,6 +486,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableValueEquals() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -470,6 +506,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByStringVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -483,6 +520,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByBooleanVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -496,6 +534,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByShortVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -509,6 +548,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByIntegerVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -522,6 +562,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByLongVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -535,6 +576,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByDateVariableValueNotEquals() {
     Date now = new Date();
 
@@ -552,6 +594,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByDoubleVariableValueNotEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -565,6 +608,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueNotEquals() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -581,6 +625,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableValueNotEquals() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -600,6 +645,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNullVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -615,6 +661,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByStringVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -629,6 +676,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByBooleanVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -644,6 +692,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByShortVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -658,6 +707,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByIntegerVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -672,6 +722,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByLongVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -686,6 +737,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDateVariableValueGreaterThan() {
     Date now = new Date();
 
@@ -704,6 +756,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDoubleVariableValueGreaterThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -718,6 +771,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueGreaterThan() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -734,6 +788,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableGreaterThan() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -753,6 +808,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNullVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -768,6 +824,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByStringVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -788,6 +845,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByBooleanVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -803,6 +861,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByShortVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -823,6 +882,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByIntegerVariableValueGreaterThanOrEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -843,6 +903,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByLongVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -863,6 +924,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDateVariableValueGreaterThanOrEqual() {
     Date now = new Date();
 
@@ -887,6 +949,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDoubleVariableValueGreaterThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -907,6 +970,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueGreaterThanOrEqual() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -923,6 +987,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableGreaterThanOrEqual() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -942,6 +1007,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNullVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -957,6 +1023,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByStringVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -971,6 +1038,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByBooleanVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -986,6 +1054,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByShortVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1000,6 +1069,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByIntegerVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1014,6 +1084,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByLongVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1028,6 +1099,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDateVariableValueLessThan() {
     Date now = new Date();
 
@@ -1046,6 +1118,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDoubleVariableValueLessThan() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1060,6 +1133,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueLessThan() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -1076,6 +1150,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableLessThan() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -1095,6 +1170,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNullVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1110,6 +1186,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByStringVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1130,6 +1207,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByBooleanVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1145,6 +1223,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByShortVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1165,6 +1244,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByIntegerVariableValueLessThanOrEquals() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1185,6 +1265,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByLongVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1205,6 +1286,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDateVariableValueLessThanOrEqual() {
     Date now = new Date();
 
@@ -1229,6 +1311,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByDoubleVariableValueLessThanOrEqual() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1249,6 +1332,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByByteArrayVariableValueLessThanOrEqual() {
     byte[] bytes = "somebytes".getBytes();
 
@@ -1265,6 +1349,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryBySerializableVariableLessThanOrEqual() {
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -1284,6 +1369,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNullVariableValueLike() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1299,6 +1385,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByStringVariableValueLike() {
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -1324,6 +1411,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQuerySorting() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1374,6 +1462,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testCaseVariableValueEqualsNumber() throws Exception {
     // long
     caseService
@@ -1438,6 +1527,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml"})
+  @Test
   public void testQueryBySuperProcessInstanceId() {
     String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
 
@@ -1449,6 +1539,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivityInsideSubProcess.bpmn20.xml"})
+  @Test
   public void testQueryBySuperProcessInstanceIdNested() {
     String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
 
@@ -1459,6 +1550,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidSuperProcessInstanceId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
@@ -1476,6 +1568,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testQueryBySubProcessInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
@@ -1495,6 +1588,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     assertEquals(superCaseInstanceId, caseInstance.getId());
   }
 
+  @Test
   public void testQueryByInvalidSubProcessInstanceId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
@@ -1511,6 +1605,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  @Test
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
@@ -1521,6 +1616,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidSuperCaseInstanceId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
@@ -1537,6 +1633,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  @Test
   public void testQueryBySubCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
@@ -1556,6 +1653,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     assertEquals(superCaseInstanceId, caseInstance.getId());
   }
 
+  @Test
   public void testQueryByInvalidSubCaseInstanceId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
@@ -1571,6 +1669,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testQueryByDeploymentId() {
     String deploymentId = repositoryService
         .createDeploymentQuery()
@@ -1584,6 +1683,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
     verifyQueryResults(query, 5);
   }
 
+  @Test
   public void testQueryByInvalidDeploymentId() {
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()

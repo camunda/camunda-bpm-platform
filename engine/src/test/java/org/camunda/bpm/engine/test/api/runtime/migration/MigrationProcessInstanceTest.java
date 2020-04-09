@@ -43,10 +43,10 @@ import org.junit.rules.RuleChain;
 public class MigrationProcessInstanceTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
-  protected MigrationTestRule testHelper = new MigrationTestRule(rule);
+  protected MigrationTestRule testRule = new MigrationTestRule(rule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
 
   protected RuntimeService runtimeService;
 
@@ -57,8 +57,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testMigrateWithIdVarargsArray() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
       .mapEqualActivities()
@@ -91,7 +91,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNullProcessInstanceIdsList() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -107,7 +107,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testProcessInstanceIdsListWithNullValue() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -123,7 +123,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNullProcessInstanceIdsArray() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -139,7 +139,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testProcessInstanceIdsArrayWithNullValue() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -155,7 +155,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testEmptyProcessInstanceIdsList() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -171,7 +171,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testEmptyProcessInstanceIdsArray() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -187,9 +187,9 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNotMigrateProcessInstanceOfWrongProcessDefinition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition wrongProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition wrongProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(wrongProcessDefinition.getId());
 
@@ -208,8 +208,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNotMigrateUnknownProcessInstance() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -226,8 +226,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNotMigrateNullProcessInstance() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -246,8 +246,8 @@ public class MigrationProcessInstanceTest {
   public void testMigrateProcessInstanceQuery() {
     int processInstanceCount = 10;
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -274,7 +274,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNullProcessInstanceQuery() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -290,7 +290,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testEmptyProcessInstanceQuery() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -309,8 +309,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testProcessInstanceQueryOfWrongProcessDefinition() {
-    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition wrongProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition testProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition wrongProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     runtimeService.startProcessInstanceById(wrongProcessDefinition.getId());
 
@@ -332,8 +332,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testProcessInstanceIdsAndQuery() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -357,8 +357,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testOverlappingProcessInstanceIdsAndQuery() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()

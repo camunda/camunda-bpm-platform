@@ -17,7 +17,10 @@
 package org.camunda.bpm.engine.test.cmmn.stage;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -40,6 +44,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   protected static final String CASE_DEFINITION_KEY = "case";
 
   @Deployment
+  @Test
   public void testCasePlanModel() {
     // given
     // a deployed process
@@ -63,6 +68,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testStage() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
@@ -97,6 +103,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testManualActivationDisabled() {
     // given
     // a deployed case definition
@@ -134,6 +141,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testManualActivationDisabledInsideStage() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
@@ -180,6 +188,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNested() {
     // given
     // a deployed case definition
@@ -205,6 +214,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRequiredEnabled() {
     // given
     // a deployed case definition
@@ -252,6 +262,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRequiredEnabledInsideStage() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
@@ -293,6 +304,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testEntryCriteriaAndManualActivationDisabled() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
@@ -331,6 +343,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExitCriteriaAndRequiredEnabled() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
@@ -361,6 +374,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testRequiredEnabled.cmmn"})
+  @Test
   public void testTerminate() {
     // given
     // a deployed case definition
@@ -390,6 +404,7 @@ public class AutoCompleteTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn"
   })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testProcessTasksOnStage() {
     // given
 

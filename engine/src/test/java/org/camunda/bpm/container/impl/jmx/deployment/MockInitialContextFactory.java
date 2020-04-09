@@ -19,6 +19,7 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
+
 import java.util.Hashtable;
 
 public class MockInitialContextFactory implements InitialContextFactory {

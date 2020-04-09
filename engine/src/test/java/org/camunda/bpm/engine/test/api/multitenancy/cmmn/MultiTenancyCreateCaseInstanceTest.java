@@ -20,14 +20,16 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTest {
 
@@ -38,8 +40,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
+  @Test
   public void testFailToCreateCaseInstanceByIdWithoutTenantId() {
-    deployment(CMMN_FILE);
+   testRule.deploy(CMMN_FILE);
 
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
@@ -53,8 +56,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByIdWithTenantId() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
@@ -68,9 +72,10 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByKeyForNonExistingTenantID() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     try {
       caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -82,9 +87,10 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByKeyForMultipleTenants() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     try {
       caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -95,8 +101,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyWithoutTenantId() {
-    deployment(CMMN_FILE);
+   testRule.deploy(CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
         .caseDefinitionWithoutTenantId()
@@ -108,8 +115,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyForAnyTenants() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
         .create();
@@ -117,9 +125,10 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyAndTenantId() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
         .caseDefinitionTenantId(TENANT_ONE)
@@ -128,10 +137,11 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deployment(CMMN_FILE);
+   testRule.deploy(CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .caseDefinitionWithoutTenantId()
@@ -141,10 +151,11 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByKeyNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     try {
       caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
@@ -155,10 +166,11 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     try {
       caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
@@ -171,8 +183,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testFailToCreateCaseInstanceByIdNoAuthenticatedTenants() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     CaseDefinition caseDefinition = repositoryService
       .createCaseDefinitionQuery()
@@ -189,11 +202,12 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     }
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyWithTenantIdAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
       .caseDefinitionTenantId(TENANT_ONE)
@@ -204,8 +218,9 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCreateCaseInstanceByIdAuthenticatedTenant() {
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     CaseDefinition caseDefinition = repositoryService
         .createCaseDefinitionQuery()
@@ -220,11 +235,12 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_FILE);
 
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
 
@@ -233,11 +249,12 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCreateCaseInstanceByKeyWithTenantIdDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_FILE);
 
     caseService
       .withCaseDefinitionByKey(CASE_DEFINITION_KEY)

@@ -30,6 +30,12 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.NAME;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PARENT_TASK;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
@@ -43,7 +49,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
-
+import org.junit.After;
+import org.junit.Test;
 /**
  * @author Danny Gräf
  */
@@ -51,14 +58,16 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
 
   protected Task task;
 
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
+
 
     if (task != null) {
       taskService.deleteTask(task.getId(), true);
     }
   }
 
+  @Test
   public void testBeanPropertyChanges() {
     TaskEntity entity = new TaskEntity();
 
@@ -84,6 +93,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(2, changes.size());
   }
 
+  @Test
   public void testNotTrackChangeToTheSameValue() {
     TaskEntity entity = new TaskEntity();
 
@@ -96,6 +106,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertTrue(entity.getPropertyChanges().isEmpty());
   }
 
+  @Test
   public void testRemoveChangeWhenSetBackToTheOrgValue() {
     TaskEntity entity = new TaskEntity();
 
@@ -112,6 +123,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertTrue(entity.getPropertyChanges().isEmpty());
   }
 
+  @Test
   public void testAllTrackedProperties() {
     Date yesterday = new Date(new Date().getTime() - 86400000);
     Date tomorrow = new Date(new Date().getTime() + 86400000);
@@ -145,6 +157,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     // DELETE property is not validated here; it is set directly on task deletion
   }
 
+  @Test
   public void testDeleteTask() {
     // given: a single task
     task = taskService.newTask();
@@ -165,6 +178,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, delete.getCategory());
   }
 
+  @Test
   public void testCompositeBeanInteraction() {
     // given: a manually created task
     task = taskService.newTask();
@@ -196,6 +210,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, entries.get(1).getCategory());
   }
 
+  @Test
   public void testMultipleValueChange() {
     // given: a single task
     task = taskService.newTask();
@@ -211,6 +226,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, update.getCategory());
   }
 
+  @Test
   public void testSetDateProperty() {
     // given: a single task
     task = taskService.newTask();
@@ -222,6 +238,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(String.valueOf(now.getTime()), logEntry.getNewValue());
   }
 
+  @Test
   public void testResetChange() {
     // given: a single task
     task = taskService.newTask();
@@ -247,6 +264,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(name, update.getNewValue());
   }
 
+  @Test
   public void testConcurrentTaskChange() {
     // create a task
     task = taskService.newTask();
@@ -265,6 +283,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     }
   }
 
+  @Test
   public void testCaseInstanceId() {
     // create new task
     task = taskService.newTask();

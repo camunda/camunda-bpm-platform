@@ -16,15 +16,20 @@
  */
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -32,6 +37,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testDefaultExternalScript() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -41,6 +47,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testDefaultExternalScriptAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py");
@@ -52,17 +59,19 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testDefaultExternalScriptAsVariable.bpmn20.xml"})
+  @Test
   public void testDefaultExternalScriptAsNonExistingVariable() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail("Process variable 'scriptPath' not defined");
     }
     catch(ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptPath'", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptPath'", e.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testDefaultExternalScriptAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptResourceBean", new ScriptResourceBean());
@@ -74,6 +83,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScriptInClasspath() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -83,6 +93,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScriptInClasspathAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py");
@@ -94,6 +105,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScriptInClasspathAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptResourceBean", new ScriptResourceBean());
@@ -105,13 +117,14 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScriptNotFoundInClasspath() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail("Resource does not exist in classpath");
     }
     catch (NotFoundException e) {
-      assertTextPresentIgnoreCase("unable to find resource at path classpath://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("unable to find resource at path classpath://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
     }
   }
 
@@ -119,6 +132,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testScriptInDeployment.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
   })
+  @Test
   public void testScriptInDeployment() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -131,6 +145,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testScriptInDeployment.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
   })
+  @Test
   public void testScriptInDeploymentAfterCacheWasCleaned() {
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
 
@@ -145,6 +160,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testScriptInDeploymentAsVariable.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
   })
+  @Test
   public void testScriptInDeploymentAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py");
@@ -159,6 +175,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testScriptInDeploymentAsBean.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
   })
+  @Test
   public void testScriptInDeploymentAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptResourceBean", new ScriptResourceBean());
@@ -170,24 +187,26 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScriptNotFoundInDeployment() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail("Resource does not exist in classpath");
     }
     catch (NotFoundException e) {
-      assertTextPresentIgnoreCase("unable to find resource at path deployment://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("unable to find resource at path deployment://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testNotExistingImport() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail("Should fail during script compilation");
     }
     catch (ScriptCompilationException e) {
-      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("import unknown", e.getMessage());
     }
   }
 

@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.variables.scope;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -36,14 +44,6 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Arrays;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Askar Akhmerov

@@ -16,17 +16,25 @@
  */
 package org.camunda.bpm.engine.test.api.cmmn;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -35,6 +43,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class CaseServiceStageTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testStartAutomated() {
     // given:
     // a deployed case definition
@@ -92,6 +101,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStart() {
     // given:
     // a deployed case definition
@@ -135,6 +145,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithVariable() {
     // given:
     // a deployed case definition
@@ -189,6 +200,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualWithVariables() {
     // given:
     // a deployed case definition
@@ -247,6 +259,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithLocalVariable() {
     // given:
     // a deployed case definition
@@ -322,6 +335,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testManualStartWithLocalVariables() {
     // given:
     // a deployed case definition
@@ -380,6 +394,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testReenableAnEnabledStage() {
     // given:
     // a deployed case definition
@@ -410,6 +425,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testReenableAnDisabledStage() {
     // given:
     // a deployed case definition
@@ -450,6 +466,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testReenableAnActiveStage() {
     // given:
     // a deployed case definition
@@ -480,6 +497,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testDisableAnEnabledStage() {
     // given:
     // a deployed case definition
@@ -515,6 +533,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testDisableADisabledStage() {
     // given:
     // a deployed case definition
@@ -551,6 +570,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testDisableAnActiveStage() {
     // given:
     // a deployed case definition
@@ -581,6 +601,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testManualStartOfADisabledStage() {
     // given:
     // a deployed case definition
@@ -615,6 +636,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testManualStartOfAnActiveStage() {
     // given:
     // a deployed case definition
@@ -645,6 +667,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testDisableShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
@@ -693,6 +716,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testCompleteShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
@@ -744,6 +768,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Test
   public void testComplete() {
     // given:
     // a deployed case definition
@@ -795,6 +820,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testCompleteEnabledStage() {
     // given:
     // a deployed case definition
@@ -824,6 +850,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testCompleteDisabledStage() {
     // given:
     // a deployed case definition
@@ -857,6 +884,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Test
   public void testAutoCompletionOfEmptyStage() {
     // given:
     // a deployed case definition
@@ -888,6 +916,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testClose() {
     // given:
     // a deployed case definition
@@ -919,6 +948,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testTerminate() {
     // given:
     // a deployed case definition
@@ -956,6 +986,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testTerminateNonFluent() {
     // given:
     // a deployed case definition
@@ -981,6 +1012,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  @Test
   public void testTerminateWithNonActiveState() {
     // given:
     // a deployed case definition

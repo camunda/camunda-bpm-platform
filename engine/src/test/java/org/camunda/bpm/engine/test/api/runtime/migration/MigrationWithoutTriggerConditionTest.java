@@ -16,6 +16,19 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.BOUNDARY_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.PROC_DEF_KEY;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.SUB_PROCESS_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.USER_TASK_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.VARIABLE_NAME;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.VAR_CONDITION;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_START_ID;
+import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.TASK_AFTER_CONDITION_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -29,13 +42,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.*;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_START_ID;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.TASK_AFTER_CONDITION_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>

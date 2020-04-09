@@ -16,16 +16,20 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.joda.time.Period;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -34,6 +38,7 @@ import org.joda.time.Period;
 public class TaskFollowUpDateExtensionsTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Test
   public void testUserTaskFollowUpDateExtension() throws Exception {
 
     Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("01-01-2015 12:10:00");
@@ -50,6 +55,7 @@ public class TaskFollowUpDateExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Test
   public void testUserTaskFollowUpDateStringExtension() throws Exception {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -66,6 +72,7 @@ public class TaskFollowUpDateExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Test
   public void testUserTaskRelativeFollowUpDate() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "P2DT2H30M");

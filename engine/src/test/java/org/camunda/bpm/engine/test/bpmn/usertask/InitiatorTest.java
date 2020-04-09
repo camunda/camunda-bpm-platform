@@ -16,8 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -26,6 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class InitiatorTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testInitiator() {
     try {
       identityService.setAuthenticatedUserId("bono");

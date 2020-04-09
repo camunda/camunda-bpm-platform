@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,13 +37,14 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -48,6 +55,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testHistoricTaskInstance() throws Exception {
     String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
 
@@ -116,12 +124,14 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().count());
   }
 
+  @Test
   public void testDeleteHistoricTaskInstance() {
     // deleting unexisting historic task instance should be silently ignored
     historyService.deleteHistoricTaskInstance("unexistingId");
   }
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceQuery() throws Exception {
     // First instance is finished
     ProcessInstance finishedInstance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
@@ -253,6 +263,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceQueryByProcessVariableValue() throws Exception {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
@@ -280,6 +291,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testHistoricTaskInstanceAssignment() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -301,6 +313,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceAssignmentListener() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("assignee", "jonny");
@@ -315,6 +328,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testHistoricTaskInstanceOwner() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -334,6 +348,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     historyService.deleteHistoricTaskInstance(hti.getId());
   }
 
+  @Test
   public void testHistoricTaskInstancePriority() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -354,6 +369,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceQueryProcessFinished() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -377,6 +393,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceQuerySorting() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
 
@@ -420,6 +437,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().desc().count());
   }
 
+  @Test
   public void testInvalidSorting() {
     try {
       historyService.createHistoricTaskInstanceQuery().asc();
@@ -444,6 +462,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryByFollowUpDate() throws Exception {
     Calendar otherDate = Calendar.getInstance();
 
@@ -484,6 +503,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryByActivityInstanceId() throws Exception {
     runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
 
@@ -500,6 +520,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryByActivityInstanceIds() throws Exception {
     ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
     ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
@@ -524,6 +545,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryByInvalidActivityInstanceId() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -549,6 +571,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseDefinitionId() {
     // given
     String caseDefinitionId = repositoryService
@@ -584,6 +607,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(humanTaskId, task.getCaseExecutionId());
   }
 
+  @Test
   public void testQueryByInvalidCaseDefinitionId() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -602,6 +626,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseDefinitionKey() {
     // given
     String key = "oneTaskCase";
@@ -640,6 +665,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(humanTaskId, task.getCaseExecutionId());
   }
 
+  @Test
   public void testQueryByInvalidCaseDefinitionKey() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -658,6 +684,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseDefinitionName() {
     // given
     CaseDefinition caseDefinition = repositoryService
@@ -695,6 +722,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(humanTaskId, task.getCaseExecutionId());
   }
 
+  @Test
   public void testQueryByInvalidCaseDefinitionName() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -713,6 +741,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseInstanceId() {
     // given
     String key = "oneTaskCase";
@@ -758,6 +787,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.cmmn",
       "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.bpmn20.xml"
     })
+  @Test
   public void testQueryByCaseInstanceIdHierarchy() {
     // given
     String caseInstanceId = caseService
@@ -800,6 +830,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByInvalidCaseInstanceId() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -818,6 +849,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseExecutionId() {
     // given
     String key = "oneTaskCase";
@@ -856,6 +888,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(humanTaskId, task.getCaseExecutionId());
   }
 
+  @Test
   public void testQueryByInvalidCaseExecutionId() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -873,6 +906,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testHistoricTaskInstanceCaseInstanceId() {
     Task task = taskService.newTask();
     task.setCaseInstanceId("aCaseInstanceId");
@@ -901,6 +935,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testProcessDefinitionKeyProperty() {
     // given
     String key = "oneTaskProcess";
@@ -921,6 +956,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  @Test
   public void testCaseDefinitionKeyProperty() {
     // given
     String key = "oneTaskCase";
@@ -941,6 +977,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByTaskDefinitionKey() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -963,6 +1000,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
   })
+  @Test
   public void testQueryByTaskDefinitionKeys() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -977,6 +1015,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(2, query.count());
   }
 
+  @Test
   public void testQueryByInvalidTaskDefinitionKeys() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -1002,6 +1041,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testQueryByProcessInstanceBusinessKey() {
     // given
     ProcessInstance piBusinessKey1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
@@ -1014,6 +1054,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testQueryByProcessInstanceBusinessKeyIn() {
     // given
     String businessKey1 = "BUSINESS-KEY-1";
@@ -1032,6 +1073,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
     assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, unexistingBusinessKey).count());
   }
 
+  @Test
   public void testQueryByInvalidProcessInstanceBusinessKeyIn() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -1056,6 +1098,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testQueryByProcessInstanceBusinessKeyLike() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
@@ -1071,6 +1114,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testQueryByProcessInstanceBusinessKeyAndArray() {
     // given
     String businessKey1 = "BUSINESS-KEY-1";

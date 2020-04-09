@@ -16,14 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
-import java.util.List;
-import org.camunda.bpm.engine.impl.event.EventType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Philipp Ossler
@@ -33,10 +37,10 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTest {
   private static final String SIGNAL_START_EVENT_PROCESS = "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml";
   private static final String SIGNAL_START_EVENT_PROCESS_NEW_VERSION = "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent_v2.bpmn20.xml";
 
+  @Test
   public void testCreateEventSubscriptionOnDeployment() {
-    deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
-        .deploy().getId();
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource(SIGNAL_START_EVENT_PROCESS));
 
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
@@ -46,10 +50,10 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTest {
     assertEquals("start", eventSubscription.getActivityId());
   }
 
+  @Test
   public void testUpdateEventSubscriptionOnDeployment(){
-    deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
-        .deploy().getId();
+    testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource(SIGNAL_START_EVENT_PROCESS));
 
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().eventType("signal").singleResult();
     assertNotNull(eventSubscription);
@@ -75,6 +79,7 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTest {
     repositoryService.deleteDeployment(newDeploymentId);
   }
 
+  @Test
   public void testAsyncSignalStartEventDeleteDeploymentWhileAsync() {
     // given a deployment
     org.camunda.bpm.engine.repository.Deployment deployment =

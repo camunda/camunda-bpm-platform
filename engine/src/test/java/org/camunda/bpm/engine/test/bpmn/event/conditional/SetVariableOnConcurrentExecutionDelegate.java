@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.TASK_WITH_CONDITION;
+import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.VARIABLE_NAME;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Task;
-
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.TASK_WITH_CONDITION;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.VARIABLE_NAME;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>

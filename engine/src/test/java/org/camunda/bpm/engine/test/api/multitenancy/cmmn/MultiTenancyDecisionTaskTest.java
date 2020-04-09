@@ -19,11 +19,13 @@ package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
 
@@ -47,9 +49,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
   protected static final String RESULT_OF_VERSION_ONE = "A";
   protected static final String RESULT_OF_VERSION_TWO = "C";
 
+  @Test
   public void testEvaluateDecisionWithDeploymentBinding() {
-    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_DEPLOYMENT, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_ONE, CMMN_DEPLOYMENT, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_DEPLOYMENT, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
@@ -58,9 +61,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithLatestBindingSameVersion() {
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
@@ -69,11 +73,12 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithLatestBindingDifferentVersions() {
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
 
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
@@ -82,12 +87,13 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithVersionBinding() {
-    deploymentForTenant(TENANT_ONE, CMMN_VERSION, DMN_FILE);
-    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_ONE, CMMN_VERSION, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
 
-    deploymentForTenant(TENANT_TWO, CMMN_VERSION, DMN_FILE_VERSION_TWO);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_VERSION, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
@@ -96,9 +102,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
-    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
@@ -109,9 +116,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithLatestBinding() {
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
@@ -122,11 +130,12 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithVersionBinding() {
-    deploymentForTenant(TENANT_ONE, CMMN_VERSION_2, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_VERSION_2, DMN_FILE);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
@@ -137,30 +146,33 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testEvaluateDecisionRefTenantIdConstant() {
-    deployment(CMMN_CONST);
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(CMMN_CONST);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionRefWithoutTenantIdConstant() {
-    deploymentForTenant(TENANT_ONE, CMMN_WITHOUT_TENANT);
-    deployment(DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_ONE, CMMN_WITHOUT_TENANT);
+   testRule.deploy(DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionRefTenantIdExpression() {
-    deployment(CMMN_EXPR);
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(CMMN_EXPR);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 

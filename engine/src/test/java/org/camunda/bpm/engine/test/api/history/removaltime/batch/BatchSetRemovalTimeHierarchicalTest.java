@@ -16,6 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
+import static org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
+
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -63,15 +72,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.io.ByteArrayInputStream;
-import java.util.Date;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
-import static org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
 
 /**
  * @author Tassilo Weidner

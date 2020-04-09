@@ -16,15 +16,23 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -33,6 +41,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
 
   protected Filter filter;
 
+  @Before
   public void setUp() {
     filter = filterService.newTaskFilter()
       .setName("name")
@@ -44,6 +53,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     assertNotNull(filter.getId());
   }
 
+  @After
   public void tearDown() {
     // delete all existing filters
     for (Filter filter : filterService.createTaskFilterQuery().list()) {
@@ -51,6 +61,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testCreateFilter() {
     assertNotNull(filter);
 
@@ -60,6 +71,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     compareFilter(filter, filter2);
   }
 
+  @Test
   public void testCreateInvalidFilter() {
     try {
       filter.setName(null);
@@ -86,6 +98,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testUpdateFilter() {
     filter.setName("newName");
     filter.setOwner("newOwner");
@@ -99,6 +112,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     compareFilter(filter, filter2);
   }
 
+  @Test
   public void testExtendFilter() {
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .taskName("newName")
@@ -111,6 +125,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     assertEquals("newOwner", filterQuery.getOwner());
   }
 
+  @Test
   public void testQueryFilter() {
 
     Filter filter2 = filterService.createTaskFilterQuery()
@@ -128,6 +143,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     compareFilter(filter, filter2);
   }
 
+  @Test
   public void testQueryUnknownFilter() {
     Filter unknownFilter = filterService.createTaskFilterQuery()
       .filterId("unknown")
@@ -143,6 +159,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     assertNull(unknownFilter);
   }
 
+  @Test
   public void testDeleteFilter() {
     filterService.deleteFilter(filter.getId());
 
@@ -150,6 +167,7 @@ public class FilterServiceTest extends PluggableProcessEngineTest {
     assertNull(filter);
   }
 
+  @Test
   public void testDeleteUnknownFilter() {
     filterService.deleteFilter(filter.getId());
     long count = filterService.createFilterQuery().count();

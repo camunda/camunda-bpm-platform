@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -28,6 +31,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class SequenceFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testTakeAllOutgoingFlowsFromNonScopeTask() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -45,11 +49,12 @@ public class SequenceFlowTest extends PluggableProcessEngineTest {
       taskService.complete(followUpTask.getId());
     }
 
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testTakeAllOutgoingFlowsFromScopeTask() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -67,6 +72,6 @@ public class SequenceFlowTest extends PluggableProcessEngineTest {
       taskService.complete(followUpTask.getId());
     }
 
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 }

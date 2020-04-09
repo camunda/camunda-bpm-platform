@@ -16,12 +16,17 @@
  */
 package org.camunda.bpm.engine.test.cmmn.decisiontask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -46,6 +51,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
   protected final String DECISION_KEY = "testDecision";
 
   @Deployment(resources = {CMMN_CALL_DECISION_CONSTANT, DECISION_OKAY_DMN })
+  @Test
   public void testCallDecisionAsConstant() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY);
@@ -59,6 +65,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       CMMN_CALL_DECISION_EXPRESSION,
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionAsExpressionStartsWithDollar() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables().putValue("testDecision", "testDecision"));
@@ -72,6 +79,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionAsExpressionStartsWithHash.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionAsExpressionStartsWithHash() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables().putValue("testDecision", "testDecision"));
@@ -85,6 +93,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallLatestDecision.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallLatestCase() {
     // given
     String deploymentId = repositoryService.createDeployment()
@@ -105,6 +114,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionByDeployment.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionByDeployment() {
     // given
     String deploymentId = repositoryService.createDeployment()
@@ -125,6 +135,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionByVersion.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionByVersion() {
     // given
     String deploymentId = repositoryService.createDeployment()
@@ -145,6 +156,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionByVersionAsExpressionStartsWithDollar.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionByVersionAsExpressionStartsWithDollar() {
     // given
     String deploymentId = repositoryService.createDeployment()
@@ -165,6 +177,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionByVersionAsExpressionStartsWithHash.cmmn",
       DECISION_OKAY_DMN
     })
+  @Test
   public void testCallDecisionByVersionAsExpressionStartsWithHash() {
     // given
     String deploymentId = repositoryService.createDeployment()
@@ -182,6 +195,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = CMMN_CALL_DECISION_CONSTANT_WITH_MANUAL_ACTIVATION)
+  @Test
   public void testDecisionNotFound() {
     // given
     createCaseInstanceByKey(CASE_KEY);
@@ -200,6 +214,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
       CMMN_CALL_DECISION_CONSTANT,
       DECISION_POJO_DMN
     })
+  @Test
   public void testPojo() {
     // given
     VariableMap variables = Variables.createVariables()
@@ -210,6 +225,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { CMMN_CALL_DECISION_CONSTANT, DECISION_OKAY_DMN })
+  @Test
   public void testIgnoreNonBlockingFlag() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY);
@@ -220,6 +236,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment( resources = { CMMN_CALL_DECISION_EXPRESSION_WITH_MANUAL_ACTIVATION, DECISION_LITERAL_EXPRESSION_DMN} )
+  @Test
   public void testCallDecisionWithLiteralExpression() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables()
@@ -240,6 +257,7 @@ public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { CMMN_CALL_DECISION_EXPRESSION, DRD_DISH_RESOURCE })
+  @Test
   public void testCallDecisionWithRequiredDecisions() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables()

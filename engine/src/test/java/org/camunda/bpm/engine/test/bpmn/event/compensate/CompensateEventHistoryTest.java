@@ -16,15 +16,19 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -34,6 +38,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 public class CompensateEventHistoryTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testBoundaryCompensationHandlerHistory.bpmn20.xml")
+  @Test
   public void testBoundaryCompensationHandlerHistoryActivityInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryHandlerProcess");
@@ -94,6 +99,7 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testDefaultCompensationHandlerHistory.bpmn20.xml")
+  @Test
   public void testDefaultCompensationHandlerHistoryActivityInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("defaultHandlerProcess");

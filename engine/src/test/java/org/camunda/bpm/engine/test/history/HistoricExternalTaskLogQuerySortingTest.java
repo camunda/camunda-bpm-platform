@@ -16,6 +16,28 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskByTimestamp;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByExecutionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByExternalTaskId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByPriority;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByProcessDefinitionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByProcessDefinitionKey;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByProcessInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByRetries;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByTopicName;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByWorkerId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.createDefaultExternalTaskModel;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -31,7 +53,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil;
-import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.*;
+import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.NullTolerantComparator;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -40,16 +62,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.*;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.createDefaultExternalTaskModel;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricExternalTaskLogQuerySortingTest {

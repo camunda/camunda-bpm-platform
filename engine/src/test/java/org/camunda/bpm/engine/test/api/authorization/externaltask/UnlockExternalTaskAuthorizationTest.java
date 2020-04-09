@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
-import java.util.Collection;
-import java.util.List;
-
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
+import java.util.Collection;
+import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;

@@ -16,14 +16,20 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Testcase for the non-spec extensions to the task candidate use case.
@@ -32,6 +38,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
 
+  @Before
   public void setUp() throws Exception {
     identityService.saveUser(identityService.newUser("kermit"));
     identityService.saveUser(identityService.newUser("gonzo"));
@@ -45,6 +52,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
     identityService.createMembership("fozzie", "management");
   }
 
+  @After
   public void tearDown() throws Exception {
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup("management");
@@ -54,6 +62,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAssigneeExtension() {
     runtimeService.startProcessInstanceByKey("assigneeExtension");
     List<Task> tasks = taskService
@@ -64,6 +73,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
     assertEquals("my task", tasks.get(0).getName());
   }
 
+  @Test
   public void testDuplicateAssigneeDeclaration() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testDuplicateAssigneeDeclaration");
@@ -75,6 +85,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCandidateUsersExtension() {
     runtimeService.startProcessInstanceByKey("candidateUsersExtension");
     List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
@@ -84,6 +95,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCandidateGroupsExtension() {
     runtimeService.startProcessInstanceByKey("candidateGroupsExtension");
 
@@ -106,6 +118,7 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTest {
   // Test where the candidate user extension is used together
   // with the spec way of defining candidate users
   @Deployment
+  @Test
   public void testMixedCandidateUserDefinition() {
     runtimeService.startProcessInstanceByKey("mixedCandidateUser");
 

@@ -16,15 +16,17 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
+import org.junit.Test;
 
 
 /**

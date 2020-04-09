@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.RepositoryService;
@@ -35,8 +36,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
-import junit.framework.AssertionFailedError;
 
 /**
  * Parse an invalid process definition and assert the error message.

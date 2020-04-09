@@ -20,6 +20,10 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -33,7 +37,6 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -48,16 +51,19 @@ import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.CancelFlightServ
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  */
 public class CompensateEventTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testCompensateOrder() {
     //given two process models, only differ in order of the activities
     final String PROCESS_MODEL_WITH_REF_BEFORE = "org/camunda/bpm/engine/test/bpmn/event/compensate/compensation_reference-before.bpmn";
@@ -81,6 +87,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompensateSubprocess() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -88,11 +95,12 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testCompensateSubprocessInsideSubprocess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -106,10 +114,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     completeTask("Cancel Hotel");
     completeTask("Cancel Flight");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensateParallelSubprocess() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -120,11 +129,12 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     taskService.complete(singleResult.getId());
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testCompensateParallelSubprocessCompHandlerWaitstate() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -144,10 +154,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     taskService.complete(singleResult.getId());
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateParallelSubprocessCompHandlerWaitstate.bpmn20.xml")
+  @Test
   public void testDeleteParallelSubprocessCompHandlerWaitstate() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -160,10 +171,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), "");
 
     // then the process has been removed
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensateMiSubprocess() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -171,11 +183,12 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testCompensateScope() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -184,12 +197,13 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   // See: https://app.camunda.com/jira/browse/CAM-1410
   @Deployment
+  @Test
   public void testCompensateActivityRef() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -198,7 +212,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertNull(runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
@@ -206,6 +220,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
    * CAM-3628
    */
   @Deployment
+  @Test
   public void testCompensateSubprocessWithBoundaryEvent() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -215,10 +230,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
     taskService.complete(compensationTask.getId());
     runtimeService.signal(instance.getId());
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensateActivityInSubprocess() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -236,10 +252,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
     taskService.complete(compensationTask.getId());
     runtimeService.signal(instance.getId());
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensateActivityInConcurrentSubprocess() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -261,10 +278,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
     taskService.complete(compensationTask.getId());
     runtimeService.signal(instance.getId());
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensateConcurrentMiActivity() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -279,10 +297,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
     // complete last open task and end process instance
     completeTask("Book Hotel");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensateConcurrentMiSubprocess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -299,10 +318,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     completeTask("Book Hotel");
 
     runtimeService.signal(processInstanceId);
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensateActivityRefMiActivity() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -315,10 +335,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(5, taskService.createTaskQuery().count());
     completeTasks("Cancel Hotel", 5);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensateActivityRefMiSubprocess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -331,11 +352,12 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(5, taskService.createTaskQuery().count());
     completeTasks("Cancel Hotel", 5);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
+  @Test
   public void testCallActivityCompensationHandler() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -345,7 +367,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     }
 
     runtimeService.signal(processInstance.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
@@ -356,6 +378,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompensateMiSubprocessVariableSnapshots() {
     // see referenced java delegates in the process definition.
 
@@ -376,6 +399,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompensateMiSubprocessWithCompensationEventSubprocessVariableSnapshots() {
     // see referenced java delegates in the process definition.
 
@@ -398,7 +422,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   /**
    * enable test case when bug is fixed
    *
-   * @see https://app.camunda.com/jira/browse/CAM-4268
+   * @see <a href="https://app.camunda.com/jira/browse/CAM-4268">https://app.camunda.com/jira/browse/CAM-4268</a>
    */
   @Deployment
   public void FAILING_testCompensateMiSubprocessVariableSnapshotOfElementVariable() {
@@ -420,14 +444,15 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(flights, BookFlightService.bookedFlights);
     assertEquals(flights, CancelFlightService.canceledFlights);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessActivityRef.bpmn20.xml" })
+  @Test
   public void testCompensateActivityRefTriggeredByEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(processInstance.getId()).variableName("undoBookHotel");
@@ -443,9 +468,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessInSubProcessActivityRef.bpmn20.xml" })
+  @Test
   public void testCompensateActivityRefTriggeredByEventSubprocessInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(processInstance.getId()).variableName("undoBookHotel");
@@ -460,9 +486,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcessActivityRef.bpmn20.xml" })
+  @Test
   public void testCompensateActivityRefInEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookSecondHotel");
 
@@ -480,12 +507,13 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   /**
    * enable test case when bug is fixed
    *
-   * @see https://app.camunda.com/jira/browse/CAM-4304
+   * @see <a href="https://app.camunda.com/jira/browse/CAM-4304">https://app.camunda.com/jira/browse/CAM-4304</a>
    */
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcess.bpmn20.xml" })
+  @Test
   public void testCompensateInEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookSecondHotel");
 
@@ -507,6 +535,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionListeners() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("start", 0);
@@ -528,6 +557,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeWithoutEventScope() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -546,6 +576,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testConcurrentExecutionsAndPendingCompensation() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -595,10 +626,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     taskService.complete(taskId);
 
     // then (3)
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationEndEventWithScope() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -607,10 +639,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
       assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
     }
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testCompensationEndEventWithActivityRef() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -619,10 +652,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
       assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
     }
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
+  @Test
   public void testActivityInstanceTreeForCompensationEndEvent(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -635,6 +669,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiActivity.bpmn20.xml")
+  @Test
   public void testActivityInstanceTreeForMiActivity(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -652,6 +687,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateParallelSubprocessCompHandlerWaitstate.bpmn20.xml")
+  @Test
   public void testActivityInstanceTreeForParallelMiActivityInSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -671,6 +707,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiSubprocess.bpmn20.xml")
+  @Test
   public void testActivityInstanceTreeForMiSubprocess(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
@@ -725,6 +762,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
+  @Test
   public void testCancelProcessInstanceWithActiveCompensation() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -733,10 +771,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationEventSubProcess.bpmn20.xml" })
+  @Test
   public void testCompensationEventSubProcessWithScope() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
 
@@ -755,10 +794,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     // third - additional compensation handler
     completeTask("Update Customer Record");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationEventSubProcessWithActivityRef() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
 
@@ -772,10 +812,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertEquals(1, taskService.createTaskQuery().count());
     completeTask("Cancel Hotel");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationEventSubProcess.bpmn20.xml" })
+  @Test
   public void testActivityInstanceTreeForCompensationEventSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("bookingProcess");
 
@@ -797,6 +838,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompensateMiSubprocessWithCompensationEventSubProcess() {
     Map<String, Object> variables = new HashMap<String, Object>();
     // multi instance collection
@@ -818,10 +860,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     completeTasks("Cancel Hotel", 2);
     completeTasks("Update Customer Record", 2);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensateParallelMiSubprocessWithCompensationEventSubProcess() {
     Map<String, Object> variables = new HashMap<String, Object>();
     // multi instance collection
@@ -840,10 +883,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     completeTasks("Cancel Hotel", 2);
     completeTasks("Update Customer Record", 2);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationEventSubprocessWithoutBoundaryEvents() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -857,10 +901,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     completeTask("Cancel Flight");
     completeTask("Cancel Hotel");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationEventSubprocessReThrowCompensationEvent() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -875,10 +920,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     // execute compensation handler at subprocess
     completeTask("Cancel Flight");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationEventSubprocessConsumeCompensationEvent() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
 
@@ -891,10 +937,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     // execute compensation handler and consume compensation event
     completeTask("Cancel Hotel");
     // compensation handler at subprocess (Cancel Flight) should not be executed
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testSubprocessCompensationHandler() {
 
     // given a process instance
@@ -920,11 +967,12 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     taskService.complete(afterCompensationTask.getId());
 
     // and the process has successfully ended
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
+  @Test
   public void testSubprocessCompensationHandlerActivityInstanceTree() {
 
     // given a process instance
@@ -945,6 +993,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
+  @Test
   public void testSubprocessCompensationHandlerDeleteProcessInstance() {
 
     // given a process instance in compensation
@@ -956,7 +1005,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
     // then the process instance is ended
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   /**
@@ -1029,10 +1078,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     taskService.complete(afterCompensationTask.getId());
 
     // and the process has successfully ended
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testConcurrentScopeCompensation() {
     // given a process instance with two concurrent tasks, one of which is waiting
     // before throwing compensation
@@ -1060,10 +1110,11 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
 
     // and after completing the concurrent task, the process instance ends successfully
     taskService.complete(concurrentTask.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testLocalVariablesInEndExecutionListener() {
     // given
     SetLocalVariableListener setListener = new SetLocalVariableListener("foo", "bar");
@@ -1114,7 +1165,7 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
           .endEvent()
       .done();
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     long dayInMillis = 1000 * 60 * 60 * 24;
     Date date1 = new Date(10 * dayInMillis);

@@ -16,16 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
@@ -35,25 +25,42 @@ import static org.camunda.bpm.engine.test.api.identity.TestPermissions.CREATE;
 import static org.camunda.bpm.engine.test.api.identity.TestPermissions.DELETE;
 import static org.camunda.bpm.engine.test.api.identity.TestPermissions.READ;
 import static org.camunda.bpm.engine.test.api.identity.TestPermissions.UPDATE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel.
  */
 public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableProcessEngineTest {
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
+
     processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
-  @Override
+  @After
   public void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
     cleanupAfterTest();
-    super.tearDown();
+
   }
 
+  @Test
   public void testAuthorizationCheckEmptyDb() {
     Resource resource1 = TestResource.RESOURCE1;
     Resource resource2 = TestResource.RESOURCE2;
@@ -70,6 +77,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1, "someOtherId"));
   }
 
+  @Test
   public void testUserOverrideGlobalGrantAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
@@ -107,6 +115,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, DELETE, resource1));
   }
 
+  @Test
   public void testGroupOverrideGlobalGrantAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
@@ -152,6 +161,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertTrue(authorizationService.isUserAuthorized("jonny", null, DELETE, resource1));
   }
 
+  @Test
   public void testUserOverrideGlobalRevokeAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
@@ -183,6 +193,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
   }
 
+  @Test
   public void testNullAuthorizationCheckUserGroup() {
     try {
       authorizationService.isUserAuthorized(null, null, UPDATE, TestResource.RESOURCE1);
@@ -192,6 +203,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     }
   }
 
+  @Test
   public void testNullAuthorizationCheckPermission() {
     try {
       authorizationService.isUserAuthorized("jonny", null, null, TestResource.RESOURCE1);
@@ -201,6 +213,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     }
   }
 
+  @Test
   public void testNullAuthorizationCheckResource() {
     try {
       authorizationService.isUserAuthorized("jonny", null, UPDATE, null);
@@ -210,6 +223,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     }
   }
 
+  @Test
   public void testUserOverrideGroupOverrideGlobalAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
@@ -250,6 +264,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
   }
 
+  @Test
   public void testEnabledAuthorizationCheck() {
     // given
     Resource resource1 = TestResource.RESOURCE1;

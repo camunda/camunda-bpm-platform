@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
@@ -31,21 +30,28 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELEGATI
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.HashMap;
-import org.camunda.bpm.engine.EntityTypes;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Danny Gräf
@@ -56,6 +62,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   protected ProcessInstance process;
   protected Task task;
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testCreateAndCompleteTask() {
     startTestProcess();
@@ -76,6 +83,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, complete.getCategory());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testAssignTask() {
     startTestProcess();
@@ -96,6 +104,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testChangeTaskOwner() {
     startTestProcess();
@@ -116,6 +125,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testSetPriority() {
     startTestProcess();
@@ -155,6 +165,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, userOperationLogEntry.getCategory());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testClaimTask() {
     startTestProcess();
@@ -175,6 +186,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testDelegateTask() {
     startTestProcess();
@@ -196,6 +208,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testResolveTask() {
     startTestProcess();
@@ -215,6 +228,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testSubmitTaskForm_Complete() {
     startTestProcess();
@@ -231,9 +245,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertTrue(Boolean.parseBoolean(log.getNewValue()));
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, log.getCategory());
 
-    assertProcessEnded(process.getId());
+    testRule.assertProcessEnded(process.getId());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testSubmitTaskForm_Resolve() {
     startTestProcess();
@@ -261,6 +276,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
+  @Test
   public void testDeleteTask() {
     // given
     Task task = taskService.newTask();
@@ -284,6 +300,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testCompleteTask() {
     // given
     startTestProcess();
@@ -304,15 +321,15 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCompleteCaseExecution() {
     // given
-    String caseDefinitionId = repositoryService
+    CaseDefinition caseDefinition = repositoryService
         .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+        .singleResult();
 
     String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
+        .withCaseDefinition(caseDefinition.getId())
         .create()
         .getId();
 
@@ -335,10 +352,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     UserOperationLogEntry entry = query.singleResult();
     assertNotNull(entry);
 
-    assertEquals(caseDefinitionId, entry.getCaseDefinitionId());
+    assertEquals(caseDefinition.getId(), entry.getCaseDefinitionId());
     assertEquals(caseInstanceId, entry.getCaseInstanceId());
     assertEquals(humanTaskId, entry.getCaseExecutionId());
-    assertEquals(deploymentId, entry.getDeploymentId());
+    assertEquals(caseDefinition.getDeploymentId(), entry.getDeploymentId());
 
     assertFalse(Boolean.valueOf(entry.getOrgValue()));
     assertTrue(Boolean.valueOf(entry.getNewValue()));
@@ -348,8 +365,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testKeepOpLogEntriesOnUndeployment() {
     // given
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     startTestProcess();
     // an op log entry directly related to the process instance is created
     taskService.resolveTask(task.getId());
@@ -371,6 +390,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteOpLogEntry() {
     // given
     startTestProcess();
@@ -393,6 +413,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteOpLogEntryWithNullArgument() {
     // given
     startTestProcess();
@@ -410,6 +431,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteOpLogNonExstingEntry() {
     // given
     startTestProcess();
@@ -426,8 +448,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment
+  @Test
   public void testOnlyTaskCompletionIsLogged() {
     // given
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -473,7 +497,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
   protected void completeTestProcess() {
     taskService.complete(task.getId());
-    assertProcessEnded(process.getId());
+    testRule.assertProcessEnded(process.getId());
   }
 
 }

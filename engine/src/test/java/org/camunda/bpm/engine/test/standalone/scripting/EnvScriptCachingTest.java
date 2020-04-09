@@ -16,11 +16,16 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import javax.script.ScriptEngine;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import javax.script.ScriptEngine;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
@@ -33,8 +38,11 @@ import org.camunda.bpm.engine.impl.scripting.SourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -58,17 +66,20 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTest {
 
   protected ScriptFactory scriptFactory;
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
+
     scriptFactory = processEngineConfiguration.getScriptFactory();
     processEngineConfiguration.getEnvScriptResolvers().add(RESOLVER);
   }
 
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
+
     processEngineConfiguration.getEnvScriptResolvers().remove(RESOLVER);
   }
 
+  @Test
   public void testEnabledPaEnvScriptCaching() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
@@ -93,6 +104,7 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTest {
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
   public void testDisabledPaEnvScriptCaching() {
     // given
     processEngineConfiguration.setEnableFetchScriptEngineFromProcessApplication(false);

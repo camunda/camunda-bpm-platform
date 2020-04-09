@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.mock;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
+
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.RuntimeService;
@@ -29,9 +32,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
 
 /**
  * @author Tassilo Weidner

@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.deploy;
 
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.COMPENSATE_EVENT_DEFINITION;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
@@ -25,10 +29,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
-
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.COMPENSATE_EVENT_DEFINITION;
 
 /**
  * @author Frederik Heremans

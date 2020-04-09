@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSc
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 import java.util.Collection;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;

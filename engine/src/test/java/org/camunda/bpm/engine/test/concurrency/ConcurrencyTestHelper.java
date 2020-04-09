@@ -16,28 +16,32 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.Job;
+import org.junit.After;
+import org.junit.Before;
 
-/**
- * @author Daniel Meyer
- *
- */
-public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
+public abstract class ConcurrencyTestHelper {
 
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected HistoryService historyService;
   protected List<ControllableCommand<?>> controllableCommands;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void init() {
     controllableCommands = new ArrayList<>();
-    super.setUp();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void cleanUp() throws Exception {
 
     // wait for all spawned threads to end
     for (ControllableCommand<?> controllableCommand : controllableCommands) {
@@ -48,23 +52,19 @@ public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
 
     // clear the test thread's interruption state
     Thread.interrupted();
-
-    super.tearDown();
   }
 
   protected ThreadControl executeControllableCommand(final ControllableCommand<?> command) {
 
     final Thread controlThread = Thread.currentThread();
 
-    Thread thread = new Thread(new Runnable() {
-      public void run() {
-        try {
-          processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(command);
-        } catch(RuntimeException e) {
-          command.monitor.setException(e);
-          controlThread.interrupt();
-          throw e;
-        }
+    Thread thread = new Thread(() -> {
+      try {
+        processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(command);
+      } catch (RuntimeException e) {
+        command.monitor.setException(e);
+        controlThread.interrupt();
+        throw e;
       }
     });
 
@@ -115,16 +115,15 @@ public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
 
     public void waitForSync(long timeout) {
       synchronized (this) {
-        if(exception != null) {
+        if (exception != null) {
           if (reportFailure) {
             return;
-          }
-          else {
+          } else {
             fail();
           }
         }
         try {
-          if(!syncAvailable) {
+          if (!syncAvailable) {
             try {
               wait(timeout);
             } catch (InterruptedException e) {
@@ -157,10 +156,10 @@ public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
           fail("Unexpected interruption");
         }
       } finally {
-        // clear our interruption state; the controlled thread may have interrupted us 
+        // clear our interruption state; the controlled thread may have interrupted us
         // in case the controlled command failed (see ConcurrencyTestCase#executeControllableCommand).
-        // 
-        // If the controlled thread finished before we entered the #join method, #join returns 
+        //
+        // If the controlled thread finished before we entered the #join method, #join returns
         // immediately and does not clear our interruption status. If we do not clear the
         // interruption status here, any subsequent call of interrupt-sensitive
         // methods may fail (e.g. monitors, IO operations)
@@ -188,7 +187,7 @@ public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
 
     public void makeContinue() {
       synchronized (this) {
-        if(exception != null) {
+        if (exception != null) {
           fail();
         }
         notifyAll();
@@ -214,6 +213,16 @@ public abstract class ConcurrencyTest extends PluggableProcessEngineTest {
 
     public Throwable getException() {
       return exception;
+    }
+  }
+
+  protected void deleteHistoryCleanupJobs() {
+    final List<Job> jobs = historyService.findHistoryCleanupJobs();
+    for (final Job job : jobs) {
+      processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
+        commandContext.getJobManager().deleteJob((JobEntity) job);
+        return null;
+      });
     }
   }
 

@@ -16,24 +16,31 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author roman.smirnov
  */
 public class ActivateJobTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testActivationById_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobById(null);
@@ -43,6 +50,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldActivateJob() {
     // given
 
@@ -75,6 +83,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByJobDefinitionId_shouldActivateJob() {
     // given
 
@@ -111,6 +120,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivateByProcessInstanceId_shouldActivateJob() {
     // given
 
@@ -147,6 +157,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldActivateJob() {
     // given
     // a deployed process definition
@@ -181,6 +192,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldActivateJob() {
     // given
     // a deployed process definition
@@ -214,6 +226,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
     assertFalse(activeJob.isSuspended());
   }
 
+  @Test
   public void testMultipleActivationByProcessDefinitionKey_shouldActivateJob() {
     // given
     String key = "suspensionProcess";
@@ -251,6 +264,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByIdUsingBuilder() {
     // given
 
@@ -280,6 +294,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByJobDefinitionIdUsingBuilder() {
     // given
 
@@ -310,6 +325,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessInstanceIdUsingBuilder() {
     // given
 
@@ -338,6 +354,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionIdUsingBuilder() {
     // given
 
@@ -368,6 +385,7 @@ public class ActivateJobTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKeyUsingBuilder() {
     // given
 

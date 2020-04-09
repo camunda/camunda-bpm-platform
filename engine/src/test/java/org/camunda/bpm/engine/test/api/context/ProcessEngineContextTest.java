@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.test.api.context;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.context.ProcessEngineContext;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -32,8 +34,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.concurrent.Callable;
 
 public class ProcessEngineContextTest {
 

@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.camunda.bpm.engine.test.util.ClockTestUtil.incrementClock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
@@ -24,14 +32,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.camunda.bpm.engine.test.util.ClockTestUtil.incrementClock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class JobExecutorAcquireJobsByTypeTest extends AbstractJobExecutorAcquireJobsTest {
 

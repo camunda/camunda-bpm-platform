@@ -16,14 +16,13 @@
  */
 package org.camunda.bpm.container.impl.jmx.kernel;
 
-import java.util.List;
-import java.util.Set;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import junit.framework.TestCase;
+import java.util.List;
+import java.util.Set;
 
+import junit.framework.TestCase;
 import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.util.FailingDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.util.StartServiceDeploymentOperationStep;

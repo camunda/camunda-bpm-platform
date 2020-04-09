@@ -18,6 +18,9 @@ package org.camunda.bpm.engine.test.history;
 
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
 import static org.camunda.bpm.engine.query.PeriodUnit.QUARTER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -33,14 +36,15 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -51,9 +55,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
 
   private Random random = new Random();
 
+  @Test
   public void testDurationReportByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
       .periodUnit(MONTH)
@@ -72,9 +77,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testTwoInstancesInSamePeriodByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -93,9 +99,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testDurationReportInDifferentPeriodsByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -134,9 +141,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testSamePeriodDifferentYearByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -154,9 +162,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testDurationReportByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -173,9 +182,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testTwoInstancesInSamePeriodDurationReportByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -193,9 +203,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testDurationReportInDifferentPeriodsByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -222,9 +233,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testSamePeriodDifferentYearByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -242,6 +254,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByInvalidPeriodUnit() {
     HistoricProcessInstanceReport report = historyService.createHistoricProcessInstanceReport();
 
@@ -251,9 +264,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     } catch (NotValidException e) {}
   }
 
+  @Test
   public void testReportByStartedBeforeByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
       .periodUnit(MONTH)
@@ -278,9 +292,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByStartedBeforeByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
       .periodUnit(QUARTER)
@@ -309,6 +324,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByInvalidStartedBefore() {
     HistoricProcessInstanceReport report = historyService.createHistoricProcessInstanceReport();
 
@@ -318,9 +334,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     } catch (NotValidException e) {}
   }
 
+  @Test
   public void testReportByStartedAfterByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     createReportScenario()
       .startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015 10:00
@@ -344,9 +361,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByStartedAfterByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     createReportScenario()
       .startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015 10:00
@@ -370,6 +388,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByInvalidStartedAfter() {
     HistoricProcessInstanceReport report = historyService.createHistoricProcessInstanceReport();
 
@@ -379,9 +398,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     } catch (NotValidException e) {}
   }
 
+  @Test
   public void testReportByStartedAfterAndStartedBeforeByMonth() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -410,9 +430,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByStartedAfterAndStartedBeforeByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -441,9 +462,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportWithExcludingConditions() {
     // given
-    deployment(createProcessWithUserTask("process"));
+   testRule.deploy(createProcessWithUserTask("process"));
 
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -466,9 +488,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertEquals(0, result.size());
   }
 
+  @Test
   public void testReportByProcessDefinitionIdByMonth() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     String processDefinitionId1 = repositoryService
         .createProcessDefinitionQuery()
@@ -495,9 +518,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByProcessDefinitionIdByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     String processDefinitionId1 = repositoryService
         .createProcessDefinitionQuery()
@@ -524,9 +548,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByMultipleProcessDefinitionIdByMonth() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     String processDefinitionId1 = repositoryService
         .createProcessDefinitionQuery()
@@ -556,9 +581,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByMultipleProcessDefinitionIdByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     String processDefinitionId1 = repositoryService
         .createProcessDefinitionQuery()
@@ -588,6 +614,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByInvalidProcessDefinitionId() {
     HistoricProcessInstanceReport report = historyService.createHistoricProcessInstanceReport();
 
@@ -600,9 +627,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     } catch (NotValidException e) {}
   }
 
+  @Test
   public void testReportByProcessDefinitionKeyByMonth() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -623,9 +651,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByProcessDefinitionKeyByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -646,9 +675,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByMultipleProcessDefinitionKeyByMonth() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(MONTH)
@@ -666,9 +696,10 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByMultipleProcessDefinitionKeyByQuarter() {
     // given
-    deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
+   testRule.deploy(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
     DurationReportResultAssertion assertion = createReportScenario()
         .periodUnit(QUARTER)
@@ -686,6 +717,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     assertThat(result).matches(assertion);
   }
 
+  @Test
   public void testReportByInvalidProcessDefinitionKey() {
     HistoricProcessInstanceReport report = historyService.createHistoricProcessInstanceReport();
 

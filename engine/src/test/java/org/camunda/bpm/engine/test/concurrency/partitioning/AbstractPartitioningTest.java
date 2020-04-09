@@ -16,30 +16,29 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import java.util.Map;
+import org.junit.Before;
 
 /**
  * @author Tassilo Weidner
  */
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public abstract class AbstractPartitioningTest extends ConcurrencyTest {
+public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
 
   protected CommandExecutor commandExecutor;
 
-  protected void setUp() throws Exception {
-    super.setUp();
-
+  @Before
+  public void setUp() throws Exception {
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-
     processEngine.getProcessEngineConfiguration().setSkipHistoryOptimisticLockingExceptions(true);
   }
 
@@ -53,9 +52,8 @@ public abstract class AbstractPartitioningTest extends ConcurrencyTest {
   }
 
   protected ProcessInstance deployAndStartProcess(BpmnModelInstance bpmnModelInstance, Map<String, Object> variablesMap) {
-    deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", bpmnModelInstance)
-      .deploy().getId();
+    testRule.deploy(repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", bpmnModelInstance));
 
     String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator().next().getId();
     return runtimeService.startProcessInstanceByKey(processDefinitionKey, variablesMap);

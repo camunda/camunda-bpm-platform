@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -52,14 +50,10 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   private static final String PROCESS_ID = "process";
   private static final String FAILING_CLASS = "this.class.does.not.Exist";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setFailedJobRetryTimeCycle("PT5M,PT20M, PT3M");
-      configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
-      return configuration;
-    }
-  };
-
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    configuration.setFailedJobRetryTimeCycle("PT5M,PT20M, PT3M");
+    configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
+  });
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

@@ -18,7 +18,12 @@ package org.camunda.bpm.engine.test.bpmn.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -36,9 +40,11 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorDelegate;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -47,6 +53,7 @@ import org.junit.Assert;
  */
 public class AsyncAfterTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testTransitionIdRequired() {
 
     // if an outgoing sequence flow has no id, we cannot use it in asyncAfter
@@ -56,13 +63,14 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
         .deploy();
       fail("Exception expected");
     } catch (ParseException e) {
-      assertTextPresent("Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.", e.getMessage());
+      testRule.assertTextPresent("Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getElementIds()).containsExactly("service");
     }
 
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterServiceTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -77,10 +85,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // if the waiting job is executed, the process instance should end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterMultiInstanceUserTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
@@ -93,12 +102,13 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
       taskService.complete(task.getId());
     }
 
-    waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
+    testRule.waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeServiceTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -124,10 +134,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // after executing the waiting job, the process instance will end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterServiceTaskMultipleTransitions() {
 
     // start process instance
@@ -178,6 +189,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterServiceTaskMultipleTransitionsConcurrent() {
 
     // start process instance
@@ -202,6 +214,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterWithoutTransition() {
 
     // start process instance
@@ -221,11 +234,12 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // if we execute the job, the process instance ends.
     managementService.executeJob(continuationJob.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
 
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterInNestedWithoutTransition() {
 
     // start process instance
@@ -250,6 +264,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterManualTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testManualTask");
@@ -264,10 +279,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // if the waiting job is executed, the process instance should end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeManualTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testManualTask");
@@ -292,10 +308,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // after executing the waiting job, the process instance will end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterIntermediateCatchEvent() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateCatchEvent");
@@ -313,10 +330,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // if the waiting job is executed, the process instance should end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeIntermediateCatchEvent() {
 
     // start process instance
@@ -331,7 +349,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     assertNotNull(job);
 
     // execute job to get to the message event
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // now we need to trigger the message to proceed
     runtimeService.correlateMessage("testMessage1");
@@ -346,10 +364,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // after executing the waiting job, the process instance will end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterIntermediateThrowEvent() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateThrowEvent");
@@ -364,10 +383,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // if the waiting job is executed, the process instance should end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeIntermediateThrowEvent() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testIntermediateThrowEvent");
@@ -392,10 +412,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     // after executing the waiting job, the process instance will end
     managementService.executeJob(job.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterInclusiveGateway() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testInclusiveGateway");
@@ -407,7 +428,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     // the process should wait *after* the gateway
     assertEquals(2, managementService.createJobQuery().active().count());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // if the waiting job is executed there should be 2 user tasks
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -419,11 +440,12 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(pi.getProcessInstanceId());
+    testRule.assertProcessEnded(pi.getProcessInstanceId());
 
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeInclusiveGateway() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testInclusiveGateway");
@@ -449,6 +471,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterExclusiveGateway() {
     // start process instance with variables
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -463,7 +486,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     // the process should wait *after* the gateway
     assertEquals(1, managementService.createJobQuery().active().count());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // if the waiting job is executed there should be 2 user tasks
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -475,10 +498,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(pi.getProcessInstanceId());
+    testRule.assertProcessEnded(pi.getProcessInstanceId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterAndBeforeExclusiveGateway() {
     // start process instance with variables
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -510,6 +534,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
    * So the only required assertion here is that the process executes successfully.
    */
   @Deployment
+  @Test
   public void testAsyncAfterWithExecutionListener() {
     // given an async after job and an execution listener on that task
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -533,6 +558,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterOnParallelGatewayFork() {
     String configuration = PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName();
     String config1 = configuration + "$afterForkFlow1";
@@ -563,6 +589,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterParallelMultiInstanceWithServiceTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -573,12 +600,13 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     assertListenerEndInvoked(pi);
 
     // the process should wait *after* execute all service tasks
-    executeAvailableJobs(1);
+    testRule.executeAvailableJobs(1);
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterServiceWrappedInParallelMultiInstance(){
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -591,12 +619,13 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     // the process should wait *after* execute each service task wrapped in the multi-instance body
     assertEquals(5L, managementService.createJobQuery().count());
     // execute all jobs - one for each service task
-    executeAvailableJobs(5);
+    testRule.executeAvailableJobs(5);
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterServiceWrappedInSequentialMultiInstance(){
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -609,7 +638,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     // the process should wait *after* execute each service task step-by-step
     assertEquals(1L, managementService.createJobQuery().count());
     // execute all jobs - one for each service task wrapped in the multi-instance body
-    executeAvailableJobs(5);
+    testRule.executeAvailableJobs(5);
 
     // behavior should be invoked for each service task
     assertBehaviorInvoked(pi, 5);
@@ -619,7 +648,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     assertNotNull(task);
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
@@ -652,6 +681,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncAfterBoundaryEvent() {
     // given process instance
     runtimeService.startProcessInstanceByKey("Process");
@@ -672,6 +702,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncBeforeBoundaryEvent() {
     // given process instance
     runtimeService.startProcessInstanceByKey("Process");
@@ -691,6 +722,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     assertNull(task);
   }
 
+  @Test
   public void testAsyncAfterErrorEvent() {
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
@@ -707,7 +739,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
       .endEvent()
       .moveToActivity("servTask")
       .endEvent().done();
-    deployment(instance);
+   testRule.deploy(instance);
 
     runtimeService.startProcessInstanceByKey("process");
 

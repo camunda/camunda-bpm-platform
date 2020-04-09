@@ -16,18 +16,37 @@
  */
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
+import org.camunda.bpm.model.bpmn.instance.CatchEvent;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
+import org.camunda.bpm.model.bpmn.instance.IntermediateCatchEvent;
+import org.camunda.bpm.model.bpmn.instance.Message;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-
-import java.util.Collection;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -46,6 +65,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
 
   private String deploymentId;
 
+  @Test
   public void testProcessStartEvent() {
     deployAndStartTestProcess(PROCESS_ID, ExecutionListener.EVENTNAME_START);
     assertFlowElementIs(StartEvent.class);
@@ -53,6 +73,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testStartEventEndEvent() {
     deployAndStartTestProcess(START_ID, ExecutionListener.EVENTNAME_END);
     assertFlowElementIs(StartEvent.class);
@@ -60,6 +81,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testSequenceFlowTakeEvent() {
     deployAndStartTestProcess(SEQUENCE_FLOW_ID, ExecutionListener.EVENTNAME_TAKE);
     assertFlowElementIs(SequenceFlow.class);
@@ -67,6 +89,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testIntermediateCatchEventStartEvent() {
     deployAndStartTestProcess(CATCH_EVENT_ID, ExecutionListener.EVENTNAME_START);
     assertFlowElementIs(IntermediateCatchEvent.class);
@@ -74,6 +97,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testIntermediateCatchEventEndEvent() {
     deployAndStartTestProcess(CATCH_EVENT_ID, ExecutionListener.EVENTNAME_END);
     assertNotNotified();
@@ -82,6 +106,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testGatewayStartEvent() {
     deployAndStartTestProcess(GATEWAY_ID, ExecutionListener.EVENTNAME_START);
     assertNotNotified();
@@ -90,6 +115,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testGatewayEndEvent() {
     deployAndStartTestProcess(GATEWAY_ID, ExecutionListener.EVENTNAME_END);
     assertNotNotified();
@@ -98,6 +124,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testUserTaskStartEvent() {
     deployAndStartTestProcess(USER_TASK_ID, ExecutionListener.EVENTNAME_START);
     assertNotNotified();
@@ -106,6 +133,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     completeTask();
   }
 
+  @Test
   public void testUserTaskEndEvent() {
     deployAndStartTestProcess(USER_TASK_ID, ExecutionListener.EVENTNAME_END);
     assertNotNotified();
@@ -114,6 +142,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     assertFlowElementIs(UserTask.class);
   }
 
+  @Test
   public void testEndEventStartEvent() {
     deployAndStartTestProcess(END_ID, ExecutionListener.EVENTNAME_START);
     assertNotNotified();
@@ -122,6 +151,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     assertFlowElementIs(EndEvent.class);
   }
 
+  @Test
   public void testProcessEndEvent() {
     deployAndStartTestProcess(PROCESS_ID, ExecutionListener.EVENTNAME_END);
     assertNotNotified();
@@ -200,6 +230,7 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     runtimeService.startProcessInstanceByKey(PROCESS_ID);
   }
 
+  @After
   public void tearDown() {
     ModelExecutionContextExecutionListener.clear();
     repositoryService.deleteDeployment(deploymentId, true);

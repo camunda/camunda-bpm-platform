@@ -16,24 +16,24 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
-import java.util.Date;
-import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.junit.Test;
-import org.camunda.bpm.engine.management.MetricsQuery;
-import org.camunda.bpm.engine.management.MetricIntervalValue;
-import org.camunda.bpm.engine.management.Metrics;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
+import java.util.List;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
+import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *

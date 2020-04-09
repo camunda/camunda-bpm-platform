@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import org.camunda.bpm.engine.impl.digest.DatabasePrefixHandler;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.camunda.bpm.engine.impl.digest.DatabasePrefixHandler;
+import org.junit.Before;
+import org.junit.Test;
 
 public class DatabasePrefixHandlerTest {
 

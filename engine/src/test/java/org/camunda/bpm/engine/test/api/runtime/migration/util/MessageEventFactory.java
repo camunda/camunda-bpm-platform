@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.api.runtime.migration.util;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
-import org.camunda.bpm.engine.test.api.runtime.migration.util.ConditionalEventFactory.ConditionalEventTrigger;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**

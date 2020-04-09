@@ -22,11 +22,10 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
+import junit.framework.TestCase;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
-
-import junit.framework.TestCase;
 
 /**
  * <p>Testcase verifying the default properties in the empty processes.xml</p>

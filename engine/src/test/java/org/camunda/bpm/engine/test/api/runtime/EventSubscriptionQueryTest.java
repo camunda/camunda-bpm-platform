@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -26,20 +32,21 @@ import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
-
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  */
 public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testQueryByEventSubscriptionId() {
     createExampleEventSubscriptions();
 
@@ -66,6 +73,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
     cleanDb();
   }
 
+  @Test
   public void testQueryByEventName() {
 
     createExampleEventSubscriptions();
@@ -90,6 +98,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByEventType() {
 
     createExampleEventSubscriptions();
@@ -114,6 +123,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQueryByActivityId() {
 
     createExampleEventSubscriptions();
@@ -140,6 +150,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testQueryByExecutionId() {
 
     // starting two instances:
@@ -175,6 +186,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testQuerySorting() {
     createExampleEventSubscriptions();
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().orderByCreated().asc().list();
@@ -187,6 +199,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMultipleEventSubscriptions() {
     String message = "cancelation-requested";
 
@@ -205,7 +218,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTest {
 
     runtimeService.createMessageCorrelation(message).processInstanceId(processInstance.getId()).correlate();
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
 

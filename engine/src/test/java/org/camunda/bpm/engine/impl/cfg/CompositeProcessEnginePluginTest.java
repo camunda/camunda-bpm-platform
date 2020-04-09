@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import java.util.Arrays;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
 
 public class CompositeProcessEnginePluginTest {
 

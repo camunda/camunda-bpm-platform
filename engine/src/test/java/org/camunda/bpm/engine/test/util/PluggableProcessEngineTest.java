@@ -16,80 +16,133 @@
  */
 package org.camunda.bpm.engine.test.util;
 
-import java.io.FileNotFoundException;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
 
-/**
- * Base class for the process engine JUnit 3 tests.
+/** Base class for the process engine test cases.
+ *
+ * The main reason not to use our own test support classes is that we need to
+ * run our test suite with various configurations, e.g. with and without spring,
+ * standalone or on a server etc.  Those requirements create some complications
+ * so we think it's best to use a separate base class.  That way it is much easier
+ * for us to maintain our own codebase and at the same time provide stability
+ * on the test support classes that we offer as part of our api (in org.camunda.bpm.engine.test).
+ *
+ * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public abstract class PluggableProcessEngineTest extends AbstractProcessEngineTestCase {
+public class PluggableProcessEngineTest {
 
-  protected static ProcessEngine cachedProcessEngine;
-  protected String engineConfigurationResource;
-  protected Function engineConfigurator;
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  protected ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RepositoryService repositoryService;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected FormService formService;
+  protected HistoryService historyService;
+  protected IdentityService identityService;
+  protected ManagementService managementService;
+  protected AuthorizationService authorizationService;
+  protected CaseService caseService;
+  protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   public PluggableProcessEngineTest() {
   }
 
-  public PluggableProcessEngineTest(String engineConfigurationResource) {
-    this(engineConfigurationResource, null);
+  @Before
+  public void initializeServices() {
+    processEngine = engineRule.getProcessEngine();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    repositoryService = processEngine.getRepositoryService();
+    runtimeService = processEngine.getRuntimeService();
+    taskService = processEngine.getTaskService();
+    formService = processEngine.getFormService();
+    historyService = processEngine.getHistoryService();
+    identityService = processEngine.getIdentityService();
+    managementService = processEngine.getManagementService();
+    authorizationService = processEngine.getAuthorizationService();
+    caseService = processEngine.getCaseService();
+    filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
+    decisionService = processEngine.getDecisionService();
   }
 
-  public PluggableProcessEngineTest(String configurationResource, Function<ProcessEngineConfigurationImpl, Void> customizeConfiguration) {
-    this.engineConfigurationResource = configurationResource;
-    this.engineConfigurator = customizeConfiguration;
+  public ProcessEngine getProcessEngine() {
+    return processEngine;
   }
 
-  public static ProcessEngine getProcessEngine() {
-    return getOrInitializeCachedProcessEngineWithTC();
-  }
-
-  @Override
-  protected void initializeProcessEngine() {
-    processEngine = getProcessEngine();
-  }
-
-  protected static ProcessEngine getOrInitializeCachedProcessEngineWithTC() {
-    if (cachedProcessEngine == null) {
-      ProcessEngineConfigurationImpl processEngineConfiguration;
-      try {
-        processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-      } catch (RuntimeException ex) {
-        if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-          processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-              .createProcessEngineConfigurationFromResource("activiti.cfg.xml");
-        } else {
-          throw ex;
-        }
+  public boolean areJobsAvailable() {
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      if (!job.isSuspended() && job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+        return true;
       }
-
-      cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
     }
-    return cachedProcessEngine;
+    return false;
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    if (engineConfigurationResource != null) {
-      processEngine.close();
-      processEngine = null;
+  protected List<ActivityInstance> getInstancesForActivityId(ActivityInstance activityInstance, String activityId) {
+    List<ActivityInstance> result = new ArrayList<>();
+    if(activityInstance.getActivityId().equals(activityId)) {
+      result.add(activityInstance);
     }
-    super.closeDownProcessEngine();
+    for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
+      result.addAll(getInstancesForActivityId(childInstance, activityId));
+    }
+    return result;
+  }
+
+  protected void deleteHistoryCleanupJobs() {
+    final List<Job> jobs = historyService.findHistoryCleanupJobs();
+    for (final Job job: jobs) {
+      processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
+        commandContext.getJobManager().deleteJob((JobEntity) job);
+        return null;
+      });
+    }
   }
 
   // CMMN METHODS

@@ -16,6 +16,17 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -30,17 +41,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Askar Akhmerov

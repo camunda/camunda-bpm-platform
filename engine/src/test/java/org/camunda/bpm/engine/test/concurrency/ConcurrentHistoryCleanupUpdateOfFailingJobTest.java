@@ -18,32 +18,43 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestCase {
+public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestHelper {
 
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setHistoryCleanupBatchWindowStartTime("00:00"));
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
+
+  protected ManagementService managementService;
   protected int retries = 5;
 
-  @Override
-  protected void initializeProcessEngine() {
-    ProcessEngineConfigurationImpl pec = ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.cfg.xml"));
-    pec.setHistoryCleanupBatchWindowStartTime("00:00");
-    processEngine = pec.buildProcessEngine();
-    initializeServices();
+  @Before
+  public void initializeProcessEngine() {
+    processEngineConfiguration =engineRule.getProcessEngineConfiguration();
+    managementService = engineRule.getManagementService();
+    historyService = engineRule.getHistoryService();
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    processEngine = null;
-    super.closeDownProcessEngine();
+  @After
+  public void tearDown() {
+    deleteHistoryCleanupJobs();
   }
 
   @Override
@@ -60,6 +71,7 @@ public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyT
 
   }
 
+  @Test
   public void testFailedHistoryCleanupJobUpdate() throws InterruptedException {
     // given configured History cleanup
 

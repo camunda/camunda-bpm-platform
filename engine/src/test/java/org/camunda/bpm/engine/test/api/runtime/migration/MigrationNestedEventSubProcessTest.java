@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -28,13 +35,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>

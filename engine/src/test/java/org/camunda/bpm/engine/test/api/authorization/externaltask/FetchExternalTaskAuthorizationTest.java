@@ -23,11 +23,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -38,28 +41,21 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
   public static final String WORKER_ID = "workerId";
   public static final long LOCK_TIME = 10000L;
 
-  protected String deploymentId;
-
   protected String instance1Id;
   protected String instance2Id;
 
-  @Override
-  protected void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+  @Before
+  public void setUp() throws Exception {
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml");
 
     instance1Id = startProcessInstanceByKey("oneExternalTaskProcess").getId();
     instance2Id = startProcessInstanceByKey("twoExternalTaskProcess").getId();
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testFetchWithoutAuthorization() {
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
@@ -70,6 +66,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(0, tasks.size());
   }
 
+  @Test
   public void testFetchWithReadOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
@@ -83,6 +80,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(0, tasks.size());
   }
 
+  @Test
   public void testFetchWithUpdateOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
@@ -96,6 +94,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(0, tasks.size());
   }
 
+  @Test
   public void testFetchWithReadAndUpdateOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ, UPDATE);
@@ -110,6 +109,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testFetchWithReadInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE);
@@ -123,6 +123,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(0, tasks.size());
   }
 
+  @Test
   public void testFetchWithUpdateInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, UPDATE_INSTANCE);
@@ -136,6 +137,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(0, tasks.size());
   }
 
+  @Test
   public void testFetchWithReadAndUpdateInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE, UPDATE_INSTANCE);
@@ -150,6 +152,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testFetchWithReadOnProcessInstanceAndUpdateInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
@@ -165,6 +168,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testFetchWithUpdateOnProcessInstanceAndReadInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, UPDATE);
@@ -180,6 +184,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testFetchWithReadAndUpdateOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ, UPDATE);
@@ -192,8 +197,8 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     // then
     assertEquals(2, tasks.size());
   }
-  
 
+  @Test
   public void testFetchWithMultipleMatchingAuthorizations() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ, UPDATE);
@@ -208,6 +213,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(2, tasks.size());
   }
 
+  @Test
   public void testQueryWithReadAndUpdateInstanceOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE, UPDATE_INSTANCE);
@@ -221,6 +227,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(2, tasks.size());
   }
 
+  @Test
   public void testQueryWithReadProcessInstanceAndUpdateInstanceOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);

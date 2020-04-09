@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.Date;
 
 import org.camunda.bpm.engine.EntityTypes;
@@ -24,6 +28,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -32,7 +37,11 @@ import org.camunda.bpm.engine.test.Deployment;
 public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetOverridingPriority() {
+    // For a given deployment
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
@@ -63,6 +72,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testOverwriteOverridingPriority() {
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -94,7 +104,11 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testClearOverridingPriority() {
+    // for a given deployment
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
@@ -131,8 +145,10 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetOverridingPriorityCascadeToJobs() {
     // given a job definition and job
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
     Job job = managementService.createJobQuery().singleResult();

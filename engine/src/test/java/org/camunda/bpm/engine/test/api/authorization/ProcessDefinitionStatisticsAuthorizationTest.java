@@ -19,6 +19,9 @@ package org.camunda.bpm.engine.test.api.authorization;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -26,6 +29,8 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -36,24 +41,17 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
 
-  protected String deploymentId;
-
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
   // without running instances //////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryWithoutAuthorizations() {
     // given
 
@@ -64,6 +62,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnOneTaskProcess() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
@@ -81,6 +80,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryWithMultiple() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
@@ -93,6 +93,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
@@ -111,6 +112,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
   // including instances //////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingInstancesWithoutProcessInstanceAuthorizations() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -137,6 +139,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
   // including failed jobs ////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingFailedJobsWithoutProcessInstanceAuthorizations() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -166,6 +169,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
   // including incidents //////////////////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingIncidentsWithoutProcessInstanceAuthorizations() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -195,6 +199,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
   // including incidents and failed jobs ///////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingIncidentsAndFailedJobsWithoutProcessInstanceAuthorizations() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);

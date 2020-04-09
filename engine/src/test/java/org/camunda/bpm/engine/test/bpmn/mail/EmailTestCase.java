@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.test.bpmn.mail;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.test.TestLogger;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.subethamail.wiser.Wiser;
 
@@ -31,9 +33,9 @@ public abstract class EmailTestCase extends PluggableProcessEngineTest {
 
   protected Wiser wiser;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
 
     int port = processEngineConfiguration.getMailServerPort();
 
@@ -55,14 +57,14 @@ public abstract class EmailTestCase extends PluggableProcessEngineTest {
     }
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     wiser.stop();
 
     // Fix for slow Jenkins
     Thread.sleep(250L);
 
-    super.tearDown();
+
   }
 
 }

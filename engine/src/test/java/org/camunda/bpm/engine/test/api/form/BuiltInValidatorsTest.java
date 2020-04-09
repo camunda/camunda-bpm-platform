@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -32,8 +37,9 @@ import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -41,6 +47,7 @@ import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
  */
 public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testDefaultFormFieldValidators() {
 
     // assert default validators are registered
@@ -56,6 +63,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testRequiredValidator() {
     RequiredValidator validator = new RequiredValidator();
     TestValidatorContext validatorContext = new TestValidatorContext(null);
@@ -74,6 +82,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
     assertTrue(validator.validate(null, validatorContext));
   }
 
+  @Test
   public void testReadOnlyValidator() {
     ReadOnlyValidator validator = new ReadOnlyValidator();
 
@@ -84,6 +93,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
     assertTrue(validator.validate(null, null));
   }
 
+  @Test
   public void testMinValidator() {
     MinValidator validator = new MinValidator();
 
@@ -107,6 +117,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testMaxValidator() {
     MaxValidator validator = new MaxValidator();
 
@@ -130,6 +141,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testMaxLengthValidator() {
     MaxLengthValidator validator = new MaxLengthValidator();
 
@@ -146,6 +158,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testMinLengthValidator() {
     MinLengthValidator validator = new MinLengthValidator();
 

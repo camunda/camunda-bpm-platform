@@ -16,13 +16,14 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.variable.Variables;
-
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -34,6 +35,7 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
   final protected String VARIABLE_VALUE = "aVariableValue";
   final protected String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
 
+  @Test
   public void testHistoryOptimisticLockingExceptionsNotSkipped() {
     // given
     processEngine.getProcessEngineConfiguration().setSkipHistoryOptimisticLockingExceptions(false);
@@ -64,7 +66,7 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     asyncThread.waitUntilDone();
 
     // then
-    assertTextPresent("Entity was updated by another transaction concurrently.", asyncThread.getException().getMessage());
+    testRule.assertTextPresent("Entity was updated by another transaction concurrently.", asyncThread.getException().getMessage());
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

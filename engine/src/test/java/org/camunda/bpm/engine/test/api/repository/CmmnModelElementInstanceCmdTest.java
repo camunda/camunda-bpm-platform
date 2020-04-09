@@ -16,15 +16,19 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Collection;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -35,6 +39,7 @@ public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTest 
   private final static String CASE_KEY = "oneTaskCase";
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  @Test
   public void testRepositoryService() {
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()

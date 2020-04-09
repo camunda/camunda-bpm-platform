@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
@@ -36,7 +37,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.mgmt.AlwaysFailingDelegate;
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;

@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm.engine.test.standalone.util;
 
-import org.camunda.bpm.engine.impl.util.CompareUtil;
-import org.junit.Test;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
+import org.junit.Test;
 
 /**
  * @author Filip Hrisafov

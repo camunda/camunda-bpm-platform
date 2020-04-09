@@ -16,9 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
@@ -26,9 +29,10 @@ import org.camunda.bpm.engine.test.Deployment;
 public class StartToEndTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testStartToEnd() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(processInstance.isEnded());
   }
   

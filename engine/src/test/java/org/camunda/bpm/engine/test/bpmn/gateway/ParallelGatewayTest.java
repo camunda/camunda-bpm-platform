@@ -16,16 +16,19 @@
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -34,8 +37,10 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.hamcrest.CoreMatchers;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
@@ -48,30 +53,35 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
    * In the end, no executions should be in the database.
    */
   @Deployment
+  @Test
   public void testSplitMergeNoWaitstates() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoinNoWaitStates");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
+  @Test
   public void testUnstructuredConcurrencyTwoForks() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoForks");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
+  @Test
   public void testUnstructuredConcurrencyTwoJoins() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoJoins");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
+  @Test
   public void testForkFollowedByOnlyEndEvents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkFollowedByEndEvents");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
+  @Test
   public void testNestedForksFollowedByEndEvents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedForksFollowedByEndEvents");
     assertTrue(processInstance.isEnded());
@@ -79,6 +89,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
 
   // ACT-482
   @Deployment
+  @Test
   public void testNestedForkJoin() {
     String pid = runtimeService.startProcessInstanceByKey("nestedForkJoin").getId();
 
@@ -125,6 +136,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
    * http://jira.codehaus.org/browse/ACT-1222
    */
   @Deployment
+  @Test
   public void testReceyclingExecutionWithCallActivity() {
     runtimeService.startProcessInstanceByKey("parent-process").getId();
 
@@ -154,6 +166,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompletingJoin() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -161,6 +174,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncParallelGateway() {
 
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -181,6 +195,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncParallelGatewayAfterScopeTask() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -200,6 +215,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testCompletingJoinInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -207,6 +223,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testParallelGatewayBeforeAndInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -228,6 +245,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkJoin() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
@@ -255,6 +273,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testUnbalancedForkJoin() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("UnbalancedForkJoin");
@@ -288,11 +307,12 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
     taskService.complete(task3.getId());
     taskService.complete(task4.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
+  @Test
   public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
-    deployment(Bpmn.createExecutableProcess("process")
+   testRule.deploy(Bpmn.createExecutableProcess("process")
       .startEvent()
       .parallelGateway("fork")
       .userTask("task1")
@@ -321,6 +341,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testImplicitParallelGatewayAfterSignalBehavior() {
     // given
     Exception exceptionOccurred = null;
@@ -342,6 +363,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExplicitParallelGatewayAfterSignalBehavior() {
     // given
     runtimeService.startProcessInstanceByKey("process");

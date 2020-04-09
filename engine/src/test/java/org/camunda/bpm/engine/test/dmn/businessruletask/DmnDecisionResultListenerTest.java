@@ -16,14 +16,22 @@
  */
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * Tests the decision result that is retrieved by an execution listener.
@@ -40,6 +48,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   protected DmnDecisionResult results;
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testNoOutput() {
     startTestProcess("no output");
 
@@ -47,6 +56,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testEmptyOutput() {
     startTestProcess("empty output");
 
@@ -57,6 +67,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testEmptyMap() {
     startTestProcess("empty map");
 
@@ -68,6 +79,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testSingleEntry() {
     startTestProcess("single entry");
 
@@ -77,6 +89,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testMultipleEntries() {
     startTestProcess("multiple entries");
 
@@ -89,6 +102,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testSingleEntryList() {
     startTestProcess("single entry list");
 
@@ -101,6 +115,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Test
   public void testMultipleEntriesList() {
     startTestProcess("multiple entries list");
 
@@ -117,6 +132,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_COUNT })
+  @Test
   public void testCollectCountHitPolicyNoOutput() {
     startTestProcess("no output");
 
@@ -128,6 +144,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicyNoOutput() {
     startTestProcess("no output");
 
@@ -135,6 +152,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicySingleEntry() {
     startTestProcess("single entry");
 
@@ -146,6 +164,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicySingleEntryList() {
     startTestProcess("single entry list");
 
@@ -166,8 +185,8 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTest {
     return processInstance;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     // reset the invoked execution listener
     DecisionResultTestListener.reset();
   }

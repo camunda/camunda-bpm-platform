@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collection;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
@@ -39,11 +43,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class BatchUpdateSuspensionStateAuthorizationTest {

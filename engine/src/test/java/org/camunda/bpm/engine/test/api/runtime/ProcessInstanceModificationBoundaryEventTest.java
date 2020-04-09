@@ -20,15 +20,19 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -52,6 +56,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
   protected static final String NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingBoundaryEventWithParallelGatewayInsideSubProcess.bpmn20.xml";
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask1AndStartBeforeTaskAfterBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -82,11 +87,12 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask1AndStartBeforeBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -113,10 +119,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
       .done());
 
     completeTasksInOrder("taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask2AndStartBeforeTaskAfterBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -150,10 +157,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask2AndStartBeforeBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -186,10 +194,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask1AndStartBeforeTaskAfterNonInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -220,10 +229,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "taskAfterBoundaryEvent", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask1AndStartBeforeNonInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -254,10 +264,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "taskAfterBoundaryEvent", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask2AndStartBeforeTaskAfterNonInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -290,10 +301,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT)
+  @Test
   public void testTask2AndStartBeforeNonInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -326,10 +338,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask1AndStartBeforeTaskAfterBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -362,10 +375,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask1", "innerTaskAfterBoundaryEvent", "innerTask2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask1AndStartBeforeBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -394,10 +408,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask1AndStartBeforeTaskAfterNonInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -430,10 +445,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask1", "innerTaskAfterBoundaryEvent", "innerTask2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask1AndStartBeforeNonInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -466,10 +482,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask1", "innerTask2", "innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask2AndStartBeforeTaskAfterBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -504,10 +521,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask2AndStartBeforeBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -542,10 +560,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask2AndStartBeforeTaskAfterNonInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -580,10 +599,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_INSIDE_SUBPROCESS)
+  @Test
   public void testTask2AndStartBeforeNonInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -618,10 +638,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask2", "innerTaskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
+  @Test
   public void testStartBeforeTaskAfterBoundaryEventOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -654,10 +675,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
+  @Test
   public void testStartBeforeBoundaryEventOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -684,10 +706,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
+  @Test
   public void testStartBeforeTaskAfterNonInterruptingBoundaryEventOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -720,10 +743,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_ON_SUBPROCESS)
+  @Test
   public void testStartBeforeNonInterruptingBoundaryEventOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -756,10 +780,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("innerTask", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY)
+  @Test
   public void testStartBeforeInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -789,10 +814,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY)
+  @Test
   public void testStartBeforeNonInterruptingBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -825,10 +851,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS)
+  @Test
   public void testStartBeforeInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -861,10 +888,11 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NON_INTERRUPTING_BOUNDARY_EVENT_WITH_PARALLEL_GATEWAY_INSIDE_SUB_PROCESS)
+  @Test
   public void testStartBeforeNonInterruptingBoundaryEventInsideSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -900,7 +928,7 @@ public class ProcessInstanceModificationBoundaryEventTest extends PluggableProce
         .done());
 
     completeTasksInOrder("task1", "task2", "taskAfterBoundaryEvent");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   protected void completeTasksInOrder(String... taskNames) {

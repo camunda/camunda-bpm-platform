@@ -16,34 +16,52 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CmmnDisabledTest extends PluggableProcessEngineTest {
+public class CmmnDisabledTest {
 
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/application/impl/deployment/cmmn.disabled.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
   protected EmbeddedProcessApplication processApplication;
 
-  public CmmnDisabledTest() {
-    super("org/camunda/bpm/application/impl/deployment/cmmn.disabled.camunda.cfg.xml");
-  }
-
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
+    runtimeService = engineRule.getRuntimeService();
+    repositoryService = engineRule.getRepositoryService();
     processApplication = new EmbeddedProcessApplication();
-    super.setUp();
   }
 
+  @Test
   public void testCmmnDisabled() {
     ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
@@ -64,6 +82,7 @@ public class CmmnDisabledTest extends PluggableProcessEngineTest {
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
   public void testVariableInstanceQuery() {
     ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

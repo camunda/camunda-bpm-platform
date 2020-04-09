@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.job;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -23,7 +24,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.revoke;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 

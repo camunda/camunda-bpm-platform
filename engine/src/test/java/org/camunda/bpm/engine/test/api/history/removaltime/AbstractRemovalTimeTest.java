@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
+
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
@@ -48,12 +54,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 /**
  * @author Tassilo Weidner

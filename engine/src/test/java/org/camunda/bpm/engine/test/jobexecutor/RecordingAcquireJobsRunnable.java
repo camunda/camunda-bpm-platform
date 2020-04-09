@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
-import org.camunda.bpm.engine.impl.jobexecutor.JobAcquisitionStrategy;
 import org.camunda.bpm.engine.impl.jobexecutor.JobAcquisitionContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobAcquisitionStrategy;
 import org.camunda.bpm.engine.impl.jobexecutor.SequentialJobAcquisitionRunnable;
 
 /**

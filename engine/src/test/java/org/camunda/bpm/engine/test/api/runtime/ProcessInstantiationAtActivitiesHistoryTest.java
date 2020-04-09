@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -24,12 +30,13 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -44,6 +51,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   protected static final String ASYNC_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testHistoricProcessInstanceForSingleActivityInstantiation() {
     // when
     ProcessInstance instance = runtimeService
@@ -71,6 +79,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = SUBPROCESS_PROCESS)
+  @Test
   public void testHistoricActivityInstancesForSubprocess() {
     // when
     ProcessInstance instance = runtimeService
@@ -126,6 +135,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = ASYNC_PROCESS)
+  @Test
   public void testHistoricProcessInstanceAsyncStartEvent() {
     // when
     ProcessInstance instance = runtimeService
@@ -172,6 +182,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testHistoricVariableInstanceForSingleActivityInstantiation() {
     // when
     ProcessInstance instance = runtimeService
@@ -205,6 +216,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testHistoricVariableInstanceSetOnProcessInstance() {
     // when
     ProcessInstance instance = runtimeService
@@ -239,6 +251,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testHistoricProcessInstanceForSynchronousCompletion() {
     // when the process instance ends immediately
     ProcessInstance instance = runtimeService
@@ -257,6 +270,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSkipCustomListenerEnsureHistoryWritten() {
     // when creating the task skipping custom listeners
     runtimeService.createProcessInstanceByKey("exclusiveGateway")

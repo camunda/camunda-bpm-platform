@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.repetition;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -23,6 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -33,6 +40,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   private static final String CASE_ID = "case";
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testVariableBasedRepetitionRuleEvaluatesToTrue() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repeat", true);
@@ -54,6 +62,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testVariableBasedRepetitionRuleEvaluatesToFalse() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repeat", false);
@@ -73,6 +82,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultVariableBasedRepetitionRuleEvaluatesToTrue() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repeat", true);
@@ -94,6 +104,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultVariableBasedRepetitionRuleEvaluatesToFalse() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repeat", false);
@@ -113,6 +124,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatTask() {
     // given
     createCaseInstance();
@@ -137,6 +149,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatStage() {
     // given
     createCaseInstance();
@@ -161,6 +174,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatMilestone() {
     // given
     createCaseInstance();
@@ -182,6 +196,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatTaskMultipleTimes() {
     // given
     createCaseInstance();
@@ -223,6 +238,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatStageMultipleTimes() {
     // given
     createCaseInstance();
@@ -264,6 +280,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatMilestoneMultipleTimes() {
     // given
     createCaseInstance();
@@ -298,6 +315,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTaskWithoutEntryCriteria.cmmn")
+  @Test
   public void testRepeatTaskWithoutEntryCriteriaWhenCompleting() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating", true)).getId();
@@ -333,6 +351,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatStageWithoutEntryCriteria.cmmn")
+  @Test
   public void testRepeatStageWithoutEntryCriteriaWhenCompleting() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
@@ -370,6 +389,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTaskWithoutEntryCriteria.cmmn")
+  @Test
   public void testRepeatTaskWithoutEntryCriteriaWhenTerminating() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
@@ -401,6 +421,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatStageWithoutEntryCriteria.cmmn")
+  @Test
   public void testRepeatStageWithoutEntryCriteriaWhenTerminating() {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
@@ -438,6 +459,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatTaskWithoutEntryCriteriaOnCustomStandardEvent() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -478,6 +500,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatStageWithoutEntryCriteriaOnCustomStandardEvent() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -520,6 +543,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonRepeatableTaskDependsOnRepeatableTask() {
     // given
     createCaseInstance();
@@ -562,6 +586,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRepeatableTaskDependsOnAnotherRepeatableTask() {
     // given
     createCaseInstance();
@@ -618,6 +643,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLimitedRepetitions() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repetition", 0);
@@ -691,6 +717,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLimitedSequentialRepetitions() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repetition", 0);
@@ -735,6 +762,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLimitedParallelRepetitions() {
     // given
     VariableMap variables = Variables.createVariables().putValue("repetition", 0);
@@ -758,6 +786,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAutoCompleteStage() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -776,6 +805,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAutoCompleteStageWithoutEntryCriteria() {
     // given
     VariableMap variables = Variables.createVariables().putValue("manualActivation", false);
@@ -804,6 +834,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAutoCompleteStageAutoActivationRepeatableTask() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -840,6 +871,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAutoCompleteStageRequiredRepeatableTask() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -872,6 +904,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn")
+  @Test
   public void testShouldNotRepeatTaskAfterCompletion() {
     // given
     createCaseInstance();
@@ -901,6 +934,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testIgnoreRepeatOnStandardEvent() {
     // given
     createCaseInstance();
@@ -925,6 +959,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testDefaultValueWithoutCondition() {
     createCaseInstanceByKey("case");
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
@@ -942,6 +977,7 @@ public class RepetitionRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testDefaultValueWithEmptyCondition() {
     createCaseInstanceByKey("case");
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();

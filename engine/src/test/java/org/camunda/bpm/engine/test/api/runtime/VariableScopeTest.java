@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
@@ -23,8 +26,6 @@ import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Daniel Meyer
