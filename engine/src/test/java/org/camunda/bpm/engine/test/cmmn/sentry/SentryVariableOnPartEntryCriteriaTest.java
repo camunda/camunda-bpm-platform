@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * 
  * @author Deivarayan Azhagappan
  *
  */
-public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryVariableOnPartEntryCriteriaTest extends PluggableProcessEngineTest {
 
   // Basic tests - create, update, delete variable
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn"})

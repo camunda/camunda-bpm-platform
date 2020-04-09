@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.cmmn.repetition;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
+public class RepetitionRuleTest extends PluggableProcessEngineTest {
 
   private static final String CASE_ID = "case";
 

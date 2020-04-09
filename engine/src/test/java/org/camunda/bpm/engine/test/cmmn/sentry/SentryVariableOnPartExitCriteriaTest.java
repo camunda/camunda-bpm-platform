@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * 
  * @author Deivarayan Azhagappan
  *
  */
-public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryVariableOnPartExitCriteriaTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
   public void testExitTaskWithVariableOnPartSatisfied() {

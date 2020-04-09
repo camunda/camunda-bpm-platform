@@ -20,16 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase {
+public class CmmnDecisionTaskResultMappingTest extends PluggableProcessEngineTest {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
   protected static final String SINGLE_ENTRY_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleEntryMapping.cmmn";

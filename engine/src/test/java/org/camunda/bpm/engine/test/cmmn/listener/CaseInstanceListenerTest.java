@@ -17,15 +17,15 @@
 package org.camunda.bpm.engine.test.cmmn.listener;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
+public class CaseInstanceListenerTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn"})
   public void testCreateListenerByClass() {

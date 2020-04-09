@@ -17,9 +17,9 @@
 package org.camunda.bpm.engine.test.cmmn.decisiontask;
 
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class DmnDecisionTaskTest extends CmmnProcessEngineTestCase {
+public class DmnDecisionTaskTest extends PluggableProcessEngineTest {
 
   public static final String CMMN_CALL_DECISION_CONSTANT = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionAsConstant.cmmn";
   public static final String CMMN_CALL_DECISION_CONSTANT_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionAsConstantWithManualActiovation.cmmn";
