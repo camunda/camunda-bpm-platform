@@ -26,7 +26,13 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERM
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +67,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.hamcrest.Matcher;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -69,6 +76,7 @@ import org.hamcrest.Matcher;
 public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
+  @Test
   public void testHistoricCaseActivityInstanceProperties() {
     String activityId = "PI_Stage_1";
 
@@ -91,6 +99,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testHistoricCaseActivityTaskStates() {
     String humanTaskId1 = "PI_HumanTask_1";
     String humanTaskId2 = "PI_HumanTask_2";
@@ -184,6 +193,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testHistoricCaseActivityMilestoneStates() {
     String milestoneId1 = "PI_Milestone_1";
     String milestoneId2 = "PI_Milestone_2";
@@ -244,6 +254,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testHistoricCaseActivityInstanceDates() {
     String taskId1 = "PI_HumanTask_1";
     String taskId2 = "PI_HumanTask_2";
@@ -340,6 +351,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testHistoricCaseActivityTaskId() {
     String taskId = "PI_HumanTask_1";
 
@@ -375,6 +387,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCaseWithManualActivation.cmmn",
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
   })
+  @Test
   public void testHistoricCaseActivityCalledProcessInstanceId() {
     String taskId = "PI_ProcessTask_1";
 
@@ -412,6 +425,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
   })
+  @Test
   public void testHistoricCaseActivityCalledCaseInstanceId() {
     String taskId = "PI_CaseTask_1";
 
@@ -450,6 +464,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
+  @Test
   public void testHistoricCaseActivityQuery() {
     String stageId = "PI_Stage_1";
     String stageName = "A HumanTask";
@@ -481,6 +496,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryPaging() {
     createCaseInstance();
     createCaseInstance();
@@ -496,6 +512,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
     "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
   })
+  @Test
   public void testQuerySorting() {
     String taskId1 = "PI_HumanTask_1";
     String taskId2 = "PI_HumanTask_2";
@@ -559,6 +576,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testQuerySortingCaseActivityType() {
     createCaseInstance().getId();
 
@@ -567,6 +585,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
       "milestone", "processTask", "humanTask");
   }
 
+  @Test
   public void testInvalidSorting() {
     try {
       historicQuery().asc();
@@ -594,6 +613,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testNativeQuery() {
     createCaseInstance();
     createCaseInstance();
@@ -624,6 +644,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testNativeQueryPaging() {
     createCaseInstance();
     createCaseInstance();
@@ -636,6 +657,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testDeleteHistoricCaseActivityInstance() {
     CaseInstance caseInstance = createCaseInstance();
 
@@ -653,12 +675,14 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testNonBlockingHumanTask() {
     CaseInstance caseInstance = createCaseInstance();
     assertNotNull(caseInstance);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testRequiredRuleEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
 
@@ -672,6 +696,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testRequiredRuleEvaluatesToFalse() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
 
@@ -685,6 +710,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testQueryByRequired() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
 
@@ -701,6 +727,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testCasePlanModel.cmmn"})
+  @Test
   public void testAutoCompleteEnabled() {
     String caseInstanceId = createCaseInstanceByKey("case").getId();
 
@@ -728,6 +755,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn"})
+  @Test
   public void testRepeatTask() {
     // given
     createCaseInstance();
@@ -742,6 +770,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatStage.cmmn"})
+  @Test
   public void testRepeatStage() {
     // given
     createCaseInstance();
@@ -757,6 +786,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatMilestone.cmmn"})
+  @Test
   public void testRepeatMilestone() {
     // given
     createCaseInstance();
@@ -771,6 +801,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testAutoCompleteStage.cmmn"})
+  @Test
   public void testAutoCompleteStage() {
     // given
     createCaseInstance();
@@ -791,6 +822,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testAutoCompleteStageWithoutEntryCriteria.cmmn"})
+  @Test
   public void testAutoCompleteStageWithRepeatableTaskWithoutEntryCriteria() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("manualActivation", false));
@@ -810,6 +842,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testDecisionTask() {
     createCaseInstance();
 
@@ -823,6 +856,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseInstanceId() {
     // given
     createCaseInstance();
@@ -837,6 +871,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByCaseInstanceIds() {
     // given
     CaseInstance instance1 = createCaseInstance();
@@ -864,6 +899,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     assertCount(2, query);
   }
 
+  @Test
   public void testQueryByInvalidCaseInstanceId() {
 
     // when
@@ -887,6 +923,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
   })
+  @Test
   public void testQueryByCaseActivityIds() {
     // given
     createCaseInstanceByKey("oneTaskCase");
@@ -900,6 +937,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     assertCount(3, query);
   }
 
+  @Test
   public void testQueryByInvalidCaseActivityId() {
 
     // when
@@ -1061,6 +1099,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testHistoricActivityInstanceWithinStageIsMarkedTerminatedOnComplete() {
 
     // given
@@ -1087,6 +1126,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testHistoricActivityInstancesAreMarkedTerminatedOnComplete() {
 
     // given
@@ -1112,6 +1152,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testDisabledHistoricActivityInstancesStayDisabledOnComplete() {
 
     // given
@@ -1139,6 +1180,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment
+  @Test
   public void testMilestoneHistoricActivityInstanceIsTerminatedOnComplete() {
 
     // given
@@ -1159,6 +1201,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageWithSentryAsEntryPointCase.cmmn"})
+  @Test
   public void testHistoricTaskWithSentryIsMarkedTerminatedOnComplete() {
 
     // given
@@ -1180,6 +1223,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageWithSentryAsEntryPointCase.cmmn"})
+  @Test
   public void testHistoricTaskWithSentryDoesNotReachStateActiveOnComplete() {
 
     // given
@@ -1201,6 +1245,7 @@ public class HistoricCaseActivityInstanceTest extends PluggableProcessEngineTest
     "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCaseWithManualActivation.cmmn",
     "org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneTaskProcess.bpmn20.xml"
   })
+  @Test
   public void testHistoricCalledProcessInstanceId() {
     String taskId = "PI_ProcessTask_1";
 

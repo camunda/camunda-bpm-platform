@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
@@ -25,12 +31,6 @@ import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Roman Smirnov

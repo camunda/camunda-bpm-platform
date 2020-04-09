@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.deployment;
 
-import java.util.Collection;
-
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
+import java.util.Collection;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -89,7 +89,6 @@ public class RedeployDeploymentAuthorizationTest {
   @After
   public void tearDown() {
     authRule.deleteUsersAndGroups();
-
   }
 
   @Test

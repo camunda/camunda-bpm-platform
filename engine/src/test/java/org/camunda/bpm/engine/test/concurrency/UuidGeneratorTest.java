@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer

@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,6 +38,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -40,6 +47,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetJobPriority() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -71,11 +79,12 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetRetries() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -107,11 +116,12 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetRetriesByJobDefinitionId() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -143,11 +153,12 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetRetriesAsync() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -180,7 +191,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     // check 'nrOfInstances' entry
@@ -201,7 +212,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
     
     // check 'async' entry
@@ -222,13 +233,14 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
     
     managementService.deleteBatch(batch.getId(), true);
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetRetriesAsyncProcessInstanceId() {
     // given a job
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -261,7 +273,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     // check 'nrOfInstances' entry
@@ -282,7 +294,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
     
     // check 'async' entry
@@ -303,13 +315,14 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertNull(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertNull(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertNull(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertNull(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertNull(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
     
     managementService.deleteBatch(batch.getId(), true);
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetJobDueDate() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -336,6 +349,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/TimerRecalculationTest.testFinishedJob.bpmn20.xml"})
+  @Test
   public void testRecalculateJobDueDate() {
     // given a job
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
@@ -373,6 +387,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testDelete() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -404,11 +419,12 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testExecute() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -440,18 +456,19 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
-    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(job.getDeploymentId(), userOperationLogEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testExecuteByJobExecutor() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
     assertEquals(1L, managementService.createJobQuery().count());
 
     // when a job is executed by the job executor
-    waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
+    testRule.waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
 
     // then no op log entry is written
     assertEquals(0L, managementService.createJobQuery().count());

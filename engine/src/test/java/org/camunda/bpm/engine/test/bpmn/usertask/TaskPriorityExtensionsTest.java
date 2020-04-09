@@ -16,13 +16,16 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thilo-Alexander Ginkel
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class TaskPriorityExtensionsTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testPriorityExtension() throws Exception {
     testPriorityExtension(25);
     testPriorityExtension(75);
@@ -48,6 +52,7 @@ public class TaskPriorityExtensionsTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testPriorityExtensionString() throws Exception {
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
     final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

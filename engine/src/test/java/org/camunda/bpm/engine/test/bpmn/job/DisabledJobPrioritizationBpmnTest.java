@@ -16,11 +16,17 @@
  */
 package org.camunda.bpm.engine.test.bpmn.job;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -28,15 +34,18 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class DisabledJobPrioritizationBpmnTest extends PluggableProcessEngineTest {
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     processEngineConfiguration.setProducePrioritizedJobs(false);
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setProducePrioritizedJobs(true);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testJobPriority() {
     // when
     runtimeService

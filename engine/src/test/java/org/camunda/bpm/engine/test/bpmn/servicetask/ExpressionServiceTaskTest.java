@@ -16,13 +16,16 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.servicetask.util.ValueBean;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Christian Stettler
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.test.bpmn.servicetask.util.ValueBean;
 public class ExpressionServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSetServiceResultToProcessVariables() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("bean", new ValueBean("ok"));
@@ -38,6 +42,7 @@ public class ExpressionServiceTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testBackwardsCompatibleExpression() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("var", "---");

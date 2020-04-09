@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -54,9 +57,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.gson.Gson;
 
 public class TelemetryReporterTest {
 

@@ -16,25 +16,35 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
-import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
-import org.camunda.bpm.engine.runtime.*;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.ExecutionTree;
-import org.camunda.bpm.engine.test.util.TestExecutionListener;
-
-import java.util.List;
-
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.util.TestExecutionListener;
+import org.junit.After;
+import org.junit.Test;
 
 
 /**
@@ -44,16 +54,17 @@ import static org.junit.Assert.assertThat;
  */
 public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     try {
-      super.tearDown();
+
     } finally {
       TestExecutionListener.reset();
     }
   }
 
   @Deployment
+  @Test
   public void testInterruptingUnderProcessDefinition() {
     testInterruptingUnderProcessDefinition(1);
   }
@@ -62,6 +73,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
    * Checks if unused event subscriptions are properly deleted.
    */
   @Deployment
+  @Test
   public void testTwoInterruptingUnderProcessDefinition() {
     testInterruptingUnderProcessDefinition(2);
   }
@@ -82,7 +94,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
@@ -93,12 +105,13 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().singleResult();
     assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testEventSubprocessListenersInvoked() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -131,6 +144,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingEventSubprocessListenersInvoked() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -166,6 +180,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNestedEventSubprocessListenersInvoked() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -199,6 +214,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNestedNonInterruptingEventSubprocessListenersInvoked() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -236,6 +252,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testEventSubprocessBoundaryListenersInvoked() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -269,6 +286,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingUnderProcessDefinition() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -286,7 +304,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
@@ -306,7 +324,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
     // #################### again, the other way around:
@@ -324,11 +342,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingUnderProcessDefinitionScope() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -345,7 +364,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
@@ -366,7 +385,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
     // #################### again, the other way around:
@@ -384,11 +403,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingInEmbeddedSubprocess() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -404,7 +424,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
@@ -424,7 +444,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
     // #################### again, the other way around:
@@ -442,11 +462,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
     // done!
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
   @Deployment
+  @Test
   public void testMultipleNonInterruptingInEmbeddedSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -499,6 +520,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingInMultiParallelEmbeddedSubprocess() {
     // #################### I. start process and only complete the tasks
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -522,7 +544,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
 
     // then: complete the last task of the main process
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     // #################### II. start process and correlate messages to trigger subprocesses instantiation
     processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -564,10 +586,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
 
     // then: complete the last task of the main process
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingInMultiSequentialEmbeddedSubprocess() {
     // start process and trigger the first message sub process
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -591,10 +614,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
 
     // then: complete the last task of the main process
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingWithParallelForkInsideEmbeddedSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     runtimeService.messageEventReceived("newMessage", runtimeService.createEventSubscriptionQuery().singleResult().getExecutionId());
@@ -617,11 +641,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingWithReceiveTask() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -682,13 +707,14 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   /**
    * CAM-3655
    */
   @Deployment
+  @Test
   public void testNonInterruptingWithAsyncConcurrentTask() {
     // given a process instance with an asyncBefore user task
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -713,10 +739,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     taskService.complete(eventSubprocessTask.getId());
 
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingWithReceiveTaskInsideEmbeddedSubProcess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -776,10 +803,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingWithUserTaskAndBoundaryEventInsideEmbeddedSubProcess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -821,10 +849,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingOutsideEmbeddedSubProcessWithReceiveTaskInsideEmbeddedSubProcess() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -860,10 +889,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     taskService.complete(task1.getId());
     taskService.complete(task2.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testInterruptingActivityInstanceTree() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -885,6 +915,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingActivityInstanceTree() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -907,6 +938,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingWithTerminatingEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     Task task = taskService.createTaskQuery().singleResult();
@@ -929,6 +961,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExpressionInMessageNameInInterruptingSubProcessDefinition() {
     // given an process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -940,7 +973,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
 }

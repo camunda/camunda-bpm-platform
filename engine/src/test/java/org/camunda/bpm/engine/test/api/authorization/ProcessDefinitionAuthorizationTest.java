@@ -26,6 +26,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.SUSPEND_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.List;
@@ -42,6 +48,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -52,22 +60,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String TWO_TASKS_PROCESS_KEY = "twoTasksProcess";
 
-  protected String deploymentId;
-
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml");
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     // given user is not authorized to read any process definition
@@ -79,6 +80,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnAnyProcessDefinition() {
     // given
     // given user gets read permission on any process definition
@@ -91,6 +93,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithMultiple() {
     // given
     // given user gets read permission on any process definition
@@ -104,6 +107,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnOneTaskProcess() {
     // given
     // given user gets read permission on "oneTaskProcess" process definition
@@ -120,6 +124,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(ONE_TASK_PROCESS_KEY, definition.getKey());
   }
 
+  @Test
   public void testQueryWithRevokedReadPermission() {
     // given
     // given user gets all permissions on any process definition
@@ -141,6 +146,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(TWO_TASKS_PROCESS_KEY, definition.getKey());
   }
 
+  @Test
   public void testQueryWithGroupAuthorizationRevokedReadPermission() {
     // given
     // given user gets all permissions on any process definition
@@ -167,6 +173,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get process definition /////////////////////////////////////////////////////
 
+  @Test
   public void testGetProcessDefinitionWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -178,13 +185,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -199,6 +207,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get deployed process definition /////////////////////////////////////////////////////
 
+  @Test
   public void testGetDeployedProcessDefinitionWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -210,13 +219,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetDeployedProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -231,6 +241,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get process diagram /////////////////////////////////////////////////////
 
+  @Test
   public void testGetProcessDiagramWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -242,13 +253,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetProcessDiagram() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -264,6 +276,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get process model /////////////////////////////////////////////////////
 
+  @Test
   public void testGetProcessModelWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -275,13 +288,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetProcessModel() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -296,6 +310,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get bpmn model instance /////////////////////////////////////////////////////
 
+  @Test
   public void testGetBpmnModelInstanceWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -307,13 +322,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetBpmnModelInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -328,6 +344,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // get process diagram layout /////////////////////////////////////////////////
 
+  @Test
   public void testGetProcessDiagramLayoutWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -339,13 +356,14 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetProcessDiagramLayout() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -361,6 +379,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // suspend process definition by id ///////////////////////////////////////////
 
+  @Test
   public void testSuspendProcessDefinitionByIdWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -372,14 +391,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionById() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -393,6 +413,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(definition.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdWithSuspendPermission() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -408,6 +429,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // activate process definition by id ///////////////////////////////////////////
 
+  @Test
   public void testActivateProcessDefinitionByIdWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -420,14 +442,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionById() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -443,6 +466,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testActivateProcessDefinitionByIdWithSuspendPermission() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -459,6 +483,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // suspend process definition by id including instances ///////////////////////////////////////////
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -471,17 +496,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -497,17 +523,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -527,6 +554,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithSuspendPermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -542,6 +570,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionSuspendedByKeyIncludingInstances();
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -560,6 +589,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdateAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -574,6 +604,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionSuspendedByKeyIncludingInstances();
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithSuspendAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -588,6 +619,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionSuspendedByKeyIncludingInstances();
   }
 
+  @Test
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithSuspendAndUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -604,6 +636,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // activate process definition by id including instances ///////////////////////////////////////////
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithoutAuthorization() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -619,17 +652,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -646,17 +680,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -677,6 +712,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithSuspendPermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -693,6 +729,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionActivatedByKeyIncludingInstances();
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -712,6 +749,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithSuspendAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -727,6 +765,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionActivatedByKeyIncludingInstances();
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithSuspendAndUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -742,6 +781,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionActivatedByKeyIncludingInstances();
   }
 
+  @Test
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdateAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -759,6 +799,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // suspend process definition by key ///////////////////////////////////////////
 
+  @Test
   public void testSuspendProcessDefinitionByKeyWithoutAuthorization() {
     // given
 
@@ -769,14 +810,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKey() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE);
@@ -789,6 +831,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(definition.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyWithSuspendPermission() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, ProcessDefinitionPermissions.SUSPEND);
@@ -803,6 +846,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // activate process definition by id ///////////////////////////////////////////
 
+  @Test
   public void testActivateProcessDefinitionByKeyWithoutAuthorization() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
@@ -814,14 +858,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionByKey() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
@@ -835,6 +880,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(definition.isSuspended());
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyWithSuspendPermission() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
@@ -850,6 +896,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // suspend process definition by key including instances ///////////////////////////////////////////
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithoutAuthorization() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE, ProcessDefinitionPermissions.SUSPEND);
@@ -861,17 +908,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessDefinitionPermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE, ProcessDefinitionPermissions.SUSPEND);
@@ -886,17 +934,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE);
@@ -915,6 +964,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithSuspendPermissionOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, ProcessDefinitionPermissions.SUSPEND);
@@ -929,6 +979,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionSuspendedByKeyIncludingInstances();
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE, UPDATE_INSTANCE);
@@ -946,6 +997,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
   }
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithSuspendAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, ProcessDefinitionPermissions.SUSPEND, SUSPEND_INSTANCE);
@@ -960,6 +1012,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithSuspendAndUpdateInstancePermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, ProcessDefinitionPermissions.SUSPEND, UPDATE_INSTANCE);
@@ -974,6 +1027,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdateAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE, SUSPEND_INSTANCE);
@@ -989,6 +1043,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // activate process definition by key including instances ///////////////////////////////////////////
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithoutAuthorization() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1003,17 +1058,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -1029,17 +1085,18 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ProcessInstancePermissions.SUSPEND.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1059,6 +1116,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithSuspendPermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1074,6 +1132,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     verifyProcessDefinitionActivatedByKeyIncludingInstances();
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1092,6 +1151,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
   }
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithSuspendAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1107,6 +1167,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithSuspendAndUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1122,6 +1183,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdateAndSuspendInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1139,6 +1201,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   // update history time to live ///////////////////////////////////////////
 
+  @Test
   public void testProcessDefinitionUpdateTimeToLive() {
 
     // given
@@ -1154,6 +1217,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   }
 
+  @Test
   public void testDecisionDefinitionUpdateTimeToLiveWithoutAuthorizations() {
     //given
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
@@ -1164,16 +1228,17 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
 
   }
 
   // startable in tasklist ///////////////////////////////////////////
 
+  @Test
   public void testStartableInTasklist() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ, CREATE_INSTANCE);
@@ -1189,6 +1254,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(processDefinitions.get(0).isStartableInTasklist());
   }
 
+  @Test
   public void testStartableInTasklistReadAllProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ);
@@ -1205,6 +1271,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(processDefinitions.get(0).isStartableInTasklist());
   }
 
+  @Test
   public void testStartableInTasklistWithoutCreateInstancePerm() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
@@ -1218,6 +1285,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(0, processDefinitions.size());
   }
 
+  @Test
   public void testStartableInTasklistWithoutReadDefPerm() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, CREATE_INSTANCE);
@@ -1231,6 +1299,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(0, processDefinitions.size());
   }
 
+  @Test
   public void testStartableInTasklistWithoutCreatePerm() {
     // given
     selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);

@@ -26,6 +26,10 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
@@ -40,6 +44,8 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * <p>Ensures authorizations are properly
@@ -52,13 +58,14 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   private final static String jonny2 = "jonny2";
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
     cleanupAfterTest();
-    super.tearDown();
+
   }
 
+  @Test
   public void testCreateAuthorization() {
 
     // add base permission which allows nobody to create authorizations
@@ -102,6 +109,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testDeleteAuthorization() {
 
     // create global auth
@@ -129,6 +137,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testUserUpdateAuthorizations() {
 
     // create global auth
@@ -169,6 +178,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   }
 
+  @Test
   public void testAuthorizationQueryAuthorizations() {
 
     // we are jonny2
@@ -192,6 +202,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   }
 
+  @Test
   public void testSaveAuthorizationAddPermissionWithInvalidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -227,6 +238,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testSaveAuthorizationMultipleResourcesIncludingInvalidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -247,6 +259,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testSaveAuthorizationRemovePermissionWithInvalidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
@@ -282,6 +295,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testSaveAuthorizationSetPermissionsWithInvalidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -317,6 +331,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testSaveAuthorizationSetPermissionsWithValidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -341,6 +356,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES));
   }
 
+  @Test
   public void testIsUserAuthorizedWithInvalidResource() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -382,6 +398,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   }
 
+  @Test
   public void testIsUserAuthorizedWithInvalidResourceMultiplePermissions() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -410,6 +427,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  @Test
   public void testIsUserAuthorizedWithValidResourceImpl() {
     // given
     ResourceImpl resource = new ResourceImpl("application", 0);

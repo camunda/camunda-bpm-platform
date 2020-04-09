@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;

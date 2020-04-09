@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -23,10 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.variable.Variables;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -38,6 +39,7 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
   final protected String VARIABLE_VALUE = "aVariableValue";
   final protected String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
 
+  @Test
   public void testConcurrentFetchAndDelete() {
     // given
     final String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,

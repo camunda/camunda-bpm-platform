@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.query;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,9 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Before;
+import org.junit.Test;
 
 public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEngineTest {
 
@@ -38,13 +41,14 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  @Override
-  protected void setUp() {
-    deployment(DMN);
-    deploymentForTenant(TENANT_ONE, DMN);
-    deploymentForTenant(TENANT_TWO, DMN);
+  @Before
+  public void setUp() {
+    testRule.deploy(DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_TWO, DMN);
   }
 
+  @Test
   public void testQueryNoTenantIdSet() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery();
@@ -52,6 +56,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(3L));
   }
 
+  @Test
   public void testQueryByTenantId() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -66,6 +71,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryByTenantIds() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -74,6 +80,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(2L));
   }
 
+  @Test
   public void testQueryByDefinitionsWithoutTenantId() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -82,6 +89,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryByTenantIdsIncludeDefinitionsWithoutTenantId() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -105,6 +113,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(3L));
   }
 
+  @Test
   public void testQueryByKey() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -127,9 +136,10 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryByLatestNoTenantIdSet() {
     // deploy a second version for tenant one
-    deploymentForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -144,9 +154,10 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitionsForTenant.get(null).getVersion(), is(1));
   }
 
+  @Test
   public void testQueryByLatestWithTenantId() {
     // deploy a second version for tenant one
-    deploymentForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -173,9 +184,10 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinition.getVersion(), is(1));
   }
 
+  @Test
   public void testQueryByLatestWithTenantIds() {
     // deploy a second version for tenant one
-    deploymentForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -192,9 +204,10 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitionsForTenant.get(TENANT_TWO).getVersion(), is(1));
   }
 
+  @Test
   public void testQueryByLatestWithoutTenantId() {
     // deploy a second version without tenant id
-    deployment(DMN);
+   testRule.deploy(DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -209,12 +222,13 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinition.getVersion(), is(2));
   }
 
+  @Test
   public void testQueryByLatestWithTenantIdsIncludeDefinitionsWithoutTenantId() {
     // deploy a second version without tenant id
-    deployment(DMN);
+   testRule.deploy(DMN);
     // deploy a third version for tenant one
-    deploymentForTenant(TENANT_ONE, DMN);
-    deploymentForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -231,6 +245,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitionsForTenant.get(null).getVersion(), is(2));
   }
 
+  @Test
   public void testQueryByNonExistingTenantId() {
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -239,6 +254,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(0L));
   }
 
+  @Test
   public void testFailQueryByTenantIdNull() {
     try {
       repositoryService.createDecisionDefinitionQuery()
@@ -249,6 +265,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     }
   }
 
+  @Test
   public void testQuerySortingAsc() {
     // exclude definitions without tenant id because of database-specific ordering
     List<DecisionDefinition> decisionDefinitions = repositoryService
@@ -263,6 +280,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitions.get(1).getTenantId(), is(TENANT_TWO));
   }
 
+  @Test
   public void testQuerySortingDesc() {
     // exclude definitions without tenant id because of database-specific ordering
     List<DecisionDefinition> decisionDefinitions = repositoryService
@@ -277,6 +295,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitions.get(1).getTenantId(), is(TENANT_ONE));
   }
 
+  @Test
   public void testQueryNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
@@ -284,6 +303,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -295,6 +315,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDecisionDefinitionsWithoutTenantId().count(), is(2L));
   }
 
+  @Test
   public void testQueryAuthenticatedTenants() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -306,6 +327,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.withoutTenantId().count(), is(1L));
   }
 
+  @Test
   public void testQueryDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);

@@ -24,15 +24,18 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * <p>Tests the deployment from two threads simultaneously.</p>
@@ -42,7 +45,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  *
  * @author Daniel Meyer
  */
-public class ConcurrentDeploymentTest extends ConcurrencyTest {
+@RequiredDatabase(excludes = DbSqlSessionFactory.H2)
+public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
 
   private static String processResource;
 
@@ -54,23 +58,9 @@ public class ConcurrentDeploymentTest extends ConcurrencyTest {
   }
 
   /**
-   * hook into test method invocation - after the process engine is initialized
+   * @see <a href="https://app.camunda.com/jira/browse/CAM-2128">https://app.camunda.com/jira/browse/CAM-2128</a>
    */
-  @Override
-  protected void runTest() throws Throwable {
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if("h2".equals(databaseType)) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
-
-  /**
-   * @see https://app.camunda.com/jira/browse/CAM-2128
-   */
+  @Test
   public void testDuplicateFiltering() throws InterruptedException {
 
     deployOnTwoConcurrentThreads(
@@ -82,6 +72,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTest {
     assertThat(deploymentQuery.count(), is(1L));
   }
 
+  @Test
   public void testVersioning() throws InterruptedException {
 
     deployOnTwoConcurrentThreads(
@@ -140,8 +131,8 @@ public class ConcurrentDeploymentTest extends ConcurrencyTest {
     thread2.waitUntilDone();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
 
     for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);

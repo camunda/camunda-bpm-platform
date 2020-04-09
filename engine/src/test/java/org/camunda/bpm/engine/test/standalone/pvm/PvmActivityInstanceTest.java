@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.While;
 import org.camunda.bpm.engine.test.standalone.pvm.verification.TransitionInstanceVerifyer;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -430,7 +431,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
 
   }
 
-
+  @Test
   public void testSubProcessNoEnd() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -472,6 +473,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
 
   }
 
+  @Test
   public void testStartInSubProcess() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();

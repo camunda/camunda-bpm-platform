@@ -17,14 +17,19 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
+import static org.junit.Assert.assertNull;
 
 import java.sql.Connection;
 
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Tests cluster scenario with two nodes trying to store telemetry property in parallel.</p>
@@ -35,23 +40,18 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
-  @Override
-  protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if ( DbSqlSessionFactory.H2.equals(databaseType) ||  DbSqlSessionFactory.MARIADB.equals(databaseType)
-        || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
-      // skip test method - if database is H2
-    } else {
-      // clean up the db property
-      TestHelper.deleteTelemetryProperty(processEngineConfiguration);
-      // invoke the test method
-      super.runTest();
-    }
+  @Before
+  public void setUp() {
+    TestHelper.deleteInstallationId(processEngineConfiguration);
   }
 
+  @Test
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.H2, DbSqlSessionFactory.MARIADB})
   public void testEnableTelemetryWithoutConcurancyIssue() throws InterruptedException {
+
+    Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
+
     ThreadControl thread1 = executeControllableCommand(new ControllableUpdateTelemetrySetupCommand(false));
     thread1.waitForSync();
 

@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -24,14 +30,15 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -46,6 +53,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartBeforeWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
@@ -89,11 +97,12 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertNull(localInstanceVarDetail.getActivityInstanceId());
 
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS)
+  @Test
   public void testStartBeforeAsyncWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
@@ -145,11 +154,12 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     managementService.executeJob(job.getId());
 
     completeTasksInOrder("task2");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeScopeWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
 
@@ -195,6 +205,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartTransitionWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
@@ -238,11 +249,12 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertNull(localInstanceVarDetail.getActivityInstanceId());
 
     completeTasksInOrder("task1", "task1");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testCancelTaskShouldCancelProcessInstance() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -262,6 +274,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSkipCustomListenerEnsureHistoryWritten() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("exclusiveGateway").getId();
@@ -284,6 +297,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testHistoricVariablesOnAsyncBefore() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -303,6 +317,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
+  @Test
   public void testModifyWithNonInitialVariables() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

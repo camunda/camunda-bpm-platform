@@ -18,7 +18,11 @@ package org.camunda.bpm.engine.test.cmmn.required;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
@@ -27,6 +31,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -35,6 +40,7 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 public class RequiredRuleTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testRequiredRuleEvaluatesToTrue() {
     CaseInstance caseInstance =
         caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
@@ -55,6 +61,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testRequiredRuleEvaluatesToFalse() {
     CaseInstance caseInstance =
         caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
@@ -72,6 +79,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultRequiredRuleEvaluatesToTrue() {
     CaseInstance caseInstance =
         caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
@@ -93,6 +101,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultRequiredRuleEvaluatesToFalse() {
     CaseInstance caseInstance =
         caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
@@ -110,6 +119,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testDefaultRequiredRuleWithoutConditionEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case");
 
@@ -123,6 +133,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testDefaultRequiredRuleWithEmptyConditionEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case");
 

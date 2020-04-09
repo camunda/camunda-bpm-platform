@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
+import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
@@ -28,11 +33,6 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
-
-import java.io.ByteArrayInputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class VersionedDeploymentHandler implements DeploymentHandler {
 

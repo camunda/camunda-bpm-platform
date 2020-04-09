@@ -16,10 +16,16 @@
  */
 package org.camunda.bpm.engine.test.cmmn.milestone;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -28,6 +34,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class MilestoneTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithoutEntryCriterias.cmmn"})
+  @Test
   public void testWithoutEntryCriterias() {
     // given
 
@@ -51,6 +58,7 @@ public class MilestoneTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  @Test
   public void testWithEntryCriteria() {
     // given
     String caseInstanceId = caseService
@@ -108,6 +116,7 @@ public class MilestoneTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithMultipleEntryCriterias.cmmn"})
+  @Test
   public void testWithMultipleEntryCriterias() {
     // given
     String caseInstanceId = caseService
@@ -165,6 +174,7 @@ public class MilestoneTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  @Test
   public void testActivityType() {
     // given
     caseService

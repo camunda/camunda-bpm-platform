@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import java.math.BigInteger;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import java.math.BigInteger;
 
 /**
  * @author Frederik Heremans

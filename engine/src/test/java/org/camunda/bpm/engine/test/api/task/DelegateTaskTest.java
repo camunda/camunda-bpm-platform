@@ -79,7 +79,7 @@ public class DelegateTaskTest {
   }
 
   /**
-   * @see http://jira.codehaus.org/browse/ACT-380
+   * @see <a href="http://jira.codehaus.org/browse/ACT-380">http://jira.codehaus.org/browse/ACT-380</a>
    */
   @Test
   @Deployment

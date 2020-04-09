@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
@@ -29,6 +29,10 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -41,12 +45,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.junit.After;
+import org.junit.Test;
 
 public class SingleProcessInstanceModificationAsyncAuthorizationTest extends AuthorizationTest {
 
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
 
-  @Override
+  @After
   public void tearDown() {
     disableAuthorization();
     List<Batch> batches = managementService.createBatchQuery().list();
@@ -63,6 +69,7 @@ public class SingleProcessInstanceModificationAsyncAuthorizationTest extends Aut
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testModificationWithAllPermissions() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "parallelGateway", userId, CREATE_INSTANCE, READ_INSTANCE, UPDATE_INSTANCE);
@@ -106,11 +113,12 @@ public class SingleProcessInstanceModificationAsyncAuthorizationTest extends Aut
     // complete the process
     disableAuthorization();
     completeTasksInOrder("task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
     enableAuthorization();
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testModificationWithoutBatchPermissions() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "parallelGateway", userId, CREATE_INSTANCE, READ_INSTANCE, UPDATE_INSTANCE);
@@ -135,6 +143,7 @@ public class SingleProcessInstanceModificationAsyncAuthorizationTest extends Aut
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testModificationRevoke() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "parallelGateway", userId, CREATE_INSTANCE, READ_INSTANCE, UPDATE_INSTANCE);

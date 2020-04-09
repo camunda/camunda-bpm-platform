@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -24,12 +27,13 @@ import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * These testcases verify that job definitions are created upon deployment of the process definition.
@@ -40,6 +44,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testTimerStartEvent() {
 
     // given
@@ -59,6 +64,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testTimerBoundaryEvent() {
 
     // given
@@ -74,6 +80,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMultipleTimerBoundaryEvents() {
 
     // given
@@ -99,6 +106,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testEventBasedGateway() {
 
     // given
@@ -124,6 +132,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testTimerIntermediateEvent() {
 
     // given
@@ -139,6 +148,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncContinuation() {
 
     // given
@@ -154,6 +164,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncContinuationOfMultiInstance() {
     // given
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -168,6 +179,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncContinuationOfActivityWrappedInMultiInstance() {
     // given
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -183,6 +195,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
       "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml"})
+  @Test
   public void testMultipleProcessDeployment() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     List<JobDefinition> jobDefinitions = query.list();

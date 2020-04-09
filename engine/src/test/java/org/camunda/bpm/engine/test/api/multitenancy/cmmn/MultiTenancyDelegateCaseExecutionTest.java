@@ -20,10 +20,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.api.multitenancy.listener.AssertingCaseExecutionListener;
 import org.camunda.bpm.engine.test.api.multitenancy.listener.AssertingCaseExecutionListener.DelegateCaseExecutionAsserter;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * Tests if a {@link DelegateCaseExecution} has the correct tenant-id.
@@ -36,47 +39,43 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
 
   protected static final String TENANT_ID = "tenant1";
 
+  @After
+  public void tearDown() throws Exception {
+    AssertingCaseExecutionListener.clear();
+  }
+
+  @Test
   public void testSingleExecution() {
-    deploymentForTenant(TENANT_ID, HUMAN_TASK_CMMN_FILE);
+    testRule.deployForTenant(TENANT_ID, HUMAN_TASK_CMMN_FILE);
 
     AssertingCaseExecutionListener.addAsserts(hasTenantId("tenant1"));
 
     createCaseInstance("case");
   }
 
+  @Test
   public void testCallCaseTask() {
-    deploymentForTenant(TENANT_ID, CMMN_FILE);
-    deployment(CASE_TASK_CMMN_FILE);
+    testRule.deployForTenant(TENANT_ID, CMMN_FILE);
+    testRule.deploy(CASE_TASK_CMMN_FILE);
 
     AssertingCaseExecutionListener.addAsserts(hasTenantId("tenant1"));
 
-    createCaseInstance("oneCaseTaskCase");
-  }
-
-  protected void createCaseInstance(String caseDefinitionKey) {
-    CaseDefinition caseDefinition = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(caseDefinitionKey)
-        .latestVersion()
-        .singleResult();
-
-    caseService.createCaseInstanceById(caseDefinition.getId());
+    createCaseInstanceByKey("oneCaseTaskCase");
   }
 
   @Override
-  protected void tearDown() throws Exception {
-    AssertingCaseExecutionListener.clear();
-    super.tearDown();
+  protected CaseInstance createCaseInstance(String caseDefinitionKey) {
+    CaseDefinition caseDefinition = repositoryService
+            .createCaseDefinitionQuery()
+            .caseDefinitionKey(caseDefinitionKey)
+            .latestVersion()
+            .singleResult();
+
+    return caseService.createCaseInstanceById(caseDefinition.getId());
   }
 
   protected static DelegateCaseExecutionAsserter hasTenantId(final String expectedTenantId) {
-    return new DelegateCaseExecutionAsserter() {
-
-      @Override
-      public void doAssert(DelegateCaseExecution execution) {
-        assertThat(execution.getTenantId(), is(expectedTenantId));
-      }
-    };
+    return execution -> assertThat(execution.getTenantId(), is(expectedTenantId));
   }
 
 }

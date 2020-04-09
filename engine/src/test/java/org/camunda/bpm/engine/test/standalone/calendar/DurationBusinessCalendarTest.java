@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
@@ -33,7 +34,8 @@ public class DurationBusinessCalendarTest extends PvmTestCase {
   public void tearDown() {
     ClockUtil.reset();
   }
-  
+
+  @Test
   public void testSimpleDuration() throws Exception {
     DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
 
@@ -47,7 +49,8 @@ public class DurationBusinessCalendarTest extends PvmTestCase {
 
     assertEquals(expectedDuedate, duedate);
   }
-  
+
+  @Test
   public void testSimpleDurationWithStartDate() throws Exception {
     DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
 

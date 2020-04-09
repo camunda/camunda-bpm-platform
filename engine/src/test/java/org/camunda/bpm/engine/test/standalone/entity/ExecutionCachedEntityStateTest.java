@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
@@ -23,10 +25,11 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -35,6 +38,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testProcessInstanceTasks() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -43,6 +47,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionTasksScope() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -55,6 +60,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionTasksParallel() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -67,6 +73,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionTasksMi() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -89,6 +96,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testProcessInstanceEventSubscriptions() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -97,6 +105,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionEventSubscriptionsScope() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -110,6 +119,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionEventSubscriptionsMi() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -132,6 +142,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testProcessInstanceJobs() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -142,6 +153,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionJobsScope() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -153,6 +165,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionJobsParallel() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -166,6 +179,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testProcessInstanceIncident() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -195,6 +209,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionIncidentParallel() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -224,6 +239,7 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testExecutionExternalTask() {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 

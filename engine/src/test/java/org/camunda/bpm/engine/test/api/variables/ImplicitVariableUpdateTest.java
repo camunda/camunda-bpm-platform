@@ -16,16 +16,22 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.history.RemoveAndUpdateValueDelegate;
 import org.camunda.bpm.engine.test.history.ReplaceAndUpdateValueDelegate;
 import org.camunda.bpm.engine.test.history.UpdateValueDelegate;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -34,6 +40,7 @@ import org.camunda.bpm.engine.variable.Variables;
 public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
+  @Test
   public void testUpdate() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
@@ -47,6 +54,7 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.parallel.bpmn20.xml")
+  @Test
   public void testUpdateParallelFlow() {
     // should also work when execution tree is expanded between the implicit update
     // and when the engine notices it
@@ -63,6 +71,7 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
+  @Test
   public void testUpdatePreviousValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
@@ -75,6 +84,7 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
+  @Test
   public void testRemoveAndUpdateValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()

@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 
 import org.camunda.bpm.engine.HistoryService;

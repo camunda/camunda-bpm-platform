@@ -16,6 +16,18 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_PROCESS_KEY;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.createDefaultExternalTaskModel;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -25,19 +37,13 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest {
@@ -47,27 +53,21 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
   protected final String ERROR_DETAILS = "These are the error details!";
   protected final String ANOTHER_PROCESS_KEY = "AnotherProcess";
 
-  protected String deploymentId;
-
-  @Override
+  @Before
   public void setUp() throws Exception {
-
-    DeploymentBuilder deploymentbuilder = repositoryService.createDeployment();
     BpmnModelInstance defaultModel = createDefaultExternalTaskModel().build();
     BpmnModelInstance modifiedModel = createDefaultExternalTaskModel().processKey(ANOTHER_PROCESS_KEY).build();
-    deploymentId = deployment(deploymentbuilder, defaultModel , modifiedModel);
-
+    testRule.deploy(defaultModel, modifiedModel);
     super.setUp();
   }
 
-  @Override
+  @After
   public void tearDown() {
     super.tearDown();
-    deleteDeployment(deploymentId);
     processEngineConfiguration.setEnableHistoricInstancePermissions(false);
   }
 
-
+  @Test
   public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(DEFAULT_PROCESS_KEY);
@@ -79,6 +79,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testSimpleQueryWithHistoryReadPermissionOnProcessDefinition() {
 
     // given
@@ -92,6 +93,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testSimpleQueryWithHistoryReadPermissionOnAnyProcessDefinition() {
 
     // given
@@ -105,6 +107,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testSimpleQueryWithMultipleAuthorizations() {
     // given
     startProcessInstanceByKey(DEFAULT_PROCESS_KEY);
@@ -118,6 +121,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
@@ -129,6 +133,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithHistoryReadPermissionOnOneProcessDefinition() {
     // given
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
@@ -141,6 +146,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 6);
   }
 
+  @Test
   public void testQueryWithHistoryReadPermissionOnAnyProcessDefinition() {
     // given
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
@@ -153,6 +159,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 8);
   }
 
+  @Test
   public void testGetErrorDetailsWithoutAuthorization() {
     // given
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
@@ -173,13 +180,14 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     } catch (AuthorizationException e) {
       // then
       String exceptionMessage = e.getMessage();
-      assertTextPresent(userId, exceptionMessage);
-      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
-      assertTextPresent(DEFAULT_PROCESS_KEY, exceptionMessage);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
+      testRule.assertTextPresent(userId, exceptionMessage);
+      testRule.assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
+      testRule.assertTextPresent(DEFAULT_PROCESS_KEY, exceptionMessage);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
     }
   }
 
+  @Test
   public void testGetErrorDetailsWithHistoryReadPermissionOnProcessDefinition() {
 
     // given
@@ -201,6 +209,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     assertEquals(ERROR_DETAILS, stacktrace);
   }
 
+  @Test
   public void testGetErrorDetailsWithHistoryReadPermissionOnProcessAnyDefinition() {
 
     // given
@@ -222,6 +231,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     assertEquals(ERROR_DETAILS, stacktrace);
   }
 
+  @Test
   public void testCheckNonePermissionOnHistoricProcessInstance() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -239,6 +249,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     assertThat(query.list()).isEmpty();
   }
 
+  @Test
   public void testCheckReadPermissionOnHistoricProcessInstance() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -258,6 +269,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
         .containsExactly(processInstanceId);
   }
 
+  @Test
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -279,6 +291,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
         .containsExactly(processInstanceId);
   }
 
+  @Test
   public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -300,6 +313,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
         .containsExactly(processInstanceId);
   }
 
+  @Test
   public void testHistoricProcessInstancePermissionsAuthorizationDisabled() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);

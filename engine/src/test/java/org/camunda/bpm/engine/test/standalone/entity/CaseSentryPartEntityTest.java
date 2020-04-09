@@ -25,12 +25,14 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Kristin Polenz
  */
 public class CaseSentryPartEntityTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testSentryWithTenantId() {
     CaseSentryPartEntity caseSentryPartEntity = new CaseSentryPartEntity();
     caseSentryPartEntity.setTenantId("tenant1");

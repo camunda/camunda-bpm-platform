@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
     List<WiserMessage> messages = wiser.getMessages();
     assertEquals(0, messages.size());
 
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     messages = wiser.getMessages();
     assertEquals(1, messages.size());
@@ -47,7 +49,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
     WiserMessage message = messages.get(0);
     EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "camunda@localhost",
             Arrays.asList("kermit@camunda.org"), null);
-    assertProcessEnded(procId);
+    testRule.assertProcessEnded(procId);
   }
 
   // copied from org.camunda.bpm.engine.test.bpmn.mail.EmailSendTaskTest
@@ -58,7 +60,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
     List<WiserMessage> messages = wiser.getMessages();
     assertEquals(0, messages.size());
 
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     messages = wiser.getMessages();
     assertEquals(1, messages.size());

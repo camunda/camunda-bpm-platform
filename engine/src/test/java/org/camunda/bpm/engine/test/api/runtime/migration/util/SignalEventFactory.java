@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
-import org.camunda.bpm.engine.test.api.runtime.migration.util.MessageEventFactory.MessageTrigger;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**

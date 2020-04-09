@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import junit.framework.TestCase;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -33,15 +34,17 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.junit.Test;
 
 /**
  * @author Ronny Bräunlich
  */
-public class DatabaseTableSchemaTest extends TestCase {
+public class DatabaseTableSchemaTest {
 
   private static final String SCHEMA_NAME = "SCHEMA1";
   private static final String PREFIX_NAME = "PREFIX1_";
 
+  @Test
   public void testPerformDatabaseSchemaOperationCreateTwice() throws Exception {
 
     // both process engines will be using this datasource.
@@ -75,6 +78,7 @@ public class DatabaseTableSchemaTest extends TestCase {
     engine1.close();
   }
 
+  @Test
   public void testTablePresentWithSchemaAndPrefix() throws SQLException {
     PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
         "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
@@ -106,6 +110,7 @@ public class DatabaseTableSchemaTest extends TestCase {
 
   }
 
+  @Test
   public void testCreateConfigurationWithMismatchtingSchemaAndPrefix() {
     try {
       StandaloneInMemProcessEngineConfiguration configuration = new StandaloneInMemProcessEngineConfiguration();
@@ -119,6 +124,7 @@ public class DatabaseTableSchemaTest extends TestCase {
     }
   }
 
+  @Test
   public void testCreateConfigurationWithMissingDotInSchemaAndPrefix() {
     try {
       StandaloneInMemProcessEngineConfiguration configuration = new StandaloneInMemProcessEngineConfiguration();

@@ -16,25 +16,40 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTest {
+public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestHelper {
 
-  protected void setUp() throws Exception {
-    super.setUp();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setHistoryCleanupBatchWindowStartTime("12:00"));
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
+
+  @Before
+  public void initializeProcessEngine() {
+    processEngineConfiguration =engineRule.getProcessEngineConfiguration();
+    historyService = engineRule.getHistoryService();
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
+    deleteHistoryCleanupJobs();
     clearDatabase();
-
-    super.tearDown();
   }
 
+  @Test
   public void testReconfigureCleanupJobs() {
     // given
     // create cleanup job
@@ -82,43 +97,29 @@ public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTest {
 
   // helpers ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  protected void initializeProcessEngine() {
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-
-    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("12:00");
-
-    processEngine = processEngineConfiguration.buildProcessEngine();
-  }
-
   protected void clearDatabase() {
     deleteHistoryCleanupJobs();
 
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 
-        commandContext.getMeterLogManager()
-          .deleteAll();
+      commandContext.getMeterLogManager()
+        .deleteAll();
 
-        commandContext.getHistoricJobLogManager()
-          .deleteHistoricJobLogsByHandlerType("history-cleanup");
+      commandContext.getHistoricJobLogManager()
+        .deleteHistoricJobLogsByHandlerType("history-cleanup");
 
-        return null;
-      }
+      return null;
     });
   }
 
   protected void makeEverLivingJobFail(final String jobId) {
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 
-        JobEntity job = commandContext.getJobManager().findJobById(jobId);
+      JobEntity job = commandContext.getJobManager().findJobById(jobId);
 
-        job.setExceptionStacktrace("foo");
+      job.setExceptionStacktrace("foo");
 
-        return null;
-      }
+      return null;
     });
   }
 

@@ -20,10 +20,14 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
@@ -31,7 +35,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -47,6 +53,7 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
   protected static final String CANCEL_END_EVENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.cancelEnd.bpmn20.xml";
 
   @Deployment(resources = INTERMEDIATE_TIMER_CATCH_PROCESS)
+  @Test
   public void testStartBeforeIntermediateCatchEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -85,12 +92,13 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     assertEquals(catchEventInstance.getExecutionIds()[0], job.getExecutionId());
 
     completeTasksInOrder("task");
-    executeAvailableJobs();
-    assertProcessEnded(processInstanceId);
+    testRule.executeAvailableJobs();
+    testRule.assertProcessEnded(processInstanceId);
 
   }
 
   @Deployment(resources = MESSAGE_START_EVENT_PROCESS)
+  @Test
   public void testStartBeforeMessageStartEvent() {
     runtimeService.correlateMessage("startMessage");
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
@@ -133,10 +141,11 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     assertEquals(startEventSubscription.getId(), subscription.getId());
 
     completeTasksInOrder("task", "task");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = TIMER_START_EVENT_PROCESS)
+  @Test
   public void testStartBeforeTimerStartEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -176,10 +185,11 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     assertEquals(startTimerJob.getId(), job.getId());
 
     completeTasksInOrder("task", "task");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testStartBeforNoneStartEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -218,10 +228,11 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testStartBeforeNoneEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -250,10 +261,11 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
           .done());
 
     completeTasksInOrder("theTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = TERMINATE_END_EVENT_PROCESS)
+  @Test
   public void testStartBeforeTerminateEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -267,10 +279,11 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     // then the process instance is terminated
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNull(updatedTree);
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CANCEL_END_EVENT_PROCESS)
+  @Test
   public void testStartBeforeCancelEndEventConcurrent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -308,6 +321,7 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = CANCEL_END_EVENT_PROCESS)
+  @Test
   public void testStartBeforeCancelEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
@@ -358,7 +372,7 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     taskService.complete(afterCancellationTask.getId());
     taskService.complete(afterSuccessTask.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {

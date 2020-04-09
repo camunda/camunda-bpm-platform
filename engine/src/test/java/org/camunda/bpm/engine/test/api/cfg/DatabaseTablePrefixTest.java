@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.Connection;
 

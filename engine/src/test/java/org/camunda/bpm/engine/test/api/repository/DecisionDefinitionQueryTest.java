@@ -173,7 +173,7 @@ public class DecisionDefinitionQueryTest {
     Deployment tempDeploymentOne = repositoryService.createDeployment()
         .addClasspathResource(DMN_ONE_RESOURCE).addClasspathResource(DMN_TWO_RESOURCE).deploy();
     engineRule.manageDeployment(tempDeploymentOne);
-    
+
     Date timeAfterDeploymentOne = DateUtils.addSeconds(ClockUtil.getCurrentTime(), 1);
 
     ClockUtil.setCurrentTime(DateUtils.addSeconds(timeAfterDeploymentOne, 5));
@@ -216,7 +216,7 @@ public class DecisionDefinitionQueryTest {
     // given
     //get rid of the milliseconds because of MySQL datetime precision
     SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss");
-      
+
     Date startTest = formatter.parse(formatter.format(DateUtils.addSeconds(ClockUtil.now(), 5)));
     ClockUtil.setCurrentTime(startTest);
 
@@ -224,7 +224,7 @@ public class DecisionDefinitionQueryTest {
     Deployment tempDeploymentOne = repositoryService.createDeployment()
         .addClasspathResource(DMN_ONE_RESOURCE).addClasspathResource(DMN_TWO_RESOURCE).deploy();
     engineRule.manageDeployment(tempDeploymentOne);
-    
+
     Date timeAtDeploymentTwo = DateUtils.addSeconds(timeAtDeploymentOne, 5);
     ClockUtil.setCurrentTime(timeAtDeploymentTwo);
     Deployment tempDeploymentTwo = repositoryService.createDeployment()
@@ -480,6 +480,7 @@ public class DecisionDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testInvalidUsageOfLatest() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 

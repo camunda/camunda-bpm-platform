@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
-import static junit.framework.TestCase.assertTrue;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Kristin Polenz
@@ -28,18 +30,20 @@ import org.camunda.bpm.engine.test.Deployment;
 public class MessageIntermediateThrowEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSingleIntermediateThrowMessageEvent() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testSingleIntermediateThrowMessageEventServiceTaskBehavior() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.wasExecuted);
   }
 

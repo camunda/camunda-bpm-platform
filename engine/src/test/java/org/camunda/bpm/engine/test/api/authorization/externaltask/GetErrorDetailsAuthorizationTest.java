@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+import java.util.List;
+
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -25,19 +33,13 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Please note that if you want to reuse Rule and other fields you should create abstract class

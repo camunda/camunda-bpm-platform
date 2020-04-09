@@ -16,13 +16,18 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener.ActivitySequenceCounterMap;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -36,6 +41,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testSequence() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -43,13 +49,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService1", "theService2", "theEnd");
   }
 
   @Deployment
+  @Test
   public void testForkSameSequenceLengthWithoutWaitStates() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -57,13 +64,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2", "theEnd2");
   }
 
   @Deployment
+  @Test
   public void testForkSameSequenceLengthWithAsyncEndEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -118,7 +126,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     managementService.executeJob(jobId);
 
     // then (3)
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(7, order.size());
@@ -129,6 +137,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkDifferentSequenceLengthWithoutWaitStates() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -136,7 +145,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2", "theService3", "theEnd2");
@@ -144,6 +153,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkDifferentSequenceLengthWithAsyncEndEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -202,7 +212,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     managementService.executeJob(jobId);
 
     // then (3)
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(8, order.size());
@@ -213,6 +223,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkReplaceBy() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -270,10 +281,11 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     assertEquals("theEnd1", theEnd1Element.getActivityId());
     assertTrue(theEnd1Element.getSequenceCounter() > theService2Element.getSequenceCounter());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testForkReplaceBy.bpmn20.xml"})
+  @Test
   public void testForkReplaceByAnotherExecutionOrder() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -330,10 +342,11 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     assertEquals("theEnd2", theEnd2Element.getActivityId());
     assertTrue(theEnd2Element.getSequenceCounter() > theService5Element.getSequenceCounter());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testForkReplaceByThreeBranches() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -418,10 +431,11 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     assertEquals("theEnd3", theEnd3Element.getActivityId());
     assertTrue(theEnd3Element.getSequenceCounter() > theService9Element.getSequenceCounter());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testForkAndJoinSameSequenceLength() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -429,7 +443,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(9, order.size());
@@ -483,6 +497,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkAndJoinDifferentSequenceLength() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -490,7 +505,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(10, order.size());
@@ -551,6 +566,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkAndJoinThreeBranchesDifferentSequenceLength() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -558,7 +574,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(4, order.size());
@@ -584,6 +600,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testSequenceInsideSubProcess() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -591,13 +608,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService1", "subProcess", "innerStart", "innerService", "innerEnd", "theService2", "theEnd");
   }
 
   @Deployment
+  @Test
   public void testForkSameSequenceLengthInsideSubProcess() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -605,7 +623,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(3, order.size());
@@ -624,6 +642,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testForkDifferentSequenceLengthInsideSubProcess() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -631,7 +650,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(3, order.size());
@@ -650,6 +669,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testSequentialMultiInstance() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -657,13 +677,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService1", "theService2", "theService2", "theService3", "theEnd");
   }
 
   @Deployment
+  @Test
   public void testParallelMultiInstance() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -671,7 +692,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(6, order.size());
@@ -702,6 +723,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLoop() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -709,13 +731,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     // when
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService1", "join", "theScript", "fork", "join", "theScript", "fork", "theService2", "theEnd");
   }
 
   @Deployment
+  @Test
   public void testInterruptingBoundaryEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -730,13 +753,14 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     runtimeService.correlateMessage("newMessage");
 
     // then (2)
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     order = ExecutionOrderListener.getActivityExecutionOrder();
     verifyOrder(order, "theStart", "theService1", "theTask", "messageBoundary", "theServiceAfterMessage", "theEnd2");
   }
 
   @Deployment
+  @Test
   public void testNonInterruptingBoundaryEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -778,7 +802,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTest {
     taskService.complete(taskId);
 
     // then (3)
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     order = ExecutionOrderListener.getActivityExecutionOrder();
     assertEquals(7, order.size());

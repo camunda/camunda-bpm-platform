@@ -16,13 +16,8 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
-import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.ClockTestUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -30,8 +25,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquireJobsTest {

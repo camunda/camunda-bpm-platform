@@ -16,8 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -35,8 +39,6 @@ import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Svetlana Dorokhova

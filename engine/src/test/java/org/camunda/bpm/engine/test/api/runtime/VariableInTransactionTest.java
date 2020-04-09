@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
@@ -26,7 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
-import static junit.framework.TestCase.assertEquals;
 
 /**
  *

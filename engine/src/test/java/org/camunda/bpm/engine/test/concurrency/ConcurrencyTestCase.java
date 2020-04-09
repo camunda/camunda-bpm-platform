@@ -16,57 +16,45 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import java.util.Date;
-
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class CancelAcquiredJobTest {
+public abstract class ConcurrencyTestCase extends ConcurrencyTestHelper {
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ProcessEngine processEngine;
+  protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected ManagementService managementService;
 
   @Before
-  public void initializeServices() {
+  public void init() {
+    processEngine = engineRule.getProcessEngine();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
+    managementService = engineRule.getManagementService();
+    super.init();
   }
-
-  @Deployment
-  @Test
-  public void testBothJobsAcquiredAtSameTime() {
-
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // move clock by 20 seconds -> both jobs are acquirable:
-    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + (20 * 1000)));
-
-    testRule.waitForJobExecutorToProcessAllJobs(6000);
-
-  }
-
-
 
 }

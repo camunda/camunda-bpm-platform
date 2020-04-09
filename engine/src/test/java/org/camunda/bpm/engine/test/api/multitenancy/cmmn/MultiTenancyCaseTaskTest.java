@@ -19,12 +19,14 @@ package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
 
@@ -44,10 +46,11 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
 
   protected static final String CASE_TASK_ID = "PI_CaseTask_1";
 
+  @Test
   public void testStartCaseInstanceWithDeploymentBinding() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_DEPLOYMENT, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_DEPLOYMENT, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_DEPLOYMENT, CMMN_CASE);
 
     createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
     createCaseInstance("caseTaskCaseDeployment", TENANT_TWO);
@@ -57,10 +60,11 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
+  @Test
   public void testStartCaseInstanceWithLatestBindingSameVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
@@ -70,12 +74,13 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
+  @Test
   public void testStartCaseInstanceWithLatestBindingDifferentVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
 
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_CASE);
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
@@ -89,10 +94,11 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testStartCaseInstanceWithVersionBinding() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_VERSION, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_VERSION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_VERSION, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_VERSION, CMMN_CASE);
 
     createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
     createCaseInstance("caseTaskCaseVersion", TENANT_TWO);
@@ -102,10 +108,11 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
+  @Test
   public void testFailStartCaseInstanceFromOtherTenantWithDeploymentBinding() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
-    deploymentForTenant(TENANT_TWO, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
+    testRule.deployForTenant(TENANT_TWO, CMMN_CASE);
 
     try {
       createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
@@ -116,10 +123,11 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testFailStartCaseInstanceFromOtherTenantWithLatestBinding() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST);
-    deploymentForTenant(TENANT_TWO, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_LATEST);
+    testRule.deployForTenant(TENANT_TWO, CMMN_CASE);
 
     try {
       createCaseInstance("caseTaskCase", TENANT_ONE);
@@ -130,12 +138,13 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testFailStartCaseInstanceFromOtherTenantWithVersionBinding() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_VERSION_2, CMMN_CASE);
+    testRule.deployForTenant(TENANT_ONE, CMMN_VERSION_2, CMMN_CASE);
 
-    deploymentForTenant(TENANT_TWO, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_CASE);
+    testRule.deployForTenant(TENANT_TWO, CMMN_CASE);
 
     try {
       createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
@@ -146,9 +155,10 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testCaseRefTenantIdConstant() {
-    deployment(CMMN_TENANT_CONST);
-    deploymentForTenant(TENANT_ONE, CMMN_CASE);
+   testRule.deploy(CMMN_TENANT_CONST);
+    testRule.deployForTenant(TENANT_ONE, CMMN_CASE);
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
@@ -156,9 +166,10 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testCaseRefTenantIdExpression() {
-    deployment(CMMN_TENANT_EXPR);
-    deploymentForTenant(TENANT_ONE, CMMN_CASE);
+   testRule.deploy(CMMN_TENANT_EXPR);
+    testRule.deployForTenant(TENANT_ONE, CMMN_CASE);
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 

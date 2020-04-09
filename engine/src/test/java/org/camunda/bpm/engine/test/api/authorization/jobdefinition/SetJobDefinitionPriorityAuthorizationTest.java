@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.jobdefinition;
 
-import java.util.Collection;
-
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
+import java.util.Collection;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;

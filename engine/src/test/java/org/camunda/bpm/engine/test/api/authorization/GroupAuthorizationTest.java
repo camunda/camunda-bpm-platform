@@ -18,8 +18,14 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +43,8 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class GroupAuthorizationTest extends AuthorizationTest {
@@ -44,8 +52,8 @@ public class GroupAuthorizationTest extends AuthorizationTest {
   public static final String testUserId = "testUser";
   public static final List<String> testGroupIds = Arrays.asList("testGroup1", "testGroup2", "testGroup3");
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     createUser(testUserId);
     for (String testGroupId : testGroupIds) {
       createGroupAndAddUser(testGroupId, testUserId);
@@ -56,6 +64,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
   }
 
 
+  @Test
   public void testTaskQueryWithoutGroupAuthorizations() {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
@@ -75,6 +84,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testTaskQueryWithOneGroupAuthorization() {
     createGroupGrantAuthorization(Resources.TASK, Authorization.ANY, testGroupIds.get(0));
 
@@ -96,6 +106,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testTaskQueryWithGroupAuthorization() {
     for (String testGroupId : testGroupIds) {
       createGroupGrantAuthorization(Resources.TASK, Authorization.ANY, testGroupId);
@@ -119,6 +130,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testTaskQueryWithUserWithoutGroups() {
     identityService.setAuthentication(testUserId, null);
 
@@ -140,6 +152,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testCheckAuthorizationWithoutGroupAuthorizations() {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
@@ -161,6 +174,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testCheckAuthorizationWithOneGroupAuthorizations() {
     createGroupGrantAuthorization(Resources.TASK, Authorization.ANY, testGroupIds.get(0));
 
@@ -184,6 +198,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testCheckAuthorizationWithGroupAuthorizations() {
     for (String testGroupId : testGroupIds) {
       createGroupGrantAuthorization(Resources.TASK, Authorization.ANY, testGroupId);
@@ -209,6 +224,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  @Test
   public void testCheckAuthorizationWithUserWithoutGroups() {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {

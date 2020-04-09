@@ -20,13 +20,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngineException;
-
-import junit.framework.TestCase;
 
 /**
  * <p>The testcases for the {@link ProcessesXmlParser}</p>

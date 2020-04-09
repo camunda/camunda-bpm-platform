@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
@@ -28,8 +30,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class EnableHistoricInstancePermissionsTest {
 

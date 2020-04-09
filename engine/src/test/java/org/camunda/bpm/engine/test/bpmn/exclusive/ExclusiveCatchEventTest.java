@@ -16,10 +16,16 @@
  */
 package org.camunda.bpm.engine.test.bpmn.exclusive;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel
@@ -27,6 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ExclusiveCatchEventTest extends PluggableProcessEngineTest {
   
   @Deployment
+  @Test
   public void testNonExclusiveCatchEvent() {
     // start process 
     runtimeService.startProcessInstanceByKey("exclusive");
@@ -34,14 +41,15 @@ public class ExclusiveCatchEventTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     assertFalse(((JobEntity)job).isExclusive());
-               
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    testRule.waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      
   }
 
   @Deployment
+  @Test
   public void testExclusiveCatchEvent() {
     // start process 
     runtimeService.startProcessInstanceByKey("exclusive");
@@ -49,21 +57,22 @@ public class ExclusiveCatchEventTest extends PluggableProcessEngineTest {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     assertTrue(((JobEntity)job).isExclusive());
-               
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    testRule.waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      
   }
   
   @Deployment
+  @Test
   public void testExclusiveCatchEventConcurrent() {
     // start process 
     runtimeService.startProcessInstanceByKey("exclusive");
     // now there should be 2 exclusive jobs in the database:
     assertEquals(2, managementService.createJobQuery().count());
-                   
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    testRule.waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      

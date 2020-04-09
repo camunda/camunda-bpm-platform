@@ -16,19 +16,25 @@
  */
 package org.camunda.bpm.engine.test.bpmn.parse;
 
+import static org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-
-import static org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Test
   public void testUserTaskParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskFailedJobRetryTimeCycle");
 
@@ -37,6 +43,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/CamundaFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Test
   public void testUserTaskParseFailedJobRetryTimeCycleInActivitiNamespace() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskFailedJobRetryTimeCycle");
 
@@ -45,6 +52,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Test
   public void testNotAsyncUserTaskParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("notAsyncUserTaskFailedJobRetryTimeCycle");
 
@@ -53,6 +61,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Test
   public void testAsyncUserTaskButWithoutParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskButWithoutFailedJobRetryTimeCycle");
 
@@ -61,6 +70,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Test
   public void testTimerBoundaryEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("boundaryEventWithFailedJobRetryTimeCycle");
 
@@ -69,6 +79,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Test
   public void testTimerBoundaryEventWithoutFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("boundaryEventWithoutFailedJobRetryTimeCycle");
 
@@ -77,6 +88,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Test
   public void testTimerStartEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("startEventWithFailedJobRetryTimeCycle");
 
@@ -85,6 +97,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Test
   public void testIntermediateCatchTimerEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateTimerEventWithFailedJobRetryTimeCycle");
 
@@ -93,6 +106,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testSignal.bpmn20.xml" })
+  @Test
   public void testSignalEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("signalEventWithFailedJobRetryTimeCycle");
 
@@ -101,6 +115,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMultiInstanceBodyWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -112,6 +127,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInnerMultiInstanceActivityWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -123,6 +139,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMultiInstanceBodyAndInnerActivityWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 

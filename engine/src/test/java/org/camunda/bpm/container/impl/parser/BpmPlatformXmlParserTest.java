@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
 import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
 import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
 import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;

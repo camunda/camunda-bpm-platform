@@ -16,12 +16,19 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
@@ -31,17 +38,23 @@ import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.Mocks;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Sebastian Menski
  */
-public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
+public class TaskQueryExpressionTest {
 
   protected Task task;
   protected User user;
@@ -49,12 +62,25 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
   protected User userWithoutGroups;
   protected Group group1;
 
-  public TaskQueryExpressionTest() {
-    super("org/camunda/bpm/engine/test/api/task/task-query-expression-test.camunda.cfg.xml");
-  }
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/task/task-query-expression-test.camunda.cfg.xml");
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected IdentityService identityService;
 
   @Before
   public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    identityService = engineRule.getIdentityService();
+
     group1 = createGroup("group1");
     Group group2 = createGroup("group2");
     Group group3 = createGroup("group3");
@@ -81,6 +107,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     taskService.addCandidateGroup(assignedCandidateTask.getId(), group1.getId());
   }
 
+  @Test
   public void testQueryByAssigneeExpression() {
     assertCount(taskQuery().taskAssigneeExpression("${'" + user.getId() + "'}"), 2);
     assertCount(taskQuery().taskAssigneeExpression("${'" + anotherUser.getId() + "'}"), 0);
@@ -92,6 +119,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskAssigneeExpression("${currentUser()}"), 0);
   }
 
+  @Test
   public void testQueryByAssigneeLikeExpression() {
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + user.getId().substring(2) + "'}"), 2);
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + anotherUser.getId().substring(2) + "'}"), 0);
@@ -103,6 +131,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%'.concat(currentUser())}"), 0);
   }
 
+  @Test
   public void testQueryByOwnerExpression() {
     assertCount(taskQuery().taskOwnerExpression("${'" + user.getId() + "'}"), 1);
     assertCount(taskQuery().taskOwnerExpression("${'" + anotherUser.getId() + "'}"), 0);
@@ -114,6 +143,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskOwnerExpression("${currentUser()}"), 0);
   }
 
+  @Test
   public void testQueryByInvolvedUserExpression() {
     assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 2);
     assertCount(taskQuery().taskInvolvedUserExpression("${'" + anotherUser.getId() + "'}"), 0);
@@ -125,6 +155,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 0);
   }
 
+  @Test
   public void testQueryByCandidateUserExpression() {
     assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}"), 1);
     assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}").includeAssignedTasks(), 2);
@@ -138,6 +169,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}"), 0);
   }
 
+  @Test
   public void testQueryByCandidateGroupExpression() {
     assertCount(taskQuery().taskCandidateGroupExpression("${'" + group1.getId() + "'}"), 1);
     assertCount(taskQuery().taskCandidateGroupExpression("${'unknown'}"), 0);
@@ -150,6 +182,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}"), 0);
   }
 
+  @Test
   public void testQueryByCandidateGroupsExpression() {
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}"), 1);
@@ -169,6 +202,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testQueryByTaskCreatedBeforeExpression() {
     adjustTime(1);
 
@@ -185,6 +219,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskCreatedBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
 
+  @Test
   public void testQueryByTaskCreatedOnExpression() {
     setTime(task.getCreateTime());
     assertCount(taskQuery().taskCreatedOnExpression("${now()}"), 1);
@@ -196,6 +231,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskCreatedOnExpression("${now()}"), 0);
   }
 
+  @Test
   public void testQueryByTaskCreatedAfterExpression() {
     adjustTime(1);
 
@@ -212,6 +248,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().taskCreatedAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
+  @Test
   public void testQueryByDueBeforeExpression() {
     adjustTime(1);
 
@@ -228,6 +265,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().dueBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
 
+  @Test
   public void testQueryByDueDateExpression() {
     setTime(task.getDueDate());
     assertCount(taskQuery().dueDateExpression("${now()}"), 1);
@@ -239,6 +277,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().dueDateExpression("${now()}"), 0);
   }
 
+  @Test
   public void testQueryByDueAfterExpression() {
     adjustTime(1);
 
@@ -255,6 +294,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().dueAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
+  @Test
   public void testQueryByFollowUpBeforeExpression() {
     adjustTime(1);
 
@@ -271,6 +311,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().followUpBeforeExpression("${dateTime().minusYears(1)}"), 0);
   }
 
+  @Test
   public void testQueryByFollowUpDateExpression() {
     setTime(task.getFollowUpDate());
     assertCount(taskQuery().followUpDateExpression("${now()}"), 1);
@@ -282,6 +323,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().followUpDateExpression("${now()}"), 0);
   }
 
+  @Test
   public void testQueryByFollowUpAfterExpression() {
     adjustTime(1);
 
@@ -298,6 +340,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery().followUpAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
+  @Test
   public void testQueryByProcessInstanceBusinessKeyExpression() {
     // given
     String aBusinessKey = "business key";
@@ -313,6 +356,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertCount(taskQuery, 1);
   }
 
+  @Test
   public void testQueryByProcessInstanceBusinessKeyLikeExpression() {
     // given
     String aBusinessKey = "business key";
@@ -335,11 +379,12 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
       .endEvent()
       .done();
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
   }
 
+  @Test
   public void testExpressionOverrideQuery() {
     String queryString = "query";
     String expressionString = "expression";
@@ -427,6 +472,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertEquals(2, taskQuery.getCandidateGroups().size());
   }
 
+  @Test
   public void testQueryOverrideExpression() {
     String queryString = "query";
     String expressionString = "expression";
@@ -514,6 +560,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTest {
     assertEquals(1, taskQuery.getCandidateGroups().size());
   }
 
+  @Test
   public void testQueryOr() {
     // given
     Date date = DateTimeUtil.now().plusDays(2).toDate();

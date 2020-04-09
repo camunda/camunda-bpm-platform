@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,12 +33,14 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
+  @Test
   public void testJobCommandsWithMessage() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
@@ -72,6 +76,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
   static final long SOME_TIME = 928374923546L;
   static final long SECOND = 1000;
 
+  @Test
   public void testJobCommandsWithTimer() {
     // clock gets automatically reset in LogTestCase.runTest
     ClockUtil.setCurrentTime(new Date(SOME_TIME));

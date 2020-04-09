@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
@@ -26,6 +32,8 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -37,9 +45,9 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
   protected static final String RESOURCE_NAME = "path/to/my/process.bpmn";
   protected static final String PROCESS_KEY = "process";
 
+  @After
+  public void tearDown() throws Exception {
 
-  protected void tearDown() throws Exception {
-    super.tearDown();
 
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     for (Deployment deployment : deployments) {
@@ -47,6 +55,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     }
   }
 
+  @Test
   public void testCreateDeployment() {
     // when
     Deployment deployment = repositoryService
@@ -80,6 +89,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(userOperationLogEntry.getCaseDefinitionId());
   }
 
+  @Test
   public void testCreateDeploymentPa() {
     // given
     EmbeddedProcessApplication application = new EmbeddedProcessApplication();
@@ -116,6 +126,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(userOperationLogEntry.getCaseDefinitionId());
   }
 
+  @Test
   public void testPropertyDuplicateFiltering() {
     // given
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
@@ -167,6 +178,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
   }
 
+  @Test
   public void testPropertiesDuplicateFilteringAndDeployChangedOnly() {
     // given
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
@@ -216,6 +228,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
   }
 
+  @Test
   public void testDeleteDeploymentCascadingShouldKeepCreateUserOperationLog() {
     // given
     Deployment deployment = repositoryService
@@ -237,6 +250,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testDeleteDeploymentWithoutCascadingShouldKeepCreateUserOperationLog() {
     // given
     Deployment deployment = repositoryService
@@ -258,6 +272,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testDeleteDeployment() {
     // given
     Deployment deployment = repositoryService
@@ -300,6 +315,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(log.getCaseDefinitionId());
   }
 
+  @Test
   public void testDeleteDeploymentCascading() {
     // given
     Deployment deployment = repositoryService
@@ -342,7 +358,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(log.getCaseDefinitionId());
   }
 
-
+  @Test
   public void testDeleteProcessDefinitionCascadingShouldKeepCreateUserOperationLog() {
     // given
     Deployment deployment = repositoryService
@@ -368,6 +384,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testDeleteProcessDefinitiontWithoutCascadingShouldKeepCreateUserOperationLog() {
     // given
     Deployment deployment = repositoryService
@@ -393,6 +410,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testDeleteProcessDefinition() {
     // given
     Deployment deployment = repositoryService
@@ -439,6 +457,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(log.getCaseDefinitionId());
   }
 
+  @Test
   public void testDeleteProcessDefinitionCascading() {
     // given
     Deployment deployment = repositoryService

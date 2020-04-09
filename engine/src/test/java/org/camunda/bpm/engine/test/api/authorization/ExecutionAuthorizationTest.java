@@ -21,11 +21,15 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -36,22 +40,15 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String MESSAGE_BOUNDARY_PROCESS_KEY = "messageBoundaryProcess";
 
-  protected String deploymentId;
-
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/messageBoundaryEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/messageBoundaryEventProcess.bpmn20.xml");
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -63,6 +60,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testSimpleQueryWithReadPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -79,6 +77,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, execution.getProcessInstanceId());
   }
 
+  @Test
   public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -95,6 +94,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, execution.getProcessInstanceId());
   }
 
+  @Test
   public void testSimpleQueryWithMultiple() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -108,6 +108,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -124,6 +125,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, execution.getProcessInstanceId());
   }
 
+  @Test
   public void testSimpleQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -140,6 +142,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, execution.getProcessInstanceId());
   }
 
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -158,6 +161,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -182,6 +186,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, execution.getProcessInstanceId());
   }
 
+  @Test
   public void testQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -202,6 +207,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 11);
   }
 
+  @Test
   public void testQueryWithReadInstancesPermissionOnOneTaskProcess() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -222,6 +228,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
   }
 
+  @Test
   public void testQueryWithReadInstancesPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -242,6 +249,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 11);
   }
 
+  @Test
   public void testQueryShouldReturnAllExecutions() {
     // given
     ProcessInstance processInstance = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);

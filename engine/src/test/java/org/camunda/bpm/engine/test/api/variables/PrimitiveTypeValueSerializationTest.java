@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;

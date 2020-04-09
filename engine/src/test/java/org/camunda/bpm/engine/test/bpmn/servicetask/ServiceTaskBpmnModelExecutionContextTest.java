@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
@@ -27,6 +31,8 @@ import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.junit.After;
+import org.junit.Test;
 
 
 /**
@@ -37,6 +43,7 @@ public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEn
   private static final String PROCESS_ID = "process";
   private String deploymentId;
 
+  @Test
   public void testJavaDelegateModelExecutionContext() {
     deploy();
 
@@ -71,6 +78,7 @@ public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEn
     deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
   }
 
+  @After
   public void tearDown() {
     ModelExecutionContextServiceTask.clear();
     repositoryService.deleteDeployment(deploymentId, true);

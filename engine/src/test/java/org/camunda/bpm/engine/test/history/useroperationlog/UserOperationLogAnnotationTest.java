@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
+
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
@@ -33,12 +39,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 @RequiredHistoryLevel(HISTORY_FULL)
 public class UserOperationLogAnnotationTest {

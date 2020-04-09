@@ -16,26 +16,50 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 
 /**
  * @author Tom Baeyens
  */
-public class CompetingJobAcquisitionTest extends PluggableProcessEngineTest {
+public class CompetingJobAcquisitionTest {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
-  Thread testThread = Thread.currentThread();
-  static ControllableThread activeThread;
-  static String jobId;
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+
+  protected static ControllableThread activeThread;
+
+
+  @Before
+  public void initializeServices() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+  }
 
   public class JobAcquisitionThread extends ControllableThread {
     OptimisticLockingException exception;
@@ -61,6 +85,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   }
 
   @Deployment
+  @Test
   public void testCompetingJobAcquisitions() throws Exception {
     runtimeService.startProcessInstanceByKey("CompetingJobAcquisitionProcess");
 

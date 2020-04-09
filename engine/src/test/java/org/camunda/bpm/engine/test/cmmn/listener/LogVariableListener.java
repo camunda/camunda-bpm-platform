@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.test.cmmn.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 
 /**
  * @author Thorben Lindhauer

@@ -16,39 +16,36 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
-import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
-import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
-
-import java.util.List;
-
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.Before;
+import org.junit.Test;
 
 public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
 
   protected String instance1Id;
   protected String instance2Id;
 
-  @Override
-  protected void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+  @Before
+  public void setUp() throws Exception {
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml");
 
     instance1Id = startProcessInstanceByKey("oneExternalTaskProcess").getId();
     instance2Id = startProcessInstanceByKey("parallelExternalTaskProcess").getId();
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testGetTopicNamesWithoutAuthorization() {
     // when
     List<String> result = externalTaskService.getTopicNames();
@@ -57,6 +54,7 @@ public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
     assertEquals(0,result.size());
   }
 
+  @Test
   public void testGetTopicNamesWithReadOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
@@ -69,6 +67,7 @@ public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
     assertEquals("externalTaskTopic", result.get(0));
   }
 
+  @Test
   public void testGetTopicNamesWithReadOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -80,6 +79,7 @@ public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
     assertEquals(4, result.size());
   }
 
+  @Test
   public void testGetTopicNamesWithReadInstanceOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
@@ -91,6 +91,7 @@ public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
     assertEquals(4, result.size());
   }
 
+  @Test
   public void testGetTopicNamesWithReadDefinitionWithMultiple() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE);
@@ -103,6 +104,7 @@ public class GetTopicNamesAuthorizationTest extends AuthorizationTest {
     assertEquals("externalTaskTopic", result.get(0));
   }
 
+  @Test
   public void testGetTopicNamesWithReadInstanceWithMultiple() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);

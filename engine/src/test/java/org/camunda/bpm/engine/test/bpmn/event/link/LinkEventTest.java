@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.bpmn.event.link;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +27,10 @@ import java.util.List;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -35,6 +39,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class LinkEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testValidEventLink() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("linkEventValid");
 
@@ -49,7 +54,7 @@ public class LinkEventTest extends PluggableProcessEngineTest {
     assertEquals(Arrays.asList(new String []{"waitAfterLink2"}), activeActivities);
 
     runtimeService.signal(pi.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
 
     // validate history
     if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
@@ -64,6 +69,7 @@ public class LinkEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testEventLinkMultipleSources() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("linkEventValid");
     List<String> activeActivities = runtimeService.getActiveActivityIds(pi.getId());
@@ -86,6 +92,7 @@ public class LinkEventTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testInvalidEventLinkMultipleTargets() {
     try {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testInvalidEventLinkMultipleTargets.bpmn20.xml").deploy();
@@ -97,6 +104,7 @@ public class LinkEventTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testCatchLinkEventAfterEventBasedGatewayNotAllowed() {
     try {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testCatchLinkEventAfterEventBasedGatewayNotAllowed.bpmn20.xml").deploy();

@@ -16,17 +16,22 @@
  */
 package org.camunda.bpm.engine.test.api.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlDocumentBuilder;
 import org.camunda.bpm.engine.impl.form.engine.HtmlElementWriter;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -34,6 +39,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class HtmlFormEngineTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testIsDefaultFormEngine() {
 
     // make sure the html form engine is the default form engine:
@@ -42,12 +48,14 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
   public void testTransformNullFormData() {
     HtmlFormEngine formEngine = new HtmlFormEngine();
     assertNull(formEngine.renderStartForm(null));
     assertNull(formEngine.renderTaskForm(null));
   }
 
+  @Test
   public void testHtmlElementWriter() {
 
     String htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName"))
@@ -115,6 +123,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderEmptyStartForm() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -124,6 +133,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderStartForm() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -137,6 +147,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderEnumField() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderEnumField");
@@ -153,6 +164,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderTaskForm() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderTaskForm");
@@ -169,6 +181,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderDateField() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -181,6 +194,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testRenderDateFieldWithPattern() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -193,6 +207,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLegacyFormPropertySupport() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupport");
@@ -209,6 +224,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLegacyFormPropertySupportReadOnly() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly");
@@ -225,6 +241,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testLegacyFormPropertySupportRequired() {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportRequired");
@@ -241,6 +258,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testBusinessKey() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();

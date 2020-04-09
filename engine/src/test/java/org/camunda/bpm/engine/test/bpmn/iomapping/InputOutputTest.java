@@ -19,7 +19,12 @@ package org.camunda.bpm.engine.test.bpmn.iomapping;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -41,8 +45,10 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 /**
  * Testcase for camunda input / output in BPMN
@@ -55,6 +61,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   // Input parameters /////////////////////////////////////////
 
   @Deployment
+  @Test
   public void testInputNullValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -66,6 +73,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputStringConstantValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -78,6 +86,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
 
   @Deployment
+  @Test
   public void testInputElValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -89,6 +98,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -100,6 +110,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptSource", "return 1 + 1");
@@ -113,6 +124,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -126,6 +138,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -137,6 +150,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -150,6 +164,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -163,6 +178,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalClasspathScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -174,6 +190,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalClasspathScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -187,6 +204,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputExternalClasspathScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -203,6 +221,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValue.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testInputExternalDeploymentScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -217,6 +236,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsVariable.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testInputExternalDeploymentScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -233,6 +253,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsBean.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testInputExternalDeploymentScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -247,6 +268,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testInputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -260,6 +282,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testInputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -273,6 +296,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testInputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -286,6 +310,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputMultipleElValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -302,6 +327,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testInputMultipleMixedValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
@@ -319,6 +345,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testInputNested() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("exprKey", "b");
@@ -340,6 +367,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testInputNestedListValues() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("exprKey", "vegie");
@@ -367,6 +395,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testInputMapElKey() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("varExpr1", "a");
@@ -382,6 +411,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testInputMapElMixedKey() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("varExpr1", "a");
@@ -397,18 +427,20 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputMapElKey.bpmn")
+  @Test
   public void testInputMapElUndefinedKey() {
     try {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
+      testRule.assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
     }
   }
 
   // output parameter ///////////////////////////////////////////////////////
 
   @Deployment
+  @Test
   public void testOutputNullValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -419,6 +451,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputStringConstantValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -430,6 +463,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
 
   @Deployment
+  @Test
   public void testOutputElValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -440,6 +474,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -450,6 +485,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptSource", "return 1 + 1");
@@ -462,6 +498,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   // related to CAM-8072
+  @Test
   public void testOutputParameterAvailableAfterParallelGateway() {
     // given
     BpmnModelInstance processDefinition = Bpmn.createExecutableProcess("process")
@@ -478,7 +515,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     .done();
 
     // when
-    deployment(processDefinition);
+   testRule.deploy(processDefinition);
     runtimeService.startProcessInstanceByKey("process");
 
     // then
@@ -490,6 +527,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -502,6 +540,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -512,6 +551,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -524,6 +564,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -536,6 +577,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalClasspathScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -546,6 +588,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalClasspathScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -558,6 +601,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputExternalClasspathScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -573,6 +617,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValue.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testOutputExternalDeploymentScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -586,6 +631,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsVariable.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testOutputExternalDeploymentScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
@@ -601,6 +647,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsBean.bpmn",
     "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
   })
+  @Test
   public void testOutputExternalDeploymentScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
@@ -614,6 +661,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testOutputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -627,6 +675,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testOutputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -640,6 +689,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testOutputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -653,6 +703,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputMultipleElValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -668,6 +719,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputMultipleMixedValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -684,6 +736,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testOutputNested() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("exprKey", "b");
@@ -705,6 +758,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings("unchecked")
+  @Test
   public void testOutputListNestedValues() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("exprKey", "vegie");
@@ -732,6 +786,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testOutputMapElKey() {
 
 
@@ -749,6 +804,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
 
   @Deployment
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Test
   public void testOutputMapElMixedKey() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("varExpr1", "a");
@@ -763,17 +819,19 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputMapElKey.bpmn")
+  @Test
   public void testOutputMapElUndefinedKey() {
     try {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
+      testRule.assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
     }
   }
 
   // ensure Io supported on event subprocess /////////////////////////////////
 
+  @Test
   public void testInterruptingEventSubprocessIoSupport() {
     try {
       repositoryService
@@ -783,12 +841,13 @@ public class InputOutputTest extends PluggableProcessEngineTest {
       fail("exception expected");
     } catch (ParseException e) {
       // happy path
-      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
+      testRule.assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("SubProcess_1");
     }
   }
 
   @Deployment
+  @Test
   public void testSubprocessIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("processVar", "value");
@@ -810,6 +869,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testSequentialMIActivityIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
@@ -847,6 +907,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testSequentialMISubprocessIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
@@ -883,6 +944,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testParallelMIActivityIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
@@ -919,6 +981,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testParallelMISubprocessIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
@@ -953,6 +1016,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
+  @Test
   public void testMIOutputMappingDisallowed() {
     try {
       repositoryService.createDeployment()
@@ -960,7 +1024,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
       .deploy();
       fail("Exception expected");
     } catch (ParseException e) {
-      assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
+      testRule.assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("miTask");
     }
 
@@ -978,6 +1042,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  @Test
   public void testExceptionInScriptInputMapping() {
     String exceptionMessage = "myException";
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -1002,6 +1067,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  @Test
   public void testExceptionInScriptOutputMapping() {
     String exceptionMessage = "myException";
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -1148,6 +1214,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testScopeActivityInstanceId() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1164,6 +1231,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     assertEquals(theTaskInstance.getId(), variableInstance.getActivityInstanceId());
   }
 
+  @Test
   public void testCompositeExpressionForInputValue() {
 
     // given
@@ -1174,7 +1242,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
       .endEvent("end")
       .done();
 
-    deployment(instance);
+   testRule.deploy(instance);
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
@@ -1187,6 +1255,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     assertEquals("Hello World!", variableInstance.getValue());
   }
 
+  @Test
   public void testCompositeExpressionForOutputValue() {
 
     // given
@@ -1200,7 +1269,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
       .endEvent("end")
       .done();
 
-    deployment(instance);
+   testRule.deploy(instance);
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
@@ -1214,6 +1283,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testOutputPlainTask() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", "bar");

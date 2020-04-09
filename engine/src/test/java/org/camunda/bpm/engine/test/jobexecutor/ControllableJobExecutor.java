@@ -29,8 +29,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquireJobsCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest.ControllableCommand;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTest.ThreadControl;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ControllableCommand;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
 import org.camunda.bpm.engine.test.concurrency.ControllableThread;
 
 /**

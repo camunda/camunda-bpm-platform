@@ -16,11 +16,16 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -29,6 +34,7 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTask.cmmn"})
+  @Test
   public void testExitTask() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -57,6 +63,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitStage.cmmn"})
+  @Test
   public void testExitStage() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -111,6 +118,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testAndJoin.cmmn"})
+  @Test
   public void testAndJoin() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -149,6 +157,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testAndFork.cmmn"})
+  @Test
   public void testAndFork() {
     // given
     createCaseInstance();
@@ -177,6 +186,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testOrJoin.cmmn"})
+  @Test
   public void testOrJoin() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -213,6 +223,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testOrFork.cmmn"})
+  @Test
   public void testOrFork() {
     // given
     createCaseInstance();
@@ -246,6 +257,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testCycle.cmmn"})
+  @Test
   public void testCycle() {
     // given
     createCaseInstance();
@@ -277,6 +289,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTaskWithIfPart.cmmn"})
+  @Test
   public void testExitTaskWithIfPartSatisfied() {
     // given
     createCaseInstance();
@@ -305,6 +318,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTaskWithIfPart.cmmn"})
+  @Test
   public void testExitTaskWithIfPartNotSatisfied() {
     // given
     createCaseInstance();
@@ -333,6 +347,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitCriteriaOnCasePlanModel.cmmn"})
+  @Test
   public void testExitCriteriaOnCasePlanModel() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -433,6 +448,7 @@ public class SentryExitCriteriaTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitActiveTask.cmmn"})
+  @Test
   public void testExitActiveTask() {
     // given
     createCaseInstance();

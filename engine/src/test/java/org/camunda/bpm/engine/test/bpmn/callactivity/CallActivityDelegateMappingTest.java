@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
-import java.util.Map;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
+
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;

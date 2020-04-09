@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
-
+import org.junit.Test;
 
 
 /**
@@ -71,6 +71,7 @@ public class PvmParallelTest extends PvmTestCase {
     assertTrue(processInstance.isEnded());
   }
 
+  @Test
   public void testSimpleWaitStateConcurrency() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -119,6 +120,7 @@ public class PvmParallelTest extends PvmTestCase {
     assertEquals(expectedActivityNames, activityNames);
   }
 
+  @Test
   public void testUnstructuredConcurrencyTwoJoins() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -167,6 +169,7 @@ public class PvmParallelTest extends PvmTestCase {
     assertNotNull(processInstance.findExecution("end"));
   }
 
+  @Test
   public void testUnstructuredConcurrencyTwoForks() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -216,6 +219,7 @@ public class PvmParallelTest extends PvmTestCase {
     assertNotNull(processInstance.findExecution("end"));
   }
 
+  @Test
   public void testJoinForkCombinedInOneParallelGateway() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

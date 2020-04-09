@@ -16,17 +16,22 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.task.Event;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
-import junit.framework.AssertionFailedError;
+
 
 
 /**
@@ -36,6 +41,7 @@ import junit.framework.AssertionFailedError;
 public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Test
   public void testCandidateUserLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
@@ -62,6 +68,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Test
   public void testCandidateGroupLink() {
     try {
       identityService.setAuthenticatedUserId("demo");
@@ -115,6 +122,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
   public void testAssigneeLink() {
     Task task = taskService.newTask("task");
     task.setAssignee("assignee");
@@ -132,6 +140,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testOwnerLink() {
     Task task = taskService.newTask("task");
     task.setOwner("owner");
@@ -155,10 +164,11 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
         return event;
       }
     }
-    throw new AssertionFailedError("no task event found with action "+action);
+    throw new AssertionError("no task event found with action "+action);
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Test
   public void testCustomTypeUserLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
@@ -185,6 +195,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Test
   public void testCustomLinkGroupLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
@@ -210,6 +221,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
     assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
   }
 
+  @Test
   public void testDeleteAssignee() {
     Task task = taskService.newTask();
     task.setAssignee("nonExistingUser");
@@ -225,6 +237,7 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTest {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testDeleteOwner() {
     Task task = taskService.newTask();
     task.setOwner("nonExistingUser");

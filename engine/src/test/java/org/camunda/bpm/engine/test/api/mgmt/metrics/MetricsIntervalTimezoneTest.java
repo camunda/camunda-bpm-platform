@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
-import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import org.junit.Assert;
 import org.junit.Test;
 

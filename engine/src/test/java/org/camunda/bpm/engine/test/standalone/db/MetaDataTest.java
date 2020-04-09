@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -24,6 +27,7 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
  */
 public class MetaDataTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testMariaDbDatabaseType() {
     if (isMariaDbConfigured()) {
       assertEquals("mariadb",  processEngineConfiguration.getDatabaseType());

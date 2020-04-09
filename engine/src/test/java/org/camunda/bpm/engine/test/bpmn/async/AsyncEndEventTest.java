@@ -16,16 +16,20 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel
@@ -33,6 +37,7 @@ import org.junit.Assert;
 public class AsyncEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testAsyncEndEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncEndEvent");
     long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
@@ -40,7 +45,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTest {
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("endEvent").count());
     Assert.assertEquals(1, count);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
     count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count();
 
     Assert.assertEquals(0, runtimeService.createExecutionQuery().activityId("endEvent").active().count());
@@ -48,6 +53,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testAsyncEndEventListeners() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncEndEvent");
     long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
@@ -57,7 +63,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTest {
     Assert.assertEquals(1, count);
 
     // as we are standing at the end event, we execute it.
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
     Assert.assertEquals(0, count);
@@ -74,6 +80,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
+  @Test
   public void testMultipleAsyncEndEvents() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleAsyncEndEvent");
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -108,6 +115,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-sub.bpmn20.xml"
   })
+  @Test
   public void testCallActivity() {
     runtimeService.startProcessInstanceByKey("super");
 

@@ -19,17 +19,21 @@ package org.camunda.bpm.engine.test.api.mgmt;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.jobByPriority;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -38,6 +42,7 @@ import org.camunda.bpm.engine.variable.Variables;
 public class JobQueryByPriorityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testOrderByPriority() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -53,6 +58,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testFilterByJobPriorityLowerThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -79,6 +85,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testFilterByJobPriorityLowerThanOrEqualsAndHigherThanOrEqual() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -94,6 +101,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testFilterByJobPriorityHigherThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -120,6 +128,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testFilterByJobPriorityLowerAndHigher() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();

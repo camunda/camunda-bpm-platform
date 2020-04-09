@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -50,8 +51,6 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import junit.framework.AssertionFailedError;
 
 public class ProcessEngineTestRule extends TestWatcher {
 
@@ -242,7 +241,11 @@ public class ProcessEngineTestRule extends TestWatcher {
    * Execute all available jobs recursively till no more jobs found.
    */
   public void executeAvailableJobs() {
-    executeAvailableJobs(0, Integer.MAX_VALUE);
+    executeAvailableJobs(0, Integer.MAX_VALUE, true);
+  }
+
+  public void executeAvailableJobs(Boolean recursive) {
+    executeAvailableJobs(0, Integer.MAX_VALUE, recursive);
   }
 
   /**
@@ -254,11 +257,15 @@ public class ProcessEngineTestRule extends TestWatcher {
    *
    * @see #executeAvailableJobs()
    */
-  public void executeAvailableJobs(int expectedExecutions){
-    executeAvailableJobs(0, expectedExecutions);
+  public void executeAvailableJobs(int expectedExecutions) {
+    executeAvailableJobs(0, expectedExecutions, true);
   }
 
-  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions) {
+  public void executeAvailableJobs(int expectedExecutions, Boolean recursive) {
+    executeAvailableJobs(0, expectedExecutions, recursive);
+  }
+
+  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions, Boolean recursive) {
     List<Job> jobs = processEngine.getManagementService().createJobQuery().withRetriesLeft().list();
 
     if (jobs.isEmpty()) {
@@ -278,7 +285,9 @@ public class ProcessEngineTestRule extends TestWatcher {
     assertThat("executed more jobs than expected.",
         jobsExecuted, lessThanOrEqualTo(expectedExecutions));
 
-    executeAvailableJobs(jobsExecuted, expectedExecutions);
+    if (recursive) {
+      executeAvailableJobs(jobsExecuted, expectedExecutions, recursive);
+    }
   }
 
   public void completeTask(String taskKey) {

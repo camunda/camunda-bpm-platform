@@ -33,6 +33,9 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -46,15 +49,16 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
   protected String deploymentId;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
-  @Override
+  @After
   public void tearDown() {
     super.tearDown();
     processEngineConfiguration.setEnableHistoricInstancePermissions(false);
@@ -63,6 +67,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
   // historic activity instance query /////////////////////////////////
 
+  @Test
   public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -74,6 +79,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testSimpleQueryWithReadHistoryPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -86,6 +92,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testSimpleQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -98,6 +105,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testSimpleQueryMultiple() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -113,6 +121,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
   // historic activity instance query (multiple process instances) ////////////////////////
 
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -131,6 +140,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadHistoryPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -151,6 +161,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 6);
   }
 
+  @Test
   public void testQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -173,6 +184,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
   // delete deployment (cascade = false)
 
+  @Test
   public void testQueryAfterDeletingDeployment() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -205,6 +217,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     enableAuthorization();
   }
 
+  @Test
   public void testCheckNonePermissionOnHistoricProcessInstance() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -222,6 +235,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     assertThat(query.list()).isEmpty();
   }
 
+  @Test
   public void testCheckReadPermissionOnHistoricProcessInstance() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -241,6 +255,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
         .containsExactly(processInstanceId, processInstanceId);
   }
 
+  @Test
   public void testCheckReadPermissionOnCompletedHistoricProcessInstance() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -264,6 +279,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
         .containsExactly(processInstanceId, processInstanceId, processInstanceId);
   }
 
+  @Test
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -288,6 +304,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
         .containsExactly(processInstanceId, processInstanceId, processInstanceId);
   }
 
+  @Test
   public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -313,6 +330,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
         .containsExactly(processInstanceId, processInstanceId, processInstanceId);
   }
 
+  @Test
   public void testHistoricProcessInstancePermissionsAuthorizationDisabled() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);

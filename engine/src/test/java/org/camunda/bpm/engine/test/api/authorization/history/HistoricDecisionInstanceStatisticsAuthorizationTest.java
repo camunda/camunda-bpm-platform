@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
+import java.util.Collection;
+
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -35,11 +40,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Collection;
-
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 /**
  * @author Askar Akhmerov

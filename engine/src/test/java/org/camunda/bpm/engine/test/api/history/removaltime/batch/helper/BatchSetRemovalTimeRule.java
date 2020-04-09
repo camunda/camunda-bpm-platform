@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch.helper;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
@@ -38,12 +44,6 @@ import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tassilo Weidner

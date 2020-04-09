@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
+import javax.naming.Context;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
-import javax.naming.Context;
 
 public class MockInitialContextRule implements TestRule {
   

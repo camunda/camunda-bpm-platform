@@ -20,11 +20,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * Tests if a {@link DelegateExecution} has the correct tenant-id. The
@@ -34,8 +36,9 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 
+  @Test
   public void testSingleExecution() {
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+    testRule.deployForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent()
       .serviceTask()
         .camundaClass(AssertingJavaDelegate.class.getName())
@@ -47,9 +50,10 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
     startProcessInstance(PROCESS_DEFINITION_KEY);
   }
 
+  @Test
   public void testConcurrentExecution() {
 
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+    testRule.deployForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent()
       .parallelGateway("fork")
         .serviceTask()
@@ -67,8 +71,9 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
     startProcessInstance(PROCESS_DEFINITION_KEY);
   }
 
+  @Test
   public void testEmbeddedSubprocess() {
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+    testRule.deployForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
         .startEvent()
         .subProcess()
           .embeddedSubProcess()
@@ -95,10 +100,10 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
     runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     AssertingJavaDelegate.clear();
-    super.tearDown();
+
   }
 
   protected static DelegateExecutionAsserter hasTenantId(final String expectedTenantId) {

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,7 +26,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Date;
-import junit.framework.TestCase;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,9 +35,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.task.DelegationState;
+import org.junit.Test;
 
-public class EntitySerializationTest extends TestCase {
+public class EntitySerializationTest {
 
+  @Test
   public void testTaskEntitySerialization() throws Exception {
     TaskEntity task = new TaskEntity();
     task.setDelegationState(DelegationState.RESOLVED);
@@ -61,6 +64,7 @@ public class EntitySerializationTest extends TestCase {
     assertEquals("end", task.getEventName());
   }
 
+  @Test
   public void testExecutionEntitySerialization() throws Exception {
    ExecutionEntity execution = new ExecutionEntity();
 

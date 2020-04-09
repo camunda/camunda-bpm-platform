@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -23,6 +28,8 @@ import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.SourceExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel.
@@ -34,6 +41,7 @@ public class ScriptCompilationTest extends PluggableProcessEngineTest {
 
   protected ScriptFactory scriptFactory;
 
+  @Before
   public void setUp() {
     scriptFactory = processEngineConfiguration.getScriptFactory();
   }
@@ -42,6 +50,7 @@ public class ScriptCompilationTest extends PluggableProcessEngineTest {
     return (SourceExecutableScript) scriptFactory.createScriptFromSource(language, source);
   }
 
+  @Test
   public void testScriptShouldBeCompiledByDefault() {
     // when a script is created
     SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, EXAMPLE_SCRIPT);
@@ -59,6 +68,7 @@ public class ScriptCompilationTest extends PluggableProcessEngineTest {
     assertNotNull(script.getCompiledScript());
   }
 
+  @Test
   public void testDisableScriptCompilation() {
     // when script compilation is disabled and a script is created
     processEngineConfiguration.setEnableScriptCompilation(false);
@@ -80,6 +90,7 @@ public class ScriptCompilationTest extends PluggableProcessEngineTest {
     processEngineConfiguration.setEnableScriptCompilation(true);
   }
 
+  @Test
   public void testDisableScriptCompilationByDisabledScriptEngineCaching() {
     // when script engine caching is disabled and a script is created
     processEngineConfiguration.setEnableScriptEngineCaching(false);
@@ -101,6 +112,7 @@ public class ScriptCompilationTest extends PluggableProcessEngineTest {
     processEngineConfiguration.setEnableScriptEngineCaching(true);
   }
 
+  @Test
   public void testOverrideScriptSource() {
     // when a script is created and executed
     SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, EXAMPLE_SCRIPT);

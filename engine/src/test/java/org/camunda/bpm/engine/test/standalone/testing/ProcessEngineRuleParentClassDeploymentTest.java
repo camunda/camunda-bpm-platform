@@ -17,12 +17,12 @@
 package org.camunda.bpm.engine.test.standalone.testing;
 
 
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
 
 
 public class ProcessEngineRuleParentClassDeploymentTest extends ProcessEngineRuleParentClassDeployment  {

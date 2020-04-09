@@ -16,8 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.junit.Assert.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

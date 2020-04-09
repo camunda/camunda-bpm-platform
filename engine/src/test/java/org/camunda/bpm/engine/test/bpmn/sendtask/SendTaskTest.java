@@ -16,9 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sendtask;
 
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -27,15 +32,17 @@ import org.camunda.bpm.engine.test.Deployment;
 public class SendTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testJavaDelegate() {
     DummySendTask.wasExecuted = false;
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("sendTaskJavaDelegate");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(DummySendTask.wasExecuted);
   }
 
   @Deployment
+  @Test
   public void testActivityName() {
     DummyActivityBehavior.wasExecuted = false;
 
@@ -43,7 +50,7 @@ public class SendTaskTest extends PluggableProcessEngineTest {
 
     runtimeService.signal(processInstance.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     assertTrue(DummyActivityBehavior.wasExecuted);
 

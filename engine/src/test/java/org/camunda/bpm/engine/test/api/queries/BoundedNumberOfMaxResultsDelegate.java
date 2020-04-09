@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.queries;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class BoundedNumberOfMaxResultsDelegate implements JavaDelegate {
 
