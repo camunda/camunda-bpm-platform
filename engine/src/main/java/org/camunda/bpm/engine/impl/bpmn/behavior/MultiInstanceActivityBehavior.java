@@ -111,6 +111,7 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
       nrOfInstances = ((Collection<?>) obj).size();
     } else if (collectionVariable != null) {
       Object obj = execution.getVariable(collectionVariable);
+      ensureNotNull("Cannot resolve number of instances from null collection variable", collectionVariable.toString(), obj);
       if (!(obj instanceof Collection)) {
         throw LOG.invalidVariableTypeException(collectionVariable, "Collection");
       }

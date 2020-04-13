@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.th
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -50,7 +52,6 @@ import org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-
 
 /**
  * @author Joram Barrez
@@ -397,6 +398,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       assertEquals("theEnd", activities.get(1).getActivityId());
       assertEquals("theStart", activities.get(2).getActivityId());
     }
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
+  public void testNullCollectionInMIThrowsException() {
+    Exception exception = assertThrows(ProcessEngineException.class, () -> {
+      runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection").getProcessInstanceId();
+    });
+    assertTextPresentIgnoreCase("Cannot resolve number of instances from null collection variable",exception.getMessage());
   }
 
   @Deployment
