@@ -49,6 +49,7 @@
         desc=""
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
+        nullable=true
         minimum=""
         deprecated=false
         additionalProperties=false
@@ -66,7 +67,16 @@
 
         <#if format?has_content>
           "format": "${format}",
+          <#if nullable>
+            "nullable": true,
+          </#if>
         </#if>
+
+        <#if type == "boolean">
+          <#if nullable>
+            "nullable": true,
+          </#if>
+        <#else>
 
         <#if enumValues?size != 0>
           "enum": [
