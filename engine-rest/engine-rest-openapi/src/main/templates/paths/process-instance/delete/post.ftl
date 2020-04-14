@@ -1,6 +1,6 @@
 {
   <@lib.endpointInfo
-      id = "deleteProcessInstancesAsync"
+      id = "deleteProcessInstancesAsyncOperation"
       tag = "Process instance"
       desc = "Deletes multiple process instances asynchronously (batch)." />
 
