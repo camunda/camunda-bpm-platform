@@ -336,13 +336,13 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     UserOperationLogQuery query = historyService
         .createUserOperationLogQuery()
         .processDefinitionId(processDefinitionId);
-    assertEquals(1, query.count());
+    assertEquals(2, query.count());
 
     // when
     repositoryService.deleteDeployment(deploymentId, true);
 
     // then
-    assertEquals(1, query.count());
+    assertEquals(2, query.count());
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
