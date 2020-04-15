@@ -126,6 +126,8 @@ public class TemplateParser {
   
       if (version.contains("SNAPSHOT")) {
         templateData.put("docsVersion", "develop");
+      } else if (version.contains("alpha")) {
+        templateData.put("docsVersion", "latest");
       } else {
         // docsVersion = 7.X
         templateData.put("docsVersion", version.substring(0, version.lastIndexOf(".")));
