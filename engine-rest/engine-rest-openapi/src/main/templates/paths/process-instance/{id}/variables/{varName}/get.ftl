@@ -45,7 +45,33 @@
     <@lib.response
         code = "200"
         dto = "VariableValueDto"
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "GET `/process-instance/aProcessInstanceId/variables/myObject123`",
+                       "value": {
+                         "value": {
+                           "prop1": "a",
+                           "prop2": "b"
+                         },
+                         "type": "Object",
+                         "valueInfo": {
+                           "objectTypeName": "com.example.MyObject",
+                           "serializationDataFormat": "application/xml"
+                         }
+                       }
+                     }',
+                    '"example-2": {
+                       "summary": "GET `/process-instance/aProcessInstanceId/variables/myObject123?deserializeValue=false`",
+                       "value": {
+                         "value": "ab",
+                         "type": "Object",
+                         "valueInfo": {
+                           "objectTypeName": "com.example.MyObject",
+                           "serializationDataFormat": "application/xml"
+                         }
+                       }
+                     }'
+        ] />
 
     <@lib.response
         code = "400"

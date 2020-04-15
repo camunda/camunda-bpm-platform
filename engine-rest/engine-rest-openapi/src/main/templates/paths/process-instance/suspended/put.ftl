@@ -24,7 +24,35 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceSuspensionStateDto" />
+      dto = "ProcessInstanceSuspensionStateDto"
+      examples = ['"example-1": {
+                     "summary": "PUT `/process-instance/suspended`",
+                     "description": "Suspend Process Instance By Process Definition Id",
+                     "value": {
+                       "processDefinitionId" : "aProcDefId",
+                       "suspended" : true
+                     }
+                   }',
+                 '"example-2": {
+                     "summary": "PUT `/process-instance/suspended`",
+                     "description": "Suspend Process Instance By Process Definition Key",
+                     "value": {
+                       "processDefinitionKey" : "aProcDefKey",
+                       "suspended" : true
+                     }
+                   }'
+                 '"example-3": {
+                     "summary": "PUT `/process-instance/suspended`",
+                     "description": "Suspend Process Instance In Group",
+                     "value": {
+                       "processInstanceIds" : [
+                         "processInstanceId1",
+                         "processInstanceIdN"
+                       ],
+                       "suspended" : true
+                     }
+                   }'
+      ] />
 
   "responses" : {
 

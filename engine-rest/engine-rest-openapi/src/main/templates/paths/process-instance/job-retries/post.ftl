@@ -11,14 +11,15 @@
                      then the resulting execution will be performed on the union of these sets.
                      **Unallowed property**: `historicProcessInstanceQuery`"
       examples = ['"example-1": {
-                       "value": {
+                     "summary": "POST `/process-instance/job-retries` Request Body 1",
+                     "value": {
                          "retries": 5,
                          "processInstances": ["aProcess", "secondProcess"],
                          "processInstanceQuery": {
                            "processDefinitionId": "aProcessDefinitionId"
                          }
                        }
-                    }']/>
+                    }'] />
 
   "responses" : {
 
@@ -37,8 +38,9 @@
                          "seedJobDefinitionId": "aSeedJobDefinitionId",
                          "monitorJobDefinitionId": "aMonitorJobDefinitionId",
                          "batchJobDefinitionId": "aBatchJobDefinitionId",
-                         "suspened": false,
-                         "tenantId": "aTenantId"
+                         "suspended": false,
+                         "tenantId": "aTenantId",
+                         "createUserId": "demo"
                        }
                      }'] />
 

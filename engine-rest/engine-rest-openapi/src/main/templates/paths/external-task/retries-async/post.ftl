@@ -32,6 +32,7 @@
                          "id": "aBatchId",
                          "type": "aBatchType",
                          "totalJobs": 10,
+                         "jobsCreated": 10,
                          "batchJobsPerSeed": 100,
                          "invocationsPerBatchJob": 1,
                          "seedJobDefinitionId": "aSeedJobDefinitionId",
