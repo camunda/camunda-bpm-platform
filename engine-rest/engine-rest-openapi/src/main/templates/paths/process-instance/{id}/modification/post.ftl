@@ -28,7 +28,36 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceModificationDto" />
+      dto = "ProcessInstanceModificationDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/process-instance/aProcessInstanceId/modification`",
+                     "value": {
+                       "skipCustomListeners": true,
+                       "skipIoMappings": true,
+                       "instructions": [{
+                         "type": "startBeforeActivity",
+                         "activityId": "activityId",
+                         "variables": {
+                         "var": {
+                           "value": "aVariableValue",
+                           "local": false,
+                           "type": "String"
+                         },
+                         "varLocal": {
+                           "value": "anotherVariableValue",
+                           "local": true,
+                           "type": "String"
+                         }
+                         }
+                       }, {
+                         "type": "cancel",
+                         "activityInstanceId": "anActivityInstanceId"
+                       }
+                       ],
+                       "annotation": "Modified to resolve an error."
+                     }
+                   }'
+      ] />
 
   "responses" : {
 

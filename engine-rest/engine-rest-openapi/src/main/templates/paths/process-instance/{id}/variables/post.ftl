@@ -19,7 +19,28 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "PatchVariablesDto" />
+      dto = "PatchVariablesDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/process-instance/aProcessInstanceId/variables`",
+                     "description": "Status 204 Response: No content.",
+                     "value": {
+                       "modifications": {
+                         "aVariable": {
+                           "value": "aValue",
+                           "type": "String"
+                         },
+                         "anotherVariable": {
+                           "value": 42,
+                           "type": "Integer"
+                         }
+                       },
+                       "deletions": [
+                         "aThirdVariable",
+                         "FourthVariable"
+                       ]
+                     }
+                   }'
+      ] />
 
   "responses": {
 

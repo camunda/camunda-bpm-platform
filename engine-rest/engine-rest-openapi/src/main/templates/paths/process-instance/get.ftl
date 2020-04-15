@@ -23,7 +23,23 @@
         code = "200"
         dto = "ProcessInstanceDto"
         array = true
-        desc = "Request successful." />
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "Status 200 response",
+                       "description": "Response for GET `/process-instance?variables=myVariable_eq_camunda,mySecondVariable_neq_aBadValue`",
+                       "value": [
+                         {
+                           "links": [],
+                           "id": "anId",
+                           "definitionId": "aProcDefId",
+                           "businessKey": "aKey",
+                           "caseInstanceId": "aCaseInstanceId",
+                           "ended": false,
+                           "suspended": false,
+                           "tenantId": null
+                         }
+                       ]
+                     }'] />
 
     <@lib.response
         code = "400"
