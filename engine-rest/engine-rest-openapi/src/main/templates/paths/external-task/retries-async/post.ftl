@@ -1,7 +1,7 @@
 {
 
   <@lib.endpointInfo
-      id = "setExternalTaskRetriesAsync"
+      id = "setExternalTaskRetriesAsyncOperation"
       tag = "External Task"
       desc = "Sets the number of retries left to execute external tasks by id asynchronously. If retries are set to 0,
               an incident is created." />
