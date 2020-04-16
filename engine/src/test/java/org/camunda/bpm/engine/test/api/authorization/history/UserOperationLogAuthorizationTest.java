@@ -535,10 +535,11 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     
-    // then only user operation log of non standalone jobs are visible
-    verifyQueryResults(query, 1);
-    assertEquals(ONE_TASK_PROCESS_KEY, query.singleResult().getProcessDefinitionKey());
-    
+    // then only user operation logs of non standalone jobs are visible
+    verifyQueryResults(query, 2);
+    assertEquals(ONE_TASK_PROCESS_KEY, query.list().get(0).getProcessDefinitionKey());
+    assertEquals(ONE_TASK_PROCESS_KEY, query.list().get(1).getProcessDefinitionKey());
+
     disableAuthorization();
     managementService.deleteJob(jobId);
     enableAuthorization();
@@ -591,8 +592,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
-    // then expect 2 entries (due to necessary permission on 'Operator' category, the definition suspension can be seen as well)
-    verifyQueryResults(query, 2);
+    // then expect 3 entries (due to necessary permission on 'Operator' category, the definition
+    // suspension, as well as the flag for related instances suspension can be seen as well)
+    verifyQueryResults(query, 3);
 
     disableAuthorization();
     managementService.deleteJob(jobId);
@@ -618,7 +620,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 3);
 
     disableAuthorization();
     managementService.deleteJob(jobId);
@@ -767,7 +769,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 2);
 
     clearDatabase();
   }
@@ -781,7 +783,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 2);
 
     clearDatabase();
   }
@@ -795,7 +797,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 2);
 
     clearDatabase();
   }
@@ -809,7 +811,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 2);
 
     clearDatabase();
   }
