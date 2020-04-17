@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -50,17 +51,16 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
     // then
     // the increased count is immediately visible
-    assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    MetricsQuery query = managementService.createMetricsQuery();
+    assertEquals(1l, query.name(Metrics.ROOT_PROCESS_INSTANCE_START).sum());
+    assertEquals(3l, query.name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // and force the db metrics reporter to report
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // still 3
-    assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(1l, query.name(Metrics.ROOT_PROCESS_INSTANCE_START).sum());
+    assertEquals(3l, query.name(Metrics.ACTIVTY_INSTANCE_START).sum());
   }
 
   public void testStandaloneTask() {
