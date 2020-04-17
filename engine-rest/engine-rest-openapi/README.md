@@ -82,6 +82,7 @@ The `main.ftl` contains the general information of the OpenAPI doc:
 * externalDocs
 * servers (default and named)
 * tags (each resource has a tag)
+  * Sub-resources should have the parent tag as prefix (e.g. `Task` and `Task Attachment`)
 * wrap up of paths and components
 
 By parsing this file end .json file is generated.
@@ -109,7 +110,10 @@ This folder contains all of the DTOs used in the request and response bodies. In
 Keep the properties of OpenAPI doc as close as possible to the Java DTOs and add explicit description whenever a property is not applicable to a certain endpoint (e.g. [PUT /process-instance/suspended](https://github.com/camunda/camunda-bpm-platform/blob/master/engine-rest/engine-rest-openapi/src/main/templates/paths/process-instance/suspended/put.ftl))
 * the definitions of the models are resolved automatically via the folder structure. The `/models` directory should contain only the models that are used in the documentation, any additional files (macros and reusable files) should go to [commons](#commons), do not create empty folders. The models are ordered lexicographically.
 * use the [utils](#utils) from the previous section when possible.
-* in case of DTO's hierarchy (`TriggerVariableValueDto extends VariableValueDto`) you may use `allOf` syntax - [example](https://github.com/camunda/camunda-bpm-platform/blob/392d98b61e5e0eff3e1dad0ee15a5ad986e0d93c/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/runtime/TriggerVariableValueDto.ftl#L2-L19).
+* use the `dto` macro to define a DTO
+  * in case of a DTO hierarchy (`TriggerVariableValueDto extends VariableValueDto`), the `dto` macro provides an `extends` 
+  attribute that makes use of the `allOf` OpenAPI syntax - [example](https://github.com/camunda/camunda-bpm-platform/blob/392d98b61e5e0eff3e1dad0ee15a5ad986e0d93c/engine-rest/engine-rest-openapi/src/main/templates/models/org/camunda/bpm/engine/rest/dto/runtime/TriggerVariableValueDto.ftl#L2-L19).
+  * the `property` macros should be nested inside the `dto` macro
 * in case the response can be two DTOs depending on request parameter (example - [message correlation](https://docs.camunda.org/manual/develop/reference/rest/message/post-message/#result) and responses `MessageCorrelationResultDto` or `MessageCorrelationResultWithVariableDto` (extending `MessageCorrelationResultDto`)), please use the DTO for the response that contains all of the properties (in the correlation case - `MessageCorrelationResultWithVariableDto`) even some are not applicable for all of the responses, and make sure to document which properties are not applicable in which use cases. (In some use cases `oneOf` approach might be applicable together with `discrimitator` ([spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.2/versions/3.0.2.md#discriminator-object)), please test this additionally as the clients might have problems to be generated in this approach.)
 * for the `property` macros DO NOT forget to put `last = true` param for the last property, that will take care for the commas in the json file.
 * the DTOs that have sorting or pagination properties should use the [common templates](#commons).
@@ -182,6 +186,7 @@ Recommendations:
 * to add links use markdown, e.g. `[link](http://example.com)`
 * Add `docsUrl` to resolve doc link - [User guide](${docsUrl}/user-guide/process-engine/process-instance-modification/)
 `docsUrl="https://docs.camunda.org/manual/${docsVersion}"
+* keep line length to a maximum of 120 characters
 * use indentation, avoid adding long descriptions on a single line,
 improve the readibility by splitting the next with single or multiple line breaks:
 ```
@@ -219,9 +224,11 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 You can add an examples to `requestBody` or `response` as follows:
 * pass the example inside single quotes instead of quotes as the examples contain quotes and they should be escaped
-* multiple examples allow
+* multiple examples are allowed
+  * each example should be a separate JSON object in the `examples` array (e.g. `example-1`, `example-2`)
 * each example should have a unique name
-* add descriptions/summary when necessary
+* add a `description` and/or `summary` properties when necessary
+* the `value` property is required and should contain the example content
 ```
   <@lib.requestBody
       mediaType = "application/json"
