@@ -76,7 +76,7 @@
           <#if nullable>
             "nullable": true,
           </#if>
-        <#else>
+        </#if>
 
         <#if enumValues?size != 0>
           "enum": [
