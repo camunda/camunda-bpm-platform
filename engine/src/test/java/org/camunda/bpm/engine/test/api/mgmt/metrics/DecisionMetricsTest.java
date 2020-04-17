@@ -23,7 +23,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 
-public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
+public class DecisionMetricsTest extends AbstractMetricsTest {
 
   public static final String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
   public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
@@ -51,24 +51,44 @@ public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
         .addClasspathResource(DMN_FILE)
         .deploy().getId();
 
+    assertEquals(0l, getExecutedDecisionInstances());
     assertEquals(0l, getExecutedDecisionElements());
+    assertEquals(0l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(0l, getExecutedDecisionElementsFromDmnEngine());
 
     runtimeService.startProcessInstanceByKey("testProcess", VARIABLES);
 
+    assertEquals(1l, getExecutedDecisionInstances());
     assertEquals(16l, getExecutedDecisionElements());
+    assertEquals(1l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
 
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
+    assertEquals(1l, getExecutedDecisionInstances());
     assertEquals(16l, getExecutedDecisionElements());
+    assertEquals(1l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
+  }
+
+  // TODO: Add Literal Expression and DRG test cases
+
+  protected long getExecutedDecisionInstances() {
+    return managementService.createMetricsQuery()
+        .name(Metrics.EXECUTED_DECISION_INSTANCES)
+        .sum();
   }
 
   protected long getExecutedDecisionElements() {
     return managementService.createMetricsQuery()
         .name(Metrics.EXECUTED_DECISION_ELEMENTS)
         .sum();
+  }
+
+  protected long getExecutedDecisionInstancesFromDmnEngine() {
+    return processEngineConfiguration.getDmnEngineConfiguration()
+        .getEngineMetricCollector()
+        .getExecutedDecisionInstances();
   }
 
   protected long getExecutedDecisionElementsFromDmnEngine() {

@@ -174,6 +174,7 @@ public class DefaultDmnDecisionContext {
     }
 
     decisionEvaluationEvent.setDecisionResult(rootEvaluatedEvent);
+    decisionEvaluationEvent.setExecutedDecisionInstances(evaluatedEvents.size());
     decisionEvaluationEvent.setExecutedDecisionElements(executedDecisionElements);
 
     evaluatedEvents.remove(rootEvaluatedEvent);

@@ -2173,6 +2173,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
     metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
 
+    metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_INSTANCES);
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
   }
 

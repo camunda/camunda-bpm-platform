@@ -25,6 +25,11 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 public interface DmnEngineMetricCollector extends DmnDecisionTableEvaluationListener {
 
   /**
+   * @return the number of executed decision instances since creation of this engine
+   */
+  long getExecutedDecisionInstances();
+
+  /**
    * @return the number of executed decision elements since creation of this engine
    */
   long getExecutedDecisionElements();
@@ -35,5 +40,12 @@ public interface DmnEngineMetricCollector extends DmnDecisionTableEvaluationList
    * @return the number of executed decision elements before resetting.
    */
   long clearExecutedDecisionElements();
+
+  /**
+   * Resets the executed decision instances to 0.
+   *
+   * @return the number of executed decision elements before resetting.
+   */
+  long clearExecutedDecisionInstances();
 
 }

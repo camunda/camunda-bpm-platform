@@ -34,6 +34,11 @@ public interface DmnDecisionEvaluationEvent {
   Collection<DmnDecisionLogicEvaluationEvent> getRequiredDecisionResults();
 
   /**
+   * @return the number of executed decision instances during the evaluation
+   */
+  long getExecutedDecisionInstances();
+
+  /**
    * @return the number of executed decision elements during the evaluation
    */
   long getExecutedDecisionElements();

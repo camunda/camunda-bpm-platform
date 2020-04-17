@@ -58,6 +58,7 @@ public class Metrics {
   /**
    * Number of executed decision elements in the DMN engine.
    */
+  public final static String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
   public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
 
   /**
