@@ -37,7 +37,7 @@ public class BpmnErrorTest {
   private static final Throwable CAUSE = new IllegalArgumentException("causeMessage");
 
   @Test
-  public void testCreation_ErrorCodeOnly_BpmnMessageContainsErrorCode() {
+  public void testCreation_ErrorCodeOnly() {
     // when
     BpmnError bpmnError = new BpmnError(ERROR_CODE);
     
@@ -47,7 +47,7 @@ public class BpmnErrorTest {
   }
 
   @Test
-  public void testCreation_ErrorMessagePresent_BpmnMessageContainsErrorCodeAndMessage() {
+  public void testCreation_ErrorMessagePresent() {
     // when
     BpmnError bpmnError = new BpmnError(ERROR_CODE, ERROR_MESSAGE);
     
@@ -57,7 +57,7 @@ public class BpmnErrorTest {
   }
 
   @Test
-  public void testCreation_ErrorCodeOnlyWithCause_BpmnMessageIsCopiedFromCause() {
+  public void testCreation_ErrorCodeOnlyWithCause() {
     // when
     BpmnError bpmnError = new BpmnError(ERROR_CODE, CAUSE);
     
@@ -69,7 +69,7 @@ public class BpmnErrorTest {
   }
 
   @Test
-  public void testCreation_ErrorMessageAndCausePresent_BpmnMessageContainsCause() {
+  public void testCreation_ErrorMessageAndCausePresent() {
     // when
     BpmnError bpmnError = new BpmnError(ERROR_CODE, ERROR_MESSAGE, CAUSE);
     

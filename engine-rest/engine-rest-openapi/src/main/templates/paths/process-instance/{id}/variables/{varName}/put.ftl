@@ -25,7 +25,28 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "VariableValueDto" />
+      dto = "VariableValueDto"
+      examples = [ '"example-1": {
+                       "summary": "PUT /process-instance/aProcessInstanceId/variables/aVarName",
+                       "description": "Status 204. No content.",
+                       "value": {
+                         "value": "someValue",
+                         "type": "String"
+                       }
+                     }',
+                    '"example-2": {
+                       "summary": "PUT /process-instance/aProcessInstanceId/variables/aVarName",
+                       "description": "Status 204. No content.",
+                       "value": {
+                         "value": "ab",
+                         "type": "Object",
+                         "valueInfo": {
+                           "objectTypeName": "com.example.MyObject",
+                           "serializationDataFormat": "application/xml"
+                         }
+                       }
+                     }'
+      ] />
 
   "responses": {
 

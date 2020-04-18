@@ -286,16 +286,26 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
-      PropertyChange propertyChange) {
+                                            PropertyChange propertyChange) {
+    logProcessDefinitionOperation(
+      operation,
+      processDefinitionId,
+      processDefinitionKey,
+      Collections.singletonList(propertyChange)
+    );
+  }
+
+  public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
+                                            List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
-          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_DEFINITION)
-            .propertyChanges(propertyChange)
-            .processDefinitionId(processDefinitionId)
-            .processDefinitionKey(processDefinitionKey)
-            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .processDefinitionId(processDefinitionId)
+          .processDefinitionKey(processDefinitionKey)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if (processDefinitionId != null) {
         ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);

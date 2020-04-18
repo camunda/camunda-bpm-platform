@@ -17,7 +17,14 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "SuspensionStateDto" />
+      dto = "SuspensionStateDto"
+      examples = ['"example-1": {
+                     "summary": "PUT `/process-instance/aProcessInstanceId/suspended`",
+                     "value": {
+                       "suspended" : true
+                     }
+                   }'
+      ] />
 
   "responses" : {
 

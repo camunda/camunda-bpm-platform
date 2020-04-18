@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -131,6 +132,19 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<ProcessDefinition, Date>() {
       @Override
       public Date getProperty(ProcessDefinition obj) {
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(obj.getDeploymentId()).singleResult();
+        return deployment.getDeploymentTime();
+      }
+    });
+  }
+
+  // DECISION DEFINITION
+
+  public static NullTolerantComparator<DecisionDefinition> decisionDefinitionByDeployTime(ProcessEngine processEngine) {
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    return propertyComparator(new PropertyAccessor<DecisionDefinition, Date>() {
+      @Override
+      public Date getProperty(DecisionDefinition obj) {
         Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(obj.getDeploymentId()).singleResult();
         return deployment.getDeploymentTime();
       }

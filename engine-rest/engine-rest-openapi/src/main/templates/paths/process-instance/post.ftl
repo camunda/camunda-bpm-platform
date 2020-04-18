@@ -14,7 +14,35 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceQueryDto" />
+      dto = "ProcessInstanceQueryDto"
+      examples = [
+                  '"example-1": {
+                     "summary": "POST `/process-instance` Request Body 1",
+                     "value": {
+                         "variables":
+                         [{
+                             "name": "myVariable",
+                             "operator": "eq",
+                             "value": "camunda"
+                           }, {
+                             "name": "mySecondVariable",
+                             "operator": "neq",
+                             "value": 124
+                           }
+                         ],
+                         "processDefinitionId": "aProcessDefinitionId",
+                         "sorting":
+                         [{
+                             "sortBy": "definitionKey",
+                             "sortOrder": "asc"
+                           }, {
+                             "sortBy": "instanceId",
+                             "sortOrder": "desc"
+                           }
+                         ]
+                       }
+                   }'
+                ] />
 
   "responses" : {
 
@@ -22,7 +50,22 @@
         code = "200"
         dto = "ProcessInstanceDto"
         array = true
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "Status 200 Response 1",
+                       "value": [
+                         {
+                           "links": [],
+                           "id": "anId",
+                           "definitionId": "aProcessDefinitionId",
+                           "businessKey": "aKey",
+                           "caseInstanceId": "aCaseInstanceId",
+                           "ended": false,
+                           "suspended": false,
+                           "tenantId": null
+                         }
+                       ]
+                   }'] />
 
     <@lib.response
         code = "400"

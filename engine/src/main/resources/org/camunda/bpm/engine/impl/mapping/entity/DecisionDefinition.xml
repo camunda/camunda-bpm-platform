@@ -209,30 +209,13 @@
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
 
   <select id="selectDecisionDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
-    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
-    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
-    ${countDistinctAfterEnd}
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectDecisionDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select ${distinct} RES.*
-    ${limitBetween}
-    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectDecisionDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
     ${countDistinctAfterEnd}
@@ -253,12 +236,15 @@
           group by TENANT_ID_, KEY_) VER
         on RES.KEY_ = VER.KEY_
     </if>
-    
-    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))      
+    <if test="shouldJoinDeploymentTable">
+      inner join ${prefix}ACT_RE_DEPLOYMENT DEP on RES.DEPLOYMENT_ID_ = DEP.ID_
     </if>
-    
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))
+    </if>
+
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -306,9 +292,15 @@
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
+      <if test="deployedAfter != null">
+        and DEP.DEPLOY_TIME_ &gt; #{deployedAfter}
+      </if>
+      <if test="deployedAt != null">
+        and DEP.DEPLOY_TIME_ = #{deployedAt}
+      </if>
       <if test="latest">
-       and RES.VERSION_ = VER.MAX_VERSION and 
-          (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null)) 
+       and RES.VERSION_ = VER.MAX_VERSION and
+          (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null))
       </if>
       <if test="decisionRequirementsDefinitionId != null">
         and RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
@@ -327,7 +319,7 @@
             #{tenantId}
           </foreach>
           <if test="includeDefinitionsWithoutTenantId">
-            or RES.TENANT_ID_ is null 
+            or RES.TENANT_ID_ is null
           </if>
           )
         </if>

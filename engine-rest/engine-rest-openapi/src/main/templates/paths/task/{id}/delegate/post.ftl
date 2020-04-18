@@ -1,7 +1,7 @@
 {
 
   <@lib.endpointInfo
-      id = "delegate"
+      id = "delegateTask"
       tag = "Task"
       desc = "Delegates a task to another user." />
 
