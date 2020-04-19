@@ -445,6 +445,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException invokeTaskListenerException(Throwable cause) {
+    if (cause instanceof ProcessEngineException) {
+      return (ProcessEngineException)cause;
+    }
     return new ProcessEngineException(exceptionMessage(
       "051",
       "There was an exception while invoking the TaskListener. Message: '{}'",
