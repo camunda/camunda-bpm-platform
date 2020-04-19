@@ -49,7 +49,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
   public ProcessEngineException exceptionWhileNotifyingPaTaskListener(Exception e) {
     return new ProcessEngineException(exceptionMessage(
         "002",
-        "Exception while notifying process application task listener."), e);
+        "Exception while notifying process application task listener: " + e.getMessage()), e);
   }
 
   public void noTargetProcessApplicationForExecution(DelegateExecution execution) {
