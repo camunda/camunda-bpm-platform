@@ -81,7 +81,7 @@ public class AuthorizationScenarioInstance {
       String message = e.getMessage();
       String assertionFailureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
 
-      List<MissingAuthorization> actualMissingAuthorizations = new ArrayList<MissingAuthorization>(e.getMissingAuthorizations());
+      List<MissingAuthorization> actualMissingAuthorizations = getActualMissingAuthorizations(e);
       List<MissingAuthorization> expectedMissingAuthorizations = MissingAuthorizationMatcher.asMissingAuthorizations(missingAuthorizations);
 
       Assert.assertThat(actualMissingAuthorizations, containsInAnyOrder(MissingAuthorizationMatcher.asMatchers(expectedMissingAuthorizations)));
@@ -125,5 +125,20 @@ public class AuthorizationScenarioInstance {
         + "\n"
         + "Scenario: \n"
         + scenario.toString();
+  }
+
+  protected List<MissingAuthorization> getActualMissingAuthorizations(AuthorizationException e) {
+    List<MissingAuthorization> actualMissingAuthorizations = new ArrayList<>();
+    for (MissingAuthorization missingAuthorization : e.getMissingAuthorizations()) {
+      String violatedPermissionName = missingAuthorization.getViolatedPermissionName();
+      String resourceType = missingAuthorization.getResourceType();
+      String resourceId = missingAuthorization.getResourceId();
+      if (resourceId == null) {
+        // ANY resourceId authorization
+        resourceId = "*";
+      }
+      actualMissingAuthorizations.add(new MissingAuthorization(violatedPermissionName, resourceType, resourceId));
+    }
+    return actualMissingAuthorizations;
   }
 }

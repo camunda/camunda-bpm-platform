@@ -63,10 +63,7 @@ public class MissingAuthorizationMatcher extends TypeSafeDiagnosingMatcher<Missi
       }
     }
 
-    if (!Authorization.ANY.equals(authorization.getResourceId())) {
-      // missing ANY authorizations are not explicitly represented in the error message
-      resourceId = authorization.getResourceId();
-    }
+    resourceId = authorization.getResourceId();
 
     Resource resource = AuthorizationTestUtil.getResourceByType(authorization.getResourceType());
     resourceName = resource.resourceName();
