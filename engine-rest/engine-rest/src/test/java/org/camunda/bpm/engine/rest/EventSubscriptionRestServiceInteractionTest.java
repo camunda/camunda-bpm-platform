@@ -51,7 +51,7 @@ AbstractRestServiceTest {
 	@ClassRule
 	public static TestContainerRule rule = new TestContainerRule();
 
-	protected static final String EVENT_SUBSCRIPTION_URL = TEST_RESOURCE_ROOT_PATH + "/eventSubscription";
+	protected static final String EVENT_SUBSCRIPTION_URL = TEST_RESOURCE_ROOT_PATH + "/event-subscription";
 	protected static final String EVENT_SUBSCRIPTION_COUNT_QUERY_URL = EVENT_SUBSCRIPTION_URL + "/count";
 
 	private EventSubscriptionQuery mockedEventSubscriptionQuery;

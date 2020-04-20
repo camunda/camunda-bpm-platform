@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 @Produces(MediaType.APPLICATION_JSON)
 public interface EventSubscriptionRestService {
 
-  public static final String PATH = "/eventSubscription";
+  public static final String PATH = "/event-subscription";
 
   /**
    * Exposes the {@link EventSubscriptionQuery} interface as a REST service.

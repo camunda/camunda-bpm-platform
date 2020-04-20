@@ -299,12 +299,13 @@ public abstract class AbstractProcessEngineRestServiceImpl {
     return subResource;
   }
 
-public EventSubscriptionRestService getEventSubscriptionRestService(String engineName) {
+  public EventSubscriptionRestService getEventSubscriptionRestService(String engineName) {
 	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
 	EventSubscriptionRestServiceImpl subResource = new EventSubscriptionRestServiceImpl(engineName, getObjectMapper());
 	subResource.setRelativeRootResourceUri(rootResourcePath);
 	return subResource;
-}
+  }
+  
   protected abstract URI getRelativeEngineUri(String engineName);
 
   protected ObjectMapper getObjectMapper() {
