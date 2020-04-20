@@ -315,7 +315,7 @@
       location = "query"
       type = "string"
       desc = "Restrict to tasks that are due on the date described by the given expression. See the
-              [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
+              [User Guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
               for more information on available functions. The expression must evaluate to a
               `java.util.Date` or `org.joda.time.DateTime` object." />
 

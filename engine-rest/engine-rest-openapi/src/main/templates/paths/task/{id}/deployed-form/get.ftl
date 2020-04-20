@@ -59,7 +59,7 @@
 
     <@lib.response
         code = "403"
-        dto = "ExceptionDto"
+        dto = "AuthorizationExceptionDto"
         desc = "The deployed form cannot be retrieved due to missing permissions on task resource.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />

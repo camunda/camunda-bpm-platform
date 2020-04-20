@@ -63,7 +63,7 @@
 
     <@lib.response
         code = "403"
-        dto = "ExceptionDto"
+        dto = "AuthorizationExceptionDto"
         last = true
         desc = "The history of the engine is disabled. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)

@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "deleteProcessInstancesAsyncOperation"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Deletes multiple process instances asynchronously (batch)." />
 
   <@lib.requestBody
