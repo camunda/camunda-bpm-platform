@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.EventSubscriptionRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
@@ -258,6 +259,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + SchemaLogRestService.PATH)
   public SchemaLogRestService getSchemaLogRestService(@PathParam("name") String engineName) {
     return super.getSchemaLogRestService(engineName);
+  }
+  
+  @Override
+  @Path("/{name}" + EventSubscriptionRestService.PATH)
+  public EventSubscriptionRestService getEventSubscriptionRestService(@PathParam("name") String engineName) {
+    return super.getEventSubscriptionRestService(engineName);
   }
 
   @GET

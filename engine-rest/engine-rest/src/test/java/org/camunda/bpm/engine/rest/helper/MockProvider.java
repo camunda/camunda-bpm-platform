@@ -1258,6 +1258,21 @@ public abstract class MockProvider {
     return mock;
   }
 
+	public static EventSubscription createMockEventSubscription(String tenantId) {
+		EventSubscription mock = mock(EventSubscription.class);
+
+		when(mock.getId()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_ID);
+		when(mock.getEventType()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_TYPE);
+		when(mock.getEventName()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_NAME);
+		when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
+		when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+		when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+		when(mock.getCreated()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE));
+		when(mock.getTenantId()).thenReturn(tenantId);
+
+		return mock;
+	}
+	
   // statistics
   public static List<ProcessDefinitionStatistics> createMockProcessDefinitionStatistics() {
     ProcessDefinitionStatistics statistics = mock(ProcessDefinitionStatistics.class);
