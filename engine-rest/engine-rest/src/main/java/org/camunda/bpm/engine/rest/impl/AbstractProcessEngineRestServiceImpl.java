@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.EventSubscriptionRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
@@ -298,6 +299,13 @@ public abstract class AbstractProcessEngineRestServiceImpl {
     return subResource;
   }
 
+  public EventSubscriptionRestService getEventSubscriptionRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    EventSubscriptionRestServiceImpl subResource = new EventSubscriptionRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+  
   protected abstract URI getRelativeEngineUri(String engineName);
 
   protected ObjectMapper getObjectMapper() {
