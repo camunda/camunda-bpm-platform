@@ -12,6 +12,7 @@
 
   <properties>
     <skipTests>true</skipTests>
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
   </properties>
 
   <dependencies>
@@ -109,6 +110,13 @@
         </plugins>
       </build>
 
+    </profile>
+  
+    <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
+      </properties>
     </profile>
   </profiles>
 
