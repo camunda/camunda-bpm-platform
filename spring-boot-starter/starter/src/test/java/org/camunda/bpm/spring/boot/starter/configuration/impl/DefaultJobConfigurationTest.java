@@ -24,18 +24,34 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import java.util.Arrays;
 
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.NotifyAcquisitionRejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.junit4.SpringRunner;
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+  classes = {TestApplication.class},
+  webEnvironment = WebEnvironment.NONE
+)
 public class DefaultJobConfigurationTest {
 
   private final SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
   private final DefaultJobConfiguration jobConfiguration = new DefaultJobConfiguration();
   private final CamundaBpmProperties properties = new CamundaBpmProperties();
+
+  @Autowired
+  JobExecutor jobExecutor;
 
   @Before
   public void setUp() {
@@ -60,6 +76,17 @@ public class DefaultJobConfigurationTest {
     jobConfiguration.registerCustomJobHandlers(processEngineConfiguration);
 
     assertThat(processEngineConfiguration.getCustomJobHandlers()).containsOnly(jobHandler);
+  }
+
+  @Test
+  public void shouldUseDefaultRejectedJobsHandler() {
+    // given default configuration
+
+    // when
+    RejectedJobsHandler rejectedJobsHandler = jobExecutor.getRejectedJobsHandler();
+
+    // then
+    assertThat(rejectedJobsHandler).isInstanceOf(NotifyAcquisitionRejectedJobsHandler.class);
   }
 
 }
