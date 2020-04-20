@@ -16,12 +16,16 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
@@ -31,6 +35,9 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -39,20 +46,22 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
-  protected JobExecutor jobExecutor;
-  protected ThreadPoolExecutor jobThreadPoolExecutor;
+  protected JobExecutor defaultJobExecutor;
+  protected ProcessEngine processEngine;
 
-  protected void setUp() throws Exception {
-    super.setUp();
-    jobExecutor = processEngineConfiguration.getJobExecutor();
+  @Before
+  public void saveJobExecutor() throws Exception {
+    processEngine = engineRule.getProcessEngine();
+    defaultJobExecutor = processEngineConfiguration.getJobExecutor();
   }
 
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    processEngineConfiguration.setJobExecutor(jobExecutor);
+  @After
+  public void restoreJobExecutor() throws Exception {
+    processEngineConfiguration.setJobExecutor(defaultJobExecutor);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
+  @Test
   public void testJobAcquisitionMetricReporting() {
 
     // given
@@ -61,7 +70,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // when
-    waitForJobExecutorToProcessAllJobs(5000);
+    testRule.waitForJobExecutorToProcessAllJobs(5000);
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then
@@ -74,6 +83,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
+  @Test
   public void testCompetingJobAcquisitionMetricReporting() {
     // given
     for (int i = 0; i < 3; i++) {
@@ -125,6 +135,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
+  @Test
   public void testJobExecutionMetricReporting() {
     // given
     for (int i = 0; i < 3; i++) {
@@ -136,7 +147,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // when
-    waitForJobExecutorToProcessAllJobs(5000);
+    testRule.waitForJobExecutorToProcessAllJobs(5000);
 
     // then
     long jobsSuccessful = managementService.createMetricsQuery().name(Metrics.JOB_SUCCESSFUL).sum();
@@ -152,6 +163,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   }
 
   @Deployment
+   @Test
   public void testJobExecutionMetricExclusiveFollowUp() {
     // given
     for (int i = 0; i < 3; i++) {
@@ -159,7 +171,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // when
-    waitForJobExecutorToProcessAllJobs(5000);
+    testRule.waitForJobExecutorToProcessAllJobs(5000);
 
     // then
     long jobsSuccessful = managementService.createMetricsQuery().name(Metrics.JOB_SUCCESSFUL).sum();
@@ -180,6 +192,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
+  @Test
   public void testJobRejectedExecutionMetricReporting() {
     // replace job executor with one that rejects all jobs
     RejectingJobExecutor rejectingExecutor = new RejectingJobExecutor();
@@ -192,7 +205,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // when executing the jobs
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then all of them were rejected by the job executor which is reflected by the metric
     long numRejectedJobs = managementService.createMetricsQuery().name(Metrics.JOB_EXECUTION_REJECTED).sum();

@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
+import org.junit.Test;
 
 public class DecisionMetricsTest extends AbstractMetricsTest {
 
@@ -36,6 +39,7 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
       .clearExecutedDecisionElements();
   }
 
+  @Test
   public void testBusinessRuleTask() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
         .startEvent()
@@ -46,10 +50,9 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
     BusinessRuleTask task = modelInstance.getModelElementById("task");
     task.setCamundaDecisionRef("decision");
 
-    deploymentId = repositoryService.createDeployment()
+    testRule.deploy(repositoryService.createDeployment()
         .addModelInstance("process.bpmn", modelInstance)
-        .addClasspathResource(DMN_FILE)
-        .deploy().getId();
+        .addClasspathResource(DMN_FILE));
 
     assertEquals(0l, getExecutedDecisionInstances());
     assertEquals(0l, getExecutedDecisionElements());
