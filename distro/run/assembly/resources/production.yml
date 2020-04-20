@@ -15,7 +15,7 @@ camunda.bpm:
 
   generic-properties.properties:
 # https://docs.camunda.org/manual/latest/user-guide/security/#variable-values-from-untrusted-sources
-    deserialization-type-validationEnabled: true
+    deserialization-type-validation-enabled: true
     deserialization-allowed-packages:
     deserialization-allowed-classes:
 # https://docs.camunda.org/manual/latest/user-guide/security/#password-policy
