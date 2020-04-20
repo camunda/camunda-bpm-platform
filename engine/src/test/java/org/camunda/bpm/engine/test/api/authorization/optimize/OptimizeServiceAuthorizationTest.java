@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -344,8 +345,11 @@ public class OptimizeServiceAuthorizationTest {
     );
     // running activity/task/process instance data
     final ProcessDefinition process2 = selectProcessDefinitionByKey("userTaskProcess");
-    runtimeService.startProcessInstanceById(process2.getId());
-    // identity link log, operations log data
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(process2.getId());
+    // op log data
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+    runtimeService.activateProcessInstanceById(processInstance.getId());
+    // identity link log data
     completeAllUserTasks();
     // decision instance data
     final DecisionDefinition decision = selectDecisionDefinitionByKey();
