@@ -49,6 +49,7 @@ import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.MultiInstanceReceiveTa
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.NestedSequentialMultiInstanceSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.ParallelMultiInstanceSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.SequentialMultiInstanceSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.histperms.HistoricInstancePermissionsWithoutProcDefKeyScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.task.OneScopeTaskScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.task.OneTaskScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.task.ParallelScopeTasksScenario;
@@ -127,6 +128,8 @@ public class TestFixture {
 
     // event-based gateway
     runner.setupScenarios(EventBasedGatewayScenario.class);
+
+    runner.setupScenarios(HistoricInstancePermissionsWithoutProcDefKeyScenario.class);
 
     processEngine.close();
   }
