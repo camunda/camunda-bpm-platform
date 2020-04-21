@@ -925,12 +925,24 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureUserOperationLogQuery(UserOperationLogQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+    PermissionCheckBuilder permissionCheckBuilder = new PermissionCheckBuilder()
         .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
-          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ)
-        .build();
-    addPermissionCheck(query.getAuthCheck(), permissionCheck);
+          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ);
+
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (isHistoricInstancePermissionsEnabled) {
+      permissionCheckBuilder.atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ);
+    }
+
+    CompositePermissionCheck permissionCheck = permissionCheckBuilder.build();
+
+    addPermissionCheck(authCheck, permissionCheck);
   }
 
   // batch
