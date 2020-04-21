@@ -656,7 +656,16 @@ public interface HistoryService {
   HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId);
 
   /**
-   * Creates a new programmatic query to search for {@link HistoricExternalTaskLog historic external task logs}.
+   * <p>Creates a new programmatic query to search for
+   * {@link HistoricExternalTaskLog historic external task logs}.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
    *
    * @since 7.7
    */
