@@ -299,7 +299,11 @@ var Directive = [
           incident.rootCauseIncidentConfiguration
         );
 
-        $http.get(scope.getJobStacktraceUrl(incident)).then(function(res) {
+        $http({
+          method: 'GET',
+          url: scope.getJobStacktraceUrl(incident),
+          transformResponse: []
+        }).then(function(res) {
           $modal
             .open({
               template: inspectTemplate,
