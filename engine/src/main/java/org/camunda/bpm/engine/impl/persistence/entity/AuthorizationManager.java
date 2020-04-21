@@ -815,7 +815,27 @@ public class AuthorizationManager extends AbstractManager {
   // historic job log query ////////////////////////////////
 
   public void configureHistoricJobLogQuery(HistoricJobLogQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY)
+            .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROCESS_INSTANCE_ID_",
+                HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // historic incident query ////////////////////////////////
