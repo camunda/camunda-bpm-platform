@@ -313,7 +313,11 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROCESS_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (
+      <if test="authCheck.isHistoricInstancePermissionsEnabled">
+        RES.PROCESS_INSTANCE_ID_,
+      </if>
+      RES.PROCESS_DEF_KEY_, '*'))
     </if>
 
     <where>
