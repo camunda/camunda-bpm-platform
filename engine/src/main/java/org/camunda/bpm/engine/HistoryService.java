@@ -107,12 +107,8 @@ public interface HistoryService {
    * */
   HistoricProcessInstanceQuery createHistoricProcessInstanceQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricActivityInstance}s. */
-  HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
-
   /**
-   * <p>Query for the number of historic activity instances aggregated by activities of a single
-   * process definition.
+   * <p>Creates a new programmatic query to search for {@link HistoricActivityInstance}s.
    *
    * <p>The result of the query is empty in the following cases:
    * <ul>
@@ -121,7 +117,17 @@ public interface HistoryService {
    *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
    *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
    *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   *
    * */
+  HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
+
+  /**
+   * <p>Query for the number of historic activity instances aggregated by activities of a single
+   * process definition.
+   *
+   * <p>The result of the query is empty when the user has no {@link Permissions#READ_HISTORY}
+   * permission on {@link Resources#PROCESS_DEFINITION}
+   */
   HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
 
   /**
