@@ -1015,11 +1015,10 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.NONE);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(0);
+    assertThat(query.list()).isEmpty();
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance_GlobalVariable() {
@@ -1035,11 +1034,12 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance_LocalVariable() {
@@ -1056,11 +1056,12 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnCompletedHistoricProcessInstance() {
@@ -1078,11 +1079,12 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
@@ -1101,11 +1103,12 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
@@ -1125,11 +1128,12 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
         ProcessDefinitionPermissions.NONE);
 
     // when
-    List<HistoricDetail> result = historyService.createHistoricDetailQuery()
-        .list();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   // helper ////////////////////////////////////////////////////////

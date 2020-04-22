@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -75,6 +76,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 /**
@@ -513,6 +515,14 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     authorizationService.saveAuthorization(authorization);
 
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
+
     // when
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
@@ -524,11 +534,12 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     );
 
     // then
-    authorization = authorizationService.createAuthorizationQuery()
-            .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-            .singleResult();
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    assertThat(authorization.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(REMOVAL_TIME, processInstanceId, processInstanceId));
   }
 
   @Test
@@ -547,6 +558,14 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     authorizationService.saveAuthorization(authorization);
 
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
+
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
     // when
@@ -557,12 +576,13 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
             .executeAsync()
     );
 
-    authorization = authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-        .singleResult();
-
     // then
-    assertThat(authorization.getRemovalTime()).isNull();
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
   }
 
   @Test

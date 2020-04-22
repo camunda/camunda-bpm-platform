@@ -368,11 +368,10 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
         HistoricProcessInstancePermissions.NONE);
 
     // when
-    List<HistoricIdentityLinkLog> result = historyService.createHistoricIdentityLinkLogQuery()
-        .list();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(0);
+    assertThat(query.list()).isEmpty();
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance() {
@@ -385,11 +384,12 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricIdentityLinkLog> result = historyService.createHistoricIdentityLinkLogQuery()
-        .list();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("rootProcessInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnCompletedHistoricProcessInstance() {
@@ -406,11 +406,12 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricIdentityLinkLog> result = historyService.createHistoricIdentityLinkLogQuery()
-        .list();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("rootProcessInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
@@ -428,11 +429,12 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, ONE_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<HistoricIdentityLinkLog> result = historyService.createHistoricIdentityLinkLogQuery()
-        .list();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("rootProcessInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
@@ -451,11 +453,12 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
         ProcessDefinitionPermissions.NONE);
 
     // when
-    List<HistoricIdentityLinkLog> result = historyService.createHistoricIdentityLinkLogQuery()
-        .list();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("rootProcessInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void createTaskAndAssignUser(String taskId) {
