@@ -300,10 +300,10 @@ public abstract class AbstractProcessEngineRestServiceImpl {
   }
 
   public EventSubscriptionRestService getEventSubscriptionRestService(String engineName) {
-	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
-	EventSubscriptionRestServiceImpl subResource = new EventSubscriptionRestServiceImpl(engineName, getObjectMapper());
-	subResource.setRelativeRootResourceUri(rootResourcePath);
-	return subResource;
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    EventSubscriptionRestServiceImpl subResource = new EventSubscriptionRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
   }
   
   protected abstract URI getRelativeEngineUri(String engineName);

@@ -45,9 +45,8 @@ public interface EventSubscriptionRestService {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<EventSubscriptionDto> getEventSubscriptions(@Context UriInfo uriInfo,
-                                               @QueryParam("firstResult") Integer firstResult,
-                                               @QueryParam("maxResults") Integer maxResults);
+  List<EventSubscriptionDto> getEventSubscriptions(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults);
 
   /**
    * Number of event subscriptions
@@ -58,5 +57,5 @@ public interface EventSubscriptionRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getEventSubscriptionsCount(@Context UriInfo uriInfo);
-  
+
 }

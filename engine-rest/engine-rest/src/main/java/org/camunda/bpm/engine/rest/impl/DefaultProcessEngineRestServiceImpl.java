@@ -183,7 +183,6 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
     return super.getModificationRestService(null);
   }
 
-
   @Path(BatchRestService.PATH)
   public BatchRestService getBatchRestService() {
     return super.getBatchRestService(null);
@@ -223,7 +222,7 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   public EventSubscriptionRestService getEventSubscriptionRestService() {
     return super.getEventSubscriptionRestService(null);
   }
-  
+
   @Override
   protected URI getRelativeEngineUri(String engineName) {
     // the default engine

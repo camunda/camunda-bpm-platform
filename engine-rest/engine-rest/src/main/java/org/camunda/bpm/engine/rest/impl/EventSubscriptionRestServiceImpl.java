@@ -31,66 +31,63 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EventSubscriptionRestServiceImpl extends AbstractRestProcessEngineAware implements
-EventSubscriptionRestService {
+public class EventSubscriptionRestServiceImpl extends AbstractRestProcessEngineAware implements EventSubscriptionRestService {
 
-	public EventSubscriptionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
-		super(engineName, objectMapper);
-	}
+  public EventSubscriptionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+    super(engineName, objectMapper);
+  }
 
-	@Override
-	public List<EventSubscriptionDto> getEventSubscriptions(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-		EventSubscriptionQueryDto queryDto = new EventSubscriptionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-		return queryEventSubscriptions(queryDto, firstResult, maxResults);
-	}
+  @Override
+  public List<EventSubscriptionDto> getEventSubscriptions(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    EventSubscriptionQueryDto queryDto = new EventSubscriptionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+    return queryEventSubscriptions(queryDto, firstResult, maxResults);
+  }
 
+  public List<EventSubscriptionDto> queryEventSubscriptions(EventSubscriptionQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
+    EventSubscriptionQuery query = queryDto.toQuery(engine);
 
-	public List<EventSubscriptionDto> queryEventSubscriptions(
-			EventSubscriptionQueryDto queryDto, Integer firstResult, Integer maxResults) {
-		ProcessEngine engine = getProcessEngine();
-		queryDto.setObjectMapper(getObjectMapper());
-		EventSubscriptionQuery query = queryDto.toQuery(engine);
+    List<EventSubscription> matchingEventSubscriptions;
+    if (firstResult != null || maxResults != null) {
+      matchingEventSubscriptions = executePaginatedQuery(query, firstResult, maxResults);
+    } else {
+      matchingEventSubscriptions = query.list();
+    }
 
-		List<EventSubscription> matchingEventSubscriptions;
-		if (firstResult != null || maxResults != null) {
-			matchingEventSubscriptions = executePaginatedQuery(query, firstResult, maxResults);
-		} else {
-			matchingEventSubscriptions = query.list();
-		}
+    List<EventSubscriptionDto> eventSubscriptionResults = new ArrayList<EventSubscriptionDto>();
+    for (EventSubscription eventSubscription : matchingEventSubscriptions) {
+      EventSubscriptionDto resultEventSubscription = EventSubscriptionDto.fromEventSubscription(eventSubscription);
+      eventSubscriptionResults.add(resultEventSubscription);
+    }
+    return eventSubscriptionResults;
+  }
 
-		List<EventSubscriptionDto> eventSubscriptionResults = new ArrayList<EventSubscriptionDto>();
-		for (EventSubscription eventSubscription : matchingEventSubscriptions) {
-			EventSubscriptionDto resultEventSubscription = EventSubscriptionDto.fromEventSubscription(eventSubscription);
-			eventSubscriptionResults.add(resultEventSubscription);
-		}
-		return eventSubscriptionResults;
-	}
+  private List<EventSubscription> executePaginatedQuery(EventSubscriptionQuery query, Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+    return query.listPage(firstResult, maxResults);
+  }
 
-	private List<EventSubscription> executePaginatedQuery(EventSubscriptionQuery query, Integer firstResult, Integer maxResults) {
-		if (firstResult == null) {
-			firstResult = 0;
-		}
-		if (maxResults == null) {
-			maxResults = Integer.MAX_VALUE;
-		}
-		return query.listPage(firstResult, maxResults);
-	}
+  @Override
+  public CountResultDto getEventSubscriptionsCount(UriInfo uriInfo) {
+    EventSubscriptionQueryDto queryDto = new EventSubscriptionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+    return queryEventSubscriptionsCount(queryDto);
+  }
 
-	@Override
-	public CountResultDto getEventSubscriptionsCount(UriInfo uriInfo) {
-		EventSubscriptionQueryDto queryDto = new EventSubscriptionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-		return queryEventSubscriptionsCount(queryDto);
-	}	
+  public CountResultDto queryEventSubscriptionsCount(EventSubscriptionQueryDto queryDto) {
+    ProcessEngine engine = getProcessEngine();
+    queryDto.setObjectMapper(getObjectMapper());
+    EventSubscriptionQuery query = queryDto.toQuery(engine);
 
-	public CountResultDto queryEventSubscriptionsCount(EventSubscriptionQueryDto queryDto) {
-		ProcessEngine engine = getProcessEngine();
-		queryDto.setObjectMapper(getObjectMapper());
-		EventSubscriptionQuery query = queryDto.toQuery(engine);
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
 
-		long count = query.count();
-		CountResultDto result = new CountResultDto();
-		result.setCount(count);
-
-		return result;
-	}
+    return result;
+  }
 }

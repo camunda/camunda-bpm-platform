@@ -260,7 +260,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   public SchemaLogRestService getSchemaLogRestService(@PathParam("name") String engineName) {
     return super.getSchemaLogRestService(engineName);
   }
-  
+
   @Override
   @Path("/{name}" + EventSubscriptionRestService.PATH)
   public EventSubscriptionRestService getEventSubscriptionRestService(@PathParam("name") String engineName) {
@@ -292,7 +292,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-    if(iterator.hasNext()) {
+    if (iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
       return provider;
     } else {

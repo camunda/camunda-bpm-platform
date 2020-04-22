@@ -45,265 +45,238 @@ import org.mockito.Mockito;
 
 import io.restassured.response.Response;
 
-public class EventSubscriptionRestServiceInteractionTest extends
-AbstractRestServiceTest {
+public class EventSubscriptionRestServiceInteractionTest extends AbstractRestServiceTest {
 
-	@ClassRule
-	public static TestContainerRule rule = new TestContainerRule();
+  @ClassRule
+  public static TestContainerRule rule = new TestContainerRule();
 
-	protected static final String EVENT_SUBSCRIPTION_URL = TEST_RESOURCE_ROOT_PATH + "/event-subscription";
-	protected static final String EVENT_SUBSCRIPTION_COUNT_QUERY_URL = EVENT_SUBSCRIPTION_URL + "/count";
+  protected static final String EVENT_SUBSCRIPTION_URL = TEST_RESOURCE_ROOT_PATH + "/event-subscription";
+  protected static final String EVENT_SUBSCRIPTION_COUNT_QUERY_URL = EVENT_SUBSCRIPTION_URL + "/count";
 
-	private EventSubscriptionQuery mockedEventSubscriptionQuery;
+  private EventSubscriptionQuery mockedEventSubscriptionQuery;
 
-	@Before
-	public void setUpRuntimeData() {
-		mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(createMockEventSubscriptionList());
-	}
+  @Before
+  public void setUpRuntimeData() {
+    mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(createMockEventSubscriptionList());
+  }
 
-	private EventSubscriptionQuery setUpMockEventSubscriptionQuery(List<EventSubscription> mockedInstances) {
-		EventSubscriptionQuery sampleEventSubscriptionsQuery = mock(EventSubscriptionQuery.class);
-		when(sampleEventSubscriptionsQuery.list()).thenReturn(mockedInstances);
-		when(sampleEventSubscriptionsQuery.count()).thenReturn((long) mockedInstances.size());
-		when(processEngine.getRuntimeService().createEventSubscriptionQuery()).thenReturn(sampleEventSubscriptionsQuery);
-		return sampleEventSubscriptionsQuery;
-	}
+  private EventSubscriptionQuery setUpMockEventSubscriptionQuery(List<EventSubscription> mockedInstances) {
+    EventSubscriptionQuery sampleEventSubscriptionsQuery = mock(EventSubscriptionQuery.class);
+    when(sampleEventSubscriptionsQuery.list()).thenReturn(mockedInstances);
+    when(sampleEventSubscriptionsQuery.count()).thenReturn((long) mockedInstances.size());
+    when(processEngine.getRuntimeService().createEventSubscriptionQuery()).thenReturn(sampleEventSubscriptionsQuery);
+    return sampleEventSubscriptionsQuery;
+  }
 
-	private List<EventSubscription> createMockEventSubscriptionList() {
-		List<EventSubscription> mocks = new ArrayList<EventSubscription>();
+  private List<EventSubscription> createMockEventSubscriptionList() {
+    List<EventSubscription> mocks = new ArrayList<EventSubscription>();
 
-		mocks.add(MockProvider.createMockEventSubscription());
-		return mocks;
-	}
+    mocks.add(MockProvider.createMockEventSubscription());
+    return mocks;
+  }
 
-	@Test
-	public void testEmptyQuery() {
-		given()
-		.then().expect().statusCode(Status.OK.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
-	}
+  @Test
+  public void testEmptyQuery() {
+    given().then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+  }
 
-	@Test
-	public void testEventSubscriptionRetrieval() {
-		Response response = given()
-				.then().expect().statusCode(Status.OK.getStatusCode())
-				.when().get(EVENT_SUBSCRIPTION_URL);
+  @Test
+  public void testEventSubscriptionRetrieval() {
+    Response response = given().then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-		// assert query invocation
-		InOrder inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
-		inOrder.verify(mockedEventSubscriptionQuery).list();
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
+    inOrder.verify(mockedEventSubscriptionQuery).list();
 
-		String content = response.asString();
-		List<String> instances = from(content).getList("");
-		Assert.assertEquals("There should be one event subscription returned.", 1, instances.size());
-		Assert.assertNotNull("There should be one event subscription returned", instances.get(0));
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    Assert.assertEquals("There should be one event subscription returned.", 1, instances.size());
+    Assert.assertNotNull("There should be one event subscription returned", instances.get(0));
 
-		String returnedEventSubscriptionId = from(content).getString("[0].id");
-		String returnedEventType = from(content).getString("[0].eventType");
-		String returnedEventName = from(content).getString("[0].eventName");
-		String returnedExecutionId = from(content).getString("[0].executionId");
-		String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-		String returnedActivityId = from(content).getString("[0].activityId");
-		String returnedCreatedDate = from(content).getString("[0].createdDate");
-		String returnedTenantId = from(content).getString("[0].tenantId");
+    String returnedEventSubscriptionId = from(content).getString("[0].id");
+    String returnedEventType = from(content).getString("[0].eventType");
+    String returnedEventName = from(content).getString("[0].eventName");
+    String returnedExecutionId = from(content).getString("[0].executionId");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+    String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedCreatedDate = from(content).getString("[0].createdDate");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
-		Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_ID, returnedEventSubscriptionId);
-		Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_TYPE, returnedEventType);
-		Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME, returnedEventName);
-		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
-		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
-		Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, returnedActivityId);
-		Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE, returnedCreatedDate);
-		Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
-	}
+    Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_ID, returnedEventSubscriptionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_TYPE, returnedEventType);
+    Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME, returnedEventName);
+    Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE, returnedCreatedDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+  }
 
-	@Test
-	public void testInvalidSortingOptions() {
-		executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
-		executeAndVerifySorting("definitionId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
-	}
+  @Test
+  public void testInvalidSortingOptions() {
+    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
+    executeAndVerifySorting("definitionId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
 
-	protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
-		given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-		.then().expect().statusCode(expectedStatus.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
-	}
+  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder).then().expect().statusCode(expectedStatus.getStatusCode()).when()
+        .get(EVENT_SUBSCRIPTION_URL);
+  }
 
-	@Test
-	public void testSortByParameterOnly() {
-		given().queryParam("sortBy", "created")
-		.then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
-	}
+  @Test
+  public void testSortByParameterOnly() {
+    given().queryParam("sortBy", "created").then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+  }
 
-	@Test
-	public void testSortOrderParameterOnly() {
-		given().queryParam("sortOrder", "asc")
-		.then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
-	}
+  @Test
+  public void testSortOrderParameterOnly() {
+    given().queryParam("sortOrder", "asc").then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+  }
 
-	@Test
-	public void testNoParametersQuery() {
-		expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+  @Test
+  public void testNoParametersQuery() {
+    expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-		verify(mockedEventSubscriptionQuery).list();
-		verifyNoMoreInteractions(mockedEventSubscriptionQuery);
-	}
+    verify(mockedEventSubscriptionQuery).list();
+    verifyNoMoreInteractions(mockedEventSubscriptionQuery);
+  }
 
-	@Test
-	public void testQueryParameters() {
-		Map<String, String> queryParameters = getCompleteQueryParameters();
+  @Test
+  public void testQueryParameters() {
+    Map<String, String> queryParameters = getCompleteQueryParameters();
 
-		given().queryParams(queryParameters)
-		.expect().statusCode(Status.OK.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
+    given().queryParams(queryParameters).expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-		verify(mockedEventSubscriptionQuery).eventSubscriptionId(queryParameters.get("eventSubscriptionId"));
-		verify(mockedEventSubscriptionQuery).eventType(queryParameters.get("eventType"));
-		verify(mockedEventSubscriptionQuery).eventName(queryParameters.get("eventName"));
-		verify(mockedEventSubscriptionQuery).executionId(queryParameters.get("executionId"));
-		verify(mockedEventSubscriptionQuery).processInstanceId(queryParameters.get("processInstanceId"));
-		verify(mockedEventSubscriptionQuery).activityId(queryParameters.get("activityId"));
-		verify(mockedEventSubscriptionQuery).list();
-	}
+    verify(mockedEventSubscriptionQuery).eventSubscriptionId(queryParameters.get("eventSubscriptionId"));
+    verify(mockedEventSubscriptionQuery).eventType(queryParameters.get("eventType"));
+    verify(mockedEventSubscriptionQuery).eventName(queryParameters.get("eventName"));
+    verify(mockedEventSubscriptionQuery).executionId(queryParameters.get("executionId"));
+    verify(mockedEventSubscriptionQuery).processInstanceId(queryParameters.get("processInstanceId"));
+    verify(mockedEventSubscriptionQuery).activityId(queryParameters.get("activityId"));
+    verify(mockedEventSubscriptionQuery).list();
+  }
 
-	private Map<String, String> getCompleteQueryParameters() {
-		Map<String, String> parameters = new HashMap<String, String>();
+  private Map<String, String> getCompleteQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
 
-		parameters.put("eventSubscriptionId", "anEventSubscriptionId");
-		parameters.put("eventType", "aEventType");
-		parameters.put("eventName", "aEventName");
-		parameters.put("executionId", "aExecutionId");
-		parameters.put("processInstanceId", "aProcessInstanceId");
-		parameters.put("activityId", "aActivityId");
+    parameters.put("eventSubscriptionId", "anEventSubscriptionId");
+    parameters.put("eventType", "aEventType");
+    parameters.put("eventName", "aEventName");
+    parameters.put("executionId", "aExecutionId");
+    parameters.put("processInstanceId", "aProcessInstanceId");
+    parameters.put("activityId", "aActivityId");
 
-		return parameters;
-	}
+    return parameters;
+  }
 
-	@Test
-	public void testTenantIdListParameter() {
-		mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(createMockProcessInstancesTwoTenants());
+  @Test
+  public void testTenantIdListParameter() {
+    mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(createMockEventSubscriptionTwoTenants());
 
-		Response response = given()
-				.queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
-				.then().expect()
-				.statusCode(Status.OK.getStatusCode())
-				.when()
-				.get(EVENT_SUBSCRIPTION_URL);
+    Response response = given().queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST).then().expect().statusCode(Status.OK.getStatusCode()).when()
+        .get(EVENT_SUBSCRIPTION_URL);
 
-		verify(mockedEventSubscriptionQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
-		verify(mockedEventSubscriptionQuery).list();
+    verify(mockedEventSubscriptionQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedEventSubscriptionQuery).list();
 
-		String content = response.asString();
-		List<String> instances = from(content).getList("");
-		assertThat(instances).hasSize(2);
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    assertThat(instances).hasSize(2);
 
-		String returnedTenantId1 = from(content).getString("[0].tenantId");
-		String returnedTenantId2 = from(content).getString("[1].tenantId");
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
 
-		assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
-		assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
-	}
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
 
-	private List<EventSubscription> createMockProcessInstancesTwoTenants() {
-		return Arrays.asList(
-				MockProvider.createMockEventSubscription(MockProvider.EXAMPLE_TENANT_ID),
-				MockProvider.createMockEventSubscription(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
-	}
+  private List<EventSubscription> createMockEventSubscriptionTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockEventSubscription(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockEventSubscription(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)
+      );
+  }
 
+  @Test
+  public void testWithoutTenantIdParameter() {
+    mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(Arrays.asList(MockProvider.createMockEventSubscription(null)));
 
-	@Test
-	public void testWithoutTenantIdParameter() {
-		mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(Arrays.asList(MockProvider.createMockEventSubscription(null)));
+    Response response = given().queryParam("withoutTenantId", true).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-		Response response = given()
-				.queryParam("withoutTenantId", true)
-				.then().expect()
-				.statusCode(Status.OK.getStatusCode())
-				.when()
-				.get(EVENT_SUBSCRIPTION_URL);
+    verify(mockedEventSubscriptionQuery).withoutTenantId();
+    verify(mockedEventSubscriptionQuery).list();
 
-		verify(mockedEventSubscriptionQuery).withoutTenantId();
-		verify(mockedEventSubscriptionQuery).list();
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
 
-		String content = response.asString();
-		List<String> definitions = from(content).getList("");
-		assertThat(definitions).hasSize(1);
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
 
-		String returnedTenantId1 = from(content).getString("[0].tenantId");
-		assertThat(returnedTenantId1).isEqualTo(null);
-	}
+  @Test
+  public void testSortingParameters() {
+    InOrder inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
+    executeAndVerifySorting("created", "asc", Status.OK);
+    inOrder.verify(mockedEventSubscriptionQuery).orderByCreated();
+    inOrder.verify(mockedEventSubscriptionQuery).asc();
 
-	@Test
-	public void testSortingParameters() {
-		InOrder inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
-		executeAndVerifySorting("created", "asc", Status.OK);
-		inOrder.verify(mockedEventSubscriptionQuery).orderByCreated();
-		inOrder.verify(mockedEventSubscriptionQuery).asc();
+    inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
+    executeAndVerifySorting("created", "desc", Status.OK);
+    inOrder.verify(mockedEventSubscriptionQuery).orderByCreated();
+    inOrder.verify(mockedEventSubscriptionQuery).desc();
 
-		inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
-		executeAndVerifySorting("created", "desc", Status.OK);
-		inOrder.verify(mockedEventSubscriptionQuery).orderByCreated();
-		inOrder.verify(mockedEventSubscriptionQuery).desc();
+    inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedEventSubscriptionQuery).orderByTenantId();
+    inOrder.verify(mockedEventSubscriptionQuery).asc();
 
-		inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
-		executeAndVerifySorting("tenantId", "asc", Status.OK);
-		inOrder.verify(mockedEventSubscriptionQuery).orderByTenantId();
-		inOrder.verify(mockedEventSubscriptionQuery).asc();
+    inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedEventSubscriptionQuery).orderByTenantId();
+    inOrder.verify(mockedEventSubscriptionQuery).desc();
 
-		inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
-		executeAndVerifySorting("tenantId", "desc", Status.OK);
-		inOrder.verify(mockedEventSubscriptionQuery).orderByTenantId();
-		inOrder.verify(mockedEventSubscriptionQuery).desc();
+  }
 
-	}
+  @Test
+  public void testSuccessfulPagination() {
 
-	@Test
-	public void testSuccessfulPagination() {
+    int firstResult = 0;
+    int maxResults = 10;
+    given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults).then().expect().statusCode(Status.OK.getStatusCode()).when()
+        .get(EVENT_SUBSCRIPTION_URL);
 
-		int firstResult = 0;
-		int maxResults = 10;
-		given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
-		.then().expect().statusCode(Status.OK.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
+    verify(mockedEventSubscriptionQuery).listPage(firstResult, maxResults);
+  }
 
-		verify(mockedEventSubscriptionQuery).listPage(firstResult, maxResults);
-	}
+  /**
+   * If parameter "firstResult" is missing, we expect 0 as default.
+   */
+  @Test
+  public void testMissingFirstResultParameter() {
+    int maxResults = 10;
+    given().queryParam("maxResults", maxResults).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-	/**
-	 * If parameter "firstResult" is missing, we expect 0 as default.
-	 */
-	@Test
-	public void testMissingFirstResultParameter() {
-		int maxResults = 10;
-		given().queryParam("maxResults", maxResults)
-		.then().expect().statusCode(Status.OK.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
+    verify(mockedEventSubscriptionQuery).listPage(0, maxResults);
+  }
 
-		verify(mockedEventSubscriptionQuery).listPage(0, maxResults);
-	}
+  /**
+   * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as
+   * default.
+   */
+  @Test
+  public void testMissingMaxResultsParameter() {
+    int firstResult = 10;
+    given().queryParam("firstResult", firstResult).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
 
-	/**
-	 * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
-	 */
-	@Test
-	public void testMissingMaxResultsParameter() {
-		int firstResult = 10;
-		given().queryParam("firstResult", firstResult)
-		.then().expect().statusCode(Status.OK.getStatusCode())
-		.when().get(EVENT_SUBSCRIPTION_URL);
+    verify(mockedEventSubscriptionQuery).listPage(firstResult, Integer.MAX_VALUE);
+  }
 
-		verify(mockedEventSubscriptionQuery).listPage(firstResult, Integer.MAX_VALUE);
-	}
+  @Test
+  public void testQueryCount() {
+    expect().statusCode(Status.OK.getStatusCode()).body("count", equalTo(1)).when().get(EVENT_SUBSCRIPTION_COUNT_QUERY_URL);
 
-	@Test
-	public void testQueryCount() {
-		expect().statusCode(Status.OK.getStatusCode())
-		.body("count", equalTo(1))
-		.when().get(EVENT_SUBSCRIPTION_COUNT_QUERY_URL);
-
-		verify(mockedEventSubscriptionQuery).count();
-	}
+    verify(mockedEventSubscriptionQuery).count();
+  }
 
 }
