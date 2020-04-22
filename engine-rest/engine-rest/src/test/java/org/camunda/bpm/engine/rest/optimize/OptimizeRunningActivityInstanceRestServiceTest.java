@@ -16,21 +16,26 @@
  */
 package org.camunda.bpm.engine.rest.optimize;
 
+import io.restassured.response.Response;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import java.util.Collections;
 import java.util.Date;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -137,6 +142,27 @@ public class OptimizeRunningActivityInstanceRestServiceTest extends AbstractRest
 
     verify(mockedOptimizeService).getRunningHistoricActivityInstances(now, now, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
+  }
+
+  @Test
+  public void testPresenceOfSequenceCounterProperty() {
+    final HistoricActivityInstanceEntity mock = mock(HistoricActivityInstanceEntity.class);
+    when(mock.getSequenceCounter()).thenReturn(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER);
+    when(mockedOptimizeService.getRunningHistoricActivityInstances(null, null, Integer.MAX_VALUE))
+      .thenReturn(Collections.singletonList(mock));
+
+    final Response response = given()
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(MediaType.APPLICATION_JSON)
+      .when()
+        .get(OPTIMIZE_RUNNING_ACTIVITY_INSTANCE_PATH);
+
+    String content = response.asString();
+    long sequenceCounter = from(content).getLong("[0].sequenceCounter");
+
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER, sequenceCounter);
   }
 
 }

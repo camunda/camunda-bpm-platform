@@ -44,7 +44,9 @@ public class HistoricActivityInstanceResourceImpl implements HistoricActivityIns
       throw new InvalidRequestException(Status.NOT_FOUND, "Historic activity instance with id '" + activityInstanceId + "' does not exist");
     }
 
-    return HistoricActivityInstanceDto.fromHistoricActivityInstance(instance);
+    final HistoricActivityInstanceDto historicActivityInstanceDto = new HistoricActivityInstanceDto();
+    HistoricActivityInstanceDto.fromHistoricActivityInstance(historicActivityInstanceDto, instance);
+    return historicActivityInstanceDto;
   }
 
 }
