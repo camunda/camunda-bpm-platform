@@ -199,7 +199,7 @@ public class PurgeDatabaseTest {
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOBDEF"));
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_USER"));
     assertEquals(5, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXECUTION"));
-    assertEquals(10, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
+    assertEquals(12, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
     assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
     assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_PROCDEF"));
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT"));
