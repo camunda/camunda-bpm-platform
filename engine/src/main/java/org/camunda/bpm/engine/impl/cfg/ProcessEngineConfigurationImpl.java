@@ -1360,6 +1360,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         PooledDataSource pooledDataSource =
             new PooledDataSource(ReflectUtil.getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
 
+        // Set default Transaction Isolation Level to READ_COMMITTED
+        pooledDataSource.setDefaultTransactionIsolationLevel(getDbTransactionIsolationLevel());
+
         if (jdbcMaxActiveConnections > 0) {
           pooledDataSource.setPoolMaximumActiveConnections(jdbcMaxActiveConnections);
         }
