@@ -987,11 +987,10 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         HistoricProcessInstancePermissions.NONE);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(0);
+    assertThat(query.list()).isEmpty();
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance_GlobalVariable() {
@@ -1007,11 +1006,12 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance_LocalVariable() {
@@ -1028,11 +1028,12 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnCompletedHistoricProcessInstance() {
@@ -1050,11 +1051,12 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
@@ -1073,11 +1075,12 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
@@ -1097,11 +1100,12 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         ProcessDefinitionPermissions.NONE);
 
     // when
-    List<HistoricVariableInstance> result = historyService.createHistoricVariableInstanceQuery()
-        .list();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   protected void setReadHistoryVariableAsDefaultReadPermission() {

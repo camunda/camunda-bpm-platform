@@ -16,7 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -68,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -585,7 +588,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance rootProcessInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     // when
     Authorization authorization =
@@ -594,16 +597,24 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     authorization.setUserId("myUserId");
     authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    String processInstanceId = processInstance.getProcessInstanceId();
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
     authorization.setResourceId(processInstanceId);
 
     authorizationService.saveAuthorization(authorization);
 
     // then
-    Date removalTime = addDays(START_DATE, 5);
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    assertThat(authorization.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
-    assertThat(authorization.getRemovalTime(), is(removalTime));
+    String rootProcessInstanceId = rootProcessInstance.getRootProcessInstanceId();
+    Date removalTime = addDays(START_DATE, 5);
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
   }
 
   @Test
@@ -618,7 +629,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     ClockUtil.setCurrentTime(START_DATE);
 
     enabledAuth();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance rootProcessInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
     disableAuth();
 
     Authorization authorization =
@@ -627,32 +638,36 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     authorization.setUserId("myUserId");
     authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    String processInstanceId = processInstance.getProcessInstanceId();
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
     authorization.setResourceId(processInstanceId);
 
     authorizationService.saveAuthorization(authorization);
 
     // assume
-    authorization = authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-        .singleResult();
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    assertThat(authorization.getRootProcessInstanceId(), is(processInstanceId));
-
+    String rootProcessInstanceId = rootProcessInstance.getRootProcessInstanceId();
     Date removalTime = addDays(START_DATE, 5);
-    assertThat(authorization.getRemovalTime(), is(removalTime));
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
 
     // when
     authorization.setResourceId("*");
     authorizationService.saveAuthorization(authorization);
 
     // then
-    authorization = authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-        .singleResult();
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    assertThat(authorization.getRootProcessInstanceId(), nullValue());
-    assertThat(authorization.getRemovalTime(), nullValue());
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, "*", null));
   }
 
   @Test
@@ -666,7 +681,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance rootProcessInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     Authorization authorization =
         authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
@@ -677,29 +692,32 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     authorizationService.saveAuthorization(authorization);
 
     // assume
-    authorization = authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-        .singleResult();
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
-    assertThat(authorization.getRootProcessInstanceId(), nullValue());
-    assertThat(authorization.getRemovalTime(), nullValue());
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, "*", null));
 
     // when
-    String processInstanceId = processInstance.getProcessInstanceId();
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
     authorization.setResourceId(processInstanceId);
 
     authorizationService.saveAuthorization(authorization);
 
     // then
-    authorization = authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
-        .singleResult();
-
-    String rootProcessInstanceId = processInstance.getRootProcessInstanceId();
-    assertThat(authorization.getRootProcessInstanceId(), is(rootProcessInstanceId));
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
 
     Date removalTime = addDays(START_DATE, 5);
-    assertThat(authorization.getRemovalTime(), is(removalTime));
+    String rootProcessInstanceId = rootProcessInstance.getRootProcessInstanceId();
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
   }
 
   @Test

@@ -977,10 +977,10 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.NONE);
 
     // when
-    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(0);
+    assertThat(query.list()).isEmpty();
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstance() {
@@ -993,10 +993,12 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnCompletedHHistoricProcessInstance() {
@@ -1013,10 +1015,12 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
         HistoricProcessInstancePermissions.READ);
 
     // when
-    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
@@ -1034,10 +1038,12 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   public void testCheckReadPermissionOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
@@ -1056,10 +1062,12 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
         ProcessDefinitionPermissions.NONE);
 
     // when
-    List<HistoricTaskInstance> result = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertThat(result.size()).isEqualTo(1);
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   // helper ////////////////////////////////////////////////////////
