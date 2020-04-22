@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
@@ -233,6 +234,7 @@ public abstract class ProcessEngineConfiguration {
   protected String databaseVendor;
   protected String databaseVersion;
   protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
+  protected int dbTransactionIsolationLevel = TransactionIsolationLevel.READ_COMMITTED.getLevel();
   protected String jdbcDriver = "org.h2.Driver";
   protected String jdbcUrl = "jdbc:h2:tcp://localhost/activiti";
   protected String jdbcUsername = "sa";
@@ -648,6 +650,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setJdbcPassword(String jdbcPassword) {
     this.jdbcPassword = jdbcPassword;
     return this;
+  }
+
+  public int getDbTransactionIsolationLevel() {
+    return dbTransactionIsolationLevel;
+  }
+
+  public void setDbTransactionIsolationLevel(int dbTransactionIsolationLevel) {
+    this.dbTransactionIsolationLevel = dbTransactionIsolationLevel;
   }
 
   public boolean isTransactionsExternallyManaged() {
