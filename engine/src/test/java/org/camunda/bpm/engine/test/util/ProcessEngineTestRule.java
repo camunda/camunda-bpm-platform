@@ -117,8 +117,8 @@ public class ProcessEngineTestRule extends TestWatcher {
     return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
-  public DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder) {
-    DeploymentWithDefinitions deployment = deploymentBuilder.deployWithResult();
+  public <T extends DeploymentWithDefinitions> T deploy(DeploymentBuilder deploymentBuilder) {
+    T deployment = (T) deploymentBuilder.deployWithResult();
 
     processEngineRule.manageDeployment(deployment);
 
