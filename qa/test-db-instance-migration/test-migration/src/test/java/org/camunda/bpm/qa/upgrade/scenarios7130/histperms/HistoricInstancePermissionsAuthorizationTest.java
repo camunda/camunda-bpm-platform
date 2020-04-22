@@ -125,4 +125,47 @@ public class HistoricInstancePermissionsAuthorizationTest {
         );
   }
 
+  @Test
+  public void shouldSkipAuthorizationChecksForHistoricProcessInstanceQuery() {
+    // given
+    engineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    auth.setUserId(USER_ID);
+    auth.setPermissions(new HistoricProcessInstancePermissions[] {
+        HistoricProcessInstancePermissions.READ });
+    auth.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    HistoricProcessInstance historicProcessInstance =
+        historyService.createHistoricProcessInstanceQuery()
+            .processInstanceBusinessKey(BUSINESS_KEY + "0")
+            .singleResult();
+
+    String processInstanceId = historicProcessInstance.getId();
+
+    auth.setResourceId(processInstanceId);
+
+    authorizationService.saveAuthorization(auth);
+
+    engineConfiguration.setAuthorizationEnabled(true);
+
+    // when
+    String processDefinitionId = historicProcessInstance.getProcessDefinitionId();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionId(processDefinitionId);
+
+    // then
+    assertThat(query.list())
+        .extracting("businessKey")
+        .containsExactly(
+            BUSINESS_KEY + "0",
+            BUSINESS_KEY + "1",
+            BUSINESS_KEY + "2",
+            BUSINESS_KEY + "3",
+            BUSINESS_KEY + "4"
+        );
+  }
+
+
 }

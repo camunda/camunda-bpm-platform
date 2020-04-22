@@ -547,18 +547,11 @@
       </foreach>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-        <choose>
-          <when test="authCheck.isHistoricInstancePermissionsEnabled">
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-          </when>
-          <otherwise>
-            and (
-            (SELF.PROC_DEF_KEY_ is not null
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-            ) or SELF.PROC_DEF_KEY_ is null
-            )
-          </otherwise>
-        </choose>
+        and (
+        (SELF.PROC_DEF_KEY_ is not null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        ) or SELF.PROC_DEF_KEY_ is null
+        )
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
