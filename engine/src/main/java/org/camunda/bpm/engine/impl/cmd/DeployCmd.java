@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -139,46 +138,46 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
     }
 
     // perform deployment
-    DeploymentWithDefinitions deployment = commandContext.runWithoutAuthorization(new Callable<DeploymentWithDefinitions>() {
-      @Override
-      public DeploymentWithDefinitions call() throws Exception {
-        acquireExclusiveLock(commandContext);
-        DeploymentEntity deploymentToRegister = initDeployment();
-        Map<String, ResourceEntity> resourcesToDeploy =
-            resolveResourcesToDeploy(commandContext, deploymentToRegister);
+    DeploymentWithDefinitions deployment = commandContext.runWithoutAuthorization(() -> {
+      acquireExclusiveLock(commandContext);
+      DeploymentEntity deploymentToRegister = initDeployment();
+      Map<String, ResourceEntity> resourcesToDeploy =
+          resolveResourcesToDeploy(commandContext, deploymentToRegister);
+      Map<String, ResourceEntity> resourcesToIgnore = new HashMap<>(deploymentToRegister.getResources());
+      resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
 
-        // save initial deployment resources before they are replaced with only the deployed ones
-        CandidateDeployment candidateDeployment =
-            CandidateDeploymentImpl.fromDeploymentEntity(deploymentToRegister);
-        if (!resourcesToDeploy.isEmpty()) {
-          LOG.debugCreatingNewDeployment();
-          deploymentToRegister.setResources(resourcesToDeploy);
-          deploy(commandContext, deploymentToRegister);
-        } else {
-          // if there are no resources to be deployed, find an existing deployment
-          String duplicateDeploymentId =
-              deploymentHandler.determineDuplicateDeployment(candidateDeployment);
-          deploymentToRegister =
-              commandContext.getDeploymentManager().findDeploymentById(duplicateDeploymentId);
-        }
-
-        scheduleProcessDefinitionActivation(commandContext, deploymentToRegister);
-
-        if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
-          // for process application deployments, job executor registration
-          // is managed by the ProcessApplicationManager
-          ProcessApplicationRegistration registration = registerProcessApplication(
-              commandContext,
-              deploymentToRegister,
-              candidateDeployment);
-
-          return new ProcessApplicationDeploymentImpl(deploymentToRegister, registration);
-        } else {
-          registerWithJobExecutor(commandContext, deploymentToRegister);
-        }
-
-        return deploymentToRegister;
+      // save initial deployment resources before they are replaced with only the deployed ones
+      CandidateDeployment candidateDeployment =
+          CandidateDeploymentImpl.fromDeploymentEntity(deploymentToRegister);
+      if (!resourcesToDeploy.isEmpty()) {
+        LOG.debugCreatingNewDeployment();
+        deploymentToRegister.setResources(resourcesToDeploy);
+        deploy(commandContext, deploymentToRegister);
+      } else {
+        // if there are no resources to be deployed, find an existing deployment
+        String duplicateDeploymentId =
+            deploymentHandler.determineDuplicateDeployment(candidateDeployment);
+        deploymentToRegister =
+            commandContext.getDeploymentManager().findDeploymentById(duplicateDeploymentId);
       }
+
+      scheduleProcessDefinitionActivation(commandContext, deploymentToRegister);
+
+      if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
+        // for process application deployments, job executor registration
+        // is managed by the ProcessApplicationManager
+        ProcessApplicationRegistration registration = registerProcessApplication(
+            commandContext,
+            deploymentToRegister,
+            candidateDeployment,
+            resourcesToIgnore.values());
+
+        return new ProcessApplicationDeploymentImpl(deploymentToRegister, registration);
+      } else {
+        registerWithJobExecutor(commandContext, deploymentToRegister);
+      }
+
+      return deploymentToRegister;
     });
 
     createUserOperationLog(deploymentBuilder, deployment, commandContext);
@@ -282,7 +281,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
   protected ProcessApplicationRegistration registerProcessApplication(CommandContext commandContext,
       DeploymentEntity deploymentToRegister,
-      CandidateDeployment candidateDeployment) {
+      CandidateDeployment candidateDeployment, Collection ignoredResources) {
 
     ProcessApplicationDeploymentBuilderImpl appDeploymentBuilder = (ProcessApplicationDeploymentBuilderImpl) deploymentBuilder;
     final ProcessApplicationReference appReference = appDeploymentBuilder.getProcessApplicationReference();
@@ -305,7 +304,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
         String[] processDefinitionKeys = getProcessDefinitionsFromResources(commandContext,
             deploymentToRegister,
-            candidateDeployment);
+            ignoredResources);
 
         // only determine deployments to resume if there are actual process definitions to look for
         if (processDefinitionKeys.length > 0) {
@@ -474,7 +473,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
     return result;
   }
 
-  protected List<? extends ProcessDefinition> getDeployedProcesses(CommandContext commandContext, DeploymentWithDefinitions deployment) {
+  protected List<? extends ProcessDefinition>   getDeployedProcesses(CommandContext commandContext, DeploymentWithDefinitions deployment) {
     List<? extends ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
     if (deployedProcessDefinitions == null) {
       // existing deployment
@@ -487,9 +486,12 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
   protected String[] getProcessDefinitionsFromResources(CommandContext commandContext,
       DeploymentEntity deploymentToRegister,
-      CandidateDeployment candidateDeployment) {
+      Collection ignoredResources) {
 
     Set<String> processDefinitionKeys = new HashSet<>();
+
+    // get process definition keys for already available process definitions
+    processDefinitionKeys.addAll(parseProcessDefinitionKeys(ignoredResources));
 
     // get process definition keys for updated process definitions
     for (ProcessDefinition processDefinition :
@@ -499,12 +501,13 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       }
     }
 
-    // get process definition keys for already available process definitions
-    Map<String, Resource> candidateResources = candidateDeployment.getResources();
-    // and remove resources that are getting deployed, so that we don't do double checks
-    candidateResources.keySet().removeAll(deploymentToRegister.getResources().keySet());
+    return processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]);
+  }
 
-    for (Resource resource : candidateResources.values()) {
+  protected Set<String> parseProcessDefinitionKeys(Collection<Resource> resources) {
+    Set<String> processDefinitionKeys = new HashSet<>(resources.size());
+
+    for (Resource resource : resources) {
       if (isBpmnResource(resource)) {
 
         ByteArrayInputStream byteStream = new ByteArrayInputStream(resource.getBytes());
@@ -522,7 +525,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       }
     }
 
-    return processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]);
+    return processDefinitionKeys;
   }
 
   protected Set<String> getAllDeploymentIds(DeploymentBuilderImpl deploymentBuilder) {
@@ -596,16 +599,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       StringBuilder builder = new StringBuilder();
 
       builder.append("The following deployments are not found by id: ");
-
-      boolean first = true;
-      for(String missingDeployment: missingDeployments) {
-        if (!first) {
-          builder.append(", ");
-        } else {
-          first = false;
-        }
-        builder.append(missingDeployment);
-      }
+      builder.append(StringUtil.join(missingDeployments.iterator()));
 
       throw new NotFoundException(builder.toString());
     }
@@ -638,16 +632,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       builder.append("' does not contain the following resources with ");
       builder.append(valueProperty);
       builder.append(": ");
-
-      boolean first = true;
-      for(String missingResource: missingResources) {
-        if (!first) {
-          builder.append(", ");
-        } else {
-          first = false;
-        }
-        builder.append(missingResource);
-      }
+      builder.append(StringUtil.join(missingResources.iterator()));
 
       throw new NotFoundException(builder.toString());
     }

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -34,10 +35,13 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -62,18 +66,22 @@ public class ProcessApplicationDeploymentTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  
+
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-  
+
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RepositoryService repositoryService;
   protected ManagementService managementService;
-  
+  protected ProcessEngine processEngine;
+
   private EmbeddedProcessApplication processApplication;
   protected DeploymentHandlerFactory defaultDeploymentHandlerFactory;
   protected DeploymentHandlerFactory customDeploymentHandlerFactory;
-  protected ProcessEngine processEngine;
+
+  protected ProcessApplicationManager processApplicationManager;
+  protected DeploymentCache deploymentCache;
+  Set<String> registeredDeployments;
 
   @Before
   public void setUp() throws Exception {
@@ -81,14 +89,20 @@ public class ProcessApplicationDeploymentTest {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     repositoryService = engineRule.getRepositoryService();
     managementService = engineRule.getManagementService();
-    
+
     defaultDeploymentHandlerFactory = processEngineConfiguration.getDeploymentHandlerFactory();
     customDeploymentHandlerFactory = new VersionedDeploymentHandlerFactory();
     processApplication = new EmbeddedProcessApplication();
+
+    processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    deploymentCache = processEngineConfiguration.getDeploymentCache();
+    registeredDeployments = processEngineConfiguration.getRegisteredDeployments();
   }
 
   @After
   public void tearDown() throws Exception {
+    clearProcessApplicationDeployments();
+    processApplication.undeploy();
     processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
   }
 
@@ -1173,6 +1187,58 @@ public class ProcessApplicationDeploymentTest {
 
     // then the registration is removed
     assertNull(managementService.getProcessApplicationForDeployment(deployment.getId()));
+  }
+
+  @Test
+  public void shouldRegisterExistingDeploymentsOnLatestProcessDefinitionRemoval() {
+    // given
+    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process").done();
+    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process").startEvent().done();
+
+    DeploymentWithDefinitions deployment1 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("foo")
+        .addModelInstance("process.bpmn", process1));
+
+    DeploymentWithDefinitions deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("foo")
+        .addModelInstance("process.bpmn", process2)
+        .resumePreviousVersions()
+        .enableDuplicateFiltering(true));
+
+    ProcessDefinition latestProcessDefinition = deployment2.getDeployedProcessDefinitions().get(0);
+
+    // assume
+    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment1.getId()));
+    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment2.getId()));
+
+    // delete latest process definition
+    repositoryService.deleteProcessDefinition(latestProcessDefinition.getId());
+
+    // stop process engine by clearing the caches
+    clearProcessApplicationDeployments();
+
+    // when
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .addModelInstance("process.bpmn", process2)
+        .resumePreviousVersions()
+        .enableDuplicateFiltering(true)
+        .name("foo"));
+
+    // then
+    assertNotNull(managementService.getProcessApplicationForDeployment(deployment1.getId()));
+    assertNotNull(managementService.getProcessApplicationForDeployment(deployment2.getId()));
+  }
+
+  /*
+   * Clears the deployment caches to simulate a stop of the process engine.
+   */
+  protected void clearProcessApplicationDeployments() {
+    processApplicationManager.clearRegistrations();
+    registeredDeployments.clear();
+    deploymentCache.discardProcessDefinitionCache();
   }
 
   /**
