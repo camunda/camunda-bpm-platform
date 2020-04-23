@@ -10,6 +10,12 @@
   <artifactId>camunda-connect-connectors-all</artifactId>
   <name>camunda BPM - connect - all connectors in one</name>
 
+  <properties>
+    <!-- We shade artifacts into the jar, so we need to generate 
+    a dependency BOM for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+
   <dependencies>
 
     <dependency>
