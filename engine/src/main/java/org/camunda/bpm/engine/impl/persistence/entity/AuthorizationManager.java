@@ -936,8 +936,11 @@ public class AuthorizationManager extends AbstractManager {
     authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
 
     if (isHistoricInstancePermissionsEnabled) {
-      permissionCheckBuilder.atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
-              HistoricProcessInstancePermissions.READ);
+      permissionCheckBuilder
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
+          .atomicCheck(HISTORIC_TASK, "RES.TASK_ID_",
+              HistoricTaskPermissions.READ);
     }
 
     CompositePermissionCheck permissionCheck = permissionCheckBuilder.build();
