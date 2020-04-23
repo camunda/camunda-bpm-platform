@@ -43,8 +43,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 public class AutoDeploymentIT {
-  static final String PROCESS_DEFINITION_ENDPOINT = "/rest/process-definition";
-  static final String DEPLOYMENT_ENDPOINT = "/rest/deployment";
+  static final String PROCESS_DEFINITION_ENDPOINT = "/engine-rest/process-definition";
+  static final String DEPLOYMENT_ENDPOINT = "/engine-rest/deployment";
 
   static List<File> dummyFiles = new ArrayList<>();
   static SpringBootManagedContainer container;

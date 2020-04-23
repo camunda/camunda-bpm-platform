@@ -51,7 +51,7 @@ public class HttpsConfigurationEnabledTest extends AbstractRestTest {
   @Test
   public void shouldConnectWithHttps() {
     // given
-    String url = "https://localhost:" + localPort + "/rest/task";
+    String url = "https://localhost:" + localPort + "/engine-rest/task";
 
     // when
     ResponseEntity<List> response = testRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null), List.class);
@@ -63,7 +63,7 @@ public class HttpsConfigurationEnabledTest extends AbstractRestTest {
   @Test
   public void shouldNotRedirect() {
     // given
-    String url = "http://localhost:" + 8080 + "/rest/task";
+    String url = "http://localhost:" + 8080 + "/engine-rest/task";
 
     // then
     exceptionRule.expect(ResourceAccessException.class);

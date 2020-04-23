@@ -16,13 +16,8 @@
  */
 package org.camunda.bpm.run.test.config.cors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
 import org.camunda.bpm.run.property.CamundaBpmRunCorsProperty;
 import org.camunda.bpm.run.test.AbstractRestTest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,18 +27,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-/**
- * Note: To run this test via an IDE you must set the system property
- * {@code sun.net.http.allowRestrictedHeaders} to {@code true}.
- * 
- * @see https://jira.camunda.com/browse/CAM-11290
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles(profiles = {
+    "test-cors-enabled",
+    "test-changed-rest-context-path"
+})
+@TestPropertySource(properties = {
+    CamundaBpmRunCorsProperty.PREFIX + ".allowed-origins=http://other.origin:8081"
+})
+/*
+ * The purpose of the test is to check if the path of the CORS filter can be changed.
+ * The CORS behavior is tested elsewhere.
  */
-@ActiveProfiles(profiles = { "test-cors-enabled" }, inheritProfiles = true)
-@TestPropertySource(properties = { CamundaBpmRunCorsProperty.PREFIX + ".enabled=false" })
-public class CorsConfigurationDisabledTest extends AbstractRestTest {
+public class CorsWithChangedContextPathTest extends AbstractRestTest {
 
   @Test
-  public void shouldPassSameOriginRequest() {
+  public void shouldCheckCorsAvailabilityOnPathChange() {
     // given
     // same origin
     String origin = "http://localhost:" + localPort;
@@ -52,31 +54,12 @@ public class CorsConfigurationDisabledTest extends AbstractRestTest {
     headers.add(HttpHeaders.ORIGIN, origin);
 
     // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/engine-rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+    ResponseEntity<List> response = testRestTemplate.exchange("/rest/task",
+        HttpMethod.GET, new HttpEntity<>(headers), List.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getHeaders().getAccessControlAllowOrigin()).isNull();
+    assertThat(response.getHeaders().getAccessControlAllowOrigin()).contains(origin);
   }
 
-  @Test
-  /* TestRestTemplate does not follow same origin policy. With CORS disabled a cross-origin request
-   * should not be allowed by the calling client (i.e. browser or TestRestTemplate). Testing this
-   * manually in a browser should work.*/
-  @Ignore
-  public void shouldFailCrossOriginRequest() {
-    // given
-    // cross origin
-    String origin = "http://other.origin";
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Origin", origin);
-
-    // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/engine-rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
-
-    // then
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    assertThat(response.getHeaders().getAccessControlAllowOrigin()).isNull();
-  }
 }
