@@ -26,8 +26,9 @@ This project incorporates components from the projects listed below. The origina
 `
 module.exports = function(grunt) {
 
-  grunt.registerTask('license-book', function() {
+  var path = grunt.option('license-book-path') || '.';
 
+  grunt.registerTask('license-book', function() {
     var done = this.async();
 
     checker.init({
@@ -69,7 +70,7 @@ END OF ${package} NOTICES AND INFORMATION
           }
 
           var licenseBook = header + summary + '\n\n' + licenseTexts;
-          fs.writeFileSync('THIRD-PARTY-NOTICE.txt', licenseBook);
+          fs.writeFileSync(path + '/THIRD-PARTY-NOTICE.txt', licenseBook);
           done();
         }
     });
