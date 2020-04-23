@@ -49,7 +49,12 @@ public class TemplateParser {
   public static void main(String[] args) throws IOException, TemplateException {
 
     if (args.length != 4) {
-      throw new RuntimeException("Must provide four arguments: <source template directory> <main template> <output directory> <intermediate output dir>");
+      throw new RuntimeException(
+          "Must provide four arguments: "
+          + "<source template directory> "
+          + "<main template> "
+          + "<output directory> "
+          + "<intermediate output dir>");
     }
 
     String sourceDirectory = args[0];
@@ -86,7 +91,8 @@ public class TemplateParser {
 
   }
 
-  protected static Map<String, Object> createTemplateData(String sourceDirectory) throws IOException {
+  protected static Map<String, Object> createTemplateData(String sourceDirectory)
+      throws IOException {
     Map<String, Object> templateData = new HashMap<>();
 
     resolveVersions(templateData);
@@ -99,7 +105,10 @@ public class TemplateParser {
   }
 
   protected static String formatJsonString(String jsonString) {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Gson gson = new GsonBuilder()
+        .serializeNulls()
+        .setPrettyPrinting()
+        .create();
 
     JsonParser jsonParser = new JsonParser();
     JsonElement json = jsonParser.parse(jsonString);
@@ -111,7 +120,8 @@ public class TemplateParser {
   protected static String createOutputFile(String debugFile) throws IOException {
     DateTimeFormatter timeStampPattern = DateTimeFormatter.ofPattern("MM-dd-HH-mm-ss");
 
-    return debugFile + "/intermediate-openapi-" + timeStampPattern.format(java.time.LocalDateTime.now()) + ".json";
+    return debugFile + "/intermediate-openapi-"
+        + timeStampPattern.format(java.time.LocalDateTime.now()) + ".json";
   }
 
   /**
@@ -157,7 +167,8 @@ public class TemplateParser {
     for (File file : modelFiles) {
       String modelName = FilenameUtils.removeExtension(file.getName());
       String filePath = file.getAbsolutePath();
-      String modelPackage = filePath.substring(filePath.lastIndexOf("org"), filePath.lastIndexOf(File.separator));
+      String modelPackage = filePath
+          .substring(filePath.lastIndexOf("org"), filePath.lastIndexOf(File.separator));
       
       models.put(modelName, modelPackage);
     }
@@ -185,8 +196,9 @@ public class TemplateParser {
     for (File file : endpointsFiles) {
       String endpointMethod = FilenameUtils.removeExtension(file.getName());
       String filePath = file.getAbsolutePath();
-      String endpointPath = filePath.substring(endpointStartAt, filePath.lastIndexOf(File.separator))
-                                    .replace(File.separator, "/");
+      String endpointPath = filePath
+          .substring(endpointStartAt, filePath.lastIndexOf(File.separator))
+          .replace(File.separator, "/");
 
       List<String> operations;
       if (endpoints.containsKey(endpointPath)) {
