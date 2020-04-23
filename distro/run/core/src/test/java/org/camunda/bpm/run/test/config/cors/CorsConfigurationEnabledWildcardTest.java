@@ -48,7 +48,7 @@ public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
     headers.add(HttpHeaders.ORIGIN, origin);
 
     // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+    ResponseEntity<List> response = testRestTemplate.exchange("/engine-rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -65,7 +65,7 @@ public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
     headers.add("Origin", origin);
 
     // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+    ResponseEntity<List> response = testRestTemplate.exchange("/engine-rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

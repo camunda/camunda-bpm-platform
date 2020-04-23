@@ -23,7 +23,7 @@
 
     <http.port>58080</http.port>
     <http.ctx-path.webapp />
-    <http.ctx-path.rest>rest/</http.ctx-path.rest>
+    <http.ctx-path.rest>engine-rest/</http.ctx-path.rest>
   </properties>
 
   <profiles>

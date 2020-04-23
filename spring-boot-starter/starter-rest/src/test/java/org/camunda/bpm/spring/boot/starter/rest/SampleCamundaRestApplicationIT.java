@@ -61,14 +61,14 @@ public class SampleCamundaRestApplicationIT {
 
   @Test
   public void restApiIsAvailable() throws Exception {
-    ResponseEntity<String> entity = testRestTemplate.getForEntity("/rest/engine/", String.class);
+    ResponseEntity<String> entity = testRestTemplate.getForEntity("/engine-rest/engine/", String.class);
     assertEquals(HttpStatus.OK, entity.getStatusCode());
     assertEquals("[{\"name\":\"testEngine\"}]", entity.getBody());
   }
 
   @Test
   public void startProcessInstanceByCustomResource() throws Exception {
-    ResponseEntity<ProcessInstanceDto> entity = testRestTemplate.postForEntity("/rest/process/start", HttpEntity.EMPTY, ProcessInstanceDto.class);
+    ResponseEntity<ProcessInstanceDto> entity = testRestTemplate.postForEntity("/engine-rest/process/start", HttpEntity.EMPTY, ProcessInstanceDto.class);
     assertEquals(HttpStatus.OK, entity.getStatusCode());
     assertNotNull(entity.getBody());
 
@@ -89,7 +89,7 @@ public class SampleCamundaRestApplicationIT {
     headers.setContentDispositionFormData("data", "test.bpmn");
 
     HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
-    ResponseEntity<String> exchange = testRestTemplate.exchange("/rest/engine/{enginename}/process-instance/{id}/variables/{variableName}/data",
+    ResponseEntity<String> exchange = testRestTemplate.exchange("/engine-rest/engine/{enginename}/process-instance/{id}/variables/{variableName}/data",
         HttpMethod.POST, requestEntity, String.class, camundaBpmProperties.getProcessEngineName(), processInstance.getId(), variableName);
 
     assertEquals(HttpStatus.NO_CONTENT, exchange.getStatusCode());
@@ -114,7 +114,7 @@ public class SampleCamundaRestApplicationIT {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<String> requestEntity = new HttpEntity<String>(requestJson, headers);
-    ResponseEntity<String> entity = testRestTemplate.postForEntity("/rest/engine/{enginename}/external-task/fetchAndLock", requestEntity, String.class,
+    ResponseEntity<String> entity = testRestTemplate.postForEntity("/engine-rest/engine/{enginename}/external-task/fetchAndLock", requestEntity, String.class,
       camundaBpmProperties.getProcessEngineName());
     assertEquals(HttpStatus.OK, entity.getStatusCode());
     assertEquals("[]", entity.getBody());
