@@ -26,11 +26,11 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
-import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
+import org.camunda.bpm.engine.rest.dto.history.optimize.OptimizeHistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.optimize.OptimizeHistoricIdentityLinkLogDto;
 import org.camunda.bpm.engine.rest.dto.history.optimize.OptimizeHistoricVariableUpdateDto;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
@@ -59,9 +59,9 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
   @GET
   @Path("/activity-instance/completed")
-  public List<HistoricActivityInstanceDto> getCompletedHistoricActivityInstances(@QueryParam("finishedAfter") String finishedAfterAsString,
-                                                                                 @QueryParam("finishedAt") String finishedAtAsString,
-                                                                                 @QueryParam("maxResults") int maxResults) {
+  public List<OptimizeHistoricActivityInstanceDto> getCompletedHistoricActivityInstances(@QueryParam("finishedAfter") String finishedAfterAsString,
+                                                                                         @QueryParam("finishedAt") String finishedAtAsString,
+                                                                                         @QueryParam("maxResults") int maxResults) {
 
     Date finishedAfter = dateConverter.convertQueryParameterToType(finishedAfterAsString);
     Date finishedAt = dateConverter.convertQueryParameterToType(finishedAtAsString);
@@ -73,9 +73,9 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     List<HistoricActivityInstance> historicActivityInstances =
       config.getOptimizeService().getCompletedHistoricActivityInstances(finishedAfter, finishedAt, maxResults);
 
-    List<HistoricActivityInstanceDto> result = new ArrayList<>();
+    List<OptimizeHistoricActivityInstanceDto> result = new ArrayList<>();
     for (HistoricActivityInstance instance : historicActivityInstances) {
-      HistoricActivityInstanceDto dto = HistoricActivityInstanceDto.fromHistoricActivityInstance(instance);
+      OptimizeHistoricActivityInstanceDto dto = OptimizeHistoricActivityInstanceDto.fromHistoricActivityInstance(instance);
       result.add(dto);
     }
     return result;
@@ -83,9 +83,9 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
   @GET
   @Path("/activity-instance/running")
-  public List<HistoricActivityInstanceDto> getRunningHistoricActivityInstances(@QueryParam("startedAfter") String startedAfterAsString,
-                                                                               @QueryParam("startedAt") String startedAtAsString,
-                                                                               @QueryParam("maxResults") int maxResults) {
+  public List<OptimizeHistoricActivityInstanceDto> getRunningHistoricActivityInstances(@QueryParam("startedAfter") String startedAfterAsString,
+                                                                                       @QueryParam("startedAt") String startedAtAsString,
+                                                                                       @QueryParam("maxResults") int maxResults) {
 
     Date startedAfter = dateConverter.convertQueryParameterToType(startedAfterAsString);
     Date startedAt = dateConverter.convertQueryParameterToType(startedAtAsString);
@@ -97,9 +97,9 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     List<HistoricActivityInstance> historicActivityInstances =
       config.getOptimizeService().getRunningHistoricActivityInstances(startedAfter, startedAt, maxResults);
 
-    List<HistoricActivityInstanceDto> result = new ArrayList<>();
+    List<OptimizeHistoricActivityInstanceDto> result = new ArrayList<>();
     for (HistoricActivityInstance instance : historicActivityInstances) {
-      HistoricActivityInstanceDto dto = HistoricActivityInstanceDto.fromHistoricActivityInstance(instance);
+      OptimizeHistoricActivityInstanceDto dto = OptimizeHistoricActivityInstanceDto.fromHistoricActivityInstance(instance);
       result.add(dto);
     }
     return result;

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -313,6 +314,7 @@ public class GetCompletedHistoricActivityInstancesForOptimizeTest {
     assertThat(startEvent.getEndTime(), notNullValue());
     assertThat(startEvent.getProcessDefinitionKey(), is("process"));
     assertThat(startEvent.getProcessDefinitionId(), notNullValue());
+    assertThat(((HistoryEvent) startEvent).getSequenceCounter(), notNullValue());
 
     assertThat(endEvent, notNullValue());
     assertThat(endEvent.getActivityName(), is("end"));
@@ -321,6 +323,7 @@ public class GetCompletedHistoricActivityInstancesForOptimizeTest {
     assertThat(endEvent.getEndTime(), notNullValue());
     assertThat(endEvent.getProcessDefinitionKey(), is("process"));
     assertThat(endEvent.getProcessDefinitionId(), notNullValue());
+    assertThat(((HistoryEvent) endEvent).getSequenceCounter(), notNullValue());
   }
 
 }
