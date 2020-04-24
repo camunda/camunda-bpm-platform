@@ -13,6 +13,10 @@
   <packaging>war</packaging>
   <name>camunda BPM - webapp - Tomcat Standalone</name>
 
+  <properties>
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -74,12 +78,10 @@
       <artifactId>camunda-webapp-tomcat</artifactId>
       <version>${project.version}</version>
       <type>war</type>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>

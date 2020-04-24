@@ -16,11 +16,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-assembly</artifactId>
       <version>${project.version}</version>
@@ -40,6 +35,13 @@
       <artifactId>camunda-bpm-run-modules-webapps</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+        <!-- we don't need any transitive dependencies -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
   </dependencies>
