@@ -10,6 +10,12 @@
   <artifactId>camunda-engine-feel-scala</artifactId>
   <name>camunda DMN - engine FEEL - SCALA</name>
 
+  <properties>
+    <!-- We shade artifacts into the jar, so we need to generate 
+    a dependency BOM for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+
   <dependencies>
 
     <dependency>

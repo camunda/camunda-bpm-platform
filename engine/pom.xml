@@ -262,6 +262,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    
+    <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
+    for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
 
     <camunda.artifact>
       org.camunda.bpm
