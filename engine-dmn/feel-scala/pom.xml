@@ -92,7 +92,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -100,9 +99,10 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
               <createSourcesJar>true</createSourcesJar>
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
               <artifactSet>
                 <excludes>
                   <exclude>org.slf4j:slf4j-api</exclude>
