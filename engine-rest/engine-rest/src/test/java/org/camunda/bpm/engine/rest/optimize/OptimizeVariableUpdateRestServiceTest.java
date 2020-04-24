@@ -16,25 +16,30 @@
  */
 package org.camunda.bpm.engine.rest.optimize;
 
+import io.restassured.response.Response;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableUpdateBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -167,4 +172,27 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
+
+  @Test
+  public void testPresenceOfSequenceCounterProperty() {
+    final HistoricDetailVariableInstanceUpdateEntity mock = mock(HistoricDetailVariableInstanceUpdateEntity.class);
+    when(mock.getSequenceCounter()).thenReturn(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER);
+    when(mock.getTypedValue()).thenReturn(EXAMPLE_PRIMITIVE_VARIABLE_VALUE);
+    when(mockedOptimizeService.getHistoricVariableUpdates(null, null, Integer.MAX_VALUE))
+      .thenReturn(Collections.singletonList(mock));
+
+    final Response response = given()
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(MediaType.APPLICATION_JSON)
+      .when()
+        .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
+
+    String content = response.asString();
+    long sequenceCounter = from(content).getLong("[0].sequenceCounter");
+
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER, sequenceCounter);
+  }
+
 }
