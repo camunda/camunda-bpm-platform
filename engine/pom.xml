@@ -42,6 +42,8 @@
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-impl</artifactId>
         </exclusion>
+        <!-- these exclusions are needed when building with Maven >= 3.3
+          see CAM-11822 for details -->
         <exclusion>
           <groupId>org.camunda.feel</groupId>
           <artifactId>feel-engine</artifactId>
@@ -85,7 +87,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- provided dependencies -->
@@ -371,9 +372,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
           <artifactSet>
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>

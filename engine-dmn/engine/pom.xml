@@ -40,6 +40,8 @@
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-scala</artifactId>
+      <!-- these exclusions are needed when building with Maven >= 3.3
+        see CAM-11822 for details -->
       <exclusions>
         <exclusion>
           <groupId>org.camunda.feel</groupId>
