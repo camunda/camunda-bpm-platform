@@ -34,9 +34,9 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
 
   public static MetricsExecutionListener ROOT_PROCESS_INSTANCE_START_COUNTER =
       new MetricsExecutionListener(Metrics.ROOT_PROCESS_INSTANCE_START,
-                                   delegateExecution -> ((ExecutionEntity) delegateExecution)
-                                       .getRootProcessInstanceId()
-                                       .equals(delegateExecution.getId()));
+                                   delegateExecution -> (delegateExecution.getId().equals(
+                                           ((ExecutionEntity) delegateExecution)
+                                               .getRootProcessInstanceId())));
   public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER =
       new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_START);
   public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER =
