@@ -50,7 +50,7 @@ create table ACT_GE_BYTEARRAY (
     TENANT_ID_ NVARCHAR2(64),
     TYPE_ INTEGER,
     CREATE_TIME_ TIMESTAMP(6),
-    ROOT_PROC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ NVARCHAR2(64),
     REMOVAL_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
