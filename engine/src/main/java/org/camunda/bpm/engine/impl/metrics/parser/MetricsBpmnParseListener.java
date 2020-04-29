@@ -18,10 +18,13 @@ package org.camunda.bpm.engine.impl.metrics.parser;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * @author Daniel Meyer
@@ -29,12 +32,25 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
 
-  public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_START);
-  public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_END);
+  public static MetricsExecutionListener ROOT_PROCESS_INSTANCE_START_COUNTER =
+      new MetricsExecutionListener(Metrics.ROOT_PROCESS_INSTANCE_START,
+                                   delegateExecution -> (delegateExecution.getId().equals(
+                                           ((ExecutionEntity) delegateExecution)
+                                               .getRootProcessInstanceId())));
+  public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER =
+      new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_START);
+  public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER =
+      new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_END);
 
   protected void addListeners(ActivityImpl activity) {
     activity.addBuiltInListener(ExecutionListener.EVENTNAME_START, ACTIVITY_INSTANCE_START_COUNTER);
     activity.addBuiltInListener(ExecutionListener.EVENTNAME_END, ACTIVITY_INSTANCE_END_COUNTER);
+  }
+
+  @Override
+  public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
+    processDefinition.addBuiltInListener(ExecutionListener.EVENTNAME_START,
+                                         ROOT_PROCESS_INSTANCE_START_COUNTER);
   }
 
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl activity) {

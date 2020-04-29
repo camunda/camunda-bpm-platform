@@ -52,8 +52,18 @@ public class DmnEngineMetricCollectorWrapper implements DmnEngineMetricCollector
   }
 
   @Override
+  public long getExecutedDecisionInstances() {
+    return collector.getExecutedDecisionInstances();
+  }
+
+  @Override
   public long getExecutedDecisionElements() {
     return collector.getExecutedDecisionElements();
+  }
+
+  @Override
+  public long clearExecutedDecisionInstances() {
+    return collector.clearExecutedDecisionInstances();
   }
 
   @Override
