@@ -99,6 +99,30 @@ var Controller = [
                 cb(err, !err ? res.result : null);
               }
             );
+          },
+          rootProcessInstances: function(cb) {
+            MetricsResource.sum(
+              {
+                name: 'root-process-instance-start',
+                startDate: fixDate($scope.startDate),
+                endDate: fixDate($scope.endDate)
+              },
+              function(err, res) {
+                cb(err, !err ? res.result : null);
+              }
+            );
+          },
+          decisionInstances: function(cb) {
+            MetricsResource.sum(
+              {
+                name: 'executed-decision-instances',
+                startDate: fixDate($scope.startDate),
+                endDate: fixDate($scope.endDate)
+              },
+              function(err, res) {
+                cb(err, !err ? res.result : null);
+              }
+            );
           }
         },
         function(err, res) {
