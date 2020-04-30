@@ -3,8 +3,12 @@
 
   <div uib-alert class="alert alert-info">
     <p>
-      {{ 'EXECUTION_METRICS_INFO_1' | translate }} <strong>{{ 'EXECUTION_METRICS_FNI' | translate }}</strong> {{ 'EXECUTION_METRICS_AND' | translate }}
-      <strong>{{ 'EXECUTION_METRICS_EDE' | translate }}</strong> {{ 'EXECUTION_METRICS_INFO_2' | translate }}
+      {{ 'EXECUTION_METRICS_INFO_1' | translate }} 
+          <strong>{{ 'EXECUTION_METRICS_FNI' | translate }}</strong>, 
+          <strong>{{ 'EXECUTION_METRICS_EDE' | translate }}</strong>, 
+          <strong>{{ 'EXECUTION_METRICS_RPI' | translate }}</strong> {{ 'EXECUTION_METRICS_AND' | translate }}
+          <strong>{{ 'EXECUTION_METRICS_DI' | translate }}</strong> 
+      {{ 'EXECUTION_METRICS_INFO_2' | translate }}
     </p>
   </div>
 
@@ -51,6 +55,12 @@
           </li>
           <li>
             <strong>{{ metrics.decisionElements.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_EDE' | translate }}
+          </li>
+          <li>
+            <strong>{{ metrics.rootProcessInstances.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_RPI' | translate }}
+          </li>
+          <li>
+            <strong>{{ metrics.decisionInstances.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_DI' | translate }}
           </li>
         </ul>
       </div>
