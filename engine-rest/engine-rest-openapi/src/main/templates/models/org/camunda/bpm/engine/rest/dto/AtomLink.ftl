@@ -3,7 +3,7 @@
     <@lib.property
         name = "rel"
         type = "string"
-        desc = "The relation of the link to the object that belogs to." />
+        desc = "The relation of the link to the object that belongs to." />
 
     <@lib.property
         name = "href"
