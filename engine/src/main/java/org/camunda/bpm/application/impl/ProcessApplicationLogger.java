@@ -47,9 +47,6 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException exceptionWhileNotifyingPaTaskListener(Exception e) {
-    if (e instanceof ProcessEngineException) {
-      return (ProcessEngineException)e;
-    }
     return new ProcessEngineException(exceptionMessage(
         "002",
         "Exception while notifying process application task listener: " + e.getMessage()), e);
