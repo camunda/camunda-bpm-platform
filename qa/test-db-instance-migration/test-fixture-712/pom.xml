@@ -63,37 +63,6 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-current-sql-scripts</id>
-              <phase>generate-test-sources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.distro</groupId>
-                    <artifactId>camunda-sql-scripts</artifactId>
-                    <version>${camunda.version.current}</version>
-                    <version>7.12.0</version>
-                    <type>test-jar</type>
-                    <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                    <overWrite>true</overWrite>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <profiles>
@@ -143,6 +112,28 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-current-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${camunda.version.current}</version>
+                      <version>7.12.0</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
 
           <!-- parse version properties from qa/pom.xml -->
