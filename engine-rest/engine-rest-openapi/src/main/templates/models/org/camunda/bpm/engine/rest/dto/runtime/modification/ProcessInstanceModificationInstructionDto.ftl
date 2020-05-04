@@ -1,6 +1,11 @@
 <@lib.dto
     required = [ "type" ] >
 
+    <#-- NOTE: Please consider adjusting the RestartProcessInstanceModificationInstructionDto
+         if the properties are valid there as well.
+         The DTO is create separately as it does not contain
+         all of these properties and the description differ too much. -->
+
     <@lib.property
         name = "type"
         type = "string"

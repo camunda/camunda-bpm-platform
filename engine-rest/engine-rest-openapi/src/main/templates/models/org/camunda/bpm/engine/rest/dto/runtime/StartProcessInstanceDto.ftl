@@ -1,5 +1,19 @@
-<@lib.dto
-    extends = "ProcessInstanceDto" >
+<@lib.dto>
+
+    <#-- NOTE: Please consider adjusting the StartProcessInstanceFormsDto
+         if the properties are valid there as well.
+         The DTO is create separately as it does not contain all of these properties. -->
+
+    <@lib.property
+        name = "businessKey"
+        type = "string"
+        desc = "The business key of the process instance." />
+
+  <@lib.property
+      name = "variables"
+      type = "object"
+      additionalProperties = true
+      dto = "VariableValueDto" />
 
     <@lib.property
         name = "caseInstanceId"
@@ -28,7 +42,6 @@
                 for activities that are started or ended as part of this request.
                 **Note**: This option is currently only respected when start instructions are submitted
                 via the `startInstructions` property." />
-                
 
     <@lib.property
         name = "withVariablesInReturn"
