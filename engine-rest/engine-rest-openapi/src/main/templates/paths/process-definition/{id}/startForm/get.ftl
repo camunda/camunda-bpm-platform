@@ -14,7 +14,7 @@
         type = "string"
         required = true
         last = true
-        desc = "The id of the process definition to get the start form for."/>
+        desc = "The id of the process definition to get the start form key for."/>
   ],
 
   "responses" : {

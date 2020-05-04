@@ -13,7 +13,7 @@
         location = "path"
         type = "string"
         required = true
-        desc = "The key of the process definition (the latest version thereof) to be retrieved."/>
+        desc = "The key of the process definition (the latest version thereof) to be activated/suspended."/>
 
     <@lib.parameter
         name = "tenant-id"

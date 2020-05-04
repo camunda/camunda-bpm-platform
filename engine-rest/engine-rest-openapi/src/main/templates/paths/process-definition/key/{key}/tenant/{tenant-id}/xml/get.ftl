@@ -13,7 +13,7 @@
         location = "path"
         type = "string"
         required = true
-        desc = "The key of the process definition (the latest version thereof) to be retrieved."/>
+        desc = "The key of the process definition (the latest version thereof) whose XML should be retrieved."/>
 
     <@lib.parameter
         name = "tenant-id"

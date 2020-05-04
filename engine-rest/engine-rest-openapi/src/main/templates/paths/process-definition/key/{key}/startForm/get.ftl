@@ -15,7 +15,7 @@
         type = "string"
         required = true
         last = true
-        desc = "The key of the process definition (the latest version thereof) to be retrieved."/>
+        desc = "The key of the process definition (the latest version thereof) for which the form key is to be retrieved."/>
   ],
 
   "responses" : {
