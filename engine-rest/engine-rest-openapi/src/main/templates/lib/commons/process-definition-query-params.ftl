@@ -27,6 +27,7 @@
   <@lib.parameter name = "deployedAfter"
       location = "query"
       type = "string"
+      format="date-time"
       desc = "Filter by the deploy time of the deployment the process definition belongs to.
               Only selects process definitions that have been deployed after (exclusive) a specific time.
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
@@ -36,6 +37,7 @@
   <@lib.parameter name = "deployedAt"
       location = "query"
       type = "string"
+      format="date-time"
       desc = "Filter by the deploy time of the deployment the process definition belongs to.
               Only selects process definitions that have been deployed at a specific time (exact match).
               By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the
@@ -71,6 +73,7 @@
   <@lib.parameter name = "version"
       location = "query"
       type = "integer"
+      format="int32"
       desc = "Filter by process definition version."/>
 
   <@lib.parameter name = "latestVersion"

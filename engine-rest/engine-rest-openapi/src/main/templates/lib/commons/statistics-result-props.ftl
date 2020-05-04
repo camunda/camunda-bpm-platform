@@ -6,12 +6,14 @@
     <@lib.property
         name = "instances"
         type = "integer"
+        format = "int32"
         nullable = false
         desc = "The total number of running process instances of this ${instanceType}."/>
 
     <@lib.property
         name = "failedJobs"
         type = "integer"
+        format = "int32"
         nullable = false
         desc = "The total number of failed jobs for the running instances.
                 **Note**: Will be `0` (not `null`), if failed jobs were excluded."/>
