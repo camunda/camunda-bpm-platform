@@ -39,7 +39,12 @@
                      }
                    }'
                  ] />
-
+    <@lib.response
+        code = "403"
+        dto = "AuthorizationExceptionDto"
+        desc = "The Process Definition xml cannot be retrieved due to missing permissions on the Process Definition resource.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+                for the error response format." />
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
