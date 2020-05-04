@@ -21,7 +21,6 @@
     <@lib.response
         code = "200"
         dto = "ProcessDefinitionDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 response",

@@ -97,7 +97,6 @@
     <@lib.response
         code = "200"
         dto = "ProcessInstanceWithVariablesDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 Response 1",
