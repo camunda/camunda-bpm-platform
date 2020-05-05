@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
-import static io.restassured.path.json.JsonPath.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
+import static io.restassured.path.json.JsonPath.from;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ import org.mockito.Mockito;
 
 import io.restassured.response.Response;
 
-public class EventSubscriptionRestServiceInteractionTest extends AbstractRestServiceTest {
+public class EventSubscriptionRestServiceQueryTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -77,12 +79,19 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testEmptyQuery() {
-    given().then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
   }
 
   @Test
   public void testEventSubscriptionRetrieval() {
-    Response response = given().then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    Response response =
+        given()
+          .then().expect()
+            .statusCode(Status.OK.getStatusCode())
+          .when().get(EVENT_SUBSCRIPTION_URL);
 
     // assert query invocation
     InOrder inOrder = Mockito.inOrder(mockedEventSubscriptionQuery);
@@ -118,24 +127,28 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
     executeAndVerifySorting("definitionId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
   }
 
-  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
-    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder).then().expect().statusCode(expectedStatus.getStatusCode()).when()
-        .get(EVENT_SUBSCRIPTION_URL);
-  }
-
   @Test
   public void testSortByParameterOnly() {
-    given().queryParam("sortBy", "created").then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParam("sortBy", "created")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
   }
 
   @Test
   public void testSortOrderParameterOnly() {
-    given().queryParam("sortOrder", "asc").then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParam("sortOrder", "asc")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
   }
 
   @Test
   public void testNoParametersQuery() {
-    expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).list();
     verifyNoMoreInteractions(mockedEventSubscriptionQuery);
@@ -145,7 +158,10 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
   public void testQueryParameters() {
     Map<String, String> queryParameters = getCompleteQueryParameters();
 
-    given().queryParams(queryParameters).expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParams(queryParameters)
+    .expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).eventSubscriptionId(queryParameters.get("eventSubscriptionId"));
     verify(mockedEventSubscriptionQuery).eventType(queryParameters.get("eventType"));
@@ -156,25 +172,16 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
     verify(mockedEventSubscriptionQuery).list();
   }
 
-  private Map<String, String> getCompleteQueryParameters() {
-    Map<String, String> parameters = new HashMap<String, String>();
-
-    parameters.put("eventSubscriptionId", "anEventSubscriptionId");
-    parameters.put("eventType", "aEventType");
-    parameters.put("eventName", "aEventName");
-    parameters.put("executionId", "aExecutionId");
-    parameters.put("processInstanceId", "aProcessInstanceId");
-    parameters.put("activityId", "aActivityId");
-
-    return parameters;
-  }
-
   @Test
   public void testTenantIdListParameter() {
     mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(createMockEventSubscriptionTwoTenants());
 
-    Response response = given().queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST).then().expect().statusCode(Status.OK.getStatusCode()).when()
-        .get(EVENT_SUBSCRIPTION_URL);
+    Response response = 
+        given()
+          .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     verify(mockedEventSubscriptionQuery).list();
@@ -190,18 +197,17 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
-  private List<EventSubscription> createMockEventSubscriptionTwoTenants() {
-    return Arrays.asList(
-        MockProvider.createMockEventSubscription(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockEventSubscription(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)
-      );
-  }
 
   @Test
   public void testWithoutTenantIdParameter() {
     mockedEventSubscriptionQuery = setUpMockEventSubscriptionQuery(Arrays.asList(MockProvider.createMockEventSubscription(null)));
 
-    Response response = given().queryParam("withoutTenantId", true).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    Response response = 
+        given()
+          .queryParam("withoutTenantId", true)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).withoutTenantId();
     verify(mockedEventSubscriptionQuery).list();
@@ -243,8 +249,12 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
 
     int firstResult = 0;
     int maxResults = 10;
-    given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults).then().expect().statusCode(Status.OK.getStatusCode()).when()
-        .get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParam("firstResult", firstResult)
+      .queryParam("maxResults", maxResults)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).listPage(firstResult, maxResults);
   }
@@ -255,7 +265,11 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testMissingFirstResultParameter() {
     int maxResults = 10;
-    given().queryParam("maxResults", maxResults).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParam("maxResults", maxResults)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).listPage(0, maxResults);
   }
@@ -267,16 +281,51 @@ public class EventSubscriptionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testMissingMaxResultsParameter() {
     int firstResult = 10;
-    given().queryParam("firstResult", firstResult).then().expect().statusCode(Status.OK.getStatusCode()).when().get(EVENT_SUBSCRIPTION_URL);
+    given()
+      .queryParam("firstResult", firstResult)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
 
     verify(mockedEventSubscriptionQuery).listPage(firstResult, Integer.MAX_VALUE);
   }
 
   @Test
   public void testQueryCount() {
-    expect().statusCode(Status.OK.getStatusCode()).body("count", equalTo(1)).when().get(EVENT_SUBSCRIPTION_COUNT_QUERY_URL);
+    expect()
+      .statusCode(Status.OK.getStatusCode()).body("count", equalTo(1))
+    .when().get(EVENT_SUBSCRIPTION_COUNT_QUERY_URL);
 
     verify(mockedEventSubscriptionQuery).count();
   }
 
+  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given()
+      .queryParam("sortBy", sortBy)
+      .queryParam("sortOrder", sortOrder)
+    .then().expect()
+      .statusCode(expectedStatus.getStatusCode())
+    .when().get(EVENT_SUBSCRIPTION_URL);
+  }
+  
+  private Map<String, String> getCompleteQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+
+    parameters.put("eventSubscriptionId", "anEventSubscriptionId");
+    parameters.put("eventType", "aEventType");
+    parameters.put("eventName", "aEventName");
+    parameters.put("executionId", "aExecutionId");
+    parameters.put("processInstanceId", "aProcessInstanceId");
+    parameters.put("activityId", "aActivityId");
+
+    return parameters;
+  }
+
+  private List<EventSubscription> createMockEventSubscriptionTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockEventSubscription(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockEventSubscription(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)
+      );
+  }
 }

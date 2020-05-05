@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
 import java.util.List;
