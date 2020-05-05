@@ -34,6 +34,7 @@
     {"name": "Condition"},
     {"name": "Deployment"},
     {"name": "Engine"},
+    {"name": "Event Subscription"},
     {"name": "External Task"},
     {"name": "Message"},
     {"name": "Metrics"},
