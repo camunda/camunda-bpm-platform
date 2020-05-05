@@ -76,6 +76,11 @@ public class CamundaBpmRunRestConfiguration {
     registration.addUrlPatterns(restApiPathPattern);
 
     registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_ORIGINS, camundaBpmRunProperties.getCors().getAllowedOrigins());
+    if (!"*".equals(camundaBpmRunProperties.getCors().getAllowedOrigins())) {
+      registration.addInitParameter(CorsFilter.PARAM_CORS_SUPPORT_CREDENTIALS, "true");
+      registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_HEADERS,
+        "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization,X-XSRF-Token,X-CSRF-Token");
+    }
     return registration;
   }
 

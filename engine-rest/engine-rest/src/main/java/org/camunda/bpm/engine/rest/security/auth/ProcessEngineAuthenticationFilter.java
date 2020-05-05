@@ -120,7 +120,7 @@ public class ProcessEngineAuthenticationFilter implements Filter {
     }
     String requestUrl = req.getRequestURI().substring(req.getContextPath().length() + servletPath.length());
 
-    boolean requiresEngineAuthentication = requiresEngineAuthentication(requestUrl);
+    boolean requiresEngineAuthentication = requiresEngineAuthentication(req.getMethod(), requestUrl);
 
     if (!requiresEngineAuthentication) {
       chain.doFilter(request, response);
@@ -209,7 +209,11 @@ public class ProcessEngineAuthenticationFilter implements Filter {
     engine.getIdentityService().clearAuthentication();
   }
 
-  protected boolean requiresEngineAuthentication(String requestUrl) {
+  protected boolean requiresEngineAuthentication(String requestMethod, String requestUrl) {
+
+    if ("OPTIONS".equals(requestMethod)) {
+      return false;
+    }
     for (Pattern whiteListedUrlPattern : WHITE_LISTED_URL_PATTERNS) {
       Matcher matcher = whiteListedUrlPattern.matcher(requestUrl);
       if (matcher.matches()) {
