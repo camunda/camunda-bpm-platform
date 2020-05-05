@@ -99,6 +99,7 @@ public class GetHistoricOperationLogsForOptimizeTest {
 
     createUser(userId);
     identityService.setAuthenticatedUserId(userId);
+    deploySimpleDefinition();
   }
 
   @After
@@ -114,16 +115,15 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendProcessInstanceByProcessInstanceId() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.suspendProcessInstanceById(processInstance.getProcessInstanceId());
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     runtimeService.activateProcessInstanceById(processInstance.getProcessInstanceId());
 
     // when
@@ -160,16 +160,15 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendProcessInstanceByProcessDefinitionId() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     runtimeService.activateProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
 
     // when
@@ -206,16 +205,15 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendProcessInstanceByProcessDefinitionKey() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.suspendProcessInstanceByProcessDefinitionKey("process");
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     runtimeService.activateProcessInstanceByProcessDefinitionKey("process");
 
     // when
@@ -252,16 +250,15 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendProcessDefinitionById() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     repositoryService.suspendProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
 
     // when
@@ -321,16 +318,15 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendProcessDefinitionByKey() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     repositoryService.suspendProcessDefinitionByKey("process", true, null);
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     repositoryService.activateProcessDefinitionByKey("process", true, null);
 
     // when
@@ -390,20 +386,19 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendByBatchJobAndProcessInstanceId() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     Batch suspendProcess = runtimeService.updateProcessInstanceSuspensionState()
       .byProcessInstanceIds(Collections.singletonList(processInstance.getProcessInstanceId()))
       .suspendAsync();
     helper.completeSeedJobs(suspendProcess);
     helper.executeJobs(suspendProcess);
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     Batch resumeProcess = runtimeService.updateProcessInstanceSuspensionState()
       .byProcessInstanceIds(Collections.singletonList(processInstance.getProcessInstanceId()))
       .activateAsync();
@@ -445,20 +440,19 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void getHistoricUserOperationLogs_suspendByBatchJobAndQuery() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .done();
-    testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process");
 
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
+    ClockUtil.setCurrentTime(nowPlus2Seconds);
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
       .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active())
       .suspendAsync();
     helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
+    Date nowPlus4Seconds = new Date(now.getTime() + 4000L);
+    ClockUtil.setCurrentTime(nowPlus4Seconds);
     Batch resumeProcess = runtimeService.updateProcessInstanceSuspensionState()
       .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().suspended())
       .activateAsync();
@@ -500,12 +494,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAfterParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -533,12 +521,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -560,12 +542,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAfterAndOccurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -586,12 +562,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void maxResultsParameterWorks() {
      // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     runtimeService.suspendProcessInstanceById(processInstance.getProcessInstanceId());
     runtimeService.activateProcessInstanceById(processInstance.getProcessInstanceId());
@@ -609,13 +579,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void resultIsSortedByTimestamp() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-        .camundaAssignee(userId)
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -643,12 +606,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void fetchOnlyProcessInstanceSuspensionStateBasedLogEntries() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask()
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     createLogEntriesThatShouldNotBeReturned(processInstance.getId());
     assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), greaterThan(0L));
@@ -713,6 +670,16 @@ public class GetHistoricOperationLogsForOptimizeTest {
 
   private Date pastDate() {
     return new Date(2L);
+  }
+
+  private void deploySimpleDefinition() {
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent("startEvent")
+      .userTask("userTask")
+      .name("task")
+      .endEvent("endEvent")
+      .done();
+    testHelper.deploy(simpleDefinition);
   }
 
 }
