@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getProcessDefinitionDiagramByKey"
       tag = "Process Definition"
+      summary = "Get Diagram"
       desc = "Retrieves the diagram for the latest version of the process definition which belongs to no tenant.
 
               If the process definition's deployment contains an image resource with the same file name

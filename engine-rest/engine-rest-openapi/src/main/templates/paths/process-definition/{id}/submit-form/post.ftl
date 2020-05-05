@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "submitForm"
       tag = "Process Definition"
+      summary = "Submit Start Form"
       desc = "Starts a process instance using a set of process variables and the business key.
               If the start event has Form Field Metadata defined, the process engine will perform backend validation
               for any form fields which have validators defined.

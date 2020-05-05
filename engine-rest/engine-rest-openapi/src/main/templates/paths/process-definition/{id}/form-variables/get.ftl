@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getStartFormVariables"
       tag = "Process Definition"
+      summary = "Get Start Form Variables"
       desc = "Retrieves the start form variables for a process definition
               (only if they are defined via the 
               [Generated Task Form](${docsUrl}/user-guide/task-forms/#generated-task-forms) approach).

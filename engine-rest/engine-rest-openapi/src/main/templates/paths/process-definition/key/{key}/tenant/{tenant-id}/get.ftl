@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getLatestProcessDefinitionByTenantId"
       tag = "Process Definition"
+      summary = "Get"
       desc = "Retrieves the latest version of the process definition for tenant according to
               the `ProcessDefinition` interface in the engine." />
 

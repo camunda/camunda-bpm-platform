@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getActivityStatisticsByProcessDefinitionKey"
       tag = "Process Definition"
+      summary = "Get Activity Instance Statistics"
       desc = "Retrieves runtime statistics of the latest version of the given process definition
               which belongs to no tenant, grouped by activities.
               These statistics include the number of running activity instances, optionally the number of failed jobs

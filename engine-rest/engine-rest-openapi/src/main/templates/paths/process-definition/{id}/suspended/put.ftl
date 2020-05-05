@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "updateProcessDefinitionSuspensionStateById"
       tag = "Process Definition"
+      summary = "Activate/Suspend By Id"
       desc = "Activates or suspends a given process definition by id." />
 
   "parameters" : [
@@ -39,12 +40,12 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        last = true
         desc = "Returned if some of the query parameters are invalid,
                 for example if the provided `executionDate` parameter doesn't have the expected format or
                 if the `processDefinitionKey` parameter is `null`. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
+
     <@lib.response
         code = "404"
         dto = "ExceptionDto"

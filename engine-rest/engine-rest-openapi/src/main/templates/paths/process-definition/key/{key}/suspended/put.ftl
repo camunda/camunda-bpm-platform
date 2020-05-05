@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "updateProcessDefinitionSuspensionStateByKey"
       tag = "Process Definition"
+      summary = "Activate/Suspend by Id"
       desc = "Activates or suspends a given process definition by latest version of process definition key
               which belongs to no tenant." />
 

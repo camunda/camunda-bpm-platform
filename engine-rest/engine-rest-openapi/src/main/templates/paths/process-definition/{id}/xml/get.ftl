@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getProcessDefinitionBpmn20Xml"
       tag = "Process Definition"
+      summary = "Get XML"
       desc = "Retrieves the BPMN 2.0 XML of a process definition." />
 
   "parameters" : [
@@ -39,10 +40,10 @@
                      }
                    }'
                  ] />
+
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        last = true
         desc = "Returned if some of the query parameters are invalid.
                 See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
@@ -54,6 +55,7 @@
         desc = "The Process Definition xml cannot be retrieved due to missing permissions on the Process Definition resource.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
+
     <@lib.response
         code = "404"
         dto = "ExceptionDto"

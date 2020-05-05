@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getActivityStatistics"
       tag = "Process Definition"
+      summary = "Get Activity Instance Statistics"
       desc = "Retrieves runtime statistics of a given process definition, grouped by activities.
               These statistics include the number of running activity instances, optionally the number of failed jobs
               and also optionally the number of incidents either grouped by incident types or for a specific incident type.

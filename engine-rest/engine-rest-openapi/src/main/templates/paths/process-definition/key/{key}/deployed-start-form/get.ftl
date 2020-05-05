@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeployedStartFormByKey"
       tag = "Process Definition"
+      summary = "Get Deployed Start Form"
       desc = "Retrieves the deployed form that can be referenced from a start event.
       For further information please refer to [User Guide](${docsUrl}/user-guide/task-forms/#embedded-task-forms)." />
 

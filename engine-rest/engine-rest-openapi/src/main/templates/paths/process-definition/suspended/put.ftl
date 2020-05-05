@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "updateProcessDefinitionSuspensionState"
       tag = "Process Definition"
+      summary = "Activate/Suspend By Key"
       desc = "Activates or suspends process definitions with the given process definition key." />
 
   <@lib.requestBody
@@ -26,16 +27,15 @@
         code = "204"
         desc = "Request successful."/>
 
-
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        last = true
         desc = "Returned if some of the query parameters are invalid,
                 for example if the provided `executionDate` parameter doesn't have the expected format or
                 if the `processDefinitionKey` parameter is `null`. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
+
     <@lib.response
         code = "404"
         dto = "ExceptionDto"

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "submitFormByKeyAndTenantId"
       tag = "Process Definition"
+      summary = "Submit Start Form"
       desc = "Starts the latest version of the process definition for a tenant
               using a set of process variables and the business key.
               If the start event has Form Field Metadata defined, the process engine will perform backend validation

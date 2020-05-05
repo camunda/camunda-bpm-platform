@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getStartFormVariablesByKey"
       tag = "Process Definition"
+      summary = "Get Start Form Variables"
       desc = "Retrieves the start form variables for the latest process definition which belongs to no tenant
               (only if they are defined via the 
               [Generated Task Form](${docsUrl}/user-guide/task-forms/#generated-task-forms) approach).

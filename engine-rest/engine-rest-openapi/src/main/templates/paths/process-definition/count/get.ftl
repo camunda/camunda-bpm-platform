@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getProcessDefinitionsCount"
       tag = "Process Definition"
+      summary = "Get List Count"
       desc = "Requests the number of process definitions that fulfill the query criteria.
               Takes the same filtering parameters as the [Get Definitions](${docsUrl}/reference/rest/process-definition/get-query/) method." />
 

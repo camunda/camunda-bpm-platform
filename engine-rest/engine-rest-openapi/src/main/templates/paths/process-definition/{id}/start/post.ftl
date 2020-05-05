@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "startProcessInstance"
       tag = "Process Definition"
+      summary = "Start Instance"
       desc = "Instantiates a given process definition.
               Process variables and business key may be supplied in the request body." />
 

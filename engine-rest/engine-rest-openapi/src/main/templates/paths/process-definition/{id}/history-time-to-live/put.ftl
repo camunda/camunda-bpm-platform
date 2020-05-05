@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "updateHistoryTimeToLiveByProcessDefinitionId"
       tag = "Process Definition"
+      summary = "Update History Time to Live"
       desc = "Updates history time to live for process definition.
               The field is used within [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup)." />
 

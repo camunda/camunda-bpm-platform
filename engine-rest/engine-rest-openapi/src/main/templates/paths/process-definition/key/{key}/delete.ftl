@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "deleteProcessDefinitionsByKey"
       tag = "Process Definition"
+      summary = "Delete By Key"
       desc = "Deletes process definitions by a given key which belong to no tenant id." />
 
   "parameters": [

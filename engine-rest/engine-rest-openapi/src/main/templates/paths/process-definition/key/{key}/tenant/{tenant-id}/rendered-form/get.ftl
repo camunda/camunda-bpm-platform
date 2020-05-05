@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getRenderedStartFormByKeyAndTenantId"
       tag = "Process Definition"
+      summary = "Get Rendered Start Form"
       desc = "Retrieves  the rendered form for the latest version of the process definition for a tenant.
               This method can be used to get the HTML rendering of a
               [Generated Task Form](${docsUrl}/user-guide/task-forms/#generated-task-forms)." />

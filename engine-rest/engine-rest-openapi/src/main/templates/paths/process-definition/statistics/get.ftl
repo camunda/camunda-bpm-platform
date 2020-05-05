@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getProcessDefinitionStatistics"
       tag = "Process Definition"
+      summary = "Get Process Instance Statistics"
       desc = "Retrieves runtime statistics of the process engine, grouped by process definitions.
               These statistics include the number of running process instances, optionally the number of failed jobs
               and also optionally the number of incidents either grouped by incident types or

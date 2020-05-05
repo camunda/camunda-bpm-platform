@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getProcessDefinitionBpmn20XmlByKey"
       tag = "Process Definition"
+      summary = "Get XML"
       desc = "Retrieves latest version the BPMN 2.0 XML of a process definition." />
 
   "parameters" : [

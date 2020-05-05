@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "restartProcessInstanceAsyncOperation"
       tag = "Process Definition"
+      summary = "Restart Process Instance Async"
       desc = "Restarts process instances that were canceled or terminated asynchronously.
               Can also restart completed process instances.
               It will create a new instance using the original instance information.
@@ -92,12 +93,12 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        last = true
         desc = "In case following parameters are missing: `instructions`, `activityId` or `transitionId`,
                 `processInstanceIds` or `historicProcessInstanceQuery`,
                 an exception of type `InvalidRequestException` is returned. 
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
+
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
