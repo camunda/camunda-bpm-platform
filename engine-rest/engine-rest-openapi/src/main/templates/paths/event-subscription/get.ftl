@@ -11,7 +11,7 @@
         name = "eventSubscriptionId"
         location = "query"
         type = "string"
-        desc = "The id of the event subscription." />
+        desc = "Only select subscription with the given id." />
 
     <@lib.parameter
         name = "eventName"
@@ -23,7 +23,7 @@
         name = "eventType"
         location = "query"
         type = "string"
-        desc = "Only select subscriptions for events with the given type. message selects message event subscriptions, signal selects signal event subscriptions, compensate selects compensation event subscriptions and conditional selects conditional event subscriptions." />
+        desc = "Only select subscriptions for events with the given type. Valid values: `message`, `signal`, `compensate` and `conditional`." />
 
     <@lib.parameter
         name = "executionId"
@@ -53,13 +53,13 @@
         name = "withoutTenantId"
         location = "query"
         type = "boolean"
-        desc = "Only select subscriptions which have no tenant id. Value values are true and false." />
+        desc = "Only select subscriptions which have no tenant id. Value may only be `true`, as `false` is the default behavior." />
 
     <@lib.parameter
         name = "includeEventSubscriptionsWithoutTenantId"
         location = "query"
         type = "boolean"
-        desc = "Select event subscriptions which have no tenant id. Can be used in combination with tenantIdIn parameter. Value values are true and false." />
+        desc = "Select event subscriptions which have no tenant id. Can be used in combination with tenantIdIn parameter. Value may only be `true`, as `false` is the default behavior." />
 
 	<#assign last = false >
     <#assign sortByValues = ['"created"', '"tenantId"']>
@@ -75,7 +75,7 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                      "summary": "GET `/event-subscription?eventType=message&sortBy=created&sortOrder=asc`",
+                      "summary": "GET `/event-subscription?eventType=message&sortBy=created&sortOrder=desc`",
                       "value": [
                         {
  						"id":"anId",
