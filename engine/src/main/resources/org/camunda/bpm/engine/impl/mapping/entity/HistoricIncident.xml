@@ -311,11 +311,26 @@
       <if test="incidentMessage != null">
         and RES.INCIDENT_MSG_ = #{incidentMessage}
       </if>
+      <if test="incidentMessageLike != null">
+        and RES.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="createTimeAfter != null">
+        and RES.CREATE_TIME_ &gt; #{createTimeAfter}
+      </if>
+      <if test="createTimeBefore != null">
+        and RES.CREATE_TIME_ &lt; #{createTimeBefore}
+      </if>
+      <if test="endTimeAfter != null">
+        and RES.END_TIME_ &gt; #{endTimeAfter}
+      </if>
+      <if test="endTimeBefore != null">
+        and RES.END_TIME_ &lt; #{endTimeBefore}
       </if>
       <if test="failedActivityId != null">
         and RES.FAILED_ACTIVITY_ID_ = #{failedActivityId}
@@ -325,6 +340,9 @@
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
       </if>
       <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
         and RES.PROC_DEF_KEY_ in

@@ -73,6 +73,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   protected String executionId;
   protected String activityId;
   protected String activityName;
+  protected String activityNameLike;
   protected String activityType;
   protected String taskAssignee;
   protected Boolean finished;
@@ -121,6 +122,11 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   @CamundaQueryParam("activityName")
   public void setActivityName(String activityName) {
     this.activityName = activityName;
+  }
+
+  @CamundaQueryParam("activityNameLike")
+  public void setActivityNameLike(String activityNameLike) {
+    this.activityNameLike = activityNameLike;
   }
 
   @CamundaQueryParam("activityType")
@@ -212,6 +218,9 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     }
     if (activityName != null) {
       query.activityName(activityName);
+    }
+    if (activityNameLike != null) {
+      query.activityNameLike(activityNameLike);
     }
     if (activityType != null) {
       query.activityType(activityType);

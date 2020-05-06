@@ -267,6 +267,9 @@
       <if test="activityName != null">
         and RES.ACT_NAME_ = #{activityName}
       </if>
+      <if test="activityNameLike != null">
+        and RES.ACT_NAME_ like #{activityNameLike} ESCAPE ${escapeChar}
+      </if>
       <if test="activityType != null">
         and RES.ACT_TYPE_ = #{activityType}
       </if>

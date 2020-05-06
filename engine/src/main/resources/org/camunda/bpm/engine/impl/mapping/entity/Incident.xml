@@ -145,9 +145,18 @@
       </if>
       <if test="incidentMessage != null">
         and RES.INCIDENT_MSG_ = #{incidentMessage}
-      </if>      
+      </if>
+      <if test="incidentMessageLike != null">
+        and RES.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="incidentTimestampBefore != null">
+        and RES.INCIDENT_TIMESTAMP_ &lt; #{incidentTimestampBefore}
+      </if>
+      <if test="incidentTimestampAfter != null">
+        and RES.INCIDENT_TIMESTAMP_ &gt; #{incidentTimestampAfter}
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
