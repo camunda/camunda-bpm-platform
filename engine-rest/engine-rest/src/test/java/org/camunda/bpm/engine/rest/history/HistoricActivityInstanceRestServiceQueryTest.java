@@ -506,6 +506,7 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("executionId", MockProvider.EXAMPLE_EXECUTION_ID);
     parameters.put("activityId", MockProvider.EXAMPLE_ACTIVITY_ID);
     parameters.put("activityName", MockProvider.EXAMPLE_ACTIVITY_NAME);
+    parameters.put("activityNameLike", MockProvider.EXAMPLE_ACTIVITY_NAME);
     parameters.put("activityType", MockProvider.EXAMPLE_ACTIVITY_TYPE);
     parameters.put("taskAssignee", MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME);
 
@@ -530,6 +531,7 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).executionId(stringQueryParameters.get("executionId"));
     verify(mockedQuery).activityId(stringQueryParameters.get("activityId"));
     verify(mockedQuery).activityName(stringQueryParameters.get("activityName"));
+    verify(mockedQuery).activityNameLike(stringQueryParameters.get("activityNameLike"));
     verify(mockedQuery).activityType(stringQueryParameters.get("activityType"));
     verify(mockedQuery).taskAssignee(stringQueryParameters.get("taskAssignee"));
 

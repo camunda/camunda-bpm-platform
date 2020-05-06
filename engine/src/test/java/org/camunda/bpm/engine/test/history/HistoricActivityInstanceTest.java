@@ -157,6 +157,10 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityName("nonExistingActivityName").list().size());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityName("No operation").list().size());
 
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityNameLike("operation").list().size());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityNameLike("%operation").list().size());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityNameLike("%oper%").list().size());
+
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().taskAssignee("nonExistingAssignee").list().size());
 
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().executionId("nonExistingExecutionId").list().size());
