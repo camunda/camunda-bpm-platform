@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationProvider;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 
 public class ContainerBasedAuthenticationFilter implements Filter {
 
@@ -116,8 +118,23 @@ public class ContainerBasedAuthenticationFilter implements Filter {
   }
 
   protected String getRequestUri(HttpServletRequest request) {
+    String requestURI = request.getRequestURI();
     String contextPath = request.getContextPath();
-    return request.getRequestURI().substring(contextPath.length());
+
+    int contextPathLength = contextPath.length();
+    if (contextPathLength > 0) {
+      requestURI = requestURI.substring(contextPathLength);
+    }
+
+    ServletContext servletContext = request.getServletContext();
+    String applicationPath = ServletContextUtil.getAppPath(servletContext);
+    int applicationPathLength = applicationPath.length();
+
+    if (applicationPathLength > 0) {
+      requestURI = requestURI.substring(applicationPathLength);
+    }
+
+    return requestURI;
   }
 
   protected String extractEngineName(HttpServletRequest request) {

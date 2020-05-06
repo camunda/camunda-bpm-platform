@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.servlet.Filter;
@@ -57,6 +56,7 @@ import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticati
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -75,6 +75,7 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockServletContext;
 
 @RunWith(Parameterized.class)
 @PrepareForTest({ ProcessEngineUtil.class, ServiceLoader.class, Authentications.class })
@@ -93,10 +94,6 @@ public class ContainerAuthenticationFilterTest {
 
   protected AuthorizationService authorizationService;
   protected IdentityService identityService;
-
-  protected User userMock;
-  protected List<String> groupIds;
-  protected List<String> tenantIds;
 
   protected Filter authenticationFilter;
 
@@ -243,7 +240,16 @@ public class ContainerAuthenticationFilterTest {
   }
 
   @Test
-  public void testContainerAuthenticationCheck() throws IOException, ServletException {
+  public void shouldCheckCustomApplicationPath() throws IOException, ServletException {
+    testContainerAuthenticationCheck("/my-custom/application/path");
+  }
+
+  @Test
+  public void shouldCheckEmptyApplicationPath() throws IOException, ServletException {
+    testContainerAuthenticationCheck("");
+  }
+
+  public void testContainerAuthenticationCheck(String applicationPath) throws IOException, ServletException {
     if (alreadyAuthenticated) {
       Authentication authentication = mock(Authentication.class);
       when(authentication.getProcessEngineName()).thenReturn(engineName);
@@ -256,7 +262,19 @@ public class ContainerAuthenticationFilterTest {
     }
 
     MockHttpServletResponse response = new MockHttpServletResponse();
-    MockHttpServletRequest request = new MockHttpServletRequest();
+    MockHttpServletRequest request = null;
+
+    if (!applicationPath.isEmpty()) {
+      MockServletContext mockServletContext = new MockServletContext();
+      request = new MockHttpServletRequest(mockServletContext);
+      requestUrl = applicationPath + requestUrl;
+      ServletContextUtil.setAppPath(applicationPath, mockServletContext);
+
+    } else {
+      request = new MockHttpServletRequest();
+
+    }
+
     request.setRequestURI(SERVICE_PATH  + requestUrl);
     request.setContextPath(SERVICE_PATH);
     applyFilter(request, response, MockProvider.EXAMPLE_USER_ID);

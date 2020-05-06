@@ -18,18 +18,37 @@ package org.camunda.bpm.webapp.impl.security.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  *
  * @author nico.rehwaldt
  */
+@RunWith(Parameterized.class)
 public class RequestFilterTest {
+
+  protected static final String EMPTY_PATH = "";
+  protected static final String CUSTOM_APP_PATH = "/my-custom/application/path";
 
   private RequestFilter matcher;
 
   private Map<String, String> matchResult;
+
+  protected String applicationPath;
+
+  @Parameterized.Parameters
+  public static Collection<String> data() {
+    return Arrays.asList(EMPTY_PATH, CUSTOM_APP_PATH);
+  }
+
+  public RequestFilterTest(String applicationPath) {
+    this.applicationPath = applicationPath;
+  }
 
   @Test
   public void shouldMatchMethod() {
@@ -38,7 +57,7 @@ public class RequestFilterTest {
     matcher = newMatcher("/foo/bar", "POST", "PUT");
 
     // when
-    matchResult = matcher.match("GET", "/foo/bar");
+    matchResult = matcher.match("GET", applicationPath + "/foo/bar");
 
     // then
     assertThat(matchResult).isNull();
@@ -51,7 +70,7 @@ public class RequestFilterTest {
     matcher = newMatcher("/foo/bar", "GET");
 
     // when
-    matchResult = matcher.match("GET", "/not-matching/");
+    matchResult = matcher.match("GET", applicationPath + "/not-matching/");
 
     // then
     assertThat(matchResult).isNull();
@@ -64,7 +83,7 @@ public class RequestFilterTest {
     matcher = newMatcher("/foo/bar", "GET");
 
     // when
-    matchResult = matcher.match("GET", "/foo/bar");
+    matchResult = matcher.match("GET", applicationPath + "/foo/bar");
 
     // then
     assertThat(matchResult).isNotNull();
@@ -77,7 +96,7 @@ public class RequestFilterTest {
     matcher = newMatcher("/{foo}/{bar}", "GET");
 
     // when
-    matchResult = matcher.match("GET", "/foo/bar");
+    matchResult = matcher.match("GET", applicationPath + "/foo/bar");
 
     // then
     assertThat(matchResult)
@@ -93,7 +112,7 @@ public class RequestFilterTest {
     matcher = newMatcher("/{foo}/{bar:.*}", "GET");
 
     // when
-    matchResult = matcher.match("GET", "/foo/bar/asdf/asd");
+    matchResult = matcher.match("GET", applicationPath + "/foo/bar/asdf/asd");
 
     // then
     assertThat(matchResult)
@@ -102,6 +121,6 @@ public class RequestFilterTest {
   }
 
   private RequestFilter newMatcher(String uri, String ... methods) {
-    return new RequestFilter(uri, methods);
+    return new RequestFilter(uri, applicationPath, methods);
   }
 }
