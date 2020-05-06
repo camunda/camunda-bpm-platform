@@ -45,7 +45,7 @@ public class SecureEnabledIT {
 
   @Test
   public void shouldEnableSecureCookie() {
-    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();

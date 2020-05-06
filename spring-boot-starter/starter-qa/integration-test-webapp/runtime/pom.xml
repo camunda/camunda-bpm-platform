@@ -22,7 +22,7 @@
     <version.chromedriver>78.0.3904.70</version.chromedriver>
 
     <http.port>58080</http.port>
-    <http.ctx-path.webapp />
+    <http.ctx-path.webapp>camunda/</http.ctx-path.webapp>
     <http.ctx-path.rest>engine-rest/</http.ctx-path.rest>
   </properties>
 

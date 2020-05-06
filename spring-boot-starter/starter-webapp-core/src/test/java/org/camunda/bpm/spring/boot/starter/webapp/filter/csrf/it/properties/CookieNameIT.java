@@ -46,7 +46,7 @@ public class CookieNameIT {
     // given
 
     // when
-    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getCookieValue("myFancyCookieName");
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
