@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Calendar;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -105,6 +106,24 @@ public class IncidentQueryTest {
   }
 
   @Test
+  public void testIncidentQueryIncidentTimestampAfterBefore() {
+
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    assertEquals(0, query.incidentTimestampBefore(hourAgo.getTime()).count());
+    assertEquals(4, query.incidentTimestampBefore(hourFromNow.getTime()).count());
+    assertEquals(4, query.incidentTimestampAfter(hourAgo.getTime()).count());
+    assertEquals(0, query.incidentTimestampAfter(hourFromNow.getTime()).count());
+    assertEquals(4, query.incidentTimestampBefore(hourFromNow.getTime())
+                                  .incidentTimestampAfter(hourAgo.getTime()).count());
+  }
+
+  @Test
   public void testQuery() {
     IncidentQuery query = runtimeService.createIncidentQuery();
     assertEquals(4, query.count());
@@ -158,6 +177,14 @@ public class IncidentQueryTest {
 
     Incident incident = query.singleResult();
     assertNull(incident);
+  }
+
+  @Test
+  public void testQueryByIncidentMessageLike() {
+    IncidentQuery query = runtimeService.createIncidentQuery();
+    assertEquals(0, query.incidentMessageLike("exception").list().size());
+    assertEquals(4, query.incidentMessageLike("exception%").list().size());
+    assertEquals(1, query.incidentMessageLike("%xception1").list().size());
   }
 
   @Test
