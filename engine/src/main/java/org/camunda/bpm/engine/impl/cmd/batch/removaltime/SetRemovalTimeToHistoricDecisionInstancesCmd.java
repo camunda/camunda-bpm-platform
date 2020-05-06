@@ -19,21 +19,21 @@ package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl.Mode;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -52,49 +52,38 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd implements Command<Bat
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    Collection<String> collectedInstanceIds = new HashSet<>();
-
-    List<String> instanceIds = builder.getIds();
-    HistoricDecisionInstanceQuery instanceQuery = builder.getQuery();
-    if (instanceQuery == null && instanceIds == null) {
+    if (builder.getQuery() == null && builder.getIds() == null) {
       throw new BadUserRequestException("Neither query nor ids provided.");
-
     }
 
-    if (instanceQuery != null) {
-      for (HistoricDecisionInstance historicDecisionInstance : instanceQuery.list()) {
-        collectedInstanceIds.add(historicDecisionInstance.getId());
-
-      }
-    }
-
-    if (instanceIds != null) {
-      collectedInstanceIds.addAll(findHistoricInstanceIds(instanceIds, commandContext));
-
-    }
+    BatchElementConfiguration elementConfiguration = collectInstances(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
-    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", collectedInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", elementConfiguration.getIds());
 
     return new BatchBuilder(commandContext)
         .type(Batch.TYPE_DECISION_SET_REMOVAL_TIME)
-        .config(getConfiguration(collectedInstanceIds))
+        .config(getConfiguration(elementConfiguration))
         .permission(BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
         .operationLogHandler(this::writeUserOperationLog)
         .build();
   }
 
-  protected List<String> findHistoricInstanceIds(List<String> instanceIds, CommandContext commandContext) {
-    List<HistoricDecisionInstance> historicDecisionInstances = createHistoricDecisionInstanceQuery(commandContext)
-      .decisionInstanceIdIn(instanceIds.toArray(new String[0]))
-      .list();
+  protected BatchElementConfiguration collectInstances(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
-    List<String> ids = new ArrayList<>();
-    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
-      ids.add(historicDecisionInstance.getId());
+    if (builder.getQuery() != null) {
+      elementConfiguration.addDeploymentMappings(((HistoricDecisionInstanceQueryImpl) builder.getQuery()).listDeploymentIdMappings());
     }
 
-    return ids;
+    List<String> idList = builder.getIds();
+    if (!CollectionUtil.isEmpty(idList)) {
+      HistoricDecisionInstanceQueryImpl query = new HistoricDecisionInstanceQueryImpl();
+      query.decisionInstanceIdIn(idList.toArray(new String[0]));
+      elementConfiguration.addDeploymentMappings(commandContext.runWithoutAuthorization(query::listDeploymentIdMappings));
+    }
+
+    return elementConfiguration;
   }
 
   protected HistoricDecisionInstanceQuery createHistoricDecisionInstanceQuery(CommandContext commandContext) {
@@ -120,8 +109,8 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd implements Command<Bat
       builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
   }
 
-  public BatchConfiguration getConfiguration(Collection<String> instances) {
-    return new SetRemovalTimeBatchConfiguration(new ArrayList<>(instances))
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRemovalTimeBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings())
         .setHierarchical(builder.isHierarchical())
         .setHasRemovalTime(hasRemovalTime())
         .setRemovalTime(builder.getRemovalTime());

@@ -33,18 +33,24 @@ public class CreateFilterConfiguration extends AbstractCamundaConfiguration {
   @PostConstruct
   public void init() {
     filterName = Optional.ofNullable(camundaBpmProperties.getFilter())
-      .map(FilterProperty::getCreate)
-      .orElseThrow(fail("filter.create not configured!"));
+        .map(FilterProperty::getCreate)
+        .orElseThrow(fail("filter.create not configured!"));
   }
 
   @Override
   public void postProcessEngineBuild(final ProcessEngine processEngine) {
     Objects.requireNonNull(filterName);
-    Filter filter = processEngine.getFilterService().createFilterQuery().filterName(filterName).singleResult();
-    if (filter == null) {
-      filter = processEngine.getFilterService().newTaskFilter(filterName);
+    long filterCount = processEngine.getFilterService()
+        .createFilterQuery()
+        .filterName(filterName)
+        .count();
+    if (filterCount == 0) {
+      Filter filter = processEngine.getFilterService().newTaskFilter(filterName);
       processEngine.getFilterService().saveFilter(filter);
       LOG.createInitialFilter(filter);
+    }
+    else {
+      LOG.skipCreateInitialFilter(filterName);
     }
   }
 

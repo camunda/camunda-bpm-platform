@@ -44,9 +44,9 @@ public class CamundaBpmRestConfigurationIT {
   @Test
   public void processDefinitionTest() {
     // start process
-    testRestTemplate.postForEntity("/rest/start/process", HttpEntity.EMPTY, String.class);
+    testRestTemplate.postForEntity("/engine-rest/start/process", HttpEntity.EMPTY, String.class);
 
-    ResponseEntity<ProcessDefinitionDto> entity = testRestTemplate.getForEntity("/rest/engine/{engineName}/process-definition/key/TestProcess/",
+    ResponseEntity<ProcessDefinitionDto> entity = testRestTemplate.getForEntity("/engine-rest/engine/{engineName}/process-definition/key/TestProcess/",
         ProcessDefinitionDto.class, camundaBpmProperties.getProcessEngineName());
 
     assertEquals(HttpStatus.OK, entity.getStatusCode());

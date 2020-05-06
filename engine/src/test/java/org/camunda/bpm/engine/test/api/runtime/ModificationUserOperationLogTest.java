@@ -158,7 +158,7 @@ public class ModificationUserOperationLogTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     identityService.setAuthenticatedUserId("userId");

@@ -19,10 +19,11 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -38,7 +39,13 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
   public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds,
       List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId,
       boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings, boolean withoutBusinessKey) {
-    super(processInstanceIds);
+    this(processInstanceIds, null, instructions, processDefinitionId, initialVariables, skipCustomListeners, skipIoMappings, withoutBusinessKey);
+  }
+
+  public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds, DeploymentMappings mappings,
+      List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId,
+      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings, boolean withoutBusinessKey) {
+    super(processInstanceIds, mappings);
     this.instructions = instructions;
     this.processDefinitionId = processDefinitionId;
     this.initialVariables = initialVariables;

@@ -139,6 +139,7 @@ create table ACT_RU_JOBDEF (
     SUSPENSION_STATE_ tinyint,
     JOB_PRIORITY_ numeric(19,0),
     TENANT_ID_ nvarchar(64),
+    DEPLOYMENT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -205,6 +206,7 @@ create table ACT_RU_VARIABLE (
     NAME_ nvarchar(255) not null,
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
+    PROC_DEF_ID_ nvarchar(64),
     CASE_EXECUTION_ID_ nvarchar(64),
     CASE_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
@@ -262,6 +264,8 @@ create table ACT_RU_AUTHORIZATION (
   RESOURCE_TYPE_ int not null,
   RESOURCE_ID_ nvarchar(255),
   PERMS_ int,
+  REMOVAL_TIME_ datetime2,
+  ROOT_PROC_INST_ID_ nvarchar(64),
   primary key (ID_)
 );
 
@@ -536,3 +540,7 @@ create index ACT_IDX_EVENT_SUBSCR_EVT_NAME ON ACT_RU_EVENT_SUBSCR(EVENT_NAME_);
 create index ACT_IDX_PROCDEF_DEPLOYMENT_ID ON ACT_RE_PROCDEF(DEPLOYMENT_ID_);
 create index ACT_IDX_PROCDEF_TENANT_ID ON ACT_RE_PROCDEF(TENANT_ID_);
 create index ACT_IDX_PROCDEF_VER_TAG ON ACT_RE_PROCDEF(VERSION_TAG_);
+
+-- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
+create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
+create index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION(REMOVAL_TIME_);

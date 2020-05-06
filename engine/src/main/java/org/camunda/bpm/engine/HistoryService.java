@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -72,6 +74,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -91,14 +94,39 @@ import java.util.List;
  */
 public interface HistoryService {
 
-  /** Creates a new programmatic query to search for {@link HistoricProcessInstance}s. */
+  /**
+   * <p>Creates a new programmatic query to search for {@link HistoricProcessInstance}s.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricProcessInstanceQuery createHistoricProcessInstanceQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricActivityInstance}s. */
+  /**
+   * <p>Creates a new programmatic query to search for {@link HistoricActivityInstance}s.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   *
+   * */
   HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
 
   /**
-   * Query for the number of historic activity instances aggregated by activities of a single process definition.
+   * <p>Query for the number of historic activity instances aggregated by activities of a single
+   * process definition.
+   *
+   * <p>The result of the query is empty when the user has no {@link Permissions#READ_HISTORY}
+   * permission on {@link Resources#PROCESS_DEFINITION}
    */
   HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
 
@@ -107,30 +135,111 @@ public interface HistoryService {
    */
   HistoricCaseActivityStatisticsQuery createHistoricCaseActivityStatisticsQuery(String caseDefinitionId);
 
-  /** Creates a new programmatic query to search for {@link HistoricTaskInstance}s. */
+  /**
+   * <p>Creates a new programmatic query to search for {@link HistoricTaskInstance}s.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricDetail}s. */
+  /**
+   * <p>Creates a new programmatic query to search for {@link HistoricDetail}s.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *       {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on
+   *       {@link Resources#PROCESS_DEFINITION}
+   *       ({@link ProcessEngineConfigurationImpl#enforceSpecificVariablePermission} must be set to
+   *       {@code true}) OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ_VARIABLE} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enforceSpecificVariablePermission} and
+   *       {@code enableHistoricInstancePermissions}
+   *       in {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricDetailQuery createHistoricDetailQuery();
 
   /**
-   * Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
-   * <p>
-   * The result of the query is empty:
-   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or</li>
-   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
-   * in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
-   * </p>
-   */
+   * <p>Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *       {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on
+   *       {@link Resources#PROCESS_DEFINITION}
+   *       ({@link ProcessEngineConfigurationImpl#enforceSpecificVariablePermission} must be set to
+   *       {@code true}) OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ_VARIABLE} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enforceSpecificVariablePermission} and
+   *       {@code enableHistoricInstancePermissions}
+   *       in {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
-  /** Creates a new programmatic query to search for {@link UserOperationLogEntry} instances. */
+  /** <p>Creates a new programmatic query to search for {@link UserOperationLogEntry} instances.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true}) OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   *
+   * */
   UserOperationLogQuery createUserOperationLogQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricIncident historic incidents}. */
+  /**
+   * <p>Creates a new programmatic query to search for {@link HistoricIncident historic incidents}.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricIncidentQuery createHistoricIncidentQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricIdentityLinkLog historic identity links}. */
+  /**
+   * <p>Creates a new programmatic query to search for
+   * {@link HistoricIdentityLinkLog historic identity links}.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricTaskPermissions#READ} permission on
+   *       {@link Resources#HISTORIC_TASK} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
+   * */
   HistoricIdentityLinkLogQuery createHistoricIdentityLinkLogQuery();
 
   /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
@@ -465,7 +574,15 @@ public interface HistoryService {
   NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery();
 
   /**
-   * Creates a new programmatic query to search for {@link HistoricJobLog historic job logs}.
+   * <p>Creates a new programmatic query to search for {@link HistoricJobLog historic job logs}.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
    *
    * @since 7.3
    */
@@ -494,7 +611,10 @@ public interface HistoryService {
   HistoricProcessInstanceReport createHistoricProcessInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a historic task instance report.
+   * <p>Creates a new programmatic query to create a historic task instance report.
+   *
+   * <p>Subsequent builder methods throw {@link AuthorizationException} when the user has no
+   * {@link Permissions#READ_HISTORY} permission on any {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.6
    */
@@ -555,7 +675,16 @@ public interface HistoryService {
   HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId);
 
   /**
-   * Creates a new programmatic query to search for {@link HistoricExternalTaskLog historic external task logs}.
+   * <p>Creates a new programmatic query to search for
+   * {@link HistoricExternalTaskLog historic external task logs}.
+   *
+   * <p>The result of the query is empty in the following cases:
+   * <ul>
+   *   <li>The user has no {@link Permissions#READ_HISTORY} permission on
+   *   {@link Resources#PROCESS_DEFINITION} OR
+   *   <li>The user has no {@link HistoricProcessInstancePermissions#READ} permission on
+   *       {@link Resources#HISTORIC_PROCESS_INSTANCE} ({@code enableHistoricInstancePermissions} in
+   *       {@link ProcessEngineConfigurationImpl} must be set to {@code true})
    *
    * @since 7.7
    */

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.repository;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.query.Query;
@@ -59,6 +61,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    * given deployment id
    */
   ProcessDefinitionQuery deploymentId(String deploymentId);
+
+  /**
+   * Only select process definitions that were deployed after the given Date (exclusive).
+   */
+  ProcessDefinitionQuery deployedAfter(Date deployedAfter);
+
+  /**
+   * Only select process definitions that were deployed at the given Date.
+   */
+  ProcessDefinitionQuery deployedAt(Date deployedAt);
 
   /**
    * Only select process definition with the given key.
@@ -219,6 +231,9 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessDefinitionQuery orderByDeploymentId();
+
+  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  ProcessDefinitionQuery orderByDeploymentTime();
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of process instances without tenant id is database-specific. */

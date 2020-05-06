@@ -19,6 +19,9 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
@@ -30,6 +33,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -60,6 +64,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnableHistoricInstancePermissions(false);
   }
 
 
@@ -215,6 +220,102 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     // then
     assertNotNull(stacktrace);
     assertEquals(ERROR_DETAILS, stacktrace);
+  }
+
+  public void testCheckNonePermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(DEFAULT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    assertThat(query.list()).isEmpty();
+  }
+
+  public void testCheckReadPermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(DEFAULT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(DEFAULT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+    createGrantAuthorization(PROCESS_DEFINITION, DEFAULT_PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.READ_HISTORY);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(DEFAULT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+    createGrantAuthorization(PROCESS_DEFINITION, DEFAULT_PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.NONE);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  public void testHistoricProcessInstancePermissionsAuthorizationDisabled() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(DEFAULT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    disableAuthorization();
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
   }
 
   protected void startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure() {

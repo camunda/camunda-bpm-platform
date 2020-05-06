@@ -84,6 +84,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String userOperationId;
   private Date occurredBefore;
   private Date occurredAfter;
+  protected Boolean initial;
 
   public HistoricDetailQueryDto() {
   }
@@ -177,6 +178,11 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.occurredAfter = occurredAfter;
   }
 
+  @CamundaQueryParam(value = "initial", converter = BooleanConverter.class)
+  public void setInitial(Boolean initial) {
+    this.initial = initial;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -259,6 +265,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (occurredAfter != null) {
       query.occurredAfter(occurredAfter);
+    }
+    if (TRUE.equals(initial)) {
+      query.initial();
     }
   }
 

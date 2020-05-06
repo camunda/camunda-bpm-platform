@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMapping;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
@@ -63,7 +65,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd impleme
 
     return new BatchBuilder(commandContext)
         .type(Batch.TYPE_PROCESS_INSTANCE_MIGRATION)
-        .config(getConfiguration(collectedInstanceIds))
+        .config(getConfiguration(collectedInstanceIds, sourceDefinition.getDeploymentId()))
         .permission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES)
         .permissionHandler(ctx ->
             checkAuthorizations(ctx, sourceDefinition, targetDefinition))
@@ -74,9 +76,9 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd impleme
         .build();
   }
 
-  public BatchConfiguration getConfiguration(Collection<String> instanceIds) {
+  public BatchConfiguration getConfiguration(Collection<String> instanceIds, String deploymentId) {
     return new MigrationBatchConfiguration(
-        new ArrayList<>(instanceIds),
+        new ArrayList<>(instanceIds), DeploymentMappings.of(new DeploymentMapping(deploymentId, instanceIds.size())),
         executionBuilder.getMigrationPlan(),
         executionBuilder.isSkipCustomListeners(),
         executionBuilder.isSkipIoMappings());

@@ -1,7 +1,9 @@
-<!-- Generates a Query Parameter JSON object -->
+<#-- Generates a Query Parameter JSON object -->
 <#macro parameter name location type desc
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
+        format=""
+        itemType=""
         required=false
         last=false >
   {
@@ -20,6 +22,16 @@
       </#if>
 
       "type": "${type}"
+
+      <#if type == "array">,
+        "items": {
+          "type": "${itemType}"
+        }
+      </#if>
+
+      <#if format?has_content>,
+        "format": "${format}"
+      </#if>
     },
 
     <#if required>
@@ -32,17 +44,18 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
-<!-- Generates a DTO Property JSON object -->
+<#-- Generates a DTO Property JSON object -->
 <#macro property name type
         desc=""
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
+        nullable=true
         minimum=""
         deprecated=false
         additionalProperties=false
         itemType="string"
         dto=""
-        format="none"
+        format=""
         addProperty=""
         last=false >
     "${name}": {
@@ -52,8 +65,17 @@
       <#else>
         "type": "${type}",
 
-        <#if format != "none">
+        <#if format?has_content>
           "format": "${format}",
+          <#if nullable>
+            "nullable": true,
+          </#if>
+        </#if>
+
+        <#if type == "boolean">
+          <#if nullable>
+            "nullable": true,
+          </#if>
         </#if>
 
         <#if enumValues?size != 0>
@@ -101,7 +123,7 @@
     <#if !last> , </#if> <#-- if not a last property add a comma-->
 </#macro>
 
-<!-- Generates a DTO JSON object -->
+<#-- Generates a DTO JSON object -->
 <#macro dto
         type="object"
         title=""
@@ -148,7 +170,7 @@
   }
 </#macro>
 
-<!-- Generates a Request Body JSON object -->
+<#-- Generates a Request Body JSON object -->
 <#macro requestBody mediaType dto
         requestDesc=""
         examples=[] >
@@ -176,42 +198,61 @@
   },
 </#macro>
 
-<!-- Generates an HTTP Response JSON object -->
+<#-- Generates an HTTP Response JSON object
+     * `dto` needs to be defined if `mediaType` is, the default, "application/json" -->
 <#macro response code desc
-        dto="ExceptionDto"
+        flatType=""
+        dto=""
         array=false
         additionalProperties=false
+        mediaType="application/json"
         examples=[]
         last=false >
     "${code}": {
 
-       <#if code!="204">
+       <#if code != "204">
          "content": {
-           "application/json": {
-             "schema": {
-
-               <#if array>
-                 "type" : "array",
-                 "items" : {
-               </#if>
-
-               <#if additionalProperties>
-                 "type" : "object",
-                 "additionalProperties": {
-               </#if>
-
-                 "$ref": "#/components/schemas/${dto}"
-
-               <#if array || additionalProperties >
-                 }
-               </#if>
-
-             }
-             <#if examples?size != 0>,
-               "examples": {
-                 ${examples?join(", ")}
+           <#if mediaType == "application/xhtml+xml">
+             "${mediaType}": {
+               "schema": {
+                 "type": "string",
+                 "format": "binary",
+                 "description": "For `application/xhtml+xml` Responses, a byte stream is returned."
                }
-             </#if>
+           <#else>
+             "${mediaType}": {
+               "schema": {
+
+                 <#if array>
+                   "type" : "array",
+                   "items" : {
+                 </#if>
+
+                 <#if additionalProperties>
+                   "type" : "object",
+                   "additionalProperties": {
+                 </#if>
+
+                 <#if dto?has_content>
+                   "$ref": "#/components/schemas/${dto}"
+                 </#if>
+
+                 <#if flatType?has_content>
+                  "type": "${flatType}"
+                 </#if>
+
+                 <#if array || additionalProperties >
+                   }
+                 </#if>
+               }
+           </#if>
+
+           <#if examples?size != 0>,
+             "examples": {
+               ${examples?join(", ")}
+             }
+           </#if>
+
            }
          },
        </#if>
@@ -241,7 +282,7 @@
     <#if !last> , </#if> <#-- if not the last entry, add a comma -->
 </#macro>
 
-<!-- Generates an Operation Information JSON object -->
+<#-- Generates an Operation Information JSON object -->
 <#macro endpointInfo
         id
         tag
@@ -253,7 +294,7 @@
     "description": "${removeIndentation(desc)}",
 </#macro>
 
-<!-- Removes source formatting indentations from descriptions -->
+<#-- Removes source formatting indentations from descriptions -->
 <#function removeIndentation text>
   <#return text?replace('\n( ){2,}', '\n', 'r') >
 </#function>

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.repository;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.query.Query;
 
 public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, DecisionDefinition> {
@@ -86,6 +88,20 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
    * @param deploymentId the id of the deployment
    */
   DecisionDefinitionQuery deploymentId(String deploymentId);
+
+  /**
+   * Only select decision definitions that were deployed after the given Date (exclusive).
+   *
+   * @param java.util.Date that constitutes the lower boundary for the deployment time in the query
+   */
+  DecisionDefinitionQuery deployedAfter(Date deployedAfter);
+  
+  /**
+   * Only select decision definitions that were deployed at the given Date.
+   *
+   * @param java.util.Date that all query results must match
+   */
+  DecisionDefinitionQuery deployedAt(Date deployedAt);
 
   /**
    * Only select decision definition with a certain version.
@@ -188,6 +204,10 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   /** Order by deployment id (needs to be followed by {@link #asc()}
    * or {@link #desc()}). */
   DecisionDefinitionQuery orderByDeploymentId();
+
+  /** Order by deployment time (needs to be followed by {@link #asc()}
+   * or {@link #desc()}). */
+  DecisionDefinitionQuery orderByDeploymentTime();
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of decision definitions without tenant id is database-specific. */

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
  *  @author Philipp Ossler
@@ -249,6 +250,14 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
     return commandContext
         .getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstancesByQueryCriteria(this, page);
+  }
+
+  @Override
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+        .getHistoricDecisionInstanceManager()
+        .findHistoricDecisionInstanceDeploymentIdMappingsByQueryCriteria(this);
   }
 
   public String getDecisionDefinitionId() {

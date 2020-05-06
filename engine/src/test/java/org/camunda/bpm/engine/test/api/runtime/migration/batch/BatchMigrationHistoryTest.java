@@ -146,7 +146,7 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricBatchCompletion() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     Date endDate = helper.addSecondsToClock(12);
@@ -173,14 +173,14 @@ public class BatchMigrationHistoryTest {
     assertEquals(BatchSeedJobHandler.TYPE, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(helper.sourceProcessDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertEquals(currentTime, jobLog.getJobDueDate());
 
     // when the seed job is executed
     Date executionDate = helper.addSecondsToClock(12);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then a new historic job log exists for the seed job
     jobLog = helper.getHistoricSeedJobLog(batch).get(1);
@@ -190,7 +190,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(BatchSeedJobHandler.TYPE, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(helper.sourceProcessDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertEquals(currentTime, jobLog.getJobDueDate());
@@ -202,7 +202,7 @@ public class BatchMigrationHistoryTest {
     Batch batch = helper.migrateProcessInstancesAsync(1);
 
     // when the seed job is executed
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     Job monitorJob = helper.getMonitorJob(batch);
     List<HistoricJobLog> jobLogs = helper.getHistoricMonitorJobLog(batch, monitorJob);
@@ -260,7 +260,7 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricBatchJobLog() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
 
@@ -326,7 +326,7 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricMonitorJobLogForBatchDeletion() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
@@ -342,7 +342,7 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricBatchJobLogForBatchDeletion() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
@@ -358,7 +358,7 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testDeleteHistoricBatch() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
 
@@ -396,7 +396,7 @@ public class BatchMigrationHistoryTest {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(1);
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     Job monitorJob = helper.getMonitorJob(batch);
     managementService.setJobRetries(monitorJob.getId(), 0);
 
@@ -415,7 +415,7 @@ public class BatchMigrationHistoryTest {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(3);
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.failExecutionJobs(batch, 3);
 
     managementService.deleteBatch(batch.getId(), false);

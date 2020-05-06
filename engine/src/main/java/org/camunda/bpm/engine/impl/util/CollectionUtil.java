@@ -121,4 +121,8 @@ public class CollectionUtil {
     }
     return result;
   }
+
+  public static boolean isEmpty(Collection<?> collection) {
+    return collection == null || collection.isEmpty();
+  }
 }

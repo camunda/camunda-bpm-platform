@@ -96,7 +96,7 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
   }
 
   protected List<String> setupFailedJobs() {
-    List<String> jobIds = new ArrayList<String>();
+    List<String> jobIds = new ArrayList<>();
 
     Deployment deploy = testHelper.deploy(JOB_EXCEPTION_DEFINITION_XML);
     ProcessDefinition sourceDefinition = engineRule.getRepositoryService()

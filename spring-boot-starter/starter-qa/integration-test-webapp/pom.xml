@@ -16,7 +16,7 @@
 
   <modules>
     <module>invoice-example</module>
-    <module>runtimes</module>
+    <module>runtime</module>
   </modules>
 
   <properties>

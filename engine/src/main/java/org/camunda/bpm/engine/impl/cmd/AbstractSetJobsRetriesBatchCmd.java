@@ -16,23 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 /**
  * @author Askar Akhmerov
@@ -43,13 +42,13 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    Collection<String> collectedInstanceIds = collectJobIds(commandContext);
+    BatchElementConfiguration elementConfiguration = collectJobIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "jobIds", collectedInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
 
     return new BatchBuilder(commandContext)
-        .config(getConfiguration(collectedInstanceIds))
+        .config(getConfiguration(elementConfiguration))
         .type(Batch.TYPE_SET_JOB_RETRIES)
         .permission(BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
         .operationLogHandler(this::writeUserOperationLog)
@@ -58,7 +57,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
   protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
 
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances",
         null,
         numInstances));
@@ -75,10 +74,10 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
             propertyChanges);
   }
 
-  protected abstract List<String> collectJobIds(CommandContext commandContext);
+  protected abstract BatchElementConfiguration collectJobIds(CommandContext commandContext);
 
-  public BatchConfiguration getConfiguration(Collection<String> instanceIds) {
-    return new SetRetriesBatchConfiguration(new ArrayList<>(instanceIds), retries);
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries);
   }
 
 }

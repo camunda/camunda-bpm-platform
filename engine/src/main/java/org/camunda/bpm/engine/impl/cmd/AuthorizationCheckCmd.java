@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNul
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
@@ -79,7 +80,8 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
   }
 
   protected boolean isHistoricInstanceResource() {
-    return Resources.HISTORIC_TASK.equals(resource);
+    return Objects.equals(Resources.HISTORIC_TASK, resource) ||
+        Objects.equals(Resources.HISTORIC_PROCESS_INSTANCE, resource);
   }
 
 }

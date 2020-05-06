@@ -1,7 +1,7 @@
 {
 
   <@lib.endpointInfo
-      id = "modifyProcessInstanceAsync"
+      id = "modifyProcessInstanceAsyncOperation"
       tag = "Process instance"
       desc = "Submits a list of modification instructions to change a process instance's execution state async.
               A modification instruction is one of the following:
@@ -29,14 +29,48 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceModificationDto" />
+      dto = "ProcessInstanceModificationDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/process-instance/aProcessInstanceId/modification-async`",
+                     "value": {
+                       "skipCustomListeners": true,
+                       "skipIoMappings": true,
+                       "instructions": [{
+                         "type": "startBeforeActivity",
+                         "activityId": "activityId"
+                       }, {
+                         "type": "cancel",
+                         "activityInstanceId": "anActivityInstanceId"
+                       }
+                       ],
+                       "annotation": "Modified to resolve an error."
+                     }
+                   }'
+      ] />
 
   "responses" : {
 
     <@lib.response
         code = "200"
         dto = "BatchDto"
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "Status 200 Response",
+                       "value": {
+                         "id": "aBatchId",
+                         "type": "aBatchType",
+                         "totalJobs": 10,
+                         "jobsCreated": 10,
+                         "batchJobsPerSeed": 100,
+                         "invocationsPerBatchJob": 1,
+                         "seedJobDefinitionId": "aSeedJobDefinitionId",
+                         "monitorJobDefinitionId": "aMonitorJobDefinitionId",
+                         "batchJobDefinitionId": "aBatchJobDefinitionId",
+                         "tenantId": "aTenantId",
+                         "suspended": false,
+                         "createUserId": "demo"
+                       }
+                     }'] />
 
     <@lib.response
         code = "400"

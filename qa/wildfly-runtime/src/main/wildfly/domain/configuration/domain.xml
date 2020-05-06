@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:10.0">
+<domain xmlns="urn:jboss:domain:12.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -35,6 +35,7 @@
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.messaging-activemq"/>
         <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+        <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
         <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
         <extension module="org.wildfly.extension.request-controller"/>
         <extension module="org.wildfly.extension.security.manager"/>
@@ -138,7 +139,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -200,7 +201,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:8.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -326,7 +327,7 @@
                 <worker name="default"/>
                 <buffer-pool name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:2.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:5.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -361,7 +362,12 @@
                 </mail-session>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+                <jaeger-tracer name="jaeger">
+                    <sampler-configuration sampler-type="const" sampler-param="1.0"/>
+                </jaeger-tracer>
+            </subsystem>
             <subsystem xmlns="urn:jboss:domain:naming:2.0">
                 <remote-naming/>
             </subsystem>
@@ -563,7 +569,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -625,7 +631,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:8.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -755,7 +761,7 @@
                 <worker name="default"/>
                 <buffer-pool name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:2.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:5.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -826,7 +832,12 @@
                 </mail-session>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+                <jaeger-tracer name="jaeger">
+                    <sampler-configuration sampler-type="const" sampler-param="1.0"/>
+                </jaeger-tracer>
+            </subsystem>
             <subsystem xmlns="urn:jboss:domain:modcluster:5.0">
                 <proxy name="default" advertise-socket="modcluster" listener="ajp">
                     <dynamic-load-provider>
@@ -1004,7 +1015,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -1071,7 +1082,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:8.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1202,7 +1213,7 @@
                 <worker name="default"/>
                 <buffer-pool name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:2.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:5.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -1237,7 +1248,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:8.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:9.0">
                 <server name="default">
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
@@ -1267,7 +1278,12 @@
                 </server>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+                <jaeger-tracer name="jaeger">
+                    <sampler-configuration sampler-type="const" sampler-param="1.0"/>
+                </jaeger-tracer>
+            </subsystem>
             <subsystem xmlns="urn:jboss:domain:naming:2.0">
                 <remote-naming/>
             </subsystem>
@@ -1430,7 +1446,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -1497,7 +1513,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:8.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1632,7 +1648,7 @@
                 <worker name="default"/>
                 <buffer-pool name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+            <subsystem xmlns="urn:jboss:domain:jaxrs:2.0"/>
             <subsystem xmlns="urn:jboss:domain:jca:5.0">
                 <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
                 <bean-validation enabled="true"/>
@@ -1703,7 +1719,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:8.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:9.0">
                 <server name="default">
                     <cluster password="${jboss.messaging.cluster.password:CHANGE ME!!}"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
@@ -1726,8 +1742,8 @@
                     <in-vm-acceptor name="in-vm" server-id="0">
                         <param name="buffer-pooling" value="false"/>
                     </in-vm-acceptor>
-                    <broadcast-group name="bg-group1" jgroups-cluster="activemq-cluster" connectors="http-connector"/>
-                    <discovery-group name="dg-group1" jgroups-cluster="activemq-cluster"/>
+                    <jgroups-broadcast-group name="bg-group1" jgroups-cluster="activemq-cluster" connectors="http-connector"/>
+                    <jgroups-discovery-group name="dg-group1" jgroups-cluster="activemq-cluster"/>
                     <cluster-connection name="my-cluster" address="jms" connector-name="http-connector" discovery-group="dg-group1"/>
                     <jms-queue name="ExpiryQueue" entries="java:/jms/queue/ExpiryQueue"/>
                     <jms-queue name="DLQ" entries="java:/jms/queue/DLQ"/>
@@ -1737,7 +1753,12 @@
                 </server>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+                <jaeger-tracer name="jaeger">
+                    <sampler-configuration sampler-type="const" sampler-param="1.0"/>
+                </jaeger-tracer>
+            </subsystem>
             <subsystem xmlns="urn:jboss:domain:modcluster:5.0">
                 <proxy name="default" advertise-socket="modcluster" listener="ajp">
                     <dynamic-load-provider>
@@ -1999,9 +2020,12 @@
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly10.1">
@@ -2014,9 +2038,12 @@
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly11.0">
@@ -2026,9 +2053,12 @@
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly12.0">
@@ -2038,9 +2068,12 @@
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly13.0">
@@ -2049,16 +2082,55 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly14.0">
             <host-release id="WildFly14.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly15.0">
+            <host-release id="WildFly15.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly16.0">
+            <host-release id="WildFly16.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly17.0">
+            <host-release id="WildFly17.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly18.0">
+            <host-release id="WildFly18.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>

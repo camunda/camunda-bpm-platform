@@ -90,7 +90,7 @@ public class EnableHistoricInstancePermissionsTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled() {
+  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled_Task() {
     // given
     config.setEnableHistoricInstancePermissions(false);
 
@@ -102,6 +102,21 @@ public class EnableHistoricInstancePermissionsTest {
     // when
     authorizationService.isUserAuthorized("myUserId", null,
         HistoricTaskPermissions.ALL, Resources.HISTORIC_TASK);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled_ProcessInstance() {
+    // given
+    config.setEnableHistoricInstancePermissions(false);
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("ENGINE-03090 Historic instance permissions are disabled, " +
+        "please check your process engine configuration.");
+
+    // when
+    authorizationService.isUserAuthorized("myUserId", null,
+        HistoricTaskPermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE);
   }
 
 }

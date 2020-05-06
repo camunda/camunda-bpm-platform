@@ -30,7 +30,7 @@ Contents:
         following web applications:
 
         webapps: http://localhost:8080/
-        rest: http://localhost:8080/rest
+        rest: http://localhost:8080/engine-rest/
 
   internal/
         This directory contains the Java application and optional components

@@ -35,6 +35,7 @@
 
     <@lib.response
         code = "400"
+        dto = "ExceptionDto"
         desc = "Returned if:
 
                 * no name was given
@@ -47,6 +48,7 @@
 
     <@lib.response
         code = "403"
+        dto = "ExceptionDto"
         desc = "Returned if the user is not allowed to throw a signal event.
 
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the
@@ -54,6 +56,7 @@
 
     <@lib.response
         code = "500"
+        dto = "ExceptionDto"
         last = true
         desc = "Returned if a single execution is specified and no such execution exists or has not
                 subscribed to the signal.

@@ -18,12 +18,7 @@ package org.camunda.bpm.run.qa;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
@@ -35,7 +30,6 @@ import io.restassured.response.Response;
 
 public class ProductionConfigurationIT {
 
-  static URL distroBase = ProductionConfigurationIT.class.getClassLoader().getResource("camunda-bpm-run-distro");
   static SpringBootManagedContainer container;
 
   @After
@@ -53,10 +47,7 @@ public class ProductionConfigurationIT {
 
   @Before
   public void runStartScript() throws IOException {
-    assertNotNull(distroBase);
-
-    File file = new File(distroBase.getFile());
-    container = new SpringBootManagedContainer(file.getAbsolutePath(), "--production");
+    container = new SpringBootManagedContainer("--production");
 
     container.createConfigurationYml("configuration/production.yml",
         ProductionConfigurationIT.class.getClassLoader().getResourceAsStream("ProductionConfigurationIntegrationTest_production.yml"));
@@ -71,7 +62,7 @@ public class ProductionConfigurationIT {
   @Test
   public void shouldStartWithProductionConfiguration() {
     // when
-    Response engineResponse = when().get(container.getBaseUrl() + "/rest/engine");
+    Response engineResponse = when().get(container.getBaseUrl() + "/engine-rest/engine");
 
     // then
     engineResponse.then()

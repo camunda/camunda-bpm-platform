@@ -72,7 +72,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().list();
 
     if (list.size() > 0) {
-      List<String> instances = new ArrayList<String>();
+      List<String> instances = new ArrayList<>();
       for (HistoricProcessInstance hpi : list) {
         instances.add(hpi.getId());
       }
@@ -84,7 +84,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         AuthorizationScenarioWithCount.scenario()
-            .withCount(2L)
+            .withCount(1L)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
                 grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
@@ -133,7 +133,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, false);
 
-    List<String> historicProcessInstances = new ArrayList<String>();
+    List<String> historicProcessInstances = new ArrayList<>();
     for (HistoricProcessInstance hpi : historyService.createHistoricProcessInstanceQuery().list()) {
       historicProcessInstances.add(hpi.getId());
     }

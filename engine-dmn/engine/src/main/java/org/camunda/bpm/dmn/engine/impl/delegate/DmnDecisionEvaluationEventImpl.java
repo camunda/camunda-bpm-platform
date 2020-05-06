@@ -27,8 +27,10 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
 
   protected DmnDecisionLogicEvaluationEvent decisionResult;
   protected Collection<DmnDecisionLogicEvaluationEvent> requiredDecisionResults = new ArrayList<DmnDecisionLogicEvaluationEvent>();
+  protected long executedDecisionInstances;
   protected long executedDecisionElements;
 
+  @Override
   public DmnDecisionLogicEvaluationEvent getDecisionResult() {
     return decisionResult;
   }
@@ -37,6 +39,7 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
     this.decisionResult = decisionResult;
   }
 
+  @Override
   public Collection<DmnDecisionLogicEvaluationEvent> getRequiredDecisionResults() {
     return requiredDecisionResults;
   }
@@ -45,6 +48,16 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
     this.requiredDecisionResults = requiredDecisionResults;
   }
 
+  @Override
+  public long getExecutedDecisionInstances() {
+    return executedDecisionInstances;
+  }
+
+  public void setExecutedDecisionInstances(long executedDecisionInstances) {
+    this.executedDecisionInstances = executedDecisionInstances;
+  }
+
+  @Override
   public long getExecutedDecisionElements() {
     return executedDecisionElements;
   }
@@ -61,6 +74,7 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
       ", name="+ dmnDecision.getName() +
       ", decisionLogic=" + dmnDecision.getDecisionLogic() +
       ", requiredDecisionResults=" + requiredDecisionResults +
+      ", executedDecisionInstances=" + executedDecisionInstances +
       ", executedDecisionElements=" + executedDecisionElements +
       '}';
   }

@@ -156,6 +156,11 @@
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
   </resultMap>
 
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
 
   <!-- JOB SELECT (FOR TIMER AND MESSAGE) -->
 
@@ -282,6 +287,12 @@
     ${countDistinctAfterEnd}
   </select>
 
+  <select id="selectJobDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="deploymentIdMapping">
+    select distinct RES.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectJobByQueryCriteriaSql"/>
+    ORDER BY RES.DEPLOYMENT_ID_ ASC
+  </select>
+
   <sql id="selectJobByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOB RES
     <if test="executable">
@@ -294,6 +305,11 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
+      <if test="ids != null and !ids.isEmpty()">
+        <bind name="listOfIds" value="ids" />
+        <bind name="fieldName" value="'RES.ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
+      </if>
       <if test="jobDefinitionId != null">
         RES.JOB_DEF_ID_ = #{jobDefinitionId}
       </if>
@@ -302,6 +318,11 @@
       </if>
       <if test="processInstanceId != null">
         and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
+      </if>
+      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+        <bind name="listOfIds" value="processInstanceIds" />
+        <bind name="fieldName" value="'RES.PROCESS_INSTANCE_ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}

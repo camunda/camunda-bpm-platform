@@ -13,6 +13,13 @@
   <name>Camunda BPM - Run - Assembly</name>
   <packaging>pom</packaging>
   
+  <properties>
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+  
   <dependencies>
     <!-- make sure the assembly runs after the REST module -->
     <dependency>
@@ -20,12 +27,26 @@
       <artifactId>camunda-bpm-run-modules-rest</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+        <!-- do not add transitive dependencies to generated dependency list -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-core</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- we consume an uberjar that contains all of its dependencies -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -33,6 +54,11 @@
       <artifactId>license-book</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
     </dependency>
 
   </dependencies>

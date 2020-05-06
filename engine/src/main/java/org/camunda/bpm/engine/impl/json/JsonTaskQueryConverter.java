@@ -53,6 +53,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String ASSIGNEE = "assignee";
   public static final String ASSIGNEE_LIKE = "assigneeLike";
   public static final String ASSIGNEE_IN = "assigneeIn";
+  public static final String ASSIGNEE_NOT_IN = "assigneeNotIn";
   public static final String INVOLVED_USER = "involvedUser";
   public static final String OWNER = "owner";
   public static final String UNASSIGNED = "unassigned";
@@ -146,6 +147,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (query.getAssigneeIn() != null) {
       JsonUtil.addArrayField(json, ASSIGNEE_IN,
           query.getAssigneeIn().toArray(new String[query.getAssigneeIn().size()]));
+    }
+
+    if (query.getAssigneeNotIn() != null) {
+      JsonUtil.addArrayField(json, ASSIGNEE_NOT_IN,
+              query.getAssigneeNotIn().toArray(new String[query.getAssigneeNotIn().size()]));
     }
 
     JsonUtil.addField(json, ASSIGNEE_LIKE, query.getAssigneeLike());
@@ -318,6 +324,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(ASSIGNEE_IN)) {
       query.taskAssigneeIn(getArray(JsonUtil.getArray(json, ASSIGNEE_IN)));
+    }
+    if (json.has(ASSIGNEE_NOT_IN)) {
+      query.taskAssigneeNotIn(getArray(JsonUtil.getArray(json, ASSIGNEE_NOT_IN)));
     }
     if (json.has(INVOLVED_USER)) {
       query.taskInvolvedUser(JsonUtil.getString(json, INVOLVED_USER));

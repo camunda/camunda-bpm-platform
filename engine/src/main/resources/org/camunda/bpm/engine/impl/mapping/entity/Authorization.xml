@@ -31,6 +31,8 @@
       RESOURCE_TYPE_,
       RESOURCE_ID_,
       PERMS_,
+      ROOT_PROC_INST_ID_,
+      REMOVAL_TIME_,
       REV_
       )
     values (
@@ -41,6 +43,8 @@
       #{resourceType ,jdbcType=INTEGER},
       #{resourceId ,jdbcType=VARCHAR},
       #{permissions, jdbcType=INTEGER},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -55,9 +59,35 @@
       USER_ID_ = #{userId, jdbcType=VARCHAR},
       RESOURCE_TYPE_ = #{resourceType, jdbcType=INTEGER},
       RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
-      PERMS_ = #{permissions, jdbcType=INTEGER}
+      PERMS_ = #{permissions, jdbcType=INTEGER},
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=TIMESTAMP}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateAuthorizationsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateAuthorizationsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where
+      <!-- task instances -->
+      RESOURCE_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+      <!-- process instances -->
+      or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
@@ -77,6 +107,52 @@
         AND RESOURCE_ID_ = #{resourceId}
   </delete>
 
+  <delete id="deleteAuthorizationsByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAuthorizationsByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAuthorizationsByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where ID_ IN
+    (SELECT ID_
+    FROM ${prefix}ACT_RU_AUTHORIZATION
+    WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset})
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
   <!-- AUTHORIZATION RESULTMAP -->
 
   <resultMap id="authorizationResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
@@ -87,6 +163,8 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="INTEGER" />
     <result property="resourceId" column="RESOURCE_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="permissions" column="PERMS_" jdbcType="INTEGER" />
   </resultMap>
 

@@ -25,6 +25,7 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 
 public class DefaultEngineMetricCollector implements DmnEngineMetricCollector, DmnDecisionEvaluationListener {
 
+  protected AtomicLong executedDecisionInstances = new AtomicLong();
   protected AtomicLong executedDecisionElements = new AtomicLong();
 
   public void notify(DmnDecisionTableEvaluationEvent evaluationEvent) {
@@ -32,14 +33,28 @@ public class DefaultEngineMetricCollector implements DmnEngineMetricCollector, D
   }
 
   public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
+    long executedDecisionInstances = evaluationEvent.getExecutedDecisionInstances();
     long executedDecisionElements = evaluationEvent.getExecutedDecisionElements();
+    this.executedDecisionInstances.getAndAdd(executedDecisionInstances);
     this.executedDecisionElements.getAndAdd(executedDecisionElements);
   }
 
+  @Override
+  public long getExecutedDecisionInstances() {
+    return executedDecisionInstances.get();
+  }
+
+  @Override
   public long getExecutedDecisionElements() {
     return executedDecisionElements.get();
   }
 
+  @Override
+  public long clearExecutedDecisionInstances() {
+    return executedDecisionInstances.getAndSet(0);
+  }
+
+  @Override
   public long clearExecutedDecisionElements() {
     return executedDecisionElements.getAndSet(0);
   }

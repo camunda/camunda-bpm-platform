@@ -8,14 +8,39 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "ProcessInstanceQueryDto" />
+      dto = "ProcessInstanceQueryDto"
+      examples = [
+                  '"example-1": {
+                     "summary": "POST `/process-instance/count` Request Body 1",
+                     "value": {
+                       "variables":
+                       [{
+                           "name": "myVariable",
+                           "operator": "eq",
+                           "value": "camunda"
+                         }, {
+                           "name": "mySecondVariable",
+                           "operator": "neq",
+                           "value": 124
+                         }
+                       ],
+                       "processDefinitionId": "aProcessDefinitionId"
+                     }
+                   }'
+                ] />
 
   "responses" : {
 
     <@lib.response
         code = "200"
         dto = "CountResultDto"
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "Status 200 Response 1",
+                       "value": {
+                         "count": 1
+                       }
+                     }'] />
 
     <@lib.response
         code = "400"

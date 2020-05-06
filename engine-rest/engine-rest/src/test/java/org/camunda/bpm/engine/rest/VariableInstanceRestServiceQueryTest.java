@@ -313,6 +313,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
           .body("[0].name", equalTo(mockInstanceBuilder.getName()))
           .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(mockInstanceBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processDefinitionId", equalTo(mockInstanceBuilder.getProcessDefinitionId()))
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].executionId", equalTo(mockInstanceBuilder.getExecutionId()))
           .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))

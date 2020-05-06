@@ -26,9 +26,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -164,7 +167,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testCompleteGETQuery() {
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
 
     parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
@@ -215,7 +218,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testCompletePOSTQuery() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
 
     parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
@@ -361,7 +364,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   protected void executeAndVerifyPOSTSorting(List<Map<String, Object>> sortingJson, Status expectedStatus) {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("sorting", sortingJson);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -449,7 +452,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
   public void testQueryByTenantIdListPost() {
     mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoTenants());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
 
     Response response = given()
@@ -509,7 +512,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
   public void testQueryByActivityIdListPost() {
     mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoActivityIds());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("activityIdIn", MockProvider.EXAMPLE_ACTIVITY_ID_LIST.split(","));
 
     Response response = given()
@@ -544,7 +547,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
   public void testQueryByPriorityListGet() {
     mockQuery = setUpMockExternalTaskQuery(createMockedExternalTasksWithPriorities());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("priorityHigherThanOrEquals", "3");
     queryParameters.put("priorityLowerThanOrEquals", "4");
 
@@ -574,7 +577,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
   public void testQueryByPriorityListPost() {
     mockQuery = setUpMockExternalTaskQuery(createMockedExternalTasksWithPriorities());
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("priorityHigherThanOrEquals", "3");
     queryParameters.put("priorityLowerThanOrEquals", "4");
 
@@ -601,10 +604,73 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(prio2).isEqualTo(EXTERNAL_TASK_HIGH_BOUND_PRIORITY);
   }
 
-
   private List<ExternalTask> createMockedExternalTasksWithPriorities() {
     return Arrays.asList(
         MockProvider.mockExternalTask().priority(EXTERNAL_TASK_LOW_BOUND_PRIORITY).buildExternalTask(),
         MockProvider.mockExternalTask().priority(EXTERNAL_TASK_HIGH_BOUND_PRIORITY).buildExternalTask());
+  }
+
+  @Test
+  public void testQueryByExternalTaskIdListGet() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoIds());
+
+    Response response = given()
+        .queryParam("externalTaskIdIn", MockProvider.EXTERNAL_TASK_ID_LIST)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(EXTERNAL_TASK_QUERY_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXTERNAL_TASK_ID, MockProvider.EXTERNAL_TASK_ANOTHER_ID);
+    verify(mockQuery).externalTaskIdIn(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedId1 = from(content).getString("[0].id");
+    String returnedId2 = from(content).getString("[1].id");
+
+    assertThat(returnedId1).isEqualTo(MockProvider.EXTERNAL_TASK_ID);
+    assertThat(returnedId2).isEqualTo(MockProvider.EXTERNAL_TASK_ANOTHER_ID);
+  }
+
+  @Test
+  public void testQueryByExternalTaskIdListPost() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoIds());
+
+    Map<String, Object> queryParameters = new HashMap<>();
+    queryParameters.put("externalTaskIdIn", MockProvider.EXTERNAL_TASK_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(EXTERNAL_TASK_QUERY_URL);
+
+    Set<String> expectedIds = new HashSet<>();
+    Collections.addAll(expectedIds, MockProvider.EXTERNAL_TASK_ID, MockProvider.EXTERNAL_TASK_ANOTHER_ID);
+    verify(mockQuery).externalTaskIdIn(expectedIds);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedId1 = from(content).getString("[0].id");
+    String returnedId2 = from(content).getString("[1].id");
+
+    assertThat(returnedId1).isEqualTo(MockProvider.EXTERNAL_TASK_ID);
+    assertThat(returnedId2).isEqualTo(MockProvider.EXTERNAL_TASK_ANOTHER_ID);
+  }
+
+  private List<ExternalTask> createMockExternalTasksTwoIds() {
+    return Arrays.asList(
+        MockProvider.mockExternalTask().buildExternalTask(),
+        MockProvider.mockExternalTask().id(MockProvider.EXTERNAL_TASK_ANOTHER_ID).buildExternalTask());
   }
 }

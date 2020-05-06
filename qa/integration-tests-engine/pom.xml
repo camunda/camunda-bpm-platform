@@ -19,7 +19,7 @@
   </properties>
 
   <!-- import shrinkwrap and arquillian bom for artifact versions,
-  	DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
+    DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -41,7 +41,7 @@
   </dependencyManagement>
 
   <dependencies>
-  	<!-- set shrinkwrap artifacts -->
+    <!-- set shrinkwrap artifacts -->
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>

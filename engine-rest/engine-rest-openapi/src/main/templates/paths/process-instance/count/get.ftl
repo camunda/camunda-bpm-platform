@@ -12,7 +12,14 @@
     <@lib.response
         code = "200"
         dto = "CountResultDto"
-        desc = "Request successful."/>
+        desc = "Request successful."
+        examples = ['"example-1": {
+                       "summary": "Status 200 response",
+                       "description": "Response for GET `/process-instance/count?variables=myVariable_eq_camunda`",
+                       "value": {
+                         "count": 1
+                       }
+                     }'] />
 
     <@lib.response
         code = "400"

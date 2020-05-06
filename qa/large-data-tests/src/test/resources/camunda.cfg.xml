@@ -22,7 +22,7 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
-    <property name="jdbcBatchProcessing" value="true"/>
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
   </bean>
 

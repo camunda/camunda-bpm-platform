@@ -26,7 +26,7 @@
     <version.jersey2>2.25.1</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
-    <version.openjpa>1.2.2</version.openjpa>
+    <version.openjpa>2.4.3</version.openjpa>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
@@ -39,8 +39,8 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly>18.0.0.Final</version.wildfly>
-    <version.wildfly.core>10.0.0.Final</version.wildfly.core>
+    <version.wildfly>19.0.0.Final</version.wildfly>
+    <version.wildfly.core>11.0.0.Final</version.wildfly.core>
 
     <!-- This version is mirrored in the external task client.
     If you change it here, also change it there -->
@@ -162,7 +162,11 @@
         <groupId>javax.persistence</groupId>
         <artifactId>persistence-api</artifactId>
         <version>1.0</version>
-        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <version>1.0.1.Final</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -216,7 +220,6 @@
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
         <version>${version.openjpa}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>

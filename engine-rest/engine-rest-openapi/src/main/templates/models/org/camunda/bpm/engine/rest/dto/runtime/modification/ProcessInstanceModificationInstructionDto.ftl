@@ -58,9 +58,4 @@
         last = true
         desc = "Can be used with instructions of type cancel. Prevents the deletion of new created activity instances." />
 
-<#--  TODO CAM-11364
-  "discriminator" : {
-    "propertyName" : "type"
-  }, -->
-
 </@lib.dto>

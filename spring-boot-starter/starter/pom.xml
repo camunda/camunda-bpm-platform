@@ -110,6 +110,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <exclusions>

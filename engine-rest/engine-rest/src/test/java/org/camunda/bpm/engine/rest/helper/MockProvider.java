@@ -450,10 +450,13 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = withTimezone("2013-04-23T13:42:43");
   public static final long EXAMPLE_JOB_DEFINITION_PRIORITY = Integer.MAX_VALUE + 52l;
+  public static final String EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID = "aDeploymentId";
 
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
   public static final String EXAMPLE_JOB_ID = "aJobId";
+  public static final String ANOTHER_EXAMPLE_JOB_ID = "anotherJobId";
+  public static final String EXAMPLE_JOB_ID_LIST = EXAMPLE_JOB_ID + "," + ANOTHER_EXAMPLE_JOB_ID;
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3;
   public static final int EXAMPLE_JOB_RETRIES = 3;
@@ -479,6 +482,8 @@ public abstract class MockProvider {
   public static final Permission[] EXAMPLE_GRANT_PERMISSION_VALUES = new Permission[] { Permissions.NONE, Permissions.READ, Permissions.UPDATE };
   public static final Permission[] EXAMPLE_REVOKE_PERMISSION_VALUES = new Permission[] { Permissions.ALL, Permissions.READ, Permissions.UPDATE };
   public static final String[] EXAMPLE_PERMISSION_VALUES_STRING = new String[] { "READ", "UPDATE" };
+  public static final String EXAMPLE_AUTH_REMOVAL_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_AUTH_ROOT_PROCESS_INSTANCE_ID = "aRootProcessInstanceId";
 
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
   public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
@@ -551,6 +556,7 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
   public static final String EXAMPLE_HISTORIC_ACTIVITY_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
+  public static final long EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER = 10L;
 
   // Historic Case Activity Instance
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ID = "aCaseActivityInstanceId";
@@ -861,6 +867,8 @@ public abstract class MockProvider {
 
   // external task
   public static final String EXTERNAL_TASK_ID = "anExternalTaskId";
+  public static final String EXTERNAL_TASK_ANOTHER_ID = "anotherExternalTaskId";
+  public static final String EXTERNAL_TASK_ID_LIST = EXTERNAL_TASK_ID + "," + EXTERNAL_TASK_ANOTHER_ID;
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
   public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = withTimezone("2015-10-05T13:25:00");
   public static final Integer EXTERNAL_TASK_RETRIES = new Integer(5);
@@ -1237,6 +1245,10 @@ public abstract class MockProvider {
   }
 
   public static EventSubscription createMockEventSubscription() {
+    return createMockEventSubscription(EXAMPLE_TENANT_ID);
+  }
+
+  public static EventSubscription createMockEventSubscription(String tenantId) {
     EventSubscription mock = mock(EventSubscription.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_ID);
@@ -1246,7 +1258,7 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(mock.getCreated()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE));
-    when(mock.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }
@@ -1757,6 +1769,9 @@ public abstract class MockProvider {
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
     when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_GRANT_PERMISSION_VALUES);
+
+    when(mockAuthorization.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_AUTH_REMOVAL_TIME));
+    when(mockAuthorization.getRootProcessInstanceId()).thenReturn(EXAMPLE_AUTH_ROOT_PROCESS_INSTANCE_ID);
 
     return mockAuthorization;
   }
@@ -2279,7 +2294,8 @@ public abstract class MockProvider {
       .jobPriority(EXAMPLE_JOB_DEFINITION_PRIORITY)
       .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
-      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .deploymentId(EXAMPLE_JOB_DEFINITION_DEPLOYMENT_ID);
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {
@@ -2343,7 +2359,8 @@ public abstract class MockProvider {
         .caseDefinitionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_ID)
         .caseInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_INST_ID)
         .caseExecutionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_EXEC_ID)
-        .tenantId(tenantId);
+        .tenantId(tenantId)
+        .initial(false);
   }
 
   public static HistoricFormField createMockHistoricFormField() {

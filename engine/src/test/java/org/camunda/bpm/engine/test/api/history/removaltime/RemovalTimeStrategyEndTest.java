@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
+import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -53,6 +57,7 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -82,10 +88,17 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
       .initHistoryRemovalTime();
   }
 
+  @After
+  public void clearDatabase() {
+    clearAuthorization();
+  }
+
   protected final String CALLED_PROCESS_KEY = "calledProcess";
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
     .startEvent()
-      .userTask("userTask").name("userTask")
+      .userTask("userTask")
+        .name("userTask")
+        .camundaCandidateUsers("foo")
     .endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
@@ -347,6 +360,401 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     // then
     assertThat(historicTaskInstance.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResolveHistoricTaskAuthorization_HistoricTaskInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+
+    authorization.setUserId("myUserId");
+    authorization.setResource(Resources.HISTORIC_TASK);
+    authorization.setResourceId(taskId);
+
+    // when
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // assume
+    assertThat(authorization.getRemovalTime(), nullValue());
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    taskService.complete(taskId);
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // then
+    assertThat(authorization.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResetAuthorizationAfterUpdate_HistoricTaskInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    enabledAuth();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    disableAuth();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    // assume
+    assertThat(authorization.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(authorization.getRemovalTime(), is(removalTime));
+
+    authorization.setResourceId("*");
+
+    // when
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // then
+    assertThat(authorization.getRootProcessInstanceId(), nullValue());
+    assertThat(authorization.getRemovalTime(), nullValue());
+  }
+
+  @Test
+  public void shouldResolveAuthorizationAfterUpdate_HistoricTaskInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_TASK);
+    authorization.setResourceId("*");
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // assume
+    assertThat(authorization.getRootProcessInstanceId(), nullValue());
+    assertThat(authorization.getRemovalTime(), nullValue());
+
+    taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    authorization.setResourceId(taskId);
+
+    // when
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    // then
+    assertThat(authorization.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+    assertThat(authorization.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResolveHistoricTaskAuthorization_HistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    String rootProcessInstanceId = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+
+    authorization.setUserId("myUserId");
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
+    authorization.setResourceId(processInstanceId);
+
+    authorizationService.saveAuthorization(authorization);
+
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, rootProcessInstanceId));
+
+    // when
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    // then
+    Date removalTime = addDays(END_DATE, 5);
+
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
+  }
+
+  @Test
+  public void shouldResetAuthorizationAfterUpdate_HistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    enabledAuth();
+    String rootProcessInstanceId = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY)
+        .getProcessInstanceId();
+    disableAuth();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+
+    authorization.setUserId("myUserId");
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
+    authorization.setResourceId(processInstanceId);
+
+    authorizationService.saveAuthorization(authorization);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Date removalTime = addDays(END_DATE, 5);
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
+
+    // when
+    authorization.setResourceId("*");
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, "*", null));
+  }
+
+  @Test
+  public void shouldResolveAuthorizationAfterUpdate_HistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    ProcessInstance rootProcessInstance =
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+    authorization.setResourceId("*");
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, "*", null));
+
+    // when
+    String processInstanceId = historyService.createHistoricProcessInstanceQuery()
+        .executedActivityIdIn("userTask")
+        .singleResult()
+        .getId();
+
+    authorization.setResourceId(processInstanceId);
+
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    Date removalTime = addDays(END_DATE, 5);
+    String rootProcessInstanceId = rootProcessInstance.getRootProcessInstanceId();
+    Assertions.assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
+  }
+
+  @Test
+  public void shouldWriteHistoryAndResolveHistoricTaskAuthorizationInDifferentTransactions() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    enabledAuth();
+    taskService.setAssignee(taskId, "myUserId");
+    disableAuth();
+
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // assume
+    assertThat(authorization.getRemovalTime(), nullValue());
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    taskService.complete(taskId);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    // then
+    assertThat(authorization.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldWriteHistoryAndResolveHistoricTaskAuthorizationInSameTransaction() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    enabledAuth();
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    disableAuth();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // assume
+    assertThat(authorization.getRemovalTime(), nullValue());
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    taskService.complete(taskId);
+
+    authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    // then
+    assertThat(authorization.getRemovalTime(), is(removalTime));
   }
 
   @Test
@@ -951,7 +1359,10 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     taskService.addCandidateUser(taskId, "aUserId");
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog =
+        historyService.createHistoricIdentityLinkLogQuery()
+            .userId("aUserId")
+            .singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog.getRemovalTime(), nullValue());
@@ -961,7 +1372,9 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.complete(taskId);
 
-    historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery()
+        .userId("aUserId")
+        .singleResult();
 
     Date removalTime = addDays(END_DATE, 5);
 
@@ -990,7 +1403,10 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.complete(taskId);
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog =
+        historyService.createHistoricIdentityLinkLogQuery()
+            .userId("aUserId")
+            .singleResult();
 
     // then
     assertThat(historicIdentityLinkLog.getTime(), is(START_DATE));

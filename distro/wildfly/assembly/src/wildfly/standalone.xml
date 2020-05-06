@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:10.0">
+<server xmlns="urn:jboss:domain:12.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.connector"/>
@@ -32,6 +32,7 @@
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
         <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+        <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
         <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
         <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
         <extension module="org.wildfly.extension.request-controller"/>
@@ -130,10 +131,10 @@
                 </handlers>
             </root-logger>
             <formatter name="PATTERN">
-                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %X %s%e%n"/>
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
             </formatter>
             <formatter name="COLOR-PATTERN">
-                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %X %s%e%n"/>
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
             </formatter>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:batch-jberet:2.0">
@@ -186,7 +187,7 @@
             <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
             <infinispan-routing cache-container="web" cache="routing"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:4.0">
+        <subsystem xmlns="urn:jboss:domain:ee:5.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
@@ -248,7 +249,7 @@
             <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
             <log-system-exceptions value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron:8.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>
@@ -398,7 +399,7 @@
             <worker name="default"/>
             <buffer-pool name="default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:2.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:5.0">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
             <bean-validation enabled="true"/>
@@ -435,8 +436,13 @@
         </subsystem>
         <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
         <subsystem xmlns="urn:wildfly:microprofile-health-smallrye:2.0" security-enabled="false" empty-liveness-checks-status="${env.MP_HEALTH_EMPTY_LIVENESS_CHECKS_STATUS:UP}" empty-readiness-checks-status="${env.MP_HEALTH_EMPTY_READINESS_CHECKS_STATUS:UP}"/>
+        <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
         <subsystem xmlns="urn:wildfly:microprofile-metrics-smallrye:2.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
-        <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
+        <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+            <jaeger-tracer name="jaeger">
+                <sampler-configuration sampler-type="const" sampler-param="1.0"/>
+            </jaeger-tracer>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
             <remote-naming/>
         </subsystem>

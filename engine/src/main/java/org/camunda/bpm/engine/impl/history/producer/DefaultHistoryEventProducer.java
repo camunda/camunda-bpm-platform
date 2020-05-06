@@ -461,6 +461,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // set source activity instance id
     evt.setActivityInstanceId(sourceActivityInstanceId);
 
+    // mark initial variables on process start
+    if (sourceExecution != null && sourceExecution.isProcessInstanceStarting()
+        && HistoryEventTypes.VARIABLE_INSTANCE_CREATE.equals(eventType)) {
+
+      if (variableInstance.getSequenceCounter() == 1) {
+        evt.setInitial(true);
+      }
+
+      if (sourceActivityInstanceId == null && sourceExecution.getActivity() != null && sourceExecution.getTransition() == null) {
+        evt.setActivityInstanceId(sourceExecution.getProcessInstanceId());
+      }
+    }
+
     return evt;
   }
 

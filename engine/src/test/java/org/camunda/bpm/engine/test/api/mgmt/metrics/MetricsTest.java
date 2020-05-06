@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
-import java.util.Collection;
-import java.util.Date;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
-import org.camunda.bpm.engine.ManagementService;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+import java.util.Date;
+
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -33,8 +36,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
-import org.junit.Assert;
-import static org.junit.Assert.assertNotEquals;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -148,8 +149,8 @@ public class MetricsTest {
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    // a count of six (start and end)
-    assertEquals(6l, managementService.createMetricsQuery()
+    // a count of 7 (start, end and root process instance)
+    assertEquals(7l, managementService.createMetricsQuery()
             .sum());
 
     // if
@@ -168,8 +169,8 @@ public class MetricsTest {
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    // a count of six (start and end)
-    assertEquals(6l, managementService.createMetricsQuery()
+    // a count of 7 (start, end and root process instance)
+    assertEquals(7l, managementService.createMetricsQuery()
             .sum());
 
     // if
@@ -190,8 +191,8 @@ public class MetricsTest {
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    // a count of six (start and end)
-    assertEquals(6l, managementService.createMetricsQuery()
+    // a count of 7 (start, end and root process instance)
+    assertEquals(7l, managementService.createMetricsQuery()
             .sum());
 
     // if
@@ -200,7 +201,7 @@ public class MetricsTest {
 
     // then
     // the entires are NOT deleted
-    assertEquals(6l, managementService.createMetricsQuery()
+    assertEquals(7l, managementService.createMetricsQuery()
             .sum());
   }
 
@@ -268,7 +269,7 @@ public class MetricsTest {
     }
     catch (ProcessEngineException e) {
       // then an exception is thrown
-      Assert.assertTrue(e.getMessage().contains("Metrics reporting is disabled"));
+      assertTrue(e.getMessage().contains("Metrics reporting is disabled"));
     }
     finally {
       // reset metrics setting
@@ -292,7 +293,7 @@ public class MetricsTest {
     }
     catch (ProcessEngineException e) {
       // then an exception is thrown
-      Assert.assertTrue(e.getMessage().contains("Metrics reporting to database is disabled"));
+      assertTrue(e.getMessage().contains("Metrics reporting to database is disabled"));
     } finally {
       processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
       processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
@@ -309,9 +310,9 @@ public class MetricsTest {
     assertEquals(0l, managementService.createMetricsQuery().name("UNKNOWN").sum());
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
-    assertEquals(6l, managementService.createMetricsQuery().sum());
-    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
-    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000))
+    assertEquals(7l, managementService.createMetricsQuery().sum());
+    assertEquals(7l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
+    assertEquals(7l, managementService.createMetricsQuery().startDate(new Date(1000))
             .endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
@@ -321,9 +322,9 @@ public class MetricsTest {
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then (query assertions)
-    assertEquals(12l, managementService.createMetricsQuery().sum());
-    assertEquals(12l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
-    assertEquals(12l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
+    assertEquals(14l, managementService.createMetricsQuery().sum());
+    assertEquals(14l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
+    assertEquals(14l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
   }
@@ -347,10 +348,10 @@ public class MetricsTest {
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then Query#startDate is inclusive and Query#endDate is exclusive
-    assertEquals(18l, managementService.createMetricsQuery().sum());
-    assertEquals(18l, managementService.createMetricsQuery().startDate(new Date(0)).sum());
-    assertEquals(12l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(7000L)).sum());
-    assertEquals(18l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(8000L)).sum());
+    assertEquals(21l, managementService.createMetricsQuery().sum());
+    assertEquals(21l, managementService.createMetricsQuery().startDate(new Date(0)).sum());
+    assertEquals(14l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(7000L)).sum());
+    assertEquals(21l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(8000L)).sum());
 
   }
 

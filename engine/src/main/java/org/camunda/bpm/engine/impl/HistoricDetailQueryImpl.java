@@ -56,6 +56,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected Long sequenceCounter;
   protected Date occurredBefore;
   protected Date occurredAfter;
+  protected boolean initial = false;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -210,6 +211,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  @Override
+  public HistoricDetailQuery initial() {
+    this.initial = true;
+    return this;
+  }
+
+  @Override
   public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<HistoricDetail> historicDetails = commandContext
@@ -334,5 +342,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public boolean isTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public boolean isInitial() {
+    return initial;
   }
 }

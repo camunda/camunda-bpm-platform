@@ -28,7 +28,8 @@
     <module name="org.jboss.as.connector" />
     <module name="org.jboss.as.ee" />
     <module name="org.jboss.as.ejb3" />
-    <module name="org.jboss.metadata" />
+    <module name="org.jboss.metadata.common" />
+    <module name="org.jboss.metadata.web" />
     <module name="org.jboss.as.web" />
     <module name="org.jboss.as.web-common" />
     <module name="org.jboss.invocation" />

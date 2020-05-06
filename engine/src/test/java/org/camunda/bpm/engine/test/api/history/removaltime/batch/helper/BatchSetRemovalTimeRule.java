@@ -109,6 +109,9 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
     clearDatabase();
 
+    getProcessEngineConfiguration().setEnableHistoricInstancePermissions(false);
+    getProcessEngineConfiguration().setAuthorizationEnabled(false);
+
     super.finished(description);
   }
 
@@ -124,6 +127,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
         }
       }
     }
+    clearAuthorization();
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +170,24 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
       engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
     }
+  }
+
+  public void enableAuth() {
+    getProcessEngineConfiguration().setAuthorizationEnabled(true);
+  }
+
+  public void disableAuth() {
+    getProcessEngineConfiguration().setAuthorizationEnabled(false);
+  }
+
+  public void clearAuthorization() {
+    engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list()
+        .forEach(authorization -> {
+          engineRule.getAuthorizationService()
+              .deleteAuthorization(authorization.getId());
+        });
   }
 
   public class TestProcessBuilder {
@@ -307,33 +329,38 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
       batchIds.add(batch.getId());
     }
 
-    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
+    executeSeedJobs(batch);
 
-    String jobId = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(seedJobDefinitionId)
-      .singleResult()
-      .getId();
-
-    engineRule.getManagementService().executeJob(jobId);
-
-    String batchJobDefinitionId = batch.getBatchJobDefinitionId();
-
-    List<Job> jobs = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(batchJobDefinitionId)
-      .list();
-
+    List<Job> jobs = getExecutionJobs(batch);
     for (Job job : jobs) {
       engineRule.getManagementService().executeJob(job.getId());
     }
 
-    String monitorJobDefinitionId = batch.getMonitorJobDefinitionId();
+    engineRule.getManagementService().executeJob(
+        getJobForDefinition(batch.getMonitorJobDefinitionId()).getId());
+  }
 
-    jobId = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(monitorJobDefinitionId)
-      .singleResult()
-      .getId();
+  public void executeSeedJobs(Batch batch) {
+    while (getSeedJob(batch) != null) {
+      engineRule.getManagementService().executeJob(getSeedJob(batch).getId());
+    }
+  }
 
-    engineRule.getManagementService().executeJob(jobId);
+  public Job getSeedJob(Batch batch) {
+    return getJobForDefinition(batch.getSeedJobDefinitionId());
+  }
+
+  protected Job getJobForDefinition(String definitionId) {
+    return engineRule.getManagementService().createJobQuery()
+    .jobDefinitionId(definitionId)
+    .singleResult();
+  }
+
+  public List<Job> getExecutionJobs(Batch batch) {
+    List<Job> jobs = engineRule.getManagementService().createJobQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId())
+        .list();
+    return jobs;
   }
 
   public static Date addDays(Date date, int amount) {

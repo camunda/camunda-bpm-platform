@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -709,6 +710,31 @@ public class BoundedNumberOfMaxResultsTest {
       // when
       runtimeService.updateProcessInstanceSuspensionState()
           .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery())
+          .suspend();
+      fail("Exception expected!");
+    } catch (BadUserRequestException e) {
+
+      // then
+      assertThat(e).hasMessage("Max results limit of 2 exceeded!");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenUpdateProcessInstanceSuspensionStateByIds_LimitExceeded() {
+    // given
+    engineRule.getProcessEngineConfiguration().setQueryMaxResultsLimit(2);
+
+    testHelper.deploy(simpleProcess);
+
+    List<String> instanceIds = new ArrayList<>();
+    instanceIds.add(runtimeService.startProcessInstanceByKey("process").getId());
+    instanceIds.add(runtimeService.startProcessInstanceByKey("process").getId());
+    instanceIds.add(runtimeService.startProcessInstanceByKey("process").getId());
+
+    try {
+      // when
+      runtimeService.updateProcessInstanceSuspensionState()
+          .byProcessInstanceIds(instanceIds)
           .suspend();
       fail("Exception expected!");
     } catch (BadUserRequestException e) {

@@ -31,6 +31,7 @@ import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYP
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.impl.cmd.AbstractSetBatchStateCmd.SUSPENSION_STATE_PROPERTY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -208,12 +209,13 @@ public class CustomHistoryLevelUserOperationLogTest {
     repositoryService.deleteProcessDefinitions().byKey("oneTaskProcess").cascade().delete();
 
     // then
-    assertEquals(3, query().entityType(PROCESS_DEFINITION).count());
+    assertEquals(5, query().entityType(PROCESS_DEFINITION).count());
 
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
       .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(suspendDefinitionEntry);
@@ -230,6 +232,7 @@ public class CustomHistoryLevelUserOperationLogTest {
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
       .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(activateDefinitionEntry);

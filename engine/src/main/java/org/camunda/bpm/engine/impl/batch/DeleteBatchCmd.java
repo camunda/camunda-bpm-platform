@@ -48,7 +48,7 @@ public class DeleteBatchCmd implements Command<Void> {
 
     checkAccess(commandContext, batchEntity);
     writeUserOperationLog(commandContext);
-    batchEntity.delete(cascadeToHistory);
+    batchEntity.delete(cascadeToHistory, true);
 
     return null;
   }

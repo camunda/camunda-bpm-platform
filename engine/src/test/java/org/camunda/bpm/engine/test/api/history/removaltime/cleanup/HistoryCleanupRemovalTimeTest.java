@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.cleanup;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
@@ -25,23 +26,38 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
+import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -79,6 +95,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.apache.commons.lang3.time.DateUtils.addMinutes;
@@ -113,6 +130,7 @@ public class HistoryCleanupRemovalTimeTest {
   protected IdentityService identityService;
   protected ExternalTaskService externalTaskService;
   protected DecisionService decisionService;
+  protected AuthorizationService authorizationService;
 
   protected static ProcessEngineConfigurationImpl engineConfiguration;
 
@@ -129,6 +147,7 @@ public class HistoryCleanupRemovalTimeTest {
     identityService = engineRule.getIdentityService();
     externalTaskService = engineRule.getExternalTaskService();
     decisionService = engineRule.getDecisionService();
+    authorizationService = engineRule.getAuthorizationService();
 
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
@@ -181,6 +200,9 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration.setBatchOperationsForHistoryCleanup(null);
 
       engineConfiguration.initHistoryCleanup();
+
+      engineConfiguration.setAuthorizationEnabled(false);
+      engineConfiguration.setEnableHistoricInstancePermissions(false);
     }
 
     ClockUtil.reset();
@@ -613,6 +635,50 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(historicTaskInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldCleanupTaskInstanceAuthorization() {
+    // given
+    engineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    engineConfiguration.setAuthorizationEnabled(true);
+    taskService.setAssignee(taskId, "myUserId");
+    engineConfiguration.setAuthorizationEnabled(false);
+
+    taskService.complete(taskId);
+
+    List<Authorization> authorizations = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .list();
+
+    // assume
+    assertThat(authorizations.size(), is(1));
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    runHistoryCleanup();
+
+    authorizations = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .list();
+
+    // then
+    assertThat(authorizations.size(), is(0));
+
+    // clear
+    clearAuthorization();
   }
 
   @Test
@@ -1141,46 +1207,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    HistoricDecisionInstanceQuery decisionInstanceQuery =
+        historyService.createHistoricDecisionInstanceQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(decisionInstances.size(), is(45));
-
-    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-
-    // then
-    assertThat(decisionInstances.size(), is(30));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-
-    // then
-    assertThat(decisionInstances.size(), is(15));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-
-    // then
-    assertThat(decisionInstances.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, decisionInstanceQuery::count, 45L);
   }
 
   @Test
@@ -1208,44 +1239,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().list();
+    HistoricProcessInstanceQuery processInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(processInstances.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    processInstances = historyService.createHistoricProcessInstanceQuery().list();
-
-    // then
-    assertThat(processInstances.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    processInstances = historyService.createHistoricProcessInstanceQuery().list();
-
-    // then
-    assertThat(processInstances.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    processInstances = historyService.createHistoricProcessInstanceQuery().list();
-
-    // then
-    assertThat(processInstances.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, processInstanceQuery::count, 15L);
   }
 
   @Test
@@ -1276,44 +1274,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+    HistoricActivityInstanceQuery activityInstanceQuery =
+        historyService.createHistoricActivityInstanceQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(activityInstances.size(), is(90));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
-
-    // then
-    assertThat(activityInstances.size(), is(60));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
-
-    // then
-    assertThat(activityInstances.size(), is(30));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
-
-    // then
-    assertThat(activityInstances.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, activityInstanceQuery::count, 90L);
   }
 
   @Test
@@ -1344,44 +1309,54 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(taskInstances.size(), is(15));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, taskInstanceQuery::count, 15L);
+  }
 
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
+  @Test
+  public void shouldDistributeWorkForAuthorizations() {
+    // given
+    engineConfiguration.setEnableHistoricInstancePermissions(true);
 
-    // when
-    managementService.executeJob(jobOne.getId());
+    testRule.deploy(CALLING_PROCESS);
 
-    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    testRule.deploy(PROCESS);
 
-    // then
-    assertThat(taskInstances.size(), is(10));
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
+        String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    // when
-    managementService.executeJob(jobTwo.getId());
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
-    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+        engineConfiguration.setAuthorizationEnabled(true);
+        taskService.setAssignee(taskId, "myUserId");
+        engineConfiguration.setAuthorizationEnabled(false);
 
-    // then
-    assertThat(taskInstances.size(), is(5));
+        taskService.complete(taskId);
+      }
+    }
 
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
 
-    // when
-    managementService.executeJob(jobThree.getId());
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
 
-    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    historyService.cleanUpHistoryAsync(true);
 
-    // then
-    assertThat(taskInstances.size(), is(0));
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    AuthorizationQuery authorizationQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK);
+
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, authorizationQuery::count, 15L);
+
+    // clear
+    clearAuthorization();
   }
 
   @Test
@@ -1414,44 +1389,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+    HistoricVariableInstanceQuery variableInstanceQuery =
+        historyService.createHistoricVariableInstanceQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(variableInstances.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
-
-    // then
-    assertThat(variableInstances.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
-
-    // then
-    assertThat(variableInstances.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
-
-    // then
-    assertThat(variableInstances.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, variableInstanceQuery::count, 15L);
   }
 
   @Test
@@ -1483,44 +1425,10 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
+    HistoricDetailQuery historicDetailQuery = historyService.createHistoricDetailQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(historicDetails.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    historicDetails = historyService.createHistoricDetailQuery().list();
-
-    // then
-    assertThat(historicDetails.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    historicDetails = historyService.createHistoricDetailQuery().list();
-
-    // then
-    assertThat(historicDetails.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    historicDetails = historyService.createHistoricDetailQuery().list();
-
-    // then
-    assertThat(historicDetails.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, historicDetailQuery::count, 15L);
   }
 
   @Test
@@ -1558,44 +1466,10 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+    HistoricIncidentQuery historicIncidentQuery = historyService.createHistoricIncidentQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(historicIncidents.size(), is(30));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    historicIncidents = historyService.createHistoricIncidentQuery().list();
-
-    // then
-    assertThat(historicIncidents.size(), is(20));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    historicIncidents = historyService.createHistoricIncidentQuery().list();
-
-    // then
-    assertThat(historicIncidents.size(), is(10));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    historicIncidents = historyService.createHistoricIncidentQuery().list();
-
-    // then
-    assertThat(historicIncidents.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, historicIncidentQuery::count, 30L);
   }
 
   @Test
@@ -1637,44 +1511,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+    HistoricExternalTaskLogQuery externalTaskLogQuery =
+        historyService.createHistoricExternalTaskLogQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(externalTaskLogs.size(), is(30));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
-
-    // then
-    assertThat(externalTaskLogs.size(), is(20));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
-
-    // then
-    assertThat(externalTaskLogs.size(), is(10));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
-
-    // then
-    assertThat(externalTaskLogs.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, externalTaskLogQuery::count, 30L);
   }
 
   @Test
@@ -1713,52 +1554,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    HistoricJobLogQuery jobLogQuery = historyService.createHistoricJobLogQuery()
+        .processDefinitionKey(PROCESS_KEY);
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(jobLogs.size(), is(30));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
-
-    // then
-    assertThat(jobLogs.size(), is(20));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
-
-    // then
-    assertThat(jobLogs.size(), is(10));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
-
-    // then
-    assertThat(jobLogs.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, jobLogQuery::count, 30L);
   }
 
   @Test
@@ -1801,44 +1601,10 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery().list();
+    UserOperationLogQuery userOperationLogQuery = historyService.createUserOperationLogQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(userOperationLogs.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    userOperationLogs = historyService.createUserOperationLogQuery().list();
-
-    // then
-    assertThat(userOperationLogs.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    userOperationLogs = historyService.createUserOperationLogQuery().list();
-
-    // then
-    assertThat(userOperationLogs.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    userOperationLogs = historyService.createUserOperationLogQuery().list();
-
-    // then
-    assertThat(userOperationLogs.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, userOperationLogQuery::count, 15L);
   }
 
   @Test
@@ -1871,44 +1637,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+    HistoricIdentityLinkLogQuery identityLinkLogQuery =
+        historyService.createHistoricIdentityLinkLogQuery();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(historicIdentityLinkLogs.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
-
-    // then
-    assertThat(historicIdentityLinkLogs.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
-
-    // then
-    assertThat(historicIdentityLinkLogs.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
-
-    // then
-    assertThat(historicIdentityLinkLogs.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, identityLinkLogQuery::count, 15L);
   }
 
   @Test
@@ -1948,44 +1681,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<Comment> comments = getCommentsBy(processInstanceIds);
-
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(comments.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    comments = getCommentsBy(processInstanceIds);
-
-    // then
-    assertThat(comments.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    comments = getCommentsBy(processInstanceIds);
-
-    // then
-    assertThat(comments.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    comments = getCommentsBy(processInstanceIds);
-
-    // then
-    assertThat(comments.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, () -> getCommentCountBy(processInstanceIds), 15);
   }
 
   @Test
@@ -2025,44 +1722,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<Attachment> attachments = getAttachmentsBy(processInstanceIds);
-
-    // assume
-    assertThat(jobs.size(), is(3));
-    assertThat(attachments.size(), is(15));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    attachments = getAttachmentsBy(processInstanceIds);
-
-    // then
-    assertThat(attachments.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    attachments = getAttachmentsBy(processInstanceIds);
-
-    // then
-    assertThat(attachments.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    attachments = getAttachmentsBy(processInstanceIds);
-
-    // then
-    assertThat(attachments.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, () -> getAttachmentCountBy(processInstanceIds), 15);
   }
 
   @Test
@@ -2104,41 +1765,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    // assume
-    assertThat(jobs.size(), is(3));
-
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    List<ByteArrayEntity> byteArrays = findByteArrays();
-
-    // then
-    assertThat(byteArrays.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    byteArrays = findByteArrays();
-
-    // then
-    assertThat(byteArrays.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    byteArrays = findByteArrays();
-
-    // then
-    assertThat(byteArrays.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, this::byteArrayCount, 15);
   }
 
   @Test
@@ -2171,11 +1799,6 @@ public class HistoryCleanupRemovalTimeTest {
       }
     }
 
-    // assume
-    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery().list();
-
-    assertThat(historicBatches.size(), is(15));
-
     ClockUtil.setCurrentTime(addDays(END_DATE, 6));
 
     engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
@@ -2185,41 +1808,10 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    // assume
-    assertThat(jobs.size(), is(3));
+    HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
-    Job jobOne = jobs.get(0);
-    jobIds.add(jobOne.getId());
-
-    // when
-    managementService.executeJob(jobOne.getId());
-
-    historicBatches = historyService.createHistoricBatchQuery().list();
-
-    // then
-    assertThat(historicBatches.size(), is(10));
-
-    Job jobTwo = jobs.get(1);
-    jobIds.add(jobTwo.getId());
-
-    // when
-    managementService.executeJob(jobTwo.getId());
-
-    historicBatches = historyService.createHistoricBatchQuery().list();
-
-    // then
-    assertThat(historicBatches.size(), is(5));
-
-    Job jobThree = jobs.get(2);
-    jobIds.add(jobThree.getId());
-
-    // when
-    managementService.executeJob(jobThree.getId());
-
-    historicBatches = historyService.createHistoricBatchQuery().list();
-
-    // then
-    assertThat(historicBatches.size(), is(0));
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, historicBatchQuery::count, 15);
   }
 
   // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2437,6 +2029,28 @@ public class HistoryCleanupRemovalTimeTest {
 
   // helper /////////////////////////////////////////////////////////////////
 
+  protected void assumeWhenThenParallelizedCleanup(List<Job> jobs, Supplier<Long> supplier,
+                                                   long initialInstanceCount) {
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(supplier.get(), is(initialInstanceCount));
+
+    long expectedInstanceCount = initialInstanceCount-(initialInstanceCount/3);
+
+    for (Job job : jobs) {
+      String jobId = job.getId();
+      jobIds.add(jobId);
+
+      // when
+      managementService.executeJob(jobId);
+
+      // then
+      assertThat(supplier.get(), is(expectedInstanceCount));
+
+      expectedInstanceCount = expectedInstanceCount - (initialInstanceCount / 3);
+    }
+  }
+
   protected List<Job> runHistoryCleanup() {
     historyService.cleanUpHistoryAsync(true);
 
@@ -2449,22 +2063,22 @@ public class HistoryCleanupRemovalTimeTest {
     return jobs;
   }
 
-  protected List<Attachment> getAttachmentsBy(List<String> processInstanceIds) {
+  protected Long getAttachmentCountBy(List<String> processInstanceIds) {
     List<Attachment> attachments = new ArrayList<>();
     for (String processInstanceId : processInstanceIds) {
       attachments.addAll(taskService.getProcessInstanceAttachments(processInstanceId));
     }
 
-    return attachments;
+    return (long) attachments.size();
   }
 
-  protected List<Comment> getCommentsBy(List<String> processInstanceIds) {
+  protected Long getCommentCountBy(List<String> processInstanceIds) {
     List<Comment> comments = new ArrayList<>();
     for (String processInstanceId : processInstanceIds) {
       comments.addAll(taskService.getProcessInstanceComments(processInstanceId));
     }
 
-    return comments;
+    return (long) comments.size();
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
@@ -2472,7 +2086,7 @@ public class HistoryCleanupRemovalTimeTest {
       .execute(new GetByteArrayCommand(byteArrayId));
   }
 
-  protected List<ByteArrayEntity> findByteArrays() {
+  protected Long byteArrayCount() {
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
       .failureLog()
       .list();
@@ -2482,7 +2096,7 @@ public class HistoryCleanupRemovalTimeTest {
       byteArrays.add(findByteArrayById(((HistoricJobLogEventEntity) jobLog).getExceptionByteArrayId()));
     }
 
-    return byteArrays;
+    return (long) byteArrays.size();
   }
 
   protected void clearJobLog(final String jobId) {
@@ -2517,6 +2131,11 @@ public class HistoryCleanupRemovalTimeTest {
         return null;
       }
     });
+  }
+
+  protected void clearAuthorization() {
+    authorizationService.createAuthorizationQuery().list()
+        .forEach(authorization -> authorizationService.deleteAuthorization(authorization.getId()));
   }
 
 }

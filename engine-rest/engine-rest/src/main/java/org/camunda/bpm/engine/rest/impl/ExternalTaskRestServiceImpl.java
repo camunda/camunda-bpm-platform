@@ -137,7 +137,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
     if (retries == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
     }
-    
+
     try {
       Batch batch = builder.setAsync(retries);
       return BatchDto.fromBatch(batch);
@@ -152,15 +152,22 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   @Override
+  public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks,
+                                    boolean withRetriesLeft) {
+    return processEngine.getExternalTaskService()
+                        .getTopicNames(withLockedTasks, withUnlockedTasks, withRetriesLeft);
+  }
+
+  @Override
   public void setRetries(SetRetriesForExternalTasksDto retriesDto){
 
     UpdateExternalTaskRetriesBuilder builder = updateRetries(retriesDto);
     Integer retries = retriesDto.getRetries();
-    
+
     if (retries == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
     }
-    
+
     try {
       builder.set(retries);
     }

@@ -1,13 +1,21 @@
 body.dashboard {
   background-color: #e5e5e5;
-  padding-top: 15px;
+  padding-top: 70px;
 }
 
-
-.cam-brand-header .btn-primary,
-.cam-brand-header .btn-primary:hover {
-  margin-top: 13px;
+[cam-widget-header] .btn-primary,
+[cam-widget-header] .btn-primary:hover {
+  font-size: 14px;
   color: #fff;
+}
+[cam-widget-header] .row {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand .logo {
+  margin-right: 5px;
+  fill: #666;
 }
 
 section .inner {
@@ -45,7 +53,6 @@ section.invoice .section-body {
   position: relative;
 }
 
-
 .screenshot {
   display: block;
   text-align: center;
@@ -54,7 +61,7 @@ section.invoice .section-body {
 
 .screenshot:before,
 .screenshot:after {
-  content: '';
+  content: "";
   display: block;
   position: absolute;
 }
@@ -79,14 +86,12 @@ section.invoice .section-body {
   max-width: calc(100% - 40px);
   margin: 5px auto;
   box-shadow: 0 0 40px -10px rgba(0, 0, 0, 0.8);
-  transition: box-shadow 0.218s ease-in-out,
-              transform 0.218s ease-in-out;
+  transition: box-shadow 0.218s ease-in-out, transform 0.218s ease-in-out;
 }
 .screenshot:hover img {
-  box-shadow: 0 0 40px -5px rgba(21, 92, 181,0.8);
+  box-shadow: 0 0 40px -5px rgba(21, 92, 181, 0.8);
   transform: translateY(-5px);
 }
-
 
 .screenshot .hover-text {
   text-align: center;

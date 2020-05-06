@@ -103,11 +103,11 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -262,6 +262,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    
+    <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
+    for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
 
     <camunda.artifact>
       org.camunda.bpm

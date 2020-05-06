@@ -35,6 +35,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
   protected String variableType;
   protected Object value;
   protected Map<String, Object> valueInfo;
+  protected Boolean initial;
 
   protected int revision;
   protected String errorMessage;
@@ -53,6 +54,10 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
 
   public Object getValue() {
     return value;
+  }
+
+  public Boolean getInitial() {
+    return initial;
   }
 
   public int getRevision() {
@@ -79,6 +84,7 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
     dto.revision = historicVariableUpdate.getRevision();
     dto.variableName = historicVariableUpdate.getVariableName();
     dto.variableInstanceId = historicVariableUpdate.getVariableInstanceId();
+    dto.initial = historicVariableUpdate.isInitial();
 
     if (historicVariableUpdate.getErrorMessage() == null) {
       try {

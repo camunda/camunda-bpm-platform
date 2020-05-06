@@ -4,7 +4,7 @@
         name = "links"
         type = "array"
         dto = "AtomLink"
-        last = last
+        last = true
         desc = "The links associated to this resource, with `method`, `href` and `rel`." />
 
 </@lib.dto>

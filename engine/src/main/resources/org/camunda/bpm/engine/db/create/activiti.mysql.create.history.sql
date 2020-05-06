@@ -150,6 +150,7 @@ create table ACT_HI_DETAIL (
     TENANT_ID_ varchar(64),
     OPERATION_ID_ varchar(64),
     REMOVAL_TIME_ datetime,
+    INITIAL_ boolean,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

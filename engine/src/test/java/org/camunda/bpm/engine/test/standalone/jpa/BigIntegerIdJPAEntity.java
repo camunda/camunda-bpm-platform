@@ -29,7 +29,7 @@ import javax.persistence.Id;
 public class BigIntegerIdJPAEntity {
 
   @Id
-  @Column(name = "ID_")
+  @Column(name = "ID_", columnDefinition = "DECIMAL(65535, 32767)")
   private BigInteger bigIntegerId;
 
   public BigInteger getBigIntegerId() {

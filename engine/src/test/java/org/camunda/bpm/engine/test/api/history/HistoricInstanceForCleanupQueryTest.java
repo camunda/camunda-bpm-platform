@@ -105,7 +105,7 @@ public class HistoricInstanceForCleanupQueryTest {
     batchOperationsMap.put(batchType, 4);
 
     for (Batch batch : list) {
-      helper.executeSeedJob(batch);
+      helper.completeSeedJobs(batch);
       helper.executeJobs(batch);
 
       ClockUtil.setCurrentTime(DateUtils.addDays(startDate, ++daysInThePast));

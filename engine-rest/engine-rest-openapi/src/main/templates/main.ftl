@@ -31,14 +31,22 @@
 
   ],
   "tags": [
+    {"name": "Condition"},
     {"name": "Deployment"},
     {"name": "Engine"},
-    {"name": "Comment"},
-    {"name": "Condition"},
+    {"name": "Event Subscription"},
+    {"name": "External Task"},
     {"name": "Message"},
+    {"name": "Metrics"},
     {"name": "Process instance"},
     {"name": "Signal"},
     {"name": "Schema Log"},
+    {"name": "Task"},
+    {"name": "Task Attachment"},
+    {"name": "Task Comment"},
+    {"name": "Task Identity Link"},
+    {"name": "Task Local Variable"},
+    {"name": "Task Variable"},
     {"name": "Version"}
   ],
   "paths": {

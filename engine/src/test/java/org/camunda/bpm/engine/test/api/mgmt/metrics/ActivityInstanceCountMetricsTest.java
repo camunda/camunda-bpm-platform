@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -24,6 +26,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -31,8 +34,9 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  */
 public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
+  @Test
   public void testBpmnActivityInstances() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
       .startEvent()
       .manualTask()
       .endEvent()
@@ -63,6 +67,7 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
         .sum());
   }
 
+  @Test
   public void testStandaloneTask() {
 
     // given
@@ -100,6 +105,7 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
   }
 
   @Deployment
+  @Test
   public void testCmmnActivitiyInstances() {
     // given
     // that no activity instances have been executed

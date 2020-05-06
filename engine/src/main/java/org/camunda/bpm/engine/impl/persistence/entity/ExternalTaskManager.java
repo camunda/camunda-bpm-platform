@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
  * @author Thorben Lindhauer
@@ -69,16 +70,17 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTasksByProcessInstanceId", processInstanceId);
   }
 
+  @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults, boolean usePriority) {
     if (queryFilters.isEmpty()) {
-      return new ArrayList<ExternalTaskEntity>();
+      return new ArrayList<>();
     }
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("topics", queryFilters);
     parameters.put("now", ClockUtil.getCurrentTime());
     parameters.put("applyOrdering", usePriority);
-    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
     orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
     parameters.put("orderingProperties", orderingProperties);
 
@@ -89,14 +91,22 @@ public class ExternalTaskManager extends AbstractManager {
     return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
+  @SuppressWarnings("unchecked")
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureQuery(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> findExternalTaskIdsByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureQuery(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskIdsByQueryCriteria", externalTaskQuery);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    configureQuery(externalTaskQuery);
+    return getDbEntityManager().selectList("selectExternalTaskDeploymentIdMappingsByQueryCriteria", externalTaskQuery);
   }
 
   public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
@@ -104,6 +114,7 @@ public class ExternalTaskManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> selectTopicNamesByQuery(ExternalTaskQueryImpl externalTaskQuery) {
     configureQuery(externalTaskQuery);
     return getDbEntityManager().selectList("selectTopicNamesByQuery", externalTaskQuery);
@@ -111,7 +122,7 @@ public class ExternalTaskManager extends AbstractManager {
 
   protected void updateExternalTaskSuspensionState(String processInstanceId,
     String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("processDefinitionKey", processDefinitionKey);
@@ -133,7 +144,7 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   public void updateExternalTaskSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);

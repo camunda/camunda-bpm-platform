@@ -57,10 +57,12 @@
 
     <@lib.response
         code = "400"
+        dto = "ExceptionDto"
         desc = "If both tenantId and withoutTenantId are supplied."/>
 
     <@lib.response
         code = "403"
+        dto = "ExceptionDto"
         last = true
         desc = "If the user is not allowed to start the process instance of the process definition, which start condition was evaluated to `true`."/>
 

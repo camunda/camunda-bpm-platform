@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.DeploymentApi;
-import org.openapitools.client.model.DeploymentDto;
+import org.openapitools.client.model.DeploymentWithDefinitionsDto;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
@@ -88,7 +88,7 @@ public class DeploymentTest {
         );
 
     // when
-    DeploymentDto deployment = api.createDeployment(null, deploymentSource, false, false, deploymentName, new File("src/test/resources/one.bpmn"));
+    DeploymentWithDefinitionsDto deployment = api.createDeployment(null, deploymentSource, false, false, deploymentName, new File("src/test/resources/one.bpmn"));
 
     // then
     assertThat(deployment.getId()).isEqualTo("aDeploymentId");

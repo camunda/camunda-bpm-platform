@@ -71,7 +71,6 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
   }
 
   protected List<HistoricTaskInstanceReportResult> executeCountByProcessDefinitionKey(CommandContext commandContext) {
-    doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
       .selectHistoricTaskInstanceCountByProcDefKeyReport(this);
   }
@@ -96,7 +95,6 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
   }
 
   protected List<HistoricTaskInstanceReportResult> executeCountByTaskName(CommandContext commandContext) {
-    doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
       .selectHistoricTaskInstanceCountByTaskNameReport(this);
   }
@@ -125,17 +123,8 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
 
 
   protected List<DurationReportResult> executeDuration(CommandContext commandContext) {
-    doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
       .createHistoricTaskDurationReport(this);
-  }
-
-  protected void doAuthCheck(CommandContext commandContext) {
-    // since a report does only make sense in context of historic
-    // data, the authorization check will be performed here
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadHistoryAnyProcessDefinition();
-    }
   }
 
   public Date getCompletedAfter() {

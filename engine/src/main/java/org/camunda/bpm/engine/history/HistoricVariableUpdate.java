@@ -60,4 +60,9 @@ public interface HistoricVariableUpdate extends HistoricDetail {
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
+
+  /**
+   * @return true if the detail historic variable update is created during the process instance start
+   */
+  Boolean isInitial();
 }

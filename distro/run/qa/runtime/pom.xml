@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -14,6 +12,10 @@
   <artifactId>camunda-bpm-run-qa-runtime</artifactId>
   <name>Camunda BPM - Run - QA - Runtime</name>
   <packaging>jar</packaging>
+  
+  <properties>
+    <run-home>${project.build.directory}/run/camunda-bpm-run-distro</run-home>
+  </properties>
 
   <dependencies>
 
@@ -36,6 +38,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -121,14 +129,6 @@
     <profile>
       <id>integration-test-camunda-run</id>
       <build>
-        <testResources>
-          <testResource>
-            <directory>${project.basedir}/src/test/resources</directory>
-          </testResource>
-          <testResource>
-            <directory>${project.build.directory}/test-resources</directory>
-          </testResource>
-        </testResources>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -139,10 +139,9 @@
               <dependenciesToScan>
                 <dependenciesToScan>org.camunda.bpm.run:camunda-bpm-run-qa-integration-tests</dependenciesToScan>
               </dependenciesToScan>
-              <excludes>
-                <!-- https://jira.camunda.com/browse/CAM-11480 -->
-                <exclude>**/AutoDeploymentIT.java</exclude>
-              </excludes>
+              <systemPropertyVariables>
+                <camunda.run.home>${run-home}</camunda.run.home>
+              </systemPropertyVariables>
             </configuration>
             <executions>
               <execution>
@@ -167,7 +166,7 @@
                   <includeArtifactIds>camunda-bpm-run</includeArtifactIds>
                   <overWriteSnapshots>true</overWriteSnapshots>
                   <excludeTransitive>true</excludeTransitive>
-                  <outputDirectory>${project.build.directory}/test-resources/camunda-bpm-run-distro</outputDirectory>
+                  <outputDirectory>${run-home}</outputDirectory>
                   <excludes>configuration/default.yml,configuration/production.yml</excludes>
                 </configuration>
               </execution>

@@ -244,7 +244,12 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, RES.CATEGORY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (
+      <if test="authCheck.isHistoricInstancePermissionsEnabled">
+        RES.PROC_INST_ID_,
+        RES.TASK_ID_,
+      </if>
+      RES.PROC_DEF_KEY_, RES.CATEGORY_, '*'))
     </if>
 
     <where>
@@ -326,7 +331,7 @@
       
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
-          and ( 
+          and (
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheckWithoutPrefix"/>
             or ( RES.CATEGORY_ IS NULL AND RES.PROC_DEF_KEY_ IS NULL )
           )

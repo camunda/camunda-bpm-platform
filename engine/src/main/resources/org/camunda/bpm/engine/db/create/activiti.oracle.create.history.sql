@@ -150,6 +150,7 @@ create table ACT_HI_DETAIL (
     TENANT_ID_ NVARCHAR2(64),
     OPERATION_ID_ NVARCHAR2(64),
     REMOVAL_TIME_ TIMESTAMP(6),
+    INITIAL_ NUMBER(1,0) CHECK (INITIAL_ IN (1,0)),
     primary key (ID_)
 );
 
