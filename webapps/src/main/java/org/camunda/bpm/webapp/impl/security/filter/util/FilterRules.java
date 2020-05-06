@@ -19,7 +19,7 @@ package org.camunda.bpm.webapp.impl.security.filter.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -43,37 +43,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class FilterRules {
 
-  public static List<SecurityFilterRule> load(InputStream configFileResource) throws IOException {
+  public static List<SecurityFilterRule> load(InputStream configFileResource,
+                                              String applicationPath) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
 
     SecurityFilterConfig config = objectMapper.readValue(configFileResource, SecurityFilterConfig.class);
-    return createFilterRules(config);
+    return createFilterRules(config, applicationPath);
   }
 
-  public static List<SecurityFilterRule> createFilterRules(SecurityFilterConfig config) {
+  public static List<SecurityFilterRule> createFilterRules(SecurityFilterConfig config,
+                                                           String applicationPath) {
     PathFilterConfig pathFilter = config.getPathFilter();
-    PathFilterRule rule = createPathFilterRule(pathFilter);
+    PathFilterRule rule = createPathFilterRule(pathFilter, applicationPath);
 
-    return new ArrayList<SecurityFilterRule>(Arrays.asList(rule));
+    return new ArrayList<>(Collections.singletonList(rule));
   }
 
-  protected static PathFilterRule createPathFilterRule(PathFilterConfig pathFilter) {
+  protected static PathFilterRule createPathFilterRule(PathFilterConfig pathFilter,
+                                                       String applicationPath) {
     PathFilterRule pathFilterRule = new PathFilterRule();
 
     for (PathMatcherConfig pathMatcherConfig : pathFilter.getDeniedPaths()) {
-      pathFilterRule.getDeniedPaths().add(transformPathMatcher(pathMatcherConfig));
+      pathFilterRule.getDeniedPaths().add(transformPathMatcher(pathMatcherConfig, applicationPath));
     }
 
     for (PathMatcherConfig pathMatcherConfig : pathFilter.getAllowedPaths()) {
-      pathFilterRule.getAllowedPaths().add(transformPathMatcher(pathMatcherConfig));
+      pathFilterRule.getAllowedPaths().add(transformPathMatcher(pathMatcherConfig, applicationPath));
     }
 
     return pathFilterRule;
   }
 
-  protected static RequestMatcher transformPathMatcher(PathMatcherConfig pathMatcherConfig) {
+  protected static RequestMatcher transformPathMatcher(PathMatcherConfig pathMatcherConfig,
+                                                       String applicationPath) {
     RequestFilter requestMatcher = new RequestFilter(
         pathMatcherConfig.getPath(),
+        applicationPath,
         pathMatcherConfig.getParsedMethods());
 
     RequestAuthorizer requestAuthorizer = RequestAuthorizer.AUTHORIZE_ANNONYMOUS;

@@ -41,10 +41,10 @@ public class RequestFilter {
 
   private String[] groups;
 
-  public RequestFilter(String pattern, String... methods) {
+  public RequestFilter(String pattern, String applicationPath, String... methods) {
     this.methods = methods;
 
-    setPattern(pattern);
+    setPattern(pattern, applicationPath);
   }
 
   public Map<String, String> match(String requestMethod, String requestUri) {
@@ -91,13 +91,18 @@ public class RequestFilter {
    * Sets the uri pattern for this matcher
    * @param pattern
    */
-  protected final void setPattern(String pattern) {
+  protected final void setPattern(String pattern, String applicationPath) {
 
     String[] parts = pattern.split("/");
 
     ArrayList<String> groupList = new ArrayList<String>();
 
     StringBuilder regexBuilder = new StringBuilder();
+
+    if (!applicationPath.isEmpty()) {
+      regexBuilder.append(applicationPath);
+    }
+
     boolean first = true;
 
     for (String part: parts) {

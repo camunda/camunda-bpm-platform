@@ -24,6 +24,7 @@ import java.util.List;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 import org.camunda.bpm.webapp.impl.security.auth.Authentications;
 import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 
@@ -85,7 +87,10 @@ public class SecurityFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
-    loadFilterRules(filterConfig);
+    ServletContext servletContext = filterConfig.getServletContext();
+
+    String applicationPath = ServletContextUtil.getAppPath(servletContext);
+    loadFilterRules(filterConfig, applicationPath);
   }
 
   @Override
@@ -106,14 +111,15 @@ public class SecurityFilter implements Filter {
     return FilterRules.authorize(requestMethod, requestUri, filterRules);
   }
 
-  protected void loadFilterRules(FilterConfig filterConfig) throws ServletException {
+  protected void loadFilterRules(FilterConfig filterConfig,
+                                 String applicationPath) throws ServletException {
     String configFileName = filterConfig.getInitParameter("configFile");
     InputStream configFileResource = filterConfig.getServletContext().getResourceAsStream(configFileName);
     if (configFileResource == null) {
       throw new ServletException("Could not read security filter config file '"+configFileName+"': no such resource in servlet context.");
     } else {
       try {
-        filterRules = FilterRules.load(configFileResource);
+        filterRules = FilterRules.load(configFileResource, applicationPath);
       } catch (Exception e) {
         throw new RuntimeException("Exception while parsing '" + configFileName + "'", e);
       } finally {

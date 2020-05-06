@@ -74,7 +74,7 @@ public abstract class AbstractTemplateFilter implements Filter {
 
   /**
    * Returns true if the given web resource exists.
-   * 
+   *
    * @param name
    * @return
    */
