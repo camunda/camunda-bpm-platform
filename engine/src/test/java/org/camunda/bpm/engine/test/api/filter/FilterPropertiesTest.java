@@ -74,6 +74,25 @@ public class FilterPropertiesTest {
   }
 
   @Test
+  public void testPropertiesInternalFromNull() {
+    // given
+    Filter noPropsFilter = filterService.
+        newTaskFilter("no props filter")
+        .setOwner("demo")
+        .setProperties(null);
+    filterService.saveFilter(noPropsFilter);
+
+    // when
+    FilterEntity noPropsFilterEntity = (FilterEntity) filterService
+        .createTaskFilterQuery()
+        .filterOwner("demo")
+        .singleResult();
+
+    // then
+    assertThat(noPropsFilterEntity.getPropertiesInternal(), is("{}"));
+  }
+
+  @Test
   public void testPropertiesFromMap() {
     Map<String, Object> properties = new HashMap<>();
     properties.put("color", "#123456");

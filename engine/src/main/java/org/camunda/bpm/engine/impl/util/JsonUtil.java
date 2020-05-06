@@ -436,28 +436,16 @@ public final class JsonUtil {
   }
 
   public static String asString(Map<String, Object> properties) {
+    String stringValue = createObject().toString();
     if (properties != null) {
 
       JsonObject jsonObject = asObject(properties);
       if (jsonObject != null) {
-
-        String stringValue = jsonObject.toString();
-        if (stringValue != null) {
-          return stringValue;
-
-        } else {
-          return "";
-
-        }
-      } else {
-        return "";
-
+        stringValue = jsonObject.toString();
       }
-
-    } else {
-      return "";
-
     }
+
+    return stringValue;
   }
 
   public static JsonArray asArray(List<String> list) {
