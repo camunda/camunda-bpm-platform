@@ -29,6 +29,8 @@ public class WebappProperty {
 
   private String securityConfigFile = "/securityFilterRules.json";
 
+  protected String applicationPath = "/camunda";
+
   @NestedConfigurationProperty
   private CsrfProperties csrf = new CsrfProperties();
 
@@ -59,6 +61,30 @@ public class WebappProperty {
     this.securityConfigFile = securityConfigFile;
   }
 
+  public String getApplicationPath() {
+    return applicationPath;
+  }
+
+  public void setApplicationPath(String applicationPath) {
+    this.applicationPath = sanitizeApplicationPath(applicationPath);
+  }
+
+  protected String sanitizeApplicationPath(String applicationPath) {
+    if (applicationPath == null || applicationPath.isEmpty()) {
+      return "";
+    }
+
+    if (!applicationPath.startsWith("/")) {
+      applicationPath = "/" + applicationPath;
+    }
+
+    if (applicationPath.endsWith("/")) {
+      applicationPath = applicationPath.substring(0, applicationPath.length() - 1);
+    }
+
+    return applicationPath;
+  }
+
   public CsrfProperties getCsrf() {
     return csrf;
   }
@@ -81,6 +107,7 @@ public class WebappProperty {
       .add("indexRedirectEnabled=" + indexRedirectEnabled)
       .add("webjarClasspath='" + webjarClasspath + '\'')
       .add("securityConfigFile='" + securityConfigFile + '\'')
+      .add("webappPath='" + applicationPath + '\'')
       .add("csrf='" + csrf + '\'')
       .add("headerSecurityProperties='" + headerSecurity + '\'')
       .toString();

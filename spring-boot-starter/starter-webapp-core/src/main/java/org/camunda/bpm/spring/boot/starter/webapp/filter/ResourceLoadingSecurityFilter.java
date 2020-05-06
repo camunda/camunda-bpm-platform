@@ -35,7 +35,7 @@ public class ResourceLoadingSecurityFilter extends SecurityFilter implements Res
 
   private WebappProperty webappProperty;
   @Override
-  protected void loadFilterRules(FilterConfig filterConfig) throws ServletException {
+  protected void loadFilterRules(FilterConfig filterConfig, String applicationPath) throws ServletException {
     String configFileName = filterConfig.getInitParameter("configFile");
     Resource resource = resourceLoader.getResource("classpath:" +webappProperty.getWebjarClasspath() + configFileName);
     InputStream configFileResource;
@@ -45,7 +45,7 @@ public class ResourceLoadingSecurityFilter extends SecurityFilter implements Res
       throw new ServletException("Could not read security filter config file '" + configFileName + "': no such resource in servlet context.");
     }
     try {
-      filterRules = FilterRules.load(configFileResource);
+      filterRules = FilterRules.load(configFileResource, applicationPath);
     } catch (Exception e) {
       throw new RuntimeException("Exception while parsing '" + configFileName + "'", e);
     } finally {

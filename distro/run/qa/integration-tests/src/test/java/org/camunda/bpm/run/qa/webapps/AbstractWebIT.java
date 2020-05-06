@@ -89,8 +89,4 @@ public abstract class AbstractWebIT {
   protected String getWebappCtxPath() {
     return testProperties.getStringProperty("http.ctx-path.webapp", null);
   }
-
-  protected String getRestCtxPath() {
-    return testProperties.getStringProperty("http.ctx-path.rest", null);
-  }
 }

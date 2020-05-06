@@ -45,7 +45,7 @@ public class SameSiteDisabledIT {
 
   @Test
   public void shouldDisableSameSiteCookie() {
-    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
