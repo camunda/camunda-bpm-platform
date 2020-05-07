@@ -120,17 +120,14 @@ public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngine
 
   @Override
   public CountResultDto getDecisionDefinitionsCount(UriInfo uriInfo) {
-    CountResultDto result = null;
-    final ProcessEngine engine = getProcessEngine();
-    final ProcessEngineConfiguration processEngineConfiguration = engine.getProcessEngineConfiguration();
-    if (!(processEngineConfiguration instanceof ProcessEngineConfigurationImpl)
-            || ((ProcessEngineConfigurationImpl) processEngineConfiguration).isDmnEnabled()) {
-        final DecisionDefinitionQueryDto queryDto = new DecisionDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-        final DecisionDefinitionQuery query = queryDto.toQuery(engine);
-        final long count = query.count();
-        result = new CountResultDto();
-        result.setCount(count);
-    }
+    DecisionDefinitionQueryDto queryDto = new DecisionDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+
+    ProcessEngine engine = getProcessEngine();
+    DecisionDefinitionQuery query = queryDto.toQuery(engine);
+
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
     return result;
   }
 
