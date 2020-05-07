@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "getProcessInstanceVariableBinary"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Retrieves the content of a Process Variable by the Process Instance id and the Process Variable name.
               Applicable for byte array or file Process Variables." />
 

@@ -1,4 +1,5 @@
-<@lib.dto>
+<@lib.dto
+    extends = "ExceptionDto" >
 
     <@lib.property
         name = "details"

@@ -286,11 +286,17 @@
 <#macro endpointInfo
         id
         tag
-        desc >
+        desc
+        summary = "" >
     "operationId": "${id}",
     "tags": [
       "${tag}"
     ],
+
+    <#if summary?has_content>
+      "summary": "${summary}",
+    </#if>
+
     "description": "${removeIndentation(desc)}",
 </#macro>
 
