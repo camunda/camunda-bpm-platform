@@ -125,17 +125,14 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public CountResultDto getCaseDefinitionsCount(UriInfo uriInfo) {
-    CountResultDto result = null;
-    final ProcessEngine engine = getProcessEngine();
-    final ProcessEngineConfiguration processEngineConfiguration = engine.getProcessEngineConfiguration();
-    if (!(processEngineConfiguration instanceof ProcessEngineConfigurationImpl)
-            || ((ProcessEngineConfigurationImpl) processEngineConfiguration).isCmmnEnabled()) {
-        final CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-        final CaseDefinitionQuery query = queryDto.toQuery(engine);
-        final long count = query.count();
-        result = new CountResultDto();
-        result.setCount(count);
-    }
+    CaseDefinitionQueryDto queryDto = new CaseDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+
+    ProcessEngine engine = getProcessEngine();
+    CaseDefinitionQuery query = queryDto.toQuery(engine);
+
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
     return result;
   }
 
