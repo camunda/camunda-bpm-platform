@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -104,6 +106,7 @@ public class ProcessApplicationDeploymentTest {
     clearProcessApplicationDeployments();
     processApplication.undeploy();
     processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
+    ClockUtil.reset();
   }
 
   @Test
@@ -1189,9 +1192,15 @@ public class ProcessApplicationDeploymentTest {
     assertNull(managementService.getProcessApplicationForDeployment(deployment.getId()));
   }
 
+  /*
+   * A delay is introduced between the two deployments so the test is valid when MySQL
+   * is used. See https://jira.camunda.com/browse/CAM-11893 for more details.
+   */
   @Test
   public void shouldRegisterExistingDeploymentsOnLatestProcessDefinitionRemoval() {
     // given
+    Date timeFreeze = new Date();
+    ClockUtil.setCurrentTime(timeFreeze);
     BpmnModelInstance process1 = Bpmn.createExecutableProcess("process").done();
     BpmnModelInstance process2 = Bpmn.createExecutableProcess("process").startEvent().done();
 
@@ -1200,6 +1209,8 @@ public class ProcessApplicationDeploymentTest {
         .name("foo")
         .addModelInstance("process.bpmn", process1));
 
+    // offset second deployment time to detect latest deployment with MySQL timestamps
+    ClockUtil.offset(1000L);
     DeploymentWithDefinitions deployment2 = testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("foo")
