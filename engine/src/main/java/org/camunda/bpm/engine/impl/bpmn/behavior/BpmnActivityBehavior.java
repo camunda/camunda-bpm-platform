@@ -51,8 +51,8 @@ public class BpmnActivityBehavior {
    * the process instance. If multiple sequencer flow are selected, multiple,
    * parallel paths of executions are created.
    */
-  public void performDefaultOutgoingBehavior(ActivityExecution activityExceution) {
-    performOutgoingBehavior(activityExceution, true, null);
+  public void performDefaultOutgoingBehavior(ActivityExecution activityExecution) {
+    performOutgoingBehavior(activityExecution, true, null);
   }
 
   /**
