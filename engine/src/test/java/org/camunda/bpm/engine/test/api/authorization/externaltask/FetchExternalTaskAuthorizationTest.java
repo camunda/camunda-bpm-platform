@@ -192,6 +192,21 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     // then
     assertEquals(2, tasks.size());
   }
+  
+
+  public void testFetchWithMultipleMatchingAuthorizations() {
+    // given
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ, UPDATE);
+    createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ, UPDATE);
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("externalTaskTopic", LOCK_TIME)
+      .execute();
+
+    // then
+    assertEquals(2, tasks.size());
+  }
 
   public void testQueryWithReadAndUpdateInstanceOnAnyProcessDefinition() {
     // given
