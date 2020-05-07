@@ -1,6 +1,6 @@
 <@lib.dto>
 
-    <#-- NOTE: Please adding changes if necessary to:
+    <#-- NOTE: Please adding any changes, if necessary, to:
          * ProcessDefinitionSuspensionStateDto
          * ProcessInstanceSuspensionStateAsyncDto
          * ProcessInstanceSuspensionStateDto
