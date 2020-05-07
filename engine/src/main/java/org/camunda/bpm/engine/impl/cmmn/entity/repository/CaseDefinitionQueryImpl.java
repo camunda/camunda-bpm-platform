@@ -24,6 +24,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
@@ -38,6 +39,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   private static final long serialVersionUID = 1L;
 
+  private final boolean cmmnEnabled;
+  
   protected String id;
   protected String[] ids;
   protected String category;
@@ -57,10 +60,12 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected boolean includeDefinitionsWithoutTenantId = false;
 
   public CaseDefinitionQueryImpl() {
+    cmmnEnabled = Context.getProcessEngineConfiguration().isCmmnEnabled();
   }
 
   public CaseDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+    cmmnEnabled = Context.getProcessEngineConfiguration().isCmmnEnabled();
   }
 
   // Query parameter //////////////////////////////////////////////////////////////
@@ -203,6 +208,9 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    if (!cmmnEnabled) {
+      return 0;
+    }
     checkQueryOk();
     return commandContext
       .getCaseDefinitionManager()

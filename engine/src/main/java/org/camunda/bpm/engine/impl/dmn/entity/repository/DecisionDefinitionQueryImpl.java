@@ -24,6 +24,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -32,6 +33,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
+
+  private final boolean dmnEnabled;
 
   protected String id;
   protected String[] ids;
@@ -59,10 +62,12 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String versionTagLike;
 
   public DecisionDefinitionQueryImpl() {
+    dmnEnabled = Context.getProcessEngineConfiguration().isDmnEnabled();
   }
 
   public DecisionDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+    dmnEnabled = Context.getProcessEngineConfiguration().isDmnEnabled();
   }
 
   // Query parameter //////////////////////////////////////////////////////////////
@@ -236,6 +241,9 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    if (!dmnEnabled) {
+      return 0;
+    }
     checkQueryOk();
     return commandContext
       .getDecisionDefinitionManager()
