@@ -167,8 +167,18 @@
   <select id="selectExternalTasksForTopics" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
     <bind name="orderingProperties" value="parameter.orderingProperties" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+
+    <bind name="performAuthorizationCheck" value="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null" />
+
     ${limitBefore}
-    select ${distinct} RES.*
+    select 
+    <!-- Distinct can only be omitted when there are no joins with a 1:n relationship.
+      Currently this is only the case for the authorization joins. When you add a join
+      in this statement in the future, check if distinct can be omitted or not -->
+    <if test="!parameter.usesPostgres || performAuthorizationCheck">
+      ${distinct} 
+    </if>
+    RES.*
     ${limitBetween}
     from (
     select RES.*, PI.BUSINESS_KEY_, PD.VERSION_TAG_
@@ -177,7 +187,7 @@
     left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
     inner join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
 
-    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="performAuthorizationCheck">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
        (AUTH.RESOURCE_TYPE_ = 8 
