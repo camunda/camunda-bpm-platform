@@ -24,6 +24,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -33,8 +34,6 @@ import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
-
-  private final boolean dmnEnabled;
 
   protected String id;
   protected String[] ids;
@@ -61,13 +60,13 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String versionTag;
   protected String versionTagLike;
 
+  private Boolean dmnEnabled;
+
   public DecisionDefinitionQueryImpl() {
-    dmnEnabled = Context.getProcessEngineConfiguration().isDmnEnabled();
   }
 
   public DecisionDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
-    dmnEnabled = Context.getProcessEngineConfiguration().isDmnEnabled();
   }
 
   // Query parameter //////////////////////////////////////////////////////////////
@@ -241,7 +240,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    if (!dmnEnabled) {
+    if (!checkDmnEnabled()) {
       return 0;
     }
     checkQueryOk();
@@ -267,6 +266,19 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
+
+  private boolean checkDmnEnabled() {
+      if (dmnEnabled == null) {
+          ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+          if (configuration != null) {
+              dmnEnabled = Boolean.valueOf(configuration.isDmnEnabled());
+          } else {
+              dmnEnabled = Boolean.TRUE;
+          }
+          
+      }
+      return dmnEnabled.booleanValue();
+    }
 
   // getters ////////////////////////////////////////////
 

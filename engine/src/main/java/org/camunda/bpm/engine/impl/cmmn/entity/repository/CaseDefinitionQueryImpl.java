@@ -24,6 +24,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -38,8 +39,6 @@ import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, CaseDefinition> implements CaseDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
-
-  private final boolean cmmnEnabled;
   
   protected String id;
   protected String[] ids;
@@ -59,13 +58,13 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
+  private Boolean cmmnEnabled;
+
   public CaseDefinitionQueryImpl() {
-    cmmnEnabled = Context.getProcessEngineConfiguration().isCmmnEnabled();
   }
 
   public CaseDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
-    cmmnEnabled = Context.getProcessEngineConfiguration().isCmmnEnabled();
   }
 
   // Query parameter //////////////////////////////////////////////////////////////
@@ -208,7 +207,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    if (!cmmnEnabled) {
+    if (!checkCmmnEnabled()) {
       return 0;
     }
     checkQueryOk();
@@ -234,6 +233,19 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
       throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
+
+  private boolean checkCmmnEnabled() {
+      if (cmmnEnabled == null) {
+          ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+          if (configuration != null) {
+              cmmnEnabled = Boolean.valueOf(configuration.isCmmnEnabled());
+          } else {
+              cmmnEnabled = Boolean.TRUE;
+          }
+          
+      }
+      return cmmnEnabled.booleanValue();
+    }
 
   // getters ////////////////////////////////////////////
 

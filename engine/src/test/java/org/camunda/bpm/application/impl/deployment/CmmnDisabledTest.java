@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -60,6 +61,21 @@ public class CmmnDisabledTest extends ResourceProcessEngineTestCase {
     } catch (Exception e) {
       // expected
     }
+
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+  
+  public void testCountCreatesNoException() {
+    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+        .deploy();
+
+    // process is deployed:
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertNotNull(processDefinition);
+    assertEquals(1, processDefinition.getVersion());
+
+    assertEquals(0, repositoryService.createCaseDefinitionQuery().count());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
@@ -55,6 +57,13 @@ public class DmnDisabledTest {
       .execute(new SchemaOperationsProcessEngineBuild());
   }
 
+  @Test
+  public void countCreatesNoException() {
+      disabledDmn();
+      assertEquals(0, processEngineImpl.getRepositoryService().createDecisionDefinitionQuery().count());
+  }
+
+  
   // allows to return a process engine configuration which doesn't create a schema when it's build.
   protected static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
 
