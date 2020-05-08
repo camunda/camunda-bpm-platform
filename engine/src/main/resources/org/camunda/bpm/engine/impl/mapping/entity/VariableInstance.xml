@@ -29,6 +29,7 @@
       ID_,
       TYPE_,
       NAME_,
+      PROC_DEF_ID_,
       PROC_INST_ID_,
       EXECUTION_ID_,
       CASE_INST_ID_,
@@ -49,6 +50,7 @@
       #{id, jdbcType=VARCHAR},
       #{serializerName, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
@@ -99,6 +101,7 @@
       <result property="revision" column="REV_" jdbcType="INTEGER"/>
       <result property="serializerName" column="TYPE_" javaType="String" jdbcType="VARCHAR"/>
       <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+      <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
       <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
@@ -162,7 +165,7 @@
         EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
     AND
         TASK_ID_ is null
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
@@ -213,7 +216,7 @@
         CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
     AND
         TASK_ID_ is null
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
@@ -241,7 +244,7 @@
 
     WHERE
         TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
-    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size() > 0">
+    <if test="parameter.variableNames != null &amp;&amp; parameter.variableNames.size > 0">
     AND
         NAME_ IN
         <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
@@ -261,8 +264,9 @@
   </select>
 
   <select id="selectVariableInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="actInstIdColumn">
@@ -432,9 +436,10 @@
 
             <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-              and RES.NAME_= #{queryVariableValue.name}
-              <bind name="varTypeField" value="'TYPE_'"/>
+              and
               <bind name="varPrefix" value="'RES.'"/>
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+              <bind name="varTypeField" value="'TYPE_'"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
@@ -485,7 +490,7 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
-  <update id="updateByteArraysByProcessInstanceId"
+  <update id="updateVariableByteArraysByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
@@ -494,31 +499,66 @@
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_VARINST
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateDecisionInputsByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- decision inputs -->
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_DEC_IN I
         INNER JOIN ${prefix}ACT_HI_DECINST D
         ON I.DEC_INST_ID_ = D.ID_
         WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateDecisionOutputsByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- decision outputs -->
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_DEC_OUT O
         INNER JOIN ${prefix}ACT_HI_DECINST D
         ON O.DEC_INST_ID_ = D.ID_
         WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateJobLogByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- job log -->
         SELECT JOB_EXCEPTION_STACK_ID_
         FROM ${prefix}ACT_HI_JOB_LOG
         WHERE PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateExternalTaskLogByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- external task log -->
         SELECT ERROR_DETAILS_ID_
         FROM ${prefix}ACT_HI_EXT_TASK_LOG
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateAttachmentByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- attachment -->
         SELECT CONTENT_ID_
         FROM ${prefix}ACT_HI_ATTACHMENT A

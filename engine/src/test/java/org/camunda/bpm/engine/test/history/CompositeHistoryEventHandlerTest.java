@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,7 @@ import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Alexander Tyatenkov
@@ -31,51 +35,56 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class CompositeHistoryEventHandlerTest extends AbstractCompositeHistoryEventHandlerTest {
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testDefaultHistoryEventHandler() {
+  public void shouldUseCompositeHistoryEventHandlerNonArgumentConstructor() {
+    processEngineConfiguration.setHistoryEventHandler(new CompositeHistoryEventHandler());
+
+    startProcessAndCompleteUserTask();
+
+    assertThat(countCustomHistoryEventHandler).isZero();
+    assertThat(historyService.createHistoricDetailQuery().count()).isZero();
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
+  public void shouldUseDefaultHistoryEventHandler() {
     // use default DbHistoryEventHandler
     processEngineConfiguration.setHistoryEventHandler(new DbHistoryEventHandler());
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(0, countCustomHistoryEventHandler);
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isZero();
+    assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(2L);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerNonArgumentConstructor() {
-    processEngineConfiguration.setHistoryEventHandler(new CompositeHistoryEventHandler());
-
-    startProcessAndCompleteUserTask();
-
-    assertEquals(0, countCustomHistoryEventHandler);
-    assertEquals(0, historyService.createHistoricDetailQuery().count());
-  }
-
-  public void testCompositeHistoryEventHandlerNonArgumentConstructorAddNullEvent() {
+  @Test
+  public void shouldUseCompositeHistoryEventHandlerNonArgumentConstructorAddNullEvent() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler();
     try {
       compositeHistoryEventHandler.add(null);
       fail("NullValueException expected");
     } catch (NullValueException e) {
-      assertTextPresent("History event handler is null", e.getMessage());
+      assertThat(e.getMessage()).containsIgnoringCase("History event handler is null");
     }
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerNonArgumentConstructorAddNotNullEvent() {
+  public void shouldUseCompositeHistoryEventHandlerNonArgumentConstructorAddNotNullEvent() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler();
     compositeHistoryEventHandler.add(new CustomDbHistoryEventHandler());
     processEngineConfiguration.setHistoryEventHandler(compositeHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(2, countCustomHistoryEventHandler);
-    assertEquals(0, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isEqualTo(2);
+    assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(0);
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerNonArgumentConstructorAddNotNullTwoEvents() {
+  public void shouldUseCompositeHistoryEventHandlerNonArgumentConstructorAddNotNullTwoEvents() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler();
     compositeHistoryEventHandler.add(new CustomDbHistoryEventHandler());
     compositeHistoryEventHandler.add(new DbHistoryEventHandler());
@@ -83,63 +92,69 @@ public class CompositeHistoryEventHandlerTest extends AbstractCompositeHistoryEv
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(2, countCustomHistoryEventHandler);
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isEqualTo(2);
+    assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(2);
   }
 
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNullVarargs() {
+  @Test
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNullVarargs() {
     HistoryEventHandler historyEventHandler = null;
     try {
       new CompositeHistoryEventHandler(historyEventHandler);
       fail("NullValueException expected");
     } catch (NullValueException e) {
-      assertTextPresent("History event handler is null", e.getMessage());
+      assertThat(e.getMessage()).containsIgnoringCase("History event handler is null");
     }
   }
 
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNullTwoVarargs() {
+  @Test
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNullTwoVarargs() {
     try {
       new CompositeHistoryEventHandler(null, null);
       fail("NullValueException expected");
     } catch (NullValueException e) {
-      assertTextPresent("History event handler is null", e.getMessage());
+      assertThat(e.getMessage()).containsIgnoringCase("History event handler is null");
     }
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNotNullVarargsOneEvent() {
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNotNullVarargsOneEvent() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler(new CustomDbHistoryEventHandler());
     processEngineConfiguration.setHistoryEventHandler(compositeHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(2, countCustomHistoryEventHandler);
-    assertEquals(0, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isEqualTo(2);
+    assertThat(historyService.createHistoricDetailQuery().count()).isZero();
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNotNullVarargsTwoEvents() {
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNotNullVarargsTwoEvents() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler(new CustomDbHistoryEventHandler(), new DbHistoryEventHandler());
     processEngineConfiguration.setHistoryEventHandler(compositeHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(2, countCustomHistoryEventHandler);
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isEqualTo(2);
+    assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(2);
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithEmptyList() {
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithEmptyList() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler(new ArrayList<HistoryEventHandler>());
     processEngineConfiguration.setHistoryEventHandler(compositeHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(0, countCustomHistoryEventHandler);
-    assertEquals(0, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isZero();
+    assertThat(historyService.createHistoricDetailQuery().count()).isZero();
   }
 
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNotEmptyListNullTwoEvents() {
+  @Test
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNotEmptyListNullTwoEvents() {
     // prepare the list with two null events
     List<HistoryEventHandler> historyEventHandlers = new ArrayList<HistoryEventHandler>();
     historyEventHandlers.add(null);
@@ -149,12 +164,13 @@ public class CompositeHistoryEventHandlerTest extends AbstractCompositeHistoryEv
       new CompositeHistoryEventHandler(historyEventHandlers);
       fail("NullValueException expected");
     } catch (NullValueException e) {
-      assertTextPresent("History event handler is null", e.getMessage());
+      assertThat(e.getMessage()).containsIgnoringCase("History event handler is null");
     }
   }
 
+  @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
-  public void testCompositeHistoryEventHandlerArgumentConstructorWithNotEmptyListNotNullTwoEvents() {
+  public void shouldUseCompositeHistoryEventHandlerArgumentConstructorWithNotEmptyListNotNullTwoEvents() {
     // prepare the list with two events
     List<HistoryEventHandler> historyEventHandlers = new ArrayList<HistoryEventHandler>();
     historyEventHandlers.add(new CustomDbHistoryEventHandler());
@@ -165,8 +181,8 @@ public class CompositeHistoryEventHandlerTest extends AbstractCompositeHistoryEv
 
     startProcessAndCompleteUserTask();
 
-    assertEquals(2, countCustomHistoryEventHandler);
-    assertEquals(2, historyService.createHistoricDetailQuery().count());
+    assertThat(countCustomHistoryEventHandler).isEqualTo(2);
+    assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(2);
   }
 
 }

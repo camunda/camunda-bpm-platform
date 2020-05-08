@@ -64,6 +64,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -72,7 +73,8 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupHistoricBatchTest {
 
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupDegreeOfParallelism(3);
       return configuration;
@@ -92,7 +94,7 @@ public class HistoryCleanupHistoricBatchTest {
   private Random random = new Random();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(migrationRule);
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -183,7 +185,7 @@ public class HistoryCleanupHistoricBatchTest {
 
     BatchEntity batch = (BatchEntity) createFailingMigrationBatch();
 
-    migrationHelper.executeSeedJob(batch);
+    migrationHelper.completeSeedJobs(batch);
 
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
@@ -231,7 +233,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testBatchOperationTypeConfigurationOnly() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("instance-migration", "P2D");
     map.put("instance-deletion", DEFAULT_TTL_DAYS);
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
@@ -244,7 +246,7 @@ public class HistoryCleanupHistoricBatchTest {
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
 
     int migrationCountBatch = 10;
     batchIds.addAll(createMigrationBatchList(migrationCountBatch));
@@ -282,7 +284,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testMixedConfiguration() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("instance-modification", "P20D");
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
@@ -293,7 +295,7 @@ public class HistoryCleanupHistoricBatchTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
     Batch modificationBatch = createModificationBatch();
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     batchIds.add(modificationBatch.getId());
 
     int migrationCountBatch = 10;
@@ -337,7 +339,7 @@ public class HistoryCleanupHistoricBatchTest {
   public void testWrongSpecificConfiguration() {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid value");
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("instance-modification", "PD");
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
@@ -356,7 +358,7 @@ public class HistoryCleanupHistoricBatchTest {
   public void testWrongSpecificConfigurationNegativeTTL() {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid value");
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("instance-modification", "P-5D");
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
@@ -383,13 +385,13 @@ public class HistoryCleanupHistoricBatchTest {
     Date startDate = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
-    List<Batch> list = new ArrayList<Batch>();
+    List<Batch> list = new ArrayList<>();
     for (int i = 0; i < batchesCount; i++) {
       list.add(migrationHelper.migrateProcessInstancesAsync(1));
     }
 
     for (Batch batch : list) {
-      migrationHelper.executeSeedJob(batch);
+      migrationHelper.completeSeedJobs(batch);
       migrationHelper.executeJobs(batch);
 
       ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.addDays(startDate, ++daysInThePast), random.nextInt(60)));
@@ -417,7 +419,7 @@ public class HistoryCleanupHistoricBatchTest {
   }
 
   private List<String> createMigrationBatchList(int migrationCountBatch) {
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     for (int i = 0; i < migrationCountBatch; i++) {
       batchIds.add(migrationHelper.migrateProcessInstancesAsync(1).getId());
     }
@@ -432,9 +434,12 @@ public class HistoryCleanupHistoricBatchTest {
   }
 
   private List<String> createCancelationBatchList(int cancelationCountBatch) {
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
+    BpmnModelInstance instance = createModelInstance();
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    String pId = runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
     for (int i = 0; i < cancelationCountBatch; i++) {
-      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList("unknownId"), "create-deletion-batch").getId());
+      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList(pId), "create-deletion-batch").getId());
     }
     return batchIds;
   }
@@ -451,7 +456,7 @@ public class HistoryCleanupHistoricBatchTest {
   }
 
   private List<String> findExceptionByteArrayIds() {
-    List<String> exceptionByteArrayIds = new ArrayList<String>();
+    List<String> exceptionByteArrayIds = new ArrayList<>();
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery().list();
     for (HistoricJobLog historicJobLog : historicJobLogs) {
       HistoricJobLogEventEntity historicJobLogEventEntity = (HistoricJobLogEventEntity) historicJobLog;

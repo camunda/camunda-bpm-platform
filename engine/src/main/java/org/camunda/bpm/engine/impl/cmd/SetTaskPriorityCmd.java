@@ -54,7 +54,8 @@ public class SetTaskPriorityCmd implements Command<Void>, Serializable {
 
     task.setPriority(priority);
 
-    task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY);
+    task.triggerUpdateEvent();
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY);
 
     return null;
   }

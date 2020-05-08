@@ -90,6 +90,15 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateUserOperationLogByProcessInstanceId", parameters);
   }
 
+  public void updateOperationLogAnnotationByOperationId(String operationId, String annotation) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("operationId", operationId);
+    parameters.put("annotation", annotation);
+
+    getDbEntityManager()
+        .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateOperationLogAnnotationByOperationId", parameters);
+  }
+
   public void deleteOperationLogEntryById(String entryId) {
     if (isHistoryEventProduced()) {
       getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);
@@ -240,16 +249,22 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
+    logProcessInstanceOperation(operation, processInstanceId, processDefinitionId, processDefinitionKey, propertyChanges, null);
+  }
+
+  public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges, String annotation) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
-      UserOperationLogContextEntryBuilder entryBuilder =
-          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_INSTANCE)
+      UserOperationLogContextEntryBuilder entryBuilder =  UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_INSTANCE)
             .propertyChanges(propertyChanges)
             .processInstanceId(processInstanceId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
             .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+      if (annotation != null) {
+        entryBuilder.annotation(annotation);
+      }
 
       if(processInstanceId != null) {
         ExecutionEntity instance = getProcessInstanceManager().findExecutionById(processInstanceId);
@@ -271,16 +286,26 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
-      PropertyChange propertyChange) {
+                                            PropertyChange propertyChange) {
+    logProcessDefinitionOperation(
+      operation,
+      processDefinitionId,
+      processDefinitionKey,
+      Collections.singletonList(propertyChange)
+    );
+  }
+
+  public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
+                                            List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
-          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_DEFINITION)
-            .propertyChanges(propertyChange)
-            .processDefinitionId(processDefinitionId)
-            .processDefinitionKey(processDefinitionKey)
-            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .processDefinitionId(processDefinitionId)
+          .processDefinitionKey(processDefinitionKey)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if (processDefinitionId != null) {
         ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
@@ -627,7 +652,30 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
+  public void logSetAnnotationOperation(String operationId) {
+    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+  }
+
+  public void logClearAnnotationOperation(String operationId) {
+    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+  }
+
+  protected void logAnnotationOperation(String operationId, String operationType) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operationType, EntityTypes.OPERATION_LOG)
+              .propertyChanges(new PropertyChange("operationId", null, operationId))
+              .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
   public void logAuthorizationOperation(String operation, AuthorizationEntity authorization, AuthorizationEntity previousValues) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();

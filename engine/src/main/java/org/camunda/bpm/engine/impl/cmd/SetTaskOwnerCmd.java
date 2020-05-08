@@ -34,7 +34,7 @@ public class SetTaskOwnerCmd extends AddIdentityLinkCmd {
   @Override
   public Void execute(CommandContext commandContext) {
     super.execute(commandContext);
-    task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
     return null;
   }
 }

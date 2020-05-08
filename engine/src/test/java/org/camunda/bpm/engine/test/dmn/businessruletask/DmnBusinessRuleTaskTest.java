@@ -52,6 +52,10 @@ public class DmnBusinessRuleTaskTest {
   public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/engine/test/dmn/deployment/DecisionWithLiteralExpression.dmn";
   public static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
+  public static final String DECISION_OKAY_DMN12 = "org/camunda/bpm/engine/test/dmn/businessruletask/dmn12/DmnBusinessRuleTaskTest.testDecisionOkay.dmn";
+
+  public static final String DECISION_OKAY_DMN13 = "org/camunda/bpm/engine/test/dmn/businessruletask/dmn13/DmnBusinessRuleTaskTest.testDecisionOkay.dmn";
+
   public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn.createExecutableProcess("process")
               .startEvent()
               .businessRuleTask()
@@ -90,6 +94,18 @@ public class DmnBusinessRuleTaskTest {
     assertEquals("okay", getDecisionResult(processInstance));
   }
 
+  @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN12 })
+  @Test
+  public void testDmn12Decision() {
+    decisionRef();
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN13 })
+  @Test
+  public void testDmn13Decision() {
+    decisionRef();
+  }
+  
   @Deployment(resources = DECISION_PROCESS)
   @Test
   public void noDecisionFound() {

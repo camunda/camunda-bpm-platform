@@ -91,5 +91,23 @@ public class ConfigurationLogger extends ProcessEngineLogger {
       "Invalid value '{}' for configuration property '{}'.", propertyValue, propertyName), e);
   }
 
+  public void databaseConnectionAccessException(Exception cause) {
+    logError(
+      "012",
+      "Exception on accessing the database connection: {}", cause.getMessage());
+  }
+
+  public void databaseConnectionCloseException(Exception cause) {
+    logError(
+      "013",
+      "Exception on closing the database connection: {}", cause.getMessage());
+  }
+
+  public void invalidBatchTypeForInvocationsPerBatchJob(String batchType) {
+    logWarn(
+        "014", "The configuration property 'invocationsPerJobByBatchType' " +
+            "contains an invalid batch type '{}' which is neither a custom nor a built-in " +
+            "batch type", batchType);
+  }
 
 }

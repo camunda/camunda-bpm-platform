@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class CollectionUtil {
    * <String, Object> map.
    */
   public static Map<String, Object> singletonMap(String key, Object value) {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put(key, value);
     return map;
   }
@@ -52,14 +53,14 @@ public class CollectionUtil {
    * Arrays.asList cannot be reliably used for SQL parameters on MyBatis < 3.3.0
    */
   public static <T> List<T> asArrayList(T[] values) {
-    ArrayList<T> result = new ArrayList<T>();
+    ArrayList<T> result = new ArrayList<>();
     Collections.addAll(result, values);
 
     return result;
   }
 
   public static <T> Set<T> asHashSet(T... elements) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     Collections.addAll(set, elements);
 
     return set;
@@ -68,7 +69,7 @@ public class CollectionUtil {
   public static <S, T> void addToMapOfLists(Map<S, List<T>> map, S key, T value) {
     List<T> list = map.get(key);
     if (list == null) {
-      list = new ArrayList<T>();
+      list = new ArrayList<>();
       map.put(key, list);
     }
     list.add(value);
@@ -77,7 +78,7 @@ public class CollectionUtil {
   public static <S, T> void addToMapOfSets(Map<S, Set<T>> map, S key, T value) {
     Set<T> set = map.get(key);
     if (set == null) {
-      set = new HashSet<T>();
+      set = new HashSet<>();
       map.put(key, set);
     }
     set.add(value);
@@ -86,21 +87,42 @@ public class CollectionUtil {
   public static <S, T> void addCollectionToMapOfSets(Map<S, Set<T>> map, S key, Collection<T> values) {
     Set<T> set = map.get(key);
     if (set == null) {
-      set = new HashSet<T>();
+      set = new HashSet<>();
       map.put(key, set);
     }
     set.addAll(values);
   }
 
   /**
-   * Chops a list into non-view sublists of length partitionSize.
+   * Chops a list into non-view sublists of length partitionSize. Note: the argument list
+   * may be included in the result.
    */
   public static <T> List<List<T>> partition(List<T> list, final int partitionSize) {
-    List<List<T>> parts = new ArrayList<List<T>>();
+    List<List<T>> parts = new ArrayList<>();
+
     final int listSize = list.size();
-    for (int i = 0; i < listSize; i += partitionSize) {
-      parts.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + partitionSize))));
+
+    if (listSize <= partitionSize) {
+      // no need for partitioning
+      parts.add(list);
+    } else {
+      for (int i = 0; i < listSize; i += partitionSize) {
+        parts.add(new ArrayList<>(list.subList(i, Math.min(listSize, i + partitionSize))));
+      }
     }
+
     return parts;
+  }
+
+  public static <T> List<T> collectInList(Iterator<T> iterator) {
+    List<T> result = new ArrayList<>();
+    while (iterator.hasNext()) {
+      result.add(iterator.next());
+    }
+    return result;
+  }
+
+  public static boolean isEmpty(Collection<?> collection) {
+    return collection == null || collection.isEmpty();
   }
 }

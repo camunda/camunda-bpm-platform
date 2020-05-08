@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -19,7 +19,7 @@
   </properties>
 
   <!-- import shrinkwrap and arquillian bom for artifact versions,
-  	DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
+    DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -41,11 +41,10 @@
   </dependencyManagement>
 
   <dependencies>
-  	<!-- set shrinkwrap artifacts -->
+    <!-- set shrinkwrap artifacts -->
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <version>${version.shrinkwrap.resolvers}</version>
       <scope>test</scope>
       <type>pom</type>
     </dependency>
@@ -78,6 +77,13 @@
           <groupId>org.apache.xalan</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.enterprise.concurrent</groupId>
+      <artifactId>javax.enterprise.concurrent-api</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -150,9 +156,43 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
-      <version>2.9.8</version>
+      <version>2.10.0</version>
+      <!--
+      Excluding jackson-databind for the following reason:
+
+      PaDataFormatConfiguratorJodaTest uses ShrinkWrap to pack jackson-datatype-joda
+      plus transitive dependencies into a WAR and deploy that via Arquillian.
+      One transitive dependency is jackson-databind. jackson-datatype-joda declares a dependency
+      to jackson-databind 2.9.9, however our current managed dependency version is 2.9.9.3 (via spin).
+      In that case, Shrinkwrap is not able to resolve the managed dependency version and
+      fails to resolve the dependency, because 2.9.9 is not available in the local Maven repo.
+
+      When can this exclusion be removed again?
+
+      At the time at which the Jackson versions of this artifact and Spin are in sync again,
+      so probably when we switch jackson-databind back to a proper patch level, for which also
+      a patch of this artifact exists.
+
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+      </exclusions>
+      -->
     </dependency>
 
+    <!--
+      needed for offline shrinkwrap,
+      BOM must be installed before this module is built
+    -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.camunda.connect</groupId>
@@ -247,226 +287,6 @@
   <profiles>
 
     <profile>
-      <id>jboss</id>
-      <dependencies>
-        <dependency>
-          <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-jboss-runtime</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
-          <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources-jboss</directory>
-            <filtering>true</filtering>
-          </testResource>
-        </testResources>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.6,1.8)</version>
-                      <message>
-                        *************************************************
-                        *                                               *
-                        * You must use JDK 6/7 to run JBoss AS 7.2.0!!! *
-                        *                                               *
-                        *************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-jboss</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <configuration>
-              <delimiters>
-                <delimiter>${*}</delimiter>
-              </delimiters>
-              <useDefaultDelimiters>false</useDefaultDelimiters>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <!-- HEMERA-2453 -->
-                <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <exclude>**/*_OTHERS.java</exclude>
-                <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
-                <exclude>**/SpringServletPALifecycleTest.java</exclude>
-                <exclude>**/TestManagedDomain_JBOSS.java</exclude>
-                <!-- CAM-1778 -->
-                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
-                <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
-                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>jboss-domain</id>
-      <dependencies>
-        <dependency>
-          <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-jboss-runtime</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
-          <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-domain-managed</artifactId>
-          <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources-jboss-domain</directory>
-            <filtering>true</filtering>
-          </testResource>
-        </testResources>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-jboss</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <configuration>
-              <delimiters>
-                <delimiter>${*}</delimiter>
-              </delimiters>
-              <useDefaultDelimiters>false</useDefaultDelimiters>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/TestManagedDomain_JBOSS.java</include>
-              </includes>
-             <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>jboss-servlet</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-jboss-servlet</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <!-- skip EE integration tests -->
-                <exclude>**/cdi/**</exclude>
-                <exclude>**/ejb/**</exclude>
-                <exclude>**/context/**</exclude>
-                <exclude>**/jar/**</exclude>
-                <excludes>**/jboss/**</excludes>
-                <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
-                <excludes>**/SpringServletPALifecycleTest.java</excludes>
-                <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
-                <!-- CAM-1778 -->
-                <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
-                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>wildfly</id>
       <dependencies>
         <dependency>
@@ -487,10 +307,6 @@
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources-jboss</directory>
-            <filtering>true</filtering>
-          </testResource>
-          <testResource>
             <directory>src/test/resources-wildfly</directory>
             <filtering>true</filtering>
           </testResource>
@@ -508,7 +324,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -585,7 +401,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -631,7 +447,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss-servlet</source>
+                    <source>src/test/java-wildfly-servlet</source>
                   </sources>
                 </configuration>
               </execution>
@@ -744,6 +560,8 @@
                 <exclude>**/PythonPaClassImportTest.java</exclude>
 
                 <exclude>**/MigrationContextSwitchBeansTest.java</exclude>
+
+                <exclude>**/ManagedJobExecutorTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
@@ -759,9 +577,9 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jboss.as}</version>
+          <groupId>${wildfly.container.adapter.groupId}</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>${wildfly.container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -787,7 +605,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-jboss</source>
+                    <source>src/test/java-wildfly</source>
                   </sources>
                 </configuration>
               </execution>
@@ -800,7 +618,7 @@
                 <configuration>
                   <resources>
                     <resource>
-                      <directory>src/test/resources-jboss</directory>
+                      <directory>src/test/resources-wildfly</directory>
                     </resource>
                   </resources>
                 </configuration>

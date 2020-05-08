@@ -172,7 +172,7 @@ public class ExceptionUtil {
         // Oracle
         || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
         // H2
-        || (exception.getMessage().toLowerCase().contains("act_uniq_variable_index_c") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
+        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
         ) {
         return true;
       }

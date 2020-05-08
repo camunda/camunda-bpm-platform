@@ -310,6 +310,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
+    Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
 
     // validate the task count
@@ -402,6 +403,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
       .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
       .queryParam("tenantIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("tenantIdIn")))
+      .queryParam("assigneeIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("assigneeIn")))
+      .queryParam("assigneeNotIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("assigneeNotIn")))
+      .queryParam("processInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceIdIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -440,6 +444,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String[] processDefinitionKeys = { "aProcessDefinitionKey", "anotherProcessDefinitionKey" };
     String[] processInstanceBusinessKeys = { "aBusinessKey", "anotherBusinessKey" };
     String[] tenantIds = { MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID };
+    String[] assigneeIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
+    String[] assigneeNotIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
+    String[] processInstanceIds = { MockProvider.EXAMPLE_PROCESS_INSTANCE_ID , MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID };
 
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
@@ -447,6 +454,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("processDefinitionKeyIn", processDefinitionKeys);
     parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
     parameters.put("tenantIdIn", tenantIds);
+    parameters.put("assigneeIn", assigneeIn);
+    parameters.put("assigneeNotIn", assigneeNotIn);
+    parameters.put("processInstanceIdIn", processInstanceIds);
 
     return parameters;
   }
@@ -551,6 +561,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
     verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
+    verify(mockQuery).taskAssigneeIn(stringArrayParameters.get("assigneeIn"));
+    verify(mockQuery).taskAssigneeNotIn(stringArrayParameters.get("assigneeNotIn"));
+    verify(mockQuery).processInstanceIdIn(stringArrayParameters.get("processInstanceIdIn"));
   }
 
   private void verifyBooleanParameterQueryInvocation() {

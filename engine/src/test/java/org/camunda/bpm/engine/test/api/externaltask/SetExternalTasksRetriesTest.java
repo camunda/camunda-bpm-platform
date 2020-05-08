@@ -17,32 +17,34 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import java.util.ArrayList;
+
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.hamcrest.collection.IsIn;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +52,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class SetExternalTasksRetriesTest {
+public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
+
+  protected static final int RETRIES = 5;
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -61,26 +65,18 @@ public class SetExternalTasksRetriesTest {
   private static String PROCESS_DEFINITION_KEY = "oneExternalTaskProcess";
   private static String PROCESS_DEFINITION_KEY_2 = "twoExternalTaskWithPriorityProcess";
 
-  private int defaultBatchJobsPerSeed;
-  private int defaultInvocationsPerBatchJob;
-  protected RuntimeService runtimeService;
-  protected RepositoryService repositoryService;
-  protected ManagementService managementService;
   protected ExternalTaskService externalTaskService;
-  protected HistoryService historyService;
 
   protected List<String> processInstanceIds;
 
   @Before
-  public void initServices() {
-    runtimeService = engineRule.getRuntimeService();
+  public void setup() {
+    initDefaults(engineRule);
     externalTaskService = engineRule.getExternalTaskService();
-    managementService = engineRule.getManagementService();
-    historyService = engineRule.getHistoryService();
+    deployTestProcesses();
   }
 
-  @Before
-  public void deployTestProcesses() throws Exception {
+  protected void deployTestProcesses() {
     org.camunda.bpm.engine.repository.Deployment deployment = engineRule.getRepositoryService().createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
@@ -89,7 +85,9 @@ public class SetExternalTasksRetriesTest {
     engineRule.manageDeployment(deployment);
 
     RuntimeService runtimeService = engineRule.getRuntimeService();
-    processInstanceIds = new ArrayList<String>();
+    if (processInstanceIds == null) {
+      processInstanceIds = new ArrayList<>();
+    }
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
@@ -97,39 +95,15 @@ public class SetExternalTasksRetriesTest {
   }
 
   @After
-  public void cleanBatch() {
-    List<Batch> batches = managementService.createBatchQuery().list();
-    if (batches.size() > 0) {
-      for (Batch batch : batches) {
-        managementService.deleteBatch(batch.getId(), true);
-      }
-    }
-
-    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
-    if (historicBatch != null) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
-  }
-
-  @Before
-  public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
-    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
-    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
-  }
-
-  @After
-  public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
-    configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
-    configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+  public void tearDown() {
+    processInstanceIds = null;
   }
 
   @Test
   public void shouldSetExternalTaskRetriesSync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -147,7 +121,7 @@ public class SetExternalTasksRetriesTest {
   public void shouldFailForNonExistingExternalTaskIdSync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -166,7 +140,7 @@ public class SetExternalTasksRetriesTest {
   public void shouldFailForNullExternalTaskIdSync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -195,7 +169,7 @@ public class SetExternalTasksRetriesTest {
   public void shouldFailForNonExistingExternalTaskIdAsync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -215,7 +189,7 @@ public class SetExternalTasksRetriesTest {
   public void shouldFailForNullExternalTaskIdAsync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -275,13 +249,13 @@ public class SetExternalTasksRetriesTest {
     ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService().createExternalTaskQuery();
 
     // when
-    Batch batch = externalTaskService.setRetriesAsync(null, externalTaskQuery, 5);
+    Batch batch = externalTaskService.setRetriesAsync(null, externalTaskQuery, RETRIES);
 
     // then
     executeSeedAndBatchJobs(batch);
 
     for (ExternalTask task : externalTaskQuery.list()) {
-      Assert.assertEquals(5, (int) task.getRetries());
+      Assert.assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -289,19 +263,61 @@ public class SetExternalTasksRetriesTest {
   public void shouldSetExternalTaskRetriesWithListAsync() {
 
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
     // when
-    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, null, 5);
+    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, null, RETRIES);
 
     // then
     executeSeedAndBatchJobs(batch);
 
     externalTasks = externalTaskService.createExternalTaskQuery().list();
     for (ExternalTask task : externalTasks) {
-      Assert.assertEquals(5, (int) task.getRetries());
+      Assert.assertEquals(RETRIES, (int) task.getRetries());
+    }
+  }
+
+  @Test
+  public void shouldSetExternalTaskRetriesWithListAsyncInDifferentDeployments() {
+    // given multiple deployments
+    deployTestProcesses();
+    ProcessDefinitionQuery definitionQuery = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY);
+    String firstDeploymentId = definitionQuery.processDefinitionVersion(1).singleResult().getDeploymentId();
+    String secondDeploymentId = definitionQuery.processDefinitionVersion(2).singleResult().getDeploymentId();
+
+    List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().list();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
+    for (ExternalTask task : externalTasks) {
+      externalTaskIds.add(task.getId());
+    }
+
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(6);
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, null, RETRIES);
+    executeSeedJobs(batch, 2);
+    // then batch jobs with different deployment ids exist
+    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+    assertThat(batchJobs.size(), is(2));
+    assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    assertThat(batchJobs.get(0).getDeploymentId(), is(not(batchJobs.get(1).getDeploymentId())));
+
+    // when the batch jobs for the first deployment are executed
+    assertThat(getTaskCountWithUnchangedRetries(), is(12L));
+    getJobIdsByDeployment(batchJobs, firstDeploymentId).forEach(managementService::executeJob);
+    // then the retries for jobs from process instances related to the first deployment should be changed
+    assertThat(getTaskCountWithUnchangedRetries(), is(6L));
+
+    // when the remaining batch jobs are executed
+    getJobIdsByDeployment(batchJobs, secondDeploymentId).forEach(managementService::executeJob);
+    // then
+    externalTasks = externalTaskService.createExternalTaskQuery().list();
+    for (ExternalTask task : externalTasks) {
+      Assert.assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -311,19 +327,19 @@ public class SetExternalTasksRetriesTest {
     ExternalTaskQuery externalTaskQuery = externalTaskService.createExternalTaskQuery();
     List<ExternalTask> externalTasks = externalTaskQuery.list();
 
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
     // when
-    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, externalTaskQuery, 5);
+    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, externalTaskQuery, RETRIES);
 
     // then
     executeSeedAndBatchJobs(batch);
 
     externalTasks = externalTaskService.createExternalTaskQuery().list();
     for (ExternalTask task : externalTasks) {
-      Assert.assertEquals(5, (int) task.getRetries());
+      Assert.assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -341,7 +357,7 @@ public class SetExternalTasksRetriesTest {
         .historicProcessInstanceQuery(processInstanceQuery)
         .setAsync(3);
 
-    createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
+    executeSeedJobs(batch, 2);
     executeBatchJobs(batch);
 
     // then no error is thrown
@@ -350,7 +366,7 @@ public class SetExternalTasksRetriesTest {
     // cleanup
     if (!testHelper.isHistoryLevelNone()) {
       batch = historyService.deleteHistoricProcessInstancesAsync(processIds, null);
-      createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
+      executeSeedJobs(batch, 2);
       executeBatchJobs(batch);
     }
   }
@@ -360,7 +376,7 @@ public class SetExternalTasksRetriesTest {
     // given
     ExternalTaskQuery externalTaskQuery = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0));
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(processInstanceIds.size()-1)).list();
-    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    ArrayList<String> externalTaskIds = new ArrayList<>();
     for (ExternalTask task : externalTasks) {
       externalTaskIds.add(task.getId());
     }
@@ -391,7 +407,7 @@ public class SetExternalTasksRetriesTest {
         tasks.get(5).getId());
 
     // when
-    Batch batch = externalTaskService.updateRetries().externalTaskIds(externalTaskIds).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().externalTaskIds(externalTaskIds).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -399,7 +415,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -416,7 +432,7 @@ public class SetExternalTasksRetriesTest {
         tasks.get(5).getId());
 
     // when
-    Batch batch = externalTaskService.updateRetries().externalTaskIds(externalTaskIds.toArray(new String[externalTaskIds.size()])).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().externalTaskIds(externalTaskIds.toArray(new String[0])).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -424,14 +440,14 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
   @Test
   public void shouldUpdateRetriesByProcessInstanceIds() {
     // when
-    Batch batch = externalTaskService.updateRetries().processInstanceIds(processInstanceIds).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().processInstanceIds(processInstanceIds).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -439,7 +455,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -448,7 +464,7 @@ public class SetExternalTasksRetriesTest {
     // given
 
     // when
-    Batch batch = externalTaskService.updateRetries().processInstanceIds(processInstanceIds.toArray(new String[processInstanceIds.size()])).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().processInstanceIds(processInstanceIds.toArray(new String[0])).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -456,7 +472,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -466,7 +482,7 @@ public class SetExternalTasksRetriesTest {
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
 
     // when
-    Batch batch = externalTaskService.updateRetries().externalTaskQuery(query).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().externalTaskQuery(query).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -474,7 +490,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -484,7 +500,7 @@ public class SetExternalTasksRetriesTest {
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
 
     // when
-    Batch batch = externalTaskService.updateRetries().processInstanceQuery(processInstanceQuery).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().processInstanceQuery(processInstanceQuery).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -492,7 +508,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -503,7 +519,7 @@ public class SetExternalTasksRetriesTest {
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
     // when
-    Batch batch = externalTaskService.updateRetries().historicProcessInstanceQuery(query).setAsync(5);
+    Batch batch = externalTaskService.updateRetries().historicProcessInstanceQuery(query).setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -511,7 +527,7 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(5, (int) task.getRetries());
+      assertEquals(RETRIES, (int) task.getRetries());
     }
   }
 
@@ -544,7 +560,7 @@ public class SetExternalTasksRetriesTest {
       .processInstanceQuery(processInstanceQuery)
       .historicProcessInstanceQuery(historicProcessInstanceQuery)
       .processInstanceIds(processInstanceIds.get(4))
-      .setAsync(5);
+      .setAsync(RETRIES);
     executeSeedAndBatchJobs(batch);
 
     // then
@@ -552,14 +568,12 @@ public class SetExternalTasksRetriesTest {
     assertEquals(6, tasks.size());
 
     for (ExternalTask task : tasks) {
-      assertEquals(Integer.valueOf(5), task.getRetries());
+      assertEquals(Integer.valueOf(RETRIES), task.getRetries());
     }
   }
 
-  public void executeSeedAndBatchJobs(Batch batch) {
-    Job job = engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
-    // seed job
-    managementService.executeJob(job.getId());
+  protected void executeSeedAndBatchJobs(Batch batch) {
+    completeSeedJobs(batch);
 
     for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
       managementService.executeJob(pending.getId());
@@ -572,43 +586,6 @@ public class SetExternalTasksRetriesTest {
     }
   }
 
-  protected void createAndExecuteSeedJobs(String seedJobDefinitionId, int expectedSeedJobsCount) {
-    for (int i = 0; i <= expectedSeedJobsCount; i++) {
-      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
-      if (i != expectedSeedJobsCount) {
-        assertNotNull(seedJob);
-        managementService.executeJob(seedJob.getId());
-      } else {
-        //the last seed job should not trigger another seed job
-        assertNull(seedJob);
-      }
-    }
-  }
-
-  /**
-   * Execute all batch jobs of batch once and collect exceptions during job execution.
-   *
-   * @param batch the batch for which the batch jobs should be executed
-   * @return the catched exceptions of the batch job executions, is empty if non where thrown
-   */
-  protected List<Exception> executeBatchJobs(Batch batch) {
-    String batchJobDefinitionId = batch.getBatchJobDefinitionId();
-    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
-    assertFalse(batchJobs.isEmpty());
-
-    List<Exception> catchedExceptions = new ArrayList<Exception>();
-
-    for (Job batchJob : batchJobs) {
-      try {
-        managementService.executeJob(batchJob.getId());
-      } catch (Exception e) {
-        catchedExceptions.add(e);
-      }
-    }
-
-    return catchedExceptions;
-  }
-
   protected void startTestProcesses() {
     RuntimeService runtimeService = engineRule.getRuntimeService();
     for (int i = 4; i < 1000; i++) {
@@ -618,7 +595,7 @@ public class SetExternalTasksRetriesTest {
   }
 
   protected List<String> startProcessInstance(String key, int instances) {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     for (int i = 0; i < instances; i++) {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
@@ -626,4 +603,28 @@ public class SetExternalTasksRetriesTest {
     return ids;
   }
 
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES, 42);
+
+    ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService()
+        .createExternalTaskQuery();
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(null, externalTaskQuery, RETRIES);
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob(), is(42));
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
+  protected long getTaskCountWithUnchangedRetries() {
+    return externalTaskService.createExternalTaskQuery().list().stream().filter(et -> !Integer.valueOf(RETRIES).equals(et.getRetries())).count();
+  }
 }

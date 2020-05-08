@@ -1,0 +1,61 @@
+# This configuration is intended for production use and was created with respect to the security guide.
+# The provided links to documentation guides for each property will give more information about the purpose of each property.
+# security guide: https://docs.camunda.org/manual/latest/user-guide/security/
+
+camunda.bpm:
+# https://docs.camunda.org/manual/latest/user-guide/security/#http-header-security-in-webapps
+# https://docs.camunda.org/manual/latest/webapps/shared-options/header-security/
+  webapp.csrf:
+    enable-same-site-cookie: true
+    same-site-cookie-option: STRICT
+
+# https://docs.camunda.org/manual/latest/user-guide/security/#authorization
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/
+  authorization.enabled: true
+
+  generic-properties.properties:
+# https://docs.camunda.org/manual/latest/user-guide/security/#variable-values-from-untrusted-sources
+    deserialization-type-validation-enabled: true
+    deserialization-allowed-packages:
+    deserialization-allowed-classes:
+# https://docs.camunda.org/manual/latest/user-guide/security/#password-policy
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/password-policy/
+    enable-password-policy: true
+
+  run:
+# https://docs.camunda.org/manual/latest/user-guide/security/#authentication
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#authentication
+    auth.enabled: true
+
+server:
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#https
+# do not use the provided certificate in production
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: camunda
+    key-store-type: pkcs12
+    key-alias: camunda
+    key-password: camunda
+  port: 8443
+
+# https://docs.camunda.org/manual/latest/user-guide/security/#http-header-security-in-webapps
+# https://docs.camunda.org/manual/latest/webapps/shared-options/header-security/
+  servlet.session.cookie:
+    secure: true
+    http-only: true
+
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#logging
+# https://docs.camunda.org/manual/latest/user-guide/logging/#process-engine
+logging:
+   level.root: INFO
+   file: logs/camunda-bpm-run.log
+
+# datasource configuration is required
+# do not use the H2 databse in production
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#connect-to-a-database
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#database
+spring.datasource:
+  url: jdbc:h2:./camunda-h2-test-production/process-engine;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
+  driver-class-name: org.h2.Driver
+  username: sa
+  password: sa

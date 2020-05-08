@@ -16,20 +16,46 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.query.Query;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngineTestCase {
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
+
+public abstract class AbstractDefinitionQueryTest {
+
+  protected final static String FIRST_DEPLOYMENT_NAME = "firstDeployment";
+  protected static final String SECOND_DEPLOYMENT_NAME = "secondDeployment";
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ExpectedException exceptionRule = ExpectedException.none();
+  @Rule
+  public RuleChain chain = RuleChain.outerRule(engineRule).around(testRule).around(exceptionRule);
+
+  protected RepositoryService repositoryService;
+  protected RuntimeService runtimeService;
 
   protected String deploymentOneId;
   protected String deploymentTwoId;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void before() throws Exception {
+    repositoryService = engineRule.getRepositoryService();
+    runtimeService = engineRule.getRuntimeService();
+
     deploymentOneId = repositoryService
       .createDeployment()
-      .name("firstDeployment")
+      .name(FIRST_DEPLOYMENT_NAME)
       .addClasspathResource(getResourceOnePath())
       .addClasspathResource(getResourceTwoPath())
       .deploy()
@@ -37,44 +63,37 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
 
     deploymentTwoId = repositoryService
       .createDeployment()
-      .name("secondDeployment")
+      .name(SECOND_DEPLOYMENT_NAME)
       .addClasspathResource(getResourceOnePath())
       .deploy()
       .getId();
-
-    super.setUp();
   }
 
   protected abstract String getResourceOnePath();
 
   protected abstract String getResourceTwoPath();
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void after() throws Exception {
     repositoryService.deleteDeployment(deploymentOneId, true);
     repositoryService.deleteDeployment(deploymentTwoId, true);
   }
 
   protected void verifyQueryResults(Query query, int countExpected) {
-    assertEquals(countExpected, query.list().size());
-    assertEquals(countExpected, query.count());
+    assertThat(query.list()).hasSize(countExpected);
+    assertThat(query.count()).isEqualTo(new Long(countExpected));
 
     if (countExpected == 1) {
-      assertNotNull(query.singleResult());
+      assertThat(query.singleResult()).isNotNull();
     } else if (countExpected > 1){
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
-      assertNull(query.singleResult());
+      assertThat(query.singleResult()).isNull();
     }
   }
 
   private void verifySingleResultFails(Query query) {
-    try {
-      query.singleResult();
-      fail("Exception expected");
-    } catch (ProcessEngineException e) {
-      // expected exception
-    }
+    exceptionRule.expect(ProcessEngineException.class);
+    query.singleResult();
   }
 }

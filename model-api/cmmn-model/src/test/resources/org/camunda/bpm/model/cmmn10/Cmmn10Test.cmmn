@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<cmmn:definitions xmlns:cmmn="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="http://camunda.org/test">
+  <cmmn:case>
+  
+    <cmmn:casePlanModel description="This is a description..." exitCriteriaRefs="Sentry_1">
+
+      <cmmn:planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" entryCriteriaRefs="Sentry_1" exitCriteriaRefs="Sentry_1" />
+
+      <cmmn:sentry id="Sentry_1">
+
+        <cmmn:planItemOnPart sourceRef="PI_HumanTask_1">
+          <cmmn:standardEvent>complete</cmmn:standardEvent>
+        </cmmn:planItemOnPart>
+
+        <cmmn:ifPart>
+          <cmmn:condition><cmmn:body>${value >= 100}</cmmn:body></cmmn:condition>
+          <cmmn:condition><cmmn:body>${value >= 300}</cmmn:body></cmmn:condition>
+        </cmmn:ifPart>
+
+      </cmmn:sentry>
+
+      <cmmn:humanTask id="HumanTask_1">
+        <cmmn:inputs name="input" />
+        <cmmn:outputs name="output" />
+      </cmmn:humanTask>
+      
+      <cmmn:event />
+      <cmmn:userEvent />
+      <cmmn:timerEvent />
+
+    </cmmn:casePlanModel>
+    
+    <cmmn:caseRoles name="role1" />
+    <cmmn:caseRoles name="role2" />
+
+  </cmmn:case>
+
+</cmmn:definitions>

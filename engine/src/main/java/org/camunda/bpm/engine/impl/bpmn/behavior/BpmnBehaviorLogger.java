@@ -156,7 +156,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException invalidVariableTypeException(String variable, String type) {
-    return new ProcessEngineException(exceptionMessage("025", "Variable '{}' is not from type '{}'.", variable, type));
+    return new ProcessEngineException(exceptionMessage("025", "Variable '{}' is not of the expected type '{}'.", variable, type));
   }
 
   public ProcessEngineException resolveCollectionExpressionOrVariableReferenceException() {
@@ -166,7 +166,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   public ProcessEngineException expressionNotANumberException(String type, String expression) {
     return new ProcessEngineException(exceptionMessage(
       "027",
-      "Could not resolve expression from type '{}'. Expression '{}' needs to be a number or number String.",
+      "Could not resolve expression of type '{}'. Expression '{}' needs to be a number or number String.",
       type,
       expression
     ));
@@ -175,7 +175,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   public ProcessEngineException expressionNotBooleanException(String type, String expression) {
     return new ProcessEngineException(exceptionMessage(
       "028",
-      "Could not resolve expression from type '{}'. Expression '{}' needs to evaluate to a boolean value.",
+      "Could not resolve expression of type '{}'. Expression '{}' needs to evaluate to a boolean value.",
       type,
       expression
     ));
@@ -269,6 +269,16 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
         "Execution with id '{}' throws an error event with errorCode '{}', but no error handler was defined. ",
         executionId,
         errorCode));
+  }
+
+
+  public ProcessEngineException missingBoundaryCatchEventEscalation(String executionId, String escalationCode) {
+    return new ProcessEngineException(
+      exceptionMessage(
+        "043",
+        "Execution with id '{}' throws an escalation event with escalationCode '{}', but no escalation handler was defined. ",
+        executionId,
+        escalationCode));
   }
 
 }

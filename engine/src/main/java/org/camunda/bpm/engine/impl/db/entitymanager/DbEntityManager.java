@@ -30,12 +30,10 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.ibatis.executor.BatchExecutorException;
-import org.apache.ibatis.executor.BatchResult;
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -48,29 +46,29 @@ import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
-import org.camunda.bpm.engine.impl.db.HasDbReferences;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.FlushResult;
 import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
-import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
@@ -80,7 +78,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
-import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 
 /**
@@ -234,7 +231,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     if (! (DbEntity.class.isAssignableFrom(loadedObjects.get(0).getClass()))) {
       return loadedObjects;
     }
-    List<DbEntity> filteredObjects = new ArrayList<DbEntity>(loadedObjects.size());
+    List<DbEntity> filteredObjects = new ArrayList<>(loadedObjects.size());
     for (Object loadedObject: loadedObjects) {
       DbEntity cachedPersistentObject = cacheFilter((DbEntity) loadedObject);
       filteredObjects.add(cachedPersistentObject);
@@ -334,137 +331,45 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   protected void flushDbOperations(List<DbOperation> operationsToFlush, List<DbOperation> allOperations) {
+
     // execute the flush
-    for (DbOperation dbOperation : operationsToFlush) {
-      boolean doOptimisticLockingException = false;
+    while (!operationsToFlush.isEmpty()) {
+      FlushResult flushResult;
       try {
-        persistenceSession.executeDbOperation(dbOperation);
+        flushResult = persistenceSession.executeDbOperations(operationsToFlush);
       } catch (Exception e) {
-        //some of the exceptions are considered to be optimistic locking exception
-        doOptimisticLockingException = isOptimisticLockingException(dbOperation, e);
-        if (!doOptimisticLockingException) {
-          throw LOG.flushDbOperationException(allOperations, dbOperation, e);
-        }
+        throw LOG.flushDbOperationsException(allOperations, e);
       }
-      if (dbOperation.isFailed() || doOptimisticLockingException) {
-        handleOptimisticLockingException(dbOperation);
-      }
-    }
 
-    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-      List<BatchResult> flushResult = new ArrayList<BatchResult>();
-      try {
-        flushResult = persistenceSession.flushOperations();
-      } catch (Exception e) {
-        //some of the exceptions are considered to be optimistic locking exception
-        DbOperation failedOperation = hasOptimisticLockingException(operationsToFlush, e);
-        if (failedOperation == null) {
-          throw LOG.flushDbOperationsException(allOperations, e);
+      List<DbOperation> failedOperations = flushResult.getFailedOperations();
+
+      for (DbOperation failedOperation : failedOperations) {
+        State failureState = failedOperation.getState();
+
+        if (failureState == State.FAILED_CONCURRENT_MODIFICATION) {
+          // this method throws an exception in case the flush cannot be continued;
+          // accordingly, this method will be left as well in this case
+          handleConcurrentModification(failedOperation);
+        }
+        else if (failureState == State.FAILED_ERROR) {
+          throw LOG.flushDbOperationException(allOperations, failedOperation, failedOperation.getFailure());
         } else {
-          handleOptimisticLockingException(failedOperation);
+          // This branch should never be reached and the exception thus indicates a bug
+          throw new ProcessEngineException("Entity session returned a failed operation not "
+              + "in an error state. This indicates a bug");
         }
       }
-      checkFlushResults(operationsToFlush, flushResult);
+
+      List<DbOperation> remainingOperations = flushResult.getRemainingOperations();
+
+      // avoid infinite loops
+      EnsureUtil.ensureLessThan("Database flush did not process any operations. This indicates a bug.",
+          "remainingOperations", remainingOperations.size(), operationsToFlush.size());
+
+      operationsToFlush = remainingOperations;
     }
   }
 
-  /**
-   * An OptimisticLockingException check for batch processing
-   *
-   * @param operationsToFlush The list of DB operations in which the Exception occurred
-   * @param cause the Exception object
-   * @return The DbOperation where the OptimisticLockingException has occurred
-   * or null if no OptimisticLockingException occurred
-   */
-  private DbOperation hasOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
-
-    BatchExecutorException batchExecutorException = ExceptionUtil.findBatchExecutorException(cause);
-
-    if (batchExecutorException != null) {
-
-      int failedOperationIndex = batchExecutorException.getSuccessfulBatchResults().size();
-      if (failedOperationIndex < operationsToFlush.size()) {
-        DbOperation failedOperation = operationsToFlush.get(failedOperationIndex);
-        if (isOptimisticLockingException(failedOperation, cause)) {
-          return failedOperation;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Checks if the reason for a persistence exception was the foreign-key referencing of a (currently)
-   * non-existing entity. This might happen with concurrent transactions, leading to an
-   * OptimisticLockingException.
-   *
-   * @param failedOperation
-   * @return
-   */
-  private boolean isOptimisticLockingException(DbOperation failedOperation, Throwable cause) {
-
-    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
-    boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
-
-    if (isVariableIntegrityViolation) {
-
-      return true;
-    } else if (
-      isConstraintViolation
-      && failedOperation instanceof DbEntityOperation
-      && ((DbEntityOperation) failedOperation).getEntity() instanceof HasDbReferences
-      && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
-      || failedOperation.getOperationType().equals(DbOperationType.UPDATE))
-      ) {
-
-      DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
-      for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
-        DbEntity referencedEntity = this.persistenceSession.selectById(reference.getValue(), reference.getKey());
-        if (referencedEntity == null) {
-
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  protected void checkFlushResults(List<DbOperation> operationsToFlush, List<BatchResult> flushResult) {
-    int flushResultSize = 0;
-
-    if (flushResult != null && flushResult.size() > 0) {
-      LOG.printBatchResults(flushResult);
-      //process the batch results to handle Optimistic Lock Exceptions
-      Iterator<DbOperation> operationIt = operationsToFlush.iterator();
-      for (BatchResult batchResult : flushResult) {
-        for (int statementResult : batchResult.getUpdateCounts()) {
-          flushResultSize++;
-          DbOperation thisOperation = operationIt.next();
-          thisOperation.setRowsAffected(statementResult);
-          if (thisOperation instanceof DbEntityOperation && ((DbEntityOperation) thisOperation).getEntity() instanceof HasDbRevision
-            && !thisOperation.getOperationType().equals(DbOperationType.INSERT)) {
-            final DbEntity dbEntity = ((DbEntityOperation) thisOperation).getEntity();
-            if (statementResult != 1) {
-              ((DbEntityOperation) thisOperation).setFailed(true);
-              handleOptimisticLockingException(thisOperation);
-            } else {
-              //update revision number in cache
-              if (thisOperation.getOperationType().equals(DbOperationType.UPDATE)) {
-                HasDbRevision versionedObject = (HasDbRevision) dbEntity;
-                versionedObject.setRevision(versionedObject.getRevisionNext());
-              }
-            }
-          }
-        }
-      }
-      //this must not happen, but worth checking
-      if (operationsToFlush.size() != flushResultSize) {
-        LOG.wrongBatchResultsSizeException(operationsToFlush);
-      }
-    }
-  }
 
   public void flushEntity(DbEntity entity) {
     CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(entity);
@@ -475,7 +380,14 @@ public class DbEntityManager implements Session, EntityLoadListener {
     flushDbOperationManager();
   }
 
-  protected void handleOptimisticLockingException(DbOperation dbOperation) {
+  /**
+   * Decides if an operation that failed for concurrent modifications can be tolerated,
+   * or if {@link OptimisticLockingException} should be raised
+   *
+   * @param dbOperation
+   * @throws OptimisticLockingException if there is no handler for the failure
+   */
+  protected void handleConcurrentModification(DbOperation dbOperation) {
     boolean isHandled = false;
 
     if(optimisticLockingListeners != null) {
@@ -695,7 +607,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   public <T extends DbEntity> List<T> pruneDeletedEntities(List<T> listToPrune) {
-    ArrayList<T> prunedList = new ArrayList<T>();
+    ArrayList<T> prunedList = new ArrayList<>();
     for (T potentiallyDeleted : listToPrune) {
       if(!isDeleted(potentiallyDeleted)) {
         prunedList.add(potentiallyDeleted);
@@ -790,7 +702,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   public void registerOptimisticLockingListener(OptimisticLockingListener optimisticLockingListener) {
     if(optimisticLockingListeners == null) {
-      optimisticLockingListeners = new ArrayList<OptimisticLockingListener>();
+      optimisticLockingListeners = new ArrayList<>();
     }
     optimisticLockingListeners.add(optimisticLockingListener);
   }

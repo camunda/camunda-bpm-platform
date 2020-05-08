@@ -35,9 +35,8 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
   protected DmnHistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
-  public HistoryDecisionEvaluationListener(DmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+  public HistoryDecisionEvaluationListener(DmnHistoryEventProducer historyEventProducer) {
     this.eventProducer = historyEventProducer;
-    this.historyLevel = historyLevel;
   }
 
   public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
@@ -51,6 +50,9 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
   }
 
   protected HistoryEvent createHistoryEvent(DmnDecisionEvaluationEvent evaluationEvent) {
+    if (historyLevel == null) {
+      historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    }
     DmnDecision decisionTable = evaluationEvent.getDecisionResult().getDecision();
     if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 

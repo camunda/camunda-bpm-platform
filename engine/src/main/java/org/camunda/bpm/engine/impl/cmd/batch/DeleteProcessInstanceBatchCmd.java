@@ -16,109 +16,102 @@
  */
 package org.camunda.bpm.engine.impl.cmd.batch;
 
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.BatchPermissions;
-import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfiguration;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch> {
+public class DeleteProcessInstanceBatchCmd implements Command<Batch> {
+
   protected final String deleteReason;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
+  protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchCmd(List<String> processInstances,
+                                       ProcessInstanceQuery processInstanceQuery,
+                                       HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                       String deleteReason,
+                                       boolean skipCustomListeners,
+                                       boolean skipSubprocesses) {
     super();
     this.processInstanceIds = processInstances;
     this.processInstanceQuery = processInstanceQuery;
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
   }
 
-  protected List<String> collectProcessInstanceIds() {
+  @Override
+  public Batch execute(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = collectProcessInstanceIds(commandContext);
 
-    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+    ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", elementConfiguration.getIds());
+
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_PROCESS_INSTANCE_DELETION)
+        .config(getConfiguration(elementConfiguration))
+        .permission(BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
+        .operationLogHandler(this::writeUserOperationLog)
+        .build();
+  }
+
+  protected BatchElementConfiguration collectProcessInstanceIds(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
     List<String> processInstanceIds = this.getProcessInstanceIds();
-    if (processInstanceIds != null) {
-      collectedProcessInstanceIds.addAll(processInstanceIds);
+    if (!CollectionUtil.isEmpty(processInstanceIds)) {
+      ProcessInstanceQueryImpl query = new ProcessInstanceQueryImpl();
+      query.processInstanceIds(new HashSet<>(processInstanceIds));
+      elementConfiguration.addDeploymentMappings(
+          commandContext.runWithoutAuthorization(query::listDeploymentIdMappings), processInstanceIds);
     }
 
-    final ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) this.processInstanceQuery;
+    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) this.processInstanceQuery;
     if (processInstanceQuery != null) {
-      collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
+      elementConfiguration.addDeploymentMappings(processInstanceQuery.listDeploymentIdMappings());
     }
 
-    return new ArrayList<String>(collectedProcessInstanceIds);
+    HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = (HistoricProcessInstanceQueryImpl) this.historicProcessInstanceQuery;
+    if (historicProcessInstanceQuery != null) {
+      elementConfiguration.addDeploymentMappings(historicProcessInstanceQuery.listDeploymentIdMappings());
+    }
+
+    return elementConfiguration;
   }
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
   }
 
-  @Override
-  public Batch execute(CommandContext commandContext) {
-    List<String> processInstanceIds = collectProcessInstanceIds();
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
 
-    ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
-    writeUserOperationLog(commandContext,
-        deleteReason,
-        processInstanceIds.size(),
-        true);
-
-    BatchEntity batch = createBatch(commandContext, processInstanceIds);
-
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-
-    return batch;
-  }
-
-  protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason, skipCustomListeners, skipSubprocesses, false);
-  }
-
-  protected BatchJobHandler<DeleteProcessInstanceBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<DeleteProcessInstanceBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_PROCESS_INSTANCE_DELETION);
-  }
-
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       String deleteReason,
-                                       int numInstances,
-                                       boolean async) {
-
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
-    propertyChanges.add(new PropertyChange("async", null, async));
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
+    propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
@@ -127,6 +120,11 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
             null,
             null,
             propertyChanges);
+  }
+
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new DeleteProcessInstanceBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(),
+        deleteReason, skipCustomListeners, skipSubprocesses, false);
   }
 
 }

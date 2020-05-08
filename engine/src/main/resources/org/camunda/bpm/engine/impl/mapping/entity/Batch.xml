@@ -123,8 +123,9 @@
   </select>
 
   <select id="selectBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectBatchesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectBatchesByQueryCriteriaSql">

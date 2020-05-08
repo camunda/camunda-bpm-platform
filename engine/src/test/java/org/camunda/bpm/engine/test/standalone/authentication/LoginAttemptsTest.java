@@ -16,50 +16,91 @@
  */
 package org.camunda.bpm.engine.test.standalone.authentication;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ch.qos.logback.classic.Level;
 import org.apache.commons.lang3.time.DateUtils;
-import org.camunda.bpm.engine.AuthenticationException;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class LoginAttemptsTest extends ResourceProcessEngineTestCase {
+public class LoginAttemptsTest {
 
   private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private static final String INDENTITY_LOGGER = "org.camunda.bpm.engine.identity";
 
-  public LoginAttemptsTest() {
-    super("org/camunda/bpm/engine/test/standalone/authentication/camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJdbcUrl("jdbc:h2:mem:LoginAttemptsTest;DB_CLOSE_DELAY=1000");
+      configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
+      configuration.setLoginMaxAttempts(5);
+      configuration.setLoginDelayFactor(2);
+      configuration.setLoginDelayMaxTime(30);
+      configuration.setLoginDelayBase(1);
+      return configuration;
+    }
+  };
+
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule);
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+                                                      .watch(INDENTITY_LOGGER)
+                                                      .level(Level.INFO);
+
+  protected IdentityService identityService;
+  protected ProcessEngine processEngine;
+
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() {
     ClockUtil.setCurrentTime(new Date());
+    for (User user : identityService.createUserQuery().list()) {
+      identityService.deleteUser(user.getId());
+    }
   }
 
   @Test
-  public void testUsuccessfulAttemptsResultInException() throws ParseException {
+  public void testUsuccessfulAttemptsResultInLockedUser() throws ParseException {
+    // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
     identityService.saveUser(user);
 
     Date now = sdf.parse("2000-01-24T13:00:00");
     ClockUtil.setCurrentTime(now);
-    try {
-      for (int i = 0; i <= 6; i++) {
-        assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
-        now = DateUtils.addSeconds(now, 5);
-        ClockUtil.setCurrentTime(now);
-      }
-      fail("expected exception");
-    } catch (AuthenticationException e) {
-      assertTrue(e.getMessage().contains("The user with id 'johndoe' is locked."));
+    // when
+    for (int i = 0; i <= 6; i++) {
+      assertThat(identityService.checkPassword("johndoe", "invalid pwd")).isFalse();
+      now = DateUtils.addSeconds(now, 5);
+      ClockUtil.setCurrentTime(now);
     }
 
-    identityService.deleteUser(user.getId());
+    // then
+    assertThat(loggingRule.getFilteredLog(INDENTITY_LOGGER, "The user with id 'johndoe' is permanently locked.").size()).isEqualTo(1);
   }
 }

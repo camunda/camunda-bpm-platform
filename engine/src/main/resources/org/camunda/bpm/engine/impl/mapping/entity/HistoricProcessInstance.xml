@@ -200,6 +200,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="state" column="STATE_" jdbcType="VARCHAR"/>
   </resultMap>
+  
+  <resultMap type="org.camunda.bpm.engine.impl.util.ImmutablePair" id="deploymentIdMapping">
+    <id property="left" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <id property="right" column="ID_" jdbcType="VARCHAR" />
+  </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
@@ -240,15 +245,22 @@
 
   <select id="selectHistoricProcessInstanceCountByQueryCriteria"
           parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
+  </select>
+  
+  <select id="selectHistoricProcessInstanceDeploymentIdMappingsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="deploymentIdMapping">
+    select distinct RES.DEPLOYMENT_ID_, RES.ID_
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ORDER BY RES.DEPLOYMENT_ID_ ASC
   </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
 
     from (
 
-    SELECT SELF.*, DEF.NAME_, DEF.VERSION_
+    SELECT SELF.*, DEF.NAME_, DEF.VERSION_, DEF.DEPLOYMENT_ID_
     FROM ${prefix}ACT_HI_PROCINST SELF
 
     LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
@@ -257,220 +269,282 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ in (
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            SELF.ID_,
+        </if>
+        SELF.PROC_DEF_KEY_, '*'))
     </if>
 
+    <bind name="INC_JOIN" value="false" />
+    <bind name="HAI_JOIN" value="false" />
+    <bind name="JOIN_TYPE" value="'inner join'" />
 
-    <if test="withIncidents || withRootIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null || incidentType != null">
-        inner join ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
+    <foreach collection="queries" item="query">
+      <if test="query.isOrQueryActive">
+        <bind name="JOIN_TYPE" value="'left join'" />
+      </if>
+
+      <if test="query != null &amp;&amp; (query.withIncidents || query.withRootIncidents || query.incidentStatus != null || query.incidentMessage != null || query.incidentMessageLike != null || query.incidentType != null)">
+        <bind name="INC_JOIN" value="true" />
+      </if>
+
+      <if test="query != null &amp;&amp; (query.executedActivityIds != null and query.executedActivityIds.length > 0) || (query.activeActivityIds != null and query.activeActivityIds.length > 0)">
+        <bind name="HAI_JOIN" value="true" />
+      </if>
+    </foreach>
+
+    <if test="INC_JOIN">
+      ${JOIN_TYPE} ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
     </if>
-
-    <if test="(executedActivityIds != null and executedActivityIds.length > 0) || (activeActivityIds != null and activeActivityIds.length > 0)">
+    <if test="HAI_JOIN">
       LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
       ON HAI.PROC_INST_ID_ = SELF.ID_
     </if>
+    
+    <!-- actual value conditions are checked in the WHERE part; 
+       however here we must join once for every variable condition.
+       It is important that in the WHERE part we use the same table
+       names for the respective conditions (i.e. VI0, VI1, VI2, ...) -->
+    <bind name="variableConditionCounter" value="0" />
+    <foreach collection="queries" item="query">
+      <foreach collection="query.queryVariableValues" item="value">
+        LEFT JOIN ${prefix}ACT_HI_VARINST VI${variableConditionCounter}
+        ON SELF.PROC_INST_ID_ = VI${variableConditionCounter}.PROC_INST_ID_
+        <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
+      </foreach>
+    </foreach>
 
+    <bind name="variableConditionCounter" value="0" />
     <where>
-      <if test="processInstanceId != null">
-        SELF.PROC_INST_ID_ = #{processInstanceId}
-      </if>
-      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and SELF.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-            #{item, jdbcType=VARCHAR}
-        </foreach>
-      </if>
-      <if test="caseInstanceId != null">
-        and SELF.CASE_INST_ID_ = #{caseInstanceId}
-      </if>
-      <if test="processDefinitionId != null">
-        and SELF.PROC_DEF_ID_ = #{processDefinitionId}
-      </if>
-      <if test="processDefinitionKey != null">
-        and DEF.KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="processDefinitionName != null">
-        and DEF.NAME_ = #{processDefinitionName}
-      </if>
-      <if test="processDefinitionNameLike != null">
-        and DEF.NAME_ like #{processDefinitionNameLike} ESCAPE ${escapeChar}
-      </if>
-      <if test="businessKey != null">
-        and SELF.BUSINESS_KEY_ = #{businessKey}
-      </if>
-      <if test="businessKeyLike != null">
-        and SELF.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE ${escapeChar}
-      </if>
+      <foreach collection="queries" item="query" index="i">
+        <choose>
+          <when test="i == 0">
+            <bind name="queryType" value="'and'" />
+          </when>
+          <otherwise>
+            <bind name="queryType" value="'or'" />
+          </otherwise>
+        </choose>
+        and (
+        <trim suffixOverrides="and">
+          1 = 1 and
+          <trim prefixOverrides="or|and">
+            <if test="query.processInstanceId != null">
+              ${queryType} SELF.PROC_INST_ID_ = #{query.processInstanceId}
+            </if>
+            <if test="query.processInstanceIds != null and !query.processInstanceIds.isEmpty()">
+              ${queryType}
+              <bind name="listOfIds" value="query.processInstanceIds" />
+              <bind name="fieldName" value="'SELF.PROC_INST_ID_'" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
+            </if>
+            <if test="query.caseInstanceId != null">
+              ${queryType} SELF.CASE_INST_ID_ = #{query.caseInstanceId}
+            </if>
+            <if test="query.processDefinitionId != null">
+              ${queryType} SELF.PROC_DEF_ID_ = #{query.processDefinitionId}
+            </if>
+            <if test="query.processDefinitionKey != null">
+              ${queryType} DEF.KEY_ = #{query.processDefinitionKey}
+            </if>
+            <if test="query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0">
+              and DEF.KEY_ in
+              <foreach item="item" index="index" collection="query.processDefinitionKeys"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="query.processDefinitionName != null">
+              ${queryType} DEF.NAME_ = #{query.processDefinitionName}
+            </if>
+            <if test="query.processDefinitionNameLike != null">
+              ${queryType} DEF.NAME_ like #{query.processDefinitionNameLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.businessKey != null">
+              ${queryType} SELF.BUSINESS_KEY_ = #{query.businessKey}
+            </if>
+            <if test="query.businessKeyLike != null">
+              ${queryType} SELF.BUSINESS_KEY_ like #{query.businessKeyLike} ESCAPE ${escapeChar}
+            </if>
 
-      <if test="startedBefore != null">
-        and SELF.START_TIME_ &lt;= #{startedBefore}
-      </if>
-      <if test="startedAfter != null">
-        and SELF.START_TIME_ &gt;= #{startedAfter}
-      </if>
-      <if test="finishedBefore != null">
-        and SELF.END_TIME_ &lt;= #{finishedBefore}
-      </if>
-      <if test="finishedAfter != null">
-        and SELF.END_TIME_ &gt;= #{finishedAfter}
-      </if>
-      <if test="processKeyNotIn != null">
-        <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-          and DEF.KEY_ not like #{procDefKey} ESCAPE ${escapeChar}
-        </foreach>
-      </if>
-      <if test="state != null">
-        and STATE_ = #{state}
-      </if>
-      
+            <if test="query.startedBefore != null">
+              ${queryType} SELF.START_TIME_ &lt;= #{query.startedBefore}
+            </if>
+            <if test="query.startedAfter != null">
+              ${queryType} SELF.START_TIME_ &gt;= #{query.startedAfter}
+            </if>
+            <if test="query.finishedBefore != null">
+              ${queryType} SELF.END_TIME_ &lt;= #{query.finishedBefore}
+            </if>
+            <if test="query.finishedAfter != null">
+              ${queryType} SELF.END_TIME_ &gt;= #{query.finishedAfter}
+            </if>
+            <if test="query.processKeyNotIn != null">
+              ${queryType} (
+                <foreach collection="query.processKeyNotIn" index="index" item="procDefKey"
+                         open="(" separator=" and " close=")">
+                  DEF.KEY_ not like #{procDefKey} ESCAPE ${escapeChar}
+                </foreach>
+              )
+            </if>
+            <if test="query.state != null">
+              ${queryType} SELF.STATE_ = #{query.state}
+            </if>
 
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="startDateOn">
-        and SELF.START_TIME_ &gt;= #{startDateOnBegin}
-        and SELF.START_TIME_ &lt;= #{startDateOnEnd}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="finishDateOn">
-        and SELF.END_TIME_ &gt;= #{finishDateOnBegin}
-        and SELF.END_TIME_ &lt;= #{finishDateOnEnd}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="finishDateBy">
-        and SELF.END_TIME_ &lt;= #{finishDateBy}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="startDateBy">
-        and SELF.START_TIME_ &gt;= #{startDateBy}
-      </if>
 
-      <if test="unfinished">
-        and SELF.END_TIME_ IS NULL
-      </if>
-      <if test="finished">
-        and SELF.END_TIME_ is not NULL
-      </if>
+            <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+            <if test="query.startDateOn">
+              ${queryType} (SELF.START_TIME_ &gt;= #{query.startDateOnBegin}
+              and SELF.START_TIME_ &lt;= #{query.startDateOnEnd})
+            </if>
+            <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+            <if test="query.finishDateOn">
+              ${queryType} (SELF.END_TIME_ &gt;= #{query.finishDateOnBegin}
+              and SELF.END_TIME_ &lt;= #{query.finishDateOnEnd})
+            </if>
+            <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+            <if test="query.finishDateBy">
+              ${queryType} SELF.END_TIME_ &lt;= #{query.finishDateBy}
+            </if>
+            <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+            <if test="query.startDateBy">
+              ${queryType} SELF.START_TIME_ &gt;= #{query.startDateBy}
+            </if>
 
-      <if test="incidentType != null">
-        and INC.INCIDENT_TYPE_ = #{incidentType}
-      </if>
-      <if test="incidentMessage != null">
-        and INC.INCIDENT_MSG_ = #{incidentMessage}
-      </if>
+            <if test="query.unfinished">
+              ${queryType} SELF.END_TIME_ IS NULL
+            </if>
+            <if test="query.finished">
+              ${queryType} SELF.END_TIME_ is not NULL
+            </if>
 
-      <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
-      </if>
+            <if test="query.incidentType != null">
+              ${queryType} INC.INCIDENT_TYPE_ = #{query.incidentType}
+            </if>
+            <if test="query.incidentMessage != null">
+              ${queryType} INC.INCIDENT_MSG_ = #{query.incidentMessage}
+            </if>
 
-      <if test="incidentStatus == 'open'">
-        and INC.END_TIME_ is null
-      </if>
+            <if test="query.incidentMessageLike != null">
+              ${queryType} INC.INCIDENT_MSG_ like #{query.incidentMessageLike} ESCAPE ${escapeChar}
+            </if>
 
-      <if test="incidentStatus == 'resolved'">
-        and INC.END_TIME_ is not null
-      </if>
+            <if test="query.incidentStatus == 'open'">
+              ${queryType} INC.END_TIME_ is null
+            </if>
 
-	  <if test="withRootIncidents">
-        and INC.ID_ = INC.ROOT_CAUSE_INCIDENT_ID_
-	  </if>
-      <if test="startedBy != null">
-        and SELF.START_USER_ID_ = #{startedBy}
-      </if>
+            <if test="query.incidentStatus == 'resolved'">
+              ${queryType} INC.END_TIME_ is not null
+            </if>
 
-      <if test="isRootProcessInstances">
-        and SELF.SUPER_PROCESS_INSTANCE_ID_ is null
-      </if>
-      <if test="superProcessInstanceId != null">
-        and SELF.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
-      </if>
-      <if test="subProcessInstanceId != null">
-        and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where
-        PROC_INST_ID_ = #{subProcessInstanceId})
-      </if>
-      <if test="superCaseInstanceId != null">
-        and SELF.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
-      </if>
-      <if test="subCaseInstanceId != null">
-        and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where
-        CASE_INST_ID_ = #{subCaseInstanceId})
-      </if>
-      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        and EXISTS (
-        select
-        ID_
-        from
-        ${prefix}ACT_HI_VARINST
-        WHERE
-        NAME_= #{queryVariableValue.name}
-        AND PROC_INST_ID_ = SELF.PROC_INST_ID_
+            <if test="query.withRootIncidents">
+              ${queryType} INC.ID_ = INC.ROOT_CAUSE_INCIDENT_ID_
+            </if>
+            <if test="query.startedBy != null">
+              ${queryType} SELF.START_USER_ID_ = #{query.startedBy}
+            </if>
 
-        <bind name="varTypeField" value="'VAR_TYPE_'"/>
-        <bind name="varPrefix" value="''"/>
-        <if test="queryVariableValue.valueConditions != null">
-          and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
-        </if>
+            <if test="query.isRootProcessInstances">
+              ${queryType} SELF.SUPER_PROCESS_INSTANCE_ID_ is null
+            </if>
+            <if test="query.superProcessInstanceId != null">
+              ${queryType} SELF.SUPER_PROCESS_INSTANCE_ID_ = #{query.superProcessInstanceId}
+            </if>
+            <if test="query.subProcessInstanceId != null">
+              ${queryType} SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where
+              PROC_INST_ID_ = #{query.subProcessInstanceId})
+            </if>
+            <if test="query.superCaseInstanceId != null">
+              ${queryType} SELF.SUPER_CASE_INSTANCE_ID_ = #{query.superCaseInstanceId}
+            </if>
+            <if test="query.subCaseInstanceId != null">
+              ${queryType} SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where
+              CASE_INST_ID_ = #{query.subCaseInstanceId})
+            </if>
+            <foreach collection="query.queryVariableValues" index="index" item="queryVariableValue">
+              <bind name="varPrefix" value="'VI' + variableConditionCounter + '.'"/>
+              ${queryType} (${varPrefix}ID_ IS NOT NULL
+              AND 
+              
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+              
+              <bind name="varTypeField" value="'VAR_TYPE_'"/>
+              <if test="queryVariableValue.valueConditions != null">
+                and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+              </if>
+              )
+              <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
+            </foreach>
+
+            <if test="query.executedActivityAfter != null || query.executedActivityBefore != null">
+              ${queryType} EXISTS (
+              SELECT *
+              FROM ${prefix}ACT_HI_ACTINST
+              <where>
+                PROC_INST_ID_ = SELF.ID_
+                <if test="query.executedActivityAfter != null">
+                  AND (START_TIME_ &gt;= #{query.executedActivityAfter} OR END_TIME_ &gt;= #{query.executedActivityAfter})
+                </if>
+                <if test="query.executedActivityBefore != null">
+                  AND (START_TIME_ &lt;= #{query.executedActivityBefore} OR END_TIME_ &lt;= #{query.executedActivityBefore})
+                </if>
+              </where>
+              )
+            </if>
+
+            <if test="query.executedActivityIds != null and query.executedActivityIds.length > 0">
+              ${queryType} (
+                HAI.END_TIME_ IS NOT NULL
+                AND HAI.ACT_ID_ IN
+                <foreach item="activityId" index="index" collection="query.executedActivityIds" open="(" separator="," close=")">
+                  #{activityId}
+                </foreach>
+              )
+            </if>
+
+            <if test="query.activeActivityIds != null and query.activeActivityIds.length > 0">
+              ${queryType} (
+                HAI.END_TIME_ IS NULL
+                AND HAI.ACT_ID_ IN
+                <foreach item="activityId" index="index" collection="query.activeActivityIds" open="(" separator="," close=")">
+                  #{activityId}
+                </foreach>
+              )
+            </if>
+
+            <if test="query.executedJobAfter != null || query.executedJobBefore != null">
+              ${queryType} EXISTS (
+              SELECT *
+              FROM ${prefix}ACT_HI_JOB_LOG
+              <where>
+                PROCESS_INSTANCE_ID_ = SELF.ID_
+                <if test="query.executedJobAfter != null">
+                  AND TIMESTAMP_ &gt;= #{query.executedJobAfter}
+                </if>
+                <if test="query.executedJobBefore != null">
+                  AND TIMESTAMP_ &lt;= #{query.executedJobBefore}
+                </if>
+              </where>
+              )
+            </if>
+
+            <if test="query.isTenantIdSet">
+              <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
+                ${queryType} SELF.TENANT_ID_ in
+                <foreach item="tenantId" index="index" collection="query.tenantIds"
+                         open="(" separator="," close=")">
+                  #{tenantId}
+                </foreach>
+              </if>
+              <if test="query.tenantIds == null">
+                ${queryType} SELF.TENANT_ID_ is null
+              </if>
+            </if>
+          </trim>
+        </trim>
         )
       </foreach>
-
-      <if test="executedActivityAfter != null || executedActivityBefore != null">
-        AND EXISTS (
-          SELECT *
-          FROM ${prefix}ACT_HI_ACTINST
-          <where>
-            PROC_INST_ID_ = SELF.ID_
-            <if test="executedActivityAfter != null">
-              AND (START_TIME_ &gt;= #{executedActivityAfter} OR END_TIME_ &gt;= #{executedActivityAfter})
-            </if>
-            <if test="executedActivityBefore != null">
-              AND (START_TIME_ &lt;= #{executedActivityBefore} OR END_TIME_ &lt;= #{executedActivityBefore})
-            </if>
-          </where>
-          )
-      </if>
-
-      <if test="executedActivityIds != null and executedActivityIds.length > 0">
-        AND HAI.END_TIME_ IS NOT NULL
-        AND HAI.ACT_ID_ IN
-        <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
-          #{activityId}
-        </foreach>
-      </if>
-
-      <if test="activeActivityIds != null and activeActivityIds.length > 0">
-        AND HAI.END_TIME_ IS NULL
-        AND HAI.ACT_ID_ IN
-        <foreach item="activityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
-          #{activityId}
-        </foreach>
-      </if>
-
-      <if test="executedJobAfter != null || executedJobBefore != null">
-        AND EXISTS (
-        SELECT *
-        FROM ${prefix}ACT_HI_JOB_LOG
-        <where>
-          PROCESS_INSTANCE_ID_ = SELF.ID_
-          <if test="executedJobAfter != null">
-            AND TIMESTAMP_ &gt;= #{executedJobAfter}
-          </if>
-          <if test="executedJobBefore != null">
-            AND TIMESTAMP_ &lt;= #{executedJobBefore}
-          </if>
-        </where>
-        )
-      </if>
-
-      <if test="isTenantIdSet">
-        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-          and SELF.TENANT_ID_ in
-          <foreach item="tenantId" index="index" collection="tenantIds"
-                   open="(" separator="," close=")">
-            #{tenantId}
-          </foreach>
-        </if>
-        <if test="tenantIds == null">
-          and SELF.TENANT_ID_ is null
-        </if>
-      </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         and (
@@ -481,7 +555,6 @@
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
-
     </where>
 
     ) RES
@@ -559,8 +632,9 @@
 
   <!-- Select History Cleanup Report Entities -->
   <select id="selectFinishedProcessInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultType="long">
-    SELECT COUNT(DISTINCT RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectFinishedProcessInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultMap="finishedReportResultMap">

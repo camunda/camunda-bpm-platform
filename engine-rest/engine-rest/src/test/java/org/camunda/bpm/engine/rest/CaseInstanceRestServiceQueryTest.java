@@ -473,8 +473,7 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testVariableParameters() {
-    // equals
+  public void testVariableValueEquals() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;
@@ -488,9 +487,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
+  }
 
-    // greater then
-    queryValue = variableName + "_gt_" + variableValue;
+  @Test
+  public void testVariableValueGreaterThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_gt_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -501,9 +504,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueGreaterThan(variableName, variableValue);
+  }
 
-    // greater then equals
-    queryValue = variableName + "_gteq_" + variableValue;
+  @Test
+  public void testVariableValueGreaterThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_gteq_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -514,9 +521,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueGreaterThanOrEqual(variableName, variableValue);
+  }
 
-    // lower then
-    queryValue = variableName + "_lt_" + variableValue;
+  @Test
+  public void testVariableValueLessThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_lt_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -527,9 +538,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueLessThan(variableName, variableValue);
+  }
 
-    // lower then equals
-    queryValue = variableName + "_lteq_" + variableValue;
+  @Test
+  public void testVariableValueLessThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_lteq_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -540,9 +555,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueLessThanOrEqual(variableName, variableValue);
+  }
 
-    // like
-    queryValue = variableName + "_like_" + variableValue;
+  @Test
+  public void testVariableValueLike() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_like_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -553,9 +572,13 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
         .get(CASE_INSTANCE_QUERY_URL);
 
     verify(mockedQuery).variableValueLike(variableName, variableValue);
+  }
 
-    // not equals
-    queryValue = variableName + "_neq_" + variableValue;
+  @Test
+  public void testVariableValueNotEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
 
     given()
       .queryParam("variables", queryValue)
@@ -569,15 +592,106 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testVariableParametersAsPost() {
-    // equals
+  public void testVariableValuesEqualsIgnoreCase() {
     String variableName = "varName";
     String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    
+    given()
+    .queryParam("variables", queryValue)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
 
+  @Test
+  public void testVariableValuesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    
+    given()
+    .queryParam("variables", queryValue)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableValuesLikeIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_like_" + variableValue;
+    
+    given()
+    .queryParam("variables", queryValue)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueLike(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableNamesEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    
+    given()
+    .queryParam("variables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableNamesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    
+    given()
+    .queryParam("variables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableValueEqualsAsPost() {
     Map<String, Object> variableJson = new HashMap<String, Object>();
-    variableJson.put("name", variableName);
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "eq");
-    variableJson.put("value", variableValue);
 
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
@@ -594,11 +708,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+  }
 
-    // greater then
+  @Test
+  public void testVariableGreaterThanAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "gt");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -608,11 +733,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueGreaterThan(variableName, variableValue);
+    verify(mockedQuery).variableValueGreaterThan("varName", "varValue");
+  }
 
-    // greater then equals
+  @Test
+  public void testVariableValueGreaterThanEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "gteq");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -622,11 +758,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueGreaterThanOrEqual(variableName, variableValue);
+    verify(mockedQuery).variableValueGreaterThanOrEqual("varName", "varValue");
+  }
 
-    // lower then
+  @Test
+  public void testVariableValueLessThanAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "lt");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -636,11 +783,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueLessThan(variableName, variableValue);
+    verify(mockedQuery).variableValueLessThan("varName", "varValue");
+  }
 
-    // lower then equals
+  @Test
+  public void testVariableValueLessThanEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "lteq");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -650,11 +808,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueLessThanOrEqual(variableName, variableValue);
+    verify(mockedQuery).variableValueLessThanOrEqual("varName", "varValue");
+  }
 
-    // like
+  @Test
+  public void testVariableValueLikeAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "like");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -664,11 +833,22 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueLike(variableName, variableValue);
+    verify(mockedQuery).variableValueLike("varName", "varValue");
+  }
 
-    // not equals
+  @Test
+  public void testVariableValueNotEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
     variableJson.put("operator", "neq");
 
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -678,7 +858,142 @@ public class CaseInstanceRestServiceQueryTest extends AbstractRestServiceTest {
       .when()
         .post(CASE_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+  }
+
+  @Test
+  public void testVariableValuesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableValuesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableValuesLikeIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "like");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueLike("varName", "varValue");
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableNamesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableNamesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+  }
+
+  @Test
+  public void testVariableNamesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableNamesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(CASE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
   }
 
   @Test

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
  *  @author Philipp Ossler
@@ -75,6 +76,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   protected String decisionRequirementsDefinitionKey;
 
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   public HistoricDecisionInstanceQueryImpl() {
   }
@@ -206,6 +208,14 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   public HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet =  true;
+    return this;
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -240,6 +250,14 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
     return commandContext
         .getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstancesByQueryCriteria(this, page);
+  }
+
+  @Override
+  public List<ImmutablePair<String, String>> executeDeploymentIdMappingsList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+        .getHistoricDecisionInstanceManager()
+        .findHistoricDecisionInstanceDeploymentIdMappingsByQueryCriteria(this);
   }
 
   public String getDecisionDefinitionId() {
@@ -368,5 +386,9 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   public String getDecisionRequirementsDefinitionKey() {
     return decisionRequirementsDefinitionKey;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 }

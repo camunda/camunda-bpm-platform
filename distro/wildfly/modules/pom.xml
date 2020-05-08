@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.wildfly</groupId>
     <artifactId>camunda-wildfly</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-wildfly-modules</artifactId>
@@ -13,8 +13,13 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
-    <version.jackson>2.9.8</version.jackson>
-    <version.jackson.annotations>2.9.0</version.jackson.annotations>
+    <version.jackson>2.10.0</version.jackson>
+    <version.jackson.databind>${version.jackson}</version.jackson.databind>
+    <version.jackson.annotations>${version.jackson}</version.jackson.annotations>
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
   </properties>
 
   <dependencies>
@@ -34,10 +39,6 @@
         <exclusion>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>joda-time</groupId>
-          <artifactId>joda-time</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -92,14 +93,6 @@
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
-    </dependency>
-
-    <!-- exclude slf4j as it is part of wildfly distro -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -175,7 +168,10 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.commons.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                      <mapper>
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-(utils|logging)-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-typed-values-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                      </mapper>
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -199,6 +195,17 @@
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson}/\3" handledirsep="yes" />
                       <regexpmapper from="^(com.fasterxml.jackson.*/.*.jar)$$" to="\1" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
+                <delete dir="target/modules/com/fasterxml/jackson/core/jackson-databind" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson.databind}/\3" handledirsep="yes" />
+                      <regexpmapper from="^(com.fasterxml.jackson.core.jackson-databind/.*.jar)$$" to="\1" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -238,7 +245,15 @@
                   <include name="**/module.xml" />
                 </replace>
 
+                <replace dir="target/modules" token="@version.freemarker@" value="${version.freemarker}">
+                  <include name="**/module.xml" />
+                </replace>
+
                 <replace dir="target/modules" token="@version.jackson@" value="${version.jackson}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.jackson.databind@" value="${version.jackson.databind}">
                   <include name="**/module.xml" />
                 </replace>
 

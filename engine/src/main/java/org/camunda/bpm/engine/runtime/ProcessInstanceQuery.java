@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -56,6 +57,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * the given key.
    */
   ProcessInstanceQuery processDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Select the process instances for any given process definition keys.
+   */
+  ProcessInstanceQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /** Select historic process instances that don't have a process-definition of which the key is present in the given list */
+  ProcessInstanceQuery processDefinitionKeyNotIn(String... processDefinitionKeys);
 
   /**
    * Selects the process instances which are defined by a process definition
@@ -103,6 +112,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * @since 7.3
    */
   ProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
+
+  /**
+   * The query will match the names of process-variables in a case-insensitive way.
+   */
+  ProcessInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of process-variables in a case-insensitive way.
+   */
+  ProcessInstanceQuery matchVariableValuesIgnoreCase();
 
   /**
    * Only select process instances which have a global variable with the given value. The type
@@ -254,4 +273,31 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
   /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessInstanceQuery orderByBusinessKey();
+
+  /**
+   * <p>After calling or(), a chain of several filter criteria could follow. Each filter criterion that follows or()
+   * will be linked together with an OR expression until the OR query is terminated. To terminate the OR query right
+   * after the last filter criterion was applied, {@link #endOr()} must be invoked.</p>
+   *
+   * @return an object of the type {@link ProcessInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The several filter criteria will be linked together by an OR expression.
+   *
+   * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
+   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
+   * mark the end of the OR query.
+   * */
+  ProcessInstanceQuery or();
+
+  /**
+   * <p>endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To terminate the
+   * OR query which has been started by invoking {@link #or()}, endOr() must be invoked. Filter criteria which are
+   * applied after calling endOr() are linked together by an AND expression.</p>
+   *
+   * @return an object of the type {@link ProcessInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The filter criteria will be linked together by an AND expression.
+   *
+   * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
+   * this exception, {@link #or()} must be invoked first.
+   * */
+  ProcessInstanceQuery endOr();
 }

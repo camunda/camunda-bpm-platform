@@ -21,10 +21,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
+import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
@@ -32,6 +35,7 @@ import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
 import org.camunda.bpm.engine.impl.util.io.StringStreamSource;
 import org.camunda.bpm.engine.impl.util.io.UrlStreamSource;
+import org.camunda.bpm.engine.impl.xml.ProblemImpl;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -41,6 +45,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class Parse extends DefaultHandler {
 
+
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
@@ -48,14 +53,16 @@ public class Parse extends DefaultHandler {
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
   private static final String XXE_PROCESSING = "http://xml.org/sax/features/external-general-entities";
 
-  private static final String NEW_LINE = System.getProperty("line.separator");
+  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
+  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA_ALL = "all";
 
   protected Parser parser;
   protected String name;
   protected StreamSource streamSource;
   protected Element rootElement = null;
-  protected List<Problem> errors = new ArrayList<Problem>();
-  protected List<Problem> warnings = new ArrayList<Problem>();
+  protected List<Problem> errors = new ArrayList<>();
+  protected List<Problem> warnings = new ArrayList<>();
   protected String schemaResource;
   protected boolean enableXxeProcessing = true;
 
@@ -132,26 +139,49 @@ public class Parse extends DefaultHandler {
     try {
       InputStream inputStream = streamSource.getInputStream();
 
-      parser.getSaxParserFactory().setFeature(XXE_PROCESSING, enableXxeProcessing);
+      SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
+      saxParserFactory.setFeature(XXE_PROCESSING, enableXxeProcessing);
+      saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
       if (schemaResource == null) { // must be done before parser is created
-        parser.getSaxParserFactory().setNamespaceAware(false);
-        parser.getSaxParserFactory().setValidating(false);
+        saxParserFactory.setNamespaceAware(false);
+        saxParserFactory.setValidating(false);
       }
 
       SAXParser saxParser = parser.getSaxParser();
+      try {
+        saxParser.setProperty(JAXP_ACCESS_EXTERNAL_SCHEMA, resolveAccessExternalSchemaProperty());
+      } catch (Exception e) {
+        // ignore unavailable option
+        LOG.logAccessExternalSchemaNotSupported(e);
+      }
       if (schemaResource != null) {
         saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
         saxParser.setProperty(JAXP_SCHEMA_SOURCE, schemaResource);
       }
       saxParser.parse(inputStream, new ParseHandler(this));
-
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.parsingFailureException(name, e);
     }
 
     return this;
+  }
+
+  /*
+   * JAXP allows users to override the default value via system properties and
+   * a central properties file (see https://docs.oracle.com/javase/tutorial/jaxp/properties/scope.html).
+   * However, both are overridden by an explicit configuration in code, as we apply it.
+   * Since we want users to customize the value, we take the system property into account.
+   * The properties file is not supported at the moment.
+   */
+  protected String resolveAccessExternalSchemaProperty() {
+    String systemProperty = System.getProperty(JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY);
+
+    if (systemProperty != null) {
+      return systemProperty;
+    } else {
+      return JAXP_ACCESS_EXTERNAL_SCHEMA_ALL;
+    }
   }
 
   public Element getRootElement() {
@@ -163,15 +193,23 @@ public class Parse extends DefaultHandler {
   }
 
   public void addError(SAXParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e));
   }
 
   public void addError(String errorMessage, Element element) {
-    errors.add(new Problem(errorMessage, name, element));
+    errors.add(new ProblemImpl(errorMessage, element));
   }
 
+  public void addError(String errorMessage, Element element, String... elementIds) {
+    errors.add(new ProblemImpl(errorMessage, element, elementIds));
+  }
+  
   public void addError(BpmnParseException e) {
-    errors.add(new Problem(e, name));
+    errors.add(new ProblemImpl(e));
+  }
+
+  public void addError(BpmnParseException e, String elementId) {
+    errors.add(new ProblemImpl(e, elementId));
   }
 
   public boolean hasErrors() {
@@ -179,11 +217,15 @@ public class Parse extends DefaultHandler {
   }
 
   public void addWarning(SAXParseException e) {
-    warnings.add(new Problem(e, name));
+    warnings.add(new ProblemImpl(e));
   }
 
   public void addWarning(String errorMessage, Element element) {
-    warnings.add(new Problem(errorMessage, name, element));
+    warnings.add(new ProblemImpl(errorMessage, element));
+  }
+
+  public void addWarning(String errorMessage, Element element, String... elementIds) {
+    warnings.add(new ProblemImpl(errorMessage, element, elementIds));
   }
 
   public boolean hasWarnings() {
@@ -194,6 +236,8 @@ public class Parse extends DefaultHandler {
     StringBuilder builder = new StringBuilder();
     for (Problem warning : warnings) {
       builder.append("\n* ");
+      builder.append(warning.getMessage());
+      builder.append(" | resource " + name);
       builder.append(warning.toString());
     }
     LOG.logParseWarnings(builder.toString());
@@ -203,9 +247,11 @@ public class Parse extends DefaultHandler {
     StringBuilder strb = new StringBuilder();
     for (Problem error : errors) {
       strb.append("\n* ");
+      strb.append(error.getMessage());
+      strb.append(" | resource " + name);
       strb.append(error.toString());
     }
-    throw LOG.exceptionDuringParsing(strb.toString());
+    throw LOG.exceptionDuringParsing(strb.toString(), name, errors, warnings);
   }
 
   public void setSchemaResource(String schemaResource) {

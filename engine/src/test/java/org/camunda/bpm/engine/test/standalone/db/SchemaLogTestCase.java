@@ -63,13 +63,12 @@ public class SchemaLogTestCase {
     }
   }
 
-  private List<String> readFolderContent(String folder) {
+  private List<String> readFolderContent(String path) {
     List<String> files = new ArrayList<String>();
-    String path = "classpath:" + folder + "/*";
     try {
       PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-      Resource[] resources = resolver.getResources(path);
-      assertThat("No resources found at " + path, resources.length, greaterThan(0));
+      Resource[] resources = resolver.getResources("classpath:" + path + "/*");
+      assertThat(resources.length, greaterThan(0));
       for (Resource res : resources) {
         files.add(res.getFilename());
       }

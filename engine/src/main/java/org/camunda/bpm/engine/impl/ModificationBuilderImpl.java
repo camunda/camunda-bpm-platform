@@ -46,6 +46,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected String annotation;
 
   public ModificationBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
     this.commandExecutor = commandExecutor;
@@ -125,6 +126,11 @@ public class ModificationBuilderImpl implements ModificationBuilder {
     return this;
   }
 
+  @Override
+  public ModificationBuilder setAnnotation(String annotation) {
+    this.annotation = annotation;
+    return this;
+  }
   public void execute(boolean writeUserOperationLog) {
     commandExecutor.execute(new ProcessInstanceModificationCmd(this, writeUserOperationLog));
   }
@@ -175,4 +181,11 @@ public class ModificationBuilderImpl implements ModificationBuilder {
     return skipIoMappings;
   }
 
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotationInternal(String annotation) {
+    this.annotation = annotation;
+  }
 }

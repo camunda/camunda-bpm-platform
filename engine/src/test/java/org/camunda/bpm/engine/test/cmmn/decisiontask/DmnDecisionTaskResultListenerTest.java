@@ -120,7 +120,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertEquals(1, results.size());
     DmnDecisionResultEntries firstOutput = results.get(0);
 
-    assertEquals(0, firstOutput.getFirstEntry());
+    assertEquals(0, (int) firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(0), firstOutput.getFirstEntryTyped());
   }
 
@@ -138,7 +138,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertEquals(1, results.size());
     DmnDecisionResultEntries firstOutput = results.get(0);
 
-    assertEquals(12, firstOutput.getFirstEntry());
+    assertEquals(12, (int) firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(12), firstOutput.getFirstEntryTyped());
   }
 
@@ -149,7 +149,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertEquals(1, results.size());
     DmnDecisionResultEntries firstOutput = results.get(0);
 
-    assertEquals(33, firstOutput.getFirstEntry());
+    assertEquals(33, (int) firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(33), firstOutput.getFirstEntryTyped());
   }
 

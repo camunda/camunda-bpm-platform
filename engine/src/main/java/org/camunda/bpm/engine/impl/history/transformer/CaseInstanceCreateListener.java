@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.history.transformer;
 
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
@@ -27,11 +26,12 @@ import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
  */
 public class CaseInstanceCreateListener extends HistoryCaseExecutionListener {
 
-  public CaseInstanceCreateListener(CmmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
-    super(historyEventProducer, historyLevel);
+  public CaseInstanceCreateListener(CmmnHistoryEventProducer historyEventProducer) {
+    super(historyEventProducer);
   }
 
   protected HistoryEvent createHistoryEvent(DelegateCaseExecution caseExecution) {
+    ensureHistoryLevelInitialized();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CREATE, caseExecution)) {
       return eventProducer.createCaseInstanceCreateEvt(caseExecution);
     }

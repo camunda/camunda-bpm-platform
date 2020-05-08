@@ -59,8 +59,9 @@
   </select>
 
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectEventSubscriptionByQueryCriteriaSql">

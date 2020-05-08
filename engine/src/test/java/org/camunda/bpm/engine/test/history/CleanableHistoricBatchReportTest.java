@@ -51,6 +51,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -58,7 +59,9 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class CleanableHistoricBatchReportTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
@@ -66,7 +69,7 @@ public class CleanableHistoricBatchReportTest {
   protected BatchModificationHelper modificationHelper = new BatchModificationHelper(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(testRule).around(engineRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule).around(migrationRule);
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected HistoryService historyService;
@@ -93,7 +96,7 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testReportMixedConfiguration() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     int modOperationsTTL = 20;
     map.put("instance-modification", "P20D");
     int defaultTTL = 5;
@@ -106,15 +109,15 @@ public class CleanableHistoricBatchReportTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
     Batch modificationBatch = createModificationBatch();
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     batchIds.add(modificationBatch.getId());
 
     int migrationCountBatch = 10;
-    List<String> batchIds1 = new ArrayList<String>();
+    List<String> batchIds1 = new ArrayList<>();
     batchIds1.addAll(createMigrationBatchList(migrationCountBatch));
 
     int cancelationCountBatch = 20;
-    List<String> batchIds2 = new ArrayList<String>();
+    List<String> batchIds2 = new ArrayList<>();
     batchIds2.addAll(createCancelationBatchList(cancelationCountBatch));
 
 
@@ -168,7 +171,7 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testReportNoDefaultConfiguration() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     int modOperationsTTL = 5;
     map.put("instance-modification", "P5D");
     int delOperationsTTL = 7;
@@ -182,15 +185,15 @@ public class CleanableHistoricBatchReportTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
     Batch modificationBatch = createModificationBatch();
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     batchIds.add(modificationBatch.getId());
 
     int migrationCountBatch = 10;
-    List<String> batchIds1 = new ArrayList<String>();
+    List<String> batchIds1 = new ArrayList<>();
     batchIds1.addAll(createMigrationBatchList(migrationCountBatch));
 
     int cancelationCountBatch = 20;
-    List<String> batchIds2 = new ArrayList<String>();
+    List<String> batchIds2 = new ArrayList<>();
     batchIds2.addAll(createCancelationBatchList(cancelationCountBatch));
 
 
@@ -252,7 +255,7 @@ public class CleanableHistoricBatchReportTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
     int cancelationCountBatch = 20;
-    List<String> batchIds2 = new ArrayList<String>();
+    List<String> batchIds2 = new ArrayList<>();
     batchIds2.addAll(createCancelationBatchList(cancelationCountBatch));
 
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -10));
@@ -280,7 +283,7 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testReportZeroTTL() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     int modOperationsTTL = 0;
     map.put("instance-modification", "P0D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
@@ -310,7 +313,7 @@ public class CleanableHistoricBatchReportTest {
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
 
     Batch modificationBatch = createModificationBatch();
     batchIds.add(modificationBatch.getId());
@@ -373,7 +376,7 @@ public class CleanableHistoricBatchReportTest {
   }
 
   private List<String> createMigrationBatchList(int migrationCountBatch) {
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     for (int i = 0; i < migrationCountBatch; i++) {
       batchIds.add(migrationHelper.migrateProcessInstancesAsync(1).getId());
     }
@@ -388,9 +391,12 @@ public class CleanableHistoricBatchReportTest {
   }
 
   private List<String> createCancelationBatchList(int cancelationCountBatch) {
-    List<String> batchIds = new ArrayList<String>();
+    BpmnModelInstance instance = createModelInstance();
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    String pId = runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
+    List<String> batchIds = new ArrayList<>();
     for (int i = 0; i < cancelationCountBatch; i++) {
-      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList("unknownId"), "create-deletion-batch").getId());
+      batchIds.add(runtimeService.deleteProcessInstancesAsync(Arrays.asList(pId), "create-deletion-batch").getId());
     }
     return batchIds;
   }

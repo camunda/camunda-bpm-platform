@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="A" name="A">
+     <informationRequirement>
+      <requiredDecision href="#B" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#C" />
+    </informationRequirement>
+    <decisionTable id="aDecisionTable">
+      <input id="input1">
+        <inputExpression><text>bb</text></inputExpression>
+      </input>
+      <input id="input2">
+        <inputExpression><text>cc</text></inputExpression>
+      </input>
+      <output id="output2" name="aa" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1"><text>"bb"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry2"><text>"cc"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1"><text>"aa"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+ </decision> 
+
+  <decision id="B" name="B">
+    <informationRequirement>
+      <requiredDecision href="#D" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#E" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#F" />
+    </informationRequirement>
+    <decisionTable id="bDecisionTable">
+      <input id="input3">
+        <inputExpression><text>dd</text></inputExpression>
+      </input>
+      <input id="input4">
+        <inputExpression><text>ee</text></inputExpression>
+      </input>
+      <input id="input5">
+        <inputExpression><text>ff</text></inputExpression>
+      </input>
+      <output id="computerType" name="bb" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry3"><text>"dd"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry4"><text>"ee"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry5"><text>"ff"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2"><text>"bb"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="C" name="C">
+    <informationRequirement>
+      <requiredDecision href="#G" />
+    </informationRequirement>
+    <decisionTable id="cDecisionTable">
+      <input id="input6">
+        <inputExpression><text>gg</text></inputExpression>
+      </input>
+      <output id="output3" name="cc" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry6"><text>"gg"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry6"><text>"cc"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="D" name="D">
+    <decisionTable id="dDecisionTable">
+      <input id="input7">
+        <inputExpression><text>xx</text></inputExpression>
+      </input>
+      <output id="output4" name="dd" typeRef="string" />
+      <rule id="rule4">
+        <inputEntry id="inputEntry7"><text>"xx"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry7"><text>"dd"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="E" name="E">
+    <decisionTable id="eDecisionTable">
+      <input id="input8">
+        <inputExpression><text>yy</text></inputExpression>
+      </input>
+      <output id="output8" name="ee" typeRef="string" />
+      <rule id="rule5">
+        <inputEntry id="inputEntry8"><text>"yy"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry8"><text>"ee"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="F" name="F">
+    <decisionTable id="fDecisionTable">
+      <input id="input9">
+        <inputExpression><text>zz</text></inputExpression>
+      </input>
+      <output id="output9" name="ff" typeRef="string" />
+      <rule id="rule6">
+        <inputEntry id="inputEntry9"><text>"zz"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry9"><text>"ff"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="G" name="G">
+    <decisionTable id="gDecisionTable">
+      <input id="input10">
+        <inputExpression><text>ll</text></inputExpression>
+      </input>
+      <output id="output10" name="gg" typeRef="string" />
+      <rule id="rule7">
+        <inputEntry id="inputEntry10"><text>"ll"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry10"><text>"gg"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -45,6 +45,9 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries which are associated with one of the given activity ids. **/
   HistoricJobLogQuery activityIdIn(String... activityIds);
 
+  /** Only select historic job log entries which are associated with failures of one of the given activity ids. **/
+  HistoricJobLogQuery failedActivityIdIn(String... activityIds);
+
   /** Only select historic job log entries which are associated with one of the given execution ids. **/
   HistoricJobLogQuery executionIdIn(String... executionIds);
 
@@ -62,6 +65,12 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
 
   /** Only select historic job log entries that belong to one of the given tenant ids. */
   HistoricJobLogQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic job log entries that have no tenant id. */
+  HistoricJobLogQuery withoutTenantId();
+
+  /** Only selects historic job log entries that belong to the given host name. */
+  HistoricJobLogQuery hostname(String hostname);
 
   /**
    * Only select log entries where the job had a priority higher than or
@@ -155,5 +164,11 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    * Note that the ordering of job log entries without tenant id is database-specific.
    */
   HistoricJobLogQuery orderByTenantId();
+
+  /**
+   * Order by hostname (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job log entries without hostname is database-specific.
+   */
+  HistoricJobLogQuery orderByHostname();
 
 }

@@ -49,4 +49,12 @@ public interface HistoricActivityStatistics {
    */
   long getCompleteScope();
 
+  /** The number of open incidents of the activity. */
+  long getOpenIncidents();
+
+  /** The number of resolved incidents of the activity. */
+  long getResolvedIncidents();
+
+  /** The number of deleted incidents of the activity. */
+  long getDeletedIncidents();
 }

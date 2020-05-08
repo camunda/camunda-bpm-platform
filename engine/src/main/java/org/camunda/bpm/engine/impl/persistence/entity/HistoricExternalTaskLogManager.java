@@ -125,6 +125,11 @@ public class HistoricExternalTaskLogManager extends AbstractManager {
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
           return producer.createHistoricExternalTaskLogFailedEvt(externalTask);
         }
+
+        @Override
+        public void postHandleSingleHistoryEventCreated(HistoryEvent event) {
+          ((ExternalTaskEntity) externalTask).setLastFailureLogId(event.getId());
+        }
       });
     }
   }

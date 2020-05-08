@@ -35,7 +35,9 @@ import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
  */
 public class DurationHelper {
 
-  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+  public static final String PnW_PATTERN = "P\\d+W";
+  private static final int MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   Date start;
 
@@ -46,6 +48,8 @@ public class DurationHelper {
   boolean isRepeat;
 
   int times;
+
+  long repeatOffset;
 
   DatatypeFactory datatypeFactory;
 
@@ -110,12 +114,19 @@ public class DurationHelper {
   }
 
   private Date getDateAfterRepeat(Date date) {
+    // use date without the current offset for due date calculation to get the
+    // next due date as it would be without any modifications, later add offset
+    Date dateWithoutOffset = new Date(date.getTime() - repeatOffset);
     if (start != null) {
       Date cur = start;
-      for (int i=0;i<times && !cur.after(date);i++) {
+      for (int i = 0; i < times && !cur.after(dateWithoutOffset); i++) {
         cur = add(cur, period);
       }
-      return cur.before(date) ? null : cur;
+      if (cur.before(dateWithoutOffset)) {
+        return null;
+      }
+      // add offset to calculated due date
+      return repeatOffset == 0L ? cur : new Date(cur.getTime() + repeatOffset);
     }
     Date cur = add(end, period.negate());
     Date next = end;
@@ -135,11 +146,24 @@ public class DurationHelper {
   }
 
   private Duration parsePeriod(String period) {
+    if (period.matches(PnW_PATTERN)) {
+      return parsePnWDuration(period);
+    }
     return datatypeFactory.newDuration(period);
+  }
+
+  private Duration parsePnWDuration(String period) {
+    String weeks = period.replaceAll("\\D", "");
+    int numberOfWeeks = Integer.parseInt(weeks);
+    return datatypeFactory.newDuration(numberOfWeeks * MS_PER_WEEK);
   }
 
   private boolean isDuration(String time) {
     return time.startsWith("P");
+  }
+
+  public void setRepeatOffset(long repeatOffset) {
+    this.repeatOffset = repeatOffset;
   }
 
 }

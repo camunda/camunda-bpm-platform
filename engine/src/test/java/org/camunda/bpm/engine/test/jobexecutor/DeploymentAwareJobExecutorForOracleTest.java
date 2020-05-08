@@ -23,20 +23,22 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assume;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class DeploymentAwareJobExecutorForOracleTest {
 
-  protected ProcessEngineBootstrapRule deploymentAwareBootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule deploymentAwareBootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJobExecutorDeploymentAware(true);
       return configuration;
@@ -46,8 +48,8 @@ public class DeploymentAwareJobExecutorForOracleTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(deploymentAwareBootstrapRule).around(engineRule).around(testRule);
-  
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   @Test
   public void testFindAcquirableJobsWhen0InstancesDeployed() {
     // given
@@ -103,11 +105,11 @@ public class DeploymentAwareJobExecutorForOracleTest {
     findAcquirableJobs();
   }
 
-  protected List<JobEntity> findAcquirableJobs() {
-    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+  protected List<AcquirableJobEntity> findAcquirableJobs() {
+    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
 
       @Override
-      public List<JobEntity> execute(CommandContext commandContext) {
+      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
         return commandContext
           .getJobManager()
           .findNextJobsToExecute(new Page(0, 100));

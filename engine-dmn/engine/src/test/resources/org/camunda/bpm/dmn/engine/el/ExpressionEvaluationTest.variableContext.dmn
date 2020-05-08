@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_0afw8ry" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="Decision">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="in" camunda:inputVariable="foo">
+        <inputExpression id="inputExpression1" typeRef="integer">        <text>in</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="out" name="out" typeRef="boolean" />
+      <rule id="row-914871961-1">
+        <inputEntry id="UnaryTests_1lhqhwf" expressionLanguage="juel">        <text><![CDATA[${variableContext.resolve('foo').getValue() == 3}]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0t3v7ny">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-914871961-2">
+        <inputEntry id="UnaryTests_03bdgg9">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1htgbok">        <text>false</text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

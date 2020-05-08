@@ -64,6 +64,10 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, TASK_LISTENER);
   }
 
+  protected void addTaskUpdateListeners(TaskDefinition taskDefinition) {
+    taskDefinition.addTaskListener(TaskListener.EVENTNAME_UPDATE, TASK_LISTENER);
+  }
+
   protected void addTaskDeleteListeners(TaskDefinition taskDefinition) {
     taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, TASK_LISTENER);
   }
@@ -139,6 +143,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
     addTaskCreateListeners(taskDefinition);
     addTaskAssignmentListeners(taskDefinition);
     addTaskCompleteListeners(taskDefinition);
+    addTaskUpdateListeners(taskDefinition);
     addTaskDeleteListeners(taskDefinition);
   }
 

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -260,22 +261,14 @@ public class HistoricProcessInstanceStateTest {
   }
 
   @Test
-  @Ignore("CAM-9934")
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/CAM-9934.bpmn"})
-  public void test() {
+  public void shouldSetCorrectInstanceStateOnInterruption() {
     // given
     processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
 
-    String jobId = processEngineRule.getManagementService()
-      .createJobQuery()
-      .timers()
-      .executable()
-      .singleResult()
-      .getId();
-
     // when
-    processEngineRule.getManagementService()
-      .executeJob(jobId);
+    processEngineRule.getRuntimeService()
+      .correlateMessage("SubProcessTrigger");
 
     HistoricProcessInstance historicProcessInstance = processEngineRule.getHistoryService()
       .createHistoricProcessInstanceQuery()
@@ -284,6 +277,32 @@ public class HistoricProcessInstanceStateTest {
     // then
     assertThat(historicProcessInstance.getState(), is(HistoricProcessInstance.STATE_ACTIVE));
     assertThat(historicProcessInstance.getEndTime(), nullValue());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/CAM-9934.bpmn"})
+  public void shouldSetRemovalTimeOnHistoricActivityInstances() {
+    // given
+    processEngineRule.getProcessEngineConfiguration()
+        .setHistoryRemovalTimeStrategy("start");
+
+    processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
+
+    // when
+    processEngineRule.getRuntimeService()
+      .correlateMessage("SubProcessTrigger");
+
+    HistoricTaskInstance taskInstance = processEngineRule.getHistoryService()
+        .createHistoricTaskInstanceQuery()
+        .taskDefinitionKey("Task_1eg238f")
+        .singleResult();
+
+    // then
+    assertThat(taskInstance.getRemovalTime(), notNullValue());
+
+    // clear
+    processEngineRule.getProcessEngineConfiguration()
+        .setHistoryRemovalTimeStrategy("end");
   }
 
   private HistoricProcessInstance getHistoricProcessInstanceWithAssertion(ProcessDefinition processDefinition) {

@@ -35,6 +35,7 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
 
   // fields copied from variable instance
   protected String variableId;
+  protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
   protected String caseInstanceId;
@@ -77,6 +78,10 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
 
   public String getId() {
     return variableId;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public String getProcessInstanceId() {
@@ -152,6 +157,7 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   public static DelegateCaseVariableInstanceImpl fromVariableInstance(VariableInstance variableInstance) {
     DelegateCaseVariableInstanceImpl delegateInstance = new DelegateCaseVariableInstanceImpl();
     delegateInstance.variableId = variableInstance.getId();
+    delegateInstance.processDefinitionId = variableInstance.getProcessDefinitionId();
     delegateInstance.processInstanceId = variableInstance.getProcessInstanceId();
     delegateInstance.executionId = variableInstance.getExecutionId();
     delegateInstance.caseExecutionId = variableInstance.getCaseExecutionId();

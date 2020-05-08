@@ -40,6 +40,7 @@
       <property name="openjpa.ConnectionPassword" value=""/>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO"/>
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(SchemaAction='add,deleteTableContents')"/>
+      <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
     </properties>
   </persistence-unit>
 </persistence>

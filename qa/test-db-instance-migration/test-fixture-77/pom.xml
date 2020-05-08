@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-77</artifactId>
@@ -24,38 +24,14 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-bpmn-model</artifactId>
-        <version>7.7.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-cmmn-model</artifactId>
-        <version>7.7.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-dmn-model</artifactId>
-        <version>7.7.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm.model</groupId>
-        <artifactId>camunda-xml-model</artifactId>
-        <version>7.7.0</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
-      you declare them to be ${camunda.version.current} here -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.7.0</version>
     </dependency>
-
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
@@ -76,36 +52,6 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-current-sql-scripts</id>
-              <phase>generate-test-sources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.distro</groupId>
-                    <artifactId>camunda-sql-scripts</artifactId>
-                    <version>7.7.0</version>
-                    <type>test-jar</type>
-                    <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                    <overWrite>true</overWrite>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <profiles>
@@ -155,6 +101,27 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-current-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>7.7.0</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
 
           <!-- parse version properties from qa/pom.xml -->

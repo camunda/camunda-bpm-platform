@@ -16,17 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.exception;
 
-import org.camunda.bpm.engine.rest.dto.ExceptionDto;
-
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Translates any {@link Throwable} to a HTTP 500 error and a JSON response.
@@ -36,26 +28,8 @@ import java.util.logging.Logger;
 @Provider
 public class ExceptionHandler implements ExceptionMapper<Throwable> {
 
-  private static final Logger LOGGER = Logger.getLogger(ExceptionHandler.class.getSimpleName());
-
   @Override
   public Response toResponse(Throwable throwable) {
-
-    LOGGER.log(Level.WARNING, getStackTrace(throwable));
-
-    ExceptionDto exceptionDto = ExceptionHandlerHelper.getInstance().fromException(throwable);
-
-    Response.Status responseStatus = ExceptionHandlerHelper.getInstance().getStatus(throwable);
-
-    return Response.status(responseStatus).entity(exceptionDto).type(MediaType.APPLICATION_JSON_TYPE).build();
+    return ExceptionHandlerHelper.getInstance().getResponse(throwable);
   }
-  
-  protected String getStackTrace(Throwable aThrowable) {
-    final Writer result = new StringWriter();
-    final PrintWriter printWriter = new PrintWriter(result);
-    aThrowable.printStackTrace(printWriter);
-    return result.toString();
-  }
-
-  
 }

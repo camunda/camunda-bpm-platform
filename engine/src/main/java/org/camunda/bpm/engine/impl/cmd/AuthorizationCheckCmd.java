@@ -16,11 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
+import java.util.Objects;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -57,6 +61,11 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
     if (authorizationManager.isPermissionDisabled(permission)) {
       throw LOG.disabledPermissionException(permission.getName());
     }
+
+    if (isHistoricInstancePermissionsDisabled(commandContext) && isHistoricInstanceResource()) {
+      throw LOG.disabledHistoricInstancePermissionsException();
+    }
+
     return authorizationManager.isAuthorized(userId, groupIds, permission, resource, resourceId);
   }
 
@@ -64,6 +73,15 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
     ensureAtLeastOneNotNull("Authorization must have a 'userId' or/and a 'groupId'.", userId, groupIds);
     ensureNotNull("Invalid permission for an authorization", "authorization.getResource()", permission);
     ensureNotNull("Invalid resource for an authorization", "authorization.getResource()", resource);
+  }
+
+  protected boolean isHistoricInstancePermissionsDisabled(CommandContext commandContext) {
+    return !commandContext.getProcessEngineConfiguration().isEnableHistoricInstancePermissions();
+  }
+
+  protected boolean isHistoricInstanceResource() {
+    return Objects.equals(Resources.HISTORIC_TASK, resource) ||
+        Objects.equals(Resources.HISTORIC_PROCESS_INSTANCE, resource);
   }
 
 }

@@ -31,13 +31,6 @@
 
     <property name="jdbcBatchProcessing" value="false"/>
 
-    <!-- TODO: REMOVE AFTER 7.11 Release -->
-    <property name="processEnginePlugins">
-      <list>
-        <bean class="org.camunda.bpm.engine.test.standalone.db.TestIgnoreSchemaLogTableOnPurgePlugin" />
-      </list>
-    </property>
-
   </bean>
 
 </beans>

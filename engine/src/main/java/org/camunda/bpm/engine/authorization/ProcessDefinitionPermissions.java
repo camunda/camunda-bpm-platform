@@ -105,7 +105,10 @@ public enum ProcessDefinitionPermissions implements Permission {
   READ_HISTORY_VARIABLE("READ_HISTORY_VARIABLE", 4194304),
 
   /** Indicates that READ_TASK_VARIABLE interactions are permitted. */
-  READ_TASK_VARIABLE("READ_TASK_VARIABLE", 8388608);
+  READ_TASK_VARIABLE("READ_TASK_VARIABLE", 8388608),
+
+  /** Indicates that UPDATE_HISTORY interactions are permitted. */
+  UPDATE_HISTORY("UPDATE_HISTORY", 16_777_216);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
 

@@ -22,6 +22,7 @@ public class HistoryCleanupConfigurationDto {
 
 	protected Date batchWindowStartTime;
 	protected Date batchWindowEndTime;
+	protected boolean enabled;
 
 	public Date getBatchWindowStartTime() {
 		return batchWindowStartTime;
@@ -37,6 +38,14 @@ public class HistoryCleanupConfigurationDto {
 
 	public void setBatchWindowEndTime(Date batchWindowEndTime) {
 		this.batchWindowEndTime = batchWindowEndTime;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 }

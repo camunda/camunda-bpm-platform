@@ -31,6 +31,8 @@
       RESOURCE_TYPE_,
       RESOURCE_ID_,
       PERMS_,
+      ROOT_PROC_INST_ID_,
+      REMOVAL_TIME_,
       REV_
       )
     values (
@@ -41,6 +43,8 @@
       #{resourceType ,jdbcType=INTEGER},
       #{resourceId ,jdbcType=VARCHAR},
       #{permissions, jdbcType=INTEGER},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -55,9 +59,35 @@
       USER_ID_ = #{userId, jdbcType=VARCHAR},
       RESOURCE_TYPE_ = #{resourceType, jdbcType=INTEGER},
       RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
-      PERMS_ = #{permissions, jdbcType=INTEGER}
+      PERMS_ = #{permissions, jdbcType=INTEGER},
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=TIMESTAMP}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateAuthorizationsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateAuthorizationsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where
+      <!-- task instances -->
+      RESOURCE_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+      <!-- process instances -->
+      or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
@@ -77,6 +107,52 @@
         AND RESOURCE_ID_ = #{resourceId}
   </delete>
 
+  <delete id="deleteAuthorizationsByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAuthorizationsByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAuthorizationsByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_AUTHORIZATION
+    where ID_ IN
+    (SELECT ID_
+    FROM ${prefix}ACT_RU_AUTHORIZATION
+    WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset})
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
   <!-- AUTHORIZATION RESULTMAP -->
 
   <resultMap id="authorizationResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
@@ -87,6 +163,8 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="INTEGER" />
     <result property="resourceId" column="RESOURCE_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="permissions" column="PERMS_" jdbcType="INTEGER" />
   </resultMap>
 
@@ -133,7 +211,7 @@
       WHERE TYPE_ = 2
       AND (
         USER_ID_ IN (#{userId, jdbcType=VARCHAR}, '*')
-        <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+        <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
         OR GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item, jdbcType=VARCHAR}</foreach>
         </if>
       )
@@ -151,8 +229,9 @@
   </select>
 
   <select id="selectAuthorizationCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectAuthorizationByQueryCriteriaSql">
@@ -215,13 +294,13 @@
 
   <select id="isUserAuthorizedForResource" resultType="integer">
 
-  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
     SELECT
   </if>
 
   <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
 
-  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+  <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
     ${dbSpecificDummyTable}
   </if>
 
@@ -327,7 +406,7 @@
           (
           SELECT
             CASE
-              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+              <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
 
                 <!-- Group GRANTS -->
                 <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
@@ -526,7 +605,7 @@
                             null
                           </if>
 
-              <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+              <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
                         END ${dbSpecificDummyTable}
                 )
               </if>
@@ -554,7 +633,7 @@
           </when> 
           <otherwise>
             AUTH.RESOURCE_ID_ IS NOT NULL 
-            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size() > 0"> 
+            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">
                 <if test="index > 0">
@@ -615,11 +694,11 @@
     FROM ${prefix}ACT_RU_AUTHORIZATION A
     WHERE A.TYPE_ &lt; 2     
     AND ( A.USER_ID_ in ( #{authCheck.authUserId, jdbcType=VARCHAR}, '*')           
-    <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
+    <if test="authGroupIds != null &amp;&amp; authGroupIds.size > 0">
       OR A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
     </if>
     )
-    <if test="atomicChecks != null &amp;&amp; atomicChecks.size() > 0">
+    <if test="atomicChecks != null &amp;&amp; atomicChecks.size > 0">
       AND (
       <if test="disjunctive">
         <foreach item="permCheck" index="index" collection="atomicChecks" open="(" separator="OR" close=")">
@@ -640,14 +719,14 @@
    input: "permissionChecks": an instance of CompositePermissionCheck
   -->
   <sql id="atomicChecks">
-    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() == 1">
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size == 1">
 
       <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
 
     </if>
 
-    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size > 1">
       <if test="permissionChecks.disjunctive">
         <bind name="atomicChecks" value="permissionChecks.atomicChecks" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveAtomicChecks" />
@@ -663,7 +742,7 @@
    input: "permissionChecks": an instance of CompositePermissionCheck
   -->
   <sql id="compositeChecks">
-    <if test="permissionChecks.compositeChecks != null &amp;&amp; permissionChecks.compositeChecks.size() > 1">
+    <if test="permissionChecks.compositeChecks != null &amp;&amp; permissionChecks.compositeChecks.size > 1">
       <if test="permissionChecks.disjunctive">
         <bind name="compositeChecks" value="permissionChecks.compositeChecks" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveCompositeChecks"/>
@@ -775,7 +854,7 @@
           (RES.CASE_EXECUTION_ID_ IS NOT NULL)
           OR
           (AUTH.RESOURCE_ID_ IS NOT NULL)
-            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size() > 0"> 
+            <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">
                 <if test="index > 0">

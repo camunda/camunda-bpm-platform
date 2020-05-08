@@ -36,6 +36,7 @@ public class ResolveTaskCmd extends CompleteTaskCmd {
   @Override
   protected void completeTask(TaskEntity task) {
     task.resolve();
-    task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
+    task.triggerUpdateEvent();
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
   }
 }

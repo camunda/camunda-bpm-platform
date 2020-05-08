@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<cmmn:definitions xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="http://camunda.org/test">
+  <cmmn:case>
+    <cmmn:casePlanModel>
+      <cmmn:humanTask/>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+</cmmn:definitions>

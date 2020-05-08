@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.impl.batch.removaltime;
 
 import com.google.gson.JsonObject;
+
+import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
@@ -29,8 +32,9 @@ import java.util.List;
 public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalTimeBatchConfiguration> {
 
   public static final SetRemovalTimeJsonConverter INSTANCE = new SetRemovalTimeJsonConverter();
-  
+
   protected static final String IDS = "ids";
+  protected static final String ID_MAPPINGS = "idMappings";
   protected static final String REMOVAL_TIME = "removalTime";
   protected static final String HAS_REMOVAL_TIME = "hasRemovalTime";
   protected static final String IS_HIERARCHICAL = "isHierarchical";
@@ -39,6 +43,7 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, IDS, configuration.getIds());
+    JsonUtil.addListField(json, ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addDateField(json, REMOVAL_TIME, configuration.getRemovalTime());
     JsonUtil.addField(json, HAS_REMOVAL_TIME, configuration.hasRemovalTime());
     JsonUtil.addField(json, IS_HIERARCHICAL, configuration.isHierarchical());
@@ -53,11 +58,14 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
 
     List<String> instanceIds =  JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
 
+    DeploymentMappings mappings = JsonUtil.asList(JsonUtil.getArray(jsonObject, ID_MAPPINGS),
+        DeploymentMappingJsonConverter.INSTANCE, DeploymentMappings::new);
+
     boolean hasRemovalTime = JsonUtil.getBoolean(jsonObject, HAS_REMOVAL_TIME);
 
     boolean isHierarchical = JsonUtil.getBoolean(jsonObject, IS_HIERARCHICAL);
 
-    return new SetRemovalTimeBatchConfiguration(instanceIds)
+    return new SetRemovalTimeBatchConfiguration(instanceIds, mappings)
       .setRemovalTime(removalTime)
       .setHasRemovalTime(hasRemovalTime)
       .setHierarchical(isHierarchical);

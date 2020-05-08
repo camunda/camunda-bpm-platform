@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -130,7 +133,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskFollowUpDate;
   protected Date taskFollowUpDateBefore;
   protected Date taskFollowUpDateAfter;
-  private List<String> tenantIds;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   protected Date startedBefore;
   protected Date startedAfter;
@@ -150,11 +154,21 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Boolean withoutCandidateGroups;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
+  
+  protected Boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
+
+  private List<HistoricTaskInstanceQueryDto> orQueries;
 
   public HistoricTaskInstanceQueryDto() {}
 
   public HistoricTaskInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<HistoricTaskInstanceQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   @CamundaQueryParam("taskId")
@@ -347,6 +361,16 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.processVariables = processVariables;
   }
 
+  @CamundaQueryParam(value="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value="variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
   @CamundaQueryParam("caseDefinitionId")
   public void setCaseDefinitionId(String caseDefinitionId) {
     this.caseDefinitionId = caseDefinitionId;
@@ -375,6 +399,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @CamundaQueryParam("taskInvolvedUser")
@@ -437,8 +466,20 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     return engine.getHistoryService().createHistoricTaskInstanceQuery();
   }
 
+  public List<HistoricTaskInstanceQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(HistoricTaskInstanceQuery query) {
+    if (orQueries != null) {
+      for (HistoricTaskInstanceQueryDto orQueryDto: orQueries) {
+        HistoricTaskInstanceQueryImpl orQuery = new HistoricTaskInstanceQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((HistoricTaskInstanceQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (taskId != null) {
       query.taskId(taskId);
     }
@@ -565,6 +606,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
     if(taskInvolvedUser != null){
       query.taskInvolvedUser(taskInvolvedUser);
     }
@@ -598,6 +642,14 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
 
     if (startedBefore != null) {
       query.startedBefore(startedBefore);
+    }
+
+    if (TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+
+    if (TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
 
     if (taskVariables != null) {

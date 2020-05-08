@@ -36,6 +36,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents which have the given process definition id. **/
   HistoricIncidentQuery processDefinitionId(String processDefinitionId);
 
+  /** Only select historic incidents which have one of the given process definition keys. **/
+  HistoricIncidentQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
   /** Only select historic incidents which have the given process instance id. **/
   HistoricIncidentQuery processInstanceId(String processInstanceId);
 
@@ -44,6 +47,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
 
   /** Only select historic incidents which contain an activity with the given id. **/
   HistoricIncidentQuery activityId(String activityId);
+
+  /** Only select historic incidents which were created due to a failure at an activity with the given id. **/
+  HistoricIncidentQuery failedActivityId(String activityId);
 
   /** Only select historic incidents which contain the id of the cause incident. **/
   HistoricIncidentQuery causeIncidentId(String causeIncidentId);
@@ -54,8 +60,14 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents that belong to one of the given tenant ids. */
   HistoricIncidentQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic incidents that have no tenant id. */
+  HistoricIncidentQuery withoutTenantId();
+
   /** Only select incidents which contain the configuration. **/
   HistoricIncidentQuery configuration(String configuration);
+
+  /** Only select incidents which contain the historyConfiguration. **/
+  HistoricIncidentQuery historyConfiguration(String historyConfiguration);
 
   /** Only select incidents that belong to one of the given job definition ids. */
   HistoricIncidentQuery jobDefinitionIdIn(String... jobDefinitionIds);
@@ -104,6 +116,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
 
   /** Order by configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByConfiguration();
+
+  /** Order by historyConfiguration (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIncidentQuery orderByHistoryConfiguration();
 
   /** Order by incidentState (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByIncidentState();

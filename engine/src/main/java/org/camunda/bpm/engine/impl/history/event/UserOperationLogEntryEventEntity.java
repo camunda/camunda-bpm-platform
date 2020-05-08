@@ -43,6 +43,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String batchId;
   protected String category;
   protected String externalTaskId;
+  protected String annotation;
 
   public String getOperationId() {
     return operationId;
@@ -180,6 +181,14 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
     this.externalTaskId = externalTaskId;
   }
 
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -206,6 +215,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
         + ", tenantId=" + tenantId
         + ", entityType=" + entityType
         + ", category=" + category
+        + ", annotation=" + annotation
         + "]";
   }
 }

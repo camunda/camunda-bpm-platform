@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -70,7 +72,9 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   protected final String CALLED_PROCESS_KEY = "calledProcess";
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
     .startEvent()
-      .userTask("userTask").name("userTask")
+      .userTask("userTask")
+        .name("userTask")
+        .camundaAssignee("foo")
       .serviceTask()
         .camundaAsyncBefore()
         .camundaClass(FailingDelegate.class.getName())
@@ -588,9 +592,11 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
     // when
     identityService.setAuthenticatedUserId("aUserId");
-    taskService.claim(taskService.createTaskQuery().singleResult().getId(), "aUserId");
+    taskService.setAssignee(taskId, "aUserId");
     identityService.clearAuthentication();
 
     UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
@@ -634,10 +640,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    // when
-    taskService.addCandidateUser(taskService.createTaskQuery().singleResult().getId(), "aUserId");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    // when
+    taskService.addCandidateUser(taskId, "aUserId");
+
+    HistoricIdentityLinkLog historicIdentityLinkLog =
+        historyService.createHistoricIdentityLinkLogQuery()
+            .userId("aUserId")
+            .singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog, notNullValue());
@@ -1182,6 +1193,34 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     // then
     assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveAuthorization() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    // when
+    enabledAuth();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    disableAuth();
+
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_TASK)
+        .singleResult();
+
+    // assume
+    assertThat(authorization, notNullValue());
+
+    // then
+    assertThat(authorization.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+
+    // clear
+    clearAuthorization();
   }
 
 }

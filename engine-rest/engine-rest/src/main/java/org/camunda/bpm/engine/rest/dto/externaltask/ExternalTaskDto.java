@@ -35,6 +35,7 @@ public class ExternalTaskDto {
   protected Date lockExpirationTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String processInstanceId;
   protected Integer retries;
   protected boolean suspended;
@@ -67,6 +68,9 @@ public class ExternalTaskDto {
   }
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
   }
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -109,6 +113,7 @@ public class ExternalTaskDto {
     dto.lockExpirationTime = task.getLockExpirationTime();
     dto.processDefinitionId = task.getProcessDefinitionId();
     dto.processDefinitionKey = task.getProcessDefinitionKey();
+    dto.processDefinitionVersionTag = task.getProcessDefinitionVersionTag();
     dto.processInstanceId = task.getProcessInstanceId();
     dto.retries = task.getRetries();
     dto.suspended = task.isSuspended();

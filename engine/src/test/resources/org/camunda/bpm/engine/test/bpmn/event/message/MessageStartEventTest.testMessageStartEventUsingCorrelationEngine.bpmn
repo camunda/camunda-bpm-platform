@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0kuigsi" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.1">
+  <bpmn:process id="Process_testMessageStartEventUsingCorrelationEngine" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_12jsbty">
+      <bpmn:outgoing>SequenceFlow_16ydoji</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_0rum255" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_16ydoji" sourceRef="StartEvent_12jsbty" targetRef="Task_Manual_newCorrelationStartMessage" />
+    <bpmn:endEvent id="EndEvent_0numv9v">
+      <bpmn:incoming>SequenceFlow_0jxicrz</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0jxicrz" sourceRef="Task_Manual_newCorrelationStartMessage" targetRef="EndEvent_0numv9v" />
+    <bpmn:userTask id="Task_Manual_newCorrelationStartMessage">
+      <bpmn:incoming>SequenceFlow_16ydoji</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0jxicrz</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmn:message id="Message_0rum255" name="newCorrelationStartMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_testMessageStartEventUsingCorrelationEngine">
+      <bpmndi:BPMNShape id="StartEvent_0gh3kt0_di" bpmnElement="StartEvent_12jsbty">
+        <dc:Bounds x="152" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_16ydoji_di" bpmnElement="SequenceFlow_16ydoji">
+        <di:waypoint x="188" y="150" />
+        <di:waypoint x="230" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0numv9v_di" bpmnElement="EndEvent_0numv9v">
+        <dc:Bounds x="372" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0jxicrz_di" bpmnElement="SequenceFlow_0jxicrz">
+        <di:waypoint x="330" y="150" />
+        <di:waypoint x="372" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0arixnd_di" bpmnElement="Task_Manual_newCorrelationStartMessage">
+        <dc:Bounds x="230" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

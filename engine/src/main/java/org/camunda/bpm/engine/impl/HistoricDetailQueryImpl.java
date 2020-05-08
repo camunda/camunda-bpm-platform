@@ -50,11 +50,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String variableInstanceId;
   protected String[] variableTypes;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected String[] processInstanceIds;
   protected String userOperationId;
   protected Long sequenceCounter;
   protected Date occurredBefore;
   protected Date occurredAfter;
+  protected boolean initial = false;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -147,6 +149,14 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricDetailQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
@@ -201,6 +211,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  @Override
+  public HistoricDetailQuery initial() {
+    this.initial = true;
+    return this;
+  }
+
+  @Override
   public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<HistoricDetail> historicDetails = commandContext
@@ -321,5 +338,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public Date getOccurredAfter() {
     return occurredAfter;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public boolean isInitial() {
+    return initial;
   }
 }

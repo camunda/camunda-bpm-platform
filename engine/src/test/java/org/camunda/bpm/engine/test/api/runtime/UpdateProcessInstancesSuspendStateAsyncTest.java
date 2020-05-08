@@ -17,11 +17,15 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -29,7 +33,6 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,10 +41,9 @@ import org.junit.rules.RuleChain;
 import org.python.google.common.collect.Sets;
 
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 public class UpdateProcessInstancesSuspendStateAsyncTest {
@@ -83,7 +85,7 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
 
 
@@ -95,6 +97,91 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
   }
 
+  @Test
+  public void testBatchSuspensionByIdsInDifferentDeployments() {
+    // given
+    String deploymentId1 = testRule.deployAndGetDefinition("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml").getDeploymentId();
+    String deploymentId2 = testRule.deployAndGetDefinition("org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml").getDeploymentId();
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+
+    // then
+    Job seedJob = helper.getSeedJob(suspendprocess);
+    assertThat(seedJob.getDeploymentId()).isIn(deploymentId1, deploymentId2);
+
+    // when
+    helper.completeSeedJobs(suspendprocess);
+
+    // then
+    List<Job> batchJobs = helper.getExecutionJobs(suspendprocess);
+    assertThat(batchJobs).hasSize(2);
+    assertThat(batchJobs.get(0).getDeploymentId()).isIn(deploymentId1, deploymentId2);
+    assertThat(batchJobs.get(1).getDeploymentId()).isIn(deploymentId1, deploymentId2);
+    assertThat(batchJobs.get(0).getDeploymentId()).isNotEqualTo(batchJobs.get(1).getDeploymentId());
+
+    // when
+    helper.completeExecutionJobs(suspendprocess);
+
+    // then
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    assertTrue(p1c.isSuspended());
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    assertTrue(p2c.isSuspended());
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void shouldSetInvocationsPerBatchTypeOnSuspension() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE, 42);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    Batch batch = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void shouldSetInvocationsPerBatchTypeOnActivation() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE, 42);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    Batch batch = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .activateAsync();
+
+    // then
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    engineRule.getProcessEngineConfiguration()
+        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
@@ -106,10 +193,10 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
     Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).activateAsync();
-    helper.executeSeedJob(activateprocess);
+    helper.completeSeedJobs(activateprocess);
     helper.executeJobs(activateprocess);
 
 
@@ -130,7 +217,7 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active()).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
 
 
@@ -152,10 +239,10 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active()).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
     Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().suspended()).activateAsync();
-    helper.executeSeedJob(activateprocess);
+    helper.completeSeedJobs(activateprocess);
     helper.executeJobs(activateprocess);
 
 
@@ -177,7 +264,7 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
 
 
@@ -201,10 +288,10 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).suspendAsync();
-    helper.executeSeedJob(suspendprocess);
+    helper.completeSeedJobs(suspendprocess);
     helper.executeJobs(suspendprocess);
     Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).activateAsync();
-    helper.executeSeedJob(activateprocess);
+    helper.completeSeedJobs(activateprocess);
     helper.executeJobs(activateprocess);
 
 

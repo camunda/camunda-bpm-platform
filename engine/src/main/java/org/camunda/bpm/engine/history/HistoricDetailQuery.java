@@ -110,6 +110,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic details with one of the given tenant ids. */
   HistoricDetailQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic details that have no tenant id. */
+  HistoricDetailQuery withoutTenantId();
+
   /** Only select historic details with the given process instance ids. */
   HistoricDetailQuery processInstanceIdIn(String... processInstanceIds);
 
@@ -123,6 +126,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
 
   /** Only select historic details that have occurred after the given date (inclusive). */
   HistoricDetailQuery occurredAfter(Date date);
+
+  /** Only select historic details that were set during the process start. */
+  HistoricDetailQuery initial();
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

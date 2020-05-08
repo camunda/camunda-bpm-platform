@@ -40,13 +40,17 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String incidentMessage;
   protected String executionId;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String[] processDefinitionKeys;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String historyConfiguration;
   protected IncidentState incidentState;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected String[] jobDefinitionIds;
 
   public HistoricIncidentQueryImpl() {
@@ -86,6 +90,12 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery failedActivityId(String activityId) {
+    ensureNotNull("failedActivityId", activityId);
+    this.failedActivityId = activityId;
+    return this;
+  }
+
   public HistoricIncidentQuery processInstanceId(String processInstanceId) {
     ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
@@ -97,6 +107,13 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     this.processDefinitionId = processDefinitionId;
     return this;
   }
+
+  public HistoricIncidentQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("processDefinitionKeys", (Object[]) processDefinitionKeys);
+    this.processDefinitionKeys = processDefinitionKeys;
+    return this;
+  }
+
 
   public HistoricIncidentQuery causeIncidentId(String causeIncidentId) {
     ensureNotNull("causeIncidentId", causeIncidentId);
@@ -113,12 +130,26 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricIncidentQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
   public HistoricIncidentQuery configuration(String configuration) {
     ensureNotNull("configuration", configuration);
     this.configuration = configuration;
+    return this;
+  }
+
+  public HistoricIncidentQuery historyConfiguration(String historyConfiguration) {
+    ensureNotNull("historyConfiguration", historyConfiguration);
+    this.historyConfiguration = historyConfiguration;
     return this;
   }
 
@@ -216,6 +247,11 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery orderByHistoryConfiguration() {
+    orderBy(HistoricIncidentQueryProperty.HISTORY_CONFIGURATION);
+    return this;
+  }
+
   public HistoricIncidentQuery orderByIncidentState() {
     orderBy(HistoricIncidentQueryProperty.INCIDENT_STATE);
     return this;
@@ -264,12 +300,20 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return activityId;
   }
 
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
   }
 
   public String getCauseIncidentId() {
@@ -284,8 +328,15 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return configuration;
   }
 
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
+  }
+
   public IncidentState getIncidentState() {
     return incidentState;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 }

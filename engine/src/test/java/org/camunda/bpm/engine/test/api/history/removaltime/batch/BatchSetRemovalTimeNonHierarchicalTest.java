@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
@@ -23,6 +24,9 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
@@ -72,6 +76,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 /**
@@ -98,6 +103,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
   protected TaskService taskService;
   protected IdentityService identityService;
   protected ExternalTaskService externalTaskService;
+  protected AuthorizationService authorizationService;
 
   @Before
   public void assignServices() {
@@ -108,6 +114,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     taskService = engineRule.getTaskService();
     identityService = engineRule.getIdentityService();
     externalTaskService = engineRule.getExternalTaskService();
+    authorizationService = engineRule.getAuthorizationService();
   }
 
   @Test
@@ -429,6 +436,153 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // then
     assertThat(historicTaskInstance.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_HistoricTaskInstanceAuthorization() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(true);
+
+    testRule.enableAuth();
+    testRule.process().userTask().deploy().start();
+    testRule.disableAuth();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byQuery(query)
+        .executeAsync()
+    );
+
+    Authorization authorization =
+        authorizationService.createAuthorizationQuery()
+            .resourceType(Resources.HISTORIC_TASK)
+            .singleResult();
+
+    // then
+    assertThat(authorization.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  @Test
+  public void shouldNotSetRemovalTime_HistoricTaskInstancePermissionsDisabled() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(true);
+
+    testRule.enableAuth();
+    testRule.process().userTask().deploy().start();
+    testRule.disableAuth();
+
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(false);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byQuery(query)
+        .executeAsync()
+    );
+
+    Authorization authorization =
+        authorizationService.createAuthorizationQuery()
+            .resourceType(Resources.HISTORIC_TASK)
+            .singleResult();
+
+    // then
+    assertThat(authorization.getRemovalTime()).isNull();
+  }
+
+  @Test
+  public void shouldSetRemovalTime_HistoricProcessInstanceAuthorization() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+    authorization.setResourceId(processInstanceId);
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    testRule.syncExec(
+        historyService.setRemovalTimeToHistoricProcessInstances()
+            .absoluteRemovalTime(REMOVAL_TIME)
+            .byQuery(query)
+            .executeAsync()
+    );
+
+    // then
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(REMOVAL_TIME, processInstanceId, processInstanceId));
+  }
+
+  @Test
+  public void shouldNotSetRemovalTime_HistoricProcessInstancePermissionsDisabled() {
+    // given
+    testRule.getProcessEngineConfiguration()
+        .setEnableHistoricInstancePermissions(false);
+
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    Authorization authorization =
+        authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.HISTORIC_PROCESS_INSTANCE);
+    authorization.setResourceId(processInstanceId);
+    authorization.setUserId("foo");
+
+    authorizationService.saveAuthorization(authorization);
+
+    // assume
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+        historyService.setRemovalTimeToHistoricProcessInstances()
+            .absoluteRemovalTime(REMOVAL_TIME)
+            .byQuery(query)
+            .executeAsync()
+    );
+
+    // then
+    authQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE);
+
+    assertThat(authQuery.list())
+        .extracting("removalTime", "resourceId", "rootProcessInstanceId")
+        .containsExactly(tuple(null, processInstanceId, processInstanceId));
   }
 
   @Test
@@ -1356,7 +1510,8 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
   @Test
   public void shouldSetRemovalTimeToBatch_Incident() {
     // given
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList("aProcessInstanceId"), "aDeleteReason");
+    String processInstance = testRule.process().failingCustomListener().deploy().start();
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstance), "aDeleteReason");
 
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.setJobRetries(jobId, 0);
@@ -1383,6 +1538,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // clear database
     managementService.deleteBatch(batch.getId(), true);
+    runtimeService.deleteProcessInstance(processInstance, "", true);
   }
 
 }

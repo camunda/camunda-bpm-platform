@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable">
+      <input id="input1" label="score" camunda:inputVariable="">
+        <inputExpression id="inputExpression1" typeRef="integer">        <text>score</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="result" name="result" typeRef="string" />
+      <rule id="row-629723977-1">
+        <inputEntry id="UnaryTests_1075dll">        <text>[1..5]</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1ktsuj7">        <text><![CDATA["a"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-629723977-2">
+        <inputEntry id="UnaryTests_1kqgpdr">        <text>[6..10]</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0oi35hi">        <text><![CDATA["b"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

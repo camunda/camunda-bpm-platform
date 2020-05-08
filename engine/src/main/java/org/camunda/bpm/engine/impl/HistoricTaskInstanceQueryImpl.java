@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +76,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected boolean processFinished;
   protected boolean processUnfinished;
   protected List<TaskQueryVariableValue> variables = new ArrayList<>();
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
@@ -82,7 +85,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date followUpBefore;
 
   protected Date followUpAfter;
+
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
+
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
   protected String caseDefinitionName;
@@ -93,6 +99,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date finishedBefore;
   protected Date startedAfter;
   protected Date startedBefore;
+
+  protected List<HistoricTaskInstanceQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
+  protected boolean isOrQueryActive = false;
 
   public HistoricTaskInstanceQueryImpl() {
   }
@@ -272,14 +281,32 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     this.unfinished = true;
     return this;
   }
+  
+  @Override
+  public HistoricTaskInstanceQuery matchVariableNamesIgnoreCase() {
+    this.variableNamesIgnoreCase = true;
+    for (QueryVariableValue variable : this.variables) {
+      variable.setVariableNameIgnoreCase(true);
+    }
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery matchVariableValuesIgnoreCase() {
+    this.variableValuesIgnoreCase = true;
+    for (QueryVariableValue variable : this.variables) {
+      variable.setVariableValueIgnoreCase(true);
+    }
+    return this;
+  }
 
   public HistoricTaskInstanceQueryImpl taskVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true, false));
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, true, false);
     return this;
   }
 
   public HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, false, true));
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
 
@@ -359,11 +386,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery withCandidateGroups() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
+    }
+
     this.withCandidateGroups = true;
     return this;
   }
 
   public HistoricTaskInstanceQuery withoutCandidateGroups() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
+    }
+
     this.withoutCandidateGroups = true;
     return this;
   }
@@ -377,6 +412,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
     for(QueryVariableValue var : variables) {
       var.initialize(types);
+    }
+
+    if (!queries.isEmpty()) {
+      for (HistoricTaskInstanceQueryImpl orQuery: queries) {
+        for (QueryVariableValue var : orQuery.variables) {
+          var.initialize(types);
+        }
+      }
     }
   }
 
@@ -399,7 +442,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
           break;
       }
     }
-    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase));
   }
 
   protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
@@ -446,19 +491,25 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public HistoricTaskInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 
   @Override
   public HistoricTaskInstanceQuery finishedAfter(Date date) {
-    finished = true;
     this.finishedAfter = date;
     return this;
   }
 
   @Override
   public HistoricTaskInstanceQuery finishedBefore(Date date) {
-    finished = true;
     this.finishedBefore = date;
     return this;
   }
@@ -490,106 +541,190 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   // ordering /////////////////////////////////////////////////////////////////
 
   public HistoricTaskInstanceQueryImpl orderByTaskId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.HISTORIC_TASK_INSTANCE_ID);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByHistoricActivityInstanceId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByHistoricActivityInstanceId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.ACTIVITY_INSTANCE_ID);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByProcessDefinitionId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.PROCESS_DEFINITION_ID);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByProcessInstanceId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.PROCESS_INSTANCE_ID);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByExecutionId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByExecutionId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.EXECUTION_ID);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByHistoricTaskInstanceDuration() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByHistoricTaskInstanceDuration() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.DURATION);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByHistoricTaskInstanceEndTime() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByHistoricTaskInstanceEndTime() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.END);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByHistoricActivityInstanceStartTime() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByHistoricActivityInstanceStartTime() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.START);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByTaskName() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskName() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_NAME);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByTaskDescription() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskDescription() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_DESCRIPTION);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskAssignee() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskAssignee() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_ASSIGNEE);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskOwner() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskOwner() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_OWNER);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskDueDate() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskDueDate() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_DUE_DATE);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskFollowUpDate() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskFollowUpDate() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_FOLLOW_UP_DATE);
     return this;
   }
 
   public HistoricTaskInstanceQueryImpl orderByDeleteReason() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByDeleteReason() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.DELETE_REASON);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskDefinitionKey() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskDefinitionKey() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_DEFINITION_KEY);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTaskPriority() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskPriority() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.TASK_PRIORITY);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByCaseDefinitionId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseDefinitionId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.CASE_DEFINITION_ID);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByCaseInstanceId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseInstanceId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.CASE_INSTANCE_ID);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByCaseExecutionId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
+    }
+
     orderBy(HistoricTaskInstanceQueryProperty.CASE_EXECUTION_ID);
     return this;
   }
 
   public HistoricTaskInstanceQuery orderByTenantId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTenantId() within 'or' query");
+    }
+
     return orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID);
   }
 
@@ -609,6 +744,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public String getProcessInstanceBusinessKeyLike() {
     return processInstanceBusinessKeyLike;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
   }
 
   public String getExecutionId() {
@@ -643,8 +786,40 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return finished;
   }
 
+  public boolean isProcessFinished() {
+    return processFinished;
+  }
+
   public boolean isUnfinished() {
     return unfinished;
+  }
+
+  public boolean isProcessUnfinished() {
+    return processUnfinished;
+  }
+
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public Date getDueBefore() {
+    return dueBefore;
+  }
+
+  public Date getDueAfter() {
+    return dueAfter;
+  }
+
+  public Date getFollowUpDate() {
+    return followUpDate;
+  }
+
+  public Date getFollowUpBefore() {
+    return followUpBefore;
+  }
+
+  public Date getFollowUpAfter() {
+    return followUpAfter;
   }
 
   public String getTaskName() {
@@ -683,12 +858,36 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return taskId;
   }
 
+  public String getTaskInvolvedGroup() {
+    return taskInvolvedGroup;
+  }
+
+  public String getTaskInvolvedUser() {
+    return taskInvolvedUser;
+  }
+
+  public String getTaskHadCandidateGroup() {
+    return taskHadCandidateGroup;
+  }
+
+  public String getTaskHadCandidateUser() {
+    return taskHadCandidateUser;
+  }
+
   public String[] getTaskDefinitionKeys() {
     return taskDefinitionKeys;
   }
 
   public List<TaskQueryVariableValue> getVariables() {
     return variables;
+  }
+
+  public Boolean getVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean getVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
   }
 
   public String getTaskOwnerLike() {
@@ -699,8 +898,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return taskOwner;
   }
 
+  public Integer getTaskPriority() {
+    return taskPriority;
+  }
+
   public String getTaskParentTaskId() {
     return taskParentTaskId;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
   }
 
   public String getCaseDefinitionId() {
@@ -738,4 +945,48 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public Date getStartedBefore() {
     return startedBefore;
   }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public List<HistoricTaskInstanceQueryImpl> getQueries() {
+    return queries;
+  }
+
+  public boolean isOrQueryActive() {
+    return isOrQueryActive;
+  }
+
+  public void addOrQuery(HistoricTaskInstanceQueryImpl orQuery) {
+    orQuery.isOrQueryActive = true;
+    this.queries.add(orQuery);
+  }
+
+  public void setOrQueryActive() {
+    isOrQueryActive = true;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery or() {
+    if (this != queries.get(0)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set or() within 'or' query");
+    }
+
+    HistoricTaskInstanceQueryImpl orQuery = new HistoricTaskInstanceQueryImpl();
+    orQuery.isOrQueryActive = true;
+    orQuery.queries = queries;
+    queries.add(orQuery);
+    return orQuery;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery endOr() {
+    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
+    }
+
+    return queries.get(0);
+  }
+
 }

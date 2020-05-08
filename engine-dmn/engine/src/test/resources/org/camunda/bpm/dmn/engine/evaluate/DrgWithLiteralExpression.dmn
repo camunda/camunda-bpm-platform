@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="dish" name="Dish" namespace="test-drg">
+  <decision id="dish-decision" name="Dish Decision">
+    <informationRequirement>
+      <requiredDecision href="#season" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#guestCount" />
+    </informationRequirement>
+    <decisionTable id="dishDecisionTable">
+      <input id="seasonInput" label="Season">
+        <inputExpression id="seasonInputExpression" typeRef="string">
+          <text>season</text>
+        </inputExpression>
+      </input>
+      <input id="guestCountInput" label="How many guests">
+        <inputExpression id="guestCountInputExpression" typeRef="integer">
+          <text>guestCount</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Dish" name="desiredDish" typeRef="string" />
+      <rule id="row-445981423-4">
+        <inputEntry id="UnaryTests_06or48g">
+          <text><![CDATA["Summer"]]></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0wa71sy">
+          <text><![CDATA[<=10]]></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_09ggol9">
+          <text><![CDATA["Light Salad"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="season" name="Season decision">
+    <decisionTable id="seasonDecisionTable">
+      <input id="temperatureInput" label="Weather in Celsius">
+        <inputExpression id="temperatureInputExpression" typeRef="integer">
+          <text>temperature</text>
+        </inputExpression>
+      </input>
+      <output id="seasonOutput" label="season" name="season" typeRef="string" />
+      <rule id="row-495762709-5">
+        <inputEntry id="UnaryTests_1fd0eqo">
+          <text><![CDATA[>30]]></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0l98klb">
+          <text><![CDATA["Summer"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="guestCount" name="Guest Count">
+    <variable name="guestCount" typeRef="integer" />
+    <literalExpression expressionLanguage="groovy">
+      <text>if(dayType == "WeekDay") { 4 } else { 12 }</text>
+    </literalExpression>
+  </decision>
+</definitions>

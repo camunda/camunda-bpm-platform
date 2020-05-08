@@ -23,31 +23,46 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
+import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 
 public class OptimizeManager extends AbstractManager {
 
-  @SuppressWarnings("unchecked")
-  public List<ByteArrayEntity> getHistoricVariableUpdateByteArrays(List<String> byteArrayIds) {
-    return (List<ByteArrayEntity>) getDbEntityManager().selectList("selectByteArrays", byteArrayIds);
+  /**
+   * Loads the byte arrays into the cache; does currently not return a list
+   * because it is not needed by the calling code and we can avoid concatenating
+   * lists in the implementation that way.
+   */
+  public void fetchHistoricVariableUpdateByteArrays(List<String> byteArrayIds) {
+
+    List<List<String>> partitions = CollectionUtil.partition(byteArrayIds, DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+
+    for (List<String> partition : partitions) {
+      getDbEntityManager().selectList("selectByteArrays", partition);
+    }
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityInstance> getCompletedHistoricActivityInstances(Date finishedAfter,
                                                                               Date finishedAt,
                                                                               int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("finishedAfter", finishedAfter);
@@ -61,7 +76,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricActivityInstance> getRunningHistoricActivityInstances(Date startedAfter,
                                                                             Date startedAt,
                                                                             int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("startedAfter", startedAfter);
@@ -75,7 +90,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricTaskInstance> getCompletedHistoricTaskInstances(Date finishedAfter,
                                                                       Date finishedAt,
                                                                       int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("finishedAfter", finishedAfter);
@@ -89,7 +104,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricTaskInstance> getRunningHistoricTaskInstances(Date startedAfter,
                                                                     Date startedAt,
                                                                     int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("startedAfter", startedAfter);
@@ -103,12 +118,15 @@ public class OptimizeManager extends AbstractManager {
   public List<UserOperationLogEntry> getHistoricUserOperationLogs(Date occurredAfter,
                                                                   Date occurredAt,
                                                                   int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     String[] operationTypes = new String[]{
-      UserOperationLogEntry.OPERATION_TYPE_ASSIGN,
-      UserOperationLogEntry.OPERATION_TYPE_CLAIM,
-      UserOperationLogEntry.OPERATION_TYPE_COMPLETE};
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB,
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION,
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE};
     Map<String, Object> params = new HashMap<>();
     params.put("occurredAfter", occurredAfter);
     params.put("occurredAt", occurredAt);
@@ -122,7 +140,7 @@ public class OptimizeManager extends AbstractManager {
   public List<OptimizeHistoricIdentityLinkLogEntity> getHistoricIdentityLinkLogs(Date occurredAfter,
                                                                                  Date occurredAt,
                                                                                  int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("occurredAfter", occurredAfter);
@@ -132,15 +150,11 @@ public class OptimizeManager extends AbstractManager {
     return getDbEntityManager().selectList("selectHistoricIdentityLinkPage", params);
   }
 
-  private void checkIsAuthorizedToReadHistoryOfProcessDefinitions() {
-    getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION);
-  }
-
   @SuppressWarnings("unchecked")
   public List<HistoricProcessInstance> getCompletedHistoricProcessInstances(Date finishedAfter,
                                                                             Date finishedAt,
                                                                             int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("finishedAfter", finishedAfter);
@@ -154,7 +168,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricProcessInstance> getRunningHistoricProcessInstances(Date startedAfter,
                                                                           Date startedAt,
                                                                           int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("startedAfter", startedAfter);
@@ -168,7 +182,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricVariableUpdate> getHistoricVariableUpdates(Date occurredAfter,
                                                                  Date occurredAt,
                                                                  int maxResults) {
-    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("occurredAfter", occurredAfter);
@@ -182,7 +196,7 @@ public class OptimizeManager extends AbstractManager {
   public List<HistoricDecisionInstance> getHistoricDecisionInstances(Date evaluatedAfter,
                                                                      Date evaluatedAt,
                                                                      int maxResults) {
-    checkIsAuthorizedToReadHistoryOfDecisionDefinitions();
+    checkIsAuthorizedToReadHistoryAndTenants();
 
     Map<String, Object> params = new HashMap<>();
     params.put("evaluatedAfter", evaluatedAfter);
@@ -205,8 +219,13 @@ public class OptimizeManager extends AbstractManager {
     return decisionInstances;
   }
 
-  private void checkIsAuthorizedToReadHistoryOfDecisionDefinitions() {
-    getAuthorizationManager().checkAuthorization(READ_HISTORY, DECISION_DEFINITION);
+  private void checkIsAuthorizedToReadHistoryAndTenants() {
+    CompositePermissionCheck necessaryPermissionsForOptimize = new PermissionCheckBuilder()
+      .conjunctive()
+      .atomicCheckForResourceId(PROCESS_DEFINITION, ANY, READ_HISTORY)
+      .atomicCheckForResourceId(DECISION_DEFINITION, ANY, READ_HISTORY)
+      .atomicCheckForResourceId(TENANT, ANY, READ)
+      .build();
+    getAuthorizationManager().checkAuthorization(necessaryPermissionsForOptimize);
   }
-
 }

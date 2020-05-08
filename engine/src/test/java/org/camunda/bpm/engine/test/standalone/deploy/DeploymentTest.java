@@ -16,7 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.deploy;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -64,8 +65,28 @@ public class DeploymentTest {
      engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
 
      long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertEquals(0, count);
+     assertThat(count, is(0L));
   }
 
+  @Test
+  public void shouldDeleteDeploymentWithRunningInstance() {
+     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+         .startEvent()
+         .userTask("testTask")
+         .endEvent()
+         .done();
 
+     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
+         .createDeployment()
+         .addModelInstance("foo.bpmn", instance)
+         .deployWithResult();
+     
+     engineRule.getRuntimeService().startProcessInstanceByKey("process");
+     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count(), is(1L));
+
+     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+
+     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
+     assertThat(count, is(0L));
+  }
 }

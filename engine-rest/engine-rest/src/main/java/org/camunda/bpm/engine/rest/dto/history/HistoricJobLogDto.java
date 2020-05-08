@@ -41,12 +41,14 @@ public class HistoricJobLogDto {
   protected String jobDefinitionConfiguration;
 
   protected String activityId;
+  protected String failedActivityId;
   protected String executionId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String deploymentId;
   protected String tenantId;
+  protected String hostname;
   protected String rootProcessInstanceId;
 
   protected boolean creationLog;
@@ -102,6 +104,10 @@ public class HistoricJobLogDto {
     return activityId;
   }
 
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
   public String getExecutionId() {
     return executionId;
   }
@@ -124,6 +130,10 @@ public class HistoricJobLogDto {
 
   public String getTenantId() {
     return tenantId;
+  }
+
+  public String getHostname() {
+    return hostname;
   }
 
   public String getRootProcessInstanceId() {
@@ -164,12 +174,14 @@ public class HistoricJobLogDto {
     result.jobDefinitionConfiguration = historicJobLog.getJobDefinitionConfiguration();
 
     result.activityId = historicJobLog.getActivityId();
+    result.failedActivityId = historicJobLog.getFailedActivityId();
     result.executionId = historicJobLog.getExecutionId();
     result.processInstanceId = historicJobLog.getProcessInstanceId();
     result.processDefinitionId = historicJobLog.getProcessDefinitionId();
     result.processDefinitionKey = historicJobLog.getProcessDefinitionKey();
     result.deploymentId = historicJobLog.getDeploymentId();
     result.tenantId = historicJobLog.getTenantId();
+    result.hostname = historicJobLog.getHostname();
     result.rootProcessInstanceId = historicJobLog.getRootProcessInstanceId();
 
     result.creationLog = historicJobLog.isCreationLog();

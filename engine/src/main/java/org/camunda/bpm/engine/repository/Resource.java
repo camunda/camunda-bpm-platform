@@ -28,4 +28,6 @@ public interface Resource {
 
   String getDeploymentId();
 
+  byte[] getBytes();
+
 }

@@ -56,6 +56,7 @@ public class QueryOrderingProperty implements Serializable {
   public static final String RELATION_VARIABLE = "variable";
   public static final String RELATION_PROCESS_DEFINITION = "process-definition";
   public static final String RELATION_CASE_DEFINITION = "case-definition";
+  public static final String RELATION_DEPLOYMENT = "deployment";
 
   protected static final long serialVersionUID = 1L;
 

@@ -17,6 +17,7 @@
 package org.camunda.bpm.qa.upgrade.gson.batch;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
@@ -59,13 +60,14 @@ public class RestartProcessInstanceBatchScenario {
           engine.getTaskService().complete(taskId);
         }
 
-        engine.getRuntimeService().restartProcessInstances(processDefinitionId)
+        Batch batch = engine.getRuntimeService().restartProcessInstances(processDefinitionId)
           .startBeforeActivity("theTask")
           .processInstanceIds(processInstanceIds)
           .skipCustomListeners()
           .skipIoMappings()
           .withoutBusinessKey()
           .executeAsync();
+        engine.getManagementService().setProperty("RestartProcessInstanceBatchScenario.batchId", batch.getId());
       }
     };
   }

@@ -28,17 +28,19 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -69,7 +71,7 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
 
     // allow timer jobs only
     checkJobType(job);
-    
+
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateJob(job);
     }
@@ -84,46 +86,47 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
         timerDeclaration.resolveAndSetDuedate(timer.getExecution(), timer, creationDateBased);
       }
     };
-    
+
     // run recalculation in correct context
     ProcessDefinitionEntity contextDefinition = commandContext
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .findDeployedProcessDefinitionById(job.getProcessDefinitionId());
     ProcessApplicationContextUtil.doContextSwitch(runnable, contextDefinition);
-    
+
     // log operation
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("duedate", oldDuedate, job.getDuedate()));
     propertyChanges.add(new PropertyChange("creationDateBased", null, creationDateBased));
-    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_RECALC_DUEDATE, jobId, 
+    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_RECALC_DUEDATE, jobId,
         job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
         propertyChanges);
-    
+
     return null;
   }
 
   protected void checkJobType(JobEntity job) {
     String type = job.getJobHandlerType();
-    if (!(TimerExecuteNestedActivityJobHandler.TYPE.equals(type) || 
-        TimerCatchIntermediateEventJobHandler.TYPE.equals(type) || 
-        TimerStartEventJobHandler.TYPE.equals(type) || 
-        TimerStartEventSubprocessJobHandler.TYPE.equals(type)) ||
+    if (!(TimerExecuteNestedActivityJobHandler.TYPE.equals(type) ||
+        TimerCatchIntermediateEventJobHandler.TYPE.equals(type) ||
+        TimerStartEventJobHandler.TYPE.equals(type) ||
+        TimerStartEventSubprocessJobHandler.TYPE.equals(type) ||
+        TimerTaskListenerJobHandler.TYPE.equals(type)) ||
         !(job instanceof TimerEntity)) {
-      throw new ProcessEngineException("Only timer jobs can be recalculated, but the job with id '" + jobId + "' is of type '" + type + "'."); 
+      throw new ProcessEngineException("Only timer jobs can be recalculated, but the job with id '" + jobId + "' is of type '" + type + "'.");
     }
   }
-  
+
   protected TimerDeclarationImpl findTimerDeclaration(CommandContext commandContext, JobEntity job) {
     TimerDeclarationImpl timerDeclaration = null;
     if (job.getExecutionId() != null) {
-      // boundary or intermediate or subprocess start event
+      // timeout listener or boundary / intermediate / subprocess start event
       timerDeclaration = findTimerDeclarationForActivity(commandContext, job);
     } else {
       // process instance start event
       timerDeclaration = findTimerDeclarationForProcessStartEvent(commandContext, job);
     }
-    
+
     if (timerDeclaration == null) {
       throw new ProcessEngineException("No timer declaration found for job id '" + jobId + "'.");
     }
@@ -136,10 +139,32 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
       throw new ProcessEngineException("No execution found with id '" + job.getExecutionId() + "' for job id '" + jobId + "'.");
     }
     ActivityImpl activity = execution.getProcessDefinition().findActivity(job.getActivityId());
-    Map<String, TimerDeclarationImpl> timerDeclarations = activity.getEventScope().getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
-    return  timerDeclarations.get(job.getActivityId());
+    if (activity != null) {
+      if (TimerTaskListenerJobHandler.TYPE.equals(job.getJobHandlerType())) {
+        return findTimeoutListenerDeclaration(job, activity);
+      }
+      Map<String, TimerDeclarationImpl> timerDeclarations = TimerDeclarationImpl.getDeclarationsForScope(activity.getEventScope());
+      if (!timerDeclarations.isEmpty() && timerDeclarations.containsKey(job.getActivityId())) {
+        return  timerDeclarations.get(job.getActivityId());
+      }
+    }
+    return null;
   }
-  
+
+  protected TimerDeclarationImpl findTimeoutListenerDeclaration(JobEntity job, ActivityImpl activity) {
+    Map<String, Map<String, TimerDeclarationImpl>> timeoutDeclarations = TimerDeclarationImpl.getTimeoutListenerDeclarationsForScope(activity.getEventScope());
+    if (!timeoutDeclarations.isEmpty()) {
+      Map<String, TimerDeclarationImpl> activityTimeouts = timeoutDeclarations.get(job.getActivityId());
+      if (activityTimeouts != null && !activityTimeouts.isEmpty()) {
+        JobHandlerConfiguration jobHandlerConfiguration = job.getJobHandlerConfiguration();
+        if (jobHandlerConfiguration instanceof TimerJobConfiguration) {
+          return activityTimeouts.get(((TimerJobConfiguration) jobHandlerConfiguration).getTimerElementSecondaryKey());
+        }
+      }
+    }
+    return null;
+  }
+
   protected TimerDeclarationImpl findTimerDeclarationForProcessStartEvent(CommandContext commandContext, JobEntity job) {
     ProcessDefinitionEntity processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(job.getProcessDefinitionId());
     @SuppressWarnings("unchecked")

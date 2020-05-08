@@ -21,6 +21,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
+import org.camunda.bpm.engine.authorization.OptimizePermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -30,6 +33,15 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
+import static org.camunda.bpm.engine.authorization.Resources.OPTIMIZE;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+
 public class ResourceTypeUtil {
 
   /**
@@ -37,14 +49,19 @@ public class ResourceTypeUtil {
    * the respective {@link Permission} Enum class for this resource.<p>
    * NOTE: In case of new {@link Permission} Enum class, please adjust the map accordingly
    */
-  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
+  protected static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS;
 
   static {
-    PERMISSION_ENUMS.put(Resources.BATCH.resourceType(), BatchPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
-    PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
-    PERMISSION_ENUMS.put(Resources.OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
+    PERMISSION_ENUMS = new HashMap<Integer, Class<? extends Enum<? extends Permission>>>() {{
+      put(BATCH.resourceType(), BatchPermissions.class);
+      put(PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
+      put(PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
+      put(TASK.resourceType(), TaskPermissions.class);
+      put(HISTORIC_TASK.resourceType(), HistoricTaskPermissions.class);
+      put(HISTORIC_PROCESS_INSTANCE.resourceType(), HistoricProcessInstancePermissions.class);
+      put(OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
+      put(OPTIMIZE.resourceType(), OptimizePermissions.class);
+    }};
 
     // the rest
     for (Resource resource : Resources.values()) {

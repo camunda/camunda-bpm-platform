@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -58,6 +59,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String name;
   protected String nameLike;
   protected String deploymentId;
+  protected Date deployedAfter;
+  protected Date deployedAt;
   protected String key;
   protected String[] keys;
   protected String keyLike;
@@ -80,6 +83,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
+  protected boolean isVersionTagSet = false;
   protected String versionTag;
   protected String versionTagLike;
 
@@ -88,6 +92,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected boolean startablePermissionCheck = false;
   // for internal use
   protected List<PermissionCheck> processDefinitionCreatePermissionChecks = new ArrayList<PermissionCheck>();
+  private boolean shouldJoinDeploymentTable = false;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -133,6 +138,20 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQueryImpl deploymentId(String deploymentId) {
     ensureNotNull("deploymentId", deploymentId);
     this.deploymentId = deploymentId;
+    return this;
+  }
+
+  public ProcessDefinitionQueryImpl deployedAfter(Date deployedAfter) {
+    ensureNotNull("deployedAfter", deployedAfter);
+    shouldJoinDeploymentTable = true;
+    this.deployedAfter = deployedAfter;
+    return this;
+  }
+
+  public ProcessDefinitionQueryImpl deployedAt(Date deployedAt) {
+    ensureNotNull("deployedAt", deployedAt);
+    shouldJoinDeploymentTable = true;
+    this.deployedAt = deployedAt;
     return this;
   }
 
@@ -259,6 +278,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery versionTag(String versionTag) {
     ensureNotNull("versionTag", versionTag);
     this.versionTag = versionTag;
+    this.isVersionTagSet = true;
 
     return this;
   }
@@ -266,6 +286,13 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery versionTagLike(String versionTagLike) {
     ensureNotNull("versionTagLike", versionTagLike);
     this.versionTagLike = versionTagLike;
+
+    return this;
+  }
+
+  public ProcessDefinitionQuery withoutVersionTag() {
+    this.isVersionTagSet = true;
+    this.versionTag = null;
 
     return this;
   }
@@ -289,6 +316,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public ProcessDefinitionQuery orderByDeploymentId() {
     return orderBy(ProcessDefinitionQueryProperty.DEPLOYMENT_ID);
+  }
+
+  public ProcessDefinitionQuery orderByDeploymentTime() {
+    shouldJoinDeploymentTable = true;
+    return orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_DEPLOYMENT, ProcessDefinitionQueryProperty.DEPLOY_TIME));
   }
 
   public ProcessDefinitionQuery orderByProcessDefinitionKey() {
@@ -381,45 +413,67 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public String getDeploymentId() {
     return deploymentId;
   }
+
+  public Date getDeployedAfter() {
+    return deployedAfter;
+  }
+
+  public Date getDeployedAt() {
+    return deployedAt;
+  }
+
   public String getId() {
     return id;
   }
+
   public String[] getIds() {
     return ids;
   }
+
   public String getName() {
     return name;
   }
+
   public String getNameLike() {
     return nameLike;
   }
+
   public String getKey() {
     return key;
   }
+
   public String getKeyLike() {
     return keyLike;
   }
+
   public Integer getVersion() {
     return version;
   }
+
   public boolean isLatest() {
     return latest;
   }
+
   public String getCategory() {
     return category;
   }
+
   public String getCategoryLike() {
     return categoryLike;
   }
+
   public String getResourceName() {
     return resourceName;
   }
+
   public String getResourceNameLike() {
     return resourceNameLike;
   }
+
   public SuspensionState getSuspensionState() {
     return suspensionState;
   }
+
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
   }
@@ -463,6 +517,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public List<PermissionCheck> getProcessDefinitionCreatePermissionChecks() {
     return processDefinitionCreatePermissionChecks;
   }
+  
+  public boolean isShouldJoinDeploymentTable() {
+    return shouldJoinDeploymentTable;
+  }
 
   public void addProcessDefinitionCreatePermissionCheck(CompositePermissionCheck processDefinitionCreatePermissionCheck) {
     processDefinitionCreatePermissionChecks.addAll(processDefinitionCreatePermissionCheck.getAllPermissionChecks());
@@ -473,5 +531,4 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     this.authorizationUserId = userId;
     return this;
   }
-
 }

@@ -56,6 +56,9 @@ public interface HistoricExternalTaskLogQuery extends Query<HistoricExternalTask
   /** Only select historic external task log entries that belong to one of the given tenant ids. */
   HistoricExternalTaskLogQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic external task log entries that have no tenant id. */
+  HistoricExternalTaskLogQuery withoutTenantId();
+
   /**
    * Only select log entries where the external task had a priority higher than or
    * equal to the given priority.

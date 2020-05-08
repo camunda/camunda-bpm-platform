@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -39,6 +40,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
  */
 public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetStateCmd {
 
+  public static final String INCLUDE_PROCESS_INSTANCES_PROPERTY = "includeProcessInstances";
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
@@ -166,9 +168,17 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   @Override
   protected void logUserOperation(CommandContext commandContext) {
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
+    PropertyChange suspensionStateChanged =
+      new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
+    PropertyChange includeProcessInstances =
+      new PropertyChange(INCLUDE_PROCESS_INSTANCES_PROPERTY, null, isIncludeSubResources());
     commandContext.getOperationLogManager()
-      .logProcessDefinitionOperation(getLogEntryOperation(), processDefinitionId, processDefinitionKey, propertyChange);
+      .logProcessDefinitionOperation(
+        getLogEntryOperation(),
+        processDefinitionId,
+        processDefinitionKey,
+        Arrays.asList(suspensionStateChanged, includeProcessInstances)
+      );
   }
 
   // ABSTRACT METHODS ////////////////////////////////////////////////////////////////////
@@ -192,6 +202,16 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder = createProcessInstanceCommandBuilder();
 
     return getNextCommand(processInstanceCommandBuilder);
+  }
+
+  @Override
+  protected String getDeploymentId(CommandContext commandContext) {
+    if (processDefinitionId != null) {
+      return getDeploymentIdByProcessDefinition(commandContext, processDefinitionId);
+    } else if (processDefinitionKey != null) {
+      return getDeploymentIdByProcessDefinitionKey(commandContext, processDefinitionKey, isTenantIdSet, tenantId);
+    }
+    return null;
   }
 
   protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);

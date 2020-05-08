@@ -197,6 +197,11 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
           return producer.createHistoricJobLogFailedEvt(job, exception);
         }
+
+        @Override
+        public void postHandleSingleHistoryEventCreated(HistoryEvent event) {
+          ((JobEntity) job).setLastFailureLogId(event.getId());
+        }
       });
     }
   }

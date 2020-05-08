@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     if (isHistoryEnabled()) {
       List<HistoricDecisionInstanceEntity> decisionInstances = findHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
 
-      List<String> decisionInstanceIds = new ArrayList<String>();
+      List<String> decisionInstanceIds = new ArrayList<>();
       for(HistoricDecisionInstanceEntity decisionInstance : decisionInstances) {
         decisionInstanceIds.add(decisionInstance.getId());
         // delete decision instance
@@ -116,7 +117,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     }
   }
 
- public List<HistoricDecisionInstance> findHistoricDecisionInstancesByQueryCriteria(HistoricDecisionInstanceQueryImpl query, Page page) {
+  public List<HistoricDecisionInstance> findHistoricDecisionInstancesByQueryCriteria(HistoricDecisionInstanceQueryImpl query, Page page) {
     if (isHistoryEnabled()) {
       configureQuery(query);
 
@@ -131,9 +132,21 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public List<ImmutablePair<String, String>> findHistoricDecisionInstanceDeploymentIdMappingsByQueryCriteria(HistoricDecisionInstanceQueryImpl query) {
+    if (isHistoryEnabled()) {
+      configureQuery(query);
+      return getDbEntityManager().selectList("selectHistoricDecisionInstanceDeploymentIdMappingsByQueryCriteria", query);
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+
+
   public void enrichHistoricDecisionsWithInputsAndOutputs(HistoricDecisionInstanceQueryImpl query, List<HistoricDecisionInstance> decisionInstances) {
     Map<String, HistoricDecisionInstanceEntity> decisionInstancesById =
-      new HashMap<String, HistoricDecisionInstanceEntity>();
+      new HashMap<>();
     for(HistoricDecisionInstance decisionInstance : decisionInstances) {
       decisionInstancesById.put(decisionInstance.getId(), (HistoricDecisionInstanceEntity) decisionInstance);
     }
@@ -149,7 +162,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);

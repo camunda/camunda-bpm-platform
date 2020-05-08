@@ -1,7 +1,6 @@
 camunda BPM - The open source BPM platform
 ==========================================
 
-[![Build Status](https://travis-ci.org/camunda/camunda-bpm-platform.svg?branch=master)](https://travis-ci.org/camunda/camunda-bpm-platform)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent)
 
 camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
@@ -25,7 +24,6 @@ camunda BPM platform provides a rich set of components centered around the BPM l
 
 #### Process Design
  * camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
- * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
  * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
@@ -82,7 +80,7 @@ Add the following lines to it:
 </activeProfiles>
 ```
 
-Apache Maven 3 and Java JDK 7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+Apache Maven 3 and Java JDK 8+ are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
 ```
 mvn clean install
@@ -91,39 +89,37 @@ mvn clean install
 This will build all the modules that make up the camunda BPM platform but will not perform any integration testing. After the build is completed, you will find the distributions under
 
 ```
-distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
-distro/jbossas7/distro/target   (JBoss AS 7 Distribution)
+distro/tomcat/distro/target     (Apache Tomcat 9 Distribution)
+distro/wildfly/distro/target   (WildFly AS Distribution)
 ```
 
 Running Integration Tests
 ----------
-The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for each server runtime we support. These projects are responsible for taking a runtime container distribution (ie. Apache Tomcat, JBoss AS ...) and configuring it for integration testing. The actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
+The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for 
+each server runtime we support. These projects are responsible for taking a runtime container 
+distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
+actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
  * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
  * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
 We have different maven profiles for selecting
-* *Runtime containers & environments*: jboss, tomcat, wildfly
+* *Runtime containers & environments*: tomcat, wildfly
 * *The testsuite*: engine-integration, webapps-integration
-* *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 / postgresql is supported in engine-integration tests)
+* *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
+  postgresql are supported in engine-integration tests)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
 ```
-mvn clean install -Pengine-integration,jboss,h2
-```
-
-For using wildfly as the runtime container you have to additionally specify the wildfly version: wildfly8, wildfly10, wildfly11, wildfly12 or wildfly13. Example:
-
-```
-mvn clean install -Pengine-integration,wildfly,wildfly10,h2
+mvn clean install -Pengine-integration,wildfly,h2
 ```
 
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
 
 ```
-mvn clean install -Pengine-integration,jboss,postgresql,postgresql-xa
+mvn clean install -Pengine-integration,wildfly,postgresql,postgresql-xa
 ```
 
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
@@ -132,9 +128,9 @@ You can select multiple testsuites but only a single database and a single runti
 mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 ```
 
-There is a special profile for JBoss Application Server:
+There is a special profile for the WildFly Application Servers:
 
-* Domain mode: `mvn clean install -Pengine-integration,h2,jboss-domain`
+* WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
 
 Limiting the number of engine unit tests
 ----------

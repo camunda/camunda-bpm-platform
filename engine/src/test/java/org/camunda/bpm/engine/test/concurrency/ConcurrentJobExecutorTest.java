@@ -213,8 +213,8 @@ public class ConcurrentJobExecutorTest {
     JobEntity jobEntity = (JobEntity) remainingJob;
     assertNull(jobEntity.getLockOwner());
 
-    // and there is a custom lock expiration time
-    assertNotNull(jobEntity.getLockExpirationTime());
+    // and there is a due date time set
+    assertNotNull(jobEntity.getDuedate());
   }
 
   @Test

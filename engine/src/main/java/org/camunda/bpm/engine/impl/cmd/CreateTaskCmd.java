@@ -37,9 +37,7 @@ public class CreateTaskCmd implements Command<Task> {
   public Task execute(CommandContext commandContext) {
     checkCreateTask(commandContext);
 
-    TaskEntity task = TaskEntity.create();
-    task.setId(taskId);
-    return task;
+    return new TaskEntity(taskId);
   }
 
   protected void checkCreateTask(CommandContext commandContext) {

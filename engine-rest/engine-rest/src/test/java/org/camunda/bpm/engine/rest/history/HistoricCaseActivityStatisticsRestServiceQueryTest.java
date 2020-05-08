@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
+import org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -58,9 +59,9 @@ public class HistoricCaseActivityStatisticsRestServiceQueryTest extends Abstract
   public static void setUpRuntimeData() {
     List<HistoricCaseActivityStatistics> mocks = MockProvider.createMockHistoricCaseActivityStatistics();
 
-    historicCaseActivityStatisticsQuery = mock(HistoricCaseActivityStatisticsQuery.class);
+    historicCaseActivityStatisticsQuery = mock(HistoricCaseActivityStatisticsQueryImpl.class);
     when(processEngine.getHistoryService().createHistoricCaseActivityStatisticsQuery(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(historicCaseActivityStatisticsQuery);
-    when(historicCaseActivityStatisticsQuery.list()).thenReturn(mocks);
+    when(historicCaseActivityStatisticsQuery.unlimitedList()).thenReturn(mocks);
   }
 
   @Test

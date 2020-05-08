@@ -45,7 +45,7 @@ public class NullValueSerializer extends AbstractTypedValueSerializer<NullValueI
     // nothing to do
   }
 
-  public NullValueImpl readValue(ValueFields valueFields, boolean deserialize) {
+  public NullValueImpl readValue(ValueFields valueFields, boolean deserialize, boolean asTransientValue) {
     return NullValueImpl.INSTANCE;
   }
 

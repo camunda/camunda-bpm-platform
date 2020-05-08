@@ -1,0 +1,84 @@
+# camunda-bpm-spring-boot-starter
+
+[cols="a,a,a,a"]
+,====
+// mvn travis
+image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link="https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
+// license
+image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="./LICENSE"]
+// mvn central
+image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.springboot/camunda-bpm-spring-boot-starter"]
+// openhub
+image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
+,====
+
+This project provides Spring Boot starters that allow you to integrate the Camunda BPM Platform into your Spring Boot applications.
+
+Please check out the https://docs.camunda.org/manual/develop/user-guide/spring-boot-integration/[Documentation],
+the https://docs.camunda.org/get-started/spring-boot/[Getting Started Guide] and
+the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-starter[Examples].
+
+## Resources
+
+* https://app.camunda.com/jira/browse/CAM/component/13850[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/master/.github/CONTRIBUTING.md[Contributing] - check this if you want to contribute
+* https://forum.camunda.org/c/spring-boot-starter[Discussion Forum] - this project has it's own sub-category at the camunda forum ... use it!
+
+### JDK 9 and onwards
+Beginning with version 3.1-alpha2, Camunda Spring Boot Starter can be used in conjunction with JDK 9 / 10.
+As Hibernate is part of Camunda Spring Boot Starter it requires JAXB. However, JAXB is deactivated by default 
+(and marked as deprecated) in JDK 9 / 10 and removed entirely in JDK 11. Therefore, it is sensible to 
+re-add JAXB to your Camunda Spring Boot Starter project.
+
+There exist various implementations of JAXB. The following Maven coordinates represent the implementation which is 
+included in the JDKs up to version 10:
+
+```xml
+<dependency>
+  <groupId>com.sun.xml.bind</groupId>
+  <artifactId>jaxb-impl</artifactId>
+</dependency>
+```
+
+## Resources for versions older than 2.3.0
+
+Before version 2.2.0, the project existed as a community extension. Therefore the resources were located in different paths. You can find all the links below.
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new issues here.
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/2.2.0/docs/src/main/asciidoc/index.adoc[Documentation]
+
+### 2.x
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/8?closed=1[Release Notes 2.2.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/10?closed=1[Release Notes 2.1.2]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/6?closed=1[Release Notes 2.1.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3?closed=1[Release Notes 2.0.0]
+
+### 1.3.0
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/4?closed=1[Release Notes 1.3.0]
+
+#### Migration hints from < 1.3.0 to >= 1.3.0
+
+[IMPORTANT]
+We have decided to refactor the configuration mechanism. Especially, we removed the  `org.camunda.bpm.spring.boot.starter.configuration.CamundaConfiguration` interface. For now, each configuration is a `org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin`. With this it is possible to hook into `preInit`, `postInit` and `postProcessEngineBuild`, which supports more complex situations.
+If you have implemented a `CamundaConfiguration`, you have to switch to `ProcessEnginePlugin` (and its `preInit` method). You can also extend your configuration from `org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration` to avoid a cast to `SpringProcessEngineConfiguration`.
+
+### 1.2.1
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1[Release Notes 1.2.1]
+* https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/[Blog Article for release 1.2.0]
+
+## Credits
+
+The Camunda Spring Boot Starter project used to be the community extension, created and supported by
+
+*  _https://github.com/osteinhauer[Oliver Steinhauer]_
+*  _https://github.com/jangalinski[Jan Galinski]_
+*  _https://github.com/hawky-4s-[Christian Lipphardt]_
+
+Starting from version 2.3.0 it was adopted as part of the Camunda BPM Platform.
+
+## License
+
+* The source files in this repository are made available under the link:./LICENSE[Apache License, Version 2.0].

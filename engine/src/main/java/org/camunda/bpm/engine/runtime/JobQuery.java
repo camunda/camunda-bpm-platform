@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.runtime;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.camunda.bpm.engine.query.Query;
 
@@ -32,11 +33,17 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs with the given id */
   JobQuery jobId(String jobId);
 
+  /** Only select jobs whose id is in the given set of ids */
+  JobQuery jobIds(Set<String> ids);
+
   /** Only select jobs which exist for the given job definition id. **/
   JobQuery jobDefinitionId(String jobDefinitionId);
 
   /** Only select jobs which exist for the given process instance. **/
   JobQuery processInstanceId(String processInstanceId);
+
+  /** Only select jobs which exist for any of the given process instance ids */
+  JobQuery processInstanceIds(Set<String> processInstanceIds);
 
   /** Only select jobs which exist for the given process definition id. **/
   JobQuery processDefinitionId(String processDefinitionId);
@@ -120,6 +127,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
   /** Only select jobs that failed due to an exception with the given message. */
   JobQuery exceptionMessage(String exceptionMessage);
+
+  /** Only select jobs that failed due to an exception at an activity with the given id. **/
+  JobQuery failedActivityId(String activityId);
 
   /** Only select jobs which have no retries left */
   JobQuery noRetriesLeft();

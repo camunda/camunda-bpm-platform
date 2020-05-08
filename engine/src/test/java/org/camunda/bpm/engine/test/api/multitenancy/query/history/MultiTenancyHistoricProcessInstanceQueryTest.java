@@ -16,92 +16,121 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyHistoricProcessInstanceQueryTest {
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
-  @Override
-  protected void setUp() {
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  protected HistoryService historyService;
+  protected RuntimeService runtimeService;
+  protected IdentityService identityService;
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Before
+  public void setUp() {
+    historyService = engineRule.getHistoryService();
+    runtimeService = engineRule.getRuntimeService();
+    identityService = engineRule.getIdentityService();
+
     BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
       .startEvent()
       .endEvent()
     .done();
 
-    deployment(oneTaskProcess);
-    deploymentForTenant(TENANT_ONE, oneTaskProcess);
-    deploymentForTenant(TENANT_TWO, oneTaskProcess);
+    testRule.deploy(oneTaskProcess);
+    testRule.deployForTenant(TENANT_ONE, oneTaskProcess);
+    testRule.deployForTenant(TENANT_TWO, oneTaskProcess);
 
     startProcessInstance();
     startProcessInstanceForTenant(TENANT_ONE);
     startProcessInstanceForTenant(TENANT_TWO);
   }
 
-  public void testQueryNoTenantIdSet() {
+  @Test
+  public void shouldQueryNoTenantIdSet() {
     HistoricProcessInstanceQuery query = historyService.
         createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
-  public void testQueryByTenantId() {
+  @Test
+  public void shouldQueryByTenantId() {
     HistoricProcessInstanceQuery query = historyService
         .createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     query = historyService
         .createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
-  public void testQueryByTenantIds() {
+  @Test
+  public void shouldQueryByTenantIds() {
     HistoricProcessInstanceQuery query = historyService
         .createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
   }
 
-  public void testQueryByNonExistingTenantId() {
+  @Test
+  public void shouldQueryByNonExistingTenantId() {
     HistoricProcessInstanceQuery query = historyService
         .createHistoricProcessInstanceQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
-  public void testQueryByWithoutTenantId() {
+  @Test
+  public void shouldQueryByWithoutTenantId() {
     HistoricProcessInstanceQuery query = historyService
       .createHistoricProcessInstanceQuery()
       .withoutTenantId();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
-  public void testFailQueryByTenantIdNull() {
+  @Test
+  public void shouldFailQueryByTenantIdNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn((String) null);
@@ -111,65 +140,71 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
     }
   }
 
-  public void testQuerySortingAsc() {
+  @Test
+  public void shouldQuerySortingAsc() {
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicProcessInstances.size(), is(2));
-    assertThat(historicProcessInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(historicProcessInstances.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(historicProcessInstances.size()).isEqualTo(2);
+    assertThat(historicProcessInstances.get(0).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(historicProcessInstances.get(1).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
-  public void testQuerySortingDesc() {
+  @Test
+  public void shouldQuerySortingDesc() {
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicProcessInstances.size(), is(2));
-    assertThat(historicProcessInstances.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(historicProcessInstances.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(historicProcessInstances.size()).isEqualTo(2);
+    assertThat(historicProcessInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(historicProcessInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
   }
 
-  public void testQueryNoAuthenticatedTenants() {
+  @Test
+  public void shouldQueryNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
-  public void testQueryAuthenticatedTenant() {
+  @Test
+  public void shouldQueryAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(1L);
   }
 
-  public void testQueryAuthenticatedTenants() {
+  @Test
+  public void shouldQueryAuthenticatedTenants() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(3L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
-  public void testQueryDisabledTenantCheck() {
-    processEngineConfiguration.setTenantCheckEnabled(false);
+  @Test
+  public void shouldQueryDisabledTenantCheck() {
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {

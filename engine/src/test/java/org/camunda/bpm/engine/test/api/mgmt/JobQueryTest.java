@@ -46,6 +46,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -56,9 +57,13 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -80,6 +85,9 @@ public class JobQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -576,6 +584,30 @@ public class JobQueryTest {
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testQueryByFailedActivityId(){
+    JobQuery query = managementService.createJobQuery().failedActivityId("theScriptTask");
+    verifyQueryResults(query, 0);
+
+    ProcessInstance processInstance = startProcessInstanceWithFailingJob();
+
+    query = managementService.createJobQuery().failedActivityId("theScriptTask");
+    verifyFailedJob(query, processInstance);
+  }
+
+  @Test
+  public void testQueryByInvalidFailedActivityId(){
+    JobQuery query = managementService.createJobQuery().failedActivityId("invalid");
+    verifyQueryResults(query, 0);
+
+    try {
+      managementService.createJobQuery().failedActivityId(null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+
+  @Test
   public void testJobQueryWithExceptions() throws Throwable {
 
     createJobWithoutExceptionMsg();
@@ -625,6 +657,135 @@ public class JobQueryTest {
 
     managementService.suspendJobDefinitionByProcessDefinitionKey("timerOnTask", true);
     verifyQueryResults(query, 3);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithOneId() {
+    // given
+    String id = managementService.createJobQuery().processInstanceId(processInstanceIdOne).singleResult().getId();
+    // when
+    JobQuery query = managementService.createJobQuery().jobIds(Collections.singleton(id));
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithMultipleIds() {
+    // given
+    Set<String> ids = managementService.createJobQuery().list().stream()
+        .map(Job::getId).collect(Collectors.toSet());
+    // when
+    JobQuery query = managementService.createJobQuery().jobIds(ids);
+    // then
+    verifyQueryResults(query, 4);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithMultipleIdsIncludingFakeIds() {
+    // given
+    Set<String> ids = new HashSet<>();
+    ids.addAll(managementService.createJobQuery().list().stream().map(Job::getId).collect(Collectors.toSet()));
+    Collections.addAll(ids, "fakeIdOne", "fakeIdTwo");
+    // when
+    JobQuery query = managementService.createJobQuery().jobIds(ids);
+    // then
+    verifyQueryResults(query, 4);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithEmptyList() {
+    // given
+    Set<String> ids = Collections.emptySet();
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Set of job ids is empty");
+    // when
+    managementService.createJobQuery().jobIds(ids);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithNull() {
+    // given
+    Set<String> ids = null;
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Set of job ids is null");
+    // when
+    managementService.createJobQuery().jobIds(ids);
+  }
+
+  @Test
+  public void testQueryByJobIdsWithFakeIds() {
+    // given
+    Set<String> ids = new HashSet<>();
+    Collections.addAll(ids, "fakeIdOne", "fakeIdTwo");
+    // when
+    JobQuery query = managementService.createJobQuery().jobIds(ids);
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithOneId() {
+    // when
+    JobQuery query = managementService.createJobQuery().processInstanceIds(Collections.singleton(processInstanceIdOne));
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithMultipleIds() {
+    // given
+    Set<String> ids = new HashSet<>();
+    Collections.addAll(ids, processInstanceIdOne, processInstanceIdThree);
+    // when
+    JobQuery query = managementService.createJobQuery().processInstanceIds(ids);
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithMultipleIdsIncludingFakeIds() {
+    // given
+    Set<String> ids = new HashSet<>();
+    Collections.addAll(ids, processInstanceIdOne, processInstanceIdThree, "fakeIdOne", "fakeIdTwo");
+    // when
+    JobQuery query = managementService.createJobQuery().processInstanceIds(ids);
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithEmptyList() {
+    // given
+    Set<String> ids = Collections.emptySet();
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Set of process instance ids is empty");
+    // when
+    managementService.createJobQuery().processInstanceIds(ids);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithNull() {
+    // given
+    Set<String> ids = null;
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Set of process instance ids is null");
+    // when
+    managementService.createJobQuery().processInstanceIds(ids);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceIdsWithFakeIds() {
+    // given
+    Set<String> ids = new HashSet<>();
+    Collections.addAll(ids, "fakeIdOne", "fakeIdTwo");
+    // when
+    JobQuery query = managementService.createJobQuery().processInstanceIds(ids);
+    // then
+    verifyQueryResults(query, 0);
   }
 
   //sorting //////////////////////////////////////////

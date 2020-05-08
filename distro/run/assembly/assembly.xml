@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+  <id>assembly</id>
+  
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>internal/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-core</include>
+      </includes>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+    </dependencySet>
+     <dependencySet>
+      <outputDirectory />
+      <includes>
+        <include>org.camunda.bpm:license-book:zip</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>configuration/userlib/</outputDirectory>
+      <includes>
+        <include>com.h2database:h2</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+  <files>
+    <file>
+      <source>resources/default.yml</source>
+      <outputDirectory>configuration/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/production.yml</source>
+      <outputDirectory>configuration/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/keystore.p12</source>
+      <outputDirectory>configuration/keystore/</outputDirectory>
+    </file>
+    <file>
+      <source>resources/start.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory />
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>resources/start.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory />
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>../../license/LICENSE</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>../../license/NOTICE</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>resources/README.txt</source>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+      <outputDirectory />
+    </file>
+  </files>
+  
+  <fileSets>
+    <fileSet>
+      <directory>../modules/rest/target/dependency/</directory>
+      <outputDirectory>internal/rest/</outputDirectory>
+    </fileSet>
+        <!-- create empty resource folder -->
+    <fileSet>
+      <directory>resources/dummyResource</directory>
+      <outputDirectory>configuration/resources/</outputDirectory>
+      <excludes>
+        <exclude>*/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+
+</assembly>

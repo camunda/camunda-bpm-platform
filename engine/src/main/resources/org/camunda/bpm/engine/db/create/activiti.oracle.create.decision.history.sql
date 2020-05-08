@@ -55,7 +55,7 @@ create table ACT_HI_DEC_IN (
     TEXT2_ NVARCHAR2(2000),
     TENANT_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
-    ROOT_PROC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ NVARCHAR2(64),
     REMOVAL_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
@@ -77,7 +77,7 @@ create table ACT_HI_DEC_OUT (
     TEXT2_ NVARCHAR2(2000),
     TENANT_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
-    ROOT_PROC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ NVARCHAR2(64),
     REMOVAL_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );

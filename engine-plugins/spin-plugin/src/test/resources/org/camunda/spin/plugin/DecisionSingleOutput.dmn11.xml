@@ -7,7 +7,7 @@
     <decisionTable id="table">
       <input id="in" label="input">
         <inputExpression id="inputExpression">
-          <text>${input1.listProperty}</text>
+          <text>input1.listProperty</text>
         </inputExpression>
       </input>
       <output id="out" label="output" name="result" >
@@ -17,7 +17,7 @@
           <text/>
         </inputEntry>
         <outputEntry id="output1">
-          <text>${input1.listProperty}</text>
+          <text>input1.listProperty</text>
         </outputEntry>
       </rule>
     </decisionTable>

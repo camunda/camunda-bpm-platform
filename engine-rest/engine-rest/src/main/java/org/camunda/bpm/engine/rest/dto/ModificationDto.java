@@ -33,6 +33,7 @@ public class ModificationDto {
   protected String processDefinitionId;
   protected boolean skipIoMappings;
   protected boolean skipCustomListeners;
+  protected String annotation;
 
   public List<ProcessInstanceModificationInstructionDto> getInstructions() {
     return instructions;
@@ -88,6 +89,14 @@ public class ModificationDto {
       instruction.applyTo(builder, processEngine, objectMapper);
     }
 
+  }
+
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
   }
 
 }

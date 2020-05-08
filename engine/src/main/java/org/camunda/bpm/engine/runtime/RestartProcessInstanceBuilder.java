@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.runtime;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -71,6 +72,11 @@ public interface RestartProcessInstanceBuilder extends InstantiationBuilder<Rest
 
   /**
    * Executes the restart synchronously.
+   * @throws BadUserRequestException
+   *   When the affected instances count exceeds the maximum results limit. A maximum results
+   *   limit can be specified with the process engine configuration property
+   *   <code>queryMaxResultsLimit</code> (default {@link Integer#MAX_VALUE}).
+   *   Please use the batch operation {@link #executeAsync()} instead.
    */
   void execute();
 

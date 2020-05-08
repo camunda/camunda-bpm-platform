@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -57,6 +58,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -269,6 +271,7 @@ public class ModificationExecutionAsyncTest {
     assertNotNull(seedJobDefinition);
     assertEquals(batch.getId(), seedJobDefinition.getJobConfiguration());
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
+    assertEquals(seedJobDefinition.getDeploymentId(), processDefinition.getDeploymentId());
 
     // and there exists a modification job definition
     JobDefinition modificationJobDefinition = helper.getExecutionJobDefinition(batch);
@@ -280,7 +283,7 @@ public class ModificationExecutionAsyncTest {
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
     assertEquals(currentTime, seedJob.getDuedate());
-    assertNull(seedJob.getDeploymentId());
+    assertEquals(seedJobDefinition.getDeploymentId(), seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
     assertNull(seedJob.getProcessInstanceId());
@@ -324,7 +327,7 @@ public class ModificationExecutionAsyncTest {
     Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
 
     // when
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the seed job definition still exists but the seed job is removed
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
@@ -347,7 +350,7 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
 
     Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -382,7 +385,7 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
 
     Batch batch = helper.startBeforeAsync("process1", 10, "user2", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -417,7 +420,7 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
 
     Batch batch = helper.startTransitionAsync("process1", 10, "seq", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -450,7 +453,7 @@ public class ModificationExecutionAsyncTest {
   public void executeModificationJobsForCancelAll() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.cancelAllAsync("process1", 10, "user1", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -484,7 +487,7 @@ public class ModificationExecutionAsyncTest {
         .processInstanceIds(instances)
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -524,7 +527,7 @@ public class ModificationExecutionAsyncTest {
         .processInstanceIds(instances)
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -559,7 +562,7 @@ public class ModificationExecutionAsyncTest {
         .processInstanceIds(instances)
         .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -600,7 +603,7 @@ public class ModificationExecutionAsyncTest {
 
     Batch batch = runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
 
     // when
@@ -635,7 +638,7 @@ public class ModificationExecutionAsyncTest {
 
     // when the seed job creates the monitor job
     Date createDate = START_DATE;
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
@@ -655,7 +658,7 @@ public class ModificationExecutionAsyncTest {
   public void testMonitorJobRemovesBatchAfterCompletion() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startBeforeAsync("process1", 10, "user2", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // when
@@ -672,7 +675,7 @@ public class ModificationExecutionAsyncTest {
   public void testBatchDeletionWithCascade() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startTransitionAsync("process1", 10, "seq", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     rule.getManagementService().deleteBatch(batch.getId(), true);
@@ -691,7 +694,7 @@ public class ModificationExecutionAsyncTest {
   public void testBatchDeletionWithoutCascade() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startBeforeAsync("process1", 10, "user2", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     rule.getManagementService().deleteBatch(batch.getId(), false);
@@ -727,7 +730,7 @@ public class ModificationExecutionAsyncTest {
   public void testBatchWithFailedModificationJobDeletionWithCascade() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startAfterAsync("process1", 2, "user1", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incidents
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
@@ -747,7 +750,7 @@ public class ModificationExecutionAsyncTest {
   public void testBatchWithFailedMonitorJobDeletionWithCascade() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startBeforeAsync("process1", 2, "user2", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // create incident
     Job monitorJob = helper.getMonitorJob(batch);
@@ -770,7 +773,7 @@ public class ModificationExecutionAsyncTest {
 
     try {
       Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
-      helper.executeSeedJob(batch);
+      helper.completeSeedJobs(batch);
 
       testRule.executeAvailableJobs();
 
@@ -799,7 +802,7 @@ public class ModificationExecutionAsyncTest {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     Batch batch = helper.startAfterAsync("process1", 2, "user1", processDefinition.getId());
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
     String deletedProcessInstanceId = processInstances.get(0).getId();
@@ -899,7 +902,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -933,7 +936,7 @@ public class ModificationExecutionAsyncTest {
       .skipCustomListeners()
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -959,7 +962,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -993,7 +996,7 @@ public class ModificationExecutionAsyncTest {
       .skipIoMappings()
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
 
     // when
     helper.executeJobs(batch);
@@ -1023,7 +1026,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(processInstanceIds)
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // then
@@ -1051,7 +1054,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(processInstanceIds)
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // then
@@ -1079,7 +1082,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(processInstanceIds)
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // then
@@ -1109,7 +1112,7 @@ public class ModificationExecutionAsyncTest {
       .processInstanceIds(processInstanceIds)
       .executeAsync();
 
-    helper.executeSeedJob(batch);
+    helper.completeSeedJobs(batch);
     helper.executeJobs(batch);
 
     // then
@@ -1118,6 +1121,28 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(execution);
       assertEquals("user", ((ExecutionEntity) execution).getActivityId());
     }
+  }
+
+  @Test
+  public void shouldSetInvocationsPerBatchType() {
+    // given
+    configuration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, 42);
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    List<String> processInstanceIds = helper.startInstances("process1", 2);
+
+    // when
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user2")
+        .processInstanceIds(processInstanceIds)
+        .executeAsync();
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

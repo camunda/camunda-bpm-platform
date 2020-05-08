@@ -46,10 +46,8 @@ public class TaskQueryVariableValue extends QueryVariableValue {
   }
   
   public TaskQueryVariableValue(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable, boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
-    super(name, value, operator, isTaskVariable);
+    super(name, value, operator, isTaskVariable, variableNameIgnoreCase, variableValueIgnoreCase);
     this.isProcessInstanceVariable = isProcessInstanceVariable;
-    this.variableNameIgnoreCase = variableNameIgnoreCase;
-    this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
   
 

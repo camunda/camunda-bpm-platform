@@ -21,7 +21,7 @@
         <property name="containerModeMap">
           other.*=manual
         </property>
-        <!--       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=192m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
+        <!--       <property name="javaVmArguments">-Xmx512m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
     </configuration>
   </container>
   

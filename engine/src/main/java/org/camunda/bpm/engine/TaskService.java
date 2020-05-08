@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
@@ -1149,4 +1150,73 @@ public interface TaskService {
 
   /** Instantiate a task report */
   TaskReport createTaskReport();
+
+  /**
+   * Signals that a business error appears, which should be handled by the process engine.
+   *
+   * @param taskId the id of an existing active task
+   * @param errorCode the error code of the corresponding bmpn error
+   *
+   * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
+   */
+  void handleBpmnError(String taskId, String errorCode);
+
+  /**
+   * @see #handleBpmnError(String, String)
+   *
+   * @param taskId the id of an existing active task
+   * @param errorCode the error code of the corresponding bmpn error
+   * @param errorMessage the error message of the corresponding bmpn error
+   */
+  void handleBpmnError(String taskId, String errorCode, String errorMessage);
+
+  /**
+   * @see #handleBpmnError(String, String)
+   *
+   * @param taskId the id of an existing active task
+   * @param errorCode the error code of the corresponding bmpn error
+   * @param errorMessage the error message of the corresponding bmpn error
+   * @param variables the variables to pass to the execution
+   */
+  void handleBpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables);
+
+  /**
+   * Signals that an escalation appears, which should be handled by the process engine.
+   *
+   * @param taskId the id of an existing active task
+   * @param escalationCode the escalation code of the corresponding escalation
+   * @param variables the variables to pass to the execution
+   *
+   * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
+  */
+  void handleEscalation(String taskId, String escalationCode);
+
+  /**
+   * Signals that an escalation appears, which should be handled by the process engine.
+   *
+   * @param taskId the id of an existing active task
+   * @param escalationCode the escalation code of the corresponding escalation
+   * @param variables the variables to pass to the execution
+   *
+   * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
+  */
+  void handleEscalation(String taskId, String escalationCode, Map<String, Object> variables);
 }

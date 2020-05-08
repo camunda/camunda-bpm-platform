@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -366,6 +367,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     String returnedIncidentType = from(content).getString("[0].incidentType");
     String returnedActivityId = from(content).getString("[0].activityId");
+    String returnedFailedActivityId = from(content).getString("[0].failedActivityId");
     String returnedCauseIncidentId = from(content).getString("[0].causeIncidentId");
     String returnedRootCauseIncidentId = from(content).getString("[0].rootCauseIncidentId");
     String returnedConfiguration = from(content).getString("[0].configuration");
@@ -387,6 +389,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_TYPE, returnedIncidentType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ACTIVITY_ID, returnedActivityId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_FAILED_ACTIVITY_ID, returnedFailedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID, returnedCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID, returnedRootCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_CONFIGURATION, returnedConfiguration);
@@ -450,6 +453,22 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testQueryByProcessDefinitionKey() {
+    String key1 = "foo";
+    String key2 = "bar";
+
+    given()
+      .queryParam("processDefinitionKeyIn", key1 + "," + key2)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORY_INCIDENT_QUERY_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+
+    inOrder.verify(mockedQuery).processDefinitionKeyIn("foo", "bar");
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryByProcessInstanceId() {
     String processInstanceId = MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID;
 
@@ -478,11 +497,23 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     String activityId = MockProvider.EXAMPLE_HIST_INCIDENT_ACTIVITY_ID;
 
     given()
-      .queryParam("activityId", activityId)
+    .queryParam("activityId", activityId)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).activityId(activityId);
+  }
+
+  @Test
+  public void testQueryByFailedActivityId() {
+    String activityId = MockProvider.EXAMPLE_HIST_INCIDENT_FAILED_ACTIVITY_ID;
+
+    given()
+      .queryParam("failedActivityId", activityId)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORY_INCIDENT_QUERY_URL);
 
-    verify(mockedQuery).activityId(activityId);
+    verify(mockedQuery).failedActivityId(activityId);
   }
 
   @Test
@@ -514,11 +545,23 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     String configuration = MockProvider.EXAMPLE_HIST_INCIDENT_CONFIGURATION;
 
     given()
-      .queryParam("configuration", configuration)
+    .queryParam("configuration", configuration)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).configuration(configuration);
+  }
+
+  @Test
+  public void testQueryByHistoryConfiguration() {
+    String historyConfiguration = MockProvider.EXAMPLE_HIST_INCIDENT_HISTORY_CONFIGURATION;
+
+    given()
+      .queryParam("historyConfiguration", historyConfiguration)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORY_INCIDENT_QUERY_URL);
 
-    verify(mockedQuery).configuration(configuration);
+    verify(mockedQuery).historyConfiguration(historyConfiguration);
   }
 
   @Test
@@ -579,10 +622,35 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    mockedQuery = setUpMockHistoricIncidentQuery(Collections.singletonList(MockProvider.createMockHistoricIncident(null)));
+
+    // when
+    Response response = given()
+        .queryParam("withoutTenantId", true)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORY_INCIDENT_QUERY_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
   public void testQueryByJobDefinitionIds() {
     String jobDefinitionIds = EXAMPLE_JOB_DEFINITION_ID + "," + NON_EXISTING_JOB_DEFINITION_ID;
 
-    Response response = given()
+    given()
         .queryParam("jobDefinitionIdIn", jobDefinitionIds)
       .then().expect()
         .statusCode(Status.OK.getStatusCode())

@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,16 +42,19 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -1670,6 +1674,71 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByTaskVariableValueIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
+  public void testQueryByTaskVariableNameIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
+  public void testQueryByTaskVariableNameValueIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
   public void testQueryByTaskVariableAsPost() {
     String variableName = "varName";
     String variableValue = "varValue";
@@ -1763,7 +1832,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
-  public void testQueryByProcessVariable() {
+  public void testQueryByProcessVariableEquals() {
     String variableName = "varName";
     String variableValue = "varValue";
     String variableParameter = variableName + "_eq_" + variableValue;
@@ -1779,9 +1848,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
+  }
 
-    // greater then
-    queryValue = variableName + "_gt_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableGreaterThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_gt_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1792,9 +1867,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueGreaterThan(variableName, variableValue);
+  }
 
-    // greater then equals
-    queryValue = variableName + "_gteq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableGreaterThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_gteq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1805,9 +1886,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueGreaterThanOrEquals(variableName, variableValue);
+  }
 
-    // lower then
-    queryValue = variableName + "_lt_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLessThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_lt_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1818,9 +1905,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLessThan(variableName, variableValue);
+  }
 
-    // lower then equals
-    queryValue = variableName + "_lteq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLessThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_lteq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1831,9 +1924,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLessThanOrEquals(variableName, variableValue);
+  }
 
-    // like
-    queryValue = variableName + "_like_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLike() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_like_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1844,9 +1943,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLike(variableName, variableValue);
+  }
 
-    // not equals
-    queryValue = variableName + "_neq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableNotEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_neq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -2147,6 +2252,58 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    mockedQuery = setUpMockHistoricTaskInstanceQuery(Collections.singletonList(MockProvider.createMockHistoricTaskInstance(null)));
+
+    // when
+    Response response = given()
+          .queryParam("withoutTenantId", true)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
+  public void testQueryWithoutTenantIdPostParameter() {
+    // given
+    mockedQuery = setUpMockHistoricTaskInstanceQuery(Collections.singletonList(MockProvider.createMockHistoricTaskInstance(null)));
+    Map<String, Object> queryParameters = Collections.singletonMap("withoutTenantId", (Object) true);
+
+    // when
+    Response response = given()
+          .contentType(POST_JSON_CONTENT_TYPE)
+          .body(queryParameters)
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
   public void testQueryTaskInvolvedUser() {
     String taskInvolvedUser = MockProvider.EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_USER;
     given()
@@ -2232,6 +2389,35 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).list();
   }
 
+  @Test
+  public void testOrQuery() {
+    // given
+    HistoricTaskInstanceQueryImpl mockedQuery = mock(HistoricTaskInstanceQueryImpl.class);
+    when(processEngine.getHistoryService().createHistoricTaskInstanceQuery()).thenReturn(mockedQuery);
+
+    String payload = "{ \"orQueries\": [{" +
+        "\"processDefinitionKey\": \"aKey\", " +
+        "\"processInstanceBusinessKey\": \"aBusinessKey\"}] }";
+
+    // when
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header(ACCEPT_JSON_HEADER)
+      .body(payload)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    ArgumentCaptor<HistoricTaskInstanceQueryImpl> argument =
+        ArgumentCaptor.forClass(HistoricTaskInstanceQueryImpl.class);
+
+    verify(mockedQuery).addOrQuery(argument.capture());
+
+    // then
+    assertThat(argument.getValue().getProcessDefinitionKey()).isEqualTo("aKey");
+    assertThat(argument.getValue().getProcessInstanceBusinessKey()).isEqualTo("aBusinessKey");
+  }
 
   private List<HistoricTaskInstance> createMockHistoricTaskInstancesTwoTenants() {
     return Arrays.asList(

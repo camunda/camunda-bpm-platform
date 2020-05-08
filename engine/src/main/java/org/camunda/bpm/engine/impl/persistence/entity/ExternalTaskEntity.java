@@ -19,14 +19,16 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -79,6 +81,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String activityId;
   protected String activityInstanceId;
   protected String tenantId;
@@ -87,6 +90,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected ExecutionEntity execution;
 
   protected String businessKey;
+
+  protected String lastFailureLogId;
 
   @Override
   public String getId() {
@@ -130,6 +135,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
+  }
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
   }
   @Override
   public String getActivityId() {
@@ -234,6 +245,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("processInstanceId", processInstanceId);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("processDefinitionKey", processDefinitionKey);
+    persistentState.put("processDefinitionVersionTag", processDefinitionVersionTag);
     persistentState.put("activityId", activityId);
     persistentState.put("activityInstanceId", activityInstanceId);
     persistentState.put("suspensionState", suspensionState);
@@ -366,8 +378,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       setErrorDetails(errorDetails);
     }
     this.lockExpirationTime = new Date(ClockUtil.getCurrentTime().getTime() + retryDuration);
-    setRetriesAndManageIncidents(retries);
     produceHistoricExternalTaskFailedEvent();
+    setRetriesAndManageIncidents(retries);
   }
 
   public void bpmnError(String errorCode, String errorMessage, Map<String, Object> variables) {
@@ -380,11 +392,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       bpmnError = new BpmnError(errorCode);
     }
     try {
-      ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
       if (variables != null && !variables.isEmpty()) {
         activityExecution.setVariables(variables);
       }
-      behavior.propagateBpmnError(bpmnError, activityExecution);
+      BpmnExceptionHandler.propagateBpmnError(bpmnError, activityExecution);
     } catch (Exception ex) {
       throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
     }
@@ -407,7 +418,9 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-    incidentHandler.handleIncident(createIncidentContext(), errorMessage);
+    IncidentContext incidentContext = createIncidentContext();
+    incidentContext.setHistoryConfiguration(getLastFailureLogId());
+    incidentHandler.handleIncident(incidentContext, errorMessage);
   }
 
   protected void removeIncident() {
@@ -547,5 +560,30 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
 
     return referenceIdAndClass;
+  }
+
+  public String getLastFailureLogId() {
+    if (lastFailureLogId == null) {
+      // try to find the last failure log in the database,
+      // can occur if setRetries is called manually since
+      // otherwise the failure handling ensures that a log
+      // entry is written before the incident is created
+      List<HistoricExternalTaskLog> logEntries = Context.getCommandContext()
+        .getProcessEngineConfiguration()
+        .getHistoryService()
+        .createHistoricExternalTaskLogQuery()
+        .failureLog()
+        .externalTaskId(id)
+        .orderByTimestamp().desc()
+        .list();
+      if (!logEntries.isEmpty()) {
+        lastFailureLogId = logEntries.get(0).getId();
+      }
+    }
+    return lastFailureLogId;
+  }
+
+  public void setLastFailureLogId(String lastFailureLogId) {
+    this.lastFailureLogId = lastFailureLogId;
   }
 }

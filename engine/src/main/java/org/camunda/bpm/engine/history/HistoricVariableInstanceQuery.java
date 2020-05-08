@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.query.Query;
 public interface HistoricVariableInstanceQuery extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
 
   /** Only select the variable with the given Id
-   * @param the id of the variable to select
+   * @param id of the variable to select
    * @return the query object */
   HistoricVariableInstanceQuery variableId(String id);
 
@@ -52,9 +52,13 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   /** Only select historic process variables which match one of the given variable types. */
   HistoricVariableInstanceQuery variableTypeIn(String... variableTypes);
 
-  /**
-   * only select historic process variables with the given name and value
-   */
+  /** The query will match the names of task and process variables in a case-insensitive way. */
+  HistoricVariableInstanceQuery matchVariableNamesIgnoreCase();
+
+  /** The query will match the values of task and process variables in a case-insensitive way. */
+  HistoricVariableInstanceQuery matchVariableValuesIgnoreCase();
+
+  /** only select historic process variables with the given name and value */
   HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue);
 
   HistoricVariableInstanceQuery orderByProcessInstanceId();
@@ -81,6 +85,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
   /** Only select historic variable instances with one of the given tenant ids. */
   HistoricVariableInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic variable instances that have no tenant id. */
+  HistoricVariableInstanceQuery withoutTenantId();
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

@@ -41,11 +41,15 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.camunda.bpm.engine.EntityTypes.JOB;
 import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
@@ -73,6 +77,8 @@ import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYP
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB_DEFINITION;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+import static org.camunda.bpm.engine.impl.cmd.AbstractSetBatchStateCmd.SUSPENSION_STATE_PROPERTY;
+import static org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd.INCLUDE_PROCESS_INSTANCES_PROPERTY;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 
@@ -371,13 +377,14 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
 
     // then
-    assertEquals(2, query().entityType(PROCESS_DEFINITION).count());
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(SUSPENSION_STATE_PROPERTY).count());
 
     // Process Definition Suspension
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
       .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(suspendDefinitionEntry);
@@ -385,7 +392,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, suspendDefinitionEntry.getDeploymentId());
 
-    assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
+    assertEquals(SUSPENSION_STATE_PROPERTY, suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
     assertNull(suspendDefinitionEntry.getOrgValue());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
@@ -394,6 +401,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(PROCESS_DEFINITION)
       .processDefinitionId(process.getProcessDefinitionId())
       .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(activateDefinitionEntry);
@@ -401,7 +409,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("oneTaskProcess", activateDefinitionEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, activateDefinitionEntry.getDeploymentId());
 
-    assertEquals("suspensionState", activateDefinitionEntry.getProperty());
+    assertEquals(SUSPENSION_STATE_PROPERTY, activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateDefinitionEntry.getCategory());
@@ -421,12 +429,13 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
 
     // then
-    assertEquals(2, query().entityType(PROCESS_DEFINITION).count());
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(SUSPENSION_STATE_PROPERTY).count());
 
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
       .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(suspendDefinitionEntry);
@@ -434,7 +443,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
     assertNull(suspendDefinitionEntry.getDeploymentId());
 
-    assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
+    assertEquals(SUSPENSION_STATE_PROPERTY, suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
     assertNull(suspendDefinitionEntry.getOrgValue());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
@@ -443,6 +452,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(PROCESS_DEFINITION)
       .processDefinitionKey("oneTaskProcess")
       .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(SUSPENSION_STATE_PROPERTY)
       .singleResult();
 
     assertNotNull(activateDefinitionEntry);
@@ -450,10 +460,294 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("oneTaskProcess", activateDefinitionEntry.getProcessDefinitionKey());
     assertNull(activateDefinitionEntry.getDeploymentId());
 
-    assertEquals("suspensionState", activateDefinitionEntry.getProperty());
+    assertEquals(SUSPENSION_STATE_PROPERTY, activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateDefinitionEntry.getCategory());
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsById_createsTwoLogEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+    repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION).count());
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION).count());
+
+    // Process Definition Suspension
+    Set<String> actualProperties = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .list()
+      .stream()
+      .map(UserOperationLogEntry::getProperty)
+      .collect(Collectors.toSet());
+
+    assertEquals(
+      actualProperties,
+      new HashSet<>(Arrays.asList(INCLUDE_PROCESS_INSTANCES_PROPERTY, SUSPENSION_STATE_PROPERTY))
+    );
+
+    // Process Definition activation
+    actualProperties = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .list()
+      .stream()
+      .map(UserOperationLogEntry::getProperty)
+      .collect(Collectors.toSet());
+
+    assertEquals(
+      actualProperties,
+      new HashSet<>(Arrays.asList(INCLUDE_PROCESS_INSTANCES_PROPERTY, SUSPENSION_STATE_PROPERTY))
+    );
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsById_includeProcessInstancesEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+    repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(INCLUDE_PROCESS_INSTANCES_PROPERTY).count());
+
+    // Process Definition Suspension
+    UserOperationLogEntry suspendDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(suspendDefinitionEntry);
+    assertEquals(process.getProcessDefinitionId(), suspendDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, suspendDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, suspendDefinitionEntry.getProperty());
+    assertEquals("true", suspendDefinitionEntry.getNewValue());
+    assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
+
+    // Process Definition Activation
+    UserOperationLogEntry activeDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(activeDefinitionEntry);
+    assertEquals(process.getProcessDefinitionId(), activeDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activeDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, activeDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, activeDefinitionEntry.getProperty());
+    assertEquals("true", activeDefinitionEntry.getNewValue());
+    assertNull(activeDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activeDefinitionEntry.getCategory());
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsById_excludeProcessInstancesEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionById(process.getProcessDefinitionId(), false, null);
+    repositoryService.activateProcessDefinitionById(process.getProcessDefinitionId(), true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(INCLUDE_PROCESS_INSTANCES_PROPERTY).count());
+
+    // Process Definition Suspension
+    UserOperationLogEntry suspendDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(suspendDefinitionEntry);
+    assertEquals(process.getProcessDefinitionId(), suspendDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, suspendDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, suspendDefinitionEntry.getProperty());
+    assertEquals("false", suspendDefinitionEntry.getNewValue());
+    assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
+
+    // Process Definition Activation
+    UserOperationLogEntry activeDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionId(process.getProcessDefinitionId())
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(activeDefinitionEntry);
+    assertEquals(process.getProcessDefinitionId(), activeDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activeDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, activeDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, activeDefinitionEntry.getProperty());
+    assertEquals("true", activeDefinitionEntry.getNewValue());
+    assertNull(activeDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activeDefinitionEntry.getCategory());
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsByKey_createsTwoLogEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
+    repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION).count());
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION).count());
+
+    // Process Definition Suspension
+    Set<String> actualProperties = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .list()
+      .stream()
+      .map(UserOperationLogEntry::getProperty)
+      .collect(Collectors.toSet());
+
+    assertEquals(
+      actualProperties,
+      new HashSet<>(Arrays.asList(INCLUDE_PROCESS_INSTANCES_PROPERTY, SUSPENSION_STATE_PROPERTY))
+    );
+
+    // Process Definition activation
+    actualProperties = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .list()
+      .stream()
+      .map(UserOperationLogEntry::getProperty)
+      .collect(Collectors.toSet());
+
+    assertEquals(
+      actualProperties,
+      new HashSet<>(Arrays.asList(INCLUDE_PROCESS_INSTANCES_PROPERTY, SUSPENSION_STATE_PROPERTY))
+    );
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsByKey_includeProcessInstancesEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
+    repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(INCLUDE_PROCESS_INSTANCES_PROPERTY).count());
+
+    // Process Definition Suspension
+    UserOperationLogEntry suspendDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(suspendDefinitionEntry);
+    assertNull(suspendDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertNull(suspendDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, suspendDefinitionEntry.getProperty());
+    assertEquals("true", suspendDefinitionEntry.getNewValue());
+    assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
+
+    // Process Definition Activation
+    UserOperationLogEntry activeDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(activeDefinitionEntry);
+    assertNull(activeDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activeDefinitionEntry.getProcessDefinitionKey());
+    assertNull(activeDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, activeDefinitionEntry.getProperty());
+    assertEquals("true", activeDefinitionEntry.getNewValue());
+    assertNull(activeDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activeDefinitionEntry.getCategory());
+  }
+
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryProcessDefinitionOperationsByKey_excludeProcessInstancesEntries() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", false, null);
+    repositoryService.activateProcessDefinitionByKey("oneTaskProcess", false, null);
+
+    // then
+    assertEquals(2, query().entityType(PROCESS_DEFINITION).property(INCLUDE_PROCESS_INSTANCES_PROPERTY).count());
+
+    // Process Definition Suspension
+    UserOperationLogEntry suspendDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(suspendDefinitionEntry);
+    assertNull(suspendDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertNull(suspendDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, suspendDefinitionEntry.getProperty());
+    assertEquals("false", suspendDefinitionEntry.getNewValue());
+    assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
+
+    // Process Definition Activation
+    UserOperationLogEntry activeDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION)
+      .property(INCLUDE_PROCESS_INSTANCES_PROPERTY)
+      .singleResult();
+
+    assertNotNull(activeDefinitionEntry);
+    assertNull(activeDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", activeDefinitionEntry.getProcessDefinitionKey());
+    assertNull(activeDefinitionEntry.getDeploymentId());
+
+    assertEquals(INCLUDE_PROCESS_INSTANCES_PROPERTY, activeDefinitionEntry.getProperty());
+    assertEquals("false", activeDefinitionEntry.getNewValue());
+    assertNull(activeDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activeDefinitionEntry.getCategory());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -654,6 +948,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .processDefinitionKey(key)
       .category(UserOperationLogEntry.CATEGORY_OPERATOR)
+      .property(SUSPENSION_STATE_PROPERTY)
       .count();
 
     assertEquals(1, processDefinitionEntryCount.longValue());
@@ -669,6 +964,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .processDefinitionKey(key)
       .category(UserOperationLogEntry.CATEGORY_OPERATOR)
+      .property(SUSPENSION_STATE_PROPERTY)
       .count();
 
     assertEquals(1, processDefinitionEntryCount.longValue());

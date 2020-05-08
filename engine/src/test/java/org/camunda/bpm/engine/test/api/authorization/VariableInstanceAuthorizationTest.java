@@ -20,6 +20,9 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
+
+import java.util.List;
+
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
@@ -222,6 +225,8 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 1);
   }
+  
+
 
   public void testProcessLocalTaskVariableQueryWithMultiple() {
     // given
@@ -436,6 +441,26 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
 
     deleteTask(taskId, true);
+  }
+  
+  /*
+   * CAM-10864: Tests that the query itself works if authorization is used and a value matcher
+   */
+  public void testQueryWithVariableValueFilter() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(VARIABLE_NAME, VARIABLE_VALUE);
+    VariableInstanceQuery ignoreCaseQuery = runtimeService.createVariableInstanceQuery().variableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).matchVariableNamesIgnoreCase();
+
+    // when
+    List<VariableInstance> results = query.list();
+    List<VariableInstance> ignoreCaseResults = ignoreCaseQuery.list();
+
+    // then
+    assertEquals(1, results.size());
+    assertEquals(1, ignoreCaseResults.size());
   }
 
   // helper ////////////////////////////////////////////////////////////////

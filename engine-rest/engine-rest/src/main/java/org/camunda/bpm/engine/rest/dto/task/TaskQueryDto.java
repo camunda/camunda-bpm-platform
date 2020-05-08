@@ -87,7 +87,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DUE_DATE_VALUE);
@@ -120,10 +120,13 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionName;
   private String processDefinitionNameLike;
   private String processInstanceId;
+  private String[] processInstanceIdIn;
   private String assignee;
   private String assigneeExpression;
   private String assigneeLike;
   private String assigneeLikeExpression;
+  private String[] assigneeIn;
+  private String[] assigneeNotIn;
   private String candidateGroup;
   private String candidateGroupExpression;
   private String candidateUser;
@@ -290,6 +293,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.processInstanceId = processInstanceId;
   }
 
+  @CamundaQueryParam(value = "processInstanceIdIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceIdIn(String[] processInstanceIdIn) {
+    this.processInstanceIdIn = processInstanceIdIn;
+  }
+
   @CamundaQueryParam("assignee")
   public void setAssignee(String assignee) {
     this.assignee = assignee;
@@ -303,6 +311,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("assigneeLike")
   public void setAssigneeLike(String assigneeLike) {
     this.assigneeLike = assigneeLike;
+  }
+
+  @CamundaQueryParam(value = "assigneeIn", converter = StringArrayConverter.class)
+  public void setAssigneeIn(String[] assigneeIn) {
+    this.assigneeIn = assigneeIn;
+  }
+
+  @CamundaQueryParam(value = "assigneeNotIn", converter = StringArrayConverter.class)
+  public void setAssigneeNotIn(String[] assigneeNotIn) {
+    this.assigneeNotIn = assigneeNotIn;
   }
 
   @CamundaQueryParam("assigneeLikeExpression")
@@ -728,6 +746,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return processInstanceId;
   }
 
+  public String[] getProcessInstanceIdIn() {
+    return processInstanceIdIn;
+  }
+
   public String getAssignee() {
     return assignee;
   }
@@ -738,6 +760,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String getAssigneeLike() {
     return assigneeLike;
+  }
+
+  public String[] getAssigneeIn() {
+    return assigneeIn;
+  }
+
+  public String[] getAssigneeNotIn() {
+    return assigneeNotIn;
   }
 
   public String getAssigneeLikeExpression() {
@@ -1047,6 +1077,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
+    if (processInstanceIdIn != null && processInstanceIdIn.length > 0) {
+      query.processInstanceIdIn(processInstanceIdIn);
+    }
     if (assignee != null) {
       query.taskAssignee(assignee);
     }
@@ -1058,6 +1091,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (assigneeLikeExpression != null) {
       query.taskAssigneeLikeExpression(assigneeLikeExpression);
+    }
+    if (assigneeIn != null && assigneeIn.length > 0) {
+      query.taskAssigneeIn(assigneeIn);
+    }
+    if (assigneeNotIn != null && assigneeNotIn.length > 0) {
+      query.taskAssigneeNotIn(assigneeNotIn);
     }
     if (candidateGroup != null) {
       query.taskCandidateGroup(candidateGroup);
@@ -1424,7 +1463,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     TaskQueryDto dto = new TaskQueryDto();
 
     if (!isOrQueryActive) {
-      dto.orQueries = new ArrayList<TaskQueryDto>();
+      dto.orQueries = new ArrayList<>();
       for (TaskQueryImpl orQuery: taskQuery.getQueries()) {
         if (orQuery.isOrQueryActive()) {
           dto.orQueries.add(fromQuery(orQuery, true));
@@ -1461,7 +1500,17 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processDefinitionName = taskQuery.getProcessDefinitionName();
     dto.processDefinitionNameLike = taskQuery.getProcessDefinitionNameLike();
     dto.processInstanceId = taskQuery.getProcessInstanceId();
+    if(taskQuery.getProcessInstanceIdIn() != null) {
+      dto.processInstanceIdIn = taskQuery.getProcessInstanceIdIn();
+    }
+
     dto.assignee = taskQuery.getAssignee();
+
+    if (taskQuery.getAssigneeIn() != null) {
+      dto.assigneeIn = taskQuery.getAssigneeIn()
+          .toArray(new String[taskQuery.getAssigneeIn().size()]);
+    }
+
     dto.assigneeLike = taskQuery.getAssigneeLike();
     dto.taskDefinitionKey = taskQuery.getKey();
     dto.taskDefinitionKeyIn = taskQuery.getKeys();
@@ -1511,9 +1560,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       }
     }
 
-    dto.processVariables = new ArrayList<VariableQueryParameterDto>();
-    dto.taskVariables = new ArrayList<VariableQueryParameterDto>();
-    dto.caseInstanceVariables = new ArrayList<VariableQueryParameterDto>();
+    dto.processVariables = new ArrayList<>();
+    dto.taskVariables = new ArrayList<>();
+    dto.caseInstanceVariables = new ArrayList<>();
     for (TaskQueryVariableValue variableValue : taskQuery.getVariables()) {
       VariableQueryParameterDto variableValueDto = new VariableQueryParameterDto(variableValue);
 
@@ -1603,7 +1652,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   public static List<SortingDto> convertQueryOrderingPropertiesToSortingDtos(List<QueryOrderingProperty> orderingProperties) {
-    List<SortingDto> sortingDtos = new ArrayList<SortingDto>();
+    List<SortingDto> sortingDtos = new ArrayList<>();
     for (QueryOrderingProperty orderingProperty : orderingProperties) {
       SortingDto sortingDto;
       if (orderingProperty instanceof VariableOrderProperty) {
@@ -1715,7 +1764,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   public static Map<String,Object> sortParametersForVariableOrderProperty(VariableOrderProperty variableOrderProperty) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     for (QueryEntityRelationCondition relationCondition : variableOrderProperty.getRelationConditions()) {
       QueryProperty property = relationCondition.getProperty();
       if (VariableInstanceQueryProperty.VARIABLE_NAME.equals(property)) {

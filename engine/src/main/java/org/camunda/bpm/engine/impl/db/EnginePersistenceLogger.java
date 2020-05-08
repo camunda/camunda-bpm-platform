@@ -686,7 +686,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
     String exceptionMessage = exceptionMessage(
       "083",
-      "Exception while executing Batch Database Operations with message '{}'. Flush summary: \n {}", message,
+      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
       buildStringFromList(operationsToFlush)
     );
 
@@ -732,6 +732,24 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "The '{}' permission is disabled, please check your process engine configuration.",
         permission
         ));
+  }
+
+  public ProcessEngineException batchingNotSupported(DbOperation operation) {
+    throw new ProcessEngineException(exceptionMessage(
+        "089",
+        "Batching not supported: The jdbc driver in use does not return the number of "
+        + "affected rows when executing statement batches. "
+        + "Consider setting the engine configuration property 'jdbcBatchProcessing' to false."
+        + "Failed operation: {}",
+        operation));
+  }
+
+  public ProcessEngineException disabledHistoricInstancePermissionsException() {
+    return  new BadUserRequestException(exceptionMessage(
+        "090",
+        "Historic instance permissions are disabled, " +
+            "please check your process engine configuration."
+    ));
   }
 
 }

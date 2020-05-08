@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
+
+import java.util.Arrays;
 
 /**
  * @author Daniel Meyer
@@ -28,6 +31,9 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
   protected String activityId;
   protected String activityName;
   protected String activityType;
+
+  protected String[] incidentIds = NO_IDS;
+  protected Incident[] incidents = new Incident[0];
 
   public String getActivityId() {
     return activityId;
@@ -65,6 +71,24 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
     this.activityName = activityName;
   }
 
+  @Override
+  public String[] getIncidentIds() {
+    return incidentIds;
+  }
+
+  public void setIncidentIds(String[] incidentIds) {
+    this.incidentIds = incidentIds;
+  }
+
+  @Override
+  public Incident[] getIncidents() {
+    return incidents;
+  }
+
+  public void setIncidents(Incident[] incidents) {
+    this.incidents = incidents;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
            + "[executionId=" + executionId
@@ -75,6 +99,8 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
            + ", parentActivityInstanceId=" + parentActivityInstanceId
            + ", processInstanceId=" + processInstanceId
            + ", processDefinitionId=" + processDefinitionId
+           + ", incidentIds=" + Arrays.toString(incidentIds)
+           + ", incidents=" + Arrays.toString(incidents)
            + "]";
   }
 

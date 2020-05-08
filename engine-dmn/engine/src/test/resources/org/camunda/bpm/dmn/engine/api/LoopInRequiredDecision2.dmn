@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" 
+  id="loopDetection"
+  name="Loop Detection" 
+  namespace="decisionWithRequiredDecisionTransform">
+
+  <decision id="A" name="A">
+    <decisionTable id="aTable">
+      <input id="input3">
+      <inputExpression>
+        <text>b</text>
+      </inputExpression>
+      </input>
+      <input id="input4">
+      <inputExpression>
+        <text>c</text>
+      </inputExpression>
+      </input>
+      <output id="amodel" name="a" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry3">
+          <text>b</text>
+        </inputEntry>
+        <inputEntry id="inputEntry4">
+          <text>c</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3">
+          <text>a</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="B" name="B">
+    <informationRequirement>
+      <requiredDecision href="#A" />
+    </informationRequirement>
+    <decisionTable id="bTable">
+      <input id="input2">
+      <inputExpression>
+        <text>d</text>
+      </inputExpression>
+      </input>
+      <output id="bmodel" name="b" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry2">
+          <text>d</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2">
+          <text>b</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="C" name="C">
+    <informationRequirement>
+      <requiredDecision href="#B" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#D" />
+    </informationRequirement>
+    <decisionTable id="cTable">
+      <input id="input5">
+      <inputExpression>
+        <text>e</text>
+      </inputExpression>
+      </input>
+      <output id="cmodel" name="c" typeRef="string" />
+      <rule id="rule4">
+        <inputEntry id="inputEntry5">
+          <text>e</text>
+        </inputEntry>
+        <outputEntry id="outputEntry4">
+          <text>c</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="D" name="D">
+    <informationRequirement>
+      <requiredDecision href="#E" />
+    </informationRequirement>
+    <decisionTable id="dTable">
+      <input id="input1">
+      <inputExpression>
+        <text>f</text>
+      </inputExpression>
+      </input>
+      <output id="dmodel" name="d" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1">
+          <text>f</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1">
+          <text>d</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="E" name="E">
+    <informationRequirement>
+      <requiredDecision href="#C" />
+    </informationRequirement>
+    <decisionTable id="eTable">
+      <input id="input6">
+      <inputExpression>
+        <text>a</text>
+      </inputExpression>
+      </input>
+      <output id="emodel" name="e" typeRef="string" />
+      <rule id="rule5">
+        <inputEntry id="inputEntry6">
+          <text>a</text>
+        </inputEntry>
+        <outputEntry id="outputEntry5">
+          <text>e</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

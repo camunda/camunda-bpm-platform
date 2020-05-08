@@ -19,26 +19,22 @@ package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl.Mode;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -46,7 +42,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBasedBatchCmd<Batch> {
+public class SetRemovalTimeToHistoricDecisionInstancesCmd implements Command<Batch> {
 
   protected SetRemovalTimeToHistoricDecisionInstancesBuilderImpl builder;
 
@@ -54,60 +50,40 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
     this.builder = builder;
   }
 
+  @Override
   public Batch execute(CommandContext commandContext) {
-    Set<String> historicDecisionInstanceIds = new HashSet<>();
-
-    List<String> instanceIds = builder.getIds();
-    HistoricDecisionInstanceQuery instanceQuery = builder.getQuery();
-    if (instanceQuery == null && instanceIds == null) {
-      throw new BadUserRequestException("Either query nor ids provided.");
-
+    if (builder.getQuery() == null && builder.getIds() == null) {
+      throw new BadUserRequestException("Neither query nor ids provided.");
     }
 
-    if (instanceQuery != null) {
-      for (HistoricDecisionInstance historicDecisionInstance : instanceQuery.list()) {
-        historicDecisionInstanceIds.add(historicDecisionInstance.getId());
-
-      }
-    }
-
-    if (instanceIds != null) {
-      historicDecisionInstanceIds.addAll(findHistoricInstanceIds(instanceIds, commandContext));
-
-    }
+    BatchElementConfiguration elementConfiguration = collectInstances(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
-    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", historicDecisionInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", elementConfiguration.getIds());
 
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
-
-    writeUserOperationLog(commandContext, historicDecisionInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
-      builder.isHierarchical(), true);
-
-    BatchEntity batch = createBatch(commandContext, new ArrayList<>(historicDecisionInstanceIds));
-
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
-
-    batch.fireHistoricStartEvent();
-
-    batch.createSeedJob();
-
-    return batch;
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_DECISION_SET_REMOVAL_TIME)
+        .config(getConfiguration(elementConfiguration))
+        .permission(BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
+        .operationLogHandler(this::writeUserOperationLog)
+        .build();
   }
 
-  protected List<String> findHistoricInstanceIds(List<String> instanceIds, CommandContext commandContext) {
-    List<HistoricDecisionInstance> historicDecisionInstances = createHistoricDecisionInstanceQuery(commandContext)
-      .decisionInstanceIdIn(instanceIds.toArray(new String[0]))
-      .list();
+  protected BatchElementConfiguration collectInstances(CommandContext commandContext) {
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
-    List<String> ids = new ArrayList<>();
-    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
-      ids.add(historicDecisionInstance.getId());
+    if (builder.getQuery() != null) {
+      elementConfiguration.addDeploymentMappings(((HistoricDecisionInstanceQueryImpl) builder.getQuery()).listDeploymentIdMappings());
     }
 
-    return ids;
+    List<String> idList = builder.getIds();
+    if (!CollectionUtil.isEmpty(idList)) {
+      HistoricDecisionInstanceQueryImpl query = new HistoricDecisionInstanceQueryImpl();
+      query.decisionInstanceIdIn(idList.toArray(new String[0]));
+      elementConfiguration.addDeploymentMappings(commandContext.runWithoutAuthorization(query::listDeploymentIdMappings));
+    }
+
+    return elementConfiguration;
   }
 
   protected HistoricDecisionInstanceQuery createHistoricDecisionInstanceQuery(CommandContext commandContext) {
@@ -116,33 +92,28 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
       .createHistoricDecisionInstanceQuery();
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode, Date removalTime,
-                                       boolean hierarchical, boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
-    propertyChanges.add(new PropertyChange("mode", null, mode));
-    propertyChanges.add(new PropertyChange("removalTime", null, removalTime));
-    propertyChanges.add(new PropertyChange("hierarchical", null, hierarchical));
+    propertyChanges.add(new PropertyChange("mode", null, builder.getMode()));
+    propertyChanges.add(new PropertyChange("removalTime", null, builder.getRemovalTime()));
+    propertyChanges.add(new PropertyChange("hierarchical", null, builder.isHierarchical()));
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
-    propertyChanges.add(new PropertyChange("async", null, async));
+    propertyChanges.add(new PropertyChange("async", null, true));
 
     commandContext.getOperationLogManager()
       .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);
   }
 
-  protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
-    return new SetRemovalTimeBatchConfiguration(ids)
-      .setHierarchical(builder.isHierarchical())
-      .setHasRemovalTime(hasRemovalTime(builder.getMode()))
-      .setRemovalTime(builder.getRemovalTime());
-  }
-
-  protected boolean hasRemovalTime(Mode mode) {
+  protected boolean hasRemovalTime() {
     return builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME ||
       builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
   }
 
-  protected BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_DECISION_SET_REMOVAL_TIME);
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new SetRemovalTimeBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings())
+        .setHierarchical(builder.isHierarchical())
+        .setHasRemovalTime(hasRemovalTime())
+        .setRemovalTime(builder.getRemovalTime());
   }
 
 }

@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -25,16 +27,46 @@ import org.junit.Test;
  *
  */
 public class StringUtilTest {
+  
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Test
-  public void testTrimToMaximumLengthAllowed() {
+  public void shouldAllowTrimToMaximumLength() {
+    // given
     String fittingThreeByteMessage = repeatCharacter("\u9faf", StringUtil.DB_MAX_STRING_LENGTH);
     String exceedingMessage = repeatCharacter("a", StringUtil.DB_MAX_STRING_LENGTH * 2);
-    
-    assertEquals(fittingThreeByteMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH), StringUtil.trimToMaximumLengthAllowed(fittingThreeByteMessage));
-    assertEquals(exceedingMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH), StringUtil.trimToMaximumLengthAllowed(exceedingMessage));
+
+    // then
+    assertThat(fittingThreeByteMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH)).isEqualTo(StringUtil.trimToMaximumLengthAllowed(fittingThreeByteMessage));
+    assertThat(exceedingMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH)).isEqualTo(StringUtil.trimToMaximumLengthAllowed(exceedingMessage));
   }
-  
+
+  @Test
+  public void shouldConvertByteArrayToString() {
+    // given
+    String message = "This is a message string";
+    byte[] bytes = message.getBytes();
+
+    // when
+    String stringFromBytes = StringUtil.fromBytes(bytes, engineRule.getProcessEngine());
+
+    // then
+    assertThat(stringFromBytes).isEqualTo(message);
+  }
+
+  @Test
+  public void shouldConvertNullByteArrayToEmptyString() {
+    // given
+    byte[] bytes = null;
+
+    // when
+    String stringFromBytes = StringUtil.fromBytes(bytes, engineRule.getProcessEngine());
+
+    // then
+    assertThat(stringFromBytes).isEmpty();
+  }
+
   protected static String repeatCharacter(String encodedCharacter, int numCharacters) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < numCharacters; i++) {

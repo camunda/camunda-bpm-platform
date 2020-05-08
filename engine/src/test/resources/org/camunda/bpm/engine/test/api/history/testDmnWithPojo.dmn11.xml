@@ -13,8 +13,8 @@
       </input>
       <output id="result" name="result" />
       <rule id="rule">
-        <inputEntry id="input1">
-          <text>pojo</text>
+        <inputEntry id="input1" expressionLanguage="juel">
+          <text>${cellInput==pojo}</text>
         </inputEntry>
         <outputEntry id="output1">
           <text>pojo</text>

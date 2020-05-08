@@ -16,29 +16,80 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
-import java.util.Map;
-
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import ch.qos.logback.classic.Level;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-public class HistoryCleanupBatchTest extends ResourceProcessEngineTestCase {
+import java.util.Map;
 
-  public HistoryCleanupBatchTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/camunda.cfg.xml");
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
+public class HistoryCleanupBatchTest {
+
+  protected static final String PROCESS_ENGINE_CONFIG =
+      "org/camunda/bpm/engine/test/standalone/history/camunda.cfg.xml";
+
+  protected static final String CONFIG_LOGGER = "org.camunda.bpm.engine.cfg";
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch(CONFIG_LOGGER)
+      .level(Level.WARN);
+
+  protected ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl engineConfiguration;
+
+  @Before
+  public void setup() {
+    processEngine = ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource(PROCESS_ENGINE_CONFIG)
+        .buildProcessEngine();
+
+    engineConfiguration =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+  }
+
+  @After
+  public void teardown() {
+    processEngine.close();
   }
 
   @Test
-  public void testBatchHistoryTimeToLiveConfiguration() {
+  public void shouldSetGlobalConfigForBatchHistoryTimeToLive() {
+    // when
+    String batchOperationHistoryTimeToLive =
+        engineConfiguration.getBatchOperationHistoryTimeToLive();
 
-    String batchOperationHistoryTimeToLive = processEngineConfiguration.getBatchOperationHistoryTimeToLive();
-    assertEquals("P5D", batchOperationHistoryTimeToLive);
+    // then
+    assertThat(batchOperationHistoryTimeToLive).isEqualTo("P5D");
+  }
 
-    Map<String, String> map = processEngineConfiguration.getBatchOperationsForHistoryCleanup();
-    assertEquals(13, map.size());
-    assertEquals("P10D", map.get("instance-migration"));
-    assertEquals("P7D", map.get("instance-modification"));
-    assertEquals("P5D", map.get("instance-restart"));
-    assertEquals("P3D", map.get("uknown-operation"));
+  @Test
+  public void shouldSetHistoryTimeToLivePerBatchType() {
+    Map<String, String> batchOperationsForHistoryCleanup =
+        engineConfiguration.getBatchOperationsForHistoryCleanup();
+
+    assertThat(batchOperationsForHistoryCleanup)
+        .contains(
+            entry(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, "P10D"),
+            entry(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, "P7D"),
+            entry("uknown-operation", "P3D")
+        );
+  }
+
+  @Test
+  public void shouldWriteLogWhenBatchTypeIsUnknown() {
+    // then
+    assertThat(loggingRule.getFilteredLog("ENGINE-12010 Invalid batch operation name " +
+        "'uknown-operation' with history time to live set to'P3D'")).hasSize(1);
   }
 
 }

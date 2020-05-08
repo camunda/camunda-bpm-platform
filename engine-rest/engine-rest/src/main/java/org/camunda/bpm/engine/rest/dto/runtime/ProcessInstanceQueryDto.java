@@ -27,6 +27,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -59,6 +60,8 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   private String deploymentId;
   private String processDefinitionKey;
+  private List<String> processDefinitionKeys;
+  private List<String> processDefinitionKeyNotIn;
   private String businessKey;
   private String businessKeyLike;
   private String caseInstanceId;
@@ -82,7 +85,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean leafProcessInstances;
   private Boolean isProcessDefinitionWithoutTenantId;
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   private List<VariableQueryParameterDto> variables;
+
+  private List<ProcessInstanceQueryDto> orQueries;
 
   public ProcessInstanceQueryDto() {
 
@@ -90,6 +98,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   public ProcessInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<ProcessInstanceQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   public Set<String> getProcessInstanceIds() {
@@ -117,6 +130,24 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public List<String> getProcessDefinitionKeys() {
+    return processDefinitionKeys;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringListConverter.class)
+  public void setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeys = processDefinitionKeys;
+  }
+
+  public List<String> getProcessDefinitionKeyNotIn() {
+    return processDefinitionKeyNotIn;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyNotIn", converter = StringListConverter.class)
+  public void setProcessDefinitionKeyNotIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeyNotIn = processDefinitionKeys;
   }
 
   public String getBusinessKey() {
@@ -216,6 +247,24 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
+  }
+
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
+    this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value ="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesCaseInsensitive) {
+    this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
   }
 
   public Boolean isWithIncident() {
@@ -328,14 +377,31 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     return engine.getRuntimeService().createProcessInstanceQuery();
   }
 
+  public List<ProcessInstanceQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(ProcessInstanceQuery query) {
-
+    if (orQueries != null) {
+      for (ProcessInstanceQueryDto orQueryDto: orQueries) {
+        ProcessInstanceQueryImpl orQuery = new ProcessInstanceQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((ProcessInstanceQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (processInstanceIds != null) {
       query.processInstanceIds(processInstanceIds);
     }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
+    }
+    if (processDefinitionKeys != null && !processDefinitionKeys.isEmpty()) {
+      query.processDefinitionKeyIn(processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]));
+    }
+    if (processDefinitionKeyNotIn != null && !processDefinitionKeyNotIn.isEmpty()) {
+      query.processDefinitionKeyNotIn(processDefinitionKeyNotIn.toArray(new String[processDefinitionKeyNotIn.size()]));
     }
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
@@ -402,6 +468,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(isProcessDefinitionWithoutTenantId)) {
       query.processDefinitionWithoutTenantId();
+    }
+    if(TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

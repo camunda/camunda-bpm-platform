@@ -45,6 +45,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected String activityInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String tenantId;
   protected long priority;
   protected VariableMapImpl variables;
@@ -96,6 +97,10 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
   }
 
   public String getTenantId() {
@@ -150,6 +155,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.activityInstanceId = externalTaskEntity.getActivityInstanceId();
     result.processDefinitionId = externalTaskEntity.getProcessDefinitionId();
     result.processDefinitionKey = externalTaskEntity.getProcessDefinitionKey();
+    result.processDefinitionVersionTag = externalTaskEntity.getProcessDefinitionVersionTag();
     result.tenantId = externalTaskEntity.getTenantId();
     result.priority = externalTaskEntity.getPriority();
     result.businessKey = externalTaskEntity.getBusinessKey();

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -42,6 +44,8 @@ import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.junit.Assert;
 
 public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
+
+  SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testFailedServiceTask() {
@@ -275,7 +279,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertNotNull(pi);
 
     // a job is acquirable
-    List<JobEntity> acquirableJobs = findAndLockAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAndLockAcquirableJobs();
     assertEquals(1, acquirableJobs.size());
 
     // execute job
@@ -378,7 +382,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2017-01-01T09:55:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -414,8 +417,8 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     //then
     Date expectedDate = simpleDateFormat.parse("2017-01-01T10:15:00");
-    Date lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime();
-    assertEquals(expectedDate, lockExpirationTime);
+    Date duedateTime = (managementService.createJobQuery().singleResult()).getDuedate();
+    assertEquals(expectedDate, duedateTime);
   }
 
   public void testRetryOnTimerStartEventWithExpression() {
@@ -456,7 +459,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -478,7 +480,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testIntermediateCatchEvent() throws Exception {
@@ -494,7 +496,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -516,7 +517,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testEndEvent() throws Exception {
@@ -530,7 +531,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -552,7 +552,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testExclusiveGateway() throws Exception {
@@ -567,7 +567,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -589,7 +588,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testInclusiveGateway() throws Exception {
@@ -604,7 +603,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -626,7 +624,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testEventBasedGateway() throws Exception {
@@ -643,7 +641,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -665,7 +662,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
   }
 
   public void testParallelGateway() throws Exception {
@@ -680,7 +677,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     deployment(bpmnModelInstance);
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
 
@@ -702,7 +698,104 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(4, job.getRetries());
 
     Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
-    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+    assertEquals(expectedDate, job.getDuedate());
+  }
+
+  public void testFailingIntermidiateBoundaryTimerJobWithCustomRetries() throws ParseException {
+    try {
+      // given
+      BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("wait")
+          .boundaryEvent("timer")
+          .cancelActivity(false)
+          .timerWithCycle("R4/PT1M")
+          .camundaFailedJobRetryTimeCycle("R2/PT10M")
+        .serviceTask("failing")
+          .camundaClass("foo")
+        .endEvent()
+        .done();
+
+      deployment(bpmnModelInstance);
+
+      Date startDate = simpleDateFormat.parse("2019-01-01T10:00:00");
+      ClockUtil.setCurrentTime(startDate);
+
+      runtimeService.startProcessInstanceByKey("process");
+
+      ClockUtil.setCurrentTime(simpleDateFormat.parse("2019-01-01T10:01:01"));
+
+      // when the first timer is triggered
+      Job firstJob = managementService.createJobQuery().singleResult();
+      try {
+        managementService.executeJob(firstJob.getId());
+      } catch (Exception e) {
+        // ignore
+      }
+
+      // then a second job will be created for the second timer
+      List<Job> jobs = managementService.createJobQuery().list();
+      assertEquals(2, jobs.size());
+      for (Job job : jobs) {
+        if (job.getRetries() == 1) { // the first job already failed once
+          Date expectedDate = simpleDateFormat.parse("2019-01-01T10:11:01");
+          assertEquals(expectedDate, job.getDuedate());
+          assertNull(((JobEntity) job).getLockExpirationTime());
+        } else if (job.getRetries() == 3) { // the second job is not triggered yet
+          Date expectedDate = simpleDateFormat.parse("2019-01-01T10:02:00");
+          assertEquals(expectedDate, job.getDuedate());
+          assertNull(((JobEntity) job).getLockExpirationTime());
+        } else {
+          fail("Unexpected job");
+        }
+      }
+    } finally {
+      ClockUtil.reset();
+    }
+  }
+
+  public void testExecuteSecondJobWhenJobFailedWithCustomJobRetriesInSameProcess() {
+    // given
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .parallelGateway("gwt")
+        .serviceTask("failing")
+          .camundaClass("foo")
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R2/PT5M")
+      .moveToNode("gwt")
+        .userTask("beforePassing")
+        .serviceTask("passing")
+          .camundaExpression("${true}")
+          .camundaAsyncBefore()
+        .userTask("afterPassing")
+      .done();
+
+    deployment(bpmnModelInstance);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    Task task = taskService.createTaskQuery().taskDefinitionKey("beforePassing").singleResult();
+    taskService.complete(task.getId());
+
+    // when one failed job and one passing are present
+    // only the passing should be executed
+    waitForJobExecutorToProcessAllJobs(5000);
+
+    // then the passing service task has been executed
+    task = taskService.createTaskQuery().taskDefinitionKey("afterPassing").singleResult();
+    assertNotNull(task);
+    // and the failing job still have one retry left
+    Job failedJob = managementService.createJobQuery().singleResult();
+    assertEquals(1, failedJob.getRetries());
+    assertNull(((JobEntity) failedJob).getLockExpirationTime());
   }
 
   protected void assertJobRetriesForActivity(ProcessInstance pi, String activityId) {
@@ -817,13 +910,13 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     return dateFormat.parse(dateString);
   }
 
-  protected List<JobEntity> findAndLockAcquirableJobs() {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+  protected List<AcquirableJobEntity> findAndLockAcquirableJobs() {
+    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
 
       @Override
-      public List<JobEntity> execute(CommandContext commandContext) {
-        List<JobEntity> jobs = commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
-        for (JobEntity job : jobs) {
+      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
+        List<AcquirableJobEntity> jobs = commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
+        for (AcquirableJobEntity job : jobs) {
           job.setLockOwner("test");
         }
         return jobs;

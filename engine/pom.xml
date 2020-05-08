@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -42,6 +42,20 @@
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-impl</artifactId>
         </exclusion>
+        <!-- these exclusions are needed when building with Maven >= 3.3
+          see CAM-11822 for details -->
+        <exclusion>
+          <groupId>org.camunda.feel</groupId>
+          <artifactId>feel-engine</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-parser-combinators_2.13</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -56,50 +70,45 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-email</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <scope>test</scope>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
+
+    <!-- provided dependencies -->
 
     <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -107,40 +116,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp-wiser</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <!-- required for DiagramQueryTest -->
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
     </dependency>
 
     <dependency>
@@ -148,18 +126,6 @@
       <artifactId>jboss-javaee-web-6.0</artifactId>
       <type>pom</type>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -188,6 +154,75 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-email</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- test dependencies  -->
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <!-- required for DiagramQueryTest -->
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
@@ -205,17 +240,17 @@
       <scope>test</scope>
     </dependency>
 
-   <dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>test</scope>
-   </dependency>
-
-   <dependency>
+    </dependency>
+    
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
       <scope>test</scope>
-   </dependency>
+    </dependency>
 
   </dependencies>
 
@@ -228,6 +263,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    
+    <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
+    for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -278,6 +317,7 @@
           <include>**/camunda.cfg.db.xml</include>
           <include>**/camunda.cfg.plugins.xml</include>
           <include>**/camunda.cfg.prefix.xml</include>
+          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
         </includes>
       </testResource>
     </testResources>
@@ -332,9 +372,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
           <artifactSet>
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>
@@ -354,7 +395,7 @@
           <relocations>
             <relocation>
               <pattern>com.google.gson</pattern>
-              <shadedPattern>camundajar.com.google.gson</shadedPattern>
+              <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
@@ -499,6 +540,9 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <forkCount>0.5C</forkCount>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -507,33 +551,10 @@
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <forkCount>0.5C</forkCount>
               <reuseForks>true</reuseForks>
               <systemPropertyVariables>
                 <jdbcUrl>jdbc:h2:mem:camunda_${surefire.forkNumber};DB_CLOSE_DELAY=1000</jdbcUrl>
               </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>oracle-10</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes>
-                <exclude>**/ManagementServiceTest.java</exclude>
-
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-              </excludes>
             </configuration>
           </plugin>
         </plugins>
@@ -554,6 +575,7 @@
                 <exclude>**/JdbcStatementTimeoutTest.java</exclude>
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
                 <exclude>**/ConcurrentDeploymentTest.java</exclude>
+                <exclude>**/DatabaseFlushTest.java</exclude>
                 <exclude>**/*TestCase.java</exclude>
               </excludes>
             </configuration>
@@ -621,6 +643,7 @@
               <excludes>
                 <exclude>org/camunda/bpm/*/impl/**</exclude>
                 <exclude>org/camunda/bpm/engine/test/ProcessEngineRule</exclude>
+                <exclude>camundajar/**/*</exclude>
               </excludes>
             </configuration>
             <executions>
@@ -709,7 +732,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-XX:MaxPermSize=192m -Xmx512m</argLine>
+              <argLine>-Xmx700m</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -752,11 +775,14 @@
                      the same except for the whole unit test suite -->
                 <exclude>**/DatabaseTablePrefixTest.java</exclude>
                 <exclude>**/DeploymentTest.java</exclude>
+				<exclude>**/DeploymentAutoHistoryTest.java</exclude>
                 <exclude>**/CustomHistoryLevelUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelWithoutUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIncidentTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIdentityLinkTest.java</exclude>
                 <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
+                <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
+                <exclude>**/LoginAttemptsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

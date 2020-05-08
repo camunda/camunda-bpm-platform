@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -24,12 +32,6 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 
 /**
@@ -85,8 +87,9 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
           .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testEmptyMessageNameFails.bpmn20.xml")
           .deploy();
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (ParseException e) {
       assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
+      assertEquals("theStart", e.getResorceReports().get(0).getErrors().get(0).getMainElementId());
     }
   }
 
@@ -370,4 +373,21 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
     }
   }
+
+  //test fix CAM-10819
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testMessageStartEventUsingCorrelationEngine.bpmn"})
+  public void testMessageStartEventUsingCorrelationEngineAndLocalVariable() {
+
+    // when
+    // sending newCorrelationStartMessage using correlation engine
+    ProcessInstance  processInstance = runtimeService.createMessageCorrelation("newCorrelationStartMessage")
+            .setVariableLocal("var", "value")
+            .correlateWithResult().getProcessInstance();
+
+    // then
+    // ensure the variable is available
+    String processInstanceValue = (String) runtimeService.getVariableLocal(processInstance.getId(), "var");
+    assertThat(processInstanceValue, equalTo("value"));
+  }
+
 }

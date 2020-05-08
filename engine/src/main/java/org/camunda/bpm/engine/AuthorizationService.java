@@ -126,6 +126,9 @@ public interface AuthorizationService {
    * @param groupIds a list of group ids the user is member of
    * @param permission the permission(s) to check for.
    * @param resource the resource for which the authorization is checked.
+   * @throws BadUserRequestException when {@code resource} is a
+   * {@link Resources#HISTORIC_TASK Historic Task} or {@link Resources#HISTORIC_PROCESS_INSTANCE
+   * Historic Process Instance} and historic instance permissions are disabled.
    */
   public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource);
   
@@ -139,6 +142,9 @@ public interface AuthorizationService {
    * @param permission the permission(s) to check for.
    * @param resource the resource for which the authorization is checked.
    * @param resourceId the resource id for which the authorization check is performed.
+   * @throws BadUserRequestException when {@code resource} is a
+   * {@link Resources#HISTORIC_TASK Historic Task} or {@link Resources#HISTORIC_PROCESS_INSTANCE
+   * Historic Process Instance} and historic instance permissions are disabled.
    */
   public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId);
   

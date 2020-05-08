@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.optimize;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,13 +35,16 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -112,7 +113,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "foo");
     runtimeService.startProcessInstanceByKey("process", variables);
 
@@ -121,7 +122,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
 
     // then
-    assertThat(historicVariableUpdates.size(), is(1));
+    assertThat(historicVariableUpdates.size()).isEqualTo(1);
     assertThatUpdateHasAllImportantInformation(historicVariableUpdates.get(0));
   }
 
@@ -133,7 +134,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "value1");
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -148,8 +149,8 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(now, null, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(1));
-    assertThat(variableUpdates.get(0).getValue().toString(), is("value2"));
+    assertThat(variableUpdates.size()).isEqualTo(1);
+    assertThat(variableUpdates.get(0).getValue().toString()).isEqualTo("value2");
   }
 
   @Test
@@ -162,7 +163,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "value1");
     runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -175,8 +176,8 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(null, now, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(1));
-    assertThat(variableUpdates.get(0).getValue().toString(), is("value1"));
+    assertThat(variableUpdates.size()).isEqualTo(1);
+    assertThat(variableUpdates.get(0).getValue().toString()).isEqualTo("value1");
   }
 
   @Test
@@ -189,7 +190,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "value1");
     runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -202,7 +203,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(now, now, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(0));
+    assertThat(variableUpdates.size()).isEqualTo(0);
   }
 
   @Test
@@ -213,7 +214,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "value1");
     variables.put("integerVar", 1);
     runtimeService.startProcessInstanceByKey("process", variables);
@@ -227,7 +228,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(pastDate(), null, 3);
 
     // then
-    assertThat(variableUpdates.size(), is(3));
+    assertThat(variableUpdates.size()).isEqualTo(3);
   }
 
   @Test
@@ -241,7 +242,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     Date now = new Date();
     Date nowPlus1Second = new Date(now.getTime() + 1000L);
     ClockUtil.setCurrentTime(nowPlus1Second);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("var1", "value1");
       runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -260,10 +261,10 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(now, null, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(3));
-    assertThat(variableUpdates.get(0).getVariableName(), is("var1"));
-    assertThat(variableUpdates.get(1).getVariableName(), is("var2"));
-    assertThat(variableUpdates.get(2).getVariableName(), is("var3"));
+    assertThat(variableUpdates.size()).isEqualTo(3);
+    assertThat(variableUpdates.get(0).getVariableName()).isEqualTo("var1");
+    assertThat(variableUpdates.get(1).getVariableName()).isEqualTo("var2");
+    assertThat(variableUpdates.get(2).getVariableName()).isEqualTo("var3");
   }
 
   @Test
@@ -278,18 +279,18 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("process");
 
     Task task = taskService.createTaskQuery().singleResult();
-    Map<String, String> formFields = new HashMap<String, String>();
+    Map<String, String> formFields = new HashMap<>();
     formFields.put("var", "foo");
     engineRule.getFormService().submitTaskFormData(task.getId(), formFields);
     long detailCount = engineRule.getHistoryService().createHistoricDetailQuery().count();
-    assertThat(detailCount, is(2L)); // variable update + form property
+    assertThat(detailCount).isEqualTo(2L); // variable update + form property
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
       optimizeService.getHistoricVariableUpdates(pastDate(), null, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(1));
+    assertThat(variableUpdates.size()).isEqualTo(1);
   }
 
   @Test
@@ -301,12 +302,12 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       .done();
     testHelper.deploy(simpleDefinition);
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("var", serializable);
 
     runtimeService.startProcessInstanceByKey("process", variables);
@@ -319,14 +320,60 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
 
     // then
-    assertThat(historicVariableUpdates.size(), is(4));
+    assertThat(historicVariableUpdates.size()).isEqualTo(4);
 
     for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
       ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
-      assertThat(typedValue.isDeserialized(), is(false));
-      assertThat(typedValue.getValueSerialized(), notNullValue());
+      assertThat(typedValue.isDeserialized()).isFalse();
+      assertThat(typedValue.getValueSerialized()).isNotNull();
     }
 
+  }
+
+  /**
+   * Excluded on h2, because the test takes quite some time there (30-40 seconds)
+   * and the fixed problem did not occur on h2.
+   */
+  @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
+  public void testFetchLargeNumberOfObjectVariables() {
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("waitState")
+      .endEvent()
+      .done();
+
+    testHelper.deploy(simpleDefinition);
+
+    int numberOfVariables = 3000;
+    VariableMap variables = createVariables(numberOfVariables);
+
+    // creates all variables in one transaction, which can take advantage
+    // of SQL batching
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+        optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10000);
+
+    // then
+    assertThat(historicVariableUpdates).hasSize(numberOfVariables);
+
+    for (HistoricVariableUpdate update : historicVariableUpdates) {
+      ObjectValue typedValue = (ObjectValue) update.getTypedValue();
+      assertThat(typedValue.getValueSerialized()).isNotNull();
+    }
+  }
+
+  private VariableMap createVariables(int num) {
+    VariableMap variables = Variables.createVariables();
+
+    for (int i = 0; i < num; i++) {
+      variables.put("var" + i, Variables.objectValue(i));
+    }
+
+    return variables;
   }
 
   private Date pastDate() {
@@ -339,14 +386,14 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
   }
 
   private void assertThatUpdateHasAllImportantInformation(HistoricVariableUpdate variableUpdate) {
-    assertThat(variableUpdate, notNullValue());
-    assertThat(variableUpdate.getId(), notNullValue());
-    assertThat(variableUpdate.getProcessDefinitionKey(), is("process"));
-    assertThat(variableUpdate.getProcessDefinitionId(), notNullValue());
-    assertThat(variableUpdate.getVariableName(), is("stringVar"));
-    assertThat(variableUpdate.getValue().toString(), is("foo"));
-    assertThat(variableUpdate.getTypeName(), is("string"));
-    assertThat(variableUpdate.getTime(), notNullValue());
+    assertThat(variableUpdate).isNotNull();
+    assertThat(variableUpdate.getId()).isNotNull();
+    assertThat(variableUpdate.getProcessDefinitionKey()).isEqualTo("process");
+    assertThat(variableUpdate.getProcessDefinitionId()).isNotNull();
+    assertThat(variableUpdate.getVariableName()).isEqualTo("stringVar");
+    assertThat(variableUpdate.getValue().toString()).isEqualTo("foo");
+    assertThat(variableUpdate.getTypeName()).isEqualTo("string");
+    assertThat(variableUpdate.getTime()).isNotNull();
   }
 
 }

@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.camunda.commons.camunda-commons-typed-values">
   <resources>
-    <resource-root path="camunda-commons-typed-values-@version.camunda.commons@.jar" />
+    <resource-root path="camunda-commons-typed-values-@project.version@.jar" />
   </resources>
 
   <dependencies>

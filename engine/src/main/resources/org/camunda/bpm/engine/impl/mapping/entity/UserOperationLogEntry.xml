@@ -50,7 +50,8 @@
         TENANT_ID_,
         REMOVAL_TIME_,
         CATEGORY_,
-        EXTERNAL_TASK_ID_
+        EXTERNAL_TASK_ID_,
+        ANNOTATION_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{deploymentId, jdbcType=VARCHAR},
@@ -77,7 +78,8 @@
         #{tenantId ,jdbcType=VARCHAR},
         #{removalTime, jdbcType=TIMESTAMP},
         #{category, jdbcType=VARCHAR},
-        #{externalTaskId, jdbcType=VARCHAR}
+        #{externalTaskId, jdbcType=VARCHAR},
+        #{annotation, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -113,6 +115,21 @@
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
           TIMESTAMP_ = TIMESTAMP_
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateOperationLogAnnotationByOperationId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set ANNOTATION_ = #{annotation, jdbcType=VARCHAR}
+      where OPERATION_ID_ = #{operationId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateOperationLogAnnotationByOperationId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set ANNOTATION_ = #{annotation, jdbcType=VARCHAR},
+          TIMESTAMP_ = TIMESTAMP_
+      where OPERATION_ID_ = #{operationId, jdbcType=VARCHAR}
   </update>
 
   <!-- OPERATION LOG ENTRY DELETE -->
@@ -197,6 +214,7 @@
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="externalTaskId" column="EXTERNAL_TASK_ID_" jdbcType="VARCHAR" />
+    <result property="annotation" column="ANNOTATION_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- OPERATION LOG ENTRY SELECT -->
@@ -216,8 +234,9 @@
   </select>
 
   <select id="selectUserOperationLogEntryCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserOperationLogQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">
@@ -225,7 +244,12 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, RES.CATEGORY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (
+      <if test="authCheck.isHistoricInstancePermissionsEnabled">
+        RES.PROC_INST_ID_,
+        RES.TASK_ID_,
+      </if>
+      RES.PROC_DEF_KEY_, RES.CATEGORY_, '*'))
     </if>
 
     <where>
@@ -307,7 +331,7 @@
       
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
-          and ( 
+          and (
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheckWithoutPrefix"/>
             or ( RES.CATEGORY_ IS NULL AND RES.PROC_DEF_KEY_ IS NULL )
           )

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,11 +19,12 @@
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
  -->
-<Server port="${tomcat6.server.port}" shutdown="SHUTDOWN">
+<Server port="${tomcat.server.port}" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
+
   <!--APR library loader. Documentation at /docs/apr.html -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
 
@@ -48,6 +49,11 @@
               factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
               pathname="conf/tomcat-users.xml" />
               
+	    <!-- Additional properties can be set to avoid a common exception
+         regarding connection timeout in the connection pool:
+          testOnBorrow="true"
+          validationQuery="SELECT 1"
+    -->
     <Resource name="jdbc/ProcessEngine"
               auth="Container"
               type="javax.sql.DataSource" 
@@ -58,7 +64,7 @@
               username="${database.username}"
               password="${database.password}"
               defaultTransactionIsolation="READ_COMMITTED"
-              maxActive="20"
+              maxTotal="20"
               minIdle="5"
               maxIdle="20" />
               
@@ -95,9 +101,9 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="${tomcat6.connector.http.port}" protocol="HTTP/1.1" 
+    <Connector port="${tomcat.connector.http.port}" protocol="HTTP/1.1" 
                connectionTimeout="20000" 
-               redirectPort="${tomcat6.connector.http.redirectPort}" />
+               redirectPort="${tomcat.connector.http.redirectPort}" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -105,19 +111,47 @@
                connectionTimeout="20000"
                redirectPort="8443" />
     -->
-    <!-- Define a SSL HTTP/1.1 Connector on port 8443
-         This connector uses the JSSE configuration, when using APR, the
-         connector should be using the OpenSSL style configuration
-         described in the APR documentation -->
+    <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443
+         This connector uses the NIO implementation. The default
+         SSLImplementation will depend on the presence of the APR/native
+         library and the useOpenSSL attribute of the
+         AprLifecycleListener.
+         Either JSSE or OpenSSL style configuration may be used regardless of
+         the SSLImplementation selected. JSSE style configuration is used below.
+    -->
     <!--
-    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
-               maxThreads="150" scheme="https" secure="true"
-               clientAuth="false" sslProtocol="TLS" />
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true">
+        <SSLHostConfig>
+            <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
+                         type="RSA" />
+        </SSLHostConfig>
+    </Connector>
+    -->
+    <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
+         This connector uses the APR/native implementation which always uses
+         OpenSSL for TLS.
+         Either JSSE or OpenSSL style configuration may be used. OpenSSL style
+         configuration is used below.
+    -->
+    <!--
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
+               maxThreads="150" SSLEnabled="true" >
+        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
+        <SSLHostConfig>
+            <Certificate certificateKeyFile="conf/localhost-rsa-key.pem"
+                         certificateFile="conf/localhost-rsa-cert.pem"
+                         certificateChainFile="conf/localhost-rsa-chain.pem"
+                         type="RSA" />
+        </SSLHostConfig>
+    </Connector>
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector port="${tomcat6.connector.ajp.port}" protocol="AJP/1.3" redirectPort="${tomcat6.connector.ajp.redirectPort}" />
-
+    <Connector protocol="AJP/1.3"
+               port="${tomcat.connector.ajp.port}"
+               redirectPort="${tomcat.connector.ajp.redirectPort}"
+               secretRequired="false" />
 
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone

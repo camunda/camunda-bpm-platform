@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected String jobDefinitionType;
   protected String jobDefinitionConfiguration;
   protected String[] activityIds;
+  protected String[] failedActivityIds;
   protected String[] executionIds;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -55,6 +57,8 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected Long jobPriorityHigherThanOrEqual;
   protected Long jobPriorityLowerThanOrEqual;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
+  protected String hostname;
 
   public HistoricJobLogQueryImpl() {
   }
@@ -109,6 +113,14 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery failedActivityIdIn(String... activityIds) {
+    List<String> activityIdList = CollectionUtil.asArrayList(activityIds);
+    ensureNotContainsNull("activityIds", activityIdList);
+    ensureNotContainsEmptyString("activityIds", activityIdList);
+    this.failedActivityIds = activityIds;
+    return this;
+  }
+
   public HistoricJobLogQuery executionIdIn(String... executionIds) {
     List<String> executionIdList = CollectionUtil.asArrayList(executionIds);
     ensureNotContainsNull("executionIds", executionIdList);
@@ -154,6 +166,21 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   public HistoricJobLogQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricJobLogQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public HistoricJobLogQuery hostname(String hostname) {
+    ensureNotEmpty("hostName", hostname);
+    this.hostname = hostname;
     return this;
   }
 
@@ -254,6 +281,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return orderBy(HistoricJobLogQueryProperty.TENANT_ID);
   }
 
+  @Override
+  public HistoricJobLogQuery orderByHostname() {
+    return orderBy(HistoricJobLogQueryProperty.HOSTNAME);
+  }
+
   // results //////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
@@ -271,6 +303,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   // getter //////////////////////////////////
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 
   public String getJobId() {
     return jobId;
@@ -294,6 +330,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public String[] getActivityIds() {
     return activityIds;
+  }
+
+  public String[] getFailedActivityIds() {
+    return failedActivityIds;
   }
 
   public String[] getExecutionIds() {
@@ -322,6 +362,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public String[] getTenantIds() {
     return tenantIds;
+  }
+
+  public String getHostname() {
+    return hostname;
   }
 
   // setter //////////////////////////////////

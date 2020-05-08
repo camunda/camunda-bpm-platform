@@ -32,6 +32,7 @@ public class MockJobDefinitionBuilder {
   protected String processDefinitionId;
   protected boolean suspended;
   protected String tenantId;
+  protected String deploymentId;
 
   public MockJobDefinitionBuilder id(String id) {
     this.id = id;
@@ -78,6 +79,11 @@ public class MockJobDefinitionBuilder {
     return this;
   }
 
+  public MockJobDefinitionBuilder deploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+    return this;
+  }
+
   public JobDefinition build() {
     JobDefinition mockJobDefinition = mock(JobDefinition.class);
     when(mockJobDefinition.getId()).thenReturn(id);
@@ -89,6 +95,7 @@ public class MockJobDefinitionBuilder {
     when(mockJobDefinition.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
     when(mockJobDefinition.isSuspended()).thenReturn(suspended);
     when(mockJobDefinition.getTenantId()).thenReturn(tenantId);
+    when(mockJobDefinition.getDeploymentId()).thenReturn(deploymentId);
     return mockJobDefinition;
   }
 

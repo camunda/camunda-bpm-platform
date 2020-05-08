@@ -53,11 +53,15 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String activityId;
 
+  protected String failedActivityId;
+
   protected String deploymentId;
 
   protected int state;
 
   protected String tenantId;
+
+  protected String hostname;
 
   public Date getTimestamp() {
     return timestamp;
@@ -191,6 +195,14 @@ public class HistoricJobLogEvent extends HistoryEvent {
     this.tenantId = tenantId;
   }
 
+  public String getHostname() {
+    return hostname;
+  }
+
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
+  }
+
   public boolean isCreationLog() {
     return state == JobState.CREATED.getStateCode();
   }
@@ -214,4 +226,13 @@ public class HistoricJobLogEvent extends HistoryEvent {
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
+  }
+
 }

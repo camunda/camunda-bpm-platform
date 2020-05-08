@@ -40,6 +40,9 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
 
   protected List<QueryVariableValue> queryVariableValues = new ArrayList<QueryVariableValue>();
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   public AbstractVariableQueryImpl() {
   }
 
@@ -95,6 +98,24 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     addVariable(name, value, QueryOperator.LIKE, true);
     return (T)this;
   }
+  
+  @SuppressWarnings("unchecked")
+  public T matchVariableNamesIgnoreCase() {
+    this.variableNamesIgnoreCase = true;
+    for (QueryVariableValue variable : this.queryVariableValues) {
+      variable.setVariableNameIgnoreCase(true);
+    }
+    return (T)this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public T matchVariableValuesIgnoreCase() {
+    this.variableValuesIgnoreCase = true;
+    for (QueryVariableValue variable : this.queryVariableValues) {
+      variable.setVariableValueIgnoreCase(true);
+    }
+    return (T)this;
+  }
 
   protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
     ensureNotNull(NotValidException.class, "name", name);
@@ -113,7 +134,10 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
         throw new NotValidException("Booleans and null cannot be used in 'like' condition");
       }
     }
-    queryVariableValues.add(new QueryVariableValue(name, value, operator, processInstanceScope));
+
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
+    queryVariableValues.add(new QueryVariableValue(name, value, operator, processInstanceScope, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase));
   }
 
   private boolean isBoolean(Object value) {
@@ -138,5 +162,12 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     return queryVariableValues;
   }
 
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
 
 }

@@ -45,7 +45,9 @@ import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskBpmnErrorDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskEscalationDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -412,4 +414,31 @@ public class TaskResourceImpl implements TaskResource {
     }
     return Response.ok(deployedTaskForm, MediaType.APPLICATION_XHTML_XML).build();
   }
+
+  @Override
+  public void handleBpmnError(TaskBpmnErrorDto dto) {
+    TaskService taskService = engine.getTaskService(); 
+
+    try {
+      taskService.handleBpmnError(taskId, dto.getErrorCode(), dto.getErrorMessage(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
+    } catch (NullValueException e) {
+      throw new RestException(Status.NOT_FOUND, e, "Task with id " + taskId + " does not exist");
+    } catch (BadUserRequestException e) {
+      throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
+    }
+  }
+
+  @Override
+  public void handleEscalation(TaskEscalationDto dto) {
+    TaskService taskService = engine.getTaskService();
+
+    try {
+      taskService.handleEscalation(taskId, dto.getEscalationCode(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
+    } catch (NullValueException e) {
+      throw new RestException(Status.NOT_FOUND, e, "Task with id " + taskId + " does not exist");
+    } catch (BadUserRequestException e) {
+      throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
+    }
+  }
+
 }

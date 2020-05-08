@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -78,6 +79,7 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
       }
 
       checkDeleteTask(task, commandContext);
+      task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE);
 
       String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
       task.delete(reason, cascade);

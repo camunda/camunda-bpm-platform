@@ -466,14 +466,6 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadHistoryAnyTaskInstance() {
-    // No tenant check here because it is called in the SQL query:
-    // Report.selectHistoricProcessInstanceDurationReport
-    // It is necessary to make the check there because the query may be return only the
-    // historic process instances which belong to the authenticated tenant.
-  }
-
-  @Override
   public void checkUpdateCaseInstance(CaseExecution caseExecution) {
     if (caseExecution != null && !getTenantManager().isAuthenticatedTenant(caseExecution.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("update the case execution '" + caseExecution.getId() + "'");
@@ -489,6 +481,11 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+    // tenant check is not available for user operation log
+  }
+
+  @Override
+  public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
     // tenant check is not available for user operation log
   }
   

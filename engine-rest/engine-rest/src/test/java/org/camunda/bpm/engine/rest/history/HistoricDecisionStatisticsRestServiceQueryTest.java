@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -64,13 +65,14 @@ public class HistoricDecisionStatisticsRestServiceQueryTest extends AbstractRest
   private void setupHistoricDecisionStatisticsMock() {
     List<HistoricDecisionInstanceStatistics> mocks = MockProvider.createMockHistoricDecisionStatistics();
 
-    historicDecisionInstanceStatisticsQuery = mock(HistoricDecisionInstanceStatisticsQuery.class);
+    historicDecisionInstanceStatisticsQuery =
+        mock(HistoricDecisionInstanceStatisticsQueryImpl.class);
     when(processEngine.getHistoryService()
         .createHistoricDecisionInstanceStatisticsQuery(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)))
     .thenReturn(historicDecisionInstanceStatisticsQuery);
 
     when(historicDecisionInstanceStatisticsQuery.decisionInstanceId(MockProvider.EXAMPLE_DECISION_INSTANCE_ID)).thenReturn(historicDecisionInstanceStatisticsQuery);
-    when(historicDecisionInstanceStatisticsQuery.list()).thenReturn(mocks);
+    when(historicDecisionInstanceStatisticsQuery.unlimitedList()).thenReturn(mocks);
   }
 
   @Test

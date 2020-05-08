@@ -25,8 +25,10 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -791,6 +793,28 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
     } catch (NotValidException e) {
       assertTextPresent("processInstanceId is null", e.getMessage());
     }
+  }
+
+  @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  public void testSetInvocationsPerBatchType() {
+    // given
+    processEngineConfiguration.getInvocationsPerBatchJobByBatchType()
+        .put(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, 42);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    Batch batch = runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
+        .executeAsync();
+
+    // then
+    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+
+    // clear
+    processEngineConfiguration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   protected void executeSeedAndBatchJobs(Batch batch) {

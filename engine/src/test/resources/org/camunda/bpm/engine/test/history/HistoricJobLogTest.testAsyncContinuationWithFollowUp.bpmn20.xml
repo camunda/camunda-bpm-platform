@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="serviceTask" />
+
+    <serviceTask id="serviceTask" 
+      camunda:asyncBefore="true" 
+      camunda:class="org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate"
+      camunda:jobPriority="15" />
+      
+    <serviceTask id="followUp1" 
+      camunda:class="org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate" />
+      
+    <serviceTask id="followUp2" 
+      camunda:class="org.camunda.bpm.engine.test.api.runtime.FailingDelegate" />
+
+    <sequenceFlow id="flow1" sourceRef="serviceTask" targetRef="followUp1" />
+    <sequenceFlow id="flow2" sourceRef="followUp1" targetRef="followUp2" />
+    <sequenceFlow id="flow3" sourceRef="followUp2" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+</definitions>

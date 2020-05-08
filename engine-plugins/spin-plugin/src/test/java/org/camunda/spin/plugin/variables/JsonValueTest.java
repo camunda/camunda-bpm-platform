@@ -16,13 +16,10 @@
  */
 package org.camunda.spin.plugin.variables;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.DataFormats.json;
 import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -223,7 +220,7 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
 
   public void testApplyValueInfoFromSerializedValue() {
     // given
-    Map<String, Object> valueInfo = new HashMap<String, Object>();
+    Map<String, Object> valueInfo = new HashMap<>();
     valueInfo.put(ValueType.VALUE_INFO_TRANSIENT, true);
 
     // when
@@ -238,35 +235,23 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
   /**
    * See https://app.camunda.com/jira/browse/CAM-9932
    */
-  public void FAILING_testTransientJsonSpinVariables() {
-    repositoryService.createDeployment()
-      .addModelInstance("model.bpmn",
-        Bpmn.createExecutableProcess("aProcess")
-          .startEvent()
-          .serviceTask()
-            .camundaClass(JsonDelegate.class)
-          .endEvent()
-          .done())
-      .deploy();
+  public void testTransientJsonSpinVariables() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcess")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(JsonDelegate.class)
+      .userTask()
+      .endEvent()
+      .done();
+    deployment(modelInstance);
 
-    runtimeService.startProcessInstanceByKey("aProcess").getId();
-  }
+    // when
+    String processInstanceId = runtimeService.startProcessInstanceByKey("aProcess").getId();
 
-  /**
-   * See https://app.camunda.com/jira/browse/CAM-9932
-   */
-  public void FAILING_testTransientXmlSpinVariables() {
-    repositoryService.createDeployment()
-      .addModelInstance("model.bpmn",
-        Bpmn.createExecutableProcess("aProcess")
-          .startEvent()
-          .serviceTask()
-            .camundaClass(XmlDelegate.class)
-          .endEvent()
-          .done())
-      .deploy();
-
-    runtimeService.startProcessInstanceByKey("aProcess").getId();
+    // then
+    Object value = runtimeService.getVariable(processInstanceId, "jsonVariable");
+    assertThat(value).isNull();
   }
 
   public void testDeserializeTransientJsonValue() {

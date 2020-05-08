@@ -52,8 +52,11 @@ public class RestartProcessInstanceBatchTest {
     // assume
     assertThat(processInstances.size(), is(0));
 
+    String batchId = engineRule.getManagementService().getProperties()
+        .get("RestartProcessInstanceBatchScenario.batchId");
     Batch batch = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_PROCESS_INSTANCE_RESTART)
+      .batchId(batchId)
       .singleResult();
 
     String jobId = engineRule.getManagementService().createJobQuery()

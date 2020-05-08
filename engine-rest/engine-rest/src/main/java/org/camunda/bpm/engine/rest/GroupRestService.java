@@ -16,16 +16,26 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
-import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
-import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
+import java.util.List;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.util.List;
+
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
+import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
+import org.camunda.bpm.engine.rest.dto.identity.GroupQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 
 /**
  * @author Daniel Meyer
@@ -48,6 +58,18 @@ public interface GroupRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getGroupCount(@Context UriInfo uriInfo);
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  List<GroupDto> queryGroups(GroupQueryDto query,
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+
+  @POST
+  @Path("/count")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto queryGroupCount(GroupQueryDto query);
 
   @POST
   @Path("/create")

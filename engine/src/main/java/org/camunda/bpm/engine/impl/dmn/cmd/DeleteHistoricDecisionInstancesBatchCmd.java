@@ -19,97 +19,81 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
+import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
-public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatchCmd<Batch> {
+public class DeleteHistoricDecisionInstancesBatchCmd implements Command<Batch> {
 
   protected List<String> historicDecisionInstanceIds;
   protected HistoricDecisionInstanceQuery historicDecisionInstanceQuery;
   protected String deleteReason;
 
-  public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds, HistoricDecisionInstanceQuery historicDecisionInstanceQuery, String deleteReason) {
-    this.historicDecisionInstanceIds = historicDecisionInstanceIds;
-    this.historicDecisionInstanceQuery = historicDecisionInstanceQuery;
+  public DeleteHistoricDecisionInstancesBatchCmd(List<String> ids,
+                                                 HistoricDecisionInstanceQuery query,
+                                                 String deleteReason) {
+    this.historicDecisionInstanceIds = ids;
+    this.historicDecisionInstanceQuery = query;
     this.deleteReason = deleteReason;
-  }
-
-  protected List<String> collectHistoricDecisionInstanceIds() {
-
-    Set<String> collectedDecisionInstanceIds = new HashSet<String>();
-
-    List<String> decisionInstanceIds = getHistoricDecisionInstanceIds();
-    if (decisionInstanceIds != null) {
-      collectedDecisionInstanceIds.addAll(decisionInstanceIds);
-    }
-
-    final HistoricDecisionInstanceQueryImpl decisionInstanceQuery = (HistoricDecisionInstanceQueryImpl) historicDecisionInstanceQuery;
-    if (decisionInstanceQuery != null) {
-      for (HistoricDecisionInstance hdi : decisionInstanceQuery.list()) {
-        collectedDecisionInstanceIds.add(hdi.getId());
-      }
-    }
-
-    return new ArrayList<String>(collectedDecisionInstanceIds);
-  }
-
-  public List<String> getHistoricDecisionInstanceIds() {
-    return historicDecisionInstanceIds;
   }
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    List<String> decisionInstanceIds = collectHistoricDecisionInstanceIds();
-    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", decisionInstanceIds);
+    BatchElementConfiguration elementConfiguration = collectHistoricDecisionInstanceIds(commandContext);
+    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", elementConfiguration.getIds());
 
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES);
-    writeUserOperationLog(commandContext, decisionInstanceIds.size());
+    return new BatchBuilder(commandContext)
+        .type(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION)
+        .config(getConfiguration(elementConfiguration))
+        .permission(BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
+        .operationLogHandler(this::writeUserOperationLog)
+        .build();
+  }
 
-    BatchEntity batch = createBatch(commandContext, decisionInstanceIds);
+  protected BatchElementConfiguration collectHistoricDecisionInstanceIds(CommandContext commandContext) {
 
-    batch.createSeedJobDefinition();
-    batch.createMonitorJobDefinition();
-    batch.createBatchJobDefinition();
+    BatchElementConfiguration elementConfiguration = new BatchElementConfiguration();
 
-    batch.fireHistoricStartEvent();
+    if (!CollectionUtil.isEmpty(historicDecisionInstanceIds)) {
+      HistoricDecisionInstanceQueryImpl query = new HistoricDecisionInstanceQueryImpl();
+      query.decisionInstanceIdIn(historicDecisionInstanceIds.toArray(new String[0]));
+      elementConfiguration.addDeploymentMappings(
+          commandContext.runWithoutAuthorization(query::listDeploymentIdMappings), historicDecisionInstanceIds);
+    }
 
-    batch.createSeedJob();
+    final HistoricDecisionInstanceQueryImpl decisionInstanceQuery =
+        (HistoricDecisionInstanceQueryImpl) historicDecisionInstanceQuery;
+    if (decisionInstanceQuery != null) {
+      elementConfiguration.addDeploymentMappings(decisionInstanceQuery.listDeploymentIdMappings());
+    }
 
-    return batch;
+    return elementConfiguration;
   }
 
   protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+          propertyChanges);
   }
 
-  protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new BatchConfiguration(processInstanceIds);
-  }
-
-  protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
+  public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
+    return new BatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings());
   }
 
 }

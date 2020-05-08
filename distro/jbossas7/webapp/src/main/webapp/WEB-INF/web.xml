@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app
+  version="3.0"
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
   <display-name>camunda bpm webapp</display-name>
 
   <!-- cockpit bootstrap listener -->
@@ -26,6 +31,13 @@
   <listener>
     <listener-class>org.camunda.bpm.webapp.impl.security.filter.util.HttpSessionMutexListener</listener-class>
   </listener>
+
+  <session-config>
+    <cookie-config>
+      <http-only>true</http-only>
+      <secure>false</secure>
+    </cookie-config>
+  </session-config>
 
   <!-- Container Based Authentication filter -->
   <!-- <filter>
@@ -80,6 +92,18 @@
   <filter-mapping>
     <filter-name>CsrfPreventionFilter</filter-name>
     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- HTTP Header Security Filter -->
+  <filter>
+    <filter-name>HttpHeaderSecurity</filter-name>
+    <filter-class>org.camunda.bpm.webapp.impl.security.filter.headersec.HttpHeaderSecurityFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>HttpHeaderSecurity</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
   <!-- engines filter -->
@@ -203,4 +227,15 @@
     <url-pattern>/api/welcome/*</url-pattern>
   </servlet-mapping>
 
+  <!-- default error page -->
+  <error-page>
+    <!-- Missing resource -->
+    <error-code>404</error-code>
+    <location>/error-404-page.html</location>
+  </error-page>
+  <error-page>
+    <!-- Uncaught exception -->
+    <error-code>500</error-code>
+    <location>/error-500-page.html</location>
+  </error-page>
 </web-app>

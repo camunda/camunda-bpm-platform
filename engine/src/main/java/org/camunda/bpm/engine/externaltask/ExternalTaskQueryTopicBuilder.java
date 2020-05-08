@@ -102,6 +102,15 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    */
   public ExternalTaskQueryTopicBuilder processDefinitionKeyIn(String... processDefinitionKeys);
 
+
+  /**
+   * Define a process definition version tag to filter external tasks by.
+   * 
+   * @param versionTag the version tag to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processDefinitionVersionTag(String versionTag);
+
   /**
    * Filter external tasks only with null tenant id.
    *

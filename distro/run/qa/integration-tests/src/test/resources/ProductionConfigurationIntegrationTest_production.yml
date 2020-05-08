@@ -1,0 +1,7 @@
+camunda.bpm.process-engine-name: production
+
+spring.datasource:
+  url: jdbc:h2:mem:process-engine;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
+  driver-class-name: org.h2.Driver
+  username: sa
+  password: sa

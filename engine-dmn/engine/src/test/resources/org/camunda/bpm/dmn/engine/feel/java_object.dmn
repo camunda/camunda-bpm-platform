@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="Definitions_1k1rlhi" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <decision id="Decision_Date_Conversion_Output" name="Decision 1">
+    <extensionElements>
+      <biodi:bounds x="156" y="81" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="input_1">
+        <inputExpression id="inputExpression_1" typeRef="date" expressionLanguage="juel">
+          <text>date1</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" typeRef="string" />
+      <rule id="DecisionRule_1rmq2b6">
+        <inputEntry id="UnaryTests_1qviji0" expressionLanguage="feel">
+          <text>&gt; person.getBirthday()</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1q3jh5z" expressionLanguage="juel">
+          <text>"foo"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1jrp8o4">
+        <inputEntry id="UnaryTests_0g8ovnf" expressionLanguage="feel">
+          <text>&lt;= person.getBirthday()</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_19hblon" expressionLanguage="juel">
+          <text>"bar"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.io.Serializable;
 import java.util.Date;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
 
@@ -235,6 +237,16 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery withoutCandidateGroups();
 
   /**
+   * The query will match the names of task and process variables in a case-insensitive way.
+   */
+  HistoricTaskInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of task and process variables in a case-insensitive way.
+   */
+  HistoricTaskInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select historic task instances which have a local task variable with the
    * given name set to the given value. Make sure history-level is configured
    * >= AUDIT when this feature is used.
@@ -324,6 +336,9 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /** Only select historic task instances with one of the given tenant ids. */
   HistoricTaskInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic task instances that have no tenant id. */
+  HistoricTaskInstanceQuery withoutTenantId();
+
   /**
    * Only select tasks where end time is after given date
    */
@@ -412,5 +427,32 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByCaseExecutionId();
+
+  /**
+   * <p>After calling or(), a chain of several filter criteria could follow. Each filter criterion that follows or()
+   * will be linked together with an OR expression until the OR query is terminated. To terminate the OR query right
+   * after the last filter criterion was applied, {@link #endOr()} must be invoked.</p>
+   *
+   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The several filter criteria will be linked together by an OR expression.
+   *
+   * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
+   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
+   * mark the end of the OR query.
+   * */
+  HistoricTaskInstanceQuery or();
+
+  /**
+   * <p>endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To terminate the
+   * OR query which has been started by invoking {@link #or()}, endOr() must be invoked. Filter criteria which are
+   * applied after calling endOr() are linked together by an AND expression.</p>
+   *
+   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The filter criteria will be linked together by an AND expression.
+   *
+   * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
+   * this exception, {@link #or()} must be invoked first.
+   * */
+  HistoricTaskInstanceQuery endOr();
 
 }

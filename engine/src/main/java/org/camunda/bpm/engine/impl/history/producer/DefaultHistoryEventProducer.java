@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.impl.history.producer;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,7 +41,18 @@ import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -62,9 +75,6 @@ import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLink;
-
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * @author Daniel Meyer
@@ -328,6 +338,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTimestamp(ClockUtil.getCurrentTime());
     evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
     evt.setExternalTaskId(contextEntry.getExternalTaskId());
+    evt.setAnnotation(contextEntry.getAnnotation());
 
     if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(evt);
@@ -354,6 +365,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setIncidentMessage(incident.getIncidentMessage());
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
+    evt.setHistoryConfiguration(incident.getHistoryConfiguration());
+    evt.setFailedActivityId(incident.getFailedActivityId());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
@@ -447,6 +460,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // set source activity instance id
     evt.setActivityInstanceId(sourceActivityInstanceId);
+
+    // mark initial variables on process start
+    if (sourceExecution != null && sourceExecution.isProcessInstanceStarting()
+        && HistoryEventTypes.VARIABLE_INSTANCE_CREATE.equals(eventType)) {
+
+      if (variableInstance.getSequenceCounter() == 1) {
+        evt.setInitial(true);
+      }
+
+      if (sourceActivityInstanceId == null && sourceExecution.getActivity() != null && sourceExecution.getTransition() == null) {
+        evt.setActivityInstanceId(sourceExecution.getProcessInstanceId());
+      }
+    }
 
     return evt;
   }
@@ -571,6 +597,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
 
+    if (executionEntity.isSuspended()) {
+      evt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+    } else {
+      evt.setState(HistoricProcessInstance.STATE_ACTIVE);
+    }
+
     return evt;
   }
 
@@ -635,10 +667,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     //determine state
     if (executionEntity.getActivity() != null) {
       evt.setState(HistoricProcessInstance.STATE_COMPLETED);
-    } else if (executionEntity.getActivity() == null && executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
-    } else if (executionEntity.getActivity() == null && !executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
+    } else {
+      if (executionEntity.isExternallyTerminated()) {
+        evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
+      } else if (!executionEntity.isExternallyTerminated()) {
+        evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
+      }
     }
   }
 
@@ -1061,6 +1095,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobRetries(jobEntity.getRetries());
     evt.setJobPriority(jobEntity.getPriority());
 
+    String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
+    evt.setHostname(hostName);
+
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {
       evt.setJobDefinitionId(jobDefinition.getId());
@@ -1083,6 +1120,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     evt.setActivityId(jobEntity.getActivityId());
+    evt.setFailedActivityId(jobEntity.getFailedActivityId());
     evt.setExecutionId(jobEntity.getExecutionId());
     evt.setProcessInstanceId(jobEntity.getProcessInstanceId());
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());

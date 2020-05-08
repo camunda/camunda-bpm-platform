@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.JsonMappingExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.JsonParseExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
@@ -49,6 +51,7 @@ public class CamundaRestResources {
     CONFIGURATION_CLASSES.add(RestExceptionHandler.class);
     CONFIGURATION_CLASSES.add(MultipartPayloadProvider.class);
     CONFIGURATION_CLASSES.add(JacksonHalJsonProvider.class);
+    CONFIGURATION_CLASSES.add(ExceptionHandler.class);
   }
 
   /**

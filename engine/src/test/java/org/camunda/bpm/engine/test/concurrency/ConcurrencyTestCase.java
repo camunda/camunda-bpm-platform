@@ -32,7 +32,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
   @Override
   protected void setUp() throws Exception {
-    controllableCommands = new ArrayList<ControllableCommand<?>>();
+    controllableCommands = new ArrayList<>();
     super.setUp();
   }
 
@@ -156,6 +156,15 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
         if (!reportFailure || exception == null) {
           fail("Unexpected interruption");
         }
+      } finally {
+        // clear our interruption state; the controlled thread may have interrupted us 
+        // in case the controlled command failed (see ConcurrencyTestCase#executeControllableCommand).
+        // 
+        // If the controlled thread finished before we entered the #join method, #join returns 
+        // immediately and does not clear our interruption status. If we do not clear the
+        // interruption status here, any subsequent call of interrupt-sensitive
+        // methods may fail (e.g. monitors, IO operations)
+        Thread.interrupted();
       }
     }
 

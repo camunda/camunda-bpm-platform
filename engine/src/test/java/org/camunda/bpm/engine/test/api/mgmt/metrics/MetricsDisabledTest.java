@@ -16,8 +16,22 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * Asserts engine functionality is metrics are disabled
@@ -25,14 +39,31 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
  * @author Daniel Meyer
  *
  */
-public class MetricsDisabledTest extends ResourceProcessEngineTestCase {
+public class MetricsDisabledTest {
 
-  public MetricsDisabledTest() {
-    super("org/camunda/bpm/engine/test/api/mgmt/metrics/metricsDisabledTest.cfg.xml");
+  @ClassRule
+  public final static ProcessEngineBootstrapRule bootstrapRule =
+      new ProcessEngineBootstrapRule("org/camunda/bpm/engine/test/api/mgmt/metrics/metricsDisabledTest.cfg.xml");
+
+  protected final ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected final ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ManagementService managementService;
+
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    managementService = engineRule.getManagementService();
   }
 
   // FAILING, see https://app.camunda.com/jira/browse/CAM-4053
   // (to run, remove "FAILING" from methodname)
+  @Ignore
+  @Test
   public void FAILING_testQueryMetricsIfMetricsIsDisabled() {
 
     // given
@@ -46,6 +77,7 @@ public class MetricsDisabledTest extends ResourceProcessEngineTestCase {
 
   }
 
+  @Test
   public void testReportNowIfMetricsDisabled() {
 
     // given
@@ -58,7 +90,7 @@ public class MetricsDisabledTest extends ResourceProcessEngineTestCase {
       managementService.reportDbMetricsNow();
       fail("Exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Metrics reporting is disabled", e.getMessage());
+      testRule.assertTextPresent("Metrics reporting is disabled", e.getMessage());
     }
   }
 }

@@ -154,7 +154,7 @@ public abstract class TestHelper {
 
   public static void deleteDeployment(ProcessEngine processEngine, String deploymentId) {
     if(deploymentId != null) {
-      processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
+      processEngine.getRepositoryService().deleteDeployment(deploymentId, true, true, true);
     }
   }
 
@@ -226,6 +226,46 @@ public abstract class TestHelper {
     }
   }
 
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Description description) {
+    RequiredDatabase annotation = description.getAnnotation(RequiredDatabase.class);
+
+    if (annotation != null) {
+      return databaseCheck(processEngine, annotation);
+
+    } else {
+      return annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
+    }
+  }
+
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
+    RequiredDatabase annotation = getAnnotation(processEngine, testClass, methodName, RequiredDatabase.class);
+
+    if (annotation != null) {
+      return databaseCheck(processEngine, annotation);
+    } else {
+      return true;
+    }
+  }
+
+  private static boolean databaseCheck(ProcessEngine processEngine, RequiredDatabase annotation) {
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    String actualDbType = processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
+
+    String[] excludes = annotation.excludes();
+
+    if (excludes != null) {
+      for (String exclude : excludes) {
+        if (exclude.equals(actualDbType)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+
   private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<T> annotationClass) {
     Method method = null;
     T annotation = null;
@@ -296,7 +336,8 @@ public abstract class TestHelper {
       message.append("Database is not clean:\n")
              .append(databasePurgeReport.getPurgeReportAsString());
     } else {
-      LOG.debug("Database was clean.");
+      LOG.debug(
+          purgeReport.getDatabasePurgeReport().isDbContainsLicenseKey() ? "Database contains license key but is considered clean." : "Database was clean.");
     }
     if (paRegistrationMessage != null) {
       message.append(paRegistrationMessage);
@@ -305,6 +346,7 @@ public abstract class TestHelper {
     if (fail && message.length() > 0) {
       Assert.fail(message.toString());
     }
+
     return message.toString();
   }
 

@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.batch.removaltime;
 
-import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-
 import java.util.Date;
 import java.util.List;
+
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 
 /**
  * @author Tassilo Weidner
@@ -31,7 +32,11 @@ public class SetRemovalTimeBatchConfiguration extends BatchConfiguration {
   protected boolean isHierarchical;
 
   public SetRemovalTimeBatchConfiguration(List<String> ids) {
-    super(ids);
+    this(ids, null);
+  }
+
+  public SetRemovalTimeBatchConfiguration(List<String> ids, DeploymentMappings mappings) {
+    super(ids, mappings);
   }
 
   public Date getRemovalTime() {

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,8 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String variableName;
   protected String variableNameLike;
   protected Object variableValue;
+  protected Boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
   protected String[] variableTypeIn;
   protected String[] executionIdIn;
   protected String[] taskIdIn;
@@ -63,6 +67,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] caseActivityIdIn;
   protected String[] processInstanceIdIn;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
   protected boolean includeDeleted;
 
   public HistoricVariableInstanceQueryDto() {
@@ -112,6 +117,16 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.variableTypeIn = variableTypeIn;
   }
 
+  @CamundaQueryParam(value="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value="variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
   public void setExecutionIdIn(String[] executionIdIn) {
     this.executionIdIn = executionIdIn;
@@ -145,6 +160,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   public boolean isIncludeDeleted() {
@@ -197,7 +217,12 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     if (variableTypeIn != null && variableTypeIn.length > 0) {
       query.variableTypeIn(variableTypeIn);
     }
-
+    if (TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if (TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
+    }
     if (executionIdIn != null && executionIdIn.length > 0) {
       query.executionIdIn(executionIdIn);
     }
@@ -219,6 +244,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
     if (includeDeleted) {
       query.includeDeleted();
     }
@@ -234,5 +262,4 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
       query.orderByTenantId();
     }
   }
-
 }

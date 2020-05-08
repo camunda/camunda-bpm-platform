@@ -343,4 +343,12 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return new SetRemovalTimeToHistoricBatchesBuilderImpl(commandExecutor);
   }
 
+  public void setAnnotationForOperationLogById(String operationId, String annotation) {
+    commandExecutor.execute(new SetAnnotationForOperationLog(operationId, annotation));
+  }
+
+  public void clearAnnotationForOperationLogById(String operationId) {
+    commandExecutor.execute(new SetAnnotationForOperationLog(operationId, null));
+  }
+
 }

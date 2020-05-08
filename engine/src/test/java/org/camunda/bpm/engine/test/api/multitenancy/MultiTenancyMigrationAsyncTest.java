@@ -77,7 +77,7 @@ public class MultiTenancyMigrationAsyncTest {
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
 
-    batchHelper.executeSeedJob(batch);
+    batchHelper.completeSeedJobs(batch);
 
     // when
     batchHelper.executeJobs(batch);
@@ -102,7 +102,7 @@ public class MultiTenancyMigrationAsyncTest {
         .processInstanceIds(Arrays.asList(processInstance.getId()))
         .executeAsync();
 
-    batchHelper.executeSeedJob(batch);
+    batchHelper.completeSeedJobs(batch);
 
     // when
     batchHelper.executeJobs(batch);

@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -42,6 +44,8 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String name;
   protected String nameLike;
   protected String deploymentId;
+  protected Date deployedAfter;
+  protected Date deployedAt;
   protected String key;
   protected String keyLike;
   protected String resourceName;
@@ -60,6 +64,8 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String versionTag;
   protected String versionTagLike;
 
+  // for internal use
+  private boolean shouldJoinDeploymentTable = false;
   private Boolean dmnEnabled;
 
   public DecisionDefinitionQueryImpl() {
@@ -121,6 +127,20 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   public DecisionDefinitionQuery deploymentId(String deploymentId) {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
     this.deploymentId = deploymentId;
+    return this;
+  }
+
+  public DecisionDefinitionQuery deployedAfter(Date deployedAfter) {
+    ensureNotNull(NotValidException.class, "deployedAfter", deployedAfter);
+    shouldJoinDeploymentTable = true;
+    this.deployedAfter = deployedAfter;
+    return this;
+  }
+
+  public DecisionDefinitionQuery deployedAt(Date deployedAt) {
+    ensureNotNull(NotValidException.class, "deployedAt", deployedAt);
+    shouldJoinDeploymentTable = true;
+    this.deployedAt = deployedAt;
     return this;
   }
 
@@ -227,8 +247,18 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery orderByDeploymentTime() {
+    shouldJoinDeploymentTable = true;
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_DEPLOYMENT, DecisionDefinitionQueryProperty.DEPLOY_TIME));
+    return this;
+  }
+
   public DecisionDefinitionQuery orderByTenantId() {
     return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
+  }
+
+  public DecisionDefinitionQuery orderByDecisionRequirementsDefinitionKey() {
+    return orderBy(DecisionDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_KEY);
   }
 
   @Override
@@ -310,6 +340,14 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return deploymentId;
   }
 
+  public Date getDeployedAfter() {
+    return deployedAfter;
+  }
+
+  public Date getDeployedAt() {
+    return deployedAt;
+  }
+
   public String getKey() {
     return key;
   }
@@ -340,5 +378,9 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   public boolean isLatest() {
     return latest;
+  }
+
+  public boolean isShouldJoinDeploymentTable() {
+    return shouldJoinDeploymentTable;
   }
 }

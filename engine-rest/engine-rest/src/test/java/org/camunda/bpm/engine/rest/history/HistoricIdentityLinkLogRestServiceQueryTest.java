@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  *
  */
 public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestServiceTest {
+
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
@@ -101,6 +103,31 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
   public void testInvalidSortingOptions() {
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("processInstanceId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testQueryWithoutTenantIdQueryParameter() {
+    // given
+    mockedQuery = setUpMockHistoricIdentityLinkQuery(Collections.singletonList(MockProvider.createMockHistoricIdentityLink(null)));
+
+    // when
+    Response response = given()
+        .queryParam("withoutTenantId", true)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORY_IDENTITY_LINK_QUERY_URL);
+
+    // then
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {

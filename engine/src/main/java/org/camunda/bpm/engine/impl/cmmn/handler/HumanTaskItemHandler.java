@@ -259,6 +259,7 @@ public class HumanTaskItemHandler extends TaskItemHandler {
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, taskListener);
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, taskListener);
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, taskListener);
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_UPDATE, taskListener);
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, taskListener);
       }
     }

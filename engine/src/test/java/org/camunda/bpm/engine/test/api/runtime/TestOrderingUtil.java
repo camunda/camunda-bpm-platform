@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import junit.framework.TestCase;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -27,14 +28,23 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -111,6 +121,32 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
       @Override public String getProperty(ProcessInstance obj) {
         return obj.getBusinessKey();
+      }
+    });
+  }
+
+  // PROCESS DEFINITION
+
+  public static NullTolerantComparator<ProcessDefinition> processDefinitionByDeployTime(ProcessEngine processEngine){
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    return propertyComparator(new PropertyAccessor<ProcessDefinition, Date>() {
+      @Override
+      public Date getProperty(ProcessDefinition obj) {
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(obj.getDeploymentId()).singleResult();
+        return deployment.getDeploymentTime();
+      }
+    });
+  }
+
+  // DECISION DEFINITION
+
+  public static NullTolerantComparator<DecisionDefinition> decisionDefinitionByDeployTime(ProcessEngine processEngine) {
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    return propertyComparator(new PropertyAccessor<DecisionDefinition, Date>() {
+      @Override
+      public Date getProperty(DecisionDefinition obj) {
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(obj.getDeploymentId()).singleResult();
+        return deployment.getDeploymentTime();
       }
     });
   }
@@ -420,6 +456,15 @@ public class TestOrderingUtil {
     });
   }
 
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricJobLog, String>() {
+      @Override
+      public String getProperty(HistoricJobLog obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
   // jobs
 
   public static NullTolerantComparator<Job> jobByPriority() {
@@ -670,6 +715,71 @@ public class TestOrderingUtil {
       public String getProperty(HistoricExternalTaskLog obj) {
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(obj.getProcessDefinitionId());
         return processDefinition.getKey();
+      }
+    });
+  }
+
+  // HISTORIC ENTITIES
+
+  public static NullTolerantComparator<HistoricActivityInstance> historicActivityInstanceByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricActivityInstance, String>() {
+      @Override
+      public String getProperty(HistoricActivityInstance obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricIncident> historicIncidentByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricIncident, String>() {
+      @Override
+      public String getProperty(HistoricIncident obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricDecisionInstance> historicDecisionInstanceByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricDecisionInstance, String>() {
+      @Override
+      public String getProperty(HistoricDecisionInstance obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricDetail> historicDetailByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricDetail, String>() {
+      @Override
+      public String getProperty(HistoricDetail obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricTaskInstance> historicTaskInstanceByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricTaskInstance, String>() {
+      @Override
+      public String getProperty(HistoricTaskInstance obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricVariableInstance> historicVariableInstanceByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricVariableInstance, String>() {
+      @Override
+      public String getProperty(HistoricVariableInstance obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
+  public static NullTolerantComparator<HistoricCaseActivityInstance> historicCaseActivityInstanceByTenantId() {
+    return propertyComparator(new PropertyAccessor<HistoricCaseActivityInstance, String>() {
+      @Override
+      public String getProperty(HistoricCaseActivityInstance obj) {
+        return obj.getTenantId();
       }
     });
   }

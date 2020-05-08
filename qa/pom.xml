@@ -11,7 +11,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -40,13 +40,13 @@
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
 
     <!-- tomcat -->
-    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
-    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
-    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
-    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-    <tomcat6.server.port>48005</tomcat6.server.port>
+    <tomcat.connector.http.port>48080</tomcat.connector.http.port>
+    <tomcat.connector.http.redirectPort>48443</tomcat.connector.http.redirectPort>
+    <tomcat.connector.ajp.port>48009</tomcat.connector.ajp.port>
+    <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
+    <tomcat.server.port>48005</tomcat.server.port>
 
-    <tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
+    <tomcat.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat.runtime.location>
 
   </properties>
 
@@ -62,9 +62,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>jboss7-runtime</module>
         <module>wildfly-runtime</module>
         <module>tomcat-runtime</module>
+        <module>vanilla-runtimes/tomcat</module>
+        <module>vanilla-runtimes/wildfly</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
         <module>test-db-upgrade</module>
@@ -73,23 +74,11 @@
         <module>test-db-rolling-update</module>
         <module>test-old-engine</module>
         <module>performance-tests-engine</module>
+        <module>large-data-tests</module>
       </modules>
     </profile>
 
     <!-- Server profiles -->
-
-    <profile>
-      <id>jboss</id>
-      <modules>
-        <module>jboss7-runtime</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>jboss-domain</id>
-      <modules>
-        <module>jboss7-runtime</module>
-      </modules>
-    </profile>
 
     <profile>
       <id>wildfly</id>
@@ -111,10 +100,31 @@
       </modules>
     </profile>
 
+    <profile>
+      <id>tomcat-vanilla</id>
+      <modules>
+        <module>vanilla-runtimes/tomcat</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>wildfly-vanilla</id>
+      <modules>
+        <module>vanilla-runtimes/wildfly</module>
+      </modules>
+    </profile>
+
     <!-- Testsuite profiles -->
 
     <profile>
       <id>webapps-integration</id>
+      <modules>
+        <module>integration-tests-webapps</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>webapps-integration-sa</id>
       <modules>
         <module>integration-tests-webapps</module>
       </modules>

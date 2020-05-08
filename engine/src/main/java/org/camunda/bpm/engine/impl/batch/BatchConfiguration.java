@@ -22,6 +22,7 @@ import java.util.List;
 public class BatchConfiguration {
 
   protected List<String> ids;
+  protected DeploymentMappings idMappings;
   protected boolean failIfNotExists;
 
   public BatchConfiguration(List<String> ids) {
@@ -29,7 +30,16 @@ public class BatchConfiguration {
   }
 
   public BatchConfiguration(List<String> ids, boolean failIfNotExists) {
+    this(ids, null, failIfNotExists);
+  }
+
+  public BatchConfiguration(List<String> ids, DeploymentMappings mappings) {
+    this(ids, mappings, true);
+  }
+
+  public BatchConfiguration(List<String> ids, DeploymentMappings mappings, boolean failIfNotExists) {
     this.ids = ids;
+    this.idMappings = mappings;
     this.failIfNotExists = failIfNotExists;
   }
 
@@ -39,6 +49,14 @@ public class BatchConfiguration {
 
   public void setIds(List<String> ids) {
     this.ids = ids;
+  }
+
+  public DeploymentMappings getIdMappings() {
+    return idMappings;
+  }
+
+  public void setIdMappings(DeploymentMappings idMappings) {
+    this.idMappings = idMappings;
   }
 
   public boolean isFailIfNotExists() {

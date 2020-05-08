@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.run</groupId>
+    <artifactId>camunda-bpm-run-root</artifactId>
+    <version>7.13.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>camunda-bpm-run</artifactId>
+  <name>Camunda BPM - Run - Distribution</name>
+  <packaging>pom</packaging>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-assembly</artifactId>
+      <version>${project.version}</version>
+      <type>tar.gz</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.distro</groupId>
+      <artifactId>camunda-sql-scripts</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+    </dependency>
+
+    <!-- make sure this runs after webapps -->
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-webapps</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <exclusions>
+        <!-- we don't need any transitive dependencies -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>target/</outputDirectory>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

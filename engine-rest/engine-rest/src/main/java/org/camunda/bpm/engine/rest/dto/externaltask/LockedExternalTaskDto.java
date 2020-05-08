@@ -39,6 +39,7 @@ public class LockedExternalTaskDto {
   protected Date lockExpirationTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String processInstanceId;
   protected Integer retries;
   protected boolean suspended;
@@ -72,6 +73,9 @@ public class LockedExternalTaskDto {
   }
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
   }
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -118,6 +122,7 @@ public class LockedExternalTaskDto {
     dto.lockExpirationTime = task.getLockExpirationTime();
     dto.processDefinitionId = task.getProcessDefinitionId();
     dto.processDefinitionKey = task.getProcessDefinitionKey();
+    dto.processDefinitionVersionTag = task.getProcessDefinitionVersionTag();
     dto.processInstanceId = task.getProcessInstanceId();
     dto.retries = task.getRetries();
     dto.topicName = task.getTopicName();
@@ -141,11 +146,26 @@ public class LockedExternalTaskDto {
   }
   @Override
   public String toString() {
-    return "LockedExternalTaskDto [activityId=" + activityId + ", activityInstanceId=" + activityInstanceId + ", errorMessage=" + errorMessage
-        + ", errorDetails=" + errorDetails + ", executionId=" + executionId + ", id=" + id + ", lockExpirationTime=" + lockExpirationTime
-        + ", processDefinitionId=" + processDefinitionId + ", processDefinitionKey=" + processDefinitionKey + ", processInstanceId=" + processInstanceId
-        + ", retries=" + retries + ", suspended=" + suspended + ", workerId=" + workerId + ", topicName=" + topicName + ", tenantId=" + tenantId
-        + ", variables=" + variables + ", priority=" + priority + ", businessKey=" + businessKey + "]";
+    return 
+        "LockedExternalTaskDto [activityId=" + activityId
+        + ", activityInstanceId=" + activityInstanceId
+        + ", errorMessage=" + errorMessage
+        + ", errorDetails=" + errorDetails
+        + ", executionId=" + executionId
+        + ", id=" + id
+        + ", lockExpirationTime=" + lockExpirationTime
+        + ", processDefinitionId=" + processDefinitionId
+        + ", processDefinitionKey=" + processDefinitionKey
+        + ", processDefinitionVersionTag=" + processDefinitionVersionTag
+        + ", processInstanceId=" + processInstanceId
+        + ", retries=" + retries
+        + ", suspended=" + suspended
+        + ", workerId=" + workerId
+        + ", topicName=" + topicName
+        + ", tenantId=" + tenantId
+        + ", variables=" + variables
+        + ", priority=" + priority
+        + ", businessKey=" + businessKey + "]";
   }
 
 }

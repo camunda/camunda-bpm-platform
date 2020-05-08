@@ -19,36 +19,21 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author Sebastian Menski
  */
 public class ExecutionStartContext {
 
-  protected boolean delayFireHistoricVariableEvents;
 
   protected InstantiationStack instantiationStack;
   protected Map<String, Object> variables;
   protected Map<String, Object> variablesLocal;
 
-  public ExecutionStartContext() {
-    this(true);
-  }
-
-  public ExecutionStartContext(boolean delayFireHistoricVariableEvents) {
-    this.delayFireHistoricVariableEvents = delayFireHistoricVariableEvents;
-  }
 
   public void executionStarted(PvmExecutionImpl execution) {
     PvmExecutionImpl parent = execution;
     while (parent != null && parent.getExecutionStartContext() != null) {
-      if (parent instanceof ExecutionEntity && delayFireHistoricVariableEvents) {
-        // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
-        ExecutionEntity executionEntity = (ExecutionEntity) parent;
-        executionEntity.fireHistoricVariableInstanceCreateEvents();
-      }
-
       parent.disposeExecutionStartContext();
       parent = parent.getParent();
     }
@@ -57,10 +42,6 @@ public class ExecutionStartContext {
   public void applyVariables(CoreExecution execution) {
     execution.setVariables(variables);
     execution.setVariablesLocal(variablesLocal);
-  }
-
-  public boolean isDelayFireHistoricVariableEvents() {
-    return delayFireHistoricVariableEvents;
   }
 
   public InstantiationStack getInstantiationStack() {

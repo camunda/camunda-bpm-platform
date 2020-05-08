@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.externaltask;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.camunda.bpm.engine.query.Query;
 
@@ -30,6 +31,11 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select the external task with the given id
    */
   ExternalTaskQuery externalTaskId(String externalTaskId);
+
+  /**
+   * Only select external tasks with any of the given ids
+   */
+  ExternalTaskQuery externalTaskIdIn(Set<String> externalTaskIds);
 
   /**
    * Only select external tasks that was most recently locked by the given worker
@@ -92,7 +98,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that belong to an instances of the given activities.
    */
   ExternalTaskQuery activityIdIn(String... activityIdIn);
-  
+
   /**
    * Only select external tasks with a priority that is higher than or equal to the given priority.
    *
@@ -110,7 +116,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * @return the builded external task query
    */
   ExternalTaskQuery priorityLowerThanOrEquals(long priority);
-    
+
   /**
    * Only select external tasks that are currently suspended
    */
@@ -130,7 +136,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that have retries = 0
    */
   ExternalTaskQuery noRetriesLeft();
-  
+
   /** Only select external tasks that belong to one of the given tenant ids. */
   ExternalTaskQuery tenantIdIn(String... tenantIds);
 
@@ -165,7 +171,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Note that the ordering of external tasks without tenant id is database-specific.
    */
   ExternalTaskQuery orderByTenantId();
-  
+
   /**
    * Order by priority (needs to be followed by {@link #asc()} or {@link #desc()}).
    * @since 7.5

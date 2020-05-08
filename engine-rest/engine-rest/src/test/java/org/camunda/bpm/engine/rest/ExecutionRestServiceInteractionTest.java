@@ -34,6 +34,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.camunda.bpm.engine.runtime.DeserializationTypeValidator;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -80,7 +82,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.restassured.http.ContentType;
@@ -159,7 +160,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableKey = "aKey";
     int variableValue = 123;
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
     variablesJson.put("variables", variables);
 
@@ -167,7 +168,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(SIGNAL_EXECUTION_URL);
 
-    Map<String, Object> expectedSignalVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedSignalVariables = new HashMap<>();
     expectedSignalVariables.put(variableKey, variableValue);
 
     verify(runtimeServiceMock).signal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedSignalVariables)));
@@ -180,7 +181,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableType = "Integer";
 
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -199,7 +200,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableType = "Short";
 
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -217,7 +218,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableValue = "1abc";
     String variableType = "Long";
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -236,7 +237,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableType = "Double";
 
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -254,7 +255,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableValue = "1abc";
     String variableType = "Date";
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -273,7 +274,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String variableType = "X";
 
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     variablesJson.put("variables", variables);
 
@@ -415,7 +416,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void testLocalVariableModification() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     String variableKey = "aKey";
     int variableValue = 123;
@@ -423,7 +424,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
     messageBodyJson.put("modifications", modifications);
 
-    List<String> deletions = new ArrayList<String>();
+    List<String> deletions = new ArrayList<>();
     deletions.add("deleteKey");
     messageBodyJson.put("deletions", deletions);
 
@@ -431,7 +432,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(EXECUTION_LOCAL_VARIABLES_URL);
 
-    Map<String, Object> expectedModifications = new HashMap<String, Object>();
+    Map<String, Object> expectedModifications = new HashMap<>();
     expectedModifications.put(variableKey, variableValue);
     verify(runtimeServiceMock).updateVariablesLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedModifications)),
         argThat(new EqualsList(deletions)));
@@ -441,7 +442,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   public void testLocalVariableModificationForNonExistingExecution() {
     doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     String variableKey = "aKey";
     int variableValue = 123;
@@ -467,7 +468,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     String variableKey = "aKey";
     int variableValue = 123;
@@ -1132,7 +1133,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testPutSingleLocalSerializableVariableFromJson() throws Exception {
 
-    ArrayList<String> serializable = new ArrayList<String>();
+    ArrayList<String> serializable = new ArrayList<>();
     serializable.add("foo");
 
     ObjectMapper mapper = new ObjectMapper();
@@ -1155,9 +1156,80 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void testValidationOnPutSingleLocalSerializableVariableFromJson() throws Exception {
+    boolean previousIsValidationEnabled = processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled();
+    DeserializationTypeValidator previousValidator = processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator();
+
+    DeserializationTypeValidator validatorMock = mock(DeserializationTypeValidator.class);
+    when(validatorMock.validate(anyString())).thenReturn(true);
+    when(processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled()).thenReturn(true);
+    when(processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator()).thenReturn(validatorMock);
+
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      String jsonBytes = mapper.writeValueAsString("test");
+      String typeName = TypeFactory.defaultInstance().constructType(String.class).toCanonical();
+
+      String variableKey = "aVariableKey";
+
+      given()
+        .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+        .multiPart("data", jsonBytes, MediaType.APPLICATION_JSON)
+        .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+      verify(validatorMock).validate("java.lang.String");
+      verifyNoMoreInteractions(validatorMock);
+
+      verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+          argThat(EqualsObjectValue.objectValueMatcher().isDeserialized().value("test")));
+    } finally {
+      when(processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled()).thenReturn(previousIsValidationEnabled);
+      when(processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator()).thenReturn(previousValidator);
+    }
+  }
+
+  @Test
+  public void testFailingValidationOnPutSingleLocalSerializableVariableFromJson() throws Exception {
+    boolean previousIsValidationEnabled = processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled();
+    DeserializationTypeValidator previousValidator = processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator();
+
+    DeserializationTypeValidator validatorMock = mock(DeserializationTypeValidator.class);
+    when(validatorMock.validate(anyString())).thenReturn(false);
+    when(processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled()).thenReturn(true);
+    when(processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator()).thenReturn(validatorMock);
+
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      String jsonBytes = mapper.writeValueAsString("test");
+      String typeName = TypeFactory.defaultInstance().constructType(String.class).toCanonical();
+
+      String variableKey = "aVariableKey";
+
+      given()
+        .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+        .multiPart("data", jsonBytes, MediaType.APPLICATION_JSON)
+        .multiPart("type", typeName, MediaType.TEXT_PLAIN)
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .when()
+        .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+      verify(validatorMock).validate("java.lang.String");
+      verifyNoMoreInteractions(validatorMock);
+    } finally {
+      when(processEngine.getProcessEngineConfiguration().isDeserializationTypeValidationEnabled()).thenReturn(previousIsValidationEnabled);
+      when(processEngine.getProcessEngineConfiguration().getDeserializationTypeValidator()).thenReturn(previousValidator);
+    }
+  }
+
+  @Test
   public void testPutSingleLocalSerializableVariableUnsupportedMediaType() throws Exception {
 
-    ArrayList<String> serializable = new ArrayList<String>();
+    ArrayList<String> serializable = new ArrayList<>();
     serializable.add("foo");
 
     ObjectMapper mapper = new ObjectMapper();
@@ -1494,7 +1566,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
         .variable(variableKey1, variableValue1)
         .variable(variableKey2, variableValue2).getVariables();
 
-    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    Map<String, Object> variablesJson = new HashMap<>();
     variablesJson.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
@@ -1502,7 +1574,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put(variableKey1, variableValue1);
     expectedVariables.put(variableKey2, variableValue2);
 
@@ -1559,7 +1631,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testCreateIncident() {
     when(runtimeServiceMock.createIncident(anyString(), anyString(), anyString(), anyString())).thenReturn(mock(Incident.class));
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("incidentType", "incidentType");
     json.put("configuration", "configuration");
     json.put("message", "message");
@@ -1573,7 +1645,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testCreateIncidentWithNullIncidentType() {
     doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(anyString(), anyString(), anyString(), anyString());
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("configuration", "configuration");
     json.put("message", "message");
 

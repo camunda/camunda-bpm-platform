@@ -35,8 +35,8 @@ public class LongValueSerlializer extends PrimitiveValueSerializer<LongValue> {
     return Variables.longValue((Long) untypedValue.getValue(), untypedValue.isTransient());
   }
 
-  public LongValue readValue(ValueFields valueFields) {
-    return Variables.longValue(valueFields.getLongValue());
+  public LongValue readValue(ValueFields valueFields, boolean asTransientValue) {
+    return Variables.longValue(valueFields.getLongValue(), asTransientValue);
   }
 
   public void writeValue(LongValue value, ValueFields valueFields) {

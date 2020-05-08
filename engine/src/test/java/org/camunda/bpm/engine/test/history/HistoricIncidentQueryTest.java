@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -47,6 +48,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -72,6 +74,8 @@ public class HistoricIncidentQueryTest {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
@@ -193,6 +197,59 @@ public class HistoricIncidentQueryTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByProcessDefinitionKey() {
+    // given
+    // 1 failed instance of "oneFailingServiceTaskProcess"
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    // one incident of each of the following processes
+    testHelper.deploy(Bpmn.createExecutableProcess("proc1").startEvent().userTask().endEvent().done());
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("proc1");
+    Incident incident2 = runtimeService.createIncident("foo", instance2.getId(), "a");
+
+    testHelper.deploy(Bpmn.createExecutableProcess("proc2").startEvent().userTask().endEvent().done());
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("proc2");
+    Incident incident3 = runtimeService.createIncident("foo", instance3.getId(), "b");
+
+    // when
+    List<HistoricIncident> incidents = historyService.createHistoricIncidentQuery()
+        .processDefinitionKeyIn("proc1", "proc2")
+        .orderByConfiguration()
+        .asc()
+        .list();
+
+    // then
+    assertThat(incidents).hasSize(2);
+    assertThat(incidents.get(0).getId()).isEqualTo(incident2.getId());
+    assertThat(incidents.get(1).getId()).isEqualTo(incident3.getId());
+  }
+
+  @Test
+  public void testQueryByInvalidProcessDefinitionKeys() {
+    // given
+    IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
+
+    // then
+    exception.expect(ProcessEngineException.class);
+
+    // when
+    incidentQuery.processDefinitionKeyIn((String[]) null);
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKey() {
+    // given
+    IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
+
+    // then
+    exception.expect(ProcessEngineException.class);
+
+    // when
+    incidentQuery.processDefinitionKeyIn((String) null);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
   public void testQueryByProcessInstanceId() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -258,7 +315,10 @@ public class HistoricIncidentQueryTest {
   }
 
   @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
   public void testQueryByInvalidActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
 
     assertEquals(0, query.activityId("invalid").list().size());
@@ -267,6 +327,34 @@ public class HistoricIncidentQueryTest {
     try {
       query.activityId(null);
       fail("It was possible to set a null value as activityId.");
+    } catch (ProcessEngineException e) { }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByFailedActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .failedActivityId("theServiceTask");
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQueryByFailedInvalidActivityId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
+
+    assertEquals(0, query.failedActivityId("invalid").list().size());
+    assertEquals(0, query.failedActivityId("invalid").count());
+
+    try {
+      query.failedActivityId(null);
+      fail("It was possible to set a null value as failedActivityId.");
     } catch (ProcessEngineException e) { }
   }
 

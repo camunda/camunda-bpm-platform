@@ -63,6 +63,8 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
       commandContext.getOperationLogManager()
           .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
+
+      task.triggerUpdateEvent();
     }
 
     return null;

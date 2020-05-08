@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -58,30 +59,18 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Dave Syer
  * @author Frederik Heremans
  */
-public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
+public abstract class JobEntity extends AcquirableJobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  public static final boolean DEFAULT_EXCLUSIVE = true;
   public static final int DEFAULT_RETRIES = 3;
 
   private static final long serialVersionUID = 1L;
 
-  protected String id;
-  protected int revision;
-
-  protected Date duedate;
-
-  protected String lockOwner = null;
-  protected Date lockExpirationTime = null;
-
   protected String executionId = null;
-  protected String processInstanceId = null;
 
   protected String processDefinitionId = null;
   protected String processDefinitionKey = null;
-
-  protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
   protected int retries = DEFAULT_RETRIES;
 
@@ -113,6 +102,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   // sequence counter //////////////////////////
   protected long sequenceCounter = 1;
+
+  // last failure log id ///////////////////////
+  protected String lastFailureLogId;
+
+  // last failing activity id ///////////////////////
+  protected String failedActivityId;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -198,13 +193,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     removeFailedJobIncident(incidentResolved);
   }
 
+  @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
+    Map<String, Object> persistentState = (HashMap) super.getPersistentState();
     persistentState.put("executionId", executionId);
-    persistentState.put("lockOwner", lockOwner);
-    persistentState.put("lockExpirationTime", lockExpirationTime);
     persistentState.put("retries", retries);
-    persistentState.put("duedate", duedate);
     persistentState.put("exceptionMessage", exceptionMessage);
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
@@ -217,10 +210,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
     return persistentState;
-  }
-
-  public int getRevisionNext() {
-    return revision+1;
   }
 
   public void setExecution(ExecutionEntity execution) {
@@ -254,6 +243,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getExecutionId() {
     return executionId;
   }
@@ -276,6 +266,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     }
   }
 
+  @Override
   public int getRetries() {
     return retries;
   }
@@ -329,6 +320,17 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
             .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
 
         if (!failedJobIncidents.isEmpty()) {
+          // update the historic job log id in the historic incidents (if available)
+          for (Incident incident : failedJobIncidents) {
+            HistoricIncidentEntity historicIncidentEvent = Context
+                .getCommandContext()
+                .getHistoricIncidentManager()
+                .findHistoricIncidentById(incident.getId());
+            if (historicIncidentEvent != null) {
+              historicIncidentEvent.setHistoryConfiguration(getLastFailureLogId());
+              Context.getCommandContext().getDbEntityManager().merge(historicIncidentEvent);
+            }
+          }
           return;
         }
 
@@ -336,6 +338,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
+      incidentContext.setHistoryConfiguration(getLastFailureLogId());
+      incidentContext.setFailedActivityId(getFailedActivityId());
 
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
@@ -382,34 +386,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     return suspensionState;
   }
 
+  @Override
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
 
-  public String getLockOwner() {
-    return lockOwner;
-  }
-
-  public void setLockOwner(String claimedBy) {
-    this.lockOwner = claimedBy;
-  }
-
-  public Date getLockExpirationTime() {
-    return lockExpirationTime;
-  }
-
-  public void setLockExpirationTime(Date claimedUntil) {
-    this.lockExpirationTime = claimedUntil;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
+  @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -418,35 +400,13 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.processDefinitionId = processDefinitionId;
   }
 
+  @Override
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
-  }
-  public boolean isExclusive() {
-    return isExclusive;
-  }
-
-  public void setExclusive(boolean isExclusive) {
-    this.isExclusive = isExclusive;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Date getDuedate() {
-    return duedate;
-  }
-
-  public void setDuedate(Date duedate) {
-    this.duedate = duedate;
   }
 
   public void setExceptionStacktrace(String exception) {
@@ -493,18 +453,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.jobHandlerConfiguration = jobHandlerConfiguration;
   }
 
-  public int getRevision() {
-    return revision;
-  }
-
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
-
+  @Override
   public String getExceptionMessage() {
     return exceptionMessage;
   }
 
+  @Override
   public String getJobDefinitionId() {
     return jobDefinitionId;
   }
@@ -559,6 +513,22 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     }
   }
 
+  protected void clearFailedJobException() {
+    ByteArrayEntity byteArray = getExceptionByteArray();
+
+    // Avoid NPE when the job was reconfigured by another
+    // node in the meantime
+    if (byteArray != null) {
+      Context.getCommandContext()
+          .getDbEntityManager()
+          .delete(byteArray);
+    }
+
+    this.exceptionByteArrayId = null;
+    this.exceptionMessage = null;
+  }
+
+  @Override
   public String getDeploymentId() {
     return deploymentId;
   }
@@ -586,6 +556,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.activityId = activityId;
   }
 
+  @Override
   public long getPriority() {
     return priority;
   }
@@ -594,6 +565,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.priority = priority;
   }
 
+  @Override
   public String getTenantId() {
     return tenantId;
   }
@@ -602,6 +574,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.tenantId = tenantId;
   }
 
+  @Override
   public Date getCreateTime() {
     return createTime;
   }
@@ -639,14 +612,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public abstract String getType();
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    return result;
-  }
-
-  @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
@@ -680,6 +645,39 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     return referenceIdAndClass;
   }
 
+  public String getLastFailureLogId() {
+    if (lastFailureLogId == null) {
+      // try to find the last failure log in the database,
+      // can occur if setRetries is called manually since
+      // otherwise the failure handling ensures that a log
+      // entry is written before the incident is created
+      List<HistoricJobLog> logEntries = Context.getCommandContext()
+        .getProcessEngineConfiguration()
+        .getHistoryService()
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .jobId(id)
+        .orderPartiallyByOccurrence().desc()
+        .list();
+      if (!logEntries.isEmpty()) {
+        lastFailureLogId = logEntries.get(0).getId();
+      }
+    }
+    return lastFailureLogId;
+  }
+
+  public void setLastFailureLogId(String lastFailureLogId) {
+    this.lastFailureLogId = lastFailureLogId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
+  }
+
+  public void setFailedActivityId(String failedActivityId) {
+    this.failedActivityId = failedActivityId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -698,9 +696,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
            + ", exceptionByteArray=" + exceptionByteArray
            + ", exceptionByteArrayId=" + exceptionByteArrayId
            + ", exceptionMessage=" + exceptionMessage
+           + ", failedActivityId=" + failedActivityId
            + ", deploymentId=" + deploymentId
            + ", priority=" + priority
            + ", tenantId=" + tenantId
            + "]";
   }
+
 }

@@ -333,11 +333,6 @@ public interface CommandChecker {
   void checkReadHistoryProcessDefinition(String processDefinitionId);
 
   /**
-   * Check if it is allowed to read the history for any task instance
-   */
-  void checkReadHistoryAnyTaskInstance();
-
-  /**
    * Check if it is allowed to update a case instance of the given case execution.
    */
   void checkUpdateCaseInstance(CaseExecution caseExecution);
@@ -346,6 +341,11 @@ public interface CommandChecker {
    * Check if it is allowed to delete the user operation log of the given user operation log entry.
    */
   void checkDeleteUserOperationLog(UserOperationLogEntry entry);
+
+  /**
+   * Check if it is allowed to update the user operation log of the given user operation log entry.
+   */
+  void checkUpdateUserOperationLog(UserOperationLogEntry entry);
 
   /**
    * Check if it is allowed to read a case instance of the given case execution.

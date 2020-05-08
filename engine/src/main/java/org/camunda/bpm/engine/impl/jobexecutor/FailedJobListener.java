@@ -32,16 +32,14 @@ import org.camunda.bpm.engine.management.Metrics;
 public class FailedJobListener implements Command<Void> {
 
   protected CommandExecutor commandExecutor;
-  protected String jobId;
-  protected Throwable exception;
+  protected JobFailureCollector jobFailureCollector;
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
   private int countRetries = 0;
   private int totalRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
-  public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
+  public FailedJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
     this.commandExecutor = commandExecutor;
-    this.jobId = jobId;
-    this.exception = exception;
+    this.jobFailureCollector = jobFailureCollector;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -50,7 +48,8 @@ public class FailedJobListener implements Command<Void> {
     logJobFailure(commandContext);
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
-    final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
+    String jobId = jobFailureCollector.getJobId();
+    final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
 
     commandExecutor.execute(new Command<Void>() {
 
@@ -60,6 +59,7 @@ public class FailedJobListener implements Command<Void> {
                 .findJobById(jobId);
 
         if (job != null) {
+          job.setFailedActivityId(jobFailureCollector.getFailedActivityId());
           fireHistoricJobFailedEvt(job);
           cmd.execute(commandContext);
         } else {
@@ -86,7 +86,7 @@ public class FailedJobListener implements Command<Void> {
 
     commandContext
             .getHistoricJobLogManager()
-            .fireJobFailedEvent(job, exception);
+            .fireJobFailedEvent(job, jobFailureCollector.getFailure());
   }
 
   protected void logJobFailure(CommandContext commandContext) {

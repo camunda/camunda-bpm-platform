@@ -23,7 +23,7 @@
         <userTask id="undoTask" isForCompensation="true"/>
         
         <!-- compensation handler should not have an outgoing sequence flow -->
-		<sequenceFlow sourceRef="undoTask" targetRef="end2" />
+		<sequenceFlow id="SequenceFlow_10" sourceRef="undoTask" targetRef="end2" />
     
         <endEvent id="end2" />        
     

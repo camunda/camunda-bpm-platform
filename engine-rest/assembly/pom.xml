@@ -8,8 +8,17 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <!-- generate a bom of dependencies for the license book.
+    We include compile and provided scope dependencies; 
+    all the dependencies that we include in only one of the 
+    runtime-specific-WARs are in provided scope -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+    <third-party-bom-scopes>compile|provided</third-party-bom-scopes>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -22,13 +31,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-jaxrs2</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- dependencies only used for assemblies should be scope provided -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -53,17 +55,6 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <version>${version.resteasy3}</version>
-      <scope>provided</scope>
-    </dependency>
-    
-    <!-- this overrides a transitive dependency Resteasy 3.0.26;
-    Resteasy depends on 1.0.1.Beta1, which was compiled with Java 8 and therefore
-     does not work in Java 7 environments (e.g. JBoss 7). 1.0.1.Final
-     was compiled with Java 7. -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-      <version>1.0.1.Final</version>
       <scope>provided</scope>
     </dependency>
 
@@ -92,7 +83,7 @@
               <archive>
                 <manifestEntries>
                   <!-- module dependencies for deployment on jboss AS 7  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
                 </manifestEntries>
               </archive>
               <descriptors>
@@ -116,7 +107,7 @@
               <archive>
                 <manifestEntries>
                   <!-- module dependencies for deployment on wildfly  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
                 </manifestEntries>
               </archive>
               <descriptors>

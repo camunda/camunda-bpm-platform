@@ -16,9 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.*;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -50,6 +54,9 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
@@ -314,7 +321,7 @@ public class TransientVariableTest {
     try {
       runtimeService.setVariable(execution.getId(), "foo", Variables.stringValue("xyz", true));
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot set transient variable with name foo"));
+      assertThat(e.getMessage()).contains("Cannot set transient variable with name foo");
     }
   }
 
@@ -327,7 +334,7 @@ public class TransientVariableTest {
     try {
       runtimeService.setVariable(execution.getId(), "foo", Variables.stringValue("xyz", true));
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot set transient variable with name foo"));
+      assertThat(e.getMessage()).contains("Cannot set transient variable with name foo");
     }
   }
 
@@ -583,6 +590,43 @@ public class TransientVariableTest {
 
     // when
     runtimeService.startProcessInstanceByKey("Process", variables);
+  }
+
+  /**
+   * CAM-9932
+   */
+  @Test
+  public void testKeepTransientIfUntypedValueIsAccessed() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcess")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(ReadTypedTransientVariableDelegate.class)
+      .userTask()
+      .endEvent()
+      .done();
+    testRule.deploy(modelInstance);
+
+    // when
+    String processInstanceId = runtimeService.startProcessInstanceByKey("aProcess").getId();
+
+    // then
+    Object value = runtimeService.getVariable(processInstanceId, "var");
+    assertThat(value).isNull();
+  }
+
+  public static class ReadTypedTransientVariableDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      execution.setVariable("var", Variables.untypedValue(Variables.objectValue("aString"), true));
+
+      // when
+      TypedValue typedValue = execution.getVariableTyped("var");
+
+      // then
+      assertThat(typedValue.isTransient()).isTrue();
+    }
   }
 
   public static class SetVariableTransientDelegate implements JavaDelegate {

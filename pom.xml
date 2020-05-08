@@ -3,15 +3,15 @@
 
   <parent>
     <groupId>org.camunda</groupId>
-    <artifactId>camunda-release-parent</artifactId>
-    <version>3.2</version>
+    <artifactId>camunda-bpm-release-parent</artifactId>
+    <version>2.1.0</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.12.0-SNAPSHOT</version>
+  <version>7.13.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
@@ -23,6 +23,18 @@
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+
+    <!-- These properties are used in both the BOM as well as camunda-parent and subprojects -->
+    <version.mybatis>3.5.3</version.mybatis>
+    <version.joda-time>2.1</version.joda-time>
+    <version.uuid-generator>3.2.0</version.uuid-generator>
+    <version.camunda.commons>1.9.0</version.camunda.commons>
+    <version.camunda.connect>1.4.0</version.camunda.connect>
+    <version.camunda.spin>1.9.0</version.camunda.spin>
+    <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
+    <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
+    <version.spring-boot>2.2.5.RELEASE</version.spring-boot>
+    <version.feel-scala>1.11.0</version.feel-scala>
   </properties>
 
   <build>
@@ -48,6 +60,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>spring-boot-starter</module>
+
         <module>qa</module>
 
         <module>webapps/h2-webapp</module>
@@ -56,6 +70,10 @@
         <module>javaee/ejb-client</module>
         <module>javaee/jobexecutor-ra</module>
         <module>javaee/jobexecutor-rar</module>
+
+        <module>model-api</module>
+        <module>typed-values</module>
+        <module>engine-dmn</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
@@ -69,8 +87,8 @@
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
-        <module>distro/wildfly8</module>
         <module>distro/sql-script</module>
+        <module>distro/run</module>
 
         <module>database</module>
         <module>parent</module>
@@ -87,6 +105,7 @@
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
+        <module>distro/run</module>
       </modules>
     </profile>
 
@@ -145,7 +164,6 @@
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/license-book</module>
-        <module>distro/wildfly8</module>
         <module>distro/wildfly</module>
       </modules>
     </profile>
@@ -157,6 +175,16 @@
       </activation>
       <modules>
         <module>distro/webjar</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-run</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/run</module>
       </modules>
     </profile>
 
@@ -187,10 +215,16 @@
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
+        <module>spring-boot-starter</module>
+        <module>model-api</module>
+
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
+
+        <module>typed-values</module>
+        <module>engine-dmn</module>
 
         <module>javaee/ejb-client</module>
 

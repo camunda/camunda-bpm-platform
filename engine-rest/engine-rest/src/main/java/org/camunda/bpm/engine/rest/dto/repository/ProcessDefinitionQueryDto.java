@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
@@ -42,6 +44,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
+  private static final String SORT_BY_DEPLOY_TIME_VALUE = "deployTime";
   private static final String SORT_BY_TENANT_ID = "tenantId";
   private static final String SORT_BY_VERSION_TAG = "versionTag";
 
@@ -56,37 +59,41 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOY_TIME_VALUE);
   }
 
-  private String processDefinitionId;
-  private List<String> processDefinitionIdIn;
-  private String category;
-  private String categoryLike;
-  private String name;
-  private String nameLike;
-  private String deploymentId;
-  private String key;
-  private String keyLike;
-  private Integer version;
-  private Boolean latestVersion;
-  private String resourceName;
-  private String resourceNameLike;
-  private String startableBy;
-  private Boolean active;
-  private Boolean suspended;
-  private String incidentId;
-  private String incidentType;
-  private String incidentMessage;
-  private String incidentMessageLike;
-  private List<String> tenantIds;
-  private Boolean withoutTenantId;
-  private Boolean includeDefinitionsWithoutTenantId;
-  private String versionTag;
-  private String versionTagLike;
-  private List<String> keys;
-  private Boolean startableInTasklist;
-  private Boolean notStartableInTasklist;
-  private Boolean startablePermissionCheck;
+  protected String processDefinitionId;
+  protected List<String> processDefinitionIdIn;
+  protected String category;
+  protected String categoryLike;
+  protected String name;
+  protected String nameLike;
+  protected String deploymentId;
+  protected Date deployedAfter;
+  protected Date deployedAt;
+  protected String key;
+  protected String keyLike;
+  protected Integer version;
+  protected Boolean latestVersion;
+  protected String resourceName;
+  protected String resourceNameLike;
+  protected String startableBy;
+  protected Boolean active;
+  protected Boolean suspended;
+  protected String incidentId;
+  protected String incidentType;
+  protected String incidentMessage;
+  protected String incidentMessageLike;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeDefinitionsWithoutTenantId;
+  protected String versionTag;
+  protected String versionTagLike;
+  protected Boolean withoutVersionTag;
+  protected List<String> keys;
+  protected Boolean startableInTasklist;
+  protected Boolean notStartableInTasklist;
+  protected Boolean startablePermissionCheck;
 
   public ProcessDefinitionQueryDto() {
 
@@ -129,6 +136,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   @CamundaQueryParam("deploymentId")
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
+  }
+
+  @CamundaQueryParam(value = "deployedAfter", converter = DateConverter.class)
+  public void setDeployedAfter(Date deployedAfter) {
+    this.deployedAfter = deployedAfter;
+  }
+
+  @CamundaQueryParam(value = "deployedAt", converter = DateConverter.class)
+  public void setDeployedAt(Date deployedAt) {
+    this.deployedAt = deployedAt;
   }
 
   @CamundaQueryParam("key")
@@ -245,6 +262,11 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.versionTagLike = versionTagLike;
   }
 
+  @CamundaQueryParam(value = "withoutVersionTag", converter = BooleanConverter.class)
+  public void setWithoutVersionTag(Boolean withoutVersionTag) {
+    this.withoutVersionTag = withoutVersionTag;
+  }
+
   @CamundaQueryParam(value = "startableInTasklist", converter = BooleanConverter.class)
   public void setStartableInTasklist(Boolean startableInTasklist) {
     this.startableInTasklist = startableInTasklist;
@@ -292,6 +314,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
+    }
+    if(deployedAfter != null) {
+      query.deployedAfter(deployedAfter);
+    }
+    if(deployedAt != null) {
+      query.deployedAt(deployedAt);
     }
     if (key != null) {
       query.processDefinitionKey(key);
@@ -351,6 +379,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if( versionTagLike != null) {
       query.versionTagLike(versionTagLike);
     }
+    if (TRUE.equals(withoutVersionTag)) {
+      query.withoutVersionTag();
+    }
     if (TRUE.equals(startableInTasklist)) {
       query.startableInTasklist();
     }
@@ -377,6 +408,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
       query.orderByProcessDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_DEPLOY_TIME_VALUE)) {
+      query.orderByDeploymentTime();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {

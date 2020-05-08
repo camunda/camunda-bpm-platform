@@ -45,7 +45,9 @@ public class HistoricDecisionStatisticsRestServiceImpl implements HistoricDecisi
       statisticsQuery.decisionInstanceId(decisionInstanceId);
     }
 
-    for (HistoricDecisionInstanceStatistics stats : statisticsQuery.list()) {
+    List<HistoricDecisionInstanceStatistics> statistics = statisticsQuery.unlimitedList();
+
+    for (HistoricDecisionInstanceStatistics stats : statistics) {
       result.add(HistoricDecisionInstanceStatisticsDto.fromDecisionDefinitionStatistics(stats));
     }
 

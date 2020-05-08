@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
@@ -85,8 +86,8 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
         checker.checkUpdateJob(job);
       }
       // write a user operation log since we're not called by the job executor
-      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_EXECUTE, 
-          jobId, job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), 
+      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_EXECUTE,
+          jobId, job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
           job.getProcessDefinitionKey(), PropertyChange.EMPTY_CHANGE);
     } else {
       jobExecutorContext.setCurrentJob(job);
@@ -108,8 +109,10 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
 
       job.execute(commandContext);
 
-    }
-    finally {
+    } catch (Throwable t) {
+      jobFailureCollector.setFailedActivityId(Context.getCommandInvocationContext().getProcessDataContext().getLatestPropertyValue(ProcessDataContext.PROPERTY_ACTIVITY_ID));
+      throw t;
+    } finally {
       if (jobExecutorContext != null) {
         jobExecutorContext.setCurrentJob(null);
         identityService.clearAuthentication();

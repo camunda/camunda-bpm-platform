@@ -101,7 +101,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
   protected String deploymentId = null;
-  protected List<String> additionalDeployments = new ArrayList<String>();
+  protected List<String> additionalDeployments = new ArrayList<>();
 
   protected boolean ensureCleanAfterTest = false;
 
@@ -162,11 +162,13 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     initializeServices();
 
     final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
+    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
     return new Statement() {
 
       @Override
       public void evaluate() throws Throwable {
         Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
+        Assume.assumeTrue("ignored because the database doesn't match the required ones", runsWithRequiredDatabase);
         ProcessEngineRule.super.apply(base, description).evaluate();
       }
     };

@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.EventSubscriptionRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
@@ -260,6 +261,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     return super.getSchemaLogRestService(engineName);
   }
 
+  @Override
+  @Path("/{name}" + EventSubscriptionRestService.PATH)
+  public EventSubscriptionRestService getEventSubscriptionRestService(@PathParam("name") String engineName) {
+    return super.getEventSubscriptionRestService(engineName);
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessEngineDto> getProcessEngineNames() {
@@ -285,7 +292,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-    if(iterator.hasNext()) {
+    if (iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
       return provider;
     } else {

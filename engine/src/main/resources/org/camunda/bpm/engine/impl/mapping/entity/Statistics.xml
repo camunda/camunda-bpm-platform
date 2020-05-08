@@ -106,8 +106,9 @@
 
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select count(distinct RES.ID_) 
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd} 
   </select>
 
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
@@ -226,8 +227,9 @@
 
   <select id ="selectDeploymentStatisticsCount" resultType="long"
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
-    select count(distinct RES.ID_) 
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd} 
   </select>
 
   <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
@@ -395,7 +397,7 @@
 
   <select id ="selectActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
 
     <if test="!failedJobsToInclude &amp;&amp; !incidentsToInclude">
       <include refid="selectActivityStatisticsSql"/>
@@ -404,6 +406,8 @@
     <if test="failedJobsToInclude || incidentsToInclude">
       <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
     </if>
+    
+    ${countDistinctAfterEnd}
 
   </select>
 
@@ -712,8 +716,9 @@
   </select>
 
   <select id ="selectBatchStatisticsCount" resultType="long" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectBatchStatisticsByQueryCriteriaSql">
@@ -788,8 +793,9 @@
   </select>
 
   <select id ="selectDecisionDefinitionStatisticsCount" resultType="long" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDecisionDefinitionStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectDecisionDefinitionStatisticsByQueryCriteriaSql">

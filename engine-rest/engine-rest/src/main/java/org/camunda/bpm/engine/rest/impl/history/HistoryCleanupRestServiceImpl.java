@@ -71,16 +71,20 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
   }
 
   public HistoryCleanupConfigurationDto getHistoryCleanupConfiguration() {
+	  ProcessEngineConfigurationImpl engineConfiguration =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+
     HistoryCleanupConfigurationDto configurationDto = new HistoryCleanupConfigurationDto();
-    final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    Date now = ClockUtil.getCurrentTime();
-    final BatchWindow batchWindow = processEngineConfiguration.getBatchWindowManager()
-      .getCurrentOrNextBatchWindow(now, processEngineConfiguration);
-    if (batchWindow == null) {
-      return configurationDto;
+    configurationDto.setEnabled(engineConfiguration.isHistoryCleanupEnabled());
+
+    BatchWindow batchWindow = engineConfiguration.getBatchWindowManager()
+      .getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), engineConfiguration);
+
+    if (batchWindow != null) {
+      configurationDto.setBatchWindowStartTime(batchWindow.getStart());
+      configurationDto.setBatchWindowEndTime(batchWindow.getEnd());
     }
-    configurationDto.setBatchWindowStartTime(batchWindow.getStart());
-    configurationDto.setBatchWindowEndTime(batchWindow.getEnd());
+
     return configurationDto;
   }
 }

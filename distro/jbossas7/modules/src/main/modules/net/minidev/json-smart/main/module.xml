@@ -4,6 +4,6 @@
   </resources>
 
   <dependencies>
-    <module name="org.minidev.accessors-smart" />
+    <module name="net.minidev.accessors-smart" />
   </dependencies>
 </module>

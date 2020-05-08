@@ -17,6 +17,7 @@
 package org.camunda.bpm.container.impl.threading.ra.inflow;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 
 /**
  * Interface to be implemented by a MessageDriven bean handling the execution of
@@ -27,6 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public interface JobExecutionHandler {
 
-  public void executeJob(String job, CommandExecutor commandExecutor);
+  public JobFailureCollector executeJob(String job, CommandExecutor commandExecutor);
 
 }

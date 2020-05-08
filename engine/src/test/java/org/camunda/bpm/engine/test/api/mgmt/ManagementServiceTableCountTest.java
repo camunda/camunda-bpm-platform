@@ -32,11 +32,11 @@ public class ManagementServiceTableCountTest extends PluggableProcessEngineTestC
 
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-    //commenting out this assertion as there is no much sense to check the quantity of records, not the presence/absence of specific ones
-    //when additional row was added within CAM-7539, the test started failing when testing old engine (7.6) with new database (7.7)
-    //assertEquals(new Long(5), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
-
-    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+    if(managementService.getLicenseKey() != null) {
+      assertEquals(new Long(1), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+    } else {
+      assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+    }
     assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
     assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
     assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));

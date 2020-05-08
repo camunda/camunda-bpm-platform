@@ -27,8 +27,10 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 
 
 /**
@@ -53,7 +55,7 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
   }
 
   @Override
-  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
     JobExecutionHandlerActivation jobHandlerActivation = ra.getJobHandlerActivation();
     if(jobHandlerActivation == null) {
       // TODO: stop acquisition / only activate acquisition if MDB active?
@@ -71,11 +73,12 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       } catch (ResourceException e) {
         log.log(Level.WARNING, "ResourceException while invoking beforeDelivery() on MessageEndpoint '"+endpoint+"'", e);
       }
-
       try {
-        ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
+        jobFailureCollector = ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
       }catch (Exception e) {
-        log.log(Level.WARNING, "Exception while executing job with id '"+nextJobId+"'.", e);
+        if(ProcessEngineLogger.shouldLogJobException(processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
+          log.log(Level.WARNING, "Exception while executing job with id '"+nextJobId+"'.", e);
+        }
       }
 
       try {
@@ -101,5 +104,17 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("NoSuchMethodException while invoking getMethod() on class "+JobExecutionHandler.class, e);
     }
+  }
+
+  /**
+   * Context class loader switch is not necessary since
+   * the loader used for job execution is successor of the engine's
+   * @see org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable#switchClassLoader()
+   *
+   * @return the context class loader of the current thread.
+   */
+  @Override
+  protected ClassLoader switchClassLoader() {
+    return Thread.currentThread().getContextClassLoader();
   }
 }

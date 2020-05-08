@@ -16,14 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -70,4 +74,49 @@ public class ErrorEndEventTest {
     assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
   }
 
+  @Test
+  @Deployment
+  public void testErrorMessage() {
+    // given a process definition including an error with camunda:errorMessage property
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("testErrorMessage");
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+
+    // then the error message defined in XML is accessible
+    assertThat((String) variables.get("errorCode"), is("123"));
+    assertThat((String) variables.get("errorMessage"), is("This is the error message indicating what went wrong."));
+  }
+
+  
+  @Test
+  @Deployment
+  public void testErrorMessageExpression() {
+    // given a process definition including an error with camunda:errorMessage property with an expression value
+    String errorMessage = "This is the error message indicating what went wrong.";
+    Map<String, Object> initialVariables = new HashMap<>();
+    initialVariables.put("errorMessageExpression", errorMessage);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("testErrorMessageExpression", initialVariables);
+
+    // when 
+    Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+
+    // then the error message expression is resolved
+    assertThat((String) variables.get("errorCode"), is("123"));
+    assertThat((String) variables.get("errorMessage"), is(errorMessage));
+  }
+
+  @Test
+  @Deployment
+  public void testError() {
+    // given a process definition including an error
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("testError");
+    
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+    
+    // then the error message defined in XML is accessible
+    assertThat((String) variables.get("errorCode"), is("123"));
+    assertNull(variables.get("errorMessage"));
+  }
 }

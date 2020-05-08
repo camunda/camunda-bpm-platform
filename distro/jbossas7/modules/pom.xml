@@ -2,17 +2,21 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-jboss-modules</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>camunda BPM - jBoss7 Modules</name>
 
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
   </properties>
 
   <dependencies>
@@ -32,10 +36,6 @@
         <exclusion>
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>joda-time</groupId>
-          <artifactId>joda-time</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -64,7 +64,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-connect</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-http-client</artifactId>
@@ -74,7 +74,7 @@
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-soap-http-client</artifactId>
     </dependency>
-    
+
     <!-- script engine dependencies -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -90,14 +90,6 @@
     <dependency>
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
-    </dependency>
-
-    <!-- exclude slf4j as it is part of jboss distro -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
-      <scope>provided</scope>
     </dependency>
 
   </dependencies>
@@ -168,7 +160,10 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.commons.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                      <mapper>
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-(utils|logging)-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-typed-values-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                      </mapper>
                     </chainedmapper>
                   </mapper>
                 </copy>
@@ -205,6 +200,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.freemarker@" value="${version.freemarker}">
                   <include name="**/module.xml" />
                 </replace>
 
@@ -245,6 +244,29 @@
         <configuration>
           <classesDirectory>${project.build.directory}/modules/</classesDirectory>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <attach>true</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

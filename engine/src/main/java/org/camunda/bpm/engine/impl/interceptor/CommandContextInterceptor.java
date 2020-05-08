@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessEngineContextImpl;
 
 /**
  * <p>Interceptor used for opening the {@link CommandContext} and {@link CommandInvocationContext}.</p>
@@ -85,9 +86,11 @@ public class CommandContextInterceptor extends CommandInterceptor {
       }
     }
 
-    boolean openNew = (context == null);
+    // only create a new command context on the current command level (CAM-10002)
+    boolean isNew = ProcessEngineContextImpl.consume();
+    boolean openNew = (context == null || isNew);
 
-    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command);
+    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command, processEngineConfiguration);
     Context.setCommandInvocationContext(commandInvocationContext);
 
     try {
@@ -121,6 +124,9 @@ public class CommandContextInterceptor extends CommandInterceptor {
         Context.removeCommandInvocationContext();
         Context.removeCommandContext();
         Context.removeProcessEngineConfiguration();
+
+        // restore the new command context flag
+        ProcessEngineContextImpl.set(isNew);
       }
     }
 

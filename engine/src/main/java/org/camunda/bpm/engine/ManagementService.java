@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -913,6 +914,33 @@ public interface ManagementService {
   Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 
   /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * processInstanceIds, processInstanceQuery or historicProcessInstanceQuery has to be provided.
+   * If all are provided, resulting list of affected jobs will contain jobs related to the
+   * query as well as jobs related to instances in the list.
+   *
+   * @param processInstanceIds ids of the process instances that for which jobs retries will be set
+   * @param processInstanceQuery query that identifies process instances with jobs
+   *                             that have to be modified
+   * @param historicProcessInstanceQuery historic query that identifies runtime process instances
+   *                                     with jobs that have to be modified
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync (List<String> processInstanceIds,
+                            ProcessInstanceQuery processInstanceQuery,
+                            HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                            int retries);
+
+  /**
    * <p>
    * Set the number of retries of all <strong>failed</strong> {@link Job jobs}
    * of the provided job definition id.
@@ -955,7 +983,23 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobDuedate(String jobId, Date newDuedate);
-  
+
+  /**
+   * Sets a new due date for the provided id. The offset between 
+   * the old and the new due date can be cascaded to all follow-up
+   * jobs. Cascading only works with timer jobs.
+   * When newDuedate is null, the job is executed with the next
+   * job executor run. In this case the cascade parameter is ignored.
+   *
+   * @param jobId id of job to modify, cannot be null.
+   * @param newDuedate new date for job execution
+   * @param cascade indicate whether follow-up jobs should be affected
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void setJobDuedate(String jobId, Date newDuedate, boolean cascade);
   /**
    * Triggers the recalculation for the job with the provided id.
    * 
@@ -1100,6 +1144,32 @@ public interface ManagementService {
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   void deleteProperty(String name);
+
+  /**
+   * Set the license key.
+   *
+   * @param licenseKey the license key string.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  void setLicenseKey(String licenseKey);
+
+  /**
+   * Get the stored license key string or <code>null</code> if no license is set.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  String getLicenseKey();
+  
+  /**
+   * Deletes the stored license key. If no license key is set, the request is ignored.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  void deleteLicenseKey();
 
   /** programmatic schema update on a given connection returning feedback about what happened
    *

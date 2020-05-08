@@ -18,36 +18,95 @@ package org.camunda.bpm.engine.test.api.repository;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNotNull;
 
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.bpmn.deployment.VersionedDeploymentHandlerFactory;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTestCase {
+public class ProcessApplicationDeploymentTest {
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RepositoryService repositoryService;
+  protected ManagementService managementService;
+  protected ProcessEngine processEngine;
 
   private EmbeddedProcessApplication processApplication;
+  protected DeploymentHandlerFactory defaultDeploymentHandlerFactory;
+  protected DeploymentHandlerFactory customDeploymentHandlerFactory;
 
-  protected void setUp() throws Exception {
+  protected ProcessApplicationManager processApplicationManager;
+  protected DeploymentCache deploymentCache;
+  Set<String> registeredDeployments;
+
+  @Before
+  public void setUp() throws Exception {
+    processEngine = engineRule.getProcessEngine();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    repositoryService = engineRule.getRepositoryService();
+    managementService = engineRule.getManagementService();
+
+    defaultDeploymentHandlerFactory = processEngineConfiguration.getDeploymentHandlerFactory();
+    customDeploymentHandlerFactory = new VersionedDeploymentHandlerFactory();
     processApplication = new EmbeddedProcessApplication();
+
+    processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    deploymentCache = processEngineConfiguration.getDeploymentCache();
+    registeredDeployments = processEngineConfiguration.getRegisteredDeployments();
   }
 
+  @After
+  public void tearDown() throws Exception {
+    clearProcessApplicationDeployments();
+    processApplication.undeploy();
+    processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
+  }
+
+  @Test
   public void testEmptyDeployment() {
     try {
       repositoryService
@@ -68,72 +127,81 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     }
   }
 
+  @Test
   public void testSimpleProcessApplicationDeployment() {
-
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    // given
+    ProcessApplicationDeployment deployment = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     // process is deployed:
     assertThatOneProcessIsDeployed();
 
-    // registration was performed:
+    // when registration was performed:
     ProcessApplicationRegistration registration = deployment.getProcessApplicationRegistration();
+
+    // then
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(1, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment);
   }
 
+  @Test
   public void testProcessApplicationDeploymentNoChanges() {
-    // create initial deployment
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    // given: create initial deployment
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     assertThatOneProcessIsDeployed();
 
+    // when
     // deploy update with no changes:
-    deployment = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(false)
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    ProcessApplicationDeployment deployment = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     // no changes
     assertThatOneProcessIsDeployed();
     ProcessApplicationRegistration registration = deployment.getProcessApplicationRegistration();
+
+    // then
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(1, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment);
   }
 
+  @Test
   public void testPartialChangesDeployAll() {
+    // given
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
 
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", model2)
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", model2));
 
-    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().done();
+    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2")
+        .startEvent()
+        .done();
 
+    // when
     // second deployment with partial changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(false)
-      .resumePreviousVersions()
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", changedModel2)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", changedModel2));
 
+    // then
     assertEquals(4, repositoryService.createProcessDefinitionQuery().count());
 
     List<ProcessDefinition> processDefinitionsModel1 =
@@ -163,34 +231,35 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
   /**
    * Test re-deployment of only those resources that have actually changed
    */
+  @Test
   public void testPartialChangesDeployChangedOnly() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
 
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", model2)
-      .deploy();
+    ProcessApplicationDeployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", model2));
 
-    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().done();
+    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2")
+        .startEvent()
+        .done();
 
     // second deployment with partial changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(true)
-      .resumePreviousVersions()
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", changedModel2)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", changedModel2));
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
@@ -221,74 +290,141 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
 
-    BpmnModelInstance anotherChangedModel2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent().done();
+    BpmnModelInstance anotherChangedModel2 = Bpmn.createExecutableProcess("process2")
+        .startEvent()
+        .endEvent()
+        .done();
 
     // testing with a third deployment to ensure the change check is not only performed against
     // the last version of the deployment
-    ProcessApplicationDeployment deployment3 = repositoryService.createDeployment(processApplication.getReference())
+    ProcessApplicationDeployment deployment3 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
         .enableDuplicateFiltering(true)
         .resumePreviousVersions()
         .addModelInstance("process1.bpmn20.xml", model1)
         .addModelInstance("process2.bpmn20.xml", anotherChangedModel2)
-        .name("deployment")
-        .deploy();
+        .name("deployment"));
 
     // there should still be one version of process 1
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process1").count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process1")
+        .count());
 
     // there should be three versions of process 2
-    assertEquals(3, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").count());
+    assertEquals(3, repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process2")
+        .count());
 
     // old deployments are resumed
     registration = deployment3.getProcessApplicationRegistration();
     deploymentIds = registration.getDeploymentIds();
     assertEquals(3, deploymentIds.size());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
   }
 
+  @Test
+  public void testDuplicateFilteringDefaultBehavior() {
+    // given
+    BpmnModelInstance oldModel = Bpmn.createExecutableProcess("versionedProcess")
+      .camundaVersionTag("3").done();
+    BpmnModelInstance newModel = Bpmn.createExecutableProcess("versionedProcess")
+      .camundaVersionTag("1").done();
+
+    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      .enableDuplicateFiltering(true)
+      .addModelInstance("model", oldModel)
+      .name("defaultDeploymentHandling"));
+
+    // when
+    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      .enableDuplicateFiltering(true)
+      .addModelInstance("model", newModel)
+      .name("defaultDeploymentHandling"));
+
+    // then
+    long deploymentCount = repositoryService.createDeploymentQuery().count();
+    assertEquals(2, deploymentCount);
+  }
+
+  @Test
+  public void testDuplicateFilteringCustomBehavior() {
+    // given
+    processEngineConfiguration.setDeploymentHandlerFactory( customDeploymentHandlerFactory);
+    BpmnModelInstance oldModel = Bpmn.createExecutableProcess("versionedProcess")
+      .camundaVersionTag("1").done();
+    BpmnModelInstance newModel = Bpmn.createExecutableProcess("versionedProcess")
+      .camundaVersionTag("3").done();
+
+    Deployment deployment1 = testRule.deploy(
+        repositoryService
+            .createDeployment(processApplication.getReference())
+            .enableDuplicateFiltering(true)
+            .addModelInstance("model.bpmn", oldModel)
+            .name("customDeploymentHandling"));
+
+    // when
+    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      .enableDuplicateFiltering(true)
+      .addModelInstance("model.bpmn", newModel)
+      .name("customDeploymentHandling"));
+
+    Deployment deployment3 = testRule.deploy(
+        repositoryService
+            .createDeployment(processApplication.getReference())
+            .enableDuplicateFiltering(true)
+            .addModelInstance("model.bpmn", oldModel)
+            .name("customDeploymentHandling"));
+
+    // then
+    long deploymentCount = repositoryService.createDeploymentQuery().count();
+    assertEquals(2, deploymentCount);
+    assertEquals(deployment1.getId(), deployment3.getId());
+  }
+
+  @Test
   public void testPartialChangesResumePreviousVersion() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
 
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addModelInstance("process1.bpmn20.xml", model1));
 
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(true)
-      .resumePreviousVersions()
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", model2)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", model2));
 
     ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
     assertEquals(2, registration.getDeploymentIds().size());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testProcessApplicationDeploymentResumePreviousVersions() {
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     assertThatOneProcessIsDeployed();
 
     // deploy update with changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(false)
-      .resumePreviousVersions()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml")
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .resumePreviousVersions()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml"));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // now there are 2 process definitions deployed
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(2, processDefinitions.get(1).getVersion());
@@ -298,27 +434,29 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testProcessApplicationDeploymentResumePreviousVersionsDifferentKeys() {
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     assertThatOneProcessIsDeployed();
 
     // deploy update with changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .resumePreviousVersions()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .resumePreviousVersions()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // now there are 2 process definitions deployed
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(1, processDefinitions.get(1).getVersion());
@@ -329,27 +467,98 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     assertEquals(1, deploymentIds.size());
     assertEquals(deployment2.getId(), deploymentIds.iterator().next());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
+  public void testProcessApplicationDeploymentResumePreviousVersionsDefaultBehavior() {
+    // given
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
+    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
+
+    // create initial deployment
+    testRule.deploy(repositoryService.createDeployment(processApplication.getReference())
+      .name("defaultDeploymentHandling")
+      .addModelInstance("process1.bpmn20.xml", model1));
+
+    // when
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("defaultDeploymentHandling")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", model2));
+
+    // then
+    ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
+    assertEquals(2, registration.getDeploymentIds().size());
+  }
+
+  @Test
+  public void testProcessApplicationDeploymentResumePreviousVersionsCustomBehavior() {
+    // given
+    processEngineConfiguration.setDeploymentHandlerFactory(customDeploymentHandlerFactory);
+    BpmnModelInstance oldModel = Bpmn.createExecutableProcess("process")
+        .camundaVersionTag("1")
+        .done();
+    BpmnModelInstance newModel = Bpmn.createExecutableProcess("process")
+        .camundaVersionTag("3")
+        .done();
+
+    // create initial deployment
+    ProcessApplicationDeployment deployment1 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("customDeploymentHandling")
+        .addModelInstance("process1.bpmn20.xml", oldModel));
+
+    // when
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("customDeploymentHandling")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", newModel));
+
+    ProcessApplicationDeployment deployment3 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("customDeploymentHandling")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .addModelInstance("process1.bpmn20.xml", oldModel));
+
+    // then
+    // PA2 registers only it's own (new) version of the model
+    ProcessApplicationRegistration registration2 = deployment2.getProcessApplicationRegistration();
+    assertEquals(1, registration2.getDeploymentIds().size());
+
+    // PA3 deploys a duplicate version of the process. The duplicate deployment needs to be found
+    // and registered (deployment1)
+    ProcessApplicationRegistration registration3 = deployment3.getProcessApplicationRegistration();
+    assertEquals(1, registration3.getDeploymentIds().size());
+    assertEquals(deployment1.getId(), registration3.getDeploymentIds().iterator().next());
+  }
+
+  @Test
   public void testProcessApplicationDeploymentNoResume() {
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     assertThatOneProcessIsDeployed();
 
     // deploy update with changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(false)
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml")
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml"));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // now there are 2 process definitions deployed
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(2, processDefinitions.get(1).getVersion());
@@ -359,29 +568,31 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(1, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
-  public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentName() {
+  @Test
+  public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameDefaultBehavior() {
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
 
     assertThatOneProcessIsDeployed();
 
     // deploy update with changes:
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(false)
-      .resumePreviousVersions()
-      .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml")
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .resumePreviousVersions()
+        .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml"));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // now there are 2 process definitions deployed
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(2, processDefinitions.get(1).getVersion());
@@ -391,28 +602,75 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
+  public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameCustomBehavior() {
+    // given
+    BpmnModelInstance oldProcess =
+        Bpmn.createExecutableProcess("process").camundaVersionTag("1").done();
+    BpmnModelInstance newProcess =
+        Bpmn.createExecutableProcess("process").camundaVersionTag("2").done();
+
+    // set custom deployment handler
+    processEngineConfiguration.setDeploymentHandlerFactory(customDeploymentHandlerFactory);
+
+    // initial deployment is created
+    testRule.deploy(
+        repositoryService
+            .createDeployment(processApplication.getReference())
+            .name("deployment")
+            .addModelInstance("version1.bpmn20.xml", oldProcess));
+
+    // when
+    // update with changes is deployed
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .resumePreviousVersions()
+        .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+        .addModelInstance("version2.bpmn20.xml", newProcess));
+
+    // then
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
+    // now there are 2 process definitions deployed
+    assertEquals(1, processDefinitions.get(0).getVersion());
+    assertEquals(2, processDefinitions.get(1).getVersion());
+
+    // old deployment was resumed
+    ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
+    Set<String> paDeploymentIds = registration.getDeploymentIds();
+    assertEquals(1, paDeploymentIds.size());
+    assertTrue(paDeploymentIds.contains(deployment2.getId()));
+    assertEquals(processEngine.getName(), registration.getProcessEngineName());
+  }
+
+  @Test
   public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameDeployDifferentProcesses(){
     BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2").done();
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn", process1)
-      .deploy();
+    testRule.deploy(repositoryService
+            .createDeployment(processApplication.getReference())
+            .name("deployment")
+            .addModelInstance("process1.bpmn", process1));
 
     assertThatOneProcessIsDeployed();
 
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .resumePreviousVersions()
-      .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
-      .addModelInstance("process2.bpmn", process2)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .resumePreviousVersions()
+        .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+        .addModelInstance("process2.bpmn", process2));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // now there are 2 process definitions deployed but both with version 1
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(1, processDefinitions.get(1).getVersion());
@@ -422,27 +680,29 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment, deployment2);
   }
 
+  @Test
   public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameNoResume(){
     BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").done();
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn", process1)
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addModelInstance("process1.bpmn", process1));
 
     assertThatOneProcessIsDeployed();
 
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("anotherDeployment")
-      .resumePreviousVersions()
-      .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
-      .addModelInstance("process2.bpmn", process1)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("anotherDeployment")
+        .resumePreviousVersions()
+        .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+        .addModelInstance("process2.bpmn", process1));
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion()
+        .asc()
+        .list();
     // there is a new version of the process
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(2, processDefinitions.get(1).getVersion());
@@ -453,127 +713,133 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     assertEquals(1, deploymentIds.size());
     assertEquals(deployment2.getId(), deploymentIds.iterator().next());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-
-    deleteDeployments(deployment, deployment2);
   }
 
+  @Test
   public void testPartialChangesResumePreviousVersionByDeploymentName() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
 
     // create initial deployment
-    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .deploy();
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addModelInstance("process1.bpmn20.xml", model1));
 
-    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .enableDuplicateFiltering(true)
-      .resumePreviousVersions()
-      .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
-      .addModelInstance("process1.bpmn20.xml", model1)
-      .addModelInstance("process2.bpmn20.xml", model2)
-      .deploy();
+    ProcessApplicationDeployment deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(true)
+        .resumePreviousVersions()
+        .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+        .addModelInstance("process1.bpmn20.xml", model1)
+        .addModelInstance("process2.bpmn20.xml", model2));
 
     ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
     assertEquals(2, registration.getDeploymentIds().size());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testDeploymentSourceShouldBeNull() {
+    // given
     String key = "process";
-
     BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
-
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-
-    Deployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment()
         .name("first-deployment-without-a-source")
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertNull(deploymentQuery.deploymentName("first-deployment-without-a-source").singleResult().getSource());
+    assertNull(deploymentQuery.deploymentName("first-deployment-without-a-source")
+                   .singleResult()
+                   .getSource());
 
-    Deployment deployment2 = repositoryService
+    // when
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("second-deployment-with-a-source")
         .source(null)
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertNull(deploymentQuery.deploymentName("second-deployment-with-a-source").singleResult().getSource());
-
-    deleteDeployments(deployment1, deployment2);
+    // then
+    assertNull(deploymentQuery.deploymentName("second-deployment-with-a-source")
+                   .singleResult()
+                   .getSource());
   }
 
+  @Test
   public void testDeploymentSourceShouldNotBeNull() {
+    // given
     String key = "process";
-
     BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
-
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-
-    Deployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment()
         .name("first-deployment-without-a-source")
         .source("my-first-deployment-source")
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertEquals("my-first-deployment-source", deploymentQuery.deploymentName("first-deployment-without-a-source").singleResult().getSource());
+    assertEquals("my-first-deployment-source",
+                 deploymentQuery.deploymentName("first-deployment-without-a-source")
+                     .singleResult()
+                     .getSource());
 
-    Deployment deployment2 = repositoryService
+    // when
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("second-deployment-with-a-source")
         .source("my-second-deployment-source")
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertEquals("my-second-deployment-source", deploymentQuery.deploymentName("second-deployment-with-a-source").singleResult().getSource());
-
-    deleteDeployments(deployment1, deployment2);
+    // then
+    assertEquals("my-second-deployment-source",
+                 deploymentQuery.deploymentName("second-deployment-with-a-source")
+                     .singleResult()
+                     .getSource());
   }
 
+  @Test
   public void testDefaultDeploymentSource() {
+    // given
     String key = "process";
-
     BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
-
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
-    Deployment deployment = repositoryService
+    // when
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("first-deployment-with-a-source")
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deploymentQuery.deploymentName("first-deployment-with-a-source").singleResult().getSource());
-
-    deleteDeployments(deployment);
+    // then
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE,
+                 deploymentQuery.deploymentName("first-deployment-with-a-source")
+                     .singleResult()
+                     .getSource());
   }
 
+  @Test
   public void testOverwriteDeploymentSource() {
+    // given
     String key = "process";
-
     BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
-
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
-    Deployment deployment = repositoryService
+    // when
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("first-deployment-with-a-source")
         .source("my-source")
-        .addModelInstance("process.bpmn", model)
-        .deploy();
+        .addModelInstance("process.bpmn", model));
 
-    assertEquals("my-source", deploymentQuery.deploymentName("first-deployment-with-a-source").singleResult().getSource());
-
-    deleteDeployments(deployment);
+    // then
+    assertEquals("my-source",
+                 deploymentQuery.deploymentName("first-deployment-with-a-source")
+                     .singleResult()
+                     .getSource());
   }
 
+  @Test
   public void testNullDeploymentSourceAwareDuplicateFilter() {
     // given
     String key = "process";
@@ -591,33 +857,30 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testNullAndProcessApplicationDeploymentSourceAwareDuplicateFilter() {
     // given
 
@@ -636,32 +899,29 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testProcessApplicationAndNullDeploymentSourceAwareDuplicateFilter() {
     // given
 
@@ -680,32 +940,29 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testProcessApplicationDeploymentSourceAwareDuplicateFilter() {
     // given
 
@@ -724,31 +981,28 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testSameDeploymentSourceAwareDuplicateFilter() {
     // given
 
@@ -767,33 +1021,30 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source("cockpit")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name("my-deployment")
         .source("cockpit")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testDifferentDeploymentSourceShouldDeployNewVersion() {
     // given
 
@@ -812,33 +1063,30 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source("my-source1")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source("my-source2")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(2, processDefinitionQuery.count());
     assertEquals(2, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testNullAndNotNullDeploymentSourceShouldDeployNewVersion() {
     // given
 
@@ -857,33 +1105,30 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source("my-source2")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(2, processDefinitionQuery.count());
     assertEquals(2, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testNotNullAndNullDeploymentSourceShouldDeployNewVersion() {
     // given
 
@@ -902,67 +1147,106 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     // when
 
-    ProcessApplicationDeployment deployment1 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source("my-source1")
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     assertEquals(1, processDefinitionQuery.count());
     assertEquals(1, deploymentQuery.count());
 
-    ProcessApplicationDeployment deployment2 = repositoryService
+    testRule.deploy(repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
         .source(null)
         .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+        .enableDuplicateFiltering(true));
 
     // then
 
     assertEquals(2, processDefinitionQuery.count());
     assertEquals(2, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
   }
 
+  @Test
   public void testUnregisterProcessApplicationOnDeploymentDeletion() {
     // given a deployment with a process application registration
-    Deployment deployment = repositoryService
-      .createDeployment()
-      .addModelInstance("process.bpmn", Bpmn.createExecutableProcess("foo").done())
-      .deploy();
+    Deployment deployment = testRule.deploy(repositoryService
+        .createDeployment()
+        .addModelInstance("process.bpmn",
+                          Bpmn.createExecutableProcess("foo").done()));
 
     // and a process application registration
-    managementService.registerProcessApplication(deployment.getId(), processApplication.getReference());
+    managementService.registerProcessApplication(deployment.getId(),
+                                                 processApplication.getReference());
 
     // when deleting the deploymen
     repositoryService.deleteDeployment(deployment.getId(), true);
 
     // then the registration is removed
     assertNull(managementService.getProcessApplicationForDeployment(deployment.getId()));
-
-
-
   }
 
-  /**
-   * Deletes the deployments cascading.
+  @Test
+  public void shouldRegisterExistingDeploymentsOnLatestProcessDefinitionRemoval() {
+    // given
+    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process").done();
+    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process").startEvent().done();
+
+    DeploymentWithDefinitions deployment1 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("foo")
+        .addModelInstance("process.bpmn", process1));
+
+    DeploymentWithDefinitions deployment2 = testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("foo")
+        .addModelInstance("process.bpmn", process2)
+        .resumePreviousVersions()
+        .enableDuplicateFiltering(true));
+
+    ProcessDefinition latestProcessDefinition = deployment2.getDeployedProcessDefinitions().get(0);
+
+    // assume
+    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment1.getId()));
+    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment2.getId()));
+
+    // delete latest process definition
+    repositoryService.deleteProcessDefinition(latestProcessDefinition.getId());
+
+    // stop process engine by clearing the caches
+    clearProcessApplicationDeployments();
+
+    // when
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .addModelInstance("process.bpmn", process2)
+        .resumePreviousVersions()
+        .enableDuplicateFiltering(true)
+        .name("foo"));
+
+    // then
+    assertNotNull(managementService.getProcessApplicationForDeployment(deployment1.getId()));
+    assertNotNull(managementService.getProcessApplicationForDeployment(deployment2.getId()));
+  }
+
+  /*
+   * Clears the deployment caches to simulate a stop of the process engine.
    */
-  private void deleteDeployments(Deployment... deployments){
-    for (Deployment deployment : deployments) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
+  protected void clearProcessApplicationDeployments() {
+    processApplicationManager.clearRegistrations();
+    registeredDeployments.clear();
+    deploymentCache.discardProcessDefinitionCache();
   }
 
   /**
    * Creates a process definition query and checks that only one process with version 1 is present.
    */
-  private void assertThatOneProcessIsDeployed() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+  protected void assertThatOneProcessIsDeployed() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     assertThat(processDefinition, is(notNullValue()));
     assertEquals(1, processDefinition.getVersion());
   }

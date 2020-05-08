@@ -238,7 +238,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       query.includeIncidentsForType(includeIncidentsForType);
     }
 
-    List<ActivityStatistics> queryResults = query.list();
+    List<ActivityStatistics> queryResults = query.unlimitedList();
 
     List<StatisticsResultDto> results = new ArrayList<>();
     for (ActivityStatistics queryResult : queryResults) {

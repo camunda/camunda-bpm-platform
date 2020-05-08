@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<host xmlns="urn:jboss:domain:10.0" name="master">
+<host xmlns="urn:jboss:domain:12.0" name="master">
     <extensions>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.wildfly.extension.core-management"/>
@@ -52,9 +52,6 @@
             </server-logger>
         </audit-log>
         <management-interfaces>
-            <native-interface security-realm="ManagementRealm">
-                <socket interface="management" port="${jboss.management-native.port}"/>
-            </native-interface>
             <http-interface security-realm="ManagementRealm">
                 <http-upgrade enabled="true"/>
                 <socket interface="management" port="${jboss.management-http.port}"/>
@@ -79,7 +76,6 @@
                 <option value="-server"/>
                 <option value="-XX:MetaspaceSize=96m"/>
                 <option value="-XX:MaxMetaspaceSize=256m"/>
-                <option value="--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"/>
             </jvm-options>
         </jvm>
     </jvms>
@@ -96,7 +92,7 @@
     </servers>
     <profile>
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-        <subsystem xmlns="urn:wildfly:elytron:6.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>

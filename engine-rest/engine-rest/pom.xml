@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.12.0-SNAPSHOT</version>
+    <version>7.13.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -18,9 +18,6 @@
     <!-- use inherited version as default -->
     <resteasy.version>${version.resteasy}</resteasy.version>
     <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
-    <!-- http-client uses an old version of slf4j -->
-    <version.slf4j>1.5.6</version.slf4j>
-    <version.logback>0.9.15</version.logback>
     <!-- other JAX-RS implementations -->
     <wink.version>1.1.1-incubating</wink.version>
     <jersey.version>1.17.1</jersey.version>
@@ -37,6 +34,26 @@
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson.version}</version>
+      <!--
+      * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
+      * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
+      -->
+      <exclusions>
+        <exclusion>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.databind.version}</version>
     </dependency>
 
     <!-- provided deps -->
@@ -49,6 +66,12 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
     
@@ -67,6 +90,18 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-jaxrs</artifactId>
       <version>1.6.5</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!--
+      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
+      BOM must be installed before this module is built
+    -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
 
@@ -174,6 +209,12 @@
    </dependency>
 
     <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
       <version>${version.tomcat}</version>
@@ -250,6 +291,19 @@
             <restEasyVersion>${resteasy.version}</restEasyVersion>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-maven-plugin</artifactId>
+        <version>${version.shrinkwrap.resolvers}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>propagate-execution-context</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -403,6 +457,116 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <excludes>
+                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
+                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
+                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
+              </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-resteasy</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>
+                        src/test/resources-resteasy
+                      </directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    
+    <profile>
+      <id>resteasy3</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <version>2.0.1.Final</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy3}</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <artifactId>httpclient</artifactId>
+              <groupId>org.apache.httpcomponents</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+          <version>4.1.42.Final</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-netty4</artifactId>
+          <version>${version.resteasy3}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- This test is only needed for the Resteasy 2 profile; with
+                  Resteasy 3 we can run the regular test -->
+                <exclude>**/ResteasyTaskRestServiceInteractionTest.java</exclude>
+              </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
             <executions>
@@ -462,6 +626,10 @@
 
     <profile>
       <id>wink</id>
+      <properties>
+        <version.slf4j>1.5.11</version.slf4j>
+        <version.logback>0.9.20</version.logback>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -477,7 +645,19 @@
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <version>1.5.11</version>
+          <version>${version.slf4j}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+          <version>${version.slf4j}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>${version.logback}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

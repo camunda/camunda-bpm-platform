@@ -18,9 +18,11 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataContext;
 
 public class ExecuteJobHelper {
 
@@ -46,24 +48,40 @@ public class ExecuteJobHelper {
   }
 
   public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd) {
+    executeJob(nextJobId, commandExecutor, jobFailureCollector, cmd, null);
+  }
+
+  public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd,
+      ProcessEngineConfigurationImpl configuration) {
     try {
-
       commandExecutor.execute(cmd);
-
     } catch (RuntimeException exception) {
       handleJobFailure(nextJobId, jobFailureCollector, exception);
       // throw the original exception to indicate the ExecuteJobCmd failed
       throw exception;
-
     } catch (Throwable exception) {
       handleJobFailure(nextJobId, jobFailureCollector, exception);
       // wrap the exception and throw it to indicate the ExecuteJobCmd failed
       throw LOG.wrapJobExecutionFailure(jobFailureCollector, exception);
-
     } finally {
+      // preserve MDC properties before listener invocation and clear MDC for job listener
+      ProcessDataContext processDataContext = null;
+      if (configuration != null) {
+        processDataContext = new ProcessDataContext(configuration);
+        processDataContext.fetchCurrentContext();
+        processDataContext.clearMdc();
+      }
+      // invoke job listener
       invokeJobListener(commandExecutor, jobFailureCollector);
+      /*
+       * reset MDC properties after successful listener invocation,
+       * in case of an exception in the listener the logging context
+       * of the listener is preserved and used from here on
+       */
+      if (processDataContext != null) {
+        processDataContext.updateMdc();
+      }
     }
-
   }
 
   protected static void invokeJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
@@ -71,7 +89,7 @@ public class ExecuteJobHelper {
       if (jobFailureCollector.getFailure() != null) {
         // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
 
-        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
+        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector);
 
         OptimisticLockingException exception = callFailedJobListenerWithRetries(commandExecutor, failedJobListener);
         if (exception != null) {
@@ -104,13 +122,12 @@ public class ExecuteJobHelper {
   }
 
   protected static void handleJobFailure(final String nextJobId, final JobFailureCollector jobFailureCollector, Throwable exception) {
-    LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, exception);
     jobFailureCollector.setFailure(exception);
   }
 
 
-  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, Throwable exception, String jobId) {
-    return new FailedJobListener(commandExecutor, jobId, exception);
+  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
+    return new FailedJobListener(commandExecutor, jobFailureCollector);
   }
 
   protected static SuccessfulJobListener createSuccessfulJobListener(CommandExecutor commandExecutor) {

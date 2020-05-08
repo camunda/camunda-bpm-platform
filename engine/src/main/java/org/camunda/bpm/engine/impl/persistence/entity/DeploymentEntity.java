@@ -60,7 +60,7 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
 
   public void addResource(ResourceEntity resource) {
     if (resources==null) {
-      resources = new HashMap<String, ResourceEntity>();
+      resources = new HashMap<>();
     }
     resources.put(resource.getName(), resource);
   }
@@ -78,7 +78,7 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
         .getCommandContext()
         .getResourceManager()
         .findResourcesByDeploymentId(id);
-      resources = new HashMap<String, ResourceEntity>();
+      resources = new HashMap<>();
       for (ResourceEntity resource: resourcesList) {
         resources.put(resource.getName(), resource);
       }

@@ -18,13 +18,10 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Date;
 import java.util.List;
-import org.apache.tools.ant.util.DateUtils;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
@@ -41,11 +38,14 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeFinished;
   protected boolean includeCanceled;
   protected boolean includeCompleteScope;
+  protected boolean includeIncidents;
 
   protected Date startedBefore;
   protected Date startedAfter;
   protected Date finishedBefore;
   protected Date finishedAfter;
+
+  protected String[] processInstanceIds;
 
   public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -64,6 +64,11 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public HistoricActivityStatisticsQuery includeCompleteScope() {
     includeCompleteScope = true;
+    return this;
+  }
+
+  public HistoricActivityStatisticsQuery includeIncidents() {
+    includeIncidents = true;
     return this;
   }
 
@@ -88,6 +93,13 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   @Override
   public HistoricActivityStatisticsQuery finishedBefore(Date date) {
     finishedBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityStatisticsQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("processInstanceIds", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
     return this;
   }
 
@@ -132,6 +144,14 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public boolean isIncludeCompleteScope() {
     return includeCompleteScope;
+  }
+
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
+  public boolean isIncludeIncidents() {
+    return includeIncidents;
   }
 
 }

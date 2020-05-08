@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+  <id>assembly</id>
+  
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <dependencySets>
+
+    <dependencySet>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-assembly</include>
+      </includes>
+      <outputDirectory />
+    </dependencySet>
+
+    <dependencySet>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </unpackOptions>
+      <includes>
+        <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
+      </includes>
+      <outputDirectory>configuration/</outputDirectory>
+    </dependencySet>
+
+  </dependencySets>
+
+  <fileSets>
+    <fileSet>
+      <directory>../modules/webapps/target/dependency/</directory>
+      <outputDirectory>internal/webapps/</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
