@@ -19,12 +19,6 @@
               failure was reported previously or if no error message was submitted" />
 
   <@lib.property
-      name = "errorDetails"
-      type = "string"
-      desc = "The error details submitted with the latest reported failure executing this task. `null` if no failure
-              was reported previously or if no error details was submitted" />
-
-  <@lib.property
       name = "executionId"
       type = "string"
       desc = "The id of the execution that the external task belongs to." />
