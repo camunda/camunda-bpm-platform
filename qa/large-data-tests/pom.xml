@@ -105,6 +105,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>${skipTests}</skipTests>
+              <argLine>-Xmx2048m</argLine>
             </configuration>
           </plugin>
         </plugins>

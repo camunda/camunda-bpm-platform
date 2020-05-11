@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -87,8 +88,10 @@ public class EngineDataGenerator {
     generateUserTaskData();
     generateCompletedProcessInstanceData();
     generateDecisionInstanceData();
+    generateOpLogData();
     logger.info("Generation of engine data has been completed.");
   }
+
 
   private void generateDecisionInstanceData() {
     logger.info("Generating decision instance data...");
@@ -122,7 +125,7 @@ public class EngineDataGenerator {
   }
 
   private void generateUserTaskData() {
-    // the user task data includes data for tasks, identity link log, operations log
+    // the user task data includes data for tasks, identity link log
     logger.info("Generating user task data....");
     final List<Integer> sequenceNumberList = createSequenceNumberList();
     generateInBatches(
@@ -134,6 +137,14 @@ public class EngineDataGenerator {
     setCandidateUserAndGroupForAllUserTask();
     completeAllUserTasks();
     logger.info("User task data successfully generated.");
+  }
+  
+  private void generateOpLogData() {
+
+    for (int i = 0; i < numberOfInstancesToGenerate; i++) {
+      repositoryService.suspendProcessDefinitionByKey(USER_TASK_PROCESS_KEY);
+      repositoryService.activateProcessDefinitionByKey(USER_TASK_PROCESS_KEY);
+    }
   }
 
   private void deployDefinitions() {
