@@ -45,7 +45,7 @@ import java.time.ZonedDateTime;
  */
 public class DateDataTypeTransformer implements DmnDataTypeTransformer {
 
-  protected SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  protected String formatPattern = "yyyy-MM-dd'T'HH:mm:ss";
 
   @Override
   public TypedValue transform(Object value) throws IllegalArgumentException {
@@ -94,7 +94,7 @@ public class DateDataTypeTransformer implements DmnDataTypeTransformer {
 
   protected Date transformString(String value) {
     try {
-      return format.parse(value);
+      return new SimpleDateFormat(formatPattern).parse(value);
     } catch (ParseException e) {
       throw new IllegalArgumentException(e);
     }
