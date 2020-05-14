@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="invoiceBusinessDecisions" name="Invoice Business Decisions" namespace="http://camunda.org/schema/1.0/dmn">
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="invoiceBusinessDecisions" name="Invoice Business Decisions" namespace="http://camunda.org/schema/1.0/dmn">
   <decision id="invoiceClassification" name="Invoice Classification">
-    <extensionElements>
-      <biodi:bounds x="393" y="325" width="100" height="55" />
-    </extensionElements>
     <decisionTable id="decisionTable">
       <input id="clause1" label="Invoice Amount" camunda:inputVariable="">
         <inputExpression id="inputExpression1" typeRef="double">
@@ -81,18 +78,7 @@
     </decisionTable>
   </decision>
   <decision id="invoice-assign-approver" name="Assign Approver Group">
-    <extensionElements>
-      <biodi:bounds x="464" y="194" width="100" height="55" />
-      <biodi:edge source="invoice-assign-approver">
-        <biodi:waypoints x="460" y="325" />
-        <biodi:waypoints x="506" y="249" />
-      </biodi:edge>
-      <biodi:edge source="invoiceClassification">
-        <biodi:waypoints x="458" y="325" />
-        <biodi:waypoints x="498" y="249" />
-      </biodi:edge>
-    </extensionElements>
-    <informationRequirement>
+    <informationRequirement id="InformationRequirement_1kkeocv">
       <requiredDecision href="#invoiceClassification" />
     </informationRequirement>
     <decisionTable id="DecisionTable_16o85h8" hitPolicy="COLLECT">
@@ -135,4 +121,18 @@
       </rule>
     </decisionTable>
   </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_1cuuevk">
+      <dmndi:DMNShape id="DMNShape_1abvt5s" dmnElementRef="invoiceClassification">
+        <dc:Bounds height="55" width="100" x="393" y="325" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_1ay7af5" dmnElementRef="invoice-assign-approver">
+        <dc:Bounds height="55" width="100" x="464" y="194" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1wn1950" dmnElementRef="InformationRequirement_1kkeocv">
+        <di:waypoint x="458" y="325" />
+        <di:waypoint x="498" y="249" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
 </definitions>
