@@ -145,7 +145,7 @@ public class DeploymentResourcesResourceImpl implements DeploymentResourcesResou
 
       return Response
           .ok(resourceAsStream, mediaType)
-          .header("Content-Disposition", "attachment; filename=" + filename)
+          .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
           .build();
     }
     else {
