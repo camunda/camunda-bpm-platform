@@ -123,7 +123,7 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       return Response.noContent().build();
     } else {
       String fileName = definition.getDiagramResourceName();
-      return Response.ok(decisionDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
+      return Response.ok(decisionDiagram).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
   }

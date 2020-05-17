@@ -144,7 +144,7 @@ import java.util.List;
         String csv = getReportResultAsCsv(uriInfo);
         return Response
             .ok(csv, mediaType)
-            .header("Content-Disposition", "attachment; filename=process-instance-report.csv")
+            .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
             .build();
       }
     }

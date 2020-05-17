@@ -276,7 +276,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } else {
       String fileName = definition.getDiagramResourceName();
       return Response.ok(processDiagram)
-          .header("Content-Disposition", "attachment; filename=" + fileName)
+          .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
           .type(getMediaTypeForFileSuffix(fileName)).build();
     }
   }

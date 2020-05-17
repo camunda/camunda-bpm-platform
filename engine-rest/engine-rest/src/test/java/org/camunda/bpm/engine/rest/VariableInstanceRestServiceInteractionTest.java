@@ -313,7 +313,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
     Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
     .and()
-      .header("Content-Disposition", "attachment; filename="+filename)
+      .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
     .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);

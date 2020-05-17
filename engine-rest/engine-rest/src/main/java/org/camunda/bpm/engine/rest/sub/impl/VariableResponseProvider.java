@@ -51,7 +51,7 @@ public class VariableResponseProvider {
       type += "; charset=" + fileValue.getEncoding();
     }
     Object value = fileValue.getValue() == null ? "" : fileValue.getValue();
-    return Response.ok(value, type).header("Content-Disposition", "attachment; filename=" + fileValue.getFilename()).build();
+    return Response.ok(value, type).header("Content-Disposition", "attachment; filename=\"" + fileValue.getFilename() + "\"").build();
   }
 
   /**
