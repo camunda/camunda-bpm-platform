@@ -593,7 +593,6 @@
             <configuration>
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
-              <forkCount>0</forkCount>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <excludes combine.children="append">
                 <exclude>**/CustomExpressionManagerTest.java</exclude>
