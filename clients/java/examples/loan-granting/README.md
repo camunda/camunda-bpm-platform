@@ -11,8 +11,8 @@ In a nutshell you will be guided through the following steps:
 ## Prerequisites
 * [Java JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * [Apache Maven](https://maven.apache.org/download.cgi)
-* [Camunda Modeler >= 1.12.0](https://camunda.org/release/camunda-modeler/1.12.0/)
-* [Camunda BPM Platform](https://camunda.org/release/camunda-bpm/tomcat/7.10/camunda-bpm-tomcat-7.10.0.zip)
+* [Camunda Modeler >= 1.12.0](https://downloads.camunda.cloud/release/camunda-modeler/4.0.0/)
+* [Camunda BPM Platform](https://downloads.camunda.cloud/release/camunda-bpm/tomcat/7.13/)
 * Camunda External Task Client
 
 First, make sure that you have downloaded and installed all the necessary prerequisites. Please check the [compatibility matrix](https://docs.camunda.org/manual/user-guide/ext-client/compatibility-matrix/) if you use older client version.
@@ -100,7 +100,6 @@ client.subscribe("creditScoreChecker")
     System.out.println("The External Task " + externalTask.getId() + " has been completed!");
 
   }).open();
-
 ```
 
 Now, just run your application. The client starts to continuously fetch and lock for External Task instances.
