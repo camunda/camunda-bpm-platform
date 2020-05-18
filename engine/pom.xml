@@ -585,7 +585,7 @@
     </profile>
 
     <profile>
-      <id>db2</id>
+      <id>oracle</id>
       <build>
         <plugins>
           <plugin>
