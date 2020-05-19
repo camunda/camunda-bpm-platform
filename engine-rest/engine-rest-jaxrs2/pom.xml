@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <name>camunda BPM - engine - REST JAX RS 2.0</name>
   <artifactId>camunda-engine-rest-jaxrs2</artifactId>
-  <version>7.13.0</version>
+  <version>7.14.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.13.0</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core</artifactId>
-      <version>7.13.0</version>
+      <version>7.14.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 
