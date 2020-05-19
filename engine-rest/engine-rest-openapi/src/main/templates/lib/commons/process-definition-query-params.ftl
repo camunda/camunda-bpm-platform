@@ -5,9 +5,8 @@
 
   <@lib.parameter name = "processDefinitionIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
-      desc = "Filter by process definition ids."/>
+      type = "string"
+      desc = "Filter by a comma-separated list of process definition ids."/>
 
   <@lib.parameter name = "name"
       location = "query"
@@ -51,9 +50,8 @@
 
   <@lib.parameter name = "keysIn"
       location = "query"
-      type = "array"
-      itemType = "string"
-      desc = "Filter by process definition keys."/>
+      type = "string"
+      desc = "Filter by a comma-separated list of process definition keys."/>
 
   <@lib.parameter name = "keyLike"
       location = "query"
@@ -133,8 +131,7 @@
 
   <@lib.parameter name = "tenantIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
+      type = "string"
       desc = "Filter by a comma-separated list of tenant ids.
               A process definition must have one of the given tenant ids."/>
 

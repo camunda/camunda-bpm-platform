@@ -34,8 +34,7 @@
 <@lib.parameter
     name = "tenantIdIn"
     location = "query"
-    type = "array"
-    itemType = "string"
+    type = "string"
     desc = "Filter by a comma-separated list of tenant ids. A deployment must have one of the given tenant ids."/>
 
 <@lib.parameter

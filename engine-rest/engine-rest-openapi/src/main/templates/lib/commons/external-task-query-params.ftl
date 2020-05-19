@@ -7,8 +7,7 @@
   <@lib.parameter
       name = "externalTaskIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
+      type = "string"
       desc = "Filter by the comma-separated list of external task ids." />
 
   <@lib.parameter
@@ -78,8 +77,7 @@
   <@lib.parameter
       name = "activityIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
+      type = "string"
       desc = "Filter by the comma-separated list of ids of the activities that an external task is created for." />
 
   <@lib.parameter
@@ -97,8 +95,7 @@
   <@lib.parameter
       name = "processInstanceIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
+      type = "string"
       desc = "Filter by a comma-separated list of process instance ids that an external task may belong to." />
 
   <@lib.parameter
@@ -110,8 +107,7 @@
   <@lib.parameter
       name = "tenantIdIn"
       location = "query"
-      type = "array"
-      itemType = "string"
+      type = "string"
       desc = "Filter by a comma-separated list of tenant ids.
               An external task must have one of the given tenant ids." />
 
