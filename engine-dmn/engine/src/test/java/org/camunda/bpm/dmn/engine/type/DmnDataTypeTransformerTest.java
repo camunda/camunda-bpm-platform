@@ -239,7 +239,10 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
 
     Date date = toDate("2015-09-18T12:00:00");
     TypedValue dateValue = Variables.dateValue(date);
-    ZonedDateTime zonedDateTime = ZonedDateTime.of(2015, 9, 18, 12, 0, 0, 0, ZoneId.of("Europe/Berlin"));
+
+    String systemTimeZone = ZoneId.systemDefault().getId();
+    String zonedDateTimeStr = "2015-09-18T12:00:00+02:00[" + systemTimeZone + "]";
+    ZonedDateTime zonedDateTime = ZonedDateTime.parse(zonedDateTimeStr);
 
     // when
     TypedValue transformedFromZonedDateTime = typeTransformer.transform(zonedDateTime);
