@@ -26,7 +26,7 @@
 
   <properties>
     <!-- please, during a release, update the camunda.version tag in the client pom as well -->
-    <camunda.version>7.13.0-SNAPSHOT</camunda.version>
+    <camunda.version>7.13.0</camunda.version>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
