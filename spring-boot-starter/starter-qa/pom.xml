@@ -14,18 +14,38 @@
   <artifactId>camunda-bpm-spring-boot-starter-qa</artifactId>
   <name>camunda BPM - Spring Boot Starter - QA - Root Pom</name>
 
-  <modules>
-    <module>integration-test-simple</module>
-    <module>integration-test-webapp</module>
-    <module>integration-test-plugins</module>
-  </modules>
-
   <profiles>  
     <profile>
       <id>distro</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <modules>
+        <module>integration-test-simple</module>
+        <module>integration-test-plugins</module>
+      </modules>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <skipTests>true</skipTests>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>integration-test-webapp</module>
+      </modules>
       <build>
         <pluginManagement>
           <plugins>

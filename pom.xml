@@ -60,6 +60,9 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
+          any modules that have a dependency to the webapps. See also the referenced POMs, 
+          they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
         <module>qa</module>
@@ -102,6 +105,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO); 
+          It should activate any module that has a dependency to the webapps -->
+        <module>spring-boot-starter</module>
+        
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
