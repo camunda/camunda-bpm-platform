@@ -19,14 +19,6 @@
 
   <packaging>pom</packaging>
 
-  <modules>
-    <module>starter</module>
-    <module>starter-rest</module>
-    <module>starter-webapp-core</module>
-    <module>starter-webapp</module>
-    <module>starter-test</module>
-  </modules>
-
   <properties>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -88,6 +80,20 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>starter</module>
+        <module>starter-rest</module>
+        <module>starter-test</module>
+        <module>starter-qa</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>starter-webapp-core</module>
+        <module>starter-webapp</module>
         <module>starter-qa</module>
       </modules>
     </profile>
