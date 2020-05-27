@@ -355,7 +355,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
       .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType("application/octet-stream")
-      .header("Content-Disposition", "attachment; filename=" + null)
+      .header("Content-Disposition", "attachment; filename=\"" + null + "\"")
       .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
 
     // verify service interaction
