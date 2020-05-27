@@ -315,7 +315,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()
-        .header("Content-Disposition", "attachment; filename="+filename)
+        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
     //due to some problems with wildfly we gotta check this separately
     String contentType = response.getContentType();

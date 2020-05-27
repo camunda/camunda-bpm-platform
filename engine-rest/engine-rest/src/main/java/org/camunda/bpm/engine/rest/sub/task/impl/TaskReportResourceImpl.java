@@ -56,7 +56,7 @@ public class TaskReportResourceImpl implements TaskReportResource {
         String csv = getReportResultAsCsv();
         return Response
           .ok(csv, mediaType)
-          .header("Content-Disposition", "attachment; filename=task-count-by-candidate-group.csv")
+          .header("Content-Disposition", "attachment; filename=\"task-count-by-candidate-group.csv\"")
           .build();
       }
     }
