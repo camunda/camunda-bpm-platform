@@ -591,7 +591,6 @@
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <excludes combine.children="append">
