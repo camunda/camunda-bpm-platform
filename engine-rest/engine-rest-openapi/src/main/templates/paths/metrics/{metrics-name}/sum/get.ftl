@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "getMetrics"
       tag = "Metrics"
+      summary = "Get Sum"
       desc = "Retrieves the `sum` (count) for a given metric." />
 
   "parameters" : [

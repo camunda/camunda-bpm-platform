@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "throwSignal"
       tag = "Signal"
+      summary = "Event"
       desc = "A signal is an event of global scope (broadcast semantics) and is delivered to all
               active handlers. Internally this maps to the engine's signal event received builder
               method `RuntimeService#createSignalEvent()`. For more information about the signal
