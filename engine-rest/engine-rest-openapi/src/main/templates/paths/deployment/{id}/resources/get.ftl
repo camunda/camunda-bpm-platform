@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeploymentResources"
       tag = "Deployment"
+      summary = "Get Resources"
       desc = "Retrieves all deployment resources of a given deployment." />
 
   "parameters" : [

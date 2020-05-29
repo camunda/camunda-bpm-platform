@@ -2,10 +2,11 @@
   <@lib.endpointInfo
       id = "evaluateCondition"
       tag = "Condition"
+      summary = "Evaluate"
       desc = "Triggers evaluation of conditions for conditional start event(s). 
-      Internally this maps to the engines condition evaluation builder method ConditionEvaluationBuilder#evaluateStartConditions(). 
-      For more information see the [Conditional Start Events](${docsUrl}/reference/bpmn20/events/conditional-events/#conditional-start-event)
-      section of the [BPMN 2.0 Implementation Reference](${docsUrl}/reference/bpmn20/)." />
+              Internally this maps to the engines condition evaluation builder method ConditionEvaluationBuilder#evaluateStartConditions(). 
+              For more information see the [Conditional Start Events](${docsUrl}/reference/bpmn20/events/conditional-events/#conditional-start-event)
+              section of the [BPMN 2.0 Implementation Reference](${docsUrl}/reference/bpmn20/)." />
 
   <@lib.requestBody
       mediaType = "application/json"

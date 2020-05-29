@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "createDeployment"
       tag = "Deployment"
+      summary = "Create"
       desc = "Creates a deployment.
 
               **Security Consideration**
