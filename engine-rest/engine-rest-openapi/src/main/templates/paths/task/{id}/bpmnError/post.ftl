@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "handleBpmnError"
       tag = "Task"
+      summary = "Handle BPMN Error"
       desc = "Reports a business error in the context of a running task by id. The error code must
               be specified to identify the BPMN error handler. See the documentation for
               [Reporting Bpmn Error](${docsUrl}/reference/bpmn20/tasks/user-task/#reporting-bpmn-error)

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeployedForm"
       tag = "Task"
+      summary = "Get Deployed Form"
       desc = "Retrieves the deployed form that is referenced from a given task. For further
             information please refer to the
             [User Guide](${docsUrl}/user-guide/task-forms/#embedded-task-forms)." />

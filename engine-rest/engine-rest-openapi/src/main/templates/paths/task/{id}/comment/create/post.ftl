@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "createComment"
       tag = "Task Comment"
+      summary = "Create"
       desc = "Creates a comment for a task by id." />
 
   "parameters" : [

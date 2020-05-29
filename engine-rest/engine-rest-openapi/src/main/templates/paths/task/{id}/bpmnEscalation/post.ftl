@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "handleEscalation"
       tag = "Task"
+      summary = "Handle BPMN Escalation"
       desc = "Reports an escalation in the context of a running task by id. The escalation code must
               be specified to identify the escalation handler. See the documentation for
               [Reporting Bpmn Escalation](${docsUrl}/reference/bpmn20/tasks/user-task/#reporting-bpmn-escalation)

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "deleteTask"
       tag = "Task"
+      summary = "Delete"
       desc = "Removes a task by id." />
 
   "parameters" : [
