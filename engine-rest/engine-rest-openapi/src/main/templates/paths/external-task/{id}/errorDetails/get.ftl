@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getExternalTaskErrorDetails"
       tag = "External Task"
+      summary = "Get Error Details"
       desc = "Retrieves the error details in the context of a running external task by id." />
 
   "parameters" : [

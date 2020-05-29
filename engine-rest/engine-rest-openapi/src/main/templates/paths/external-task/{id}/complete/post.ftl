@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "completeExternalTaskResource"
       tag = "External Task"
+      summary = "Complete"
       desc = "Completes an external task by id and updates process variables." />
 
   "parameters" : [

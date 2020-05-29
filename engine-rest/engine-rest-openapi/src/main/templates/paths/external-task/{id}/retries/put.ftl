@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "setExternalTaskResourceRetries"
       tag = "External Task"
+      summary = "Set Retries"
       desc = "Sets the number of retries left to execute an external task by id. If retries are set to 0, an 
               incident is created." />
 
