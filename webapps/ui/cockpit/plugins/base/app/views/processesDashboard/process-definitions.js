@@ -199,8 +199,10 @@ module.exports = [
             : countProcessDefinitions();
 
           $scope.toggleSection = function toggleSection() {
+            $scope.activeSection = !$scope.activeSection;
+
             // if tab is not active, it's enough to only get the count of process definitions
-            $scope.activeSection === !$scope.activeSection
+            $scope.activeSection
               ? listProcessDefinitions()
               : countProcessDefinitions();
             localConf.set('processesDashboardActive', $scope.activeSection);
