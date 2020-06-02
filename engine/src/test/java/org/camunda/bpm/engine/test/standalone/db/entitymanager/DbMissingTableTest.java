@@ -77,9 +77,15 @@ public class DbMissingTableTest {
   @Test
   public void shouldReportMissingDbTableInLogs() {
     // given
+    exceptionRule.expect(ProcessEngineException.class);
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("timerProcess")
         .startEvent()
-        .timerWithCycle("R5/PT5M")
+        .userTask("user_task")
+          .boundaryEvent("timer")
+            .cancelActivity(false)
+            .timerWithCycle("R5/PT5M")
+          .endEvent()
+          .moveToActivity("user_task")
         .endEvent()
         .done();
     try {
@@ -90,16 +96,13 @@ public class DbMissingTableTest {
     } catch (SQLException throwables) {
       throwables.printStackTrace();
     }
-
-    // then
-    exceptionRule.expect(ProcessEngineException.class);
-//    exceptionRule.expectMessage(("repeat_offset_"));
-
-    // when
     testRule.deploy(modelInstance);
 
+    // when
+    runtimeService.startProcessInstanceByKey("timerProcess");
+
     // then
-    assertThat(loggingRule.getFilteredLog("ENGINE-03004").get(0).getMessage())
+    assertThat(loggingRule.getFilteredLog("ENGINE-03083").get(0).getMessage())
         .containsIgnoringCase("REPEAT_OFFSET_");
   }
 
