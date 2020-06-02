@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 public class TestFixture {
 
-  public static final String ENGINE_VERSION = "7.13.0";
+  public static final String ENGINE_VERSION = "7.14.0";
 
   public TestFixture(ProcessEngine processEngine) {
   }
