@@ -98,6 +98,16 @@
       </modules>
     </profile>
     <profile>
+      <id>distro-starter</id>
+      <!-- This profile is run in the release CI for building the enterprise artifacts
+          It can be removed if the webapp repo is merged to the platform and
+          distro-ce is not used for building the spring boot starter -->
+      <modules>
+        <module>starter-webapp-core</module>
+        <module>starter-webapp</module>
+      </modules>
+    </profile>
+    <profile>
       <id>integration-test-spring-boot-starter</id>
       <modules>
         <module>starter-qa</module>
