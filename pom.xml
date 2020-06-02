@@ -200,11 +200,8 @@
       <!-- This profile is run in the release CI for building the enterprise artifacts
           It can be removed if the webapp repo is merged to the platform and
           distro-ce is not used for building the spring boot starter -->
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <modules>
-        <module>distro/spring-boot-starter</module>
+        <module>spring-boot-starter</module>
       </modules>
     </profile>
 
