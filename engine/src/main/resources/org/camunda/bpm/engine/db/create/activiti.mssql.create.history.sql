@@ -53,7 +53,7 @@ create table ACT_HI_ACTINST (
     CALL_CASE_INST_ID_ nvarchar(64),
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
-    ASSIGNEE_ nvarchar(64),
+    ASSIGNEE_ nvarchar(255),
     START_TIME_ datetime2 not null,
     END_TIME_ datetime2,
     DURATION_ numeric(19,0),
