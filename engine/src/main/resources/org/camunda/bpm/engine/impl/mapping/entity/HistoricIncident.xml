@@ -293,6 +293,11 @@
     from ${prefix}ACT_HI_INCIDENT RES
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <!--
+        HEADS-UP!!!
+        If you change something here, you should probably also change it the EE Webapp
+        See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicIncident.xml
+      -->
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
       AUTH ON (AUTH.RESOURCE_ID_ in (
       <if test="authCheck.isHistoricInstancePermissionsEnabled">
@@ -384,6 +389,11 @@
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        <!--
+          HEADS-UP!!!
+          If you change something here, you should probably also change it the EE Webapp
+          See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicIncident.xml
+        -->
         <!-- incident exists in context of a process definition -->
         and (
           (RES.PROC_DEF_ID_ is not null
