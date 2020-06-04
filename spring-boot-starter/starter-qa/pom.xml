@@ -68,6 +68,7 @@
       <modules>
         <module>integration-test-simple</module>
         <module>integration-test-plugins</module>
+        <module>integration-test-webapp</module>
       </modules>
     </profile>
   </profiles>
