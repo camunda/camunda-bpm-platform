@@ -36,7 +36,7 @@ public class ContainerBasedAuthFilterRegistration {
         filterRegistration.setFilter(new ContainerBasedAuthenticationFilter());
         filterRegistration.setInitParameters(Collections.singletonMap("authentication-provider",
             "org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider"));
-        filterRegistration.addUrlPatterns(ChangedAppPathContainerBasedAuthTest.MY_APP_PATH + "/*");
+        filterRegistration.addUrlPatterns(ChangedAppPathContainerBasedAuthIT.MY_APP_PATH + "/*");
         return filterRegistration;
     }
 

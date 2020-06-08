@@ -94,7 +94,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
+        <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <!-- See CAM-11901 -->
           <useManifestOnlyJar>false</useManifestOnlyJar>

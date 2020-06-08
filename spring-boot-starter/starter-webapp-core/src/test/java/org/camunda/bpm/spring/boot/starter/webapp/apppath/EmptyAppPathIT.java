@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.apppath.containerbasedauth;
+package org.camunda.bpm.spring.boot.starter.webapp.apppath;
 
+import org.camunda.bpm.spring.boot.starter.webapp.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -33,25 +35,37 @@ import static org.assertj.core.api.Assertions.assertThat;
     classes = { TestApplication.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-    "camunda.bpm.webapp.applicationPath=" + ChangedAppPathContainerBasedAuthTest.MY_APP_PATH
+    "camunda.bpm.webapp.applicationPath=" + EmptyAppPathIT.MY_APP_PATH
 })
-public class ChangedAppPathContainerBasedAuthTest {
+public class EmptyAppPathIT {
 
-  protected static final String MY_APP_PATH = "/my/application/path";
+  protected static final String MY_APP_PATH = "";
+
+  @Rule
+  public HeaderRule headerRule = new HeaderRule();
+
+  @LocalServerPort
+  public int port;
 
   @Autowired
-  protected TestRestTemplate testRestTemplate;
+  protected TestRestTemplate restClient;
 
   @Test
-  public void shouldCheckContainerBasedAuthFilterAvailable() {
+  public void shouldCheckCsrfCookiePath() {
     // given
 
     // when
-    ResponseEntity<String> response = testRestTemplate.getForEntity(MY_APP_PATH +
-        "/app/welcome/default/", String.class);
+    headerRule.performRequest("http://localhost:" + port + MY_APP_PATH +
+        "/app/tasklist/default");
 
     // then
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    String xsrfCookieValue = headerRule.getXsrfCookieValue();
+    String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
+
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
+
+    assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
   }
 
 }

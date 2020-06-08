@@ -39,9 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     classes = { TestApplication.class },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-    "camunda.bpm.webapp.applicationPath=" + ChangedAppPathTest.MY_APP_PATH
+    "camunda.bpm.webapp.applicationPath=" + ChangedAppPathIT.MY_APP_PATH
 })
-public class ChangedAppPathTest {
+public class ChangedAppPathIT {
 
   protected static final String MY_APP_PATH = "/my/application/path";
 
@@ -66,7 +66,8 @@ public class ChangedAppPathTest {
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + MY_APP_PATH + ";SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
