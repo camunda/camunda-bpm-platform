@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 
 /**
  * Provides basic CSRF protection implementing a Same Origin Standard Header verification (step 1)
@@ -265,12 +267,8 @@ public class CsrfPreventionFilter implements Filter {
 
           String csrfCookieValue = cookieName + "=" + token;
 
-          String contextPath = "/";
-          if (!request.getContextPath().isEmpty()) {
-            contextPath = request.getContextPath();
-          }
-
-          csrfCookieValue += CsrfConstants.CSRF_PATH_FIELD_NAME + contextPath;
+          String cookiePath = getCookiePath(request);
+          csrfCookieValue += CsrfConstants.CSRF_PATH_FIELD_NAME + cookiePath;
 
           session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
 
@@ -281,6 +279,22 @@ public class CsrfPreventionFilter implements Filter {
           response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
         }
       }
+    }
+  }
+
+  protected String getCookiePath(HttpServletRequest request) {
+    ServletContext servletContext = request.getServletContext();
+    String applicationPath = ServletContextUtil.getAppPath(servletContext);
+
+    String contextPath = request.getContextPath();
+    String cookiePath = contextPath + applicationPath;
+
+    if (!cookiePath.isEmpty()) {
+      return cookiePath;
+
+    } else {
+      return "/";
+
     }
   }
 

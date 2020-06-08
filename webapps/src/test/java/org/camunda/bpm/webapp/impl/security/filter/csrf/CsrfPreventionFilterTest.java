@@ -125,7 +125,8 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/camunda;SameSite=Lax");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" +
+      CSRF_PATH_FIELD_NAME + getCookiePath(SERVICE_PATH) + ";SameSite=Lax");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);
@@ -135,7 +136,7 @@ public class CsrfPreventionFilterTest {
   public void testNonModifyingRequestTokenGenerationWithRootContextPath() throws IOException, ServletException {
     // given
     MockHttpSession session = new MockHttpSession();
-    MockHttpServletRequest nonModifyingRequest = new MockHttpServletRequest();
+    MockHttpServletRequest nonModifyingRequest = getMockedRequest();
     nonModifyingRequest.setMethod("GET");
     nonModifyingRequest.setSession(session);
 
@@ -156,7 +157,8 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/;SameSite=Lax");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" +
+      CSRF_PATH_FIELD_NAME + getCookiePath("") + ";SameSite=Lax");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);
@@ -205,7 +207,7 @@ public class CsrfPreventionFilterTest {
 
       // no token in header
       MockHttpServletResponse response2 = new MockHttpServletResponse();
-      MockHttpServletRequest modifyingRequest = new MockHttpServletRequest();
+      MockHttpServletRequest modifyingRequest = getMockedRequest();
       modifyingRequest.setMethod("POST");
       modifyingRequest.setSession(session);
       modifyingRequest.setRequestURI(SERVICE_PATH  + modifyingRequestUrl);
@@ -222,7 +224,7 @@ public class CsrfPreventionFilterTest {
   protected MockHttpServletResponse performNonModifyingRequest(String requestUrl, MockHttpSession session) throws IOException, ServletException {
     MockHttpServletResponse response = new MockHttpServletResponse();
 
-    MockHttpServletRequest nonModifyingRequest = new MockHttpServletRequest();
+    MockHttpServletRequest nonModifyingRequest = getMockedRequest();
     nonModifyingRequest.setMethod("GET");
     nonModifyingRequest.setSession(session);
     nonModifyingRequest.setRequestURI(SERVICE_PATH  + requestUrl);
@@ -238,7 +240,8 @@ public class CsrfPreventionFilterTest {
   protected MockHttpServletResponse performModifyingRequest(String token, MockHttpSession session) throws IOException, ServletException {
     MockHttpServletResponse response = new MockHttpServletResponse();
 
-    MockHttpServletRequest modifyingRequest = new MockHttpServletRequest();
+    MockHttpServletRequest modifyingRequest = getMockedRequest();
+
     modifyingRequest.setMethod("POST");
     modifyingRequest.setSession(session);
     modifyingRequest.setRequestURI(SERVICE_PATH  + modifyingRequestUrl);
@@ -252,4 +255,19 @@ public class CsrfPreventionFilterTest {
 
     return response;
   }
+
+  protected MockHttpServletRequest getMockedRequest() {
+    return new MockHttpServletRequest();
+  }
+
+  protected String getCookiePath(String contextPath) {
+    if (contextPath.isEmpty()) {
+      return "/";
+
+    } else {
+      return contextPath;
+
+    }
+  }
+
 }
