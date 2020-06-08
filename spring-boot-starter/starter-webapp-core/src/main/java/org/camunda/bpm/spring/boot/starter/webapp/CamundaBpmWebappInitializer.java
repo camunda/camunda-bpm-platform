@@ -26,11 +26,11 @@ import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazyProcessEnginesFilter;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazySecurityFilter;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.SpringBootCsrfPreventionFilter;
 import org.camunda.bpm.tasklist.impl.web.TasklistApplication;
 import org.camunda.bpm.tasklist.impl.web.bootstrap.TasklistContainerBootstrap;
 import org.camunda.bpm.webapp.impl.engine.EngineRestApplication;
 import org.camunda.bpm.webapp.impl.security.auth.AuthenticationFilter;
+import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.HttpHeaderSecurityFilter;
 import org.camunda.bpm.webapp.impl.security.filter.util.HttpSessionMutexListener;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
@@ -96,7 +96,7 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
     registerFilter("Security Filter", LazySecurityFilter.class,
         singletonMap("configFile", webapp.getSecurityConfigFile()),
         applicationPath + "/api/*", applicationPath + "/app/*");
-    registerFilter("CsrfPreventionFilter", SpringBootCsrfPreventionFilter.class,
+    registerFilter("CsrfPreventionFilter", CsrfPreventionFilter.class,
         webapp.getCsrf().getInitParams(),
         applicationPath + "/api/*", applicationPath + "/app/*");
 

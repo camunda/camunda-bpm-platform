@@ -21,6 +21,9 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
 public class WebappProperty {
+
+  public static final String DEFAULT_APP_PATH = "/camunda";
+
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".webapp";
 
   private boolean indexRedirectEnabled = true;
@@ -29,7 +32,7 @@ public class WebappProperty {
 
   private String securityConfigFile = "/securityFilterRules.json";
 
-  protected String applicationPath = "/camunda";
+  protected String applicationPath = DEFAULT_APP_PATH;
 
   @NestedConfigurationProperty
   private CsrfProperties csrf = new CsrfProperties();

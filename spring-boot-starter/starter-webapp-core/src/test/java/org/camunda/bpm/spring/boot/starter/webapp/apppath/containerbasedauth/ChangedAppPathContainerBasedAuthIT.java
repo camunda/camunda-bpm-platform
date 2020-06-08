@@ -14,50 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
+package org.camunda.bpm.spring.boot.starter.webapp.apppath.containerbasedauth;
 
-import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = { TestApplication.class },
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-  "camunda.bpm.webapp.csrf.cookieName=myFancyCookieName"
+    "camunda.bpm.webapp.applicationPath=" + ChangedAppPathContainerBasedAuthIT.MY_APP_PATH
 })
-public class CookieNameIT {
+public class ChangedAppPathContainerBasedAuthIT {
 
-  @Rule
-  public HeaderRule headerRule = new HeaderRule();
+  protected static final String MY_APP_PATH = "/my/application/path";
 
-  @LocalServerPort
-  public int port;
+  @Autowired
+  protected TestRestTemplate testRestTemplate;
 
   @Test
-  public void shouldChangeCookieName() {
+  public void shouldCheckContainerBasedAuthFilterAvailable() {
     // given
 
     // when
-    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
-
-    String xsrfCookieValue = headerRule.getCookieValue("myFancyCookieName");
-    String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
+    ResponseEntity<String> response = testRestTemplate.getForEntity(MY_APP_PATH +
+        "/app/welcome/default/", String.class);
 
     // then
-    assertThat(xsrfCookieValue).matches("myFancyCookieName=[A-Z0-9]{32};" +
-        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=Lax");
-    assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
-
-    assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
   }
 
 }

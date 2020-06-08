@@ -111,7 +111,12 @@
     <profile>
       <id>integration-test-spring-boot-starter</id>
       <modules>
+        <!-- All modules that contain *IT.java test classes need to be listed here -->
+
         <module>starter-qa</module>
+        <module>starter</module>
+        <module>starter-rest</module>
+        <module>starter-webapp-core</module>
       </modules>
       <build>
         <plugins>
@@ -126,6 +131,13 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
           </plugin>
         </plugins>
       </build>

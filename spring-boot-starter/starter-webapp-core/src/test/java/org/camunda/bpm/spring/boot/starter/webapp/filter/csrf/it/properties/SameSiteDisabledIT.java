@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
 
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
@@ -50,7 +51,8 @@ public class SameSiteDisabledIT {
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH);
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);

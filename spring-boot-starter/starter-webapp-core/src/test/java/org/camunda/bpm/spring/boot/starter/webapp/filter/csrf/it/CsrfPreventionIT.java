@@ -17,6 +17,7 @@
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
 
 import org.apache.commons.io.IOUtils;
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
@@ -51,7 +52,8 @@ public class CsrfPreventionIT {
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
@@ -64,7 +66,8 @@ public class CsrfPreventionIT {
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
