@@ -117,13 +117,15 @@ module.exports = function(grunt, dirname, licensebookConfig) {
 
     for(var key in packageJson.dependencies) {
       if(excluded.indexOf(key) === -1) {
-        includedFiles.add(__dirname + '/../../../node_modules/' + key + '/index.js');
+        // Non-linked path
+        includedFiles.add(__dirname + '/../../../../' + key + '/index.js');
         b.require(key);
         cacheData[key] = packageJson.dependencies[key];
       }
     }
     for(var i = 0; i < included.length; i++) {
-      includedFiles.add(__dirname + '/../../../node_modules/' + included[i] + '/index.js');
+      // Non-linked path
+      includedFiles.add(__dirname + '/../../../../' + included[i] + '/index.js');
 
       b.require(included[i]);
       cacheData[included[i]] = 'no idea ¯\\_(ツ)_/¯';
