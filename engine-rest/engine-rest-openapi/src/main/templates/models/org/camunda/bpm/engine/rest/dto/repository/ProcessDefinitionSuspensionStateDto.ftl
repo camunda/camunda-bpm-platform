@@ -34,6 +34,6 @@
         desc = "The date on which all process definitions with the given key will be activated or suspended.
                 If `null`, the suspension state of all process definitions with the given key is updated immediately.
                 By [default](${docsUrl}/reference/rest/overview/date-format/),
-                the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200." />
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
 
 </@lib.dto>

@@ -20,7 +20,11 @@
         "default": ${defaultValue},
       </#if>
 
-      "type": "${type}"
+      <#if type == "array">
+        "type": "string"
+      <#else>
+        "type": "${type}"
+      </#if>
 
       <#if format?has_content>,
         "format": "${format}"
@@ -35,6 +39,32 @@
   }
 
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
+</#macro>
+
+<#macro parameters
+        object
+        skip = []
+        last = false>
+  <#local result>
+    <#list object as key, value>
+      <#if !skip?seq_contains(key)>
+        <@lib.parameter
+            name = key
+            location = "query"
+            type = value["type"]
+            format = value["format"]
+            defaultValue = value["defaultValue"]
+            enumValues = value["enumValues"]
+            last = true
+            desc = value["desc"] />,
+      </#if>
+    </#list>
+  </#local>
+  <#if last>
+    ${result?keep_before_last(",")}
+  <#else>
+    ${result}
+  </#if>
 </#macro>
 
 <#-- Generates a DTO Property JSON object -->
@@ -114,6 +144,32 @@
     }
 
     <#if !last> , </#if> <#-- if not a last property add a comma-->
+</#macro>
+
+<#macro properties
+        object
+        skip = []
+        last = false>
+  <#local result>
+    <#list object as key, value>
+      <#if !skip?seq_contains(key)>
+        <@lib.property name = key
+            type = value["type"]
+            enumValues = value["enumValues"]
+            format = value["format"]
+            dto = value["dto"]
+            itemType = value["itemType"]
+            defaultValue = value["defaultValue"]
+            last = true
+            desc = value["desc"]/>,
+      </#if>
+    </#list>
+  </#local>
+  <#if last>
+    ${result?keep_before_last(",")}
+  <#else>
+    ${result}
+  </#if>
 </#macro>
 
 <#-- Generates a DTO JSON object -->
