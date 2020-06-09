@@ -206,8 +206,10 @@ module.exports = function(grunt) {
 
   require('./grunt/tasks/license-header')(grunt, false);
   require('./camunda-commons-ui/grunt/tasks/localescompile')(grunt);
-  require('./camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
-  require('./camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
+  var licensebookConfig = {enabled: false, includedFiles: new Set()};
+
+  require('./camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname, licensebookConfig);
+  require('./camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname, licensebookConfig);
 
   grunt.loadNpmTasks('grunt-karma');
 
