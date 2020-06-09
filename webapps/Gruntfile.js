@@ -160,7 +160,6 @@ module.exports = function(grunt) {
   require('./ui/common/grunt/config/eslint')(config, eslintConf);
   require('./camunda-bpm-sdk-js/grunt/config/eslint')(config, eslintConf);
 
-  require('./grunt/tasks/license-book')(grunt);
   require('./grunt/tasks/license-check')(grunt);
 
   grunt.initConfig({

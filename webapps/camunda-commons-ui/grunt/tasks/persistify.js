@@ -16,8 +16,10 @@
  */
 
 var fs = require('fs');
+var through = require('through2');
 
-module.exports = function(grunt, dirname) {
+
+module.exports = function(grunt, dirname, licensebookConfig) {
   'use strict';
   grunt.registerMultiTask('persistify', function() {
 
@@ -50,6 +52,14 @@ module.exports = function(grunt, dirname) {
     }
 
     b.add( this.data.src );
+
+    if(licensebookConfig.enabled) {
+      b.pipeline.get("deps").push(through.obj(function(row, enc, next) {
+        licensebookConfig.includedFiles.add(row.file);
+        this.push(row);
+        next();
+      }));
+    }
 
     b.on( 'bundle:done', function( time ) {
       console.log(dest + ' written in ' + time + 'ms');
