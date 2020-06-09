@@ -50,7 +50,7 @@
     "dom4": "2.1.5",
     "events": "3.0.0",
     "fast-xml-parser": "^3.12.20",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "jquery-ui": "1.12.1",
     "lodash": "4.17.14",
     "moment": "2.24.0",

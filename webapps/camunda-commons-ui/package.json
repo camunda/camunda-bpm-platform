@@ -44,7 +44,7 @@
     "clipboard": "2.0.4",
     "cmmn-js": "0.18.1",
     "dmn-js": "6.3.3",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "lodash": "4.17.14"
   },
   "devDependencies": {
