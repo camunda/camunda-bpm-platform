@@ -16,6 +16,7 @@
  */
 
 var fs = require('fs');
+var through = require('through2');
 
 var commonPackage = fs.readFileSync(__dirname + '/../../package.json', 'utf8');
 
@@ -49,8 +50,7 @@ var included = [
 ];
 
 
-module.exports = function(grunt, dirname) {
-  'use strict';
+module.exports = function(grunt, dirname, licensebookConfig) {
   grunt.registerMultiTask('ensureLibs', function() {
 
     var done = this.async();
@@ -103,28 +103,40 @@ module.exports = function(grunt, dirname) {
 
     var b = require(dirname + '/node_modules/persistify')( browserifyOptions, persistifyOptions );
 
+
+    const includedFiles = licensebookConfig.includedFiles;
+    if(licensebookConfig.enabled) {
+      b.pipeline.get("deps").push(through.obj(function(row, enc, next) {
+        includedFiles.add(row.file);
+        this.push(row);
+        next();
+      }));
+    }
+
     var cacheData = {};
 
     for(var key in packageJson.dependencies) {
       if(excluded.indexOf(key) === -1) {
+        includedFiles.add(__dirname + '/../../../node_modules/' + key + '/index.js');
         b.require(key);
         cacheData[key] = packageJson.dependencies[key];
       }
     }
     for(var i = 0; i < included.length; i++) {
-      // if(included[i].includes('camunda-bpm-sdk-js'))
-      //   b.require('./' + included[i]);
-      // else
-        b.require(included[i]);
+      includedFiles.add(__dirname + '/../../../node_modules/' + included[i] + '/index.js');
+
+      b.require(included[i]);
       cacheData[included[i]] = 'no idea ¯\\_(ツ)_/¯';
     }
 
     fs.readFile(cacheDest, 'utf8', function(err, previousCache) {
       if(!err && JSON.stringify(cacheData, null, '  ') === previousCache) {
-        console.log('everything up to date');
-        done();
-        return;
-      }
+        if (!licensebookConfig.enabled) {   
+          console.log('everything up to date');
+          done();
+          return;
+        }
+       }
 
       b.on( 'bundle:done', function( time ) {
         console.log(dest + ' written in ' + time + 'ms');
