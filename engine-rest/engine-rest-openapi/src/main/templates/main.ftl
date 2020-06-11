@@ -48,6 +48,7 @@
     {"name": "Task Identity Link"},
     {"name": "Task Local Variable"},
     {"name": "Task Variable"},
+    {"name": "User"},
     {"name": "Version"}
   ],
   "paths": {
