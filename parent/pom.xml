@@ -44,7 +44,7 @@
 
     <!-- This version is mirrored in the external task client.
     If you change it here, also change it there -->
-    <version.tomcat>9.0.35</version.tomcat>
+    <version.tomcat>9.0.36</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
