@@ -261,6 +261,24 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(oldInstance.getId(), historicActivityInstance.getCalledProcessInstanceId());
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/calledProcessWaiting.bpmn20.xml",
+  "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testCallSimpleSubProcess.bpmn20.xml" })
+  public void testHistoricActivityInstanceCalledProcessIdWithWaitState() {
+    // given
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
+    HistoricActivityInstanceQuery activityQuery = historyService.createHistoricActivityInstanceQuery().activityId("callSubProcess");
+
+    // assume
+    assertEquals(calledInstance.getId(), activityQuery.singleResult().getCalledProcessInstanceId());
+
+    // when
+    taskService.complete(taskService.createTaskQuery().processInstanceId(calledInstance.getId()).singleResult().getId());
+
+    // then
+    assertEquals(calledInstance.getId(), activityQuery.singleResult().getCalledProcessInstanceId());
+  }
+
   @Deployment
   public void testSorting() {
     runtimeService.startProcessInstanceByKey("process");
