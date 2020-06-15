@@ -863,6 +863,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextProcessInstanceId = "processInstanceId";
   protected String loggingContextTenantId = "tenantId";
 
+
+  // telemetry ///////////////////////////////////////////////////////
+  protected boolean telemetryEnabled = false;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -925,6 +929,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPermissionProvider();
     initHostName();
     initMetrics();
+    initTelemetry();
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
@@ -2177,6 +2182,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_INSTANCES);
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
+  }
+
+  protected void initTelemetry() {
+    if (telemetryEnabled) {
+      // initialize telemetry reporter
+    }
   }
 
   protected void initSerialization() {
@@ -4609,4 +4620,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isTelemetryEnabled() {
+    return telemetryEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryEnabled(boolean telemetryEnabled) {
+    this.telemetryEnabled = telemetryEnabled;
+    return this;
+  }
 }

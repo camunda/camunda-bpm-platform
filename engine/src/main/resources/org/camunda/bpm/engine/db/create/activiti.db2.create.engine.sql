@@ -40,6 +40,9 @@ values ('history.cleanup.job.lock', '0', 1);
 insert into ACT_GE_PROPERTY
 values ('startup.lock', '0', 1);
 
+insert into ACT_GE_PROPERTY
+values ('telemetry.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64) not null,
     REV_ integer,

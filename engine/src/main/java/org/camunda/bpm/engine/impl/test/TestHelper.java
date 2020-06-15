@@ -551,7 +551,19 @@ public abstract class TestHelper {
     }
   }
 
-
+  public static void deleteTelemetryProperty(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+         PropertyEntity telemetryProperty = dbEntityManager.selectById(PropertyEntity.class, "camunda.telemetry.enabled");
+         if (telemetryProperty != null) {
+           dbEntityManager.delete(telemetryProperty);
+         }
+         return null;
+       }
+      });
+  }
 
 
 }

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmd.TelemetrySetupCommand;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.SimpleIpBasedProvider;
@@ -144,6 +145,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected void executeSchemaOperations() {
     commandExecutorSchemaOperations.execute(processEngineConfiguration.getSchemaOperationsCommand());
     commandExecutorSchemaOperations.execute(processEngineConfiguration.getHistoryLevelCommand());
+    
+    if (processEngineConfiguration.isTelemetryEnabled()) {
+      commandExecutorSchemaOperations.execute(new TelemetrySetupCommand(processEngineConfiguration.isTelemetryEnabled()));
+    }
 
     try {
       commandExecutorSchemaOperations.execute(processEngineConfiguration.getProcessEngineBootstrapCommand());
