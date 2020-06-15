@@ -28,28 +28,40 @@ import static org.assertj.core.api.Assertions.assertThat;
   "camunda.bpm.webapp.headerSecurity.contentSecurityPolicyDisabled=true",
   "camunda.bpm.webapp.headerSecurity.contentTypeOptionsDisabled=true"
 })
-public class HttpHeaderSecurityDisabled extends ParsePropertiesHelper {
+public class HttpHeaderSecurityDisabledTest extends ParsePropertiesHelper {
 
   @Test
   public void shouldCheckXssProtectionDisabled() {
+    // given
+    
+    // when
     HeaderSecurityProperties properties = webapp.getHeaderSecurity();
 
+    // then
     assertThat(properties.isXssProtectionDisabled()).isTrue();
     assertThat(properties.getInitParams()).containsEntry("xssProtectionDisabled", "true");
   }
 
   @Test
   public void shouldCheckContentSecurityPolicyDisabled() {
+    // given
+    
+    // when
     HeaderSecurityProperties properties = webapp.getHeaderSecurity();
 
+    // then
     assertThat(properties.isContentSecurityPolicyDisabled()).isTrue();
     assertThat(properties.getInitParams()).containsEntry("contentSecurityPolicyDisabled", "true");
   }
 
   @Test
   public void shouldCheckContentTypeOptionsDisabled() {
+    // given
+    
+    // when
     HeaderSecurityProperties properties = webapp.getHeaderSecurity();
 
+    // then
     assertThat(properties.isContentTypeOptionsDisabled()).isTrue();
     assertThat(properties.getInitParams()).containsEntry("contentTypeOptionsDisabled", "true");
   }
