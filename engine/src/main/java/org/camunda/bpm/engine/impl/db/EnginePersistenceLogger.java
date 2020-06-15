@@ -120,11 +120,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
       Throwable cause) {
 
+    String message = ExceptionUtil.collectExceptionMessages(cause);
     String exceptionMessage = exceptionMessage(
       "004",
       "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
       operation.toString(),
-      cause.getMessage(),
+      message,
       buildStringFromList(operationsToFlush)
     );
 
@@ -668,22 +669,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
     Throwable cause) {
-    String message = cause.getMessage();
 
-    //collect real SQL exception messages in case of batch processing
-    Throwable exCause = cause;
-    do {
-      if (exCause instanceof BatchExecutorException) {
-        final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
-        StringBuilder sb = new StringBuilder();
-        for (SQLException sqlException : relatedSqlExceptions) {
-          sb.append(sqlException).append("\n");
-        }
-        message = message + "\n" + sb.toString();
-      }
-      exCause = exCause.getCause();
-    } while (exCause != null);
-
+    String message = ExceptionUtil.collectExceptionMessages(cause);
     String exceptionMessage = exceptionMessage(
       "083",
       "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
