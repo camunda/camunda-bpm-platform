@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it.properties;
+package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
@@ -32,13 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-  "camunda.bpm.webapp.headerSecurity.xssProtectionValue=aValue",
-  "camunda.bpm.webapp.headerSecurity.contentSecurityPolicyValue=aValue",
-  "camunda.bpm.webapp.headerSecurity.contentTypeOptionsValue=aValue",
-  "camunda.bpm.webapp.headerSecurity.hstsDisabled=false",
-  "camunda.bpm.webapp.headerSecurity.hstsValue=aValue"
+    "camunda.bpm.webapp.headerSecurity.hstsDisabled=false"
 })
-public class HttpHeaderSecurityValueIT {
+public class HstsIT {
 
   @Rule
   public HeaderRule headerRule;
@@ -52,47 +48,14 @@ public class HttpHeaderSecurityValueIT {
   }
 
   @Test
-  public void shouldCheckValueOfXssProtectionHeader() {
+  public void shouldCheckDefaultOfEnabledHsts() {
     // given
 
     // when
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("X-XSS-Protection")).isEqualTo("aValue");
-  }
-
-  @Test
-  public void shouldCheckValueOfContentSecurityPolicyHeader() {
-    // given
-
-    // when
-    headerRule.performRequest();
-
-    // then
-    assertThat(headerRule.getHeader("Content-Security-Policy")).isEqualTo("aValue");
-  }
-
-  @Test
-  public void shouldCheckValueOfContentTypeOptions() {
-    // given
-
-    // when
-    headerRule.performRequest();
-
-    // then
-    assertThat(headerRule.getHeader("X-Content-Type-Options")).isEqualTo("aValue");
-  }
-
-  @Test
-  public void shouldCheckValueOfHsts() {
-    // given
-
-    // when
-    headerRule.performRequest();
-
-    // then
-    assertThat(headerRule.getHeader("Strict-Transport-Security")).isEqualTo("aValue");
+    assertThat(headerRule.getHeader("Strict-Transport-Security")).isEqualTo("max-age=31536000");
   }
 
 }

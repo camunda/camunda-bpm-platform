@@ -26,7 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
   "camunda.bpm.webapp.headerSecurity.xssProtectionValue=aValue",
   "camunda.bpm.webapp.headerSecurity.contentSecurityPolicyValue=aValue",
-  "camunda.bpm.webapp.headerSecurity.contentTypeOptionsValue=aValue"
+  "camunda.bpm.webapp.headerSecurity.contentTypeOptionsValue=aValue",
+  "camunda.bpm.webapp.headerSecurity.hstsValue=aValue"
 })
 public class HttpHeaderSecurityValueTest extends ParsePropertiesHelper {
 
@@ -52,6 +53,18 @@ public class HttpHeaderSecurityValueTest extends ParsePropertiesHelper {
 
     assertThat(properties.getContentTypeOptionsValue()).isEqualTo("aValue");
     assertThat(properties.getInitParams()).containsEntry("contentTypeOptionsValue", "aValue");
+  }
+
+  @Test
+  public void shouldCheckHstsValue() {
+    // given
+    
+    // when
+    HeaderSecurityProperties properties = webapp.getHeaderSecurity();
+
+    // then
+    assertThat(properties.getHstsValue()).isEqualTo("aValue");
+    assertThat(properties.getInitParams()).containsEntry("hstsValue", "aValue");
   }
 
 }

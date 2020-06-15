@@ -19,57 +19,30 @@ package org.camunda.bpm.spring.boot.starter.property.headersec;
 import org.camunda.bpm.spring.boot.starter.property.HeaderSecurityProperties;
 import org.camunda.bpm.spring.boot.starter.property.ParsePropertiesHelper;
 import org.junit.Test;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HttpHeaderSecurityDefaultsTest extends ParsePropertiesHelper {
+@TestPropertySource(properties = {
+  "camunda.bpm.webapp.headerSecurity.hstsDisabled=false",
+  "camunda.bpm.webapp.headerSecurity.hstsIncludeSubdomainsDisabled=false",
+  "camunda.bpm.webapp.headerSecurity.hstsMaxAge=47",
+  "camunda.bpm.webapp.headerSecurity.hstsValue=Foo"
+})
+public class HstsPropertiesTest extends ParsePropertiesHelper {
 
   @Test
-  public void shouldCheckXssProtection() {
+  public void shouldCheckHstsProperties() {
     // given
-
+    
     // when
     HeaderSecurityProperties properties = webapp.getHeaderSecurity();
 
     // then
-    assertThat(properties.isXssProtectionDisabled()).isFalse();
-    assertThat(properties.getInitParams()).doesNotContainKey("xssProtectionDisabled");
-  }
-
-  @Test
-  public void shouldCheckContentSecurityPolicy() {
-    // given
-
-    // when
-    HeaderSecurityProperties properties = webapp.getHeaderSecurity();
-
-    // then
-    assertThat(properties.isContentSecurityPolicyDisabled()).isFalse();
-    assertThat(properties.getInitParams()).doesNotContainKey("contentSecurityPolicyDisabled");
-  }
-
-  @Test
-  public void shouldCheckContentTypeOptions() {
-    // given
-
-    // when
-    HeaderSecurityProperties properties = webapp.getHeaderSecurity();
-
-    // then
-    assertThat(properties.isContentTypeOptionsDisabled()).isFalse();
-    assertThat(properties.getInitParams()).doesNotContainKey("contentTypeOptionsDisabled");
-  }
-
-  @Test
-  public void shouldCheckHsts() {
-    // given
-
-    // when
-    HeaderSecurityProperties properties = webapp.getHeaderSecurity();
-
-    // then
-    assertThat(properties.isHstsDisabled()).isTrue();
-    assertThat(properties.getInitParams()).doesNotContainKey("hstsDisabled");
+    assertThat(properties.isHstsDisabled()).isFalse();
+    assertThat(properties.isHstsIncludeSubdomainsDisabled()).isFalse();
+    assertThat(properties.getHstsMaxAge()).isEqualTo("47");
+    assertThat(properties.getHstsValue()).isEqualTo("Foo");
   }
 
 }
