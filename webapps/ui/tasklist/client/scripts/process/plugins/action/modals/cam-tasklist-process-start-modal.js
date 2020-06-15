@@ -44,6 +44,10 @@ module.exports = [
     search,
     camAPI
   ) {
+    $scope.$on('authentication.login.required', function() {
+      $scope.$dismiss();
+    });
+
     function errorNotification(src, err) {
       $translate(src)
         .then(function(translated) {
