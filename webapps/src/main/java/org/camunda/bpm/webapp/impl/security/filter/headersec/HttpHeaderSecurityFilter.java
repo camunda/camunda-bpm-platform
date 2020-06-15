@@ -19,6 +19,7 @@ package org.camunda.bpm.webapp.impl.security.filter.headersec;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentTypeOptionsProvider;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
+import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.StrictTransportSecurityProvider;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.XssProtectionProvider;
 
 import javax.servlet.Filter;
@@ -43,6 +44,7 @@ public class HttpHeaderSecurityFilter implements Filter {
     add(new XssProtectionProvider());
     add(new ContentSecurityPolicyProvider());
     add(new ContentTypeOptionsProvider());
+    add(new StrictTransportSecurityProvider());
 
   }};
 
