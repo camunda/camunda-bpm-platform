@@ -33,7 +33,7 @@
     <version.camunda.spin>1.9.0</version.camunda.spin>
     <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-    <version.spring-boot>2.2.5.RELEASE</version.spring-boot>
+    <version.spring-boot>2.2.8.RELEASE</version.spring-boot>
     <version.feel-scala>1.11.0</version.feel-scala>
   </properties>
 
