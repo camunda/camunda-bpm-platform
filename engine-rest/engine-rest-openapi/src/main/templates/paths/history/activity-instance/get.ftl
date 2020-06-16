@@ -1,15 +1,16 @@
-<#assign requestMethod="GET"/>
-<#include "/lib/commons/history-activity-instance.ftl" >
-
 {
   <@lib.endpointInfo
       id = "getHistoricActivityInstances"
       tag = "Historic Activity Instance"
+      summary = "Get List"
       desc = "Queries for historic activity instances that fulfill the given parameters.
               The size of the result set can be retrieved by using the
               [Get Historic Activity Instance Count](${docsUrl}/reference/rest/history/activity-instance/get-activity-instance-query-count/) method." />
 
   "parameters" : [
+
+    <#assign requestMethod="GET"/>
+    <#include "/lib/commons/history-activity-instance.ftl" >
 
     <#assign last = false >
 

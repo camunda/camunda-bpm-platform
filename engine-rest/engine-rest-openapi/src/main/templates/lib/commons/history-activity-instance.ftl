@@ -54,51 +54,47 @@
   },
   "finished": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Only include finished activity instances.
              Value may only be `true`, as `false` behaves the same as when the property is not set."
   },
   "unfinished": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Only include unfinished activity instances.
              Value may only be `true`, as `false` behaves the same as when the property is not set."
   },
   "canceled": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Only include canceled activity instances.
              Value may only be `true`, as `false` behaves the same as when the property is not set."
   },
   "completeScope": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Only include activity instances which completed a scope.
              Value may only be `true`, as `false` behaves the same as when the property is not set."
   },
   "startedBefore": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restrict to instances that were started before the given date.
-             By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restrict to instances that were started before the given date. By [default](${docsUrl}/reference/rest/overview/date-format/),
+             the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
   },
   "startedAfter": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restrict to instances that were started after the given date.
-             By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restrict to instances that were started after the given date. By [default](${docsUrl}/reference/rest/overview/date-format/),
+             the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
   },
   "finishedBefore": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restrict to instances that were finished before the given date.
-             By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restrict to instances that were finished before the given date. By [default](${docsUrl}/reference/rest/overview/date-format/),
+             the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
   },
   "finishedAfter": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restrict to instances that were finished after the given date.
-             By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restrict to instances that were finished after the given date. By [default](${docsUrl}/reference/rest/overview/date-format/),
+             the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
   },
   "tenantIdIn": {
     "type": "array",
@@ -107,7 +103,6 @@
   },
   "withoutTenantId": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Only include historic activity instances that belong to no tenant. Value may only be `true`, as `false` is the default behavior."
   }
 }>

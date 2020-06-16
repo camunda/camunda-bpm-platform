@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "queryHistoricActivityInstancesCount"
       tag = "Historic Activity Instance"
+      summary = "Get List Count (POST)"
       desc = "Queries for the number of historic activity instances that fulfill the given parameters." />
 
   <#assign requestMethod="POST"/>
