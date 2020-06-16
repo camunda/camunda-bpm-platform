@@ -24,6 +24,10 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
+import org.camunda.bpm.engine.test.util.TelemetryHelper;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * @author Roman Smirnov
@@ -229,6 +233,33 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
     }
+  }
+
+  // configure telemetry /////////////////////////////////////
+
+  public void testTelemetryEnabledWithoutAutorization() {
+    // given
+
+    try {
+      // when
+      managementService.configureTelemetry(false);
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+    }
+  }
+
+  public void testTelemetryEnabledAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    managementService.configureTelemetry(true);
+
+    // then
+    String telemetryPropertyValue = TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration).getValue();
+    assertThat(Boolean.parseBoolean(telemetryPropertyValue)).isTrue();
   }
 
 }

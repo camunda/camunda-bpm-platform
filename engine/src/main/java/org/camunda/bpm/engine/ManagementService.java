@@ -1343,4 +1343,7 @@ public interface ManagementService {
    */
   SchemaLogQuery createSchemaLogQuery();
 
+  /** Enable/disable telemetry */
+  void configureTelemetry(boolean enabled);
+
 }
