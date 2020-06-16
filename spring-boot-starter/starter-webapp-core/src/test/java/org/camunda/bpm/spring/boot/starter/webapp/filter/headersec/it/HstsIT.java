@@ -32,7 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-    "camunda.bpm.webapp.headerSecurity.hstsDisabled=false"
+    "camunda.bpm.webapp.headerSecurity.hstsDisabled=false",
+    "camunda.bpm.webapp.headerSecurity.hstsMaxAge=8",
+    "camunda.bpm.webapp.headerSecurity.hstsIncludeSubdomainsDisabled=false"
 })
 public class HstsIT {
 
@@ -48,14 +50,15 @@ public class HstsIT {
   }
 
   @Test
-  public void shouldCheckDefaultOfEnabledHsts() {
+  public void shouldConfigureHsts() {
     // given
 
     // when
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("Strict-Transport-Security")).isEqualTo("max-age=31536000");
+    assertThat(headerRule.getHeader("Strict-Transport-Security"))
+        .isEqualTo("max-age=8; includeSubDomains");
   }
 
 }
