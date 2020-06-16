@@ -98,6 +98,20 @@
   <filter>
     <filter-name>HttpHeaderSecurity</filter-name>
     <filter-class>org.camunda.bpm.webapp.impl.security.filter.headersec.HttpHeaderSecurityFilter</filter-class>
+
+    <!--
+    The Strict Transport Security header is disabled by default.
+    You can enable it by uncommenting the configuration below.
+    Read more about it in the documentation
+    https://docs.camunda.org/manual/latest/webapps/shared-options/header-security/#strict-transport-security
+    -->
+
+    <!--
+    <init-param>
+      <param-name>hstsDisabled</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    -->
   </filter>
 
   <filter-mapping>
