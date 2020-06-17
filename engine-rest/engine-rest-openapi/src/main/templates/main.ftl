@@ -36,6 +36,7 @@
     {"name": "Engine"},
     {"name": "Event Subscription"},
     {"name": "External Task"},
+    {"name": "Historic Activity Instance"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process Definition"},
