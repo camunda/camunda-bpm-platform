@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 
-import org.camunda.bpm.webapp.impl.WebappLogger;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
 
 import java.util.Arrays;
@@ -28,8 +28,6 @@ import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.imp
 import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.StrictTransportSecurityProvider.Parameters.VALUE;
 
 public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
-
-  public static final WebappLogger LOG = WebappLogger.WEBAPP_LOGGER;
 
   public static final String HEADER_NAME = "Strict-Transport-Security";
 
@@ -89,7 +87,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
 
       if (isValueParameterDefined && isAnyParameterDefined) {
         String className = this.getClass().getSimpleName();
-        throw LOG.exceptionParametersCannotBeSet(className);
+        throw exceptionParametersCannotBeSet(className);
 
       } else if (isValueParameterDefined) {
         setValue(value);
@@ -123,6 +121,12 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
 
       }
     }
+  }
+
+  protected ProcessEngineException exceptionParametersCannotBeSet(String className) {
+    return new ProcessEngineException(className + ": cannot set " + VALUE.getName() +
+      " in conjunction with " + MAX_AGE.getName() + " or " +
+      INCLUDE_SUBDOMAINS_DISABLED.getName() + ".");
   }
 
   protected String getParameterValue(Parameters parameter) {

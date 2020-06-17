@@ -90,7 +90,7 @@ public class StrictTransportSecurityTest {
     // then
     assertThat(expectedException)
       .isInstanceOf(ProcessEngineException.class)
-      .hasMessage("WEBAPP-01001 StrictTransportSecurityProvider: cannot set hstsValue " +
+      .hasMessage("StrictTransportSecurityProvider: cannot set hstsValue " +
         "in conjunction with hstsMaxAge or hstsIncludeSubdomainsDisabled.");
   }
 
