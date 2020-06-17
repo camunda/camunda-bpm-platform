@@ -565,5 +565,18 @@ public abstract class TestHelper {
       });
   }
 
+  public static void deleteInstallationId(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+         PropertyEntity installationIdProperty = dbEntityManager.selectById(PropertyEntity.class, "camunda.installation.id");
+         if (installationIdProperty != null) {
+           dbEntityManager.delete(installationIdProperty);
+         }
+         return null;
+       }
+      });
+  }
 
 }

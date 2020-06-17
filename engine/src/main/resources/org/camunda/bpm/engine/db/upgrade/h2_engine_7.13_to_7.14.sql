@@ -18,6 +18,11 @@
 insert into ACT_GE_SCHEMA_LOG
 values ('300', CURRENT_TIMESTAMP, '7.14.0');
 
+
 -- insert telemetry.lock in property table - https://jira.camunda.com/browse/CAM-12023  --
 insert into ACT_GE_PROPERTY
 values ('telemetry.lock', '0', 1);
+
+-- insert telemetry.lock in property table - https://jira.camunda.com/browse/CAM-12031  --
+insert into ACT_GE_PROPERTY
+values ('installationId.lock', '0', 1);
