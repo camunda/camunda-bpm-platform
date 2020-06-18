@@ -866,6 +866,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // telemetry ///////////////////////////////////////////////////////
   protected boolean telemetryEnabled = false;
+  /** The endpoint which telemetry is sent to */
+  protected String telemetryEndpoint = "http://localhost:8080/pings";
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -4628,4 +4630,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.telemetryEnabled = telemetryEnabled;
     return this;
   }
+
+  public String getTelemetryEndpoint() {
+    return telemetryEndpoint;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryEndpoint(String telemetryEndpoint) {
+    this.telemetryEndpoint = telemetryEndpoint;
+    return this;
+  }
+
 }

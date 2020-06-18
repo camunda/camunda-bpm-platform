@@ -82,7 +82,7 @@ public class TelemetryConfigurationTest {
     processEngineConfiguration
                               .setTelemetryEnabled(telemetryEnabled)
                               .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
-
+ 
     // when
     processEngineConfiguration.buildProcessEngine();
 
@@ -90,4 +90,21 @@ public class TelemetryConfigurationTest {
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
     assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryEnabled).size()).isOne();
   }
+
+  @Test
+  public void shouldStartEngineWithChangedTelemetryEndpoint() {
+    // given
+    String telemetryEndpoint = "http://localhost:8081/pings";
+    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    processEngineConfiguration
+        .setTelemetryEndpoint(telemetryEndpoint)
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+
+    // when
+    processEngineConfiguration.buildProcessEngine();
+
+    // then
+    assertThat(processEngineConfiguration.getTelemetryEndpoint()).isEqualTo(telemetryEndpoint);
+  }
+
 }
