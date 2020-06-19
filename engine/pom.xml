@@ -89,6 +89,11 @@
       <artifactId>gson</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+
     <!-- provided dependencies -->
 
     <dependency>
@@ -252,6 +257,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>${version.wiremock}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
@@ -396,6 +407,10 @@
             <relocation>
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.http</pattern>
+              <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
