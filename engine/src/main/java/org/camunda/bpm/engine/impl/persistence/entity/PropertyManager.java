@@ -25,6 +25,10 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
  */
 public class PropertyManager extends AbstractManager {
 
+  public void instert(PropertyEntity property) {
+    getDbEntityManager().insert(property);
+  }
+
   public PropertyEntity findPropertyById(String propertyId) {
     return getDbEntityManager().selectById(PropertyEntity.class, propertyId);
   }

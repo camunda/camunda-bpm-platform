@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineBootstrapCommand;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -133,7 +132,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   protected void createTelemetryProperty(CommandContext commandContext) {
     boolean telemetryEnabled = Context.getProcessEngineConfiguration().isTelemetryEnabled();
     PropertyEntity property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
-    commandContext.getSession(DbEntityManager.class).insert(property);
+    commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
   }
 }
