@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface TelemetryRestService {
 
-  public static final String PATH = "/telemetry";
+  String PATH = "/telemetry/configuration";
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)

@@ -242,7 +242,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      managementService.configureTelemetry(false);
+      managementService.enableTelemetry(false);
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -255,7 +255,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
-    managementService.configureTelemetry(true);
+    managementService.enableTelemetry(true);
 
     // then
     String telemetryPropertyValue = TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration).getValue();

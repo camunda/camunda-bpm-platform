@@ -12,10 +12,10 @@
       mediaType = "application/json"
       dto = "TelemetryConfigurationDto"
       examples = ['"examle-1": {
-                     "summary": "POST /telemetry",
+                     "summary": "POST /telemetry/configuration",
                      "description": "The content of the Request Body",
                      "value": {
-                         "telemetryEnabled": true
+                         "enableTelemetry": true
                        }
                      }'] />
 
@@ -26,7 +26,7 @@
         desc = "Request successful." />
 
     <@lib.response
-        code = "404"
+        code = "401"
         dto = "ExceptionDto"
         last = true
         desc = "If the user who perform the operation is not a <b>camunda-admin</b> user." />

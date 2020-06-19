@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -66,13 +65,6 @@ import static org.junit.Assert.assertThat;
  * @author Joram Barrez
  */
 public class ManagementServiceTest extends PluggableProcessEngineTestCase {
-
-  @Override
-  protected void tearDown() throws Exception {
-    TestHelper.deleteTelemetryProperty(processEngineConfiguration);
-
-    super.tearDown();
-  }
 
   public void testGetMetaDataForUnexistingTable() {
     TableMetaData metaData = managementService.getTableMetaData("unexistingtable");
@@ -821,20 +813,21 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // given default configuration
 
     // when
-    managementService.configureTelemetry(true);
+    managementService.enableTelemetry(true);
 
     // then
     assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isTrue();
-  }
 
+    // cleanup
+    managementService.enableTelemetry(false);
+  }
 
   public void testTelemetryDisabled() {
     // given default configuration
-    managementService.configureTelemetry(true);
+    managementService.enableTelemetry(true);
 
     // when
-    managementService.configureTelemetry(false);
-
+    managementService.enableTelemetry(false);
 
     // then
     assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isFalse();

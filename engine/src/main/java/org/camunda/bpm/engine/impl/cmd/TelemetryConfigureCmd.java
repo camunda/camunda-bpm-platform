@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
 public class TelemetryConfigureCmd implements Command<Object> {
 
@@ -33,7 +34,8 @@ public class TelemetryConfigureCmd implements Command<Object> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
 
-    new TelemetrySetupCommand(telemetryEnabled).execute(commandContext);
+    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
+    telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
 
     return null;
   }

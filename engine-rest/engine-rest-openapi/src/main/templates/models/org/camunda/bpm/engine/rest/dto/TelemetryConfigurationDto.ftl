@@ -1,9 +1,9 @@
 <@lib.dto>
 
     <@lib.property
-        name = "telemetryEnabled"
+        name = "enableTelemetry"
         type = "boolean"
         last = true
-        desc = "Specifies if the data collection should be sent or not."/>
+        desc = "Specifies if the telemetry data should be sent or not."/>
 
 </@lib.dto>

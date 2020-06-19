@@ -42,7 +42,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   protected static final String TELEMETRY_URL = TEST_RESOURCE_ROOT_PATH +  TelemetryRestService.PATH;
 
-  private ManagementService managementServiceMock;
+  protected ManagementService managementServiceMock;
 
   @Before
   public void setupMocks() {
@@ -64,28 +64,28 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     .when()
       .post(TELEMETRY_URL);
 
-    verify(managementServiceMock).configureTelemetry(true);
+    verify(managementServiceMock).enableTelemetry(true);
   }
 
   @Test
   public void shouldThrowAuthorizationException() {
     String message = "Required admin authenticated group or user.";
-    doThrow(new AuthorizationException(message)).when(managementServiceMock).configureTelemetry(anyBoolean());
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).enableTelemetry(anyBoolean());
 
     Map<String, Object> requestBody = new HashMap<String, Object>();
     requestBody.put("enableTelemetry", true);
 
     given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(requestBody)
-      .then()
-        .expect()
-          .statusCode(Status.FORBIDDEN.getStatusCode())
-          .contentType(ContentType.JSON)
-          .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-          .body("message", equalTo(message))
-      .when()
-        .post(TELEMETRY_URL);
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(requestBody)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .post(TELEMETRY_URL);
   }
   
 }
