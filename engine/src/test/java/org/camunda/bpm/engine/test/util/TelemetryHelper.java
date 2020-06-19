@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
 public class TelemetryHelper {
 
-  // TODO remove logic after the telemetry configuration can be fetched via API 
   public static PropertyEntity fetchConfigurationProperty(ProcessEngineConfigurationImpl configuration) {
     return configuration.getCommandExecutorTxRequired()
       .execute(new Command<PropertyEntity>() {
