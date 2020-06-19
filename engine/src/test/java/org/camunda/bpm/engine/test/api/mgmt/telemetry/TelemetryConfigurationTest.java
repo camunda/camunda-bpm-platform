@@ -54,7 +54,7 @@ public class TelemetryConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.isTelemetryEnabled()).isFalse();
-    assertThat(fetchConfigurationProperty(processEngineConfiguration)).isNull();
+    assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isFalse();
   }
 
   @Test
