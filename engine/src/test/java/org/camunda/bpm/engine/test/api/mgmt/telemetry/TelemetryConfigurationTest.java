@@ -22,10 +22,16 @@ import static org.camunda.bpm.engine.test.util.TelemetryHelper.fetchConfiguratio
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class TelemetryConfigurationTest {
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -67,4 +73,21 @@ public class TelemetryConfigurationTest {
     assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isTrue();
   }
 
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
+  public void shouldLogTelemetryPersistenceLog() {
+    // given
+    boolean telemetryEnabled = true;
+    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    processEngineConfiguration
+                              .setTelemetryEnabled(telemetryEnabled)
+                              .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+
+    // when
+    processEngineConfiguration.buildProcessEngine();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryEnabled).size()).isOne();
+  }
 }

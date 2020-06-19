@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.test.util.TelemetryHelper.fetchConfiguratio
 
 import java.sql.Connection;
 
-import org.camunda.bpm.engine.impl.cmd.TelemetrySetupCommand;
+import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
@@ -83,9 +83,9 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
   }
 
   protected static class ControllableUpdateTelemetrySetupCommand extends ControllableCommand<Void> {
-    
+
     boolean telemetryEnabled;
-    
+
     public ControllableUpdateTelemetrySetupCommand(boolean telemetryEnabled) {
       this.telemetryEnabled = telemetryEnabled;
     }
@@ -94,7 +94,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
       monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
-      new TelemetrySetupCommand(false).execute(commandContext);
+      new BootstrapEngineCommand().configureTelemetryProperty(commandContext);
 
       monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
