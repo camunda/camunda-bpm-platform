@@ -34,6 +34,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
+  protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
+
   @Override
   public Void execute(CommandContext commandContext) {
 
@@ -43,6 +45,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       checkHistoryCleanupLockExists(commandContext);
       createHistoryCleanupJob(commandContext);
     }
+
+    configureTelemetryProperty(commandContext);
 
     return null;
   }
@@ -85,4 +89,50 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         .isHistoryCleanupEnabled();
   }
 
+  public void configureTelemetryProperty(CommandContext commandContext) {
+    try {
+
+      checkTelemetryLockExists(commandContext);
+
+      commandContext.getPropertyManager().acquireExclusiveLockForTelemetry();
+      PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
+
+      if (databaseTelemetryProperty == null) {
+        LOG.noTelemetryPropertyFound();
+        createTelemetryProperty(commandContext);
+      } else {
+        boolean oldValue = Boolean.parseBoolean(databaseTelemetryProperty.getValue());
+        boolean currentValue = Context.getProcessEngineConfiguration().isTelemetryEnabled();
+        if(currentValue != oldValue) {
+          databaseTelemetryProperty.setValue(Boolean.toString(currentValue));
+        }
+      }
+
+    } catch (Exception e) {
+      LOG.errorConfiguringTelemetryProperty(e);
+    }
+  }
+
+  protected void checkTelemetryLockExists(CommandContext commandContext) {
+    PropertyEntity telemetryLockProperty = commandContext.getPropertyManager().findPropertyById("telemetry.lock");
+    if (telemetryLockProperty == null) {
+      LOG.noTelemetryLockPropertyFound();
+    }
+  }
+
+  protected PropertyEntity databaseTelemetryConfiguration(CommandContext commandContext) {
+    try {
+      return commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY_NAME);
+    } catch (Exception e) {
+      LOG.errorFetchingTelemetryPropertyInDatabase(e);
+      return null;
+    }
+  }
+
+  protected void createTelemetryProperty(CommandContext commandContext) {
+    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isTelemetryEnabled();
+    PropertyEntity property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
+    commandContext.getPropertyManager().insert(property);
+    LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
+  }
 }

@@ -25,6 +25,10 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
  */
 public class PropertyManager extends AbstractManager {
 
+  public void instert(PropertyEntity property) {
+    getDbEntityManager().insert(property);
+  }
+
   public PropertyEntity findPropertyById(String propertyId) {
     return getDbEntityManager().selectById(PropertyEntity.class, propertyId);
   }
@@ -45,6 +49,11 @@ public class PropertyManager extends AbstractManager {
     // We lock a special startup lock property
     getDbEntityManager().lock("lockStartupLockProperty");
 
+  }
+
+  public void acquireExclusiveLockForTelemetry() {
+    // We lock a special telemetry lock property
+    getDbEntityManager().lock("lockTelemetryLockProperty");
   }
 
 }

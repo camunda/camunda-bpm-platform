@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.executor.BatchExecutorException;
 import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
@@ -737,6 +735,34 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Historic instance permissions are disabled, " +
             "please check your process engine configuration."
     ));
+  }
+
+  public void noTelemetryLockPropertyFound() {
+    logDebug(
+        "091", "No telemetry lock property found in the database");
+  }
+
+  public void noTelemetryPropertyFound() {
+    logDebug(
+        "092", "No telemetry property found in the database");
+  }
+
+  public void creatingTelemetryPropertyInDatabase(Boolean telemetryEnabled) {
+    logDebug(
+        "093",
+        "Creating the telemetry property in database with the value: {}", telemetryEnabled);
+  }
+
+  public void errorFetchingTelemetryPropertyInDatabase(Exception exception) {
+    logDebug(
+        "094",
+        "Error while fetching the telemetry property from the database: {}", exception.getMessage());
+  }
+
+  public void errorConfiguringTelemetryProperty(Exception exception) {
+    logDebug(
+        "095",
+        "Error while configurting the telemetry property: {}", exception.getMessage());
   }
 
 }
