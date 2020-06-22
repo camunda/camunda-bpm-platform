@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SchemaLogRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.TelemetryRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
@@ -265,6 +266,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + EventSubscriptionRestService.PATH)
   public EventSubscriptionRestService getEventSubscriptionRestService(@PathParam("name") String engineName) {
     return super.getEventSubscriptionRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + TelemetryRestService.PATH)
+  public TelemetryRestService getTelemetryRestService(@PathParam("name") String engineName) {
+    return super.getTelemetryRestService(engineName);
   }
 
   @GET

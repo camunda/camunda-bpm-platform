@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.TelemetryHelper;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -806,6 +809,30 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTasks(taskIds, true);
   }
 
+  public void testTelemetryEnabled() {
+    // given default configuration
+
+    // when
+    managementService.enableTelemetry(true);
+
+    // then
+    assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isTrue();
+
+    // cleanup
+    managementService.enableTelemetry(false);
+  }
+
+  public void testTelemetryDisabled() {
+    // given default configuration
+    managementService.enableTelemetry(true);
+
+    // when
+    managementService.enableTelemetry(false);
+
+    // then
+    assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isFalse();
+  }
+
   private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {
     assertEquals(expectedTaskNames.length, rowData.size());
     String columnKey = "NAME_";
@@ -830,4 +857,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     return taskIds;
   }
 
+
+  protected PropertyEntity getTelemetryProperty() {
+    return TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration);
+  }
 }

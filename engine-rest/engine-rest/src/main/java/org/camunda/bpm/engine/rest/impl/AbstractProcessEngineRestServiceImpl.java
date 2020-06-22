@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SchemaLogRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.TelemetryRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
@@ -305,7 +306,14 @@ public abstract class AbstractProcessEngineRestServiceImpl {
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
-  
+
+  public TelemetryRestService getTelemetryRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    TelemetryRestServiceImpl subResource = new TelemetryRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
   protected abstract URI getRelativeEngineUri(String engineName);
 
   protected ObjectMapper getObjectMapper() {

@@ -49,6 +49,7 @@
     {"name": "Task Identity Link"},
     {"name": "Task Local Variable"},
     {"name": "Task Variable"},
+    {"name": "Telemetry"},
     {"name": "User"},
     {"name": "Version"}
   ],
