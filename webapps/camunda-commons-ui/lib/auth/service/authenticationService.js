@@ -105,7 +105,7 @@ module.exports = [
           url: Uri.appUri('admin://auth/user/:engine/login/:appName'),
           data: form,
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
           }
         });
       }
