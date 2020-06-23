@@ -230,6 +230,8 @@ public abstract class ProcessEngineConfiguration {
   protected String mailServerDefaultFrom = "camunda@localhost";
 
   protected String databaseType;
+  protected String databaseVendor;
+  protected String databaseVersion;
   protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
   protected String jdbcDriver = "org.h2.Driver";
   protected String jdbcUrl = "jdbc:h2:tcp://localhost/activiti";
@@ -549,6 +551,24 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setDatabaseType(String databaseType) {
     this.databaseType = databaseType;
+    return this;
+  }
+
+  public String getDatabaseVendor() {
+    return databaseVendor;
+  }
+
+  public ProcessEngineConfiguration setDatabaseVendor(String databaseVendor) {
+    this.databaseVendor = databaseVendor;
+    return this;
+  }
+
+  public String getDatabaseVersion() {
+    return databaseVersion;
+  }
+
+  public ProcessEngineConfiguration setDatabaseVersion(String databaseVersion) {
+    this.databaseVersion = databaseVersion;
     return this;
   }
 

@@ -150,6 +150,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     } catch (OptimisticLockingException ole) {
       LOG.historyCleanupJobReconfigurationFailure(ole);
     }
+
+    commandExecutorSchemaOperations.execute(new StartTelemetryReporterCommand());
   }
 
   @Override
@@ -159,6 +161,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 
     if(processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration.getDbMetricsReporter().stop();
+    }
+
+    if (processEngineConfiguration.getTelemetryReporter() != null) {
+      processEngineConfiguration.getTelemetryReporter().stop();
     }
 
     if ((jobExecutor != null)) {

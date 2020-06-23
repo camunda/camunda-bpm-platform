@@ -35,6 +35,8 @@ public class TelemetryReporter {
   protected Data data;
   protected HttpClient httpClient;
 
+  protected boolean stopped;
+
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            Data data,
@@ -54,22 +56,25 @@ public class TelemetryReporter {
   }
 
   public void start() {
+    if (stopped) {
+      // if the reporter was already stopped another task should be scheduled
+      initTelemetrySendingTask();
+    }
     timer = new Timer("Camunda Telemetry Reporter", true);
     long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
 
     timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
   }
 
-  public void stop(boolean reportLastTime) {
+  public void stop() {
     if (timer != null) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      if (reportLastTime) {
-        // collect and send manually for the last time
-        reportNow();
-      }
+      // collect and send manually for the last time
+      reportNow();
     }
+    stopped = true;
   }
 
   public void reportNow() {

@@ -37,7 +37,7 @@ import com.google.gson.Gson;
 
 public class TelemetrySendingTask extends TimerTask {
 
-  private static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
@@ -68,21 +68,26 @@ public class TelemetrySendingTask extends TimerTask {
     commandExecutor.execute(new Command<Void>() {
       @Override
       public Void execute(CommandContext commandContext) {
-        try {
-          HttpPost request = new HttpPost(telemetryEndpoint);
-          String telemetryData = new Gson().toJson(data);
-          StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader("content-type", MediaType.APPLICATION_JSON);
-          request.setEntity(requestBody);
-          HttpResponse response = httpClient.execute(request);
+        // send data only if telemetry is enabled
+        if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
+          try {
+            HttpPost request = new HttpPost(telemetryEndpoint);
+            String telemetryData = new Gson().toJson(data);
+            StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
+            request.setHeader("content-type", MediaType.APPLICATION_JSON);
+            request.setEntity(requestBody);
+            HttpResponse response = httpClient.execute(request);
 
-          if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
-            LOG.unexpectedResponseWhileSendingTelemetryData();
-          } else {
-            LOG.telemetryDataSent(telemetryData);
+            if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
+              LOG.unexpectedResponseWhileSendingTelemetryData();
+            } else {
+              LOG.telemetryDataSent(telemetryData);
+            }
+          } catch (Exception e) {
+            LOG.exceptionWhileSendingTelemetryData(e.getMessage());
           }
-        } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e.getMessage());
+        } else {
+          LOG.telemetryDisabled();
         }
         return null;
       }
