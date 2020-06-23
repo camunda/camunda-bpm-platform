@@ -867,7 +867,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // telemetry ///////////////////////////////////////////////////////
   protected boolean telemetryEnabled = false;
   /** The endpoint which telemetry is sent to */
-  protected String telemetryEndpoint = "http://localhost:8080/pings";
+  protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
