@@ -31,6 +31,7 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected List<String> variableNames;
+  protected boolean localVariables;
   protected String businessKey;
   protected String processDefinitionId;
   protected List<String> processDefinitionIdIn;
@@ -70,6 +71,14 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   public List<String> getVariableNames() {
     return variableNames;
+  }
+
+  public boolean isLocalVariables() {
+    return localVariables;
+  }
+
+  public void setLocalVariables(boolean localVariables) {
+    this.localVariables = localVariables;
   }
 
   public String getBusinessKey() {

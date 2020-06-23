@@ -50,6 +50,17 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder variables(String... variableNames);
 
   /**
+   * @param localVariables
+   *          whether or not variables from greater scope than the external task
+   *          should be fetched. <code>false</code> means all variables visible
+   *          in the scope of the external task will be fetched,
+   *          <code>true</code> means only local variables (to the scope of the
+   *          external task) will be fetched
+   * @return the builder
+   */
+  TopicSubscriptionBuilder localVariables(boolean localVariables);
+
+  /**
    * @param businessKey to filter for external tasks that are supposed to be fetched and locked
    * @return the builder
    */

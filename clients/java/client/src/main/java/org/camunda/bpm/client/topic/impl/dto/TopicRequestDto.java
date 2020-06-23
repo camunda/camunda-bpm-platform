@@ -28,6 +28,7 @@ public class TopicRequestDto {
   protected String topicName;
   protected long lockDuration;
   protected List<String> variables;
+  protected boolean localVariables;
   protected String businessKey;
   protected String processDefinitionId;
   protected List<String> processDefinitionIdIn;
@@ -54,6 +55,14 @@ public class TopicRequestDto {
 
   public List<String> getVariables() {
     return variables;
+  }
+
+  public boolean isLocalVariables() {
+    return localVariables;
+  }
+
+  public void setLocalVariables(boolean localVariables) {
+    this.localVariables = localVariables;
   }
 
   public String getBusinessKey() {
@@ -148,6 +157,9 @@ public class TopicRequestDto {
     }
     if(topicSubscription.getProcessDefinitionVersionTag() != null) {
       topicRequestDto.setProcessDefinitionVersionTag(topicSubscription.getProcessDefinitionVersionTag());
+    }
+    if(topicSubscription.isLocalVariables()) {
+      topicRequestDto.setLocalVariables(topicSubscription.isLocalVariables());
     }
     return topicRequestDto;
   }

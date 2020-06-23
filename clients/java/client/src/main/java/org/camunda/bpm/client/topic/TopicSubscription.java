@@ -58,6 +58,15 @@ public interface TopicSubscription {
   List<String> getVariableNames();
 
   /**
+   * @return whether or not variables from greater scopes than the external task
+   *         are fetched. <code>false</code> means all variables visible in the
+   *         scope of the external task will be fetched, <code>true</code> means
+   *         only local variables (to the scope of the external task) will be
+   *         fetched.
+   */
+  boolean isLocalVariables();
+
+  /**
    * @return the business key associated with the external tasks which are supposed to be fetched and locked
    */
   String getBusinessKey();
@@ -89,7 +98,7 @@ public interface TopicSubscription {
   String getProcessDefinitionVersionTag();
 
   /**
-   * @return the tenant id presence for associated with the external tasks which are supposed to be fetched and locked
+   * @return the tenant id presence for the external tasks which are supposed to be fetched and locked
    */
   boolean isWithoutTenantId();
 

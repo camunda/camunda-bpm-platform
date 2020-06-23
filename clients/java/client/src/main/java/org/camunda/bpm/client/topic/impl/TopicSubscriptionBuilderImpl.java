@@ -34,6 +34,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected String topicName;
   protected Long lockDuration;
   protected List<String> variableNames;
+  protected boolean localVariables;
   protected String businessKey;
   protected String processDefinitionId;
   protected List<String> processDefinitionIds;
@@ -69,6 +70,11 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder localVariables(boolean localVariables) {
+    this.localVariables = localVariables;
+    return this;
+  }
+  
   public TopicSubscriptionBuilder businessKey(String businessKey) {
     this.businessKey = businessKey;
     return this;
@@ -147,6 +153,9 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
     if(processDefinitionVersionTag != null) {
       subscription.setProcessDefinitionVersionTag(processDefinitionVersionTag);
+    }
+    if(localVariables) {
+      subscription.setLocalVariables(localVariables);
     }
     topicSubscriptionManager.subscribe(subscription);
 
