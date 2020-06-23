@@ -252,14 +252,17 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
   public void testTelemetryEnabledAsCamundaAdmin() {
     // given
+    disableAuthorization();
+    managementService.enableTelemetry(true);
+    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
-    managementService.enableTelemetry(true);
+    managementService.enableTelemetry(false);
 
     // then
     String telemetryPropertyValue = TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration).getValue();
-    assertThat(Boolean.parseBoolean(telemetryPropertyValue)).isTrue();
+    assertThat(Boolean.parseBoolean(telemetryPropertyValue)).isFalse();
   }
 
 }
