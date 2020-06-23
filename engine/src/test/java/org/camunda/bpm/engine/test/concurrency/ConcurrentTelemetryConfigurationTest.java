@@ -94,7 +94,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
       monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
-      new BootstrapEngineCommand().configureTelemetryProperty(commandContext);
+      new BootstrapEngineCommand().initializeTelemetryProperty(commandContext);
 
       monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
