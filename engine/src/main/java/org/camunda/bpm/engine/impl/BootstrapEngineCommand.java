@@ -124,7 +124,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createTelemetryProperty(CommandContext commandContext) {
-    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isTelemetryInitialized();
+    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);

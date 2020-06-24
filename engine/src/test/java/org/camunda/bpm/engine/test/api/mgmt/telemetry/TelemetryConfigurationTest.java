@@ -53,7 +53,7 @@ public class TelemetryConfigurationTest {
     processEngineConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isTelemetryInitialized()).isFalse();
+    assertThat(processEngineConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isFalse();
   }
 
@@ -62,14 +62,14 @@ public class TelemetryConfigurationTest {
     // given
     processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration
-                              .setTelemetryInitialized(true)
+                              .setInitializeTelemetry(true)
                               .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
 
     // when
     processEngineConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isTelemetryInitialized()).isTrue();
+    assertThat(processEngineConfiguration.isInitializeTelemetry()).isTrue();
     assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isTrue();
   }
 
@@ -80,7 +80,7 @@ public class TelemetryConfigurationTest {
     boolean telemetryInitialized = true;
     processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration
-                              .setTelemetryInitialized(telemetryInitialized)
+                              .setInitializeTelemetry(telemetryInitialized)
                               .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
  
     // when
