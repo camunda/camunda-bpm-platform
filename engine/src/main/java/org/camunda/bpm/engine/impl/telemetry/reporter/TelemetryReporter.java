@@ -20,7 +20,7 @@ import java.util.Timer;
 
 import org.apache.http.client.HttpClient;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.telemetry.node.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 
 public class TelemetryReporter {
 
@@ -43,9 +43,10 @@ public class TelemetryReporter {
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
     this.httpClient = httpClient;
+    initTelemetrySendingTask();
   }
 
-  public void initTelemetrySendingTask() {
+  protected void initTelemetrySendingTask() {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
                                                     data,
@@ -59,13 +60,15 @@ public class TelemetryReporter {
     timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
   }
 
-  public void stop() {
+  public void stop(boolean reportLastTime) {
     if (timer != null) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      // collect and send manually for the last time
-      reportNow();
+      if (reportLastTime) {
+        // collect and send manually for the last time
+        reportNow();
+      }
     }
   }
 

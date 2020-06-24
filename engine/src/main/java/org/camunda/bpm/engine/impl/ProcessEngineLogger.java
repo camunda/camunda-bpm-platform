@@ -44,7 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPluginLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.scripting.ScriptLogger;
-import org.camunda.bpm.engine.impl.telemetry.node.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.commons.logging.BaseLogger;

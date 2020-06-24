@@ -14,33 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.node;
+package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Database {
+public class Data {
 
-  protected String vendor;
-  protected String version;
+  protected String installation;
+  protected Product product;
 
-  public Database(String vendor, String version) {
+  public Data(String installation, Product product) {
     super();
-    this.vendor = vendor;
-    this.version = version;
+    this.installation = installation;
+    this.product = product;
   }
 
-  public String getVendor() {
-    return vendor;
+  public String getInstallation() {
+    return installation;
   }
 
-  public void setVendor(String vendor) {
-    this.vendor = vendor;
+  public void setInstallation(String installation) {
+    this.installation = installation;
   }
 
-  public String getVersion() {
-    return version;
+  public Product getProduct() {
+    return product;
   }
 
-  public void setVersion(String version) {
-    this.version = version;
+  public void setProduct(Product product) {
+    this.product = product;
   }
 
 }

@@ -37,10 +37,10 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.node.Data;
-import org.camunda.bpm.engine.impl.telemetry.node.Database;
-import org.camunda.bpm.engine.impl.telemetry.node.Internals;
-import org.camunda.bpm.engine.impl.telemetry.node.Product;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.Database;
+import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
+import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -90,7 +90,6 @@ public class TelemetryReporterTest {
                                                                 TELEMETRY_ENDPOINT,
                                                                 data,
                                                                 HttpClientBuilder.create().build());
-    telemetryReporter.initTelemetrySendingTask();
 
     // when
     telemetryReporter.reportNow();
@@ -112,7 +111,6 @@ public class TelemetryReporterTest {
                                                                 TELEMETRY_ENDPOINT,
                                                                 createDataToSend(),
                                                                 mockedClient);
-    telemetryReporter.initTelemetrySendingTask();
     HttpResponse mockedResponse = mock(HttpResponse.class);
     when(mockedClient.execute(any())).thenReturn(mockedResponse);
     StatusLine mockedStatus = mock(StatusLine.class);
@@ -136,7 +134,6 @@ public class TelemetryReporterTest {
                                                                 TELEMETRY_ENDPOINT,
                                                                 createDataToSend(),
                                                                 mockedClient);
-    telemetryReporter.initTelemetrySendingTask();
     when(mockedClient.execute(any())).thenReturn(null);
 
     // when

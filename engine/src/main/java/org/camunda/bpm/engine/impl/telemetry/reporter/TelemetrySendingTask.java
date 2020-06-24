@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.telemetry.node.Data;
-import org.camunda.bpm.engine.impl.telemetry.node.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 
 import com.google.gson.Gson;
 

@@ -14,33 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.node;
+package org.camunda.bpm.engine.impl.telemetry;
 
-public class Data {
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
-  protected String installation;
-  protected Product product;
+public class TelemetryLogger extends ProcessEngineLogger {
 
-  public Data(String installation, Product product) {
-    super();
-    this.installation = installation;
-    this.product = product;
+  public void startTelemetrySendingTask() {
+    logDebug(
+        "001", "Start telemetry sending task.");
   }
 
-  public String getInstallation() {
-    return installation;
+  public void exceptionWhileSendingTelemetryData(String message) {
+    logDebug(
+        "002", "An exception occurred while sending telemetry data: {}", message);
   }
 
-  public void setInstallation(String installation) {
-    this.installation = installation;
+  public void unexpectedResponseWhileSendingTelemetryData() {
+    logDebug(
+        "003", "Unexpect response while sending telemetry data.");
   }
 
-  public Product getProduct() {
-    return product;
+  public void telemetryDataSent(String data) {
+    logDebug(
+        "004", "Telemetry data sent: {}", data);
   }
-
-  public void setProduct(Product product) {
-    this.product = product;
-  }
-
 }

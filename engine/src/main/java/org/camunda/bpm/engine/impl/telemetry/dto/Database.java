@@ -14,29 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.node;
+package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+public class Database {
 
-public class TelemetryLogger extends ProcessEngineLogger {
+  protected String vendor;
+  protected String version;
 
-  public void startTelemetrySendingTask() {
-    logDebug(
-        "001", "Start telemetry sending task.");
+  public Database(String vendor, String version) {
+    super();
+    this.vendor = vendor;
+    this.version = version;
   }
 
-  public void exceptionWhileSendingTelemetryData(String message) {
-    logDebug(
-        "002", "An exception occurred while sending telemetry data: {}", message);
+  public String getVendor() {
+    return vendor;
   }
 
-  public void unexpectedResponseWhileSendingTelemetryData() {
-    logDebug(
-        "003", "Unexpect response while sending telemetry data.");
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
   }
 
-  public void telemetryDataSent(String data) {
-    logDebug(
-        "004", "Telemetry data sent: {}", data);
+  public String getVersion() {
+    return version;
   }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
 }
