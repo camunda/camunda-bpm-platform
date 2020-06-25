@@ -48,7 +48,8 @@
 
       <div cam-widget-loader
            loading-state="{{ ctrl.getLoadingState('history') }}"
-           text-empty="{{ 'BATCHES_PROGRESS_NO_FINISHED' | translate }}">
+           text-empty="{{ 'BATCHES_PROGRESS_NO_FINISHED' | translate }}"
+           ng-if="ctrl.shouldLoadHistory">
 
         <table class="cam-table">
           <thead sortable-table-head
@@ -77,6 +78,9 @@
 
                     max-size="7"
                     boundary-links="true"></ul>
+      </div>
+      <div class="history-loader" ng-if="!ctrl.shouldLoadHistory">
+        <button class="btn btn-default" ng-click="ctrl.loadHistory()">{{'BATCHES_LOAD_ENDED' | translate}}</button>
       </div>
     </div>
 

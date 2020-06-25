@@ -50,7 +50,8 @@ var defaultConfig = {
     }
   },
   batchOperation: {
-    mode: 'filter'
+    mode: 'filter',
+    autoLoadEnded: true
   },
   csrfCookieName: 'XSRF-TOKEN',
   disableWelcomeMessage: false,
@@ -160,6 +161,15 @@ module.exports = function(config, app) {
         return (
           (config[param] && config[param].mode) || defaultConfig[param].mode
         );
+      };
+
+      this.getBatchOperationAutoLoadEnded = function() {
+        var param = 'batchOperation';
+
+        return config[param] &&
+          typeof config[param].autoLoadEnded !== 'undefined'
+          ? config[param].autoLoadEnded
+          : defaultConfig[param].autoLoadEnded;
       };
 
       this.getBpmnJs = function() {
