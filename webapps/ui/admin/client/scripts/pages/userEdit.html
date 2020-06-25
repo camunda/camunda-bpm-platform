@@ -167,8 +167,9 @@
 
           <div class="col-sm-8 col-md-10">
             <div cam-widget-password
-              cam-widget-password-password="credentials.password"
-              cam-widget-password-valid="credentials.valid"></div>
+                 cam-widget-password-profile="persistedProfile"
+                 cam-widget-password-password="credentials.password"
+                 cam-widget-password-valid="credentials.valid"></div>
 
             <p class="text-danger"
                ng-show="updateCredentialsForm.inputPassword.$error.password">
