@@ -45,6 +45,10 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -55,6 +59,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 
 /**
@@ -1132,6 +1139,68 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // now the base permission applies and grants us read access
     assertEquals(1, identityService.createTenantQuery().count());
+  }
+
+  public void testDelegationCode() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+      .startEvent()
+      .scriptTask()
+        .scriptFormat("javascript")
+        .scriptText("execution.getProcessEngine().getIdentityService().createUserQuery().userId(\"monster\").singleResult().getFirstName();")
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
+
+    User oscar = identityService.newUser("oscar");
+    identityService.saveUser(oscar);
+
+    User monster = identityService.newUser("monster");
+    identityService.saveUser(monster);
+
+    createGrantAuthorization(USER, "oscar", "oscar", READ);
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, "foo", "oscar", READ, Permissions.CREATE_INSTANCE);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, "*", "oscar", READ, Permissions.CREATE);
+
+    ProcessInstance pi = null;
+
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+      identityService.setAuthenticatedUserId("oscar");
+      pi = runtimeService.startProcessInstanceByKey("foo");
+    }
+    finally {
+      identityService.clearAuthentication();
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      identityService.clearAuthentication();
+
+      for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+        authorizationService.deleteAuthorization(authorization.getId());
+      }
+    }
+
+    assertNotNull(pi);
+    assertTrue(pi.isEnded());
+  }
+
+  protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+    Authorization authorization = createAuthorization(AUTH_TYPE_GRANT, resource, resourceId);
+    authorization.setUserId(userId);
+    for (Permission permission : permissions) {
+      authorization.addPermission(permission);
+    }
+    authorizationService.saveAuthorization(authorization);
+  }
+
+  protected Authorization createAuthorization(int type, Resource resource, String resourceId) {
+    Authorization authorization = authorizationService.createNewAuthorization(type);
+
+    authorization.setResource(resource);
+    if (resourceId != null) {
+      authorization.setResourceId(resourceId);
+    }
+
+    return authorization;
   }
 
   protected void lockUser(String userId, String invalidPassword) throws ParseException {

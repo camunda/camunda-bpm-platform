@@ -16,22 +16,27 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import java.util.HashSet;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPagingWithMemberOfGroup;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPagingWithMemberOfGroup;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Daniel Meyer
@@ -72,7 +77,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertNotNull(users);
     assertEquals(3, users.size());
   }
-  
+
   public void testFilterByUserIdWithCapitalization() {
 	try {
 	  processEngineConfiguration.setAuthorizationEnabled(true);
@@ -273,6 +278,42 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
       assertTrue("Wrong exception", ex.getMessage().contains("Native user queries are not supported for LDAP"));
     }
 
+  }
+
+  public void testDelegationCode() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+      .startEvent()
+      .scriptTask()
+        .scriptFormat("javascript")
+        .scriptText("execution.getProcessEngine().getIdentityService().createUserQuery().userId(\"roman\").singleResult().getFirstName();")
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
+
+    createGrantAuthorization(USER, "oscar", "oscar", READ);
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, "foo", "oscar", READ, Permissions.CREATE_INSTANCE);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, "*", "oscar", READ, Permissions.CREATE);
+
+    ProcessInstance pi = null;
+
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+      identityService.setAuthenticatedUserId("oscar");
+      pi = runtimeService.startProcessInstanceByKey("foo");
+    }
+    finally {
+      identityService.clearAuthentication();
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      identityService.clearAuthentication();
+
+      for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+        authorizationService.deleteAuthorization(authorization.getId());
+      }
+    }
+
+    assertNotNull(pi);
+    assertTrue(pi.isEnded());
   }
 
   protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
