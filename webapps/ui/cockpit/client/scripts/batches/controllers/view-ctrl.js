@@ -43,6 +43,7 @@ module.exports = [
   '$translate',
   'Notifications',
   'localConf',
+  'configuration',
   function(
     $scope,
     page,
@@ -51,7 +52,8 @@ module.exports = [
     $modal,
     $translate,
     Notifications,
-    localConf
+    localConf,
+    configuration
   ) {
     $scope.runtimeHeadColumns = [
       {
@@ -189,7 +191,7 @@ module.exports = [
 
     require('../components/breadcrumbs')(page, $scope.$root, $translate);
 
-    $scope.ctrl = new Ctrl(camAPI, localConf);
+    $scope.ctrl = new Ctrl(camAPI, localConf, configuration);
     $scope.ctrl.loadPeriodically(5000);
 
     $scope.openLog = function(job) {

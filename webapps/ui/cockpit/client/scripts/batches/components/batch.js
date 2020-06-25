@@ -21,9 +21,10 @@ var events = require('./events');
 
 var PAGE_SIZE = 10;
 
-var Batch = function(camAPI, localConf) {
+var Batch = function(camAPI, localConf, configuration) {
   this._sdk = camAPI;
   this._localConf = localConf;
+  this.shouldLoadHistory = configuration.getBatchOperationAutoLoadEnded();
 
   this.sortingProperties = {
     runtime: 'batch-runtime-sort',
@@ -294,6 +295,14 @@ Batch.prototype.updatePage = function(type) {
 
 Batch.prototype.load = function() {
   this._load('runtime');
+
+  if (this.shouldLoadHistory) {
+    this._load('history');
+  }
+};
+
+Batch.prototype.loadHistory = function() {
+  this.shouldLoadHistory = true;
   this._load('history');
 };
 

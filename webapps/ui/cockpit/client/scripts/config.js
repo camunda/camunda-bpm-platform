@@ -55,7 +55,10 @@ window.camCockpitConf = {
   // 'batchOperation' : {
   //   // select mode of query for process instances or decision instances
   //   // possible values: filter, search
-  //   'mode': 'filter'
+  //   'mode': 'filter',
+  //
+  //   // select if Historic Batches should be loaded automatically when navigating to #/batch
+  //   'autoLoadEnded': true
   // },
   // bpmnJs: {
   //   moddleExtensions: {
