@@ -865,7 +865,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
 
   // telemetry ///////////////////////////////////////////////////////
-  protected boolean telemetryEnabled = false;
+  /**
+   * Sets the initial property value of telemetry configuration only once
+   * when it has never been enabled/disabled before.
+   * Subsequent changes can be done only via the
+   * {@link ManagementService#enableTelemetry(boolean) Telemetry} API in {@link ManagementService}
+   */
+  protected boolean initializeTelemetry = false;
   /** The endpoint which telemetry is sent to */
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
 
@@ -2187,7 +2193,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initTelemetry() {
-    if (telemetryEnabled) {
+    if (initializeTelemetry) {
       // initialize telemetry reporter
     }
   }
@@ -4622,12 +4628,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isTelemetryEnabled() {
-    return telemetryEnabled;
+  public boolean isInitializeTelemetry() {
+    return initializeTelemetry;
   }
 
-  public ProcessEngineConfigurationImpl setTelemetryEnabled(boolean telemetryEnabled) {
-    this.telemetryEnabled = telemetryEnabled;
+  public ProcessEngineConfigurationImpl setInitializeTelemetry(boolean telemetryInitialized) {
+    this.initializeTelemetry = telemetryInitialized;
     return this;
   }
 

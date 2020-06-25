@@ -38,12 +38,6 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
 public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
   @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    TestHelper.deleteTelemetryProperty(processEngineConfiguration);
-  }
-
-  @Override
   protected void runTest() throws Throwable {
     final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
@@ -52,6 +46,8 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
         || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
       // skip test method - if database is H2
     } else {
+      // clean up the db property
+      TestHelper.deleteTelemetryProperty(processEngineConfiguration);
       // invoke the test method
       super.runTest();
     }
@@ -94,7 +90,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
       monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
-      new BootstrapEngineCommand().configureTelemetryProperty(commandContext);
+      new BootstrapEngineCommand().initializeTelemetryProperty(commandContext);
 
       monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 

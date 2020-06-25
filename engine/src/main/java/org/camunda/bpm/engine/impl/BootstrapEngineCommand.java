@@ -46,7 +46,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       createHistoryCleanupJob(commandContext);
     }
 
-    configureTelemetryProperty(commandContext);
+    initializeTelemetryProperty(commandContext);
 
     return null;
   }
@@ -89,7 +89,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         .isHistoryCleanupEnabled();
   }
 
-  public void configureTelemetryProperty(CommandContext commandContext) {
+  public void initializeTelemetryProperty(CommandContext commandContext) {
     try {
 
       checkTelemetryLockExists(commandContext);
@@ -100,12 +100,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       if (databaseTelemetryProperty == null) {
         LOG.noTelemetryPropertyFound();
         createTelemetryProperty(commandContext);
-      } else {
-        boolean oldValue = Boolean.parseBoolean(databaseTelemetryProperty.getValue());
-        boolean currentValue = Context.getProcessEngineConfiguration().isTelemetryEnabled();
-        if(currentValue != oldValue) {
-          databaseTelemetryProperty.setValue(Boolean.toString(currentValue));
-        }
       }
 
     } catch (Exception e) {
@@ -130,7 +124,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createTelemetryProperty(CommandContext commandContext) {
-    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isTelemetryEnabled();
+    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);

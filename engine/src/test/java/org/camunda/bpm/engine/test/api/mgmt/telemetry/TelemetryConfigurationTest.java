@@ -53,7 +53,7 @@ public class TelemetryConfigurationTest {
     processEngineConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isTelemetryEnabled()).isFalse();
+    assertThat(processEngineConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isFalse();
   }
 
@@ -62,14 +62,14 @@ public class TelemetryConfigurationTest {
     // given
     processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration
-                              .setTelemetryEnabled(true)
+                              .setInitializeTelemetry(true)
                               .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
 
     // when
     processEngineConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isTelemetryEnabled()).isTrue();
+    assertThat(processEngineConfiguration.isInitializeTelemetry()).isTrue();
     assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isTrue();
   }
 
@@ -77,10 +77,10 @@ public class TelemetryConfigurationTest {
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
   public void shouldLogTelemetryPersistenceLog() {
     // given
-    boolean telemetryEnabled = true;
+    boolean telemetryInitialized = true;
     processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration
-                              .setTelemetryEnabled(telemetryEnabled)
+                              .setInitializeTelemetry(telemetryInitialized)
                               .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
  
     // when
@@ -88,7 +88,7 @@ public class TelemetryConfigurationTest {
 
     // then
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
-    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryEnabled).size()).isOne();
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitialized).size()).isOne();
   }
 
   @Test
