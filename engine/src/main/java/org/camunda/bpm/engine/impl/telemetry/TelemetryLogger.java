@@ -39,4 +39,12 @@ public class TelemetryLogger extends ProcessEngineLogger {
     logDebug(
         "004", "Telemetry data sent: {}", data);
   }
+
+  public void databaseTelemetryPropertyMissingInfo(boolean telemetryEnabled) {
+    logInfo(
+        "005",
+        "`camunda.telemetry.enabled` propery is missing in the database, creating the property with value: {}",
+        Boolean.toString(telemetryEnabled));
+  }
+
 }

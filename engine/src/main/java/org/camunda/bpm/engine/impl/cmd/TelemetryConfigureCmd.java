@@ -16,12 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 
 public class TelemetryConfigureCmd implements Command<Object> {
+
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   protected boolean telemetryEnabled;
 
@@ -35,7 +39,13 @@ public class TelemetryConfigureCmd implements Command<Object> {
     authorizationManager.checkCamundaAdmin();
 
     PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
-    telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
+    if (telemetryProperty != null) {
+      telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
+    } else {
+      LOG.databaseTelemetryPropertyMissingInfo(telemetryEnabled);
+      telemetryProperty = new PropertyEntity("camunda.telemetry.enabled", Boolean.toString(telemetryEnabled));
+      commandContext.getPropertyManager().insert(telemetryProperty);
+    }
 
     return null;
   }
