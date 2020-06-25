@@ -64,13 +64,13 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     .when()
       .post(TELEMETRY_URL);
 
-    verify(managementServiceMock).enableTelemetry(true);
+    verify(managementServiceMock).toggleTelemetry(true);
   }
 
   @Test
   public void shouldThrowAuthorizationException() {
     String message = "Required admin authenticated group or user.";
-    doThrow(new AuthorizationException(message)).when(managementServiceMock).enableTelemetry(anyBoolean());
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).toggleTelemetry(anyBoolean());
 
     Map<String, Object> requestBody = new HashMap<String, Object>();
     requestBody.put("enableTelemetry", true);

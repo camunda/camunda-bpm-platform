@@ -869,7 +869,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Sets the initial property value of telemetry configuration only once
    * when it has never been enabled/disabled before.
    * Subsequent changes can be done only via the
-   * {@link ManagementService#enableTelemetry(boolean) Telemetry} API in {@link ManagementService}
+   * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
    */
   protected boolean initializeTelemetry = false;
   /** The endpoint which telemetry is sent to */

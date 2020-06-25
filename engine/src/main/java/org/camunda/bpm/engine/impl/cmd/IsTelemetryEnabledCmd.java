@@ -14,22 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.util;
+package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 
-public class TelemetryHelper {
+public class IsTelemetryEnabledCmd implements Command<Boolean> {
 
-  public static PropertyEntity fetchConfigurationProperty(ProcessEngineConfigurationImpl configuration) {
-    return configuration.getCommandExecutorTxRequired()
-      .execute(new Command<PropertyEntity>() {
-        public PropertyEntity execute(CommandContext commandContext) {
-          return commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
-        }
-      });
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+
+  public Boolean execute(CommandContext commandContext) {
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkCamundaAdmin();
+
+    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
+    if (telemetryProperty != null) {
+      return Boolean.parseBoolean(telemetryProperty.getValue());
+    } else {
+      LOG.databaseTelemetryPropertyMissingInfo();
+      return false;
+    }
   }
 
 }

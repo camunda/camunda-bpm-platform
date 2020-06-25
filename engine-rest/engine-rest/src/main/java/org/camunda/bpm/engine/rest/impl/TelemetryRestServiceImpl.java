@@ -33,7 +33,7 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
 
     ManagementService managementService = processEngine.getManagementService();
 
-    managementService.enableTelemetry(enableTelemetry);
+    managementService.toggleTelemetry(enableTelemetry);
   }
 
 }

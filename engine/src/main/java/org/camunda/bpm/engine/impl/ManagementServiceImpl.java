@@ -504,7 +504,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new SchemaLogQueryImpl(commandExecutor);
   }
 
-  public void enableTelemetry(boolean enabled) {
+  public void toggleTelemetry(boolean enabled) {
     commandExecutor.execute(new TelemetryConfigureCmd(enabled));
+  }
+
+  public boolean isTelemetryEnabled() {
+    return commandExecutor.execute(new IsTelemetryEnabledCmd());
   }
 }

@@ -1349,6 +1349,10 @@ public interface ManagementService {
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
-  void enableTelemetry(boolean enabled);
+  void toggleTelemetry(boolean enabled);
 
+  /**
+   * Checks if sending telemetry data to Camunda is enabled/disabled
+   */
+  boolean isTelemetryEnabled();
 }
