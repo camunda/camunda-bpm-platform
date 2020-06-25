@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPluginLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.scripting.ScriptLogger;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.commons.logging.BaseLogger;
@@ -135,6 +136,9 @@ public class ProcessEngineLogger extends BaseLogger {
 
   public static final IndentityLogger INDENTITY_LOGGER = BaseLogger.createLogger(
       IndentityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.identity", "27");
+
+  public static final TelemetryLogger TELEMETRY_LOGGER = BaseLogger.createLogger(
+      TelemetryLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.telemetry", "28");
 
   public static boolean shouldLogJobException(ProcessEngineConfiguration processEngineConfiguration, JobEntity currentJob) {
     boolean enableReducedJobExceptionLogging = processEngineConfiguration.isEnableReducedJobExceptionLogging();
