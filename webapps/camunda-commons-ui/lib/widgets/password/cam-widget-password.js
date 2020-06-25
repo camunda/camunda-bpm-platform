@@ -24,9 +24,7 @@ var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
 module.exports = [
   'camAPI',
   'debounce',
-  '$translate',
-  '$sce',
-  function(camAPI, debounce, $translate, $sce) {
+  function(camAPI, debounce) {
     return {
       scope: {
         password: '=camWidgetPasswordPassword',
@@ -38,9 +36,6 @@ module.exports = [
         var variablePolicyIsActive = false;
         $scope.loadingState = 'DEACTIVATED';
 
-        $scope.tooltipText = '';
-        var policyText = $translate.instant('PASSWORD_POLICY_TOOLTIP');
-
         function createRules() {
           passwordPolicyProvider.get().then(function(res) {
             if (!res) {
@@ -50,16 +45,8 @@ module.exports = [
               return;
             }
             variablePolicyIsActive = true;
-            policyText += '<ul>';
-            res.rules.forEach(function(rule) {
-              policyText +=
-                '<li>' +
-                $translate.instant(rule.placeholder, rule.parameter) +
-                '</li>';
-            });
-            policyText += '</ul>';
-
-            $scope.tooltipText = $sce.trustAsHtml(policyText);
+            $scope.tooltip = 'PASSWORD_POLICY_TOOLTIP';
+            $scope.rules = res.rules;
 
             // update State
             handlePasswordUpdate();
@@ -72,7 +59,6 @@ module.exports = [
 
           $scope.isValid = false;
           if (!$scope.password) {
-            $scope.tooltipText = $sce.trustAsHtml(policyText);
             $scope.loadingState = 'NOT_OK';
             return;
           }
@@ -91,9 +77,7 @@ module.exports = [
             .validate($scope.password, function(err, res) {
               if (err) {
                 $scope.loadingState = 'NOT_OK';
-                $scope.tooltipText = $sce.trustAsHtml(
-                  $translate.instant('PASSWORD_POLICY_TOOLTIP_ERROR')
-                );
+                $scope.tooltip = 'PASSWORD_POLICY_TOOLTIP_ERROR';
                 return;
               }
               if (res.valid) {
@@ -103,21 +87,9 @@ module.exports = [
                 $scope.loadingState = 'NOT_OK';
                 $scope.isValid = false;
 
-                $scope.tooltipText = $translate.instant(
-                  'PASSWORD_POLICY_TOOLTIP_PARTIAL'
-                );
-                $scope.tooltipText += '<ul>';
-                res.rules.forEach(function(rule) {
-                  if (!rule.valid) {
-                    $scope.tooltipText +=
-                      '<li>' +
-                      $translate.instant(rule.placeholder, rule.parameter) +
-                      '</li>';
-                  }
-                });
-                $scope.tooltipText += '</ul>';
+                $scope.tooltip = 'PASSWORD_POLICY_TOOLTIP_PARTIAL';
 
-                $scope.tooltipText = $sce.trustAsHtml($scope.tooltipText);
+                $scope.rules = res.rules;
               }
             })
             .catch(angular.noop);
