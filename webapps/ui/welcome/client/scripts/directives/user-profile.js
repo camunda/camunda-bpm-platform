@@ -91,6 +91,7 @@ module.exports = [
             id: $scope.user.id
           },
           function(err, data) {
+            $scope.persistedProfile = data;
             angular.extend($scope.user, data);
             $scope.$root.userFullName = data.firstName + ' ' + data.lastName;
           }
@@ -103,6 +104,8 @@ module.exports = [
 
             if (!err) {
               $scope.userProfile.$setPristine();
+
+              $scope.persistedProfile = angular.copy($scope.user);
 
               Notifications.addMessage({
                 status: $translate.instant('CHANGES_SAVED'),

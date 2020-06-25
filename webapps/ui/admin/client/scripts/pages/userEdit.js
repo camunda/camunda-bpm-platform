@@ -151,6 +151,7 @@ module.exports = [
               res
             ) {
               $scope.user = res;
+              $scope.persistedProfile = res;
 
               $scope.profile = angular.copy(res);
               $scope.profileCopy = angular.copy(res);
@@ -180,6 +181,7 @@ module.exports = [
             );
             UserResource.updateProfile(resourceData, function(err) {
               if (err === null) {
+                $scope.persistedProfile = resourceData;
                 Notifications.addMessage({
                   type: 'success',
                   status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
