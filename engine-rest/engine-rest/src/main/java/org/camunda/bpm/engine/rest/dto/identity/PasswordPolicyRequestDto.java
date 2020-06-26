@@ -19,9 +19,18 @@ package org.camunda.bpm.engine.rest.dto.identity;
 /**
  * @author Miklas Boskamp
  */
-public class PasswordDto {
+public class PasswordPolicyRequestDto {
 
-  private String password;
+  protected String password;
+  protected UserProfileDto profile;
+
+  public UserProfileDto getProfile() {
+    return profile;
+  }
+
+  public void setProfile(UserProfileDto profile) {
+    this.profile = profile;
+  }
 
   public String getPassword() {
     return password;
@@ -30,4 +39,5 @@ public class PasswordDto {
   public void setPassword(String password) {
     this.password = password;
   }
+
 }

@@ -165,7 +165,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   public boolean checkPasswordAgainstPolicy() {
     PasswordPolicyResult result = Context.getProcessEngineConfiguration()
       .getIdentityService()
-      .checkPasswordAgainstPolicy(newPassword);
+      .checkPasswordAgainstPolicy(newPassword, this);
 
     return result.isValid();
   }
