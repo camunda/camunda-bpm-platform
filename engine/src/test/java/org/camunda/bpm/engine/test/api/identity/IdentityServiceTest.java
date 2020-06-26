@@ -1058,6 +1058,12 @@ public class IdentityServiceTest {
     }
   }
 
+  @Test
+  public void shouldCreateUserWithEmptyUserId() {
+    User user = identityService.newUser("");
+    assertThat(user).isNotNull();
+  }
+
   private Object createStringSet(String... strings) {
     Set<String> stringSet = new HashSet<String>();
     for (String string : strings) {

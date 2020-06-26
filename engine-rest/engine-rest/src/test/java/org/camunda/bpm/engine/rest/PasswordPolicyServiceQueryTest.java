@@ -18,11 +18,16 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -32,6 +37,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyDigitRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyLengthRuleImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -104,7 +110,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
     PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
 
-    when(identityServiceMock.checkPasswordAgainstPolicy(anyString()))
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString(), (User)isNull()))
       .thenReturn(passwordPolicyResultMock);
 
     when(passwordPolicyResultMock.getFulfilledRules())
@@ -140,7 +146,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
     PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
 
-    when(identityServiceMock.checkPasswordAgainstPolicy(anyString()))
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString(), (User)isNull()))
       .thenReturn(passwordPolicyResultMock);
 
     when(passwordPolicyResultMock.getFulfilledRules())
@@ -159,6 +165,94 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
         .body("valid", equalTo(true))
     .when()
       .post(QUERY_URL);
+  }
+
+  @Test
+  public void shouldCheckPasswordPolicyWithUserData() {
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(true);
+
+    User userMock = mock(User.class);
+    when(identityServiceMock.newUser(anyString())).thenReturn(userMock);
+
+    PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
+
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString(), any(User.class)))
+      .thenReturn(passwordPolicyResultMock);
+
+    when(passwordPolicyResultMock.getFulfilledRules())
+      .thenReturn(Collections.emptyList());
+
+    when(passwordPolicyResultMock.getViolatedRules())
+      .thenReturn(Collections.emptyList());
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("password", "myCandidatePassword");
+
+    Map<String, String> profile = new HashMap<>();
+    profile.put("id", "myId");
+    profile.put("firstName", "foo");
+    profile.put("lastName", "bar");
+    profile.put("email", "baz");
+    payload.put("profile", profile);
+
+    given()
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(payload)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("valid", equalTo(true))
+    .when()
+      .post(QUERY_URL);
+
+    verify(identityServiceMock)
+        .checkPasswordAgainstPolicy("myCandidatePassword", userMock);
+    verify(identityServiceMock).newUser("myId");
+    verify(userMock).setFirstName("foo");
+    verify(userMock).setLastName("bar");
+    verify(userMock).setEmail("baz");
+  }
+
+  @Test
+  public void shouldCheckPasswordPolicyWithUserDataAndUserIdNull() {
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(true);
+
+    User userMock = mock(User.class);
+    when(identityServiceMock.newUser(anyString())).thenReturn(userMock);
+
+    PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
+
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString(), any(User.class)))
+      .thenReturn(passwordPolicyResultMock);
+
+    when(passwordPolicyResultMock.getFulfilledRules())
+      .thenReturn(Collections.emptyList());
+
+    when(passwordPolicyResultMock.getViolatedRules())
+      .thenReturn(Collections.emptyList());
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("password", "myCandidatePassword");
+
+    Map<String, String> profile = new HashMap<>();
+    profile.put("id", null);
+    payload.put("profile", profile);
+
+    given()
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(payload)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("valid", equalTo(true))
+    .when()
+      .post(QUERY_URL);
+
+    verify(identityServiceMock)
+        .checkPasswordAgainstPolicy("myCandidatePassword", userMock);
+    verify(identityServiceMock).newUser("");
   }
 
   @Test

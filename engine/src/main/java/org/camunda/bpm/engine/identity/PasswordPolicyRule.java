@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.identity;
 
+import org.camunda.bpm.engine.IdentityService;
+
 import java.util.Map;
 
 /**
@@ -44,12 +46,32 @@ public interface PasswordPolicyRule {
 
   /**
    * Checks the given password against this rule.
+   *
+   * <p><strong>Heads-up:</strong> The return value is not respected when
+   * {@link PasswordPolicyRule#execute(String, User)} is implemented.</p>
    * 
-   * @param password
-   *          the string that should be checked
+   * @param candidatePassword
+   *          which is checked against a password policy
    * @return <code>true</code> if the given password matches this rule.
    *         <code>false</code> if the given password is not compliant with this
    *         rule.
    */
-  boolean execute(String password);
+  boolean execute(String candidatePassword);
+
+  /**
+   * Checks the given password and the user against this rule.
+   *
+   * @param candidatePassword
+   *          which is checked against a password policy
+   * @param user
+   *          to be taken into account when checking the candidate password. Can be {@code null}
+   *          when {@link IdentityService#checkPassword(String, String)} is called.
+   * @return <code>true</code> if the given password matches this rule.
+   *         <code>false</code> if the given password is not compliant with this
+   *         rule.
+   */
+  default boolean execute(String candidatePassword, User user) {
+    return execute(candidatePassword);
+  }
+
 }

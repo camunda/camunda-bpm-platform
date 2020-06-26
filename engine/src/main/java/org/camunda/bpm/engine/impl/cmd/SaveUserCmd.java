@@ -35,7 +35,7 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   
   private static final long serialVersionUID = 1L;
   protected UserEntity user;
-  private boolean skipPasswordPolicy;
+  protected boolean skipPasswordPolicy;
   
   public SaveUserCmd(User user) {
     this(user, false);

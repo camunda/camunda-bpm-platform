@@ -33,16 +33,17 @@ public class DefaultPasswordPolicyImpl implements PasswordPolicy {
   public static final int MIN_LENGTH = 10;
   // password complexity
   public static final int MIN_LOWERCASE = 1;
-  public static final int MIN_UPPERCSE = 1;
+  public static final int MIN_UPPERCASE = 1;
   public static final int MIN_DIGIT = 1;
   public static final int MIN_SPECIAL = 1;
 
-  protected final List<PasswordPolicyRule> rules = new ArrayList<PasswordPolicyRule>();
+  protected final List<PasswordPolicyRule> rules = new ArrayList<>();
 
   public DefaultPasswordPolicyImpl() {
+    rules.add(new PasswordPolicyUserDataRuleImpl());
     rules.add(new PasswordPolicyLengthRuleImpl(MIN_LENGTH));
     rules.add(new PasswordPolicyLowerCaseRuleImpl(MIN_LOWERCASE));
-    rules.add(new PasswordPolicyUpperCaseRuleImpl(MIN_UPPERCSE));
+    rules.add(new PasswordPolicyUpperCaseRuleImpl(MIN_UPPERCASE));
     rules.add(new PasswordPolicyDigitRuleImpl(MIN_DIGIT));
     rules.add(new PasswordPolicySpecialCharacterRuleImpl(MIN_SPECIAL));
   }

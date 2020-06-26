@@ -32,8 +32,9 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.CheckPasswordPolicyResultDto;
-import org.camunda.bpm.engine.rest.dto.identity.PasswordDto;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordPolicyRequestDto;
 import org.camunda.bpm.engine.rest.dto.identity.PasswordPolicyDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
@@ -113,13 +114,26 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
   }
 
   @Override
-  public Response checkPassword(PasswordDto password) {
+  public Response checkPassword(PasswordPolicyRequestDto dto) {
     boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
       IdentityService identityService = processEngine.getIdentityService();
 
-      PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(password.getPassword());
+      User user = null;
+      UserProfileDto profileDto = dto.getProfile();
+      if (profileDto != null) {
+        String id = sanitizeUserId(profileDto.getId());
+        user = identityService.newUser(id);
+
+        user.setFirstName(profileDto.getFirstName());
+        user.setLastName(profileDto.getLastName());
+        user.setEmail(profileDto.getEmail());
+
+      }
+
+      String candidatePassword = dto.getPassword();
+      PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(candidatePassword, user);
 
       return Response.status(Status.OK.getStatusCode())
         .entity(CheckPasswordPolicyResultDto.fromPasswordPolicyResult(result))
@@ -130,4 +144,9 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
     }
   }
+
+  protected String sanitizeUserId(String userId) {
+    return userId != null ? userId : "";
+  }
+
 }

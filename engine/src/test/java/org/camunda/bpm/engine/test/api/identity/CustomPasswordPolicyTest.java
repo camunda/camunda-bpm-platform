@@ -67,7 +67,7 @@ public class CustomPasswordPolicyTest {
   public void testPasswordPolicyConfiguration() {
     PasswordPolicy policy = processEngineConfiguration.getPasswordPolicy();
     assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class), is(true));
-    assertThat(policy.getRules().size(), is(5));
+    assertThat(policy.getRules().size(), is(6));
   }
 
   @Test
