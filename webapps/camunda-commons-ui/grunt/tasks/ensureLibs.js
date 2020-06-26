@@ -118,7 +118,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     for(var key in packageJson.dependencies) {
       if(excluded.indexOf(key) === -1) {
         // Non-linked path
-        includedFiles.add(__dirname + '/../../../../' + key + '/index.js');
+        includedFiles.add(__dirname + '/../../../../../node_modules/' + key + '/index.js');
         b.require(key);
         cacheData[key] = packageJson.dependencies[key];
       }
