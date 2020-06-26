@@ -1,7 +1,7 @@
 <@lib.dto>
 
     <@lib.property
-        name = "value"
+        name = "name"
         type = "string"
         desc = "Variable name"/>
 
