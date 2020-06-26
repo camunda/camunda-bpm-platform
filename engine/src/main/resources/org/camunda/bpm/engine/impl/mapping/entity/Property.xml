@@ -106,4 +106,12 @@
     SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'telemetry.lock'
   </select>
 
+  <select id="lockInstallationIdLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'installationId.lock' ${constant_for_update}
+  </select>
+
+  <select id="lockInstallationIdLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'installationId.lock'
+  </select>
+
 </mapper>

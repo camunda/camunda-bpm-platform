@@ -411,6 +411,9 @@ public abstract class ProcessEngineConfiguration {
   /** Indicates whether type validation should be done before deserialization */
   protected boolean deserializationTypeValidationEnabled = false;
 
+  /** An unique installation identifier */
+  protected String installationId;
+
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -1052,6 +1055,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setDeserializationTypeValidationEnabled(boolean deserializationTypeValidationEnabled) {
     this.deserializationTypeValidationEnabled = deserializationTypeValidationEnabled;
+    return this;
+  }
+
+  public String getInstallationId() {
+    return installationId;
+  }
+
+  public ProcessEngineConfiguration setInstallationId(String installationId) {
+    this.installationId = installationId;
     return this;
   }
 

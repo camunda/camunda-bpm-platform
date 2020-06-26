@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.UUID;
+
 import org.camunda.bpm.engine.ProcessEngineBootstrapCommand;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -31,13 +33,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
  */
 public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
-
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
+  protected static final String INSTALLATION_PROPERTY_NAME = "camunda.installation.id";
 
   @Override
   public Void execute(CommandContext commandContext) {
+
+    initializeInstallationId(commandContext);
 
     checkDeploymentLockExists(commandContext);
 
@@ -129,4 +133,50 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
   }
+
+  public void initializeInstallationId(CommandContext commandContext) {
+    checkInstallationIdLockExists(commandContext);
+
+    String databaseInstallationId = databaseInstallationId(commandContext);
+
+    if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
+
+      commandContext.getPropertyManager().acquireExclusiveLockForInstallationId();
+      databaseInstallationId = databaseInstallationId(commandContext);
+
+      if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
+        LOG.noInstallationIdPropertyFound();
+        createInstallationProperty(commandContext);
+      }
+    } else {
+      LOG.installationIdPropertyFound(databaseInstallationId);
+      commandContext.getProcessEngineConfiguration().setInstallationId(databaseInstallationId);
+    }
+  }
+
+  protected void createInstallationProperty(CommandContext commandContext) {
+    String installationId = UUID.randomUUID().toString();
+    PropertyEntity property = new PropertyEntity(INSTALLATION_PROPERTY_NAME, installationId);
+    commandContext.getPropertyManager().insert(property);
+    LOG.creatingInstallationPropertyInDatabase(property.getValue());
+    commandContext.getProcessEngineConfiguration().setInstallationId(installationId);
+  }
+
+  protected String databaseInstallationId(CommandContext commandContext) {
+    try {
+      PropertyEntity installationIdProperty = commandContext.getPropertyManager().findPropertyById(INSTALLATION_PROPERTY_NAME);
+      return installationIdProperty != null ? installationIdProperty.getValue() : null;
+    } catch (Exception e) {
+      LOG.couldNotSelectInstallationId(e.getMessage());
+      return null;
+    }
+  }
+
+  protected void checkInstallationIdLockExists(CommandContext commandContext) {
+    PropertyEntity installationIdProperty = commandContext.getPropertyManager().findPropertyById("installationId.lock");
+    if (installationIdProperty == null) {
+      LOG.noInstallationIdLockPropertyFound();
+    }
+  }
+
 }

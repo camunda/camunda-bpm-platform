@@ -765,4 +765,31 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Error while configurting the telemetry property: {}", exception.getMessage());
   }
 
+  public void noInstallationIdPropertyFound() {
+    logDebug(
+        "096", "No installation id property found in database");
+  }
+
+  public void creatingInstallationPropertyInDatabase(String value) {
+    logDebug(
+        "097",
+        "Creating the installation id property in database with the value: {}", value);
+  }
+
+  public void couldNotSelectInstallationId(String message) {
+    logDebug(
+        "098",
+        "Could not select installation id property: {}", message);
+  }
+
+  public void noInstallationIdLockPropertyFound() {
+    logDebug(
+        "099", "No installation id lock property found in the database");
+  }
+
+  public void installationIdPropertyFound(String value) {
+    logDebug(
+        "100", "Installation id property found in the database: {}", value);
+  }
+
 }
