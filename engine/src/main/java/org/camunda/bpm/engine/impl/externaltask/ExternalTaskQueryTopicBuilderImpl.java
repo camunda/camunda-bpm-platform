@@ -146,4 +146,9 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
+  public ExternalTaskQueryTopicBuilder includeExtensionProperties() {
+    currentInstruction.setIncludeExtensionProperties(true);
+    return this;
+  }
+
 }

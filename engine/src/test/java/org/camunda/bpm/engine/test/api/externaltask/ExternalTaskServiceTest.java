@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -3260,7 +3261,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertThat(result).containsExactly("topic1");
   }
 
-
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml"})
   public void testGetTopicNamesisDistinct(){
     //given
@@ -3272,6 +3272,48 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     
     //then
     assertThat(result).containsExactlyInAnyOrder("topic1", "topic2", "topic3");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchAndLockWithExtensionProperties.bpmn20.xml" })
+  public void testFetchAndLockWithExtensionProperties_shouldReturnProperties() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithCustomProperties");
+
+    // when
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic(TOPIC_NAME, LOCK_TIME).includeExtensionProperties()
+        .execute();
+
+    // then
+    assertThat(lockedExternalTasks).hasSize(1);
+    assertThat(lockedExternalTasks.get(0).getExtensionProperties()).containsOnly(entry("property1", "value1"), entry("property2", "value2"),
+        entry("property3", "value3"));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchAndLockWithoutExtensionProperties.bpmn20.xml" })
+  public void testFetchAndLockWithExtensionProperties_shouldReturnEmptyMap() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithoutCustomProperties");
+
+    // when
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic(TOPIC_NAME, LOCK_TIME).includeExtensionProperties()
+        .execute();
+
+    // then
+    assertThat(lockedExternalTasks).hasSize(1);
+    assertThat(lockedExternalTasks.get(0).getExtensionProperties()).isEmpty();
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchAndLockWithExtensionProperties.bpmn20.xml" })
+  public void testFetchAndLockWithoutExtensionProperties_shouldReturnEmptyMap() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithCustomProperties");
+
+    // when
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic(TOPIC_NAME, LOCK_TIME).execute();
+
+    // then
+    assertThat(lockedExternalTasks).hasSize(1);
+    assertThat(lockedExternalTasks.get(0).getExtensionProperties()).isEmpty();
   }
 
   protected Date nowPlus(long millis) {

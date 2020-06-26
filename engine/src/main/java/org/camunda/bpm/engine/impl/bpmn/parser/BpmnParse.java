@@ -2381,6 +2381,9 @@ public class BpmnParse extends Parse {
 
     ParameterValueProvider topicNameProvider = parseTopic(serviceTaskElement, PROPERTYNAME_EXTERNAL_TASK_TOPIC);
     ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
+    Map<String, String> properties = parseCamundaExtensionProperties(serviceTaskElement);
+    activity.getProperties().set(BpmnProperties.EXTENSION_PROPERTIES, properties);
+
     activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicNameProvider, priorityProvider));
   }
 

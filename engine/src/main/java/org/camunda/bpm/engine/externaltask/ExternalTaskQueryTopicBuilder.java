@@ -141,4 +141,10 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    */
   public ExternalTaskQueryTopicBuilder localVariables();
 
+  /**
+   * Configure the query to include custom extension properties, if available, for all fetched tasks.
+   * 
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder includeExtensionProperties();
 }
