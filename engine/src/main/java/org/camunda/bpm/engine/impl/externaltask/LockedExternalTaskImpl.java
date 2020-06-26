@@ -17,10 +17,13 @@
 package org.camunda.bpm.engine.impl.externaltask;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -50,6 +53,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected long priority;
   protected VariableMapImpl variables;
   protected String businessKey;
+  protected Map<String, String> extensionProperties;
 
   public String getId() {
     return id;
@@ -124,6 +128,12 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   public String getBusinessKey() {
     return businessKey;
   }
+  
+
+  @Override
+  public Map<String, String> getExtensionProperties() {
+    return extensionProperties;
+  }
 
   /**
    * Construct representation of locked ExternalTask from corresponding entity.
@@ -139,7 +149,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
    * @return object with all fields copied from the ExternalTaskEntity, error details fetched from the
    * database and variables attached
    */
-  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch, boolean isLocal, boolean deserializeVariables) {
+  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch, boolean isLocal, boolean deserializeVariables, boolean includeExtensionProperties) {
     LockedExternalTaskImpl result = new LockedExternalTaskImpl();
     result.id = externalTaskEntity.getId();
     result.topicName = externalTaskEntity.getTopicName();
@@ -163,6 +173,13 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     ExecutionEntity execution = externalTaskEntity.getExecution();
     result.variables = new VariableMapImpl();
     execution.collectVariables(result.variables, variablesToFetch, isLocal, deserializeVariables);
+
+    if(includeExtensionProperties) {
+      result.extensionProperties = (Map<String, String>) execution.getActivity().getProperty(BpmnProperties.EXTENSION_PROPERTIES.getName());
+    }
+    if(result.extensionProperties == null) {
+      result.extensionProperties = Collections.emptyMap();
+    }
 
     return result;
   }

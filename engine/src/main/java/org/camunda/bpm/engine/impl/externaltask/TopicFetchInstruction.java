@@ -49,6 +49,7 @@ public class TopicFetchInstruction implements Serializable {
   protected long lockDuration;
   protected boolean deserializeVariables = false;
   protected boolean localVariables = false;
+  protected boolean includeExtensionProperties = false;
 
   public TopicFetchInstruction(String topicName, long lockDuration) {
     this.topicName = topicName;
@@ -179,6 +180,14 @@ public class TopicFetchInstruction implements Serializable {
 
   public void setLocalVariables(boolean localVariables) {
     this.localVariables = localVariables;
+  }
+
+  public boolean isIncludeExtensionProperties() {
+    return includeExtensionProperties;
+  }
+
+  public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
+    this.includeExtensionProperties = includeExtensionProperties;
   }
 
 }

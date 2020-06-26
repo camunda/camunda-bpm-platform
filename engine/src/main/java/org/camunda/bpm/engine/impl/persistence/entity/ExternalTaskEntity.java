@@ -86,6 +86,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
   protected String tenantId;
   protected long priority;
+  
+  protected Map<String, String> extensionProperties;
 
   protected ExecutionEntity execution;
 
@@ -231,6 +233,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+  
+  public Map<String, String> getExtensionProperties() {
+    return extensionProperties;
+  }
+
+  public void setExtensionProperties(Map<String, String> extensionProperties) {
+    this.extensionProperties = extensionProperties;
   }
 
   @Override
