@@ -35,6 +35,7 @@ public class FetchExternalTasksDto {
   protected String workerId;
   protected boolean usePriority = false;
   protected List<FetchExternalTaskTopicDto> topics;
+  protected boolean includeExtensionProperties = false;
 
   public int getMaxTasks() {
     return maxTasks;
@@ -63,6 +64,14 @@ public class FetchExternalTasksDto {
     this.usePriority = usePriority;
   }
 
+  public boolean isIncludeExtensionProperties() {
+    return includeExtensionProperties;
+  }
+
+  public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
+    this.includeExtensionProperties = includeExtensionProperties;
+  }
+
   public static class FetchExternalTaskTopicDto {
     protected String topicName;
     protected String businessKey;
@@ -76,6 +85,7 @@ public class FetchExternalTasksDto {
     protected HashMap<String, Object> processVariables;
     protected boolean deserializeValues = false;
     protected boolean localVariables = false;
+    protected boolean includeExtensionProperties = false;
 
     protected boolean withoutTenantId;
     protected String[] tenantIdIn;
@@ -164,6 +174,12 @@ public class FetchExternalTasksDto {
     public void setTenantIdIn(String[] tenantIdIn) {
       this.tenantIdIn = tenantIdIn;
     }
+    public boolean isIncludeExtensionProperties() {
+      return includeExtensionProperties;
+    }
+    public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
+      this.includeExtensionProperties = includeExtensionProperties;
+    }
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
@@ -222,6 +238,10 @@ public class FetchExternalTasksDto {
 
         if(topicDto.getProcessDefinitionVersionTag() != null) {
           topicFetchBuilder = topicFetchBuilder.processDefinitionVersionTag(topicDto.getProcessDefinitionVersionTag());
+        }
+
+        if(topicDto.isIncludeExtensionProperties()) {
+          topicFetchBuilder = topicFetchBuilder.includeExtensionProperties();
         }
 
         fetchBuilder = topicFetchBuilder;

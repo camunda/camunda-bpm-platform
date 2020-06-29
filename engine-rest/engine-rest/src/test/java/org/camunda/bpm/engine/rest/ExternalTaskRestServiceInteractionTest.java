@@ -152,6 +152,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.tenantIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
 
     Batch batch = createMockBatch();
     updateRetriesBuilder = mock(UpdateExternalTaskRetriesBuilder.class);
@@ -382,6 +383,33 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).processDefinitionVersionTag("versionTag");
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockIncludeExtensionProperties() {
+    // given
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    // when
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+
+    Map<String, Object> topicParameter = new HashMap<String, Object>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("includeExtensionProperties", true);
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    executePost(parameters);
+
+    // then
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).includeExtensionProperties();
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
