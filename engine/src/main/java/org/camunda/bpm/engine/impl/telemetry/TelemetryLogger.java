@@ -50,7 +50,7 @@ public class TelemetryLogger extends ProcessEngineLogger {
   public void databaseTelemetryPropertyMissingInfo() {
     logInfo(
         "006",
-        "`camunda.telemetry.enabled` propery is missing in the database");
+        "`camunda.telemetry.enabled` property is missing in the database");
   }
 
 }
