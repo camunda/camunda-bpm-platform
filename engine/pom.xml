@@ -395,11 +395,9 @@
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>
-              <exclude>org.apache.commons:*</exclude>
               <exclude>com.sun.mail:*</exclude>
               <exclude>javax.activation:*</exclude>
               <exclude>org.mybatis:mybatis:*</exclude>
-              <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
             </excludes>
           </artifactSet>
@@ -412,7 +410,26 @@
               <pattern>org.apache.http</pattern>
               <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
             </relocation>
+            <relocation>
+              <pattern>org.apache.commons.codec</pattern>
+              <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.commons.logging</pattern>
+              <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
+            </relocation>
           </relocations>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/DEPENDENCIES</exclude>
+                <exclude>META-INF/LICENSE</exclude>
+                <exclude>META-INF/NOTICE</exclude>
+                <exclude>mozilla/**</exclude>
+              </excludes>
+            </filter>
+          </filters>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
