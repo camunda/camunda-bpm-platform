@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -24,9 +26,6 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
-import org.camunda.bpm.engine.test.util.TelemetryHelper;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -242,7 +241,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      managementService.enableTelemetry(false);
+      managementService.toggleTelemetry(false);
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -253,16 +252,15 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void testTelemetryEnabledAsCamundaAdmin() {
     // given
     disableAuthorization();
-    managementService.enableTelemetry(true);
+    managementService.toggleTelemetry(true);
     enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
-    managementService.enableTelemetry(false);
+    managementService.toggleTelemetry(false);
 
     // then
-    String telemetryPropertyValue = TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration).getValue();
-    assertThat(Boolean.parseBoolean(telemetryPropertyValue)).isFalse();
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
 }

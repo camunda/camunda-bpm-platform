@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -43,7 +44,6 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.TelemetryHelper;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -809,28 +809,39 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTasks(taskIds, true);
   }
 
+  public void testFetchTelemetryConfiguration() {
+    // given default configuration
+    boolean expectedTelemetryValue = Boolean.parseBoolean(getTelemetryProperty(processEngineConfiguration).getValue());
+
+    // when
+    boolean actualTelemetryValue = managementService.isTelemetryEnabled();
+
+    // then
+    assertThat(actualTelemetryValue).isEqualTo(expectedTelemetryValue);
+  }
+
   public void testTelemetryEnabled() {
     // given default configuration
 
     // when
-    managementService.enableTelemetry(true);
+    managementService.toggleTelemetry(true);
 
     // then
-    assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isTrue();
+    assertThat(managementService.isTelemetryEnabled()).isTrue();
 
     // cleanup
-    managementService.enableTelemetry(false);
+    managementService.toggleTelemetry(false);
   }
 
   public void testTelemetryDisabled() {
-    // given default configuration
-    managementService.enableTelemetry(true);
+    // given
+    managementService.toggleTelemetry(true);
 
     // when
-    managementService.enableTelemetry(false);
+    managementService.toggleTelemetry(false);
 
     // then
-    assertThat(Boolean.parseBoolean(getTelemetryProperty().getValue())).isFalse();
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
   private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {
@@ -858,7 +869,12 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   }
 
 
-  protected PropertyEntity getTelemetryProperty() {
-    return TelemetryHelper.fetchConfigurationProperty(processEngineConfiguration);
+  protected PropertyEntity getTelemetryProperty(ProcessEngineConfigurationImpl configuration) {
+      return configuration.getCommandExecutorTxRequired()
+        .execute(new Command<PropertyEntity>() {
+          public PropertyEntity execute(CommandContext commandContext) {
+            return commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
+          }
+        });
   }
 }

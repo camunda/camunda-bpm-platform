@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.util.TelemetryHelper.fetchConfigurationProperty;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -54,7 +53,7 @@ public class TelemetryConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.isInitializeTelemetry()).isFalse();
-    assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isFalse();
+    assertThat(processEngineConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
   }
 
   @Test
@@ -70,7 +69,7 @@ public class TelemetryConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.isInitializeTelemetry()).isTrue();
-    assertThat(Boolean.parseBoolean(fetchConfigurationProperty(processEngineConfiguration).getValue())).isTrue();
+    assertThat(processEngineConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
   }
 
   @Test

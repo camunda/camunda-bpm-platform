@@ -17,14 +17,12 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.util.TelemetryHelper.fetchConfigurationProperty;
 
 import java.sql.Connection;
 
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
@@ -74,8 +72,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
     assertNull(thread1.exception);
     assertNull(thread2.exception);
-    PropertyEntity telemetryProperty = fetchConfigurationProperty(processEngineConfiguration);
-    assertThat(Boolean.parseBoolean(telemetryProperty.getValue())).isFalse();
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
   protected static class ControllableUpdateTelemetrySetupCommand extends ControllableCommand<Void> {
