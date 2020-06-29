@@ -19,69 +19,73 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class DeploymentTest {
+public class HighLoadDeploymentTest {
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
-    configuration.setJdbcUrl("jdbc:h2:mem:DeploymentTest-HistoryLevelNone;DB_CLOSE_DELAY=1000");
-    configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
-    configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE);
-    configuration.setDbHistoryUsed(false);
-  });
-
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testHelper);
 
-  @Test
-  public void shouldDeleteDeployment() {
-     BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().endEvent().done();
+  protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
+  protected HistoryService historyService;
 
-     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-         .createDeployment()
-         .addModelInstance("foo.bpmn", instance)
-         .deployWithResult();
-
-     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
-
-     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
+    repositoryService = engineRule.getRepositoryService();
+    historyService = engineRule.getHistoryService();
   }
 
   @Test
-  public void shouldDeleteDeploymentWithRunningInstance() {
-     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-         .startEvent()
-         .userTask("testTask")
-         .endEvent()
-         .done();
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldDeleteDeploymentWithCascade() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("testTask")
+        .endEvent()
+        .done();
 
-     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-         .createDeployment()
-         .addModelInstance("foo.bpmn", instance)
-         .deployWithResult();
-     
-     engineRule.getRuntimeService().startProcessInstanceByKey("process");
-     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count(), is(1L));
+    DeploymentWithDefinitions deployment = repositoryService
+        .createDeployment()
+        .addModelInstance("foo.bpmn", instance)
+        .deployWithResult();
 
-     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+    for (int i = 0; i < 2200; i++) {
+      runtimeService.startProcessInstanceByKey("process");
+    }
 
-     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+    // when
+    assertThat(engineRule.getHistoryService().createHistoricProcessInstanceQuery().count(), is(2200L));
+    repositoryService.deleteDeployment(deployment.getId(), true);
+
+    // then
+    long hpiCount = historyService.createHistoricProcessInstanceQuery().count();
+    long count = repositoryService.createDeploymentQuery().count();
+    assertThat(hpiCount, is(0L));
+    assertThat(count, is(0L));
   }
 }
