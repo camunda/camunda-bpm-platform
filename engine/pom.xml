@@ -419,17 +419,6 @@
               <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
             </relocation>
           </relocations>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes>
-                <exclude>META-INF/DEPENDENCIES</exclude>
-                <exclude>META-INF/LICENSE</exclude>
-                <exclude>META-INF/NOTICE</exclude>
-                <exclude>mozilla/**</exclude>
-              </excludes>
-            </filter>
-          </filters>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
