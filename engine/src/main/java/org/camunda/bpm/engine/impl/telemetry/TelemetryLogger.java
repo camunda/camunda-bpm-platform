@@ -58,4 +58,9 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "007", "Sending telemetry is disabled.");
   }
 
+  public void schedulingTaskFails(String message) {
+    logDebug(
+        "008", "An exception occured during scheduling telemetry task: {}", message);
+  }
+
 }

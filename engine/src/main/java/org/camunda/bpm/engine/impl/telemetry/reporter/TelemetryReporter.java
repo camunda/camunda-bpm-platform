@@ -19,10 +19,14 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.util.Timer;
 
 import org.apache.http.client.HttpClient;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 
 public class TelemetryReporter {
+
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   // send report every 24 hours
   protected long reportingIntervalInSeconds = 24 * 60 * 60;
@@ -60,10 +64,16 @@ public class TelemetryReporter {
       // if the reporter was already stopped another task should be scheduled
       initTelemetrySendingTask();
     }
-    timer = new Timer("Camunda Telemetry Reporter", true);
-    long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
+    if (timer == null) { // initialize timer if only the the timer is not scheduled yet
+      timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
+      long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
 
-    timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+      try {
+        timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+      } catch (Exception e) {
+        LOG.schedulingTaskFails(e.getMessage());
+      }
+    }
   }
 
   public void stop() {

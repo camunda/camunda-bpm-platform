@@ -27,13 +27,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-
-import com.google.gson.Gson;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 public class TelemetrySendingTask extends TimerTask {
 
@@ -65,32 +62,29 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected void sendData() {
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-        // send data only if telemetry is enabled
-        if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
-          try {
-            HttpPost request = new HttpPost(telemetryEndpoint);
-            String telemetryData = new Gson().toJson(data);
-            StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-            request.setHeader("content-type", MediaType.APPLICATION_JSON);
-            request.setEntity(requestBody);
-            HttpResponse response = httpClient.execute(request);
+    commandExecutor.execute(commandContext -> {
+      // send data only if telemetry is enabled
+      if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
+        try {
+          HttpPost request = new HttpPost(telemetryEndpoint);
+          String telemetryData = JsonUtil.asString(data);
+          StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
+          request.setHeader("content-type", MediaType.APPLICATION_JSON);
+          request.setEntity(requestBody);
+          HttpResponse response = httpClient.execute(request);
 
-            if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
-              LOG.unexpectedResponseWhileSendingTelemetryData();
-            } else {
-              LOG.telemetryDataSent(telemetryData);
-            }
-          } catch (Exception e) {
-            LOG.exceptionWhileSendingTelemetryData(e.getMessage());
+          if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
+            LOG.unexpectedResponseWhileSendingTelemetryData();
+          } else {
+            LOG.telemetryDataSent(telemetryData);
           }
-        } else {
-          LOG.telemetryDisabled();
+        } catch (Exception e) {
+          LOG.exceptionWhileSendingTelemetryData(e.getMessage());
         }
-        return null;
+      } else {
+        LOG.telemetryDisabled();
       }
+      return null;
     });
   }
 

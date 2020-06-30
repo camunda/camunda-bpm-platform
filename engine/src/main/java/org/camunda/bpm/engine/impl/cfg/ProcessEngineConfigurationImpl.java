@@ -397,7 +397,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected static final String EDITION_ENTERPRISE = "enterprise";
   protected static final String EDITION_COMMUNITY = "community";
-  protected static final String PRODUCT_NAME = "Camunda BPM";
+  protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
 
   public static SqlSessionFactory cachedSqlSessionFactory;
 
@@ -2580,7 +2580,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       initTelemetryData();
     }
     if (telemetryHttpClient == null) {
-      telemetryHttpClient = HttpClientBuilder.create().build();
+      telemetryHttpClient = HttpClientBuilder.create().useSystemProperties().build();
     }
     if (telemetryReporter == null) {
       telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
@@ -2603,7 +2603,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
 
       Product product = new Product(PRODUCT_NAME, version, edition, internals);
-      telemetryData = new Data(installationId, product);
+
+      // installationId=null, the id will be fetched later from database
+      telemetryData = new Data(null, product);
   }
 
   // getters and setters //////////////////////////////////////////////////////

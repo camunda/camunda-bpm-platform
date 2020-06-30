@@ -448,6 +448,11 @@ public final class JsonUtil {
     return stringValue;
   }
 
+  public static String asString(Object data) {
+    return gsonMapper.toJson(data);
+  }
+
+
   public static JsonArray asArray(List<String> list) {
     if (list != null) {
       JsonElement jsonElement = null;
