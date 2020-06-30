@@ -28,6 +28,9 @@
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
+    <!-- telemetry configuration -->
+    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
+
   </bean>
   
 </beans>
