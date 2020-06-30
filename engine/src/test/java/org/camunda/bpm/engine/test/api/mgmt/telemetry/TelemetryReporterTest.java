@@ -197,27 +197,6 @@ public class TelemetryReporterTest {
     // second during #reportNow call
   }
 
-  @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
-  public void shouldLogInvalidInstallationId() throws ClientProtocolException, IOException {
-    // given 
-    managementService.toggleTelemetry(true);
-    Data data = createDataToSend();
-    data.setInstallation("1234"); // not an UUID
-    HttpClient mockedClient = mock(HttpClient.class);
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
-                                                                TELEMETRY_ENDPOINT,
-                                                                data,
-                                                                mockedClient);
-    when(mockedClient.execute(any())).thenReturn(null); // actually we won't send the data
-
-    // when
-    telemetryReporter.reportNow();
-
-    // then
-    assertThat(loggingRule.getFilteredLog("Invalid installation id will prevent sending telemetry, id").size()).isOne();
-  }
-  
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Internals internals = new Internals(database);
