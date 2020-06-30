@@ -90,6 +90,11 @@ public interface IdentityService {
   /**
    * Saves the user. If the user already existed, the user is updated.
    * @param user user to save, cannot be null.
+   * @throws ProcessEngineException when user id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#userResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException when a user with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
    * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#USER} (update existing user)
@@ -135,6 +140,11 @@ public interface IdentityService {
   /**
    * Saves the group. If the group already existed, the group is updated.
    * @param group group to save. Cannot be null.
+   * @throws ProcessEngineException when group id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#groupResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException when a group with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
    * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#GROUP} (update existing group)
@@ -197,6 +207,11 @@ public interface IdentityService {
    *
    * @param tenant
    *          the tenant to save. Cannot be <code>null</code>.
+   * @throws ProcessEngineException when tenant id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#tenantResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException
    *           when a tenant with the same name already exists.
    * @throws UnsupportedOperationException
