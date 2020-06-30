@@ -36,7 +36,7 @@ public class TelemetryConfigureCmd implements Command<Object> {
     this.telemetryEnabled = telemetryEnabled;
   }
 
-  public Object execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
