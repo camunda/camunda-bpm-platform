@@ -40,6 +40,7 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected String processDefinitionVersionTag;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
+  protected boolean includeExtensionProperties;
 
   public TopicSubscriptionImpl(String topicName, Long lockDuration, ExternalTaskHandler externalTaskHandler,
                                TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames,
@@ -144,6 +145,14 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   public TopicSubscription setTenantIdIn(List<String> tenantIds) {
     this.tenantIdIn = tenantIds;
     return this;
+  }
+
+  public boolean isIncludeExtensionProperties() {
+    return includeExtensionProperties;
+  }
+
+  public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
+    this.includeExtensionProperties = includeExtensionProperties;
   }
 
   public int hashCode() {

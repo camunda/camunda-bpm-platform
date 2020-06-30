@@ -106,4 +106,13 @@ public interface TopicSubscription {
    * @return the tenant ids associated with the external tasks which are supposed to be fetched and locked
    */
   List<String> getTenantIdIn();
+
+  /**
+   * @return whether or not custom extension properties defined in the external
+   *         task activity are included. The default is <code>false</code>,
+   *         which means that no extension properties will be available within
+   *         the external-task-client. <code>true</code> means that all defined
+   *         extension properties are fetched and provided.
+   */
+  boolean isIncludeExtensionProperties();
 }

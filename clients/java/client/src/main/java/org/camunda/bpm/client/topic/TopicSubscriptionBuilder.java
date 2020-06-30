@@ -109,6 +109,18 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder tenantIdIn(String... tenantIds);
 
   /**
+   * @param includeExtensionProperties
+   *          whether or not to include custom extension properties for fetched
+   *          external tasks. <code>true</code> means all extensionProperties
+   *          defined in the external task activity will be provided.
+   *          <code>false</code> means custom extension properties are not
+   *          available within the external-task-client. The default is
+   *          <code>false</code>.
+   * @return the builder
+   */
+  TopicSubscriptionBuilder includeExtensionProperties(boolean includeExtensionProperties);
+
+  /**
    * Release the topic subscription for being executed asynchronously
    *
    * @throws ExternalTaskClientException

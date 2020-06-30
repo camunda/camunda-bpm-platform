@@ -17,6 +17,7 @@
 package org.camunda.bpm.client.task;
 
 import org.camunda.bpm.client.exception.ValueMapperException;
+import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -195,6 +196,27 @@ public interface ExternalTask {
    * @return the business key
    */
   String getBusinessKey();
+  
+  /**
+   * Returns the value of the extension property for a given key or <code>null</code> if the property was not available.
+   * 
+   * @see ExternalTask#getExtensionProperties()
+   * @return the extension property, or <code>null</code> if not available
+   */
+  String getExtensionProperty(String propertyKey);
 
+  /**
+   * Returns all available extension properties. Extension properties must be
+   * defined at the external task activity inside the BPMN model and explicitly
+   * fetched (e.g. by calling
+   * {@link TopicSubscriptionBuilder#includeExtensionProperties(boolean)}) to be
+   * available.
+   * 
+   * If no extension properties are available the returned map will be empty.
+   * 
+   * @return a map of available extension properties, never <code>null</code>
+   */
+  Map<String, String> getExtensionProperties();
+  
 }
 

@@ -17,6 +17,7 @@
 package org.camunda.bpm.client.task.impl;
 
 import java.text.DateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class ExternalTaskImpl implements ExternalTask {
   protected long priority;
   protected Map<String, TypedValueField> variables;
   protected String businessKey;
+  protected Map<String, String> extensionProperties;
 
   @JsonIgnore
   @SuppressWarnings("rawtypes")
@@ -286,6 +288,24 @@ public class ExternalTaskImpl implements ExternalTask {
     }
 
     return (T) typedValue;
+  }
+
+
+  public Map<String, String> getExtensionProperties() {
+    return extensionProperties == null ? Collections.emptyMap() : extensionProperties;
+  }
+
+  public void setExtensionProperties(Map<String, String> extensionProperties) {
+    this.extensionProperties = extensionProperties;
+  }
+
+  @JsonIgnore
+  @Override
+  public String getExtensionProperty(String propertyKey) {
+    if(extensionProperties != null) {
+      return extensionProperties.get(propertyKey);
+    }
+    return null;
   }
 
   @Override

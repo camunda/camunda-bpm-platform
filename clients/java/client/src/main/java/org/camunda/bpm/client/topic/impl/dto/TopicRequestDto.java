@@ -37,6 +37,7 @@ public class TopicRequestDto {
   protected String processDefinitionVersionTag;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
+  protected boolean includeExtensionProperties;
 
   public TopicRequestDto(String topicName, long lockDuration, List<String> variables, String businessKey) {
     this.topicName = topicName;
@@ -125,6 +126,14 @@ public class TopicRequestDto {
     this.tenantIdIn = tenantIdIn;
   }
 
+  public boolean isIncludeExtensionProperties() {
+    return includeExtensionProperties;
+  }
+
+  public void setIncludeExtensionProperties(boolean includeExtensionProperties) {
+    this.includeExtensionProperties = includeExtensionProperties;
+  }
+
   public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription, long clientLockDuration) {
     Long lockDuration = topicSubscription.getLockDuration();
 
@@ -160,6 +169,9 @@ public class TopicRequestDto {
     }
     if(topicSubscription.isLocalVariables()) {
       topicRequestDto.setLocalVariables(topicSubscription.isLocalVariables());
+    }
+    if(topicSubscription.isIncludeExtensionProperties()) {
+      topicRequestDto.setIncludeExtensionProperties(topicSubscription.isIncludeExtensionProperties());
     }
     return topicRequestDto;
   }

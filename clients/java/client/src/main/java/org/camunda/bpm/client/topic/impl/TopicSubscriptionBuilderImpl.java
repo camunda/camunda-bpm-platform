@@ -45,6 +45,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected List<String> tenantIds;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
+  protected boolean includeExtensionProperties;
 
 
   public TopicSubscriptionBuilderImpl(String topicName, TopicSubscriptionManager topicSubscriptionManager) {
@@ -119,6 +120,11 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder includeExtensionProperties(boolean includeExtensionProperties) {
+    this.includeExtensionProperties = includeExtensionProperties;
+    return this;
+  }
+
   public TopicSubscription open() {
     if (topicName == null) {
       throw LOG.topicNameNullException();
@@ -156,6 +162,9 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
     if(localVariables) {
       subscription.setLocalVariables(localVariables);
+    }
+    if(includeExtensionProperties) {
+      subscription.setIncludeExtensionProperties(includeExtensionProperties);
     }
     topicSubscriptionManager.subscribe(subscription);
 
