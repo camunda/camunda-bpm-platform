@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.nio.charset.StandardCharsets;
 import java.util.TimerTask;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpResponse;
@@ -69,7 +70,7 @@ public class TelemetrySendingTask extends TimerTask {
           HttpPost request = new HttpPost(telemetryEndpoint);
           String telemetryData = JsonUtil.asString(data);
           StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader("content-type", MediaType.APPLICATION_JSON);
+          request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
           request.setEntity(requestBody);
           HttpResponse response = httpClient.execute(request);
 
