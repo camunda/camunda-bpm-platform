@@ -100,6 +100,7 @@ public class BpmnParseTest {
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    processEngineConfiguration.setEnableXxeProcessing(false);
   }
 
 
@@ -1191,15 +1192,39 @@ public class BpmnParseTest {
   }
 
   @Test
-  public void testXxeProcessing() {
-    try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
-      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
-      fail("Exception expected");
-    } catch (ParseException e) {
-      testRule.assertTextPresent("cvc-datatype-valid.1.2.1: ''", e.getMessage());
-      testRule.assertTextPresent("cvc-type.3.1.3: The value ''", e.getMessage());
-    }
+  public void shouldPreventXxeProcessing() {
+    // given
+    String resource =
+        TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
+
+    // then
+    exception.expectMessage(containsString("DOCTYPE is disallowed when the feature " +
+        "\"http://apache.org/xml/features/disallow-doctype-decl\" set to true."));
+
+    // when
+    repositoryService.createDeployment()
+        .name(resource)
+        .addClasspathResource(resource)
+        .deploy();
+  }
+
+  @Test
+  public void shouldAllowXxeProcessing() {
+    // given
+    processEngineConfiguration.setEnableXxeProcessing(true);
+
+    String resource =
+        TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
+
+    // then
+    exception.expectMessage(containsString("Could not parse"));
+    exception.expectMessage(containsString("file.txt"));
+
+    // when
+    repositoryService.createDeployment()
+        .name(resource)
+        .addClasspathResource(resource)
+        .deploy();
   }
 
   @Test
