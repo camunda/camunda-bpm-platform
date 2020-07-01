@@ -101,7 +101,6 @@
     <profile>
       <id>upgrade-db</id>
       <dependencies>
-
         <dependency>
           <groupId>org.camunda.bpm.distro</groupId>
           <artifactId>camunda-sql-scripts</artifactId>
@@ -128,11 +127,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-	  <dependency>
-		  <groupId>com.google.code.gson</groupId>
-		  <artifactId>gson</artifactId>
-		  <scope>test</scope>
-	  </dependency>
       <build>
         <plugins>
           <!-- parse version properties from qa/pom.xml -->
