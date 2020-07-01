@@ -45,7 +45,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;

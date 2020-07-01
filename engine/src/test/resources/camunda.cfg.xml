@@ -37,6 +37,9 @@
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
+    <!-- telemetry configuration -->
+    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
+
   </bean>
 
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->

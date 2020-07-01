@@ -35,10 +35,6 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class ConcurrentInstallationIdInitializationTest extends ConcurrencyTestCase {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
 
   @Override
   protected void runTest() throws Throwable {

@@ -19,10 +19,14 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.util.Timer;
 
 import org.apache.http.client.HttpClient;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 
 public class TelemetryReporter {
+
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   // send report every 24 hours
   protected long reportingIntervalInSeconds = 24 * 60 * 60;
@@ -34,6 +38,8 @@ public class TelemetryReporter {
   protected String telemetryEndpoint;
   protected Data data;
   protected HttpClient httpClient;
+
+  protected boolean stopped;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
@@ -53,23 +59,32 @@ public class TelemetryReporter {
                                                     httpClient);
   }
 
-  public void start() {
-    timer = new Timer("Camunda Telemetry Reporter", true);
-    long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
+  public synchronized void start() {
+    if (stopped) {
+      // if the reporter was already stopped another task should be scheduled
+      initTelemetrySendingTask();
+    }
+    if (timer == null) { // initialize timer if only the the timer is not scheduled yet
+      timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
+      long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
 
-    timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+      try {
+        timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+      } catch (Exception e) {
+        LOG.schedulingTaskFails(e.getMessage());
+      }
+    }
   }
 
-  public void stop(boolean reportLastTime) {
+  public synchronized void stop() {
     if (timer != null) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      if (reportLastTime) {
-        // collect and send manually for the last time
-        reportNow();
-      }
+      // collect and send manually for the last time
+      reportNow();
     }
+    stopped = true;
   }
 
   public void reportNow() {

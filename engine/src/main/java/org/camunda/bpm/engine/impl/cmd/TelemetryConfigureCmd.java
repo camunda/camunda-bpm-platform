@@ -22,10 +22,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
-public class TelemetryConfigureCmd implements Command<Object> {
+public class TelemetryConfigureCmd implements Command<Void> {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+
+  protected static final String TELEMETRY_PROPERTY = "camunda.telemetry.enabled";
 
   protected boolean telemetryEnabled;
 
@@ -33,18 +36,25 @@ public class TelemetryConfigureCmd implements Command<Object> {
     this.telemetryEnabled = telemetryEnabled;
   }
 
-  public Object execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
 
-    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
+    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY);
     if (telemetryProperty != null) {
       telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
     } else {
       LOG.databaseTelemetryPropertyMissingInfo(telemetryEnabled);
-      telemetryProperty = new PropertyEntity("camunda.telemetry.enabled", Boolean.toString(telemetryEnabled));
+      telemetryProperty = new PropertyEntity(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled));
       commandContext.getPropertyManager().insert(telemetryProperty);
+    }
+
+    TelemetryReporter telemetryReporter = commandContext.getProcessEngineConfiguration().getTelemetryReporter();
+    if (telemetryEnabled) {
+      telemetryReporter.start();
+    } else {
+      telemetryReporter.stop();
     }
 
     return null;

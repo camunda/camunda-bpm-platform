@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 import java.util.UUID;
 
 import org.camunda.bpm.engine.ProcessEngineBootstrapCommand;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -51,6 +52,9 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
 
     initializeTelemetryProperty(commandContext);
+    // installationId needs to be updated in the telemetry data
+    updateTelemetryData(commandContext);
+    startTelemetryReporter(commandContext);
 
     return null;
   }
@@ -179,4 +183,19 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
   }
 
+  protected void updateTelemetryData(CommandContext commandContext) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    String installationId = processEngineConfiguration.getInstallationId();
+
+    // set installationId in the telemetry data
+    processEngineConfiguration.getTelemetryData().setInstallation(installationId);
+  }
+
+  protected void startTelemetryReporter(CommandContext commandContext) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    // start telemetry reporter only if the telemetry is enabled
+    if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
+      processEngineConfiguration.getTelemetryReporter().start();
+    }
+  }
 }

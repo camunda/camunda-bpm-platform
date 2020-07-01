@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import java.nio.charset.StandardCharsets;
 import java.util.TimerTask;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpResponse;
@@ -27,17 +28,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-
-import com.google.gson.Gson;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 public class TelemetrySendingTask extends TimerTask {
 
-  private static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+  protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
@@ -65,14 +63,14 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected void sendData() {
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
+    commandExecutor.execute(commandContext -> {
+      // send data only if telemetry is enabled
+      if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
         try {
           HttpPost request = new HttpPost(telemetryEndpoint);
-          String telemetryData = new Gson().toJson(data);
+          String telemetryData = JsonUtil.asString(data);
           StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader("content-type", MediaType.APPLICATION_JSON);
+          request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
           request.setEntity(requestBody);
           HttpResponse response = httpClient.execute(request);
 
@@ -84,8 +82,10 @@ public class TelemetrySendingTask extends TimerTask {
         } catch (Exception e) {
           LOG.exceptionWhileSendingTelemetryData(e.getMessage());
         }
-        return null;
+      } else {
+        LOG.telemetryDisabled();
       }
+      return null;
     });
   }
 
