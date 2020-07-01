@@ -127,12 +127,13 @@
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
-      </dependencies>
-	  <dependency>
+			  <dependency>
 		  <groupId>com.google.code.gson</groupId>
 		  <artifactId>gson</artifactId>
 		  <scope>test</scope>
 	  </dependency>
+      </dependencies>
+
       <build>
         <plugins>
           <!-- parse version properties from qa/pom.xml -->
