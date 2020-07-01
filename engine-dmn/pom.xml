@@ -16,7 +16,7 @@
 
   <properties>
     <version.juel>2.2.7</version.juel>
-    <version.log4j>2.9.0</version.log4j>
+    <version.log4j>2.13.3</version.log4j>
   </properties>
 
   <dependencyManagement>
