@@ -100,11 +100,26 @@
                      }'] />
 
     <@lib.response
-        code = "404"
+        code = "200"
+        mediaType = "application/csv"
+        desc = "Request successful. In case of an expected application/csv response to retrieve the result as a csv file." />
+
+    <@lib.response
+        code = "200"
+        mediaType = "text/csv"
+        desc = "Request successful. In case of an expected text/csv response to retrieve the result as a csv file." />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        desc = "Returned if some of the query parameters are invalid or mandatory parameters are not supplied.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
+
+    <@lib.response
+        code = "403"
         dto = "ExceptionDto"
         last = true
-        desc = "Not Found
-                Historic process instance with given id does not exist.
+        desc = "If the authenticated user is unauthorized to read the history.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
 
   }

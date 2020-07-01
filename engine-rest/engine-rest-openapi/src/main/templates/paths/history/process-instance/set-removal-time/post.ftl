@@ -44,7 +44,9 @@
                                   "seedJobDefinitionId": "120b5690-724a-11e9-98b7-be5e0f7575b7",
                                   "monitorJobDefinitionId": "120b568f-724a-11e9-98b7-be5e0f7575b7",
                                   "batchJobDefinitionId": "120b568e-724a-11e9-98b7-be5e0f7575b7",
-                                  "tenantId": "accounting"
+                                  "tenantId": "accounting",
+                                  "suspended": false,
+                                  "createUserId": null
                                 }
                      }'] />
 

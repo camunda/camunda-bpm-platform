@@ -42,16 +42,19 @@
                                   "seedJobDefinitionId": "120b5690-724a-11e9-98b7-be5e0f7575b7",
                                   "monitorJobDefinitionId": "120b568f-724a-11e9-98b7-be5e0f7575b7",
                                   "batchJobDefinitionId": "120b568e-724a-11e9-98b7-be5e0f7575b7",
-                                  "tenantId": "accounting"
+                                  "tenantId": "accounting",
+                                  "suspended": false,
+                                  "createUserId": null
                                 }
                      }'] />
 
     <@lib.response
-        code = "404"
+        code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Not found
-                Historic process instance with given id does not exist." />
+        desc = "Returned if some of the query parameters are invalid, i.e. neither historicProcessInstanceIds,
+                nor historicProcessInstanceQuery is present. See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+                for the error response format." />
 
   }
 }

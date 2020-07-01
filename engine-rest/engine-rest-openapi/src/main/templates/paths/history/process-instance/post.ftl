@@ -22,7 +22,7 @@
                      "value": {
                                 "finishedAfter": "2013-01-01T00:00:00.000+0200",
                                 "finishedBefore": "2013-04-01T23:59:59.000+0200",
-                                "executedActivityAfter": "2013-03-23T13:42:44",
+                                "executedActivityAfter": "2013-03-23T13:42:44.000+0200",
                                 "variables": [
                                   {
                                     "name": "myVariable",
