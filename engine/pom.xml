@@ -422,7 +422,10 @@
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
-          <shadeTestJar>true</shadeTestJar>
+          <!-- shading test jar is disabled due to
+               the httpclient and dependencies that it brings have *-tests.jar and we prevent their shading,
+               otherwise the tests of those libraries are unpacked and executed (via surefire plugin) in the upgrade setups -->
+          <shadeTestJar>false</shadeTestJar> 
         </configuration>
       </plugin>
     </plugins>
