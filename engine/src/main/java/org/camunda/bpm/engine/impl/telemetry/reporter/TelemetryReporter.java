@@ -59,7 +59,7 @@ public class TelemetryReporter {
                                                     httpClient);
   }
 
-  public void start() {
+  public synchronized void start() {
     if (stopped) {
       // if the reporter was already stopped another task should be scheduled
       initTelemetrySendingTask();
@@ -76,7 +76,7 @@ public class TelemetryReporter {
     }
   }
 
-  public void stop() {
+  public synchronized void stop() {
     if (timer != null) {
       // cancel the timer
       timer.cancel();
