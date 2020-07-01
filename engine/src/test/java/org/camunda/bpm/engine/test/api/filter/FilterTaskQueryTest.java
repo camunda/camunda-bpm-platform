@@ -26,17 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryEntityRelationCondition;
 import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
 import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
@@ -55,8 +52,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import com.google.gson.JsonObject;
 
 /**
  * @author Sebastian Menski
@@ -1147,9 +1142,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
 
-  /**
-   * Tests compatibility with serialization format that was used in 7.2
-   */
+
+  /* IGNORED TESTS, please check CAM-12116
+  // Tests compatibility with serialization format that was used in 7.2
   @SuppressWarnings("deprecation")
   public void testDeprecatedOrderingFormatDeserializationSingleOrdering() {
     String sortByNameAsc = "RES." + TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
@@ -1175,9 +1170,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
-  /**
-   * Tests compatibility with serialization format that was used in 7.2
-   */
+
+   / Tests compatibility with serialization format that was used in 7.2
   @SuppressWarnings("deprecation")
   public void testDeprecatedOrderingFormatDeserializationSecondaryOrdering() {
     String sortByNameAsc = "RES." + TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
@@ -1212,9 +1206,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNull(orderingProperty2.getQueryProperty().getFunction());
   }
 
-  /**
-   * Tests compatibility with serialization format that was used in 7.2
-   */
+  // Tests compatibility with serialization format that was used in 7.2
   @SuppressWarnings("deprecation")
   public void testDeprecatedOrderingFormatDeserializationFunctionOrdering() {
     String orderingWithFunction = "LOWER(RES." + TaskQueryProperty.NAME.getName() + ") asc";
@@ -1240,7 +1232,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getFunction(),
       orderingProperty.getQueryProperty().getFunction());
   }
-
+  */
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
     public void testInitializeFormKeysEnabled() {
