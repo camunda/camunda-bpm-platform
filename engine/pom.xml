@@ -395,7 +395,6 @@
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>
-              <exclude>org.apache.commons:*</exclude>
               <exclude>com.sun.mail:*</exclude>
               <exclude>javax.activation:*</exclude>
               <exclude>org.mybatis:mybatis:*</exclude>
@@ -411,6 +410,10 @@
             <relocation>
               <pattern>org.apache.http</pattern>
               <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.commons.codec</pattern>
+              <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
