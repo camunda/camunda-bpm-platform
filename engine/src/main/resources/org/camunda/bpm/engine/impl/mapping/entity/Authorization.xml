@@ -867,4 +867,42 @@
       </choose>
     </if>
   </sql>
+  
+  <sql id="contextualAuthorizationCheck2">
+	<if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+	  <choose>
+        <when test="authCheck.revokeAuthorizationCheckEnabled">
+          <bind name="authUserId" value="authCheck.authUserId" />
+          <bind name="authGroupIds" value="authCheck.authGroupIds" />
+          <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
+          AND
+          ( CASE
+          WHEN
+          <!-- variable instance or task exists in context of a case instance -->
+          RES.CASE_EXECUTION_ID_ is not null
+          THEN
+          <!-- everything which exists in context of a case instance is visible to the users -->
+          1
+          ELSE
+          <!-- EVERYTHING ELSE like standalone tasks and other -->
+          (
+          <bind name="permissionChecks" value="authCheck.permissionChecks" />
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
+          )
+          END ) = 1
+        </when>
+        <otherwise>
+          and (
+          (RES.CASE_EXECUTION_ID_ IS NOT NULL)
+          OR
+          (AUTH_1.RESOURCE_ID_ IS NOT NULL)
+          OR
+          (AUTH_2.RESOURCE_ID_ IS NOT NULL)
+          OR
+          (AUTH_3.RESOURCE_ID_ IS NOT NULL)
+          )
+        </otherwise>
+      </choose>
+    </if>
+  </sql>
 </mapper>

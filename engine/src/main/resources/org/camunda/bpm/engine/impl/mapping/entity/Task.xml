@@ -287,8 +287,12 @@
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_           
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH_1 ON (AUTH_1.RESOURCE_ID_ = RES.ID_)
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH_2 ON (AUTH_2.RESOURCE_ID_ = PROCDEF.KEY_)
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH_3 ON (AUTH_3.RESOURCE_ID_ = '*')
       </if>
     </if>
     
@@ -652,7 +656,7 @@
         )
       </foreach>
       
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck2" /> 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
  
     </where>
