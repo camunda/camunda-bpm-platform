@@ -37,6 +37,7 @@
     {"name": "Event Subscription"},
     {"name": "External Task"},
     {"name": "Historic Activity Instance"},
+    {"name": "Historic Process Instance"},
     {"name": "Incident"},
     {"name": "Message"},
     {"name": "Metrics"},
