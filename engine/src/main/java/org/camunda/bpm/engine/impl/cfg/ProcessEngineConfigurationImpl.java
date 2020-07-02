@@ -2598,7 +2598,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       String version = ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion();
 
       if (version != null && version.contains("-ee")) {
-        version = version.split("-")[0]; // trim `-ee` suffix
+        version = version.replace("-ee", ""); // trim `-ee` suffix
         edition = EDITION_ENTERPRISE;
       }
 
