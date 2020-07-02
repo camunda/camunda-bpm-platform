@@ -199,7 +199,7 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     List<HistoricDetail> historicDetails =
         historyService.createHistoricDetailQuery()
         .variableUpdates()
-        .executionId(processInstance.getId())
+        .processInstanceId(processInstance.getId())
         .initial()
         .list();
 
@@ -212,7 +212,7 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
         HistoricDetailQueryImpl queryWithStartActivities = (HistoricDetailQueryImpl) historyService.createHistoricDetailQuery()
                 .variableUpdates()
                 .activityInstanceId(startActivityInstance.getId())
-                .executionId(processInstance.getId());
+                .processInstanceId(processInstance.getId());
         historicDetails = queryWithStartActivities
                .sequenceCounter(1)
                .list();
@@ -235,7 +235,7 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
     List<HistoricVariableInstance> historicVariables =
         historyService.createHistoricVariableInstanceQuery()
-            .executionIdIn(processInstance.getId())
+            .processInstanceId(processInstance.getId())
             .list();
 
     VariableMap variables = new VariableMapImpl();
