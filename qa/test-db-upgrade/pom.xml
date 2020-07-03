@@ -212,6 +212,7 @@
                       <version>${project.version}</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+					  <excludes>camundajar/**</excludes>
                     </artifactItem>
                   </artifactItems>
                 </configuration>

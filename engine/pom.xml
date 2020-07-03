@@ -409,23 +409,14 @@
             <relocation>
               <pattern>org.apache.http</pattern>
               <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
-              <excludes>
-                <exclude>*Test*</exclude>
-              </excludes>
             </relocation>
             <relocation>
               <pattern>org.apache.commons.codec</pattern>
               <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
-              <excludes>
-                <exclude>*Test*</exclude>
-              </excludes>
             </relocation>
             <relocation>
               <pattern>org.apache.commons.logging</pattern>
               <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
-              <excludes>
-                <exclude>*Test*</exclude>
-              </excludes>
             </relocation>
           </relocations>
           <transformers>
