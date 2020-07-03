@@ -409,23 +409,29 @@
             <relocation>
               <pattern>org.apache.http</pattern>
               <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
+              <excludes>
+                <exclude>*Test*</exclude>
+              </excludes>
             </relocation>
             <relocation>
               <pattern>org.apache.commons.codec</pattern>
               <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
+              <excludes>
+                <exclude>*Test*</exclude>
+              </excludes>
             </relocation>
             <relocation>
               <pattern>org.apache.commons.logging</pattern>
               <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
+              <excludes>
+                <exclude>*Test*</exclude>
+              </excludes>
             </relocation>
           </relocations>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
-          <!-- shading test jar is disabled due to
-               the httpclient and dependencies that it brings have *-tests.jar and we prevent their shading,
-               otherwise the tests of those libraries are unpacked and executed (via surefire plugin) in the upgrade setups -->
-          <shadeTestJar>false</shadeTestJar> 
+          <shadeTestJar>true</shadeTestJar> 
         </configuration>
       </plugin>
     </plugins>
