@@ -743,4 +743,56 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
   }
 
+  @Deployment
+  public void testAllPositiveSplitAndJoinAfterParallelGatewayWithBackloop() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    runtimeService.startProcessInstanceByKey("process");
+
+    taskService.complete(taskQuery.taskDefinitionKey("A").singleResult().getId());
+    taskService.complete(taskQuery.taskDefinitionKey("B").singleResult().getId());
+    taskService.complete(taskQuery.taskDefinitionKey("E").singleResult().getId());
+
+    // when
+    taskService.complete(taskQuery.taskDefinitionKey("C").singleResult().getId());
+
+    // then
+    Task task = taskQuery.taskDefinitionKey("D").singleResult();
+    assertNotNull(task);
+  }
+
+  @Deployment
+  public void testMixedPositiveNegativeSplitAndJoinAfterParallelGatewayWithBackloop() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    runtimeService.startProcessInstanceByKey("process");
+
+    taskService.complete(taskQuery.taskDefinitionKey("A").singleResult().getId());
+    taskService.complete(taskQuery.taskDefinitionKey("B").singleResult().getId());
+
+    // when
+    taskService.complete(taskQuery.taskDefinitionKey("C").singleResult().getId());
+
+    // then
+    Task task = taskQuery.taskDefinitionKey("D").singleResult();
+    assertNotNull(task);
+  }
+
+  @Deployment
+  public void testMixedPositiveDefaultSplitAndJoinAfterParallelGatewayWithBackloop() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    runtimeService.startProcessInstanceByKey("process");
+
+    taskService.complete(taskQuery.taskDefinitionKey("A").singleResult().getId());
+    taskService.complete(taskQuery.taskDefinitionKey("B").singleResult().getId());
+
+    // when
+    taskService.complete(taskQuery.taskDefinitionKey("C").singleResult().getId());
+
+    // then
+    Task task = taskQuery.taskDefinitionKey("D").singleResult();
+    assertNotNull(task);
+  }
+
 }
