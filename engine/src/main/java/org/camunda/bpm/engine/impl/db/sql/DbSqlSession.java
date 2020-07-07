@@ -234,7 +234,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     } else if (
         isConstraintViolation
         && failedOperation instanceof DbEntityOperation
-        && !failedOperation.getOperationType().equals(DbOperationType.DELETE)
+        && failedOperation.getOperationType().equals(DbOperationType.DELETE)
         ) {
       return true;
     }
