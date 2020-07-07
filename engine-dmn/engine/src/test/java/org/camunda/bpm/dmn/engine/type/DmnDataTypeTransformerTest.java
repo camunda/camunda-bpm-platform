@@ -39,6 +39,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -225,7 +226,7 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
   public void dateType() throws ParseException {
     DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
 
-    Date date = toDate("2015-09-18T12:00:00");
+    Date date = toDate("2015-09-18T12:00:00", null);
     TypedValue dateValue = Variables.dateValue(date);
 
     assertThat(typeTransformer.transform("2015-09-18T12:00:00"), is(dateValue));
@@ -237,7 +238,7 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
     // given
     DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
 
-    Date date = toDate("2015-09-18T12:00:00");
+    Date date = toDate("2015-09-18T12:00:00", "Europe/Berlin");
     TypedValue dateValue = Variables.dateValue(date);
     ZonedDateTime zonedDateTime = ZonedDateTime.of(2015, 9, 18, 12, 0, 0, 0, ZoneId.of("Europe/Berlin"));
 
@@ -253,7 +254,7 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
     // given
     DmnDataTypeTransformer typeTransformer = registry.getTransformer("date");
 
-    Date date = toDate("2015-09-18T15:00:00");
+    Date date = toDate("2015-09-18T15:00:00", null);
     TypedValue dateValue = Variables.dateValue(date);
     LocalDateTime localDateTime = LocalDateTime.parse("2015-09-18T15:00:00");
 
@@ -353,8 +354,11 @@ public class DmnDataTypeTransformerTest extends DmnEngineTest {
     typeTransformer.transform("18.09.2015 12:00:00");
   }
 
-  protected Date toDate(String date) {
+  protected Date toDate(String date, String timeZone) {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    if (timeZone != null) {
+        format.setTimeZone(TimeZone.getTimeZone(timeZone));
+    }
 
     try {
       return format.parse(date);
