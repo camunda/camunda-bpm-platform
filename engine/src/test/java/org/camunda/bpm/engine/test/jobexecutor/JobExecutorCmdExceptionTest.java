@@ -135,7 +135,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
-  public void IGNORE_testJobRetriesDecrementedOnFailedFlush() {
+  public void testJobRetriesDecrementedOnFailedFlush() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
 

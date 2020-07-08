@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -234,6 +235,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     } else if (
         isConstraintViolation
         && failedOperation instanceof DbEntityOperation
+        && ByteArrayEntity.class.isAssignableFrom(failedOperation.getEntityType())
         && failedOperation.getOperationType().equals(DbOperationType.DELETE)
         ) {
       return true;
