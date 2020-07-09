@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
+import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -66,7 +68,7 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        // add failure to the  history cleanup job 
+        // add failure to the history cleanup job
         List<Job> jobs = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs();
         ((JobEntity) jobs.get(0)).setExceptionStacktrace("foo");
 
@@ -74,9 +76,9 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
       }
     });
 
-    ThreadControl threadOne = executeControllableCommand(new ThreadOne());
+    ThreadControl threadOne = executeControllableCommand(new ControllableBootstrap());
 
-    ThreadControl threadTwo = executeControllableCommand(new ThreadTwo());
+    ThreadControl threadTwo = executeControllableCommand(new ControllableBootstrap());
     threadTwo.reportInterrupts();
     threadOne.waitForSync();
     threadTwo.waitForSync();
@@ -96,27 +98,31 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
         .contains("Entity was updated by another transaction concurrently.");
   }
 
-  public class ThreadOne extends ControllableCommand<Void> {// Runnable
+  public class ControllableBootstrap extends ControllableCommand<Void> {
 
     public Void execute(CommandContext commandContext) {
+
+      SyncTransactionListener syncListener = new SyncTransactionListener(monitor);
+
+      commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTING, syncListener);
       monitor.sync();
       new BootstrapEngineCommand().execute(commandContext);
-      monitor.sync();
       return null;
     }
 
   }
 
-  public class ThreadTwo extends ControllableCommand<Void> {
+  public class SyncTransactionListener implements TransactionListener {
 
-    public Void execute(CommandContext commandContext) {
-      monitor.sync();
+    ThreadControl monitor;
 
-      new BootstrapEngineCommand().execute(commandContext);
-      monitor.sync();
-
-      return null;
+    public SyncTransactionListener(ThreadControl monitor) {
+      super();
+      this.monitor = monitor;
     }
 
+    public void execute(CommandContext commandContext) {
+      monitor.sync();
+    }
   }
 }
