@@ -16,15 +16,16 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.Job;
 
 public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTestCase {
 
@@ -52,16 +53,22 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
 
   public void testThrowOleDuringDeletionOfJobStacktraceTest() {
     // given
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        JobEntity jobEntity = new MessageEntity();
+        // created history cleanup job
+        processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("00:00");
+        processEngineConfiguration.initHistoryCleanup();
+        new BootstrapEngineCommand().execute(commandContext);
 
-        jobEntity.setExceptionStacktrace("foo");
+        return null;
+      }
+    });
 
-        commandContext.getJobManager().insert(jobEntity);
-
-        job.set(jobEntity);
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        // add failure to the  history cleanup job 
+        List<Job> jobs = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs();
+        ((JobEntity) jobs.get(0)).setExceptionStacktrace("foo");
 
         return null;
       }
@@ -70,32 +77,31 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
     ThreadControl threadOne = executeControllableCommand(new ThreadOne());
 
     ThreadControl threadTwo = executeControllableCommand(new ThreadTwo());
-    threadOne.reportInterrupts();
-
+    threadTwo.reportInterrupts();
     threadOne.waitForSync();
     threadTwo.waitForSync();
 
-    threadTwo.makeContinueAndWaitForSync();
+    threadTwo.makeContinue();
+    threadTwo.waitForSync();
+
+    threadOne.makeContinue();
+    threadOne.waitForSync();
 
     threadOne.waitUntilDone();
 
-    // when
-    threadTwo.makeContinue(); 
+    threadTwo.waitUntilDone();
 
     // then
-    assertThat(threadOne.getException().getMessage()).contains("Entity was updated by another transaction concurrently.");
+    assertThat(threadTwo.getException().getMessage())
+        .contains("Entity was updated by another transaction concurrently.");
   }
 
-  public class ThreadOne extends ControllableCommand<Void> {
+  public class ThreadOne extends ControllableCommand<Void> {// Runnable
 
     public Void execute(CommandContext commandContext) {
       monitor.sync();
-
-      JobEntity jobEntity = commandContext.getJobManager().findJobById(job.get().getId());
-      String byteArrayId = jobEntity.getExceptionByteArrayId();
-      ByteArrayEntity byteArray = Context.getCommandContext().getDbEntityManager()
-          .selectById(ByteArrayEntity.class, byteArrayId);
-      Context.getCommandContext().getDbEntityManager().delete(byteArray);
+      new BootstrapEngineCommand().execute(commandContext);
+      monitor.sync();
       return null;
     }
 
@@ -106,9 +112,8 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
     public Void execute(CommandContext commandContext) {
       monitor.sync();
 
-      JobEntity jobEntity = commandContext.getJobManager().findJobById(job.get().getId());
+      new BootstrapEngineCommand().execute(commandContext);
       monitor.sync();
-      jobEntity.setLockOwner("foo");
 
       return null;
     }
