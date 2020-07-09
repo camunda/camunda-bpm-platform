@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
+import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -53,7 +54,7 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
     super.tearDown();
   }
 
-  public void testThrowOleDuringDeletionOfJobStacktraceTest() {
+  public void testThrowOleDuringDeletionOfJobStacktraceTest() throws InterruptedException {
     // given
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
@@ -66,32 +67,34 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
       }
     });
 
+    String cleanUpJobId = processEngineConfiguration.getHistoryService().findHistoryCleanupJob().getId();
+    
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         // add failure to the history cleanup job
-        List<Job> jobs = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs();
-        ((JobEntity) jobs.get(0)).setExceptionStacktrace("foo");
+        JobEntity cleanupJob = commandContext.getJobManager().findJobById(cleanUpJobId);
+        cleanupJob.setExceptionStacktrace("foo");
 
         return null;
       }
     });
 
-    ThreadControl threadOne = executeControllableCommand(new ControllableBootstrap());
+    ThreadControl threadOne = executeControllableCommand(new JobUpdateCmd(cleanUpJobId));
 
     ThreadControl threadTwo = executeControllableCommand(new ControllableBootstrap());
     threadTwo.reportInterrupts();
     threadOne.waitForSync();
     threadTwo.waitForSync();
 
-    threadTwo.makeContinue();
-    threadTwo.waitForSync();
-
     threadOne.makeContinue();
     threadOne.waitForSync();
 
-    threadOne.waitUntilDone();
+    threadTwo.makeContinue();
+    Thread.sleep(3000); // wait a bit until t2 is blocked during the flush
+    
+    threadOne.waitUntilDone(); // let t1 commit, unblocking t2
 
-    threadTwo.waitUntilDone();
+    threadTwo.waitUntilDone(); // continue with t2, expected to roll back
 
     // then
     assertThat(threadTwo.getException().getMessage())
@@ -102,27 +105,30 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
 
     public Void execute(CommandContext commandContext) {
 
-      SyncTransactionListener syncListener = new SyncTransactionListener(monitor);
-
-      commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTING, syncListener);
       monitor.sync();
       new BootstrapEngineCommand().execute(commandContext);
       return null;
     }
 
   }
-
-  public class SyncTransactionListener implements TransactionListener {
-
-    ThreadControl monitor;
-
-    public SyncTransactionListener(ThreadControl monitor) {
-      super();
-      this.monitor = monitor;
+  
+  public class JobUpdateCmd extends ControllableCommand<Void> {
+    
+    private String jobId;
+    
+    public JobUpdateCmd(String jobId) {
+      this.jobId = jobId;
     }
 
-    public void execute(CommandContext commandContext) {
+    public Void execute(CommandContext commandContext) {
+
+      commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTING, cc -> monitor.sync());
       monitor.sync();
+      JobEntity job = commandContext.getJobManager().findJobById(jobId);
+      job.setRetries(job.getRetries() + 1); // for reproducing the problem, it is important that 
+                                            // this tx does not delete the exception stack trace
+      return null;
     }
+
   }
 }
