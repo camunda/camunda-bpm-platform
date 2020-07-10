@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
 
-import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
@@ -28,15 +27,14 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {"server.error.include-message=always"})
 public class CsrfPreventionIT {
 
   @Rule
