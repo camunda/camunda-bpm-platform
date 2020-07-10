@@ -20,9 +20,11 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.INSERT;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -133,7 +135,36 @@ public class DbOperationManager {
     addSortedInserts(flush);
     // then UPDATEs + DELETEs
     addSortedModifications(flush);
+    
+    resolveDependencies(flush);
     return flush;
+  }
+
+  // TODO: resolve is probably not the correct verb
+  private void resolveDependencies(List<DbOperation> flush) {
+    for (DbOperation operation : flush) {
+      if (operation instanceof DbEntityOperation) {
+        DbEntity entity = ((DbEntityOperation) operation).getEntity();
+        if (entity instanceof HasDbReferences) {
+          Map<String, Class> dependentEntities = ((HasDbReferences) entity).getDependentEntities();
+          
+          
+          if (dependentEntities != null) {
+            dependentEntities.forEach((id, type) -> {
+              // TODO: also updates and inserts?
+              
+              // TODO: should not instantiate a new set every time :)
+              deletes.getOrDefault(type, new TreeSet<DbEntityOperation>()).forEach(o -> {
+                if (id.equals(o.getEntity().getId())) {
+                  o.setDependency(operation);
+                }
+              });
+            });
+          }
+          
+        }
+      }
+    }
   }
 
   /** Adds the insert operations to the flush (in correct order).

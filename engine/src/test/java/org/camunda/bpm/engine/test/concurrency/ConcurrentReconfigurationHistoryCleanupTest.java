@@ -18,12 +18,8 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
-import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -32,24 +28,22 @@ import org.camunda.bpm.engine.runtime.Job;
 
 public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTestCase {
 
-  protected AtomicReference<JobEntity> job = new AtomicReference<>();
+  // TODO: proper setup of a separate process engine wiht history cleanup
+  // TODO: consolidate with other history cleanup test cases, e.g. ConcurrentHistoryCleanupReconfigureTest
 
   protected void tearDown() throws Exception {
-    if (job.get() != null) {
-      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          JobEntity jobEntity = job.get();
 
-          jobEntity.setRevision(2);
-
-          commandContext.getJobManager().deleteJob(jobEntity);
-          commandContext.getByteArrayManager().deleteByteArrayById(jobEntity.getExceptionByteArrayId());
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobEntity.getId());
-
-          return null;
-        }
-      });
-    }
+    String cleanUpJobId = processEngineConfiguration.getHistoryService().findHistoryCleanupJob().getId();
+    
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
+    processEngineConfiguration.initHistoryCleanup();
+    processEngineConfiguration.getCommandExecutorTxRequired().<Void>execute(c -> {
+      JobEntity cleanUpJob = c.getJobManager().findJobById(cleanUpJobId);
+      cleanUpJob.delete();
+      c.getHistoricJobLogManager().deleteHistoricJobLogByJobId(cleanUpJobId);
+      
+      return null;
+    });
 
     super.tearDown();
   }
@@ -97,8 +91,16 @@ public class ConcurrentReconfigurationHistoryCleanupTest extends ConcurrencyTest
     threadTwo.waitUntilDone(); // continue with t2, expected to roll back
 
     // then
-    assertThat(threadTwo.getException().getMessage())
-        .contains("Entity was updated by another transaction concurrently.");
+    assertThat(threadTwo.getException()).isNull();
+    
+    // TODO: assert job retries were updated, history cleanup was not reconfigured
+    
+    Job cleanupJob = processEngineConfiguration.getHistoryService().findHistoryCleanupJob();
+    // TODO:  make assertion nice, i.e. not implicitly depend on retry default value
+    assertThat(cleanupJob.getRetries()).isEqualTo(4);
+    
+    String stacktrace = managementService.getJobExceptionStacktrace(cleanUpJobId);
+    assertThat(stacktrace).isEqualTo("foo");
   }
 
   public class ControllableBootstrap extends ControllableCommand<Void> {
