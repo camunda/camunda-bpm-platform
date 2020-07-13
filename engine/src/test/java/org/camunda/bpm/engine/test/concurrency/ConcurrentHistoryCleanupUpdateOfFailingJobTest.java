@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
 
-public class ConcurrentUpdateOfFailingHistoryCleanupTest extends ConcurrencyTestCase {
+public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestCase {
 
   protected int retries = 5;
 
@@ -46,8 +46,9 @@ public class ConcurrentUpdateOfFailingHistoryCleanupTest extends ConcurrencyTest
     super.closeDownProcessEngine();
   }
 
-  protected void tearDown() throws Exception {
-    String cleanUpJobId = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs().get(0).getId();
+  @Override
+  protected void deleteHistoryCleanupJobs() {
+    String cleanUpJobId = historyService.findHistoryCleanupJobs().get(0).getId();
 
     processEngineConfiguration.getCommandExecutorTxRequired().<Void>execute(c -> {
       JobEntity cleanUpJob = c.getJobManager().findJobById(cleanUpJobId);
@@ -57,13 +58,12 @@ public class ConcurrentUpdateOfFailingHistoryCleanupTest extends ConcurrencyTest
       return null;
     });
 
-    super.tearDown();
   }
 
   public void testFailedHistoryCleanupJobUpdate() throws InterruptedException {
     // given configured History cleanup
 
-    String cleanUpJobId = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs().get(0).getId();
+    String cleanUpJobId = historyService.findHistoryCleanupJobs().get(0).getId();
 
     processEngineConfiguration.getCommandExecutorTxRequired().<Void>execute(c -> {
       // add failure to the history cleanup job
@@ -85,7 +85,7 @@ public class ConcurrentUpdateOfFailingHistoryCleanupTest extends ConcurrencyTest
 
     threadTwo.makeContinue();
     Thread.sleep(3000); // wait a bit until t2 is blocked during the flush
-    
+
     threadOne.waitUntilDone(); // let t1 commit, unblocking t2
 
     threadTwo.waitUntilDone(); // continue with t2, expected to roll back
@@ -93,7 +93,7 @@ public class ConcurrentUpdateOfFailingHistoryCleanupTest extends ConcurrencyTest
     // then
     assertThat(threadTwo.getException()).isNull();
 
-    Job cleanupJob = processEngineConfiguration.getHistoryService().findHistoryCleanupJobs().get(0);
+    Job cleanupJob = historyService.findHistoryCleanupJobs().get(0);
     assertThat(cleanupJob.getRetries()).isEqualTo(retries);
 
     String stacktrace = managementService.getJobExceptionStacktrace(cleanupJob.getId());
