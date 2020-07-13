@@ -807,6 +807,7 @@
                 <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
+                <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

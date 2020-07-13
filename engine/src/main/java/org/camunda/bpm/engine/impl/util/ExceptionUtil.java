@@ -142,7 +142,7 @@ public class ExceptionUtil {
         // Oracle & H2
         || (exception.getMessage().toLowerCase().contains("integrity constraint")
           // Oracle
-          || ("23000".equals(exception.getSQLState()) && (exception.getErrorCode() == 2291))
+          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2291)
           // H2
           || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
         // DB2
