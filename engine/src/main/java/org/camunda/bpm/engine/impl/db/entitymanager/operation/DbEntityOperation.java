@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.operation;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -37,7 +36,6 @@ public class DbEntityOperation extends DbOperation {
 
   protected Set<String> flushRelevantEntityReferences;
   
-  // TODO: depending/dependent??
   protected DbOperation dependentOperation;
 
   public void recycle() {

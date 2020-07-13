@@ -43,11 +43,12 @@ public interface HasDbReferences {
    * an object of this type.
    */
   Map<String, Class> getReferencedEntitiesIdAndClass();
-  
+
   /**
    * <p>Scope: PERSISTED references
    */
   default Map<String, Class> getDependentEntities() {
     return Collections.EMPTY_MAP;
   }
+
 }

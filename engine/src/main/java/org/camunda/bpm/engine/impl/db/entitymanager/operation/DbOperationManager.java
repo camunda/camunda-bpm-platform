@@ -20,7 +20,6 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.INSERT;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -136,35 +135,8 @@ public class DbOperationManager {
     // then UPDATEs + DELETEs
     addSortedModifications(flush);
     
-    resolveDependencies(flush);
+    determinateDependencies(flush);
     return flush;
-  }
-
-  // TODO: resolve is probably not the correct verb
-  private void resolveDependencies(List<DbOperation> flush) {
-    for (DbOperation operation : flush) {
-      if (operation instanceof DbEntityOperation) {
-        DbEntity entity = ((DbEntityOperation) operation).getEntity();
-        if (entity instanceof HasDbReferences) {
-          Map<String, Class> dependentEntities = ((HasDbReferences) entity).getDependentEntities();
-          
-          
-          if (dependentEntities != null) {
-            dependentEntities.forEach((id, type) -> {
-              // TODO: also updates and inserts?
-              
-              // TODO: should not instantiate a new set every time :)
-              deletes.getOrDefault(type, new TreeSet<DbEntityOperation>()).forEach(o -> {
-                if (id.equals(o.getEntity().getId())) {
-                  o.setDependency(operation);
-                }
-              });
-            });
-          }
-          
-        }
-      }
-    }
   }
 
   /** Adds the insert operations to the flush (in correct order).
@@ -273,5 +245,29 @@ public class DbOperationManager {
     }
 
     return opList;
+  }
+
+  protected void determinateDependencies(List<DbOperation> flush) {
+    TreeSet<DbEntityOperation> defaultValue = new TreeSet<DbEntityOperation>();
+    for (DbOperation operation : flush) {
+      if (operation instanceof DbEntityOperation) {
+        DbEntity entity = ((DbEntityOperation) operation).getEntity();
+        if (entity instanceof HasDbReferences) {
+          Map<String, Class> dependentEntities = ((HasDbReferences) entity).getDependentEntities();
+
+          if (dependentEntities != null) {
+            dependentEntities.forEach((id, type) -> {
+
+              deletes.getOrDefault(type, defaultValue).forEach(o -> {
+                if (id.equals(o.getEntity().getId())) {
+                  o.setDependency(operation);
+                }
+              });
+            });
+          }
+
+        }
+      }
+    }
   }
 }

@@ -61,7 +61,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Dave Syer
  * @author Frederik Heremans
  */
-public abstract class JobEntity extends AcquirableJobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
+public abstract class JobEntity extends AcquirableJobEntity
+    implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -110,6 +111,8 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   // last failing activity id ///////////////////////
   protected String failedActivityId;
+
+  protected Map<String, Class> persistedDependentEntities;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -648,14 +651,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     return referenceIdAndClass;
   }
 
-  // TODO: move
-  private Map<String, Class> persistedDependentEntities; 
-  
   @Override
   public Map<String, Class> getDependentEntities() {
     return persistedDependentEntities;
   }
-  
+
   @Override
   public void postLoad() {
     if (exceptionByteArrayId != null) {
