@@ -20,7 +20,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.qa.largedata.optimize.util.EngineDataGenerator;
+import org.camunda.bpm.qa.largedata.util.EngineDataGenerator;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -41,13 +41,13 @@ public class OptimizeApiPageSizeTest {
   @ClassRule
   public static ProcessEngineRule processEngineRule = new ProcessEngineRule("camunda.cfg.xml");
 
-
   @BeforeClass
   public static void init() {
     optimizeService = processEngineRule.getProcessEngineConfiguration().getOptimizeService();
 
     // given the generated engine data
-    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE);
+    // make sure that there are at least two pages of each entity available
+    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2);
     generator.generateData();
   }
 
