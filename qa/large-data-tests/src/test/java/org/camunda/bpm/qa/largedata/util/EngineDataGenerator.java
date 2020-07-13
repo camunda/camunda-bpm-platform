@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.largedata.optimize.util;
+package org.camunda.bpm.qa.largedata.util;
 
 import com.google.common.collect.Lists;
 import org.camunda.bpm.engine.DecisionService;
@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -36,7 +35,7 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.camunda.bpm.qa.largedata.optimize.util.DmnHelper.createSimpleDmnModel;
+import static org.camunda.bpm.qa.largedata.util.DmnHelper.createSimpleDmnModel;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -51,25 +50,26 @@ public class EngineDataGenerator {
 
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private static final String userId = "testUser";
-  private static final String groupId = "testGroup";
-  private static final String USER_TASK_PROCESS_KEY = "userTaskProcess";
-  private static final String AUTO_COMPLETE_PROCESS_KEY = "autoCompleteProcess";
-  private static final String DECISION_KEY = "simpleDecisionKey";
+  public static final String userId = "testUser";
+  public static final String groupId = "testGroup";
+  public static final String USER_TASK_PROCESS_KEY = "userTaskProcess";
+  public static final String AUTO_COMPLETE_PROCESS_KEY = "autoCompleteProcess";
+  public static final String DECISION_KEY = "simpleDecisionKey";
+  public static final String DEPLOYMENT_NAME = "testDeployment";
 
-  private final IdentityService identityService;
-  private final DecisionService decisionService;
-  private final RepositoryService repositoryService;
-  private final RuntimeService runtimeService;
-  private final TaskService taskService;
-  private final ProcessEngine processEngine;
+  protected final IdentityService identityService;
+  protected final DecisionService decisionService;
+  protected final RepositoryService repositoryService;
+  protected final RuntimeService runtimeService;
+  protected final TaskService taskService;
+  protected final ProcessEngine processEngine;
 
   public final int numberOfInstancesToGenerate;
 
   // allows to configure how many commands are executed in one transaction if jdbc transaction is enabled
   public static final int BATCH_SIZE = 100;
 
-  public EngineDataGenerator(final ProcessEngine processEngine, final int optimizePageSize) {
+  public EngineDataGenerator(final ProcessEngine processEngine, final int numberOfInstancesToGenerate) {
     this.processEngine = processEngine;
     this.identityService = processEngine.getIdentityService();
     this.decisionService = processEngine.getDecisionService();
@@ -77,23 +77,21 @@ public class EngineDataGenerator {
     this.runtimeService = processEngine.getRuntimeService();
     this.taskService = processEngine.getTaskService();
 
-    // we double the amount of instances to generate to make sure that there are at least two pages
-    // of each entity available
-    numberOfInstancesToGenerate = optimizePageSize * 2;
+    this.numberOfInstancesToGenerate = numberOfInstancesToGenerate;
   }
 
   public void generateData() {
-    logger.info("Generating engine data for Optimize rest tests...");
+    logger.info("Generating engine test data...");
     deployDefinitions();
     generateUserTaskData();
     generateCompletedProcessInstanceData();
     generateDecisionInstanceData();
     generateOpLogData();
-    logger.info("Generation of engine data has been completed.");
+    logger.info("Generation of engine test data has been completed.");
   }
 
 
-  private void generateDecisionInstanceData() {
+  public void generateDecisionInstanceData() {
     logger.info("Generating decision instance data...");
     final List<Integer> sequenceNumberList = createSequenceNumberList();
     generateInBatches(
@@ -110,7 +108,7 @@ public class EngineDataGenerator {
       .evaluate();
   }
 
-  private void generateCompletedProcessInstanceData() {
+  public void generateCompletedProcessInstanceData() {
     logger.info("Generating completed process instance data...");
     final List<Integer> sequenceNumberList = createSequenceNumberList();
     generateInBatches(
@@ -124,7 +122,7 @@ public class EngineDataGenerator {
     runtimeService.startProcessInstanceByKey(AUTO_COMPLETE_PROCESS_KEY, createSimpleVariables());
   }
 
-  private void generateUserTaskData() {
+  public void generateUserTaskData() {
     // the user task data includes data for tasks, identity link log
     logger.info("Generating user task data....");
     final List<Integer> sequenceNumberList = createSequenceNumberList();
@@ -139,7 +137,7 @@ public class EngineDataGenerator {
     logger.info("User task data successfully generated.");
   }
   
-  private void generateOpLogData() {
+  public void generateOpLogData() {
 
     for (int i = 0; i < numberOfInstancesToGenerate; i++) {
       repositoryService.suspendProcessDefinitionByKey(USER_TASK_PROCESS_KEY);
@@ -147,12 +145,13 @@ public class EngineDataGenerator {
     }
   }
 
-  private void deployDefinitions() {
+  public void deployDefinitions() {
     logger.info("Deploying process & decision definitions...");
     BpmnModelInstance userTaskProcessModelInstance = createUserTaskProcess();
     BpmnModelInstance autoCompleteProcessModelInstance = createSimpleServiceTaskProcess();
     final DmnModelInstance decisionModelInstance = createSimpleDmnModel(DECISION_KEY);
     DeploymentBuilder deploymentbuilder = repositoryService.createDeployment();
+    deploymentbuilder.name(DEPLOYMENT_NAME);
     deploymentbuilder.addModelInstance("userTaskProcess.bpmn", userTaskProcessModelInstance);
     deploymentbuilder.addModelInstance("autoCompleteProcess.bpmn", autoCompleteProcessModelInstance);
     deploymentbuilder.addModelInstance("simpleDecision.dmn", decisionModelInstance);
@@ -160,12 +159,12 @@ public class EngineDataGenerator {
     logger.info("Definitions successfully deployed.");
   }
 
-  private void createUser() {
+  public void createUser() {
     User user = identityService.newUser(EngineDataGenerator.userId);
     identityService.saveUser(user);
   }
 
-  private void createGroup() {
+  public void createGroup() {
     Group group = identityService.newGroup(groupId);
     identityService.saveGroup(group);
   }
@@ -182,7 +181,7 @@ public class EngineDataGenerator {
     );
   }
 
-  private void completeAllUserTasks() {
+  public void completeAllUserTasks() {
     List<Task> list = taskService.createTaskQuery().list();
     generateInBatches(
       list,
