@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,16 +27,28 @@ import java.util.Set;
 public interface HasDbReferences {
 
   /**
+   * <p>Scope: IN-MEMORY references
+   * 
    * @return the ids of the entities that this entity references. Should
    *   only return ids for entities of the same type
    */
   Set<String> getReferencedEntityIds();
 
   /**
+   * <p>Scope: IN-MEMORY references
+   * 
    * @return a map of the ids and the entities' classes that this
    * entity references. It's used when trying to determine if there
    * was an Optimistic Locking occurrence on an INSERT or UPDATE of
    * an object of this type.
    */
   Map<String, Class> getReferencedEntitiesIdAndClass();
+
+  /**
+   * <p>Scope: PERSISTED references
+   */
+  default Map<String, Class> getDependentEntities() {
+    return Collections.EMPTY_MAP;
+  }
+
 }

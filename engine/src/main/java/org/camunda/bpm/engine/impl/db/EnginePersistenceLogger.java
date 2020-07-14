@@ -792,4 +792,13 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "100", "Installation id property found in the database: {}", value);
   }
 
+  public void ignoreFailureDuePreconditionNotMet(DbOperation ignoredOperation, String preconditionMessage, DbOperation failedOperation) {
+    logDebug(
+        "101",
+        "Ignoring '{}' database operation failure due to an unmet precondition. {}: '{}'",
+        ignoredOperation.toString(),
+        preconditionMessage,
+        failedOperation.toString());
+  }
+
 }

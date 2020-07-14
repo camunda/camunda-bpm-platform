@@ -178,7 +178,7 @@ public class BatchDbSqlSession extends DbSqlSession {
       }
 
       if (operation.isFailed()) {
-        failedOperations.add(operation);
+        failedOperations.add(operation); // the operation is added to the list only if it's marked as failed
       }
     }
 
@@ -191,7 +191,9 @@ public class BatchDbSqlSession extends DbSqlSession {
 
       DbOperation failedOperation = operationsIt.next();
       postProcessOperationPerformed(failedOperation, 0, failure);
-      failedOperations.add(failedOperation);
+      if (failedOperation.isFailed()) {
+        failedOperations.add(failedOperation); // the operation is added to the list only if it's marked as failed
+      }
     }
   }
 

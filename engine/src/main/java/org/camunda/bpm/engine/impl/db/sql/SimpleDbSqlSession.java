@@ -59,7 +59,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
 
       executeDbOperation(operation);
 
-      if (operation.getState() != State.APPLIED) {
+      if (operation.isFailed()) {
         List<DbOperation> remainingOperations = operations.subList(i + 1, operations.size());
         return FlushResult.withFailuresAndRemaining(Collections.singletonList(operation), remainingOperations);
       }

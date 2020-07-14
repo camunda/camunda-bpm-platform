@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionB
 import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -59,7 +61,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Dave Syer
  * @author Frederik Heremans
  */
-public abstract class JobEntity extends AcquirableJobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
+public abstract class JobEntity extends AcquirableJobEntity
+    implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -108,6 +111,8 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   // last failing activity id ///////////////////////
   protected String failedActivityId;
+
+  protected Map<String, Class> persistedDependentEntities;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -519,6 +524,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     // Avoid NPE when the job was reconfigured by another
     // node in the meantime
     if (byteArray != null) {
+      
       Context.getCommandContext()
           .getDbEntityManager()
           .delete(byteArray);
@@ -643,6 +649,22 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
 
     return referenceIdAndClass;
+  }
+
+  @Override
+  public Map<String, Class> getDependentEntities() {
+    return persistedDependentEntities;
+  }
+
+  @Override
+  public void postLoad() {
+    if (exceptionByteArrayId != null) {
+      persistedDependentEntities = new HashMap<String, Class>();
+      persistedDependentEntities.put(exceptionByteArrayId, ByteArrayEntity.class);
+    }
+    else {
+      persistedDependentEntities = Collections.EMPTY_MAP;
+    }
   }
 
   public String getLastFailureLogId() {
