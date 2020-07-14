@@ -135,7 +135,7 @@ public class DbOperationManager {
     // then UPDATEs + DELETEs
     addSortedModifications(flush);
     
-    determinateDependencies(flush);
+    determineDependencies(flush);
     return flush;
   }
 
@@ -247,7 +247,7 @@ public class DbOperationManager {
     return opList;
   }
 
-  protected void determinateDependencies(List<DbOperation> flush) {
+  protected void determineDependencies(List<DbOperation> flush) {
     TreeSet<DbEntityOperation> defaultValue = new TreeSet<DbEntityOperation>();
     for (DbOperation operation : flush) {
       if (operation instanceof DbEntityOperation) {

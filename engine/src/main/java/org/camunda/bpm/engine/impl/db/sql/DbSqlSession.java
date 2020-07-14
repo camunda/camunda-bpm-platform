@@ -189,13 +189,13 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       operation.setRowsAffected(0);
       operation.setFailure(failure);
 
-      DbOperation dependentOperation = operation.getDependentOperation();
+      DbOperation dependencyOperation = operation.getDependentOperation();
 
       if (isConcurrentModificationException(operation, failure)) {
         operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else if (dependentOperation != null && dependentOperation.getState() != null && dependentOperation.getState() != State.APPLIED) {
+      } else if (dependencyOperation != null && dependencyOperation.getState() != null && dependencyOperation.getState() != State.APPLIED) {
         // the owning operation was not successful, so the prerequisite for this operation was not given
-        LOG.ignoreFailureDuePreconditionNotMet();
+        LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
         operation.setState(State.NOT_APPLIED);
       } else {
         operation.setState(State.FAILED_ERROR);
