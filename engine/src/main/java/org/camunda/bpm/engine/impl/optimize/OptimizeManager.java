@@ -213,8 +213,12 @@ public class OptimizeManager extends AbstractManager {
         .includeInputs()
         .includeOutputs();
 
-    getHistoricDecisionInstanceManager()
-      .enrichHistoricDecisionsWithInputsAndOutputs(query, decisionInstances);
+    List<List<HistoricDecisionInstance>> partitions = CollectionUtil.partition(decisionInstances, DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+
+    for (List<HistoricDecisionInstance> partition : partitions) {
+      getHistoricDecisionInstanceManager()
+        .enrichHistoricDecisionsWithInputsAndOutputs(query, partition);
+    }
 
     return decisionInstances;
   }
