@@ -743,6 +743,28 @@ public class ProcessApplicationDeploymentTest {
   }
 
   @Test
+  public void testProcessApplicationDeploymentResumptionDoesNotCachePreviousBpmnModelInstance() {
+    // given an initial deployment
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml"));
+
+    deploymentCache.discardProcessDefinitionCache();
+
+    // when an update with changes is deployed
+    testRule.deploy(repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("deployment")
+        .enableDuplicateFiltering(false)
+        .resumePreviousVersions()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version2.bpmn20.xml"));
+
+    // then the cache is still empty
+    assertTrue(deploymentCache.getBpmnModelInstanceCache().isEmpty());
+  }
+
+  @Test
   public void testDeploymentSourceShouldBeNull() {
     // given
     String key = "process";

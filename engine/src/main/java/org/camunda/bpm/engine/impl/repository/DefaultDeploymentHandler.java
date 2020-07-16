@@ -58,8 +58,8 @@ public class DefaultDeploymentHandler implements DeploymentHandler {
       String[] processDefinitionKeys) {
 
     Set<String> deploymentIds = new HashSet<>();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKeysIn(processDefinitionKeys).list();
+    List<ProcessDefinition> processDefinitions = Context.getCommandContext().getProcessDefinitionManager()
+        .findProcessDefinitionsByKeyIn(processDefinitionKeys);
     for (ProcessDefinition processDefinition : processDefinitions) {
       deploymentIds.add(processDefinition.getDeploymentId());
     }
