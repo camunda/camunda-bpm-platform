@@ -32,7 +32,7 @@ public class TelemetryLogger extends ProcessEngineLogger {
 
   public void unexpectedResponseWhileSendingTelemetryData() {
     logDebug(
-        "003", "Unexpect response while sending telemetry data.");
+        "003", "Unexpected response while sending telemetry data.");
   }
 
   public void telemetryDataSent(String data) {

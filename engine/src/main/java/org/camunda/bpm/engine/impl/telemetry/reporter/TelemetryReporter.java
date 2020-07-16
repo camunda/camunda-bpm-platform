@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 
 import java.util.Timer;
 
-import org.apache.http.client.HttpClient;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.connect.httpclient.HttpConnector;
 
 public class TelemetryReporter {
 
@@ -37,18 +37,18 @@ public class TelemetryReporter {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected Data data;
-  protected HttpClient httpClient;
+  protected HttpConnector http;
 
   protected boolean stopped;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            Data data,
-                           HttpClient httpClient) {
+                           HttpConnector http) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
-    this.httpClient = httpClient;
+    this.http = http;
     initTelemetrySendingTask();
   }
 
@@ -56,7 +56,7 @@ public class TelemetryReporter {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
                                                     data,
-                                                    httpClient);
+                                                    http);
   }
 
   public synchronized void start() {

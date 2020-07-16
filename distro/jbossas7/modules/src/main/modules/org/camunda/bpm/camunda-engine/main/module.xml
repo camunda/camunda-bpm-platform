@@ -20,8 +20,6 @@
     <module name="org.joda.time" slot="2.1" />
     <module name="org.codehaus.groovy.groovy-all" services="import"/>
 
-    <module name="org.slf4j" />
-
     <module name="sun.jdk" services="import"/>
 
     <module name="org.camunda.bpm.model.camunda-xml-model" />
@@ -32,6 +30,7 @@
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
+    <module name="org.camunda.connect.camunda-connect-http-client" services="import" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
     <module name="org.camunda.spin.camunda-spin-core" services="import" />
 

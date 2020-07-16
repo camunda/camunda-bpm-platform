@@ -16,22 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import java.nio.charset.StandardCharsets;
 import java.util.TimerTask;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.connect.httpclient.HttpConnector;
+import org.camunda.connect.httpclient.HttpResponse;
 
 public class TelemetrySendingTask extends TimerTask {
 
@@ -40,16 +35,16 @@ public class TelemetrySendingTask extends TimerTask {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected Data data;
-  protected HttpClient httpClient;
+  protected HttpConnector http;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               Data data,
-                              HttpClient httpClient) {
+                              HttpConnector http) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
-    this.httpClient = httpClient;
+    this.http = http;
   }
 
   @Override
@@ -67,14 +62,15 @@ public class TelemetrySendingTask extends TimerTask {
       // send data only if telemetry is enabled
       if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
         try {
-          HttpPost request = new HttpPost(telemetryEndpoint);
           String telemetryData = JsonUtil.asString(data);
-          StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-          request.setEntity(requestBody);
-          HttpResponse response = httpClient.execute(request);
+          HttpResponse response = http.createRequest()
+              .url(telemetryEndpoint)
+              .post()
+              .contentType(MediaType.APPLICATION_JSON)
+              .payload(telemetryData)
+              .execute();
 
-          if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
+          if (response == null || response.getStatusCode() != 202) {
             LOG.unexpectedResponseWhileSendingTelemetryData();
           } else {
             LOG.telemetryDataSent(telemetryData);

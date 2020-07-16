@@ -44,8 +44,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -370,6 +368,8 @@ import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.connect.Connectors;
+import org.camunda.connect.httpclient.HttpConnector;
 
 
 /**
@@ -888,7 +888,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
   protected TelemetryReporter telemetryReporter;
   /** http client used for sending telemetry */
-  protected HttpClient telemetryHttpClient;
+  protected HttpConnector telemetryHttp;
   protected Data telemetryData;
 
 
@@ -2579,14 +2579,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (telemetryData == null) {
       initTelemetryData();
     }
-    if (telemetryHttpClient == null) {
-      telemetryHttpClient = HttpClientBuilder.create().useSystemProperties().build();
+    if (telemetryHttp == null) {
+      telemetryHttp = Connectors.getConnector(HttpConnector.ID);
     }
     if (telemetryReporter == null) {
       telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
           telemetryEndpoint,
           telemetryData,
-          telemetryHttpClient);
+          telemetryHttp);
     }
   }
 
@@ -4706,13 +4706,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public HttpClient getTelemetryHttpClient() {
-    return telemetryHttpClient;
+  public HttpConnector getTelemetryHttp() {
+    return telemetryHttp;
   }
- 
-  public ProcessEngineConfigurationImpl setTelemetryHttpClient(HttpClient telemetryHttpClient) {
-    this.telemetryHttpClient = telemetryHttpClient;
-    return this;
+
+  public void setTelemetryHttp(HttpConnector telemetryHttp) {
+    this.telemetryHttp = telemetryHttp;
   }
 
   public Data getTelemetryData() {
