@@ -48,18 +48,22 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void complete(ExternalTask externalTask) {
-    complete(externalTask, null,  null);
+    complete(externalTask, null, null);
   }
 
   @Override
   public void complete(ExternalTask externalTask, Map<String, Object> variables) {
-    complete(externalTask, variables,  null);
+    complete(externalTask, variables, null);
   }
 
   @Override
   public void complete(ExternalTask externalTask, Map<String, Object> variables,  Map<String, Object> localVariables) {
+    complete(externalTask.getId(), variables, localVariables);
+  }
+
+  public void complete(String externalTaskId, Map<String, Object> variables, Map<String, Object> localVariables) {
     try {
-      engineClient.complete(externalTask.getId(), variables, localVariables);
+      engineClient.complete(externalTaskId, variables, localVariables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
@@ -67,8 +71,13 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+    handleFailure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
+  }
+
+  @Override
+  public void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
     try {
-      engineClient.failure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
+      engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a failure", e);
     }
@@ -86,8 +95,13 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables) {
+    handleBpmnError(externalTask.getId(), errorCode, errorMessage, variables);
+  }
+
+  @Override
+  public void handleBpmnError(String externalTaskId, String errorCode, String errorMessage, Map<String, Object> variables) {
     try {
-      engineClient.bpmnError(externalTask.getId(), errorCode, errorMessage, variables);
+      engineClient.bpmnError(externalTaskId, errorCode, errorMessage, variables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
@@ -95,11 +109,15 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void extendLock(ExternalTask externalTask, long newDuration) {
+    extendLock(externalTask.getId(), newDuration);
+  }
+
+  @Override
+  public void extendLock(String externalTaskId, long newDuration) {
     try {
-      engineClient.extendLock(externalTask.getId(), newDuration);
+      engineClient.extendLock(externalTaskId, newDuration);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("extending lock", e);
     }
   }
-
 }

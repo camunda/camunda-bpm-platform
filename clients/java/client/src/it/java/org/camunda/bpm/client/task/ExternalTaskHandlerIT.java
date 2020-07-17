@@ -273,6 +273,27 @@ public class ExternalTaskHandlerIT {
   }
 
   @Test
+  public void shouldCompleteById() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.complete(task.getId(), null, null);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+  }
+
+  @Test
   public void shouldExtendLock() {
     // given
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
@@ -287,6 +308,27 @@ public class ExternalTaskHandlerIT {
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
+    ExternalTask externalTaskBeforeExtendLock = handler.getHandledTasks().get(0);
+    ExternalTask externalTaskAfterExtendLock = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+
+    assertThat(externalTaskAfterExtendLock.getLockExpirationTime()).isAfter(externalTaskBeforeExtendLock.getLockExpirationTime());
+  }
+
+  @Test
+  public void shouldExtendLockById() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.extendLock(task.getId(), LOCK_DURATION * 10);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+    .handler(handler)
+    .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+    
     ExternalTask externalTaskBeforeExtendLock = handler.getHandledTasks().get(0);
     ExternalTask externalTaskAfterExtendLock = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
 
@@ -317,7 +359,7 @@ public class ExternalTaskHandlerIT {
   }
 
   @Test
-  public void shoulInvokeHandleBpmnError() {
+  public void shouldInvokeHandleBpmnError() {
     // given
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
       client.handleBpmnError(task, "500");
@@ -338,7 +380,7 @@ public class ExternalTaskHandlerIT {
   }
 
   @Test
-  public void shoulInvokeHandleBpmnErrorWithVariables() {
+  public void shouldInvokeHandleBpmnErrorWithVariables() {
     // given
     String variableName = "foo";
     String variableValue = "bar";
@@ -369,7 +411,7 @@ public class ExternalTaskHandlerIT {
   }
 
   @Test
-  public void shoulInvokeHandleBpmnErrorWithErrorMessage() {
+  public void shouldInvokeHandleBpmnErrorWithErrorMessage() {
     // given
     String anErrorMessage = "meaningful error message";
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
@@ -391,6 +433,28 @@ public class ExternalTaskHandlerIT {
     assertThat(processInstanceVariable).isNotNull();
     assertThat(processInstanceVariable.getName()).isEqualTo("errorMessage");
     assertThat(processInstanceVariable.getValue()).isEqualTo(anErrorMessage);
+  }
+
+
+  @Test
+  public void shouldInvokeHandleBpmnErrorById() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.handleBpmnError(task.getId(), "500", null, null);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+    .handler(handler)
+    .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_AFTER_BPMN_ERROR);
   }
 
   @Test
@@ -439,6 +503,27 @@ public class ExternalTaskHandlerIT {
     assertThat(task.getErrorMessage()).isEqualTo("my-message");
     assertThat(task.getErrorDetails()).isEqualTo("my-details");
     assertThat(task.getRetries()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldInvokeHandleFailureById() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.handleFailure(task.getId(), "my-message", "my-details", 0, 0);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    IncidentDto incident = engineRule.getIncidentByProcessInstanceId(processInstance.getId());
+    assertThat(incident).isNotNull();
+    assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(incident.getActivityId()).isEqualTo(EXTERNAL_TASK_ID);
   }
 
   @Test
