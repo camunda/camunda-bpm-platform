@@ -88,7 +88,7 @@ public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyT
 
     threadOne.waitUntilDone(); // let t1 commit, unblocking t2
 
-    threadTwo.waitUntilDone(); // continue with t2, expected to roll back
+    threadTwo.waitUntilDone(true); // continue with t2, expected to roll back
 
     // then
     assertThat(threadTwo.getException()).isNull();
@@ -106,6 +106,7 @@ public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyT
 
       monitor.sync();
       new BootstrapEngineCommand().execute(commandContext);
+      monitor.sync();
       return null;
     }
 
