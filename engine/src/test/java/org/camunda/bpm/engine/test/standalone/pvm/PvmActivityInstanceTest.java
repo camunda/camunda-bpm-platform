@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -26,7 +30,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
@@ -40,13 +43,14 @@ import org.junit.Test;
  * @author Daniel Meyer
  *
  */
-public class PvmActivityInstanceTest extends PvmTestCase {
+public class PvmActivityInstanceTest {
 
   /**
    * +-----+   +-----+   +-------+
    * | one |-->| two |-->| three |
    * +-----+   +-----+   +-------+
    */
+  @Test
   public void testSequence() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -92,6 +96,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
    *                  +-->| end |
    *                      +-----+
    */
+  @Test
   public void testWhileLoop() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -184,6 +189,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
    *           |                           +----------+          |
    *           +-------------------------------------------------+
    */
+  @Test
   public void testMultipleConcurrentEndsInsideEmbeddedSubProcessWithWaitState() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -295,6 +301,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
    *           |                                                       |
    *           +-------------------------------------------------------+
    */
+  @Test
   public void testNestedSubProcessNoEnd() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -376,6 +383,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
    *           |                                                       |
    *           +-------------------------------------------------------+
    */
+  @Test
   public void testNestedSubProcessBothNoEnd() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -533,6 +541,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
    * | one |-->| two |-->| three |
    * +-----+   +-----+   +-------+
    */
+  @Test
   public void testScopeActivity() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();

@@ -22,14 +22,22 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionSuspensionTest extends PvmTestCase {
+public class CaseExecutionSuspensionTest {
 
   @Test
   public void testSuspendCaseInstance() {
@@ -129,7 +137,7 @@ public class CaseExecutionSuspensionTest extends PvmTestCase {
         .endActivity()
         .createActivity("B")
           .behavior(new TaskWaitState())
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .endActivity()
       .endActivity()
       .buildCaseDefinition();

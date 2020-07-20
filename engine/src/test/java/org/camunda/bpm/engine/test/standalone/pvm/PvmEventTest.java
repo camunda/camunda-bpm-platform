@@ -16,31 +16,33 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
-
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class PvmEventTest extends PvmTestCase {
+public class PvmEventTest {
 
   /**
    * +-------+   +-----+
    * | start |-->| end |
    * +-------+   +-----+
    */
+  @Test
   public void testStartEndEvents() {
     EventCollector eventCollector = new EventCollector();
 
@@ -85,6 +87,7 @@ public class PvmEventTest extends PvmTestCase {
    * +-----+   | +-----------+   +----------+ |   +---+
    *           +------------------------------+
    */
+  @Test
   public void testEmbeddedSubProcessEvents() {
     EventCollector eventCollector = new EventCollector();
 
@@ -157,6 +160,7 @@ public class PvmEventTest extends PvmTestCase {
    *              +--->|c2|---+
    *                   +--+
    */
+  @Test
   public void testSimpleAutmaticConcurrencyEvents() {
     EventCollector eventCollector = new EventCollector();
 
@@ -233,6 +237,7 @@ public class PvmEventTest extends PvmTestCase {
    * +-----+   | +-----------+   +------------+   +----------+ |   +---+
    *           +-----------------------------------------------+
    */
+  @Test
   public void testEmbeddedSubProcessEventsDelete() {
     EventCollector eventCollector = new EventCollector();
 

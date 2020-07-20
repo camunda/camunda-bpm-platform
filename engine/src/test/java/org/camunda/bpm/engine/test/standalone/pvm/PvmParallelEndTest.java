@@ -16,19 +16,21 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class PvmParallelEndTest extends PvmTestCase {
+public class PvmParallelEndTest {
 
   /**
    *                   +----+
@@ -43,6 +45,7 @@ public class PvmParallelEndTest extends PvmTestCase {
    *              +--->|end2|
    *                   +----+
    */
+  @Test
   public void testParallelEnd() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

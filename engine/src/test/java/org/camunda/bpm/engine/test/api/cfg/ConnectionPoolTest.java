@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -23,14 +26,15 @@ import org.apache.ibatis.session.Configuration;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  */
-public class ConnectionPoolTest extends PvmTestCase {
+public class ConnectionPoolTest {
 
+  @Test
   public void testMyBatisConnectionPoolProperlyConfigured() {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/cfg/connection-pool.camunda.cfg.xml");

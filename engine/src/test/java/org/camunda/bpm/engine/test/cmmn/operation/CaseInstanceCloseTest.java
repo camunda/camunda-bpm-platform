@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,14 +32,14 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceCloseTest extends PvmTestCase {
+public class CaseInstanceCloseTest {
 
   /**
    *
@@ -59,7 +65,7 @@ public class CaseInstanceCloseTest extends PvmTestCase {
       .listener("close", stateTransitionCollector)
       .createActivity("A")
         .behavior(new TaskWaitState())
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
       .endActivity()
       .buildCaseDefinition();
 

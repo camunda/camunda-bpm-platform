@@ -23,7 +23,13 @@ import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
@@ -34,8 +40,9 @@ import org.junit.Test;
 /**
  * @author Tom Baeyens
  */
-public class PvmParallelTest extends PvmTestCase {
+public class PvmParallelTest {
 
+  @Test
   public void testSimpleAutmaticConcurrency() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

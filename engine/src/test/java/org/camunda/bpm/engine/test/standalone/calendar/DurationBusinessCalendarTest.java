@@ -16,11 +16,12 @@
  */
 package org.camunda.bpm.engine.test.standalone.calendar;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.After;
 import org.junit.Test;
@@ -28,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Tom Baeyens
  */
-public class DurationBusinessCalendarTest extends PvmTestCase {
+public class DurationBusinessCalendarTest {
 
   @After
   public void tearDown() {

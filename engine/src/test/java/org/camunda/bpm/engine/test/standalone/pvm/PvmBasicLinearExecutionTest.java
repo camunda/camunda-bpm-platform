@@ -16,29 +16,34 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.While;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class PvmBasicLinearExecutionTest extends PvmTestCase {
+public class PvmBasicLinearExecutionTest {
 
   /**
    * +-------+   +-----+
    * | start |-->| end |
    * +-------+   +-----+
    */
+  @Test
   public void testStartEnd() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -63,6 +68,7 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
    * | one |-->| two |-->| three |
    * +-----+   +-----+   +-------+
    */
+  @Test
   public void testSingleAutomatic() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("one")
@@ -91,6 +97,7 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
    * | one |-->| two |-->| three |
    * +-----+   +-----+   +-------+
    */
+  @Test
   public void testSingleWaitState() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("one")
@@ -124,6 +131,7 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
    * | one |-->| two |-->| three |-->| four |--> | five |
    * +-----+   +-----+   +-------+   +------+    +------+
    */
+  @Test
   public void testCombinationOfWaitStatesAndAutomatics() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -178,6 +186,7 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
    *                  +-->| end |
    *                      +-----+
    */
+  @Test
   public void testWhileLoop() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

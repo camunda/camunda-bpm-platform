@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ import org.junit.Test;
 /**
  * @author Tom Baeyens
  */
-public class PvmVariablesTest extends PvmTestCase {
+public class PvmVariablesTest {
 
   @Test
   public void testVariables() {

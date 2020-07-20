@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,18 +29,18 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class PvmEmbeddedSubProcessTest extends PvmTestCase {
+public class PvmEmbeddedSubProcessTest {
 
   /**
    *           +------------------------------+
@@ -46,6 +50,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    * +-----+   |  +-----------+   +---------+ |   +---+
    *           +------------------------------+
    */
+  @Test
   public void testEmbeddedSubProcess() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -94,6 +99,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           |                           +----------+ |
    *           +----------------------------------------+
    */
+  @Test
   public void testMultipleConcurrentEndsInsideEmbeddedSubProcess() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -151,6 +157,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           |                           +----------+          |
    *           +-------------------------------------------------+
    */
+  @Test
   public void testMultipleConcurrentEndsInsideEmbeddedSubProcessWithWaitState() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -213,6 +220,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           |                                                       |
    *           +-------------------------------------------------------+
    */
+  @Test
   public void testNestedSubProcessNoEnd() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -262,6 +270,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    * +-----+   |  +-----------+               |
    *           +------------------------------+
    */
+  @Test
   public void testEmbeddedSubProcessWithoutEndEvents() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -296,6 +305,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           |                                                       |
    *           +-------------------------------------------------------+
    */
+  @Test
   public void testNestedSubProcessBothNoEnd() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -335,6 +345,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    * +-----+   |  +-----------+   +---------+ |
    *           +------------------------------+
    */
+  @Test
   public void testEmbeddedSubProcessNoEnd() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -369,6 +380,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    * +-----+   |  +-----------+   +---------+ |   +---+
    *           +------------------------------+
    */
+  @Test
   public void testStartInScope() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
