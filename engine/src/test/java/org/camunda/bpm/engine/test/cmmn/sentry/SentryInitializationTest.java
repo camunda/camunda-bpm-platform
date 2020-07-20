@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.model.cmmn.VariableTransition;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class SentryInitializationTest extends PluggableProcessEngineTest {
+public class SentryInitializationTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPart.cmmn"})
   @Test

@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -421,7 +422,9 @@ public class MultiInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testParallelUserTasksBasedOnCollectionExpression() {
+  @Ignore
+  @Test
+  public void testParallelUserTasksBasedOnCollectionExpression() {
     DelegateEvent.clearEvents();
 
     runtimeService.startProcessInstanceByKey("process",

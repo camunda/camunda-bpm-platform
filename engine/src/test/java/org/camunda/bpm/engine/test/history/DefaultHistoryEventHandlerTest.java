@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
@@ -50,16 +48,12 @@ public class DefaultHistoryEventHandlerTest {
   public boolean isDefaultHandlerEnabled;
 
   @Rule
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      // given
-      configuration.setEnableDefaultDbHistoryEventHandler(isDefaultHandlerEnabled);
-      configuration.setCustomHistoryEventHandlers(Collections.<HistoryEventHandler>singletonList(new CustomHistoryEventHandler()));
+  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    // given
+    configuration.setEnableDefaultDbHistoryEventHandler(isDefaultHandlerEnabled);
+    configuration.setCustomHistoryEventHandlers(Collections.singletonList(new CustomHistoryEventHandler()));
+  });
 
-      return configuration;
-    }
-  };
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 

@@ -24,10 +24,8 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -50,14 +48,10 @@ import org.junit.rules.RuleChain;
 public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSchedulerTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configure(configuration, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL);
-    }
-  };
-
-  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configure(configuration, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL));
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);

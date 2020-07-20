@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -41,7 +40,6 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -78,11 +76,8 @@ public class ProcessDataLoggingContextTest {
   private boolean defaultEngineRegistered;
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configuration.setLoggingContextBusinessKey("businessKey");
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setLoggingContextBusinessKey("businessKey"));
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);

@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.test.standalone.initialization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.Test;
 
 /**
@@ -40,7 +40,10 @@ public class ProcessEngineInitializationTest {
       fail("expected exception");
     } catch (Exception e) {
       // OK
-      TestHelper.assertTextPresent("ENGINE-03057 There are no Camunda tables in the database. Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e.getMessage());
+      assertThat(e.getMessage()).contains("ENGINE-03057 There are no Camunda tables in the database. " +
+        "Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" " +
+        "(use create-drop for testing only!) in bean processEngineConfiguration " +
+        "in camunda.cfg.xml for automatic schema creation");
     }
   }
 

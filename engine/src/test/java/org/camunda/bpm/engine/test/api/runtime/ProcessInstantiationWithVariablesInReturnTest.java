@@ -29,7 +29,6 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
@@ -66,14 +65,10 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   protected static final String SIMPLE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.simpleProcess.bpmn20.xml";
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setJavaSerializationFormatEnabled(true);
-      return configuration;
-    }
-  };
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJavaSerializationFormatEnabled(true));
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);

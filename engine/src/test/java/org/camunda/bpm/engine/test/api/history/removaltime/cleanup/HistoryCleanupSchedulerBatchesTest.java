@@ -26,10 +26,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -50,14 +48,10 @@ import org.junit.rules.RuleChain;
 public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSchedulerTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configure(configuration, HistoryEventTypes.BATCH_START, HistoryEventTypes.BATCH_END);
-    }
-  };
-
-  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configure(configuration, HistoryEventTypes.BATCH_START, HistoryEventTypes.BATCH_END));
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Before
   public void init() {

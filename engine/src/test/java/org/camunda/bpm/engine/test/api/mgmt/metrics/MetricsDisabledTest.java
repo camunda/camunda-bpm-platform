@@ -60,11 +60,10 @@ public class MetricsDisabledTest {
     managementService = engineRule.getManagementService();
   }
 
-  // FAILING, see https://app.camunda.com/jira/browse/CAM-4053
   // (to run, remove "FAILING" from methodname)
-  @Ignore
+  @Ignore("CAM-4053")
   @Test
-  public void FAILING_testQueryMetricsIfMetricsIsDisabled() {
+  public void testQueryMetricsIfMetricsIsDisabled() {
 
     // given
     // that the metrics are disabled (see xml configuration referenced in constructor)

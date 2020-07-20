@@ -18,9 +18,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
@@ -38,12 +36,8 @@ import org.junit.rules.RuleChain;
 public class DeploymentAwareJobExecutorForOracleTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule deploymentAwareBootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setJobExecutorDeploymentAware(true);
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule deploymentAwareBootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJobExecutorDeploymentAware(true));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(deploymentAwareBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

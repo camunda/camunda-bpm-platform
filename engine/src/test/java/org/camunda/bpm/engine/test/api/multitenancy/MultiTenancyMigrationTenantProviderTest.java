@@ -18,9 +18,7 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
@@ -49,20 +47,13 @@ public class MultiTenancyMigrationTenantProviderTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    TenantIdProvider tenantIdProvider = new VariableBasedTenantIdProvider();
+    configuration.setTenantIdProvider(tenantIdProvider);
+  });
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      TenantIdProvider tenantIdProvider = new VariableBasedTenantIdProvider();
-      configuration.setTenantIdProvider(tenantIdProvider);
-
-      return configuration;
-    }
-  };
 
   @Rule
   public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testHelper);

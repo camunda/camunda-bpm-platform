@@ -63,14 +63,11 @@ public class HistoryCleanupBatchWindowForEveryDayTest {
   protected int defaultBatchSize;
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setHistoryCleanupBatchSize(20);
-      configuration.setHistoryCleanupBatchThreshold(10);
-      configuration.setDefaultNumberOfRetries(5);
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    configuration.setHistoryCleanupBatchSize(20);
+    configuration.setHistoryCleanupBatchThreshold(10);
+    configuration.setDefaultNumberOfRetries(5);
+  });
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);

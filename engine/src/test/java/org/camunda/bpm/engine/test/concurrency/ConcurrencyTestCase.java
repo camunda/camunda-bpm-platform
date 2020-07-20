@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -43,6 +44,7 @@ public abstract class ConcurrencyTestCase extends ConcurrencyTestHelper {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected HistoryService historyService;
   protected ManagementService managementService;
 
   @Before
@@ -52,6 +54,7 @@ public abstract class ConcurrencyTestCase extends ConcurrencyTestHelper {
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
     super.init();

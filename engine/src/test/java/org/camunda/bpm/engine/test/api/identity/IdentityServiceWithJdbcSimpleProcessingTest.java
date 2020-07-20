@@ -18,10 +18,8 @@ package org.camunda.bpm.engine.test.api.identity;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -39,16 +37,10 @@ import org.junit.rules.RuleChain;
 public class IdentityServiceWithJdbcSimpleProcessingTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setJdbcBatchProcessing(false);
-      return configuration;
-    }
-  };
-
-  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJdbcBatchProcessing(false));
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -56,7 +48,7 @@ public class IdentityServiceWithJdbcSimpleProcessingTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private IdentityService identityService;
+  protected IdentityService identityService;
 
   @Before
   public void init() {

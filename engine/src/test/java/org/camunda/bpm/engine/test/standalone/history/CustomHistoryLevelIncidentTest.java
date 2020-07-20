@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -87,18 +86,14 @@ public class CustomHistoryLevelIncidentTest {
   static CustomHistoryLevelIncident customHistoryLevelIncident = new CustomHistoryLevelIncident(eventTypes);
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIncident.class.getSimpleName());
-      List<HistoryLevel> levels = new ArrayList<>();
-      levels.add(customHistoryLevelIncident);
-      processEngineConfiguration.setCustomHistoryLevels(levels);
-      processEngineConfiguration.setHistory("aCustomHistoryLevelIncident");
-      processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
-      return processEngineConfiguration;
-    }
-  };
-
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    configuration.setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIncident.class.getSimpleName());
+    List<HistoryLevel> levels = new ArrayList<>();
+    levels.add(customHistoryLevelIncident);
+    configuration.setCustomHistoryLevels(levels);
+    configuration.setHistory("aCustomHistoryLevelIncident");
+    configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
+  });
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper migrationHelper = new BatchMigrationHelper(engineRule, migrationRule);

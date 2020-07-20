@@ -23,14 +23,14 @@ import static org.junit.Assert.assertTrue;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceListenerTest extends PluggableProcessEngineTest {
+public class CaseInstanceListenerTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn"})
   @Test

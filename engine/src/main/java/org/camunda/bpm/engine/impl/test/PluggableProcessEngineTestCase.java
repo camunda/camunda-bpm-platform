@@ -35,6 +35,15 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
  * @author Joram Barrez
  */
 public class PluggableProcessEngineTestCase extends AbstractProcessEngineTestCase {
+  /**
+   * This class isn't used in the Process Engine test suite anymore.
+   * However, some Test classes in the following modules still use it:
+   *   * camunda-engine-plugin-spin
+   *   * camunda-engine-plugin-connect
+   *   * camunda-identity-ldap
+   *
+   * It should be removed once those Test classes are migrated to JUnit 4.
+   */
 
   protected static ProcessEngine cachedProcessEngine;
 

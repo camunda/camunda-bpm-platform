@@ -32,14 +32,14 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AutoCompleteTest extends PluggableProcessEngineTest {
+public class AutoCompleteTest extends CmmnTest {
 
   protected static final String CASE_DEFINITION_KEY = "case";
 

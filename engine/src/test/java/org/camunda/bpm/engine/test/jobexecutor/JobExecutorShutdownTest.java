@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -66,12 +65,8 @@ public class JobExecutorShutdownTest {
       .endEvent()
       .done();
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configuration.setJobExecutor(buildControllableJobExecutor());
-    }
-  };
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJobExecutor(buildControllableJobExecutor()));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule

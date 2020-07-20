@@ -55,6 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class HandleTaskAuthorizationTest {
+
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 

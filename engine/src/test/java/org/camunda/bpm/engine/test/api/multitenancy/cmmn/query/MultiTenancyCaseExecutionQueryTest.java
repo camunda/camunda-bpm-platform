@@ -183,7 +183,6 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
     assertThat(query.count(), is(6L));
   }
 
-  @Override
   protected CaseInstance createCaseInstance(String tenantId) {
     String caseDefinitionId = null;
 

@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -58,30 +57,24 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
   protected static final String WEEKEND = "Weekend";
   protected static final String USER_ID = "user";
 
+  protected static StaticTenantIdTestProvider tenantIdProvider;
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
+    configuration.setTenantIdProvider(tenantIdProvider);
+  });
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   protected DecisionService decisionService;
   protected RepositoryService repositoryService;
   protected HistoryService historyService;
   protected IdentityService identityService;
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  protected static StaticTenantIdTestProvider tenantIdProvider;
-
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
-      configuration.setTenantIdProvider(tenantIdProvider);
-
-      return configuration;
-    }
-  };
-
-  @Rule
-  public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Before
   public void setUp() {

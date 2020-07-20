@@ -140,7 +140,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
   @Test
   public void testQueryCaseTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -164,9 +164,9 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     startProcessInstanceByKey(ONE_PROCESS_KEY);
     startProcessInstanceByKey(ONE_PROCESS_KEY);
 
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     taskService.addCandidateUser(taskService.createTaskQuery().list().get(3).getId(), "dUserId");
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     taskService.addCandidateUser(taskService.createTaskQuery().list().get(4).getId(), "eUserId");
 
     createTaskAndAssignUser("one");

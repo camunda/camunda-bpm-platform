@@ -856,7 +856,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithoutAuthorization() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
@@ -870,7 +870,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
@@ -886,7 +886,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   // CAM-9888
   public void failing_testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
@@ -902,7 +902,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadPermissionOnCategory() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
@@ -918,7 +918,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
@@ -1775,7 +1775,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseDeleteEntryWithoutAuthorization() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
     
@@ -1800,7 +1800,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseDeleteEntryWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
     
@@ -1827,7 +1827,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseDeleteEntryWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
     
@@ -1854,7 +1854,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseDeleteEntryWithDeletePermissionOnCategory() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
     
@@ -1874,7 +1874,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseDeleteEntryWithDeletePermissionOnAnyCategory() {
     // given
-    createCaseInstanceByKey(ONE_TASK_CASE_KEY);
+    testRule.createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
     

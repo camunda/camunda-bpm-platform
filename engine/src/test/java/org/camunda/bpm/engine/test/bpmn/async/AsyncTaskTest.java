@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -346,7 +347,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTest {
 
   // TODO: Think about this:
   @Deployment
-  public void FAILING_testFailingAsyncServiceTimer() {
+  @Ignore
+  @Test
+  public void testFailingAsyncServiceTimerWithMessageJob() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
     // now there are two jobs the message and a timer:
@@ -858,7 +861,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testLongProcessDefinitionKey() {
+  @Ignore
+  @Test
+  public void testLongProcessDefinitionKey() {
     String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
     String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
 

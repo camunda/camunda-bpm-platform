@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -1031,7 +1032,9 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
-  public void FAILING_testBpmnErrorInScriptInputMapping() {
+  @Ignore
+  @Test
+  public void testBpmnErrorInScriptInputMapping() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("throwInMapping", "in");
     variables.put("exception", new BpmnError("error"));
@@ -1056,7 +1059,9 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
-  public void FAILING_testBpmnErrorInScriptOutputMapping() {
+  @Ignore
+  @Test
+  public void testBpmnErrorInScriptOutputMapping() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("throwInMapping", "out");
     variables.put("exception", new BpmnError("error"));
@@ -1081,7 +1086,9 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testOutputMappingOnErrorBoundaryEvent() {
+  @Ignore
+  @Test
+  public void testOutputMappingOnErrorBoundaryEvent() {
 
     // case 1: no error occurs
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -1118,7 +1125,9 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testOutputMappingOnMessageBoundaryEvent() {
+  @Ignore
+  @Test
+  public void testOutputMappingOnMessageBoundaryEvent() {
 
     // case 1: no error occurs
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -1165,7 +1174,9 @@ public class InputOutputTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testOutputMappingOnTimerBoundaryEvent() {
+  @Ignore
+  @Test
+  public void testOutputMappingOnTimerBoundaryEvent() {
 
     // case 1: no error occurs
     runtimeService.startProcessInstanceByKey("testProcess");

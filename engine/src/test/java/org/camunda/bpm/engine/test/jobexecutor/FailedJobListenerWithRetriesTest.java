@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.DefaultJobRetryCmd;
@@ -42,6 +41,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -51,21 +51,17 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FailedJobListenerWithRetriesTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setFailedJobCommandFactory(new OLEFailedJobCommandFactory());
-      configuration.setFailedJobListenerMaxRetries(5);
-      return configuration;
-    }
-  };
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  private RuntimeService runtimeService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
 
   @Parameterized.Parameter(0)
   public int failedRetriesNumber;
@@ -78,6 +74,9 @@ public class FailedJobListenerWithRetriesTest {
 
   @Before
   public void init() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    processEngineConfiguration.setFailedJobCommandFactory(new OLEFailedJobCommandFactory());
+    processEngineConfiguration.setFailedJobListenerMaxRetries(5);
     runtimeService = engineRule.getRuntimeService();
   }
 
@@ -137,7 +136,7 @@ public class FailedJobListenerWithRetriesTest {
     return jobs.get(0);
   }
 
-  private class OLEFailedJobCommandFactory extends DefaultFailedJobCommandFactory {
+  public class OLEFailedJobCommandFactory extends DefaultFailedJobCommandFactory {
 
     private Map<String, OLEFoxJobRetryCmd> oleFoxJobRetryCmds = new HashMap<>();
 
@@ -153,7 +152,7 @@ public class FailedJobListenerWithRetriesTest {
     }
   }
 
-  private class OLEFoxJobRetryCmd extends DefaultJobRetryCmd {
+  public class OLEFoxJobRetryCmd extends DefaultJobRetryCmd {
 
     private int countRuns = 0;
 

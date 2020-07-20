@@ -302,7 +302,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQueryWithTaskInsideCaseWithoutAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
@@ -616,7 +616,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testSaveCaseTaskUpdate() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     Task task = selectSingleTask();
     task.setAssignee("demo");
 
@@ -943,7 +943,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetAssignee() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -1180,7 +1180,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetOwner() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -1498,7 +1498,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddCandidateUser() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -1861,7 +1861,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddCandidateGroup() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -2169,7 +2169,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddUserIdentityLink() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -2372,7 +2372,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddGroupIdentityLink() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -2638,7 +2638,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskDeleteCandidateUser() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
@@ -2899,7 +2899,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskDeleteCandidateGroup() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
@@ -3182,7 +3182,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskDeleteUserIdentityLink() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
@@ -3357,7 +3357,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskDeleteGroupIdentityLink() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     addCandidateGroup(taskId, "accounting");
 
@@ -3512,7 +3512,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetIdentityLinks() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     addCandidateUser(taskId, "demo");
 
@@ -3810,7 +3810,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskClaimTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -4008,7 +4008,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskCompleteTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -4244,7 +4244,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskDelegateTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -4403,7 +4403,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskResolveTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, userId);
     delegateTask(taskId, "demo");
@@ -4642,7 +4642,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetPriority() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -4823,7 +4823,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetSubTasksWithoutAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String parentTaskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -4846,7 +4846,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetSubTasksWithReadPermissionOnSub1() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String parentTaskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -4874,7 +4874,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetSubTasks() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String parentTaskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -5287,7 +5287,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetAssigneeNoAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
@@ -5533,7 +5533,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetOwnerNoAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
@@ -5803,7 +5803,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddCandidateUserNoAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
@@ -6046,7 +6046,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskAddCandidateGroupNoAuthorization() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
@@ -6069,7 +6069,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariable() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6084,7 +6084,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariableLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6103,7 +6103,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariableTyped() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6119,7 +6119,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariableLocalTyped() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6139,7 +6139,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6158,7 +6158,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6181,7 +6181,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesTyped() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6200,7 +6200,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesLocalTyped() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6223,7 +6223,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesByName() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6242,7 +6242,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesLocalByName() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6265,7 +6265,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesTypedByName() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     // when
@@ -6284,7 +6284,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetVariablesLocalTypedByName() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6307,7 +6307,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetVariable() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifySetVariable(taskId);
@@ -6318,7 +6318,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetVariableLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifySetVariableLocal(taskId);
@@ -6329,7 +6329,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifySetVariables(taskId);
@@ -6340,7 +6340,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSetVariablesLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifySetVariablesLocal(taskId);
@@ -6351,7 +6351,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskRemoveVariable() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     verifyRemoveVariable(taskId);
@@ -6362,7 +6362,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskRemoveVariableLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6377,7 +6377,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskRemoveVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    testRule.createCaseInstanceByKey(CASE_KEY, getVariables());
     String taskId = selectSingleTask().getId();
 
     verifyRemoveVariables(taskId);
@@ -6388,7 +6388,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskRemoveVariablesLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     disableAuthorization();
@@ -6403,7 +6403,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskUpdateVariablesLocal() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifyUpdateVariablesLocal(taskId);
@@ -6414,7 +6414,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskUpdateVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     verifyUpdateVariables(taskId);

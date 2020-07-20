@@ -48,7 +48,6 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -85,15 +84,12 @@ public class CustomHistoryLevelUserOperationLogTest {
   static HistoryLevel customHistoryLevelUOL = new CustomHistoryLevelUserOperationLog();
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelUserOperationLogTest");
       configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelUOL));
       configuration.setHistory("aCustomHistoryLevelUOL");
       configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
-      return configuration;
-    }
-  };
+  });
 
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public AuthorizationTestBaseRule authRule = new AuthorizationTestBaseRule(engineRule);

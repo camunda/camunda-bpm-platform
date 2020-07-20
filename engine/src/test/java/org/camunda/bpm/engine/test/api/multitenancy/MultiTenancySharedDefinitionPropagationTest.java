@@ -20,8 +20,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -42,18 +40,11 @@ public class MultiTenancySharedDefinitionPropagationTest {
   protected static final String TENANT_ID = "tenant1";
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ID);
-      configuration.setTenantIdProvider(tenantIdProvider);
-
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ID);
+    configuration.setTenantIdProvider(tenantIdProvider);
+  });
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule

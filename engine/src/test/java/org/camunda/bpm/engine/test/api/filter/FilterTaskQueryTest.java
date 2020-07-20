@@ -64,6 +64,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -2080,11 +2081,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertNull(taskQuery.getAssigneeNotIn());
   }
 
-  /**
-   * See CAM-9613
-   */
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void FAILING_testDateVariable() {
+  @Ignore("CAM-9613")
+  @Test
+  public void testDateVariable() {
     // given
     Date date = new Date();
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -2103,11 +2103,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertThat(filterService.count(filter.getId()), is(1L));
   }
 
-  /**
-   * See CAM-9613
-   */
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void FAILING_testByteArrayVariable() {
+  @Ignore("CAM-9613")
+  @Test
+  public void testByteArrayVariable() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
       Variables.createVariables().putValue("bytesVariable", "aByteArray".getBytes()));
@@ -2125,11 +2124,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertThat(filterService.count(filter.getId()), is(1L));
   }
 
-  /**
-   * See CAM-9613
-   */
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void FAILING_testLongVariable() {
+  @Ignore("CAM-9613")
+  @Test
+  public void testLongVariable() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
       Variables.createVariables().putValue("longVariable", 7L));
@@ -2147,11 +2145,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertThat(filterService.count(filter.getId()), is(1L));
   }
 
-  /**
-   * See CAM-9613
-   */
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void FAILING_testShortVariable() {
+  @Ignore("CAM-9613")
+  @Test
+  public void testShortVariable() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
       Variables.createVariables().putValue("shortVariable", (short) 7));

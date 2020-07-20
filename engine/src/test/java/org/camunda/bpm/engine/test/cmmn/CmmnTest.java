@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.test;
+package org.camunda.bpm.engine.test.cmmn;
 
-import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -24,18 +23,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-/**
- * Base class for CMMN test cases with helper methods.
- *
- * These also includes state transition methods which are currently
- * not implemented as parted of the public API, i.e. {@link CaseService}.
- * These methods should be removed after they are available through public API.
- *
- * @author Sebastian Menski
- */
-public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
+public class CmmnTest extends PluggableProcessEngineTest {
+
+  //CMMN METHODS
 
   // create case instance
   protected CaseInstance createCaseInstance() {

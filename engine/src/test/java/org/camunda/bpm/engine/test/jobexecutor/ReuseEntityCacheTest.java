@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.ArrayList;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -48,12 +47,8 @@ public class ReuseEntityCacheTest {
   public static final String ENTITY_ID1 = "Execution1";
   public static final String ENTITY_ID2 = "Execution2";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configuration.setJobExecutor(new ControllableJobExecutor());
-    }
-  };
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJobExecutor(new ControllableJobExecutor()));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule
