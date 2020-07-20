@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -41,9 +39,7 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
 
   protected static final String TENANT_ONE = "tenant1";
-
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
-
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent()
       .userTask()
@@ -52,18 +48,11 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
     .done();
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
-      configuration.setTenantIdProvider(tenantIdProvider);
-
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
+    configuration.setTenantIdProvider(tenantIdProvider);
+  });
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
@@ -74,7 +63,6 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
 
   @Before
   public void setUp() throws Exception {
-
     testRule.deploy(PROCESS);
   }
 

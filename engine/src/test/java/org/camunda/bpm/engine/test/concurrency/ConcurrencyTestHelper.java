@@ -21,18 +21,14 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.runtime.Job;
 import org.junit.After;
 import org.junit.Before;
 
 public abstract class ConcurrencyTestHelper {
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected HistoryService historyService;
   protected List<ControllableCommand<?>> controllableCommands;
 
   @Before
@@ -216,14 +212,5 @@ public abstract class ConcurrencyTestHelper {
     }
   }
 
-  protected void deleteHistoryCleanupJobs() {
-    final List<Job> jobs = historyService.findHistoryCleanupJobs();
-    for (final Job job : jobs) {
-      processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
-        commandContext.getJobManager().deleteJob((JobEntity) job);
-        return null;
-      });
-    }
-  }
 
 }

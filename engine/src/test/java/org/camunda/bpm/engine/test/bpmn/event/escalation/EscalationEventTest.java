@@ -25,6 +25,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -161,11 +162,11 @@ public class EscalationEventTest extends PluggableProcessEngineTest {
 
   /**
    * current bug: default value of 'cancelActivity' is 'true'
-   *
-   * @see <a href="https://app.camunda.com/jira/browse/CAM-4403">https://app.camunda.com/jira/browse/CAM-4403</a>
    */
   @Deployment
-  public void FAILING_testImplicitNonInterruptingEscalationBoundaryEvent() {
+  @Ignore("CAM-4403")
+  @Test
+  public void testImplicitNonInterruptingEscalationBoundaryEvent() {
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the subprocess
 

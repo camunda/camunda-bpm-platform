@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -419,13 +420,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     assertTrue(GetVariablesDelegate.values.containsAll(hotels));
   }
 
-  /**
-   * enable test case when bug is fixed
-   *
-   * @see <a href="https://app.camunda.com/jira/browse/CAM-4268">https://app.camunda.com/jira/browse/CAM-4268</a>
-   */
   @Deployment
-  public void FAILING_testCompensateMiSubprocessVariableSnapshotOfElementVariable() {
+  @Ignore("Fix CAM-4268")
+  @Test
+  public void testCompensateMiSubprocessVariableSnapshotOfElementVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     // multi instance collection
     List<String> flights = Arrays.asList("STS-14", "STS-28");
@@ -728,11 +726,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
       .done());
   }
 
-  /**
-   * CAM-4903
-   */
   @Deployment
-  public void FAILING_testActivityInstanceTreeForMiSubProcessDefaultHandler() {
+  @Ignore("CAM-4903")
+  @Test
+  public void testActivityInstanceTreeForMiSubProcessDefaultHandler() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
     completeTasks("Book Hotel", 5);
@@ -1008,11 +1005,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
     testRule.assertProcessEnded(processInstance.getId());
   }
 
-  /**
-   * CAM-4387
-   */
   @Deployment
-  public void FAILING_testSubprocessCompensationHandlerWithEventSubprocess() {
+  @Ignore("CAM-4387")
+  @Test
+  public void testSubprocessCompensationHandlerWithEventSubprocess() {
     // given a process instance in compensation
     runtimeService.startProcessInstanceByKey("subProcessCompensationHandlerWithEventSubprocess");
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
@@ -1031,7 +1027,9 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
    * CAM-4387
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandlerWithEventSubprocess.bpmn20.xml")
-  public void FAILING_testSubprocessCompensationHandlerWithEventSubprocessActivityInstanceTree() {
+  @Ignore("CAM-4387")
+  @Test
+  public void testSubprocessCompensationHandlerWithEventSubprocessActivityInstanceTree() {
     // given a process instance in compensation
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandlerWithEventSubprocess");
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
@@ -1051,11 +1049,10 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
        .done());
   }
 
-  /**
-   * CAM-4387
-   */
   @Deployment
-  public void FAILING_testReceiveTaskCompensationHandler() {
+  @Ignore("CAM-4387")
+  @Test
+  public void testReceiveTaskCompensationHandler() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveTaskCompensationHandler");
 
@@ -1141,7 +1138,9 @@ public class CompensateEventTest extends PluggableProcessEngineTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-  public void FAILING_testDeleteInstanceWithEventScopeExecution()
+  @Ignore
+  @Test
+  public void testDeleteInstanceWithEventScopeExecution()
   {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")

@@ -451,7 +451,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetTaskFormData() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -657,7 +657,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetRenderedTaskForm() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -867,7 +867,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskGetTaskFormVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -997,7 +997,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseTaskSubmitTaskForm() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when

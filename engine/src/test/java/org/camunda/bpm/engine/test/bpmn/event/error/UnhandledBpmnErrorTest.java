@@ -19,11 +19,9 @@ package org.camunda.bpm.engine.test.bpmn.event.error;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -41,15 +39,10 @@ import org.junit.rules.RuleChain;
 public class UnhandledBpmnErrorTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
-      return configuration;
-    }
-  };
-
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setEnableExceptionsAfterUnhandledBpmnError(true));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -57,8 +50,8 @@ public class UnhandledBpmnErrorTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private RuntimeService runtimeService;
-  private TaskService taskService;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
 
   @Before
   public void setUp() {

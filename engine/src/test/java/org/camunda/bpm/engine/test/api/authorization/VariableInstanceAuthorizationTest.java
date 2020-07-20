@@ -105,7 +105,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   @Test
   public void testCaseLocalTaskVariableQueryWithoutAuthorization () {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
     setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 

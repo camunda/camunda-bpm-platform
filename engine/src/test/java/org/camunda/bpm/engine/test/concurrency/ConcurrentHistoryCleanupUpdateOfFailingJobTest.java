@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
@@ -26,22 +27,27 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestHelper {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setHistoryCleanupBatchWindowStartTime("00:00"));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected HistoryService historyService;
   protected ManagementService managementService;
   protected int retries = 5;
 
@@ -54,21 +60,7 @@ public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyT
 
   @After
   public void tearDown() {
-    deleteHistoryCleanupJobs();
-  }
-
-  @Override
-  protected void deleteHistoryCleanupJobs() {
-    String cleanUpJobId = historyService.findHistoryCleanupJobs().get(0).getId();
-
-    processEngineConfiguration.getCommandExecutorTxRequired().<Void>execute(c -> {
-      JobEntity cleanUpJob = c.getJobManager().findJobById(cleanUpJobId);
-      cleanUpJob.delete();
-      c.getHistoricJobLogManager().deleteHistoricJobLogByJobId(cleanUpJobId);
-
-      return null;
-    });
-
+    testRule.deleteHistoryCleanupJobs();
   }
 
   @Test

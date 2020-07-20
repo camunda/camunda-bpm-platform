@@ -52,6 +52,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.joda.time.LocalDateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -105,7 +106,9 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
   // FIXME: This test likes to run in an endless loop when invoking the
   // waitForJobExecutorOnCondition method
   @Deployment
-  public void FAILING_testCycleDateStartTimerEvent() throws Exception {
+  @Ignore
+  @Test
+  public void testCycleDateStartTimerEvent() throws Exception {
     ClockUtil.setCurrentTime(new Date());
 
     // After process start, there should be timer created

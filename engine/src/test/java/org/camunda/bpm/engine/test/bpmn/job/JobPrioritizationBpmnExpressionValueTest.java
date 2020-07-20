@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -110,7 +111,9 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
    * Can't distinguish this case from the cases we have to tolerate due to CAM-4207
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
-  public void FAILING_testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
+  @Ignore("CAM-4207")
+  @Test
+  public void testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
     // when
     try {
       runtimeService

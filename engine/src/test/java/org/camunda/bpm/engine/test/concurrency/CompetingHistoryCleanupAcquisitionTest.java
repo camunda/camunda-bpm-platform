@@ -24,6 +24,7 @@ import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryClea
 import java.util.Collections;
 import java.util.Date;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -54,6 +55,8 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelpe
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
+  protected HistoryService historyService;
+  protected ManagementService managementService;
 
   protected final Date CURRENT_DATE = new Date(1363608000000L);
 
@@ -64,8 +67,6 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelpe
   protected ControllableJobExecutor jobExecutor;
 
   protected ThreadControl acquisitionThread;
-
-  protected ManagementService managementService;
 
   @Before
   public void setUp() throws Exception {
@@ -222,7 +223,7 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestHelpe
   // helpers ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   protected void clearDatabase() {
-    deleteHistoryCleanupJobs();
+    testRule.deleteHistoryCleanupJobs();
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 

@@ -636,7 +636,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTest {
   @Ignore("CAM-126")
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
-  public void FAILING_testActivityStatisticsQueryWithNoInstances() {
+  public void testActivityStatisticsQueryWithNoInstances() {
 
     ProcessDefinition definition =
         repositoryService

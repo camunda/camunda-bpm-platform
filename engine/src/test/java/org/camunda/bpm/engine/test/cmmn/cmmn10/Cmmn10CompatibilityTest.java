@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class Cmmn10CompatibilityTest extends PluggableProcessEngineTest {
+public class Cmmn10CompatibilityTest extends CmmnTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRequiredRule.cmmn")
   @Test

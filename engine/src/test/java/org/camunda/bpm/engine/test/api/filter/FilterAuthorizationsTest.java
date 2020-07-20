@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -334,10 +335,9 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
     }
   }
 
-  /**
-   * CAM-4889
-   */
-  public void FAILING_testUpdateFilterGenericOwnerId() {
+  @Ignore("CAM-4889")
+  @Test
+  public void testUpdateFilterGenericOwnerId() {
     grantCreateFilter();
 
     Filter filter = filterService.newTaskFilter("someName");

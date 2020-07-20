@@ -26,7 +26,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class DmnDecisionTaskResultListenerTest extends PluggableProcessEngineTest {
+public class DmnDecisionTaskResultListenerTest extends CmmnTest {
 
   protected static final String TEST_CASE = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskResultListenerTest.cmmn";
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";

@@ -61,6 +61,16 @@ import junit.framework.AssertionFailedError;
  * @author Tom Baeyens
  */
 public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
+  /**
+   * This class isn't used in the Process Engine test suite anymore.
+   * However, some Test classes in the following modules still use it:
+   *   * camunda-engine-plugin-spin
+   *   * camunda-engine-plugin-connect
+   *   * camunda-engine-spring
+   *   * camunda-identity-ldap
+   *
+   * It should be removed once those Test classes are migrated to JUnit 4.
+   */
 
   private final static Logger LOG = TestLogger.TEST_LOGGER.getLogger();
 

@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -516,7 +517,9 @@ public class VariableListenerTest extends PluggableProcessEngineTest {
    * TODO: add when history for case execution variables is implemented
    */
   @Deployment
-  public void FAILING_testListenerDoesNotInterfereWithHistory() {
+  @Ignore
+  @Test
+  public void testListenerDoesNotInterfereWithHistory() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
       .create();

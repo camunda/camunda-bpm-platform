@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.junit.Test;
 
 /**
@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author Deivarayan Azhagappan
  *
  */
-public class SentryVariableOnPartExitCriteriaTest extends PluggableProcessEngineTest {
+public class SentryVariableOnPartExitCriteriaTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
   @Test

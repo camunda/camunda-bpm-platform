@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -61,18 +60,14 @@ import org.junit.rules.RuleChain;
 public class DeploymentCacheCfgTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+  public static ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
       // apply configuration options here
       configuration.setCacheCapacity(2);
       configuration.setCacheFactory(new MyCacheFactory());
       configuration.setEnableFetchProcessDefinitionDescription(false);
-      return configuration;
-    }
-  };
+  });
 
   protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(cacheFactoryBootstrapRule);
-
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(cacheFactoryEngineRule);
 
   @Rule

@@ -74,6 +74,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -962,7 +963,9 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
-  public void FAILING_testImplicitVariableUpdateActivityInstanceId() {
+  @Ignore
+  @Test
+  public void testImplicitVariableUpdateActivityInstanceId() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
@@ -989,7 +992,9 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
-  public void FAILING_testImplicitVariableUpdateAndReplacementInOneTransaction() {
+  @Ignore
+  @Test
+  public void testImplicitVariableUpdateAndReplacementInOneTransaction() {
     // given
     runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
@@ -2239,11 +2244,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     }
   }
 
-  /**
-   * CAM-2828
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
-  public void FAILING_testSubmitFormHistoricUpdates() {
+  @Ignore("CAM-2828")
+  @Test
+  public void testSubmitFormHistoricUpdates() {
 
     String processDefinitionId = repositoryService
       .createProcessDefinitionQuery()

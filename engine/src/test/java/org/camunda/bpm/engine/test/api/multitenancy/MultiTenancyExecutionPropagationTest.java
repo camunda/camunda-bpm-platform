@@ -507,7 +507,6 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 
-  @Override
   protected CaseInstance createCaseInstance() {
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
     return caseService.createCaseInstanceById(caseDefinition.getId());

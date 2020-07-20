@@ -223,7 +223,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
   @Test
   public void testQueryAfterCaseTask() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
 
     // when
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -252,8 +252,8 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     createTask("four");
     createTask("five");
 
-    createCaseInstanceByKey(CASE_KEY);
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
 
     // when
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -286,8 +286,8 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     createTask("four");
     createTask("five");
 
-    createCaseInstanceByKey(CASE_KEY);
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
@@ -322,8 +322,8 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     createTask("four");
     createTask("five");
 
-    createCaseInstanceByKey(CASE_KEY);
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 

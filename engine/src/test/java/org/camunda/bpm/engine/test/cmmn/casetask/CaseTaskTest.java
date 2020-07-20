@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.junit.Test;
@@ -43,7 +43,7 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class CaseTaskTest extends PluggableProcessEngineTest {
+public class CaseTaskTest extends CmmnTest {
 
   protected final String CASE_TASK = "PI_CaseTask_1";
   protected final String ONE_CASE_TASK_CASE = "oneCaseTaskCase";

@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -214,7 +215,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
    * Fails at least on mssql; mssql appears to lock more than the actual event subscription row
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void FAILING_testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
+  @Ignore
+  @Test
+  public void testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -311,7 +314,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
    * @throws InterruptedException
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void FAILING_testConcurrentMixedCorrelationCase2() throws InterruptedException {
+  @Ignore("CAM-3636")
+  @Test
+  public void testConcurrentMixedCorrelationCase2() throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance

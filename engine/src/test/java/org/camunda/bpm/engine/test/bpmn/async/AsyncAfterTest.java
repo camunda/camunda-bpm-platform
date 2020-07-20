@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -652,7 +653,9 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   }
 
   @Deployment
-  public void FAILING_testAsyncAfterOnParallelGatewayJoin() {
+  @Ignore
+  @Test
+  public void testAsyncAfterOnParallelGatewayJoin() {
     String configuration = PvmAtomicOperation.ACTIVITY_END.getCanonicalName();
 
     runtimeService.startProcessInstanceByKey("process");

@@ -50,28 +50,24 @@ import org.junit.rules.ExpectedException;
 public class JsonSerializationWithValidationOnMultipleEnginesTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRulePositive = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+  public static ProcessEngineBootstrapRule bootstrapRulePositive = new ProcessEngineBootstrapRule(configuration -> {
       DeserializationTypeValidator validatorMock = mock(DeserializationTypeValidator.class);
       when(validatorMock.validate(anyString())).thenReturn(true);
-      return configuration
+      configuration
           .setDeserializationTypeValidator(validatorMock)
           .setDeserializationTypeValidationEnabled(true)
           .setJdbcUrl("jdbc:h2:mem:positive");
-    };
-  };
+  });
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRuleNegative = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+  public static ProcessEngineBootstrapRule bootstrapRuleNegative = new ProcessEngineBootstrapRule(configuration -> {
       DeserializationTypeValidator validatorMock = mock(DeserializationTypeValidator.class);
       when(validatorMock.validate(anyString())).thenReturn(false);
-      return configuration
+      configuration
           .setDeserializationTypeValidator(validatorMock)
           .setDeserializationTypeValidationEnabled(true)
           .setJdbcUrl("jdbc:h2:mem:negative");
-    };
-  };
+  });
 
   @Rule
   public ProcessEngineRule engineRulePositive = new ProvidedProcessEngineRule(bootstrapRulePositive);

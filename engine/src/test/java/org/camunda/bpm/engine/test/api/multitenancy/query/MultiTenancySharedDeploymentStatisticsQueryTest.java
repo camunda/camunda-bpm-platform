@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -58,27 +57,19 @@ public class MultiTenancySharedDeploymentStatisticsQueryTest {
   protected static StaticTenantIdTestProvider tenantIdProvider;
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
-      configuration.setTenantIdProvider(tenantIdProvider);
-
-      return configuration;
-    }
-  };
-
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
+    configuration.setTenantIdProvider(tenantIdProvider);
+  });
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  @Rule
+  public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   protected RuntimeService runtimeService;
-
   protected ManagementService managementService;
-
   protected IdentityService identityService;
-
   protected ProcessEngineConfiguration processEngineConfiguration;
 
   protected static final BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess(ONE_TASK_PROCESS_DEFINITION_KEY)
@@ -99,9 +90,7 @@ public class MultiTenancySharedDeploymentStatisticsQueryTest {
       .camundaClass("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
       .camundaAsyncBefore()
     .done();
-  
-  @Rule
-  public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
+
 
   @Before
   public void setUp() {

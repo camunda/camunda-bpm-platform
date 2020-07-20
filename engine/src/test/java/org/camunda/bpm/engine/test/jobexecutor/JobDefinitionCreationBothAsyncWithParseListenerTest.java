@@ -22,10 +22,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -51,25 +49,20 @@ import org.junit.Test;
  */
 public class JobDefinitionCreationBothAsyncWithParseListenerTest {
 
-
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      List<BpmnParseListener> listeners = new ArrayList<>();
-      listeners.add(new AbstractBpmnParseListener(){
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    List<BpmnParseListener> listeners = new ArrayList<>();
+    listeners.add(new AbstractBpmnParseListener(){
 
-        @Override
-        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
-          activity.setAsyncBefore(true);
-          activity.setAsyncAfter(true);
-        }
-      });
+      @Override
+      public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+        activity.setAsyncBefore(true);
+        activity.setAsyncAfter(true);
+      }
+    });
 
-      configuration.setCustomPreBPMNParseListeners(listeners);
-      return configuration;
-    }
-  };
+    configuration.setCustomPreBPMNParseListeners(listeners);
+  });
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);

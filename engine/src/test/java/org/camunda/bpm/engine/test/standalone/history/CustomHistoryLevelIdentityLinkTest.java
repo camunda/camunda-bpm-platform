@@ -27,12 +27,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.task.Task;
@@ -68,20 +66,16 @@ public class CustomHistoryLevelIdentityLinkTest {
   static CustomHistoryLevelIdentityLink customHisstoryLevelIL = new CustomHistoryLevelIdentityLink();
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + getClass().getSimpleName());
-      List<HistoryLevel> levels = new ArrayList<>();
-      levels.add(customHisstoryLevelIL);
-      processEngineConfiguration.setCustomHistoryLevels(levels);
-      processEngineConfiguration.setHistory("aCustomHistoryLevelIL");
-      processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
-      return processEngineConfiguration;
-    }
-  };
-
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    configuration.setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIdentityLinkTest.class.getSimpleName());
+    List<HistoryLevel> levels = new ArrayList<>();
+    levels.add(customHisstoryLevelIL);
+    configuration.setCustomHistoryLevels(levels);
+    configuration.setHistory("aCustomHistoryLevelIL");
+    configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
+  });
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
