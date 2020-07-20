@@ -19,16 +19,17 @@ package org.camunda.bpm.engine.test.standalone.pvm;
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class PvmProcessInstanceEndTest extends PvmTestCase {
+public class PvmProcessInstanceEndTest {
 
+  @Test
   public void testSimpleProcessInstanceEnd() {
     EventCollector eventCollector = new EventCollector();
     

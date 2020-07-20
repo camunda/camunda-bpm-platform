@@ -16,16 +16,20 @@
  */
 package org.camunda.bpm.engine.test.standalone.initialization;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.SQLException;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
-public class NoDbConnectionTest extends PvmTestCase {
+public class NoDbConnectionTest {
 
+  @Test
   public void testNoDbConnection() {
     try {
       ProcessEngineConfiguration

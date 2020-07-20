@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.test;
 
+import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
@@ -29,11 +31,13 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -579,4 +583,27 @@ public abstract class TestHelper {
       });
   }
 
+  /**
+   * Asserts if the provided text is part of some text.
+   */
+  public static void assertTextPresent(String expected, String actual) {
+    if ( (actual==null)
+        || (actual.indexOf(expected)==-1)
+    ) {
+      throw new AssertionFailedError("expected presence of ["+expected+"], but was ["+actual+"]");
+    }
+  }
+
+  /**
+   * Asserts if the provided text is part of some text, ignoring any uppercase characters
+   */
+  public static void assertTextPresentIgnoreCase(String expected, String actual) {
+    assertTextPresent(expected.toLowerCase(), actual.toLowerCase());
+  }
+
+  public static Object defaultManualActivation() {
+    Expression expression = new FixedValue(true);
+    CaseControlRuleImpl caseControlRule = new CaseControlRuleImpl(expression);
+    return caseControlRule;
+  }
 }

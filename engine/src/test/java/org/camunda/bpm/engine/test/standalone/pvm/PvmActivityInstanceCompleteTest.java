@@ -22,19 +22,19 @@ import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
+import org.junit.Test;
 
 /**
  *
  * @author roman.smirnov
  *
  */
-public class PvmActivityInstanceCompleteTest extends PvmTestCase {
+public class PvmActivityInstanceCompleteTest {
 
 
   /**
@@ -42,6 +42,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    * | start |-->| end |
    * +-------+   +-----+
    */
+  @Test
   public void testSingleEnd() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -79,6 +80,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    *              +--->|end2|
    *                   +----+
    */
+  @Test
   public void testTwoEnds() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -128,6 +130,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    *              +--->| a2 |---+
    *                   +----+
    */
+  @Test
   public void testSingleEndAfterParallelJoin() {
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
@@ -187,6 +190,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    *           |                               |
    *           +-------------------------------+
    */
+  @Test
   public void testSimpleSubProcess() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
@@ -242,6 +246,7 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
    *                +--------->| end2 |
    *                           +------+
    */
+  @Test
   public void testBoundaryEvent() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();

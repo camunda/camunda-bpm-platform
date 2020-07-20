@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +27,18 @@ import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EventScopeCreatingSubprocess;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
+import org.junit.Test;
 
 
 /**
  * 
  * @author Daniel Meyer
  */
-public class PvmEventScopesTest extends PvmTestCase {
+public class PvmEventScopesTest {
   
   /** 
    * 
@@ -55,6 +58,7 @@ public class PvmEventScopesTest extends PvmTestCase {
    *                                       destroy evt scope --+  
    *           
    */
+  @Test
   public void testActivityEndDestroysEventScopes() {
       PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -125,6 +129,7 @@ public class PvmEventScopesTest extends PvmTestCase {
    *                                                                                  |
    *                                                              destroy evt scope --+  
    */
+  @Test
   public void testTransitionDestroysEventScope() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

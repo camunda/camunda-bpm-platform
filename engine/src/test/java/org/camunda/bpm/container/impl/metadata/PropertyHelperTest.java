@@ -27,11 +27,12 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  */
-public class PropertyHelperTest extends TestCase {
+public class PropertyHelperTest {
 
   // process engine properties
   protected static final String JOB_EXECUTOR_DEPLOYMENT_AWARE_PROP = "jobExecutorDeploymentAware";
@@ -51,6 +52,7 @@ public class PropertyHelperTest extends TestCase {
   /**
    * Assert that String, int and boolean properties can be set.
    */
+  @Test
   public void testProcessEngineConfigurationProperties() {
     ProcessEngineConfiguration engineConfiguration = new StandaloneProcessEngineConfiguration();
 
@@ -70,6 +72,7 @@ public class PropertyHelperTest extends TestCase {
     Assert.assertEquals("someUrl", engineConfiguration.getJdbcUrl());
   }
 
+  @Test
   public void testJobExecutorConfigurationProperties() {
     // given
     JobExecutor jobExecutor = new DefaultJobExecutor();
@@ -94,6 +97,7 @@ public class PropertyHelperTest extends TestCase {
    * Assures that property names are matched on the setter name according to java beans conventions
    * and not on the field name.
    */
+  @Test
   public void testConfigurationPropertiesWithMismatchingFieldAndSetter() {
     ProcessEngineConfigurationImpl engineConfiguration = new StandaloneProcessEngineConfiguration();
 
@@ -109,6 +113,7 @@ public class PropertyHelperTest extends TestCase {
     Assert.assertTrue(engineConfiguration.isDbIdentityUsed());
   }
 
+  @Test
   public void testNonExistingPropertyForProcessEngineConfiguration() {
     ProcessEngineConfiguration engineConfiguration = new StandaloneProcessEngineConfiguration();
     Map<String, String> propertiesToSet = new HashMap<String, String>();
@@ -122,6 +127,7 @@ public class PropertyHelperTest extends TestCase {
     }
   }
 
+  @Test
   public void testResolvePropertyForExistingProperty() {
     Properties source = new Properties();
     source.put("camunda.test.someKey", "1234");
@@ -129,6 +135,7 @@ public class PropertyHelperTest extends TestCase {
     Assert.assertEquals("1234", result);
   }
 
+  @Test
   public void testResolvePropertyWhitespaceAndMore() {
     Properties source = new Properties();
     source.put("camunda.test.someKey", "1234");
@@ -136,6 +143,7 @@ public class PropertyHelperTest extends TestCase {
     Assert.assertEquals(" -1234- ", result);
   }
 
+  @Test
   public void testResolvePropertyForMultiplePropertes() {
     Properties source = new Properties();
     source.put("camunda.test.oneKey", "1234");
@@ -144,12 +152,14 @@ public class PropertyHelperTest extends TestCase {
     Assert.assertEquals("-1234-5678-", result);
   }
 
+  @Test
   public void testResolvePropertyForMissingProperty() {
     Properties source = new Properties();
     String result = PropertyHelper.resolveProperty(source, "${camunda.test.someKey}");
     Assert.assertEquals("", result);
   }
 
+  @Test
   public void testResolvePropertyNoTemplate() {
     Properties source = new Properties();
     source.put("camunda.test.someKey", "1234");
