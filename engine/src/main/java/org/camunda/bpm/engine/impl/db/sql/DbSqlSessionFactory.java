@@ -87,6 +87,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificDistinct = new HashMap<>();
 
+  public static final Map<String, String> databaseSpecificNumericCast = new HashMap<>();
+
   public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<>();
 
   public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<>();
@@ -123,6 +125,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
     databaseSpecificDistinct.put(H2, "distinct");
+    databaseSpecificNumericCast.put(H2, "");
 
     databaseSpecificCountDistinctBeforeStart.put(H2, defaultDistinctCountBeforeStart);
     databaseSpecificCountDistinctBeforeEnd.put(H2, defaultDistinctCountBeforeEnd);
@@ -348,10 +351,12 @@ public class DbSqlSessionFactory implements SessionFactory {
       dbSpecificConstants.put(postgresLikeDatabase, constants);
     }
     databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
+    databaseSpecificNumericCast.put(POSTGRES, "");
 
     // cockroachdb
     // CRDB doesn't currently support DAY extraction from intervals. The following is a workaround:
     databaseSpecificDaysComparator.put(CRDB, "CAST( EXTRACT (HOUR FROM #{currentTimestamp} - ${date}) / 24 AS INT ) >= ${days}");
+    databaseSpecificNumericCast.put(CRDB, "::NUMERIC");
 
     // oracle
     databaseSpecificLimitBeforeStatements.put(ORACLE, "select * from ( select a.*, ROWNUM rnum from (");
@@ -367,6 +372,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(ORACLE, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
     databaseSpecificDistinct.put(ORACLE, "distinct");
+    databaseSpecificNumericCast.put(ORACLE, "");
 
     databaseSpecificCountDistinctBeforeStart.put(ORACLE, defaultDistinctCountBeforeStart);
     databaseSpecificCountDistinctBeforeEnd.put(ORACLE, defaultDistinctCountBeforeEnd);
@@ -447,6 +453,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(DB2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(DB2, "");
+    databaseSpecificNumericCast.put(DB2, "");
 
     databaseSpecificCountDistinctBeforeStart.put(DB2, defaultDistinctCountBeforeStart);
     databaseSpecificCountDistinctBeforeEnd.put(DB2, defaultDistinctCountBeforeEnd);
@@ -531,6 +538,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(MSSQL, "");
+    databaseSpecificNumericCast.put(MSSQL, "");
 
     databaseSpecificCountDistinctBeforeStart.put(MSSQL, defaultDistinctCountBeforeStart);
     databaseSpecificCountDistinctBeforeEnd.put(MSSQL, defaultDistinctCountBeforeEnd);

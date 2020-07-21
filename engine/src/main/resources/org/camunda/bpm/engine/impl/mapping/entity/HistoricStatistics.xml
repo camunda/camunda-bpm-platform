@@ -101,9 +101,9 @@
             , sum(CASE WHEN ACT.ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END) as COMPLETE_SCOPE_COUNT_
             </if>
             <if test="includeIncidents">
-            , 0 as OPEN_INCIDENT_COUNT_
-            , 0 as RESOLVED_INCIDENT_COUNT_
-            , 0 as DELETED_INCIDENT_COUNT_
+            , 0${numericCast} as OPEN_INCIDENT_COUNT_
+            , 0${numericCast} as RESOLVED_INCIDENT_COUNT_
+            , 0${numericCast} as DELETED_INCIDENT_COUNT_
             </if>
 
           from ${prefix}ACT_HI_ACTINST ACT
@@ -142,15 +142,15 @@
         UNION
             select
               INC.ACTIVITY_ID_ as ID_,
-              0 as INSTANCE_COUNT_
+              0${numericCast} as INSTANCE_COUNT_
               <if test="includeFinished">
-              , 0 as FINISHED_COUNT_
+              , 0${numericCast} as FINISHED_COUNT_
               </if>
               <if test="includeCanceled">
-              , 0 as CANCELED_COUNT_
+              , 0${numericCast} as CANCELED_COUNT_
               </if>
               <if test="includeCompleteScope">
-              , 0 as COMPLETE_SCOPE_COUNT_
+              , 0${numericCast} as COMPLETE_SCOPE_COUNT_
               </if>
               , sum(CASE WHEN INC.INCIDENT_STATE_ = 0 THEN 1 ELSE 0 END) as OPEN_INCIDENT_COUNT_
               , sum(CASE WHEN INC.INCIDENT_STATE_ = 1 THEN 1 ELSE 0 END) as RESOLVED_INCIDENT_COUNT_
