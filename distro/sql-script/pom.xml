@@ -170,6 +170,10 @@
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.case.engine.sql activiti.postgres.create.decision.engine.sql activiti.postgres.create.history.sql activiti.postgres.create.case.history.sql activiti.postgres.create.decision.history.sql" />
                 </concat>
 
+                <concat destfile="target/sql/create/cockroachdb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.cockroachdb.create.engine.sql activiti.cockroachdb.create.case.engine.sql activiti.cockroachdb.create.decision.engine.sql activiti.cockroachdb.create.history.sql activiti.cockroachdb.create.case.history.sql activiti.cockroachdb.create.decision.history.sql" />
+                </concat>
+
                 <!-- add identity create files -->
                 <copy todir="target/sql/create" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" />
@@ -210,6 +214,10 @@
 
                 <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.decision.engine.sql activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.decision.history.sql activiti.postgres.drop.case.history.sql activiti.postgres.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/cockroachdb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.cockroachdb.drop.decision.engine.sql activiti.cockroachdb.drop.case.engine.sql activiti.cockroachdb.drop.engine.sql activiti.cockroachdb.drop.decision.history.sql activiti.cockroachdb.drop.case.history.sql activiti.cockroachdb.drop.history.sql" />
                 </concat>
 
                 <!-- add identity drop files -->
@@ -361,6 +369,23 @@
 
                 <concat destfile="target/upgrade-test/sql/upgrade/postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
+                <!-- cockroachdb patches -->
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <copy todir="target/upgrade-test/sql/upgrade">

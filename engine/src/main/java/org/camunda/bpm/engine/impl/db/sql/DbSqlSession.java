@@ -574,7 +574,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
       String databaseType = dbSqlSessionFactory.getDatabaseType();
 
-      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
+      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)
+          || DbSqlSessionFactory.CRDB.equals(databaseType)) {
         tableName = tableName.toLowerCase();
       }
 
@@ -610,7 +611,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
           // for postgres we have to use lower case
-          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
+          String databaseType = getDbSqlSessionFactory().getDatabaseType();
+          if (DbSqlSessionFactory.POSTGRES.equals(databaseType)
+              || DbSqlSessionFactory.CRDB.equals(databaseType)) {
             schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }
