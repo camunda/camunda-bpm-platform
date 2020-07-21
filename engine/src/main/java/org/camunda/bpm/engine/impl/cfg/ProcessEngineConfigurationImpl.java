@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -1494,6 +1495,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
   protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
   protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
+  protected static final String POSTGRES_DB_PRODUCT_NAME = "PostgreSQL";
+  protected static final String CRDB_DB_PRODUCT_NAME = "CockroachDB";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
@@ -1501,7 +1504,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty(MY_SQL_PRODUCT_NAME, "mysql");
     databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME, "mariadb");
     databaseTypeMappings.setProperty("Oracle", "oracle");
-    databaseTypeMappings.setProperty("PostgreSQL", "postgres");
+    databaseTypeMappings.setProperty(POSTGRES_DB_PRODUCT_NAME, "postgres");
+    databaseTypeMappings.setProperty(CRDB_DB_PRODUCT_NAME, "cockroachdb");
     databaseTypeMappings.setProperty("Microsoft SQL Server", "mssql");
     databaseTypeMappings.setProperty("DB2", "db2");
     databaseTypeMappings.setProperty("DB2", "db2");
@@ -1533,6 +1537,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       String databaseProductName = databaseMetaData.getDatabaseProductName();
       if (MY_SQL_PRODUCT_NAME.equals(databaseProductName)) {
         databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
+      }
+      if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
+        databaseProductName = checkForCrdb(connection);
       }
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
@@ -1582,6 +1589,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     return databaseName;
+  }
+
+  protected String checkForCrdb(Connection connection) {
+    try {
+      ResultSet result = connection.prepareStatement("select version() as version;").executeQuery();
+      if (result.next()) {
+        String versionData = result.getString(1);
+        if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
+          return CRDB_DB_PRODUCT_NAME;
+        }
+      }
+    } catch (SQLException ignore) {
+    }
+
+    return POSTGRES_DB_PRODUCT_NAME;
   }
 
   protected void initDatabaseVendorAndVersion(DatabaseMetaData databaseMetaData) throws SQLException {

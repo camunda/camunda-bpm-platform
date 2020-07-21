@@ -85,7 +85,8 @@ public class ExternalTaskManager extends AbstractManager {
     orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
     parameters.put("orderingProperties", orderingProperties);
     String databaseType = Context.getProcessEngineConfiguration().getDatabaseType();
-    parameters.put("usesPostgres", DbSqlSessionFactory.POSTGRES.equals(databaseType));
+    parameters.put("usesPostgres",
+        DbSqlSessionFactory.POSTGRES.equals(databaseType) || DbSqlSessionFactory.CRDB.equals(databaseType));
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureQuery(parameter);
