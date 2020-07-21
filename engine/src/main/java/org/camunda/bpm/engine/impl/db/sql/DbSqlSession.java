@@ -142,14 +142,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
                                        int rowsAffected,
                                        Exception failure) {
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       DbEntity dbEntity = operation.getEntity();
 
@@ -189,7 +182,13 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
     if (failure != null) {
       operation.setFailure(failure);
-      operation.setState(State.FAILED_ERROR);
+
+      State failedState = State.FAILED_ERROR;
+      if (isCrdbTransactionRetryException(failure)) {
+        failedState = State.FAILED_CONCURRENT_MODIFICATION;
+        operation.setFatalFailure(true);
+      }
+      operation.setState(failedState);
     } else {
       operation.setRowsAffected(rowsAffected);
       operation.setState(State.APPLIED);
@@ -201,20 +200,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
                                        Exception failure) {
     
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      DbOperation dependencyOperation = operation.getDependentOperation();
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else if (dependencyOperation != null && dependencyOperation.getState() != null && dependencyOperation.getState() != State.APPLIED) {
-        // the owning operation was not successful, so the prerequisite for this operation was not given
-        LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
-        operation.setState(State.NOT_APPLIED);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       operation.setRowsAffected(rowsAffected);
 
@@ -227,6 +213,36 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         operation.setState(State.APPLIED);
       }
     }
+  }
+
+  protected void configureFailedDbEntityOperation(DbEntityOperation operation, Exception failure) {
+    operation.setRowsAffected(0);
+    operation.setFailure(failure);
+
+    DbOperationType operationType = operation.getOperationType();
+    DbOperation dependencyOperation = operation.getDependentOperation();
+
+    State failedState;
+    if (isCrdbTransactionRetryException(failure)) {
+
+      operation.setFatalFailure(true);
+      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+    } else if (isConcurrentModificationException(operation, failure)) {
+
+      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+    } else if (DbOperationType.DELETE.equals(operationType)
+              && dependencyOperation != null
+              && dependencyOperation.getState() != null
+              && dependencyOperation.getState() != State.APPLIED) {
+
+      // the owning operation was not successful, so the prerequisite for this operation was not given
+      LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
+      failedState = State.NOT_APPLIED;
+    } else {
+
+      failedState = State.FAILED_ERROR;
+    }
+    operation.setState(failedState);
   }
 
   protected boolean isConcurrentModificationException(DbOperation failedOperation,
@@ -258,6 +274,30 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
     return false;
   }
+
+  /**
+   * In cases where CockroachDB is used, and a failed operation is detected,
+   * the method checks if the exception was caused by a CockroachDB
+   * <code>TransactionRetryException</code>.
+   *
+   * @param cause for which an operation failed
+   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
+   *          Otherwise, it's false.
+   */
+  protected boolean isCrdbTransactionRetryException(Throwable cause) {
+    // only check when CRDB is used
+    String databaseType = Context.getProcessEngineConfiguration().getDatabaseType();
+    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      boolean isCrdbTxRetryException = ExceptionUtil.checkCrdbTransactionRetryException(cause);
+      if (isCrdbTxRetryException) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
 
   // insert //////////////////////////////////////////
 
@@ -291,14 +331,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     DbEntity entity = operation.getEntity();
 
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       // set revision of our copy to 1
       if (entity instanceof HasDbRevision) {

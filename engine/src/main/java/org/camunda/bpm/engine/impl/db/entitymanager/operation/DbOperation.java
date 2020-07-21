@@ -35,6 +35,13 @@ public abstract class DbOperation implements Recyclable {
   protected int rowsAffected;
   protected Exception failure;
   protected State state;
+  
+  /**
+   * An operation that received a fatal failure can't be recovered from,
+   * or ignored, in the same transaction. Instead, the transaction in which
+   * this operation was executed in must be rolled back and retried.
+   */
+  protected boolean isFatalFailure = false;
 
   /**
    * The type of the DbEntity this operation is executed on.
@@ -83,6 +90,14 @@ public abstract class DbOperation implements Recyclable {
 
   public void setState(State state) {
     this.state = state;
+  }
+
+  public boolean isFatalFailure() {
+    return isFatalFailure;
+  }
+
+  public void setFatalFailure(boolean isFatalFailure) {
+    this.isFatalFailure = isFatalFailure;
   }
 
   public Exception getFailure() {

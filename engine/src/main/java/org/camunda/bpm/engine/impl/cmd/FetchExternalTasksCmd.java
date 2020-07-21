@@ -23,8 +23,10 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.externaltask.LockedExternalTaskImpl;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -61,7 +63,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   @Override
   public List<LockedExternalTask> execute(CommandContext commandContext) {
     validateInput();
-
+    
     for (TopicFetchInstruction instruction : fetchInstructions.values()) {
       instruction.ensureVariablesInitialized();
     }
@@ -97,12 +99,21 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
     commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
 
+      @Override
       public Class<? extends DbEntity> getEntityType() {
         return ExternalTaskEntity.class;
       }
 
-      public void failedOperation(DbOperation operation) {
-        if (operation instanceof DbEntityOperation) {
+      @Override
+      public OptimisticLockingResult failedOperation(DbOperation operation) {
+
+        // When CockroachDB is used, the transaction can't be
+        // continued since the OLE can't be ignored, so it's completely retried.
+        String databaseType = commandContext.getProcessEngineConfiguration().getDatabaseType();
+        if (operation.isFatalFailure() && DbSqlSessionFactory.CRDB.equals(databaseType)) {
+
+          return OptimisticLockingResult.RETRY;
+        } else if (!operation.isFatalFailure() && operation instanceof DbEntityOperation) {
           DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
           DbEntity dbEntity = dbEntityOperation.getEntity();
 
@@ -118,10 +129,20 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
             }
           }
 
+          // If the entity that failed with an OLE is not in the list,
+          // we rethrow the OLE to the caller.
           if (!failedOperationEntityInList) {
-            throw LOG.concurrentUpdateDbEntityException(operation);
+            return OptimisticLockingResult.THROW;
           }
+
+          // If the entity that failed with an OLE has been removed
+          // from the list, we suppress the OLE.
+          return OptimisticLockingResult.IGNORE;
         }
+
+        // If none of the conditions are satisfied, this might indicate a bug,
+        // so we throw the OLE.
+        return OptimisticLockingResult.THROW;
       }
     });
   }

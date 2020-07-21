@@ -23,6 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
@@ -794,6 +795,24 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 			  "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
 			  + "It is not returned by the current fetch and lock command.", 
 			  taskId);
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryException(DbOperation operation) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "102",
+        "Execution of '{}' failed. Entity was updated by another transaction concurrently, " +
+            "and the transaction needs to be retried",
+        operation
+    ));
+  }
+
+  public void fatalFailureOperationIgnored(DbOperation operation) {
+    logError(
+      "103",
+      "An OptimisticLockingListener attempted to ignore a fatal failure of: {}. " +
+        "If encountered, please report this failure to the Camunda development team.",
+      operation
+    );
   }
 
 }

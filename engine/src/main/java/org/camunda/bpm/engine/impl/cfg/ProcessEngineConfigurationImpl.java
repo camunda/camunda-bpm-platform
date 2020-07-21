@@ -211,6 +211,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
@@ -460,6 +461,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Separate command executor to be used for db schema operations. Must always use NON-JTA transactions
    */
   protected CommandExecutor commandExecutorSchemaOperations;
+
+  // TODO: document which commands this affects and that it only applies to CRDB
+  protected int commandRetries = 0;
 
   // SESSION FACTORIES ////////////////////////////////////////////////////////
 
@@ -979,6 +983,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
+
+    // Database type needs to be detected before CommandExecutors are initialized
+    initDataSource();
+
     initCommandExecutors();
     initServices();
     initIdGenerator();
@@ -988,7 +996,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initExternalTaskPriorityProvider();
     initBatchHandlers();
     initJobExecutor();
-    initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
     initIdentityProviderSessionFactory();
@@ -4899,4 +4906,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.telemetryRequestTimeout = telemetryRequestTimeout;
     return this;
   }
+
+  public ProcessEngineConfigurationImpl setCommandRetries(int commandRetries) {
+    this.commandRetries = commandRetries;
+    return this;
+  }
+
+  public int getCommandRetries() {
+    return commandRetries;
+  }
+
+  protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
+    return new CrdbTransactionRetryInterceptor(commandRetries);
+  }
+
 }

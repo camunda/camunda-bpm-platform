@@ -394,28 +394,51 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @throws OptimisticLockingException if there is no handler for the failure
    */
   protected void handleConcurrentModification(DbOperation dbOperation) {
-    boolean isHandled = false;
+    OptimisticLockingResult handlingResult = OptimisticLockingResult.THROW;
 
     if(optimisticLockingListeners != null) {
       for (OptimisticLockingListener optimisticLockingListener : optimisticLockingListeners) {
         if(optimisticLockingListener.getEntityType() == null
             || optimisticLockingListener.getEntityType().isAssignableFrom(dbOperation.getEntityType())) {
-          optimisticLockingListener.failedOperation(dbOperation);
-          isHandled = true;
+          handlingResult = optimisticLockingListener.failedOperation(dbOperation);
         }
       }
     }
-
-    if (!isHandled && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()) {
-      DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
-      if (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity)) {
-        isHandled = true;
-      }
+    
+    if (OptimisticLockingResult.IGNORE.equals(handlingResult) && dbOperation.isFatalFailure()) {
+      LOG.fatalFailureOperationIgnored(dbOperation);
+      handlingResult = OptimisticLockingResult.THROW;
     }
 
-    if(!isHandled) {
-      throw LOG.concurrentUpdateDbEntityException(dbOperation);
+    if (OptimisticLockingResult.THROW.equals(handlingResult)
+        && canIgnoreHistoryModificationFailure(dbOperation)) {
+        handlingResult = OptimisticLockingResult.IGNORE;
     }
+
+    switch (handlingResult) {
+      case RETRY:
+        throw LOG.crdbTransactionRetryException(dbOperation);
+      case IGNORE:
+        break;
+      case THROW:
+      default:
+        throw LOG.concurrentUpdateDbEntityException(dbOperation);
+    }
+  }
+
+  /**
+   * Determines if a failed database operation (OptimisticLockingException)
+   * on a Historic entity can be ignored.
+   *
+   * @param dbOperation that failed
+   * @return true if the failure can be ignored
+   */
+  protected boolean canIgnoreHistoryModificationFailure(DbOperation dbOperation) {
+    DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
+    return 
+        !dbOperation.isFatalFailure()
+        && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()
+        && (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity));
   }
 
   protected boolean isHistoricByteArray(DbEntity dbEntity) {
