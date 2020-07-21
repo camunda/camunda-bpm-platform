@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -158,12 +159,17 @@ public class ControllableJobExecutor extends JobExecutor {
     protected void rethrowOptimisticLockingException(CommandContext commandContext) {
       commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
 
+        @Override
         public Class<? extends DbEntity> getEntityType() {
           return JobEntity.class;
         }
 
-        public void failedOperation(DbOperation operation) {
+        @Override
+        public OptimisticLockingResult failedOperation(DbOperation operation) {
           oleThrown = true;
+
+          // Mark OLE as handled
+          return OptimisticLockingResult.IGNORE;
         }
 
       });

@@ -186,6 +186,21 @@ public class ExceptionUtil {
     return false;
   }
 
+  public static Boolean checkCrdbTransactionRetryException(Throwable cause) {
+    List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
+    for (SQLException exception : relatedSqlExceptions) {
+      String errorMessage = exception.getMessage().toLowerCase();
+      int errorCode = exception.getErrorCode();
+      if (errorCode == 40001
+          || errorMessage != null
+          && (errorMessage.contains("restart transaction") || errorMessage.contains("retry txn"))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static BatchExecutorException findBatchExecutorException(Throwable exception) {
     Throwable cause = exception;
     do {
