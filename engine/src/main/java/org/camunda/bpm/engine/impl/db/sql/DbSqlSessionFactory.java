@@ -288,8 +288,6 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificFalseConstant.put(postgresLikeDatabase, "false");
       databaseSpecificIfNull.put(postgresLikeDatabase, "COALESCE");
 
-      databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
-
       databaseSpecificCollationForCaseSensitivity.put(postgresLikeDatabase, "");
 
       addDatabaseSpecificStatement(postgresLikeDatabase, "insertByteArray", "insertByteArray_postgres");
@@ -349,6 +347,11 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
       dbSpecificConstants.put(postgresLikeDatabase, constants);
     }
+    databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
+
+    // cockroachdb
+    // CRDB doesn't currently support DAY extraction from intervals. The following is a workaround:
+    databaseSpecificDaysComparator.put(CRDB, "CAST( EXTRACT (HOUR FROM #{currentTimestamp} - ${date}) / 24 AS INT ) >= ${days}");
 
     // oracle
     databaseSpecificLimitBeforeStatements.put(ORACLE, "select * from ( select a.*, ROWNUM rnum from (");
