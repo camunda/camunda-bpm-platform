@@ -19,8 +19,10 @@ package org.camunda.bpm.qa.largedata.optimize;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.camunda.bpm.engine.impl.OptimizeService;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.qa.largedata.util.EngineDataGenerator;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -49,6 +51,11 @@ public class OptimizeApiPageSizeTest {
     // make sure that there are at least two pages of each entity available
     EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2);
     generator.generateData();
+  }
+
+  @AfterClass
+  public static void tearDown() {
+    TestHelper.assertAndEnsureCleanDbAndCache(processEngineRule.getProcessEngine(), false);
   }
 
   @Test

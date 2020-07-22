@@ -23,9 +23,11 @@ import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.qa.largedata.util.EngineDataGenerator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -48,6 +50,11 @@ public class DeleteDeploymentCascadeTest {
     EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), GENERATE_PROCESS_INSTANCES_COUNT);
     generator.deployDefinitions();
     generator.generateCompletedProcessInstanceData();
+  }
+
+  @After
+  public void tearDown() {
+    TestHelper.assertAndEnsureCleanDbAndCache(processEngineRule.getProcessEngine(), false);
   }
 
   @Test
