@@ -19,7 +19,7 @@
 
   <properties>
     <version.spring.framework.standalone.webapps>4.3.23.RELEASE</version.spring.framework.standalone.webapps>
-    <version.spring.framework>3.2.18.RELEASE</version.spring.framework>
+    <version.spring.framework>5.2.8.RELEASE</version.spring.framework>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.10.0.Final</version.resteasy3>
