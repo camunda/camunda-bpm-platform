@@ -124,7 +124,7 @@ The supported browsers are:
 
 - Chrome
 - Firefox
-- Internet Explorer 9+
+- Edge 79+
 
 
 ## Contributing
