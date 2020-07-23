@@ -48,6 +48,19 @@
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
     </dependency>
+    
+    <!-- jersey-server (transitive dependency of camunda-bpm-spring-boot-starter-rest)
+      requires JAXB API and Activation API
+      to be present; Its pom has an optional profile 
+      (activated by Java 11+) that adds these dependencies.
+      However, in order to be able to build Run with Java 8 and
+      operate it with Java 11+, we must have a 
+      direct dependency to JAXB, regardless which Java version we 
+      use for building -->
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
