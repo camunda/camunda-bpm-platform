@@ -406,19 +406,20 @@
               ${queryType} RES.CASE_EXECUTION_ID_ = #{query.caseExecutionId}
             </if>
             <if test="query.taskName != null">
-              ${queryType} RES.NAME_ = #{query.taskName}
+              <!-- CAM-12186 case insensitive task name and description queries -->
+              ${queryType} UPPER(RES.NAME_) = UPPER(#{query.taskName})
             </if>
             <if test="query.taskNameLike != null">
-              ${queryType} RES.NAME_ like #{query.taskNameLike} ESCAPE ${escapeChar}
+              ${queryType} UPPER(RES.NAME_) like UPPER(#{query.taskNameLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.taskParentTaskId != null">
               ${queryType} RES.PARENT_TASK_ID_ = #{query.taskParentTaskId}
             </if>
             <if test="query.taskDescription != null">
-              ${queryType} RES.DESCRIPTION_ = #{query.taskDescription}
+              ${queryType} UPPER(RES.DESCRIPTION_) = UPPER(#{query.taskDescription})
             </if>
             <if test="query.taskDescriptionLike != null">
-              ${queryType} RES.DESCRIPTION_ like #{query.taskDescriptionLike} ESCAPE ${escapeChar}
+              ${queryType} UPPER(RES.DESCRIPTION_) like UPPER(#{query.taskDescriptionLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.taskDeleteReason != null">
               ${queryType} RES.DELETE_REASON_ = #{query.taskDeleteReason}

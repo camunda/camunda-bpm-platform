@@ -334,10 +334,11 @@
               ${queryType} UPPER(RES.NAME_) not like UPPER(#{query.nameNotLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.description != null">
-              ${queryType} RES.DESCRIPTION_ = #{query.description}
+              <!-- based on CAM-12186 description case insensitive -->
+              ${queryType} UPPER(RES.DESCRIPTION_) = UPPER(#{query.description})
             </if>
             <if test="query.descriptionLike != null">
-              ${queryType} RES.DESCRIPTION_ like #{query.descriptionLike} ESCAPE ${escapeChar}
+              ${queryType} UPPER(RES.DESCRIPTION_) like UPPER(#{query.descriptionLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.priority != null">
               ${queryType} RES.PRIORITY_ = #{query.priority}

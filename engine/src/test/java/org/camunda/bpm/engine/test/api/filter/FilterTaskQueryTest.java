@@ -1039,6 +1039,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * CAM-12186
+   *
+   * Verify that search by description returns case insensitive results
+   */
+  public void testTaskQueryLookupByDescriptionCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskDescription("description 1");
+    saveQuery(query);
+
+    List<Task> tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(1));
+
+    query = taskService.createTaskQuery();
+    query.taskDescription("dEscription 2");
+    saveQuery(query);
+
+    tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(1));
+  }
+
+  /**
    * CAM-6165
    *
    * Verify that search by name like returns case insensitive results
@@ -2127,6 +2150,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   protected void createTasks() {
     Task task = taskService.newTask("task1");
     task.setName("Task 1");
+    task.setDescription("Description 1");
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.PENDING);
     taskService.saveTask(task);
@@ -2134,6 +2158,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     task = taskService.newTask("task2");
     task.setName("Task 2");
+    task.setDescription("Description 2");
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.RESOLVED);
     taskService.saveTask(task);
@@ -2142,6 +2167,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     task = taskService.newTask("task3");
     task.setName("Task 3");
+    task.setDescription("Description 3");
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.RESOLVED);
     taskService.saveTask(task);
