@@ -98,6 +98,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances with the given task name.
    * This is the last name given to the task.
+   * The query will match the names of historic task instances in a case-insensitive way.
    */
   HistoricTaskInstanceQuery taskName(String taskName);
 
@@ -105,12 +106,14 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * Only select historic task instances with a task name like the given value.
    * This is the last name given to the task.
    * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * The query will match the names of historic task instances in a case-insensitive way.
    */
   HistoricTaskInstanceQuery taskNameLike(String taskNameLike);
 
   /**
    * Only select historic task instances with the given task description.
    * This is the last description given to the task.
+   * The query will match the descriptions of historic task instances in a case-insensitive way.
    */
   HistoricTaskInstanceQuery taskDescription(String taskDescription);
 
@@ -118,6 +121,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * Only select historic task instances with a task description like the given value.
    * This is the last description given to the task.
    * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * The query will match the descriptions of historice task instances in a case-insensitive way.
    */
   HistoricTaskInstanceQuery taskDescriptionLike(String taskDescriptionLike);
 

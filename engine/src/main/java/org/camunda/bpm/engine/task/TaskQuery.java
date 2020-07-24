@@ -40,25 +40,43 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery taskId(String taskId);
 
-  /** Only select tasks with the given name */
+  /**
+   * Only select tasks with the given name.
+   * The query will match the names of tasks in a case-insensitive way.
+   */
   TaskQuery taskName(String name);
 
-  /** Only select tasks with a name not matching the given name */
+  /**
+   * Only select tasks with a name not matching the given name/
+   * The query will match the names of tasks in a case-insensitive way.
+   */
   TaskQuery taskNameNotEqual(String name);
 
-  /** Only select tasks with a name matching the parameter.
-   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  /**
+   * Only select tasks with a name matching the parameter.
+   * The syntax is that of SQL: for example usage: nameLike(%camunda%).
+   * The query will match the names of tasks in a case-insensitive way.
+   */
   TaskQuery taskNameLike(String nameLike);
 
-  /** Only select tasks with a name not matching the parameter.
-   *  The syntax is that of SQL: for example usage: nameNotLike(%camunda%)*/
+  /**
+   * Only select tasks with a name not matching the parameter.
+   * The syntax is that of SQL: for example usage: nameNotLike(%camunda%)
+   * The query will match the names of tasks in a case-insensitive way.
+   */
   TaskQuery taskNameNotLike(String nameNotLike);
 
-  /** Only select tasks with the given description. */
+  /**
+   * Only select tasks with the given description.
+   * The query will match the descriptions of tasks in a case-insensitive way.
+   */
   TaskQuery taskDescription(String description);
 
-  /** Only select tasks with a description matching the parameter .
-   *  The syntax is that of SQL: for example usage: descriptionLike(%camunda%)*/
+  /**
+   * Only select tasks with a description matching the parameter .
+   * The syntax is that of SQL: for example usage: descriptionLike(%camunda%)
+   * The query will match the descriptions of tasks in a case-insensitive way.
+   */
   TaskQuery taskDescriptionLike(String descriptionLike);
 
   /** Only select tasks with the given priority. */
