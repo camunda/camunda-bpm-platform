@@ -342,6 +342,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
+import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.BooleanValueSerializer;
@@ -395,8 +396,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
-  protected static final String EDITION_ENTERPRISE = "enterprise";
-  protected static final String EDITION_COMMUNITY = "community";
+
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
 
   public static SqlSessionFactory cachedSqlSessionFactory;
@@ -2594,15 +2594,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       Database database = new Database(databaseVendor, databaseVersion);
       Internals internals = new Internals(database);
 
-      String edition = EDITION_COMMUNITY;
-      String version = ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion();
+      ProcessEngineDetails engineInfo = ParseUtil
+          .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion());
 
-      if (version != null && version.contains("-ee")) {
-        version = version.replace("-ee", ""); // trim `-ee` suffix
-        edition = EDITION_ENTERPRISE;
-      }
-
-      Product product = new Product(PRODUCT_NAME, version, edition, internals);
+      Product product = new Product(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
 
       // installationId=null, the id will be fetched later from database
       telemetryData = new Data(null, product);

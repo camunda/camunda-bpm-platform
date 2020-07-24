@@ -102,4 +102,16 @@ public class ParseUtil {
       return null;
     }
   }
+
+  public static ProcessEngineDetails parseProcessEngineVersion(String packageImplementationVersion) {
+    String version = packageImplementationVersion;
+    String edition = ProcessEngineDetails.EDITION_COMMUNITY;
+
+    if (version != null && version.contains("-ee")) {
+      version = version.replace("-ee", ""); // trim `-ee` suffix
+      edition = ProcessEngineDetails.EDITION_ENTERPRISE;
+    }
+
+    return new ProcessEngineDetails(version, edition);
+  }
 }
