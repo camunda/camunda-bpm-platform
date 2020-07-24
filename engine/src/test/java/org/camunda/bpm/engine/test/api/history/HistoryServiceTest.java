@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -111,6 +112,78 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
     historyService.createHistoricTaskInstanceQuery().orderByTaskName().asc().list();
     historyService.createHistoricTaskInstanceQuery().orderByTaskOwner().asc().list();
     historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().list();
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryTaskNameCaseInsensitive() {
+    // With a clean ProcessEngine, no instances should be available
+    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+
+    List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskName("my task").list();
+    assertEquals(1, historicTasks.size());
+
+    // CAM-12186: check that query is case insensitive
+    List<HistoricTaskInstance> historicTasksUcfirst = historyService.createHistoricTaskInstanceQuery().taskName("My task").list();
+    assertEquals(1, historicTasks.size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryTaskNameLikeCaseInsensitive() {
+    // With a clean ProcessEngine, no instances should be available
+    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+
+    List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskNameLike("my task").list();
+    assertEquals(1, historicTasks.size());
+
+    // CAM-12186: check that query is case insensitive
+    List<HistoricTaskInstance> historicTasksUcfirst = historyService.createHistoricTaskInstanceQuery().taskNameLike("My task").list();
+    assertEquals(1, historicTasks.size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryTaskDescriptionCaseInsensitive() {
+    // With a clean ProcessEngine, no instances should be available
+    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+
+    List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskDescription("my description").list();
+    assertEquals(1, historicTasks.size());
+
+    // CAM-12186: check that query is case insensitive
+    List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskDescription("My description").list();
+    assertEquals(1, historicTasks.size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHistoricTaskInstanceQueryTaskDescriptionLikeCaseInsensitive() {
+    // With a clean ProcessEngine, no instances should be available
+    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, tasks.size());
+    taskService.complete(tasks.get(0).getId());
+
+    List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("my description").list();
+    assertEquals(1, historicTasks.size());
+
+    // CAM-12186: check that query is case insensitive
+    List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("My description").list();
+    assertEquals(1, historicTasks.size());
   }
 
   @SuppressWarnings("deprecation") // deprecated method is tested here
