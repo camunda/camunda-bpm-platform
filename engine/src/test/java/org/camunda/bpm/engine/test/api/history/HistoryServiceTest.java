@@ -128,8 +128,8 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
     assertEquals(1, historicTasks.size());
 
     // CAM-12186: check that query is case insensitive
-    List<HistoricTaskInstance> historicTasksUcfirst = historyService.createHistoricTaskInstanceQuery().taskName("My task").list();
-    assertEquals(1, historicTasks.size());
+    List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskName("My task").list();
+    assertEquals(1, historicTasksUcFirst.size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -146,8 +146,8 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
     assertEquals(1, historicTasks.size());
 
     // CAM-12186: check that query is case insensitive
-    List<HistoricTaskInstance> historicTasksUcfirst = historyService.createHistoricTaskInstanceQuery().taskNameLike("My task").list();
-    assertEquals(1, historicTasks.size());
+    List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskNameLike("My task").list();
+    assertEquals(1, historicTasksUcFirst.size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -165,7 +165,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
 
     // CAM-12186: check that query is case insensitive
     List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskDescription("My description").list();
-    assertEquals(1, historicTasks.size());
+    assertEquals(1, historicTasksUcFirst.size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -183,7 +183,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
 
     // CAM-12186: check that query is case insensitive
     List<HistoricTaskInstance> historicTasksUcFirst = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("My description").list();
-    assertEquals(1, historicTasks.size());
+    assertEquals(1, historicTasksUcFirst.size());
   }
 
   @SuppressWarnings("deprecation") // deprecated method is tested here
