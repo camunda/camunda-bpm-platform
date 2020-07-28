@@ -55,7 +55,11 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
         scriptsForDB.add(file);
       }
     }
-    assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+
+    // exclude databases that are newly added
+    if (!scriptsForDB.isEmpty()) {
+      assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+    }
   }
 
   @Test
