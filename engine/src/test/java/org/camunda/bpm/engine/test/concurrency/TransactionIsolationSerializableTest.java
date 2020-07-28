@@ -24,19 +24,25 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.After;
 import org.junit.Test;
 
 /**
- * @author Daniel Meyer
+ * We only test Serializable Transaction Isolation on CockroachDB.
  *
+ * @author Daniel Meyer
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class DbDeadlockTest extends ConcurrencyTestCase {
+@RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.MSSQL, DbSqlSessionFactory.ORACLE,
+                               DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB,
+                               DbSqlSessionFactory.H2 })
+public class TransactionIsolationSerializableTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
@@ -54,12 +60,16 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
    *      ========             ========
    * ------INSERT---------------------------   |
    * ---------------------------INSERT------   |
-   * ---------------------------SELECT------   v time
-   * ------SELECT---------------------------
+   * ------SELECT---------------------------   v time
+   * ---------------------------SELECT------
    *
    * Deadlocks may occur if readers are not properly isolated from writers.
    *
    */
+  
+  // TODO: ignore on CockroachDB and at a later point create dedicated concurrency test cases
+  // for CockroachDB that reproduce the scenarios described in https://docs.google.com/document/d/1jf1hsFoLBL0xAkwasV2-S5uf0iGw93FITwMMLJVZjz0/edit 
+  // and verify that our implementation can handle them
   @Test
   public void testTransactionIsolation() {
 
@@ -73,15 +83,12 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     // wait for Thread 2 to perform INSERT
     thread2.waitForSync();
 
+    // wait for Thread 1  to perform same SELECT => deadlock
+    thread1.waitUntilDone(true);
+
     // wait for Thread 2 to perform SELECT
     thread2.makeContinue();
-
-    // wait for Thread 1  to perform same SELECT => deadlock
-    thread1.makeContinue();
-
     thread2.waitForSync();
-    thread1.waitForSync();
-
   }
 
   static class TestCommand extends ControllableCommand<Void> {
@@ -128,16 +135,12 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     thread1.waitUntilDone();
 
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        public Void execute(CommandContext commandContext) {
-          List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
-          for (HistoricProcessInstance historicProcessInstance : list) {
-            commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
-          }
-          return null;
+      .execute((Command<Void>) commandContext -> {
+        List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
+        for (HistoricProcessInstance historicProcessInstance : list) {
+          commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
         }
-
+        return null;
       });
   }
 

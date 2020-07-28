@@ -16,13 +16,14 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.task.Attachment;
 import org.junit.Test;
 
@@ -33,7 +34,8 @@ import org.junit.Test;
 public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartitioningTest {
 
   @Test
-  public void testConcurrentFetchAndDelete() {
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB })
+  public void shouldSuppressOleOnConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
 
@@ -43,17 +45,14 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(attachment.getId()));
 
     // assume
-    assertThat(taskService.getAttachment(attachment.getId()), notNullValue());
+    assertThat(taskService.getAttachment(attachment.getId())).isNotNull();
 
     asyncThread.waitForSync();
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    commandExecutor.execute((Command<Void>) commandContext -> {
 
-        commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
-
-        return null;
-      }
+      commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
+      return null;
     });
 
     // when
@@ -61,7 +60,41 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(taskService.getAttachment(attachment.getId()), nullValue());
+    assertThat(taskService.getAttachment(attachment.getId())).isNull();
+  }
+
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.MSSQL, DbSqlSessionFactory.ORACLE,
+    DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB,
+    DbSqlSessionFactory.H2 })
+  public void shouldThrowOleOnConcurrentFetchAndDeleteWithCrdb() {
+    // given
+    String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
+
+    final Attachment attachment = taskService.createAttachment("anAttachmentType", null, processInstanceId,
+      "anAttachmentName", null, "http://camunda.com");
+
+    ThreadControl asyncThread = executeControllableCommand(new AsyncThread(attachment.getId()));
+    asyncThread.reportInterrupts();
+
+    // assume
+    assertThat(taskService.getAttachment(attachment.getId())).isNotNull();
+
+    asyncThread.waitForSync();
+
+    commandExecutor.execute((Command<Void>) commandContext -> {
+
+      commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
+      return null;
+    });
+
+    // when
+    asyncThread.makeContinue();
+    asyncThread.waitUntilDone();
+
+    // then
+    // TODO: consider additional assertions that show that the OLE prevented the changes in the original test
+    assertThat(asyncThread.getException()).isInstanceOf(OptimisticLockingException.class);
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

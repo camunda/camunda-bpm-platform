@@ -20,10 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -107,8 +109,15 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread2.waitForSync();
     assertTrue(thread2.getException() != null);
     assertTrue(thread2.getException() instanceof ProcessEngineException);
-    testRule.assertTextPresent("does not have a subscription to a message event with name 'Message'",
-        thread2.getException().getMessage());
+
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      assertThat(thread2.getException().getMessage())
+          .contains("does not have a subscription to a message event with name 'Message'");
+    } else {
+      // In CRDB, the changes from thread1 cause an TransactionRetryException
+      // in thread2 and the whole transaction needs to be retried.
+      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+    }
 
     // the first thread ended successfully without an exception
     thread1.join();
@@ -192,23 +201,35 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // thread two correlates and acquires the exclusive lock on the event subscription of instance2
     // depending on the database and locking used, this may block thread2
     thread2.makeContinue();
+    Thread.sleep(3000); // wait a bit until t2 is blocked during the flush
 
     // thread 1 completes successfully
     thread1.waitUntilDone();
     assertNull(thread1.getException());
 
-    // thread2 should be able to continue at least after thread1 has finished and released its lock
-    thread2.waitForSync();
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      // thread2 should be able to continue at least after thread1 has finished and released its lock
+      thread2.waitForSync();
 
-    // the service task was executed the second time
-    assertEquals(2, InvocationLogListener.getInvocations());
+      // thread 2 completes successfully
+      thread2.waitUntilDone();
 
-    // thread 2 completes successfully
-    thread2.waitUntilDone();
-    assertNull(thread2.getException());
+      assertNull(thread2.getException());
+      // the service task was executed the second time
+      assertEquals(2, InvocationLogListener.getInvocations());
+      // the follow-up task was reached in both instances
+      assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+    } else {
+      // in CRDB, we don't call a second waitForSync since thread2
+      // never reaches the second sync due to the OLE
+      thread2.waitUntilDone(true);
+      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
 
-    // the follow-up task was reached in both instances
-    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+      // the service task was executed the second time
+      assertEquals(1, InvocationLogListener.getInvocations());
+      // the follow-up task was reached in both instances
+      assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+    }
   }
 
   /**
@@ -261,9 +282,17 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
+  /** On CockroachDB, the test will cause a hanging thread:
+   * 1. TX1 will perform a SELECT FOR UPDATE which behaves as a CRDB Write Intent
+   * 2. TX2 will attempt to SELECT the same ACT_RU_EVENT_SUBSCR row and will block in CRDB
+   *
+   * To make the test work on CRDB, TX1 needs to commit before TX2 executes the ACT_RU_EVENT_SUBSCR select,
+   * which orders the transactions and makes the test redundant.
+   */
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
-  public void testConcurrentMixedCorrelation() throws InterruptedException {
+  public void testConcurrentMixedCorrelation() {
     InvocationLogListener.reset();
 
     // given a process instance

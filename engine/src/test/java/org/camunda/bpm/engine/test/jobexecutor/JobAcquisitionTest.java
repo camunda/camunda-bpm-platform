@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
@@ -52,9 +53,11 @@ public class JobAcquisitionTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setJobExecutor(new ControllableJobExecutor()));
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Before
   public void setUp() throws Exception {
@@ -113,7 +116,13 @@ public class JobAcquisitionTest {
     // but the acquisition thread immediately tries again
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
-    Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
 
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
+    } else {
+      // In CRDB, Job Acquisition failures result in a complete rollback and retry of the transaction.
+      // This causes the BackoffJobAcquisitionStrategy to propose an Idle time of 5000ms.
+      Assert.assertEquals(5000, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
+    }
   }
 }

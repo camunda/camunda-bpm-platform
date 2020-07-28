@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -44,6 +46,23 @@ import org.junit.Test;
 /**
  * <p>Tests a concurrent attempt of a bootstrapping Process Engine to reconfigure
  * the HistoryCleanupJob while the JobExecutor tries to execute it.</p>
+ *
+ * The steps are the following:
+ *
+ *  1. The (History Cleanup) JobExecution thread is started, and stopped before the job is executed.
+ *  2. The Process Engine Bootstrap thread is started, and stopped before the HistoryCleanupJob is reconfigured.
+ *  3. The JobExecution thread executes the HistoryCleanupJob and stops before flushing.
+ *  4. The Process Engine Bootstrap thread reconfigures the HistoryCleanupJob and stops before flushing.
+ *  5. The JobExecution thread flushes the update to the HistoryCleanupJob.
+ *  6. The Process Engine Bootstrap thread attempts to flush the reconfigured HistoryCleanupJob.
+ *  6.1 An OptimisticLockingException is thrown due to the concurrent JobExecution
+ *      thread update to the HistoryCleanupJob.
+ *  6.2 The OptimisticLockingListener registered with
+ *      the <code>BootstrapEngineCommand#createHistoryCleanupJob()</code> suppresses the exception.
+ *  6.3 In case the OptimisticLockingListener didn't handle the OLE,
+ *      it's still caught and logged in <code>ProcessEngineImpl#executeSchemaOperations()</code>
+ *  7. The Process Engine Bootstrap thread successfully builds and registers the new Process Engine.
+ *
  *
  * @author Nikola Koevski
  */
@@ -66,19 +85,19 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     final ProcessEngine otherProcessEngine = ProcessEngines.getProcessEngine(PROCESS_ENGINE_NAME);
     if (otherProcessEngine != null) {
 
-      ((ProcessEngineConfigurationImpl)otherProcessEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
+      ((ProcessEngineConfigurationImpl)otherProcessEngine.getProcessEngineConfiguration())
+          .getCommandExecutorTxRequired()
+          .execute((Command<Void>) commandContext -> {
 
-          List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
-          if (jobs.size() > 0) {
-            assertEquals(1, jobs.size());
-            String jobId = jobs.get(0).getId();
-            commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-            commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-          }
+            List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
+            if (jobs.size() > 0) {
+              assertEquals(1, jobs.size());
+              String jobId = jobs.get(0).getId();
+              commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+            }
 
-          return null;
-        }
+            return null;
       });
 
       otherProcessEngine.close();
@@ -132,9 +151,17 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
     assertNull(thread1.getException());
     assertNull(thread2.getException());
-    
-    assertNull(bootstrapCommand.getContextSpy().getThrowable());
 
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      assertNull(bootstrapCommand.getContextSpy().getThrowable());
+    } else {
+      // When CockroachDB is used, the OptimisticLockingException can't be ignored,
+      // and the ProcessEngineBootstrapCommand must be retried
+      assertThat(bootstrapCommand.getContextSpy().getThrowable()).isInstanceOf(OptimisticLockingException.class);
+    }
+
+    // the Process Engine is successfully registered even when run on CRDB
+    // since the OLE is caught and handled during the Process Engine Bootstrap command
     assertNotNull(ProcessEngines.getProcessEngines().get(PROCESS_ENGINE_NAME));
   }
 
