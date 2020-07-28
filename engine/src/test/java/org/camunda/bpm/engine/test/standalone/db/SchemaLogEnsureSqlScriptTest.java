@@ -20,8 +20,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.junit.Before;
@@ -33,6 +36,10 @@ import org.junit.Test;
  */
 public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
 
+  protected static final String PROPERTIES_FILE_PATH = "/testconfig.properties";
+  protected static final String VERSION_PROPERTY = "camunda.version";
+
+  protected Properties connectionProperties;
   protected String currentSchemaVersion;
   protected String dataBaseType;
 
@@ -48,14 +55,20 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
   }
 
   @Test
-  public void ensureUpgradeScriptsUpdateSchemaLogVersion() {
-    List<String> scriptsForDB = new ArrayList<String>();
+  public void ensureUpgradeScriptsUpdateSchemaLogVersion() throws IOException {
+    List<String> scriptsForDB = new ArrayList<>();
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
       if (file.startsWith(dataBaseType)) {
         scriptsForDB.add(file);
       }
     }
-    assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+
+    if (!scriptsForDB.isEmpty()) {
+      assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+    } else {
+      // databases that are newly added have no update scripts yet
+      assertThat(getCurrentMinorVersion(), is(currentSchemaVersion));
+    }
   }
 
   @Test
@@ -65,7 +78,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     }
   }
 
-  private String getTargetVersionForScript(String file) {
+  protected String getTargetVersionForScript(String file) {
     String targetVersion = file.substring(file.indexOf("to_") + 3).replace(".sql", "");
     if(isMinorLevel(targetVersion)) {
       targetVersion += ".0";
@@ -73,7 +86,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     return targetVersion;
   }
 
-  private String getLatestTargetVersion(List<String> scriptFiles) {
+  protected String getLatestTargetVersion(List<String> scriptFiles) {
     String latestVersion = null;
     for (String file : scriptFiles) {
       if(latestVersion == null) {
@@ -88,7 +101,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     return latestVersion;
   }
 
-  private boolean isLaterVersionThan(String v1, String v2) {
+  protected boolean isLaterVersionThan(String v1, String v2) {
     String[] v1_ = v1.split("\\.|_");
     String[] v2_ = v2.split("\\.|_");
 
@@ -101,5 +114,25 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
       }
     }
     return false;
+  }
+
+  protected String getCurrentMinorVersion() throws IOException {
+    if (connectionProperties == null) {
+      InputStream propStream = null;
+      try {
+        propStream = SchemaLogEnsureSqlScriptTest.class.getResourceAsStream(PROPERTIES_FILE_PATH);
+        connectionProperties = new Properties();
+        connectionProperties.load(propStream);
+      } finally {
+        propStream.close();
+      }
+    }
+
+    String version = connectionProperties.getProperty(VERSION_PROPERTY);
+    // remove the patch version, and create a "clean" minor version
+    int lastPos = version.lastIndexOf(".");
+    version = version.substring(0, lastPos);
+
+    return version + ".0";
   }
 }

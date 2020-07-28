@@ -345,17 +345,12 @@
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
-      </testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
-          <include>**/camunda.cfg.db.xml</include>
-          <include>**/camunda.cfg.plugins.xml</include>
-          <include>**/camunda.cfg.prefix.xml</include>
-          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
+          <include>**/camunda.cfg.*.xml</include>
+          <include>testconfig.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -671,12 +666,6 @@
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-                <exclude>**/DbDeadlockTest.java</exclude>
-                <exclude>**/CompetingHistoricVariableInstancePartitioningTest.java</exclude>
-                <exclude>**/CompetingHistoricByteArrayPartitioningTest.java</exclude>
-              </excludes>
             </configuration>
           </plugin>
         </plugins>
