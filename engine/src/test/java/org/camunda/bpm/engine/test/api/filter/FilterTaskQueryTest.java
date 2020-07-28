@@ -1043,6 +1043,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
    *
    * Verify that search by description returns case insensitive results
    */
+  @Test
   public void testTaskQueryLookupByDescriptionCaseInsensitive() {
     TaskQuery query = taskService.createTaskQuery();
     query.taskDescription("description 1");
