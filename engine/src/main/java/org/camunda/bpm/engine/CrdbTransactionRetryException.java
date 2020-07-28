@@ -24,6 +24,10 @@ public class CrdbTransactionRetryException extends OptimisticLockingException {
   private static final long serialVersionUID = 1L;
 
   public CrdbTransactionRetryException(String message) {
-      super(message);
+    super(message);
+  }
+
+  public CrdbTransactionRetryException(String message, Throwable throwable) {
+    super(message, throwable);
   }
 }

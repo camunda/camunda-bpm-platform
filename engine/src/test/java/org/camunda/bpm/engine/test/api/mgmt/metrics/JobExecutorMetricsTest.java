@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -125,7 +126,14 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     long acquiredJobsFailure = managementService.createMetricsQuery()
         .name(Metrics.JOB_ACQUIRED_FAILURE).sum();
-    assertEquals(3, acquiredJobsFailure);
+    
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      assertEquals(3, acquiredJobsFailure);
+    } else {
+      // in the case of CRDB, the acquisitionCmd could not tell the job executor
+      // how many jobs it unsuccessfully attempted to acquire
+      assertEquals(0, acquiredJobsFailure);
+    }
 
     // cleanup
     jobExecutor1.shutdown();
