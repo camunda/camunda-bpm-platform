@@ -115,9 +115,9 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryTaskNameCaseInsensitive() {
-    // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -133,9 +133,9 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryTaskNameLikeCaseInsensitive() {
-    // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -151,9 +151,9 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryTaskDescriptionCaseInsensitive() {
-    // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -169,9 +169,9 @@ public class HistoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testHistoricTaskInstanceQueryTaskDescriptionLikeCaseInsensitive() {
-    // With a clean ProcessEngine, no instances should be available
-    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+    // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
