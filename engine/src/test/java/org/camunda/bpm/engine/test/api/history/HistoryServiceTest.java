@@ -138,6 +138,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, tasks.size());
     taskService.complete(tasks.get(0).getId());
 
+    // then
     List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskNameLike("my task").list();
     assertEquals(1, historicTasks.size());
 
