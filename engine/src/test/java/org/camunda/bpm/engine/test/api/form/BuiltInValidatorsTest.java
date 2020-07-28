@@ -147,8 +147,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTest {
 
     assertTrue(validator.validate(null, null));
 
-    assertTrue(validator.validate("test", new TestValidatorContext("5")));
-    assertFalse(validator.validate("test", new TestValidatorContext("4")));
+    assertTrue(validator.validate("test", new TestValidatorContext("4")));
+    assertFalse(validator.validate("test", new TestValidatorContext("3")));
 
     try {
       validator.validate("test", new TestValidatorContext("4.4"));
