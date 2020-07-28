@@ -22,8 +22,10 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -36,6 +38,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+/**
+ * When CockroachDB is used, this test is ignored since this scenario behaves in a serialized manner there.
+ * The HistoryCleanupJob retries are set first, and then the BootstrapCommand reconfigures
+ * the HistoryCleanupJob, overwriting the retires and stack trace. The following diagram explains this
+ * in more detail:
+ *
+ * TX1 (job retries)   			      |	TX2 (Bootstrap command)
+ * ------------------------------------------------------------------------------------------------------
+ * READ HistoryCleanupJob    			|
+ * WRITE Job Retries              |
+ *     ---> CRDB TX Write Intent	|	-> READ (check for HistoryCleanupJob) -> CRDB TX Block
+ * Thread SYNC									  |
+ * COMMIT									        |   -> CRDB TX Unblock
+ * 								          			|   Continue regular execution to reconfigure HistoryCleanupJob
+ * 								          			|     * Set default retries (3)
+ * 								          			|     * Clear exception stacktrace
+ *
+ */
+@RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
 public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestHelper {
 
   @ClassRule

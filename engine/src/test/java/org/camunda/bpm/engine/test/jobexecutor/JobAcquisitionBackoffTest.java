@@ -26,12 +26,14 @@ import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadContr
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedAcquisitionEvent;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
@@ -48,9 +50,11 @@ public class JobAcquisitionBackoffTest {
   @Rule
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setJobExecutor(new ControllableJobExecutor()));
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected ControllableJobExecutor jobExecutor1;
   protected ControllableJobExecutor jobExecutor2;
@@ -120,9 +124,16 @@ public class JobAcquisitionBackoffTest {
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
     RecordedWaitEvent waitEvent = jobExecutor2WaitEvents.get(0);
-    // we don't know the exact wait time,
-    // since there is random jitter applied
-    JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
+
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      // we don't know the exact wait time,
+      // since there is random jitter applied
+      JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
+    } else {
+      // In CRDB, Job Acquisition failures result in a complete rollback and retry of the transaction.
+      // This causes the BackoffJobAcquisitionStrategy to propose an Idle time of 5000ms.
+      Assert.assertEquals(5000, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
+    }
 
     // when performing another cycle of acquisition
     JobAcquisitionTestHelper.activateInstances(engineRule.getProcessEngine(), 6);
@@ -145,17 +156,25 @@ public class JobAcquisitionBackoffTest {
     Assert.assertEquals(2, jobExecutor1WaitEvents.size());
     Assert.assertEquals(0, jobExecutor1WaitEvents.get(1).getTimeBetweenAcquisitions());
 
-    // then thread 2 has tried to acquire 6 jobs this time
     List<RecordedAcquisitionEvent> jobExecutor2AcquisitionEvents = jobExecutor2.getAcquireJobsRunnable().getAcquisitionEvents();
     secondAcquisitionAttempt = jobExecutor2AcquisitionEvents.get(1);
-    Assert.assertEquals(6, secondAcquisitionAttempt.getNumJobsToAcquire());
-
-    // and again increased its backoff
     jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
-    Assert.assertEquals(2, jobExecutor2WaitEvents.size());
     RecordedWaitEvent secondWaitEvent = jobExecutor2WaitEvents.get(1);
     long expectedBackoffTime = BASE_BACKOFF_TIME * BACKOFF_FACTOR; // 1000 * 2^1
-    JobAcquisitionTestHelper.assertInBetween(expectedBackoffTime, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getTimeBetweenAcquisitions());
+
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      // then thread 2 has tried to acquire 6 jobs this time
+      Assert.assertEquals(6, secondAcquisitionAttempt.getNumJobsToAcquire());
+      // and again increased its backoff
+      Assert.assertEquals(2, jobExecutor2WaitEvents.size());
+      JobAcquisitionTestHelper.assertInBetween(expectedBackoffTime, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getTimeBetweenAcquisitions());
+    } else {
+      // on CRDB, thread 2 has tried to acquire 3 jobs this time
+      Assert.assertEquals(3, secondAcquisitionAttempt.getNumJobsToAcquire());
+      // and again the BackoffJobAcquisitionStrategy propose an Idle time (of 10000ms this time)
+      Assert.assertEquals(2, jobExecutor2WaitEvents.size());
+      Assert.assertEquals(10000, secondWaitEvent.getTimeBetweenAcquisitions());
+    }
   }
 
   @Test
@@ -194,12 +213,29 @@ public class JobAcquisitionBackoffTest {
     // when in the next cycles acquisition thread2 successfully acquires jobs without OLE for n times
     JobAcquisitionTestHelper.activateInstances(engineRule.getProcessEngine(), 12);
 
-    for (int i = 0; i < BACKOFF_DECREASE_THRESHOLD; i++) {
-      // backoff has not decreased yet
-      Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
+    // backoff has not decreased yet;
+    // on CRDB, an Idle wait time of 5000ms is introduced
+    Assert.assertTrue(jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions() > 0);
+    acquisitionThread2.makeContinueAndWaitForSync(); // acquire
+    acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
 
-      acquisitionThread2.makeContinueAndWaitForSync(); // acquire
-      acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      for (int i = 1; i < BACKOFF_DECREASE_THRESHOLD; i++) {
+        // backoff has not decreased yet
+        Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
+
+        acquisitionThread2.makeContinueAndWaitForSync(); // acquire
+        acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
+      }
+    } else {
+      for (int i = 1; i < BACKOFF_DECREASE_THRESHOLD; i++) {
+        // on CRDB, thread2 immediately retries to acquire jobs
+        // since there have been no failures, or jobs acquired since the first try
+        Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() == 0);
+
+        acquisitionThread2.makeContinueAndWaitForSync(); // acquire
+        acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
+      }
     }
 
     // it decreases its backoff again

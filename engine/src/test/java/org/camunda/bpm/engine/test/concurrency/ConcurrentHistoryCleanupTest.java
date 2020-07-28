@@ -20,10 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assume.assumeTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.util.List;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -71,6 +73,7 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     thread1.waitForSync();
 
     ThreadControl thread2 = executeControllableCommand(new ControllableHistoryCleanupCommand());
+    thread2.reportInterrupts();
     thread2.waitForSync();
 
     thread1.makeContinue();
@@ -91,7 +94,11 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     assertEquals(1, historyCleanupJobs.size());
 
     assertNull(thread1.getException());
-    assertNull(thread2.getException());
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      assertNull(thread2.getException());
+    } else {
+      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
+    }
 
   }
 

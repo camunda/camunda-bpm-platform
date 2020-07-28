@@ -77,8 +77,14 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
+    
+    // TODO: need to catch CRDB exception on commit and warp in OLE if necessary (same for JTA)
     defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED));
 
+    // TODO: make this work for cases in which TX integration is used, but the TX Is not user-managed (same for JTA)
+    // this requires:
+    //   - move this interceptor in front of the Spring TX interceptor
+    //   - catch CRDB exceptions on commit in TX interceptor and wrap in OLE (see above)
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }

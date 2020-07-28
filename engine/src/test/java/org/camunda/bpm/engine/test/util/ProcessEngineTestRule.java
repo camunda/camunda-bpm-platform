@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -414,6 +415,16 @@ public class ProcessEngineTestRule extends TestWatcher {
         .businessKey(businessKey)
         .setVariables(variables)
         .create();
+  }
+  
+  public String getDatabaseType() {
+    return processEngineRule.getProcessEngineConfiguration()
+        .getDbSqlSessionFactory()
+        .getDatabaseType();
+  }
+
+  public boolean databaseSupportsIgnoredOLE() {
+    return !DbSqlSessionFactory.CRDB.equals(getDatabaseType());
   }
 
   public void deleteAllAuthorizations() {
