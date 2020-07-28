@@ -133,6 +133,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
+    // when
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
     taskService.complete(tasks.get(0).getId());
