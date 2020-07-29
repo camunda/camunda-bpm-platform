@@ -1,0 +1,35 @@
+{
+  "customScripts": [],
+  "locales": ["en"],
+  "csrfCookieName": "XSRF-TOKEN",
+  "bpmnJs": {
+    "additionalModules": [],
+    "moddleExtensions": {}
+  },
+  "skipCustomListeners": {
+    "default": true,
+    "hidden": false
+  },
+  "skipIoMappings": {
+    "default": true,
+    "hidden": false
+  },
+  "runtimeActivityInstanceMetrics": {
+    "display": true
+  },
+  "historicActivityInstanceMetrics": {
+    "adjustablePeriod": true,
+    "period": {
+      "unit": "day"
+    }
+  },
+  "batchOperation": {
+    "mode": "filter",
+    "autoLoadEnded": true
+  },
+  "defaultFilter": {
+    "historicProcessDefinitionInstancesSearch": {}
+  },
+  "disableWelcomeMessage": false,
+  "userOperationLogAnnotationLength": 4000
+}
