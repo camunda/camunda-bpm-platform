@@ -67,6 +67,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
   public static final String ONE_TASK_PROCESS = "oneTaskProcess";
   protected static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQuery() {
     // With a clean ProcessEngine, no instances should be available
@@ -81,6 +82,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQueryOrderBy() {
     // With a clean ProcessEngine, no instances should be available
@@ -128,6 +130,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historicTasksUcFirst.size());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricTaskInstanceQueryTaskNameLikeCaseInsensitive() {
     // given
