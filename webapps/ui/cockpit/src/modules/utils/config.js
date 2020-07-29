@@ -100,11 +100,16 @@ async function loadPlugins() {
 
 async function loadLocale() {
   const locales = config.locales;
+  const availableLanguages = locales.availableLocales;
   const preferredLanguage = getLanguage();
-  const defaultLanguage = locales[0];
-  const localesToLoad = locales.includes(preferredLanguage)
-    ? [defaultLanguage, preferredLanguage] // Order is important, defaultLanguage always first
-    : [defaultLanguage];
+  const fallbackLanguage = locales.fallbackLocale;
+
+  const isPreferredLanguageAvailable =
+    availableLanguages.includes(preferredLanguage) &&
+    preferredLanguage !== fallbackLanguage;
+  const localesToLoad = isPreferredLanguageAvailable
+    ? [fallbackLanguage, preferredLanguage] // Order is important, defaultLanguage always first
+    : [fallbackLanguage];
 
   const loadedLocales = await Promise.all(
     localesToLoad.map(
@@ -117,16 +122,16 @@ async function loadLocale() {
     )
   );
 
-  if (!locales.includes(preferredLanguage)) {
+  if (!isPreferredLanguageAvailable) {
     config.locale = loadedLocales[0];
     return;
   }
-  const defaultLocale = loadedLocales[0];
+  const fallbackLocale = loadedLocales[0];
   const preferredLocale = loadedLocales[1];
-  for (let key in defaultLocale) {
+  for (let key in fallbackLocale) {
     preferredLocale[key] = preferredLocale[key]
-      ? {...defaultLocale[key], ...preferredLocale[key]}
-      : defaultLocale[key];
+      ? { ...fallbackLocale[key], ...preferredLocale[key] }
+      : fallbackLocale[key];
   }
 
   config.locale = preferredLocale;
@@ -165,7 +170,7 @@ export async function loadConfig() {
   let loadedConfig = (
     await import(/* webpackIgnore: true */ "../../scripts/config.js")
   ).default;
-  config = {...defaultConfig, ...loadedConfig};
+  config = { ...defaultConfig, ...loadedConfig };
   await Promise.all([loadPlugins(), loadLocale(), loadBpmnJsExtensions()]);
   return config;
 }
