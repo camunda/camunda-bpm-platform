@@ -57,8 +57,8 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
     logInfo("021", "Auto-Deploying resources: {}", resources);
   }
 
-  public void enterLicenseKey(URL licenseKeyFile) {
-    logInfo("030", "Setting up license key: {}", licenseKeyFile);
+  public void enterLicenseKey(String licenseKeySource) {
+    logInfo("030", "Setting up license key: {}", licenseKeySource);
   }
 
   public void enterLicenseKeyFailed(URL licenseKeyFile, Exception e) {
