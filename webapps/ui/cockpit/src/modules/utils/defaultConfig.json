@@ -1,6 +1,9 @@
 {
   "customScripts": [],
-  "locales": ["en"],
+  "locales": {
+    "availableLocales": ["en"],
+    "fallbackLocale": "en"
+  },
   "csrfCookieName": "XSRF-TOKEN",
   "bpmnJs": {
     "additionalModules": [],

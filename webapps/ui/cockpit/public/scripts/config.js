@@ -21,7 +21,10 @@ export default {
   //   // with a file called 'customScript.js' in it
   //   // 'my-custom-script/customScript'
   // ],
-  // locales: ['en'],
+  // locales: {
+  //   availableLocales: ['en', 'de'],
+  //   fallbackLocale: 'en'
+  // },
   // csrfCookieName: 'XSRF-TOKEN',
   // bpmnJs: {
   //   additionalModules: [
