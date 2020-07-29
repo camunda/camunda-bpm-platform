@@ -17,6 +17,7 @@
 
 import buildInPlugins from "../../plugins";
 import eePlugins from "../../enterprise";
+import defaultConfig from "./defaultConfig.json";
 
 const inProduction = process.env.NODE_ENV === "production";
 
@@ -146,7 +147,7 @@ async function loadBpmnJsExtensions() {
   const moddlePromises = [];
 
   for (const key in bpmnJsConf.moddleExtensions) {
-    const path =  withSuffix(bpmnJsConf.moddleExtensions[key], ".json");
+    const path = withSuffix(bpmnJsConf.moddleExtensions[key], ".json");
 
     moddlePromises.push(
       fetch(inProduction ? `../${path}` : `/${path}`)
@@ -161,8 +162,10 @@ async function loadBpmnJsExtensions() {
 }
 
 export async function loadConfig() {
-  config = (await import(/* webpackIgnore: true */ "../../scripts/config.js"))
-    .default;
+  let loadedConfig = (
+    await import(/* webpackIgnore: true */ "../../scripts/config.js")
+  ).default;
+  config = {...defaultConfig, ...loadedConfig};
   await Promise.all([loadPlugins(), loadLocale(), loadBpmnJsExtensions()]);
   return config;
 }
