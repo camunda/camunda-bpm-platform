@@ -26,7 +26,9 @@ export default function() {
   // ngModule.directive("camCockpitRepository", directive);
 
   const node = document.createElement("div");
-  node.innerHTML = `<div ng-view></div>`;
+  node.innerHTML = `<div ng-view></div>
+  <div notifications-panel class="page-notifications"></div>
+  `;
 
   return { node, module: ngModule };
 }

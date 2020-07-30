@@ -26,7 +26,10 @@ const auth = function() {
   const node = document.createElement("div");
   const ngModule = angular.module("reactLogin", []);
 
-  node.innerHTML = `<div ng-view />`;
+  node.innerHTML = `
+  <div ng-view></div>
+  <div notifications-panel class="page-notifications"></div>
+  `;
 
   return { node, module: ngModule };
 };

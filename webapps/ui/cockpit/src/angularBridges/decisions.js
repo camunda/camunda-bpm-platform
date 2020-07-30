@@ -28,7 +28,10 @@ export default function() {
   cam-breadcrumbs-panel
   divider="&raquo;"
   ng-cloak
-  class="breadcrumbs-panel"></div><div cam-cockpit-decisions />`;
+  class="breadcrumbs-panel"></div>
+  <div cam-cockpit-decisions></div>
+  <div notifications-panel class="page-notifications"></div>
+  `;
   node.className = "ctn-main";
 
   return { node, module: ngModule };

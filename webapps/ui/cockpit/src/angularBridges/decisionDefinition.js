@@ -25,7 +25,9 @@ export default function() {
       divider="&raquo;"
       ng-cloak
       class="breadcrumbs-panel"></div>
-  <div ng-view></div>`;
+  <div ng-view></div>
+  <div notifications-panel class="page-notifications"></div>
+  `;
   node.className = "ctn-main";
 
   return { node, module: decisionDefinition };
