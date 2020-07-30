@@ -26,7 +26,10 @@ export default function() {
   ngModule.directive("camCockpitDashboard", directive);
 
   const node = document.createElement("div");
-  node.innerHTML = `<div class="CockpitDashboard" cam-cockpit-dashboard />`;
+  node.innerHTML = `
+  <div class="CockpitDashboard" cam-cockpit-dashboard></div>
+  <div notifications-panel class="page-notifications"></div>
+  `;
 
   return { node, module: ngModule };
 }
