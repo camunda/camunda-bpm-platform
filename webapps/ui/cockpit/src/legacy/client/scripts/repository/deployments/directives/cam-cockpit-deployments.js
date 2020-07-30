@@ -16,6 +16,7 @@
  */
 
 var lodash = require("../../../../../camunda-commons-ui/vendor/lodash");
+var angular = require("angular");
 
 var template = require("./cam-cockpit-deployments.html.js");
 var searchConfigJSON = require("./cam-cockpit-deployments-search-plugin-config.json");
@@ -42,7 +43,7 @@ module.exports = [
           var deploymentsListData = ($scope.deploymentsListData = $scope.deploymentsData.newChild(
             $scope
           ));
-          $scope.searchConfig = searchConfigJSON;
+          $scope.searchConfig = angular.copy(searchConfigJSON);
 
           $scope.loadingState = "INITIAL";
 
@@ -129,12 +130,6 @@ module.exports = [
               $scope.currentDeployment &&
               deployment.id === $scope.currentDeployment.id
             );
-          });
-
-          $timeout(() => {
-            if ($scope.loadingState === "INITIAL") {
-              $scope.onSearchChange({}, { size: 50, current: 1 });
-            }
           });
         }
       ]
