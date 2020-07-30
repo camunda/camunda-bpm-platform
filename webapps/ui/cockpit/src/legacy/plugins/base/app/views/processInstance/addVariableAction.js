@@ -42,7 +42,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               }
             },
             controller: addTemplate.controller,
-            template: addTemplate.template
+            template: addTemplate.template,
+            appendTo: angular.element('.angular-app')
           });
 
           dialog.result

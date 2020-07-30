@@ -40,7 +40,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               }
             },
             controller: "UpdateProcessInstanceSuspensionStateController",
-            template: dialogTemplate
+            template: dialogTemplate,
+            appendTo: angular.element('.angular-app')
           });
 
           dialog.result

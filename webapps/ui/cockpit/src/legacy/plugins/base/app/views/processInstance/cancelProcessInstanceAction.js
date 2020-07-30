@@ -18,6 +18,8 @@
 var dialogTemplate = require("./cancel-process-instance-dialog.html.js");
 var actionTemplate = require("./cancel-process-instance-action.html.js");
 
+var angular = require("angular");
+
 module.exports = function(ngModule) {
   ngModule.controller("CancelProcessInstanceActionController", [
     "$scope",
@@ -37,7 +39,8 @@ module.exports = function(ngModule) {
               }
             },
             controller: "CancelProcessInstanceController",
-            template: dialogTemplate
+            template: dialogTemplate,
+            appendTo: angular.element('.angular-app')
           })
           .result.catch(function() {});
       };

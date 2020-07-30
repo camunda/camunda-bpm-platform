@@ -319,7 +319,8 @@ var Directive = [
                     url: scope.getJobStacktraceUrl(incident)
                   };
                 }
-              }
+              },
+              appendTo: angular.element('.angular-app')
             })
             .result.catch(angular.noop)
             .finally(function() {

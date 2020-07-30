@@ -24,6 +24,8 @@ var deleteModalCtrl = require("./modal-ctrl");
 var jobLogModalCtrl = require("./job-log-ctrl");
 var jobLogModalTemplate = require("../templates/job-log.html.js");
 
+var angular = require("angular");
+
 module.exports = [
   "$scope",
   "page",
@@ -143,7 +145,8 @@ module.exports = [
     events.on("deleteModal:open", function(deleteModal) {
       var modal = (deleteModal.instance = $modal.open({
         template: deleteModalTemplate,
-        controller: deleteModalCtrl
+        controller: deleteModalCtrl,
+        appendTo: angular.element('.angular-app')
       }));
 
       modal.result.catch(function() {});
@@ -193,7 +196,8 @@ module.exports = [
             return job;
           }
         },
-        size: "lg"
+        size: "lg",
+        appendTo: angular.element('.angular-app')
       });
     };
   }

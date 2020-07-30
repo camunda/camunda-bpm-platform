@@ -43,7 +43,8 @@ module.exports = [
                   }
                 },
                 controller: "UpdateProcessDefinitionSuspensionStateController",
-                template: dialogTemplate
+                template: dialogTemplate,
+                appendTo: angular.element('.angular-app')
               });
 
               dialog.result

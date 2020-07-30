@@ -340,7 +340,8 @@ module.exports = function(ngModule) {
               },
               controller: "IdentityLinksController",
               template: identityLinksTemplate,
-              windowClass: "identity-link-modal"
+              windowClass: "identity-link-modal",
+              appendTo: angular.element('.angular-app')
             })
             .result.catch(angular.noop);
         });

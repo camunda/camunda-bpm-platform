@@ -18,6 +18,8 @@
 var template = require("./cam-cockpit-delete-deployment-plugin.html.js");
 var modalTemplate = require("./modals/cam-cockpit-delete-deployment-modal.html.js");
 
+var angular = require("angular");
+
 var Controller = [
   "$scope",
   "$uibModal",
@@ -39,7 +41,8 @@ var Controller = [
             deployment: function() {
               return deployment;
             }
-          }
+          },
+          appendTo: angular.element('.angular-app')
         })
         .result.then(function() {
           $rootScope.$broadcast("cam-common:cam-searchable:query-force-change");

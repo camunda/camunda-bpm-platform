@@ -169,7 +169,8 @@ module.exports = [
                 readonly: function() {
                   return $scope.display;
                 }
-              }
+              },
+              appendTo: angular.element('.angular-app')
             })
             .result.then(function(result) {
               $scope.variable.value = result.value;
