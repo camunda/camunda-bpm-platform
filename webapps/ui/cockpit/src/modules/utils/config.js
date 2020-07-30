@@ -20,7 +20,6 @@ import eePlugins from "../../enterprise";
 
 const inProduction = process.env.NODE_ENV === "production";
 
-const configPath = inProduction ? "../config.json" : "/config.json";
 let config = {};
 
 function getLanguage() {
@@ -57,6 +56,10 @@ const getExcludedPlugins = () => {
   return excluded;
 };
 
+function withSuffix(string, suffix) {
+  return !string.endsWith(suffix) ? string + suffix : string;
+}
+
 async function loadPlugins() {
   const excludedPlugins = getExcludedPlugins();
   const excludedPluginsFilter = plugin => {
@@ -73,7 +76,7 @@ async function loadPlugins() {
   });
 
   const fetchers = customScripts.map(url =>
-    import(/* webpackIgnore: true */ "../../" + url)
+    import(/* webpackIgnore: true */ "../../" + withSuffix(url, ".js"))
   );
 
   fetchers.push(
@@ -121,7 +124,7 @@ async function loadLocale() {
   const preferredLocale = loadedLocales[1];
   for (let key in defaultLocale) {
     preferredLocale[key] = preferredLocale[key]
-      ? { ...defaultLocale[key], ...preferredLocale[key] }
+      ? {...defaultLocale[key], ...preferredLocale[key]}
       : defaultLocale[key];
   }
 
@@ -132,7 +135,7 @@ async function loadBpmnJsExtensions() {
   const bpmnJsConf = config["bpmnJs"] || {};
 
   const moduleFetchers = bpmnJsConf.additionalModules.map(url =>
-    import(/* webpackIgnore: true */ "../../" + url)
+    import(/* webpackIgnore: true */ "../../" + withSuffix(url, ".js"))
   );
 
   const modulePromise = Promise.all(moduleFetchers).then(result => {
@@ -143,9 +146,10 @@ async function loadBpmnJsExtensions() {
   const moddlePromises = [];
 
   for (const key in bpmnJsConf.moddleExtensions) {
-    const path = bpmnJsConf.moddleExtensions[key];
+    const path =  withSuffix(bpmnJsConf.moddleExtensions[key], ".json");
+
     moddlePromises.push(
-      fetch(inProduction ? `../${path}.json` : `/${path}.json`)
+      fetch(inProduction ? `../${path}` : `/${path}`)
         .then(res => res.json())
         .then(json => {
           bpmnJsConf.moddleExtensions[key] = json;
@@ -157,7 +161,8 @@ async function loadBpmnJsExtensions() {
 }
 
 export async function loadConfig() {
-  config = await (await fetch(configPath)).json();
+  config = (await import(/* webpackIgnore: true */ "../../scripts/config.js"))
+    .default;
   await Promise.all([loadPlugins(), loadLocale(), loadBpmnJsExtensions()]);
   return config;
 }
