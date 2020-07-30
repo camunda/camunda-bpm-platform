@@ -18,6 +18,7 @@
 const prodRegex = /<!-- prod -->(((?!\/prod).|\n)*)<!-- \/prod -->/g;
 const devRegex = /<!-- dev(((?!-->).|\n)*)-->/g;
 const fs = require("fs");
+const glob = require("glob");
 
 // Restore development index.html
 let content = fs.readFileSync(__dirname + "/../public/index.html", "utf-8");
@@ -26,3 +27,10 @@ content = content.replace(prodRegex, "<!-- prod$1-->");
 content = content.replace(devRegex, "<!-- dev -->$1<!-- /dev -->");
 
 fs.writeFileSync(__dirname + "/../public/index.html", content, "UTF-8");
+
+const files = glob.sync(
+  "build/{asset-manifest,precache-manifest,service-worker}.*"
+);
+files.forEach(f => {
+  fs.unlinkSync(__dirname + "/../" + f);
+});
