@@ -161,7 +161,8 @@ module.exports = [
                 return angular.copy(_getVar(variable));
               },
               readonly: readonly
-            }
+            },
+            appendTo: angular.element('.angular-app')
           };
         };
 
@@ -366,7 +367,8 @@ module.exports = [
                   };
                 }
               ],
-              template: confirmationTemplate
+              template: confirmationTemplate,
+              appendTo: angular.element('.angular-app')
             })
             .result.catch(angular.noop);
         };

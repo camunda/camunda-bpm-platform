@@ -32,6 +32,8 @@ export default function AngularApp({ component }) {
     const domNode = ref.current;
     domNode.appendChild(node);
 
+    node.classList.add("angular-app");
+
     angular.bootstrap(node, [module.name]);
 
     return () => {

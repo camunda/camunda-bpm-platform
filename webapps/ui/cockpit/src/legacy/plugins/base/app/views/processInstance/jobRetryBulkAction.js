@@ -18,6 +18,8 @@
 var dialogTemplate = require("./job-retry-bulk-dialog.html.js");
 var actionTemplate = require("./job-retry-bulk-action.html.js");
 
+var angular = require("angular");
+
 module.exports = function(ngModule) {
   ngModule.controller("JobRetryActionController", [
     "$scope",
@@ -36,7 +38,8 @@ module.exports = function(ngModule) {
             },
             size: "lg",
             controller: "JobRetriesController",
-            template: dialogTemplate
+            template: dialogTemplate,
+            appendTo: angular.element('.angular-app')
           })
           .result.catch(function() {});
       };

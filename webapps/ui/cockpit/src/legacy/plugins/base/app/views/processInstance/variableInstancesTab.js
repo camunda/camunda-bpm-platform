@@ -125,7 +125,8 @@ module.exports = function(ngModule) {
               }
             },
             controller: uploadTemplate.controller,
-            template: uploadTemplate.template
+            template: uploadTemplate.template,
+            appendTo: angular.element('.angular-app')
           })
           .result.then(
             function() {
@@ -243,7 +244,8 @@ module.exports = function(ngModule) {
               variable: function() {
                 return info.variable;
               }
-            }
+            },
+            appendTo: angular.element('.angular-app')
           })
           .result.then(
             function() {

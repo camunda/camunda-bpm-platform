@@ -45,7 +45,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                 }
               },
               controller: "BulkJobDefinitionOverrideJobPriorityController",
-              template: dialogTemplate
+              template: dialogTemplate,
+              appendTo: angular.element('.angular-app')
             });
 
             dialog.result

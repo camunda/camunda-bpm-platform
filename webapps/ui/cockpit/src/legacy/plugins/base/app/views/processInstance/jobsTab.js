@@ -266,7 +266,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                   };
                 }
               ],
-              template: jobRescheduleTemplate
+              template: jobRescheduleTemplate,
+              appendTo: angular.element('.angular-app')
             })
             .result.catch(angular.noop);
         };
