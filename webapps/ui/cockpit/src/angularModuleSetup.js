@@ -198,7 +198,7 @@ export default function setup(module) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(true);
+      $qProvider.errorOnUnhandledRejections(false);
     }
   ]);
 }
