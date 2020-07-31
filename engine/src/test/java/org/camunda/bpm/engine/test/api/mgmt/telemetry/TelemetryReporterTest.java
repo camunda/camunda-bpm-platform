@@ -25,20 +25,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
+import java.net.HttpURLConnection;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.gson.Gson;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -48,33 +37,41 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
-import org.camunda.connect.httpclient.HttpConnector;
-import org.camunda.connect.httpclient.HttpRequest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.gson.Gson;
 
 public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
   @Rule
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
+  public ProcessEngineBootstrapRule bootstrapRule =
+      new ProcessEngineBootstrapRule(configuration ->
+      configuration.setTelemetryEndpoint(TELEMETRY_ENDPOINT));
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public WireMockRule wireMockRule = new WireMockRule(8082);
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
+
+  @ClassRule
+  public static WireMockRule wireMockRule = new WireMockRule(8082);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementService managementService;
@@ -94,25 +91,25 @@ public class TelemetryReporterTest {
   public void shouldSendTelemetry() {
     // given
     managementService.toggleTelemetry(true);
-    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT))
-              .willReturn(aResponse()
-                          .withStatus(202)));
-
     Data data = createDataToSend();
+    String requestBody = new Gson().toJson(data);
+    stubFor(post(urlEqualTo("/pings"))
+            .willReturn(aResponse()
+                        .withBody(requestBody)
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
     TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 TELEMETRY_ENDPOINT,
                                                                 data,
-                                                                configuration.getTelemetryHttp());
+                                                                configuration.getTelemetryHttpConnector());
 
     // when
     telemetryReporter.reportNow();
 
     // then
-    String requestBody = new Gson().toJson(data);
     verify(postRequestedFor(urlEqualTo("/pings"))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
-
   }
 
   @Test
@@ -125,9 +122,9 @@ public class TelemetryReporterTest {
         .setInitializeTelemetry(true)
         .setTelemetryData(data)
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
-    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT))
+    stubFor(post(urlEqualTo("/pings"))
         .willReturn(aResponse()
-                    .withStatus(202)));
+                    .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
     processEngineConfiguration.buildProcessEngine();
   
     // when
@@ -141,28 +138,41 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldSendTelemetryWhenHttpConnectorNotInitialized() {
+    // given
+    managementService.toggleTelemetry(true);
+    Data data = createDataToSend();
+    String requestBody = new Gson().toJson(data);
+    stubFor(post(urlEqualTo("/pings"))
+            .willReturn(aResponse()
+                        .withBody(requestBody)
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+                                                                TELEMETRY_ENDPOINT,
+                                                                data,
+                                                                null);
+
+    // when
+    telemetryReporter.reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo("/pings"))
+              .withRequestBody(equalToJson(requestBody))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
   public void shouldLogTelemetrySent() {
     // given
     managementService.toggleTelemetry(true);
-    HttpConnector http = mock(HttpConnector.class);
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
-                                                                TELEMETRY_ENDPOINT,
-                                                                createDataToSend(),
-                                                                http);
-    HttpRequest mockedRequest = mock(HttpRequest.class);
-    HttpResponse mockedResponse = mock(HttpResponse.class);
-    when(http.createRequest()).thenReturn(mockedRequest);
-
-    when(mockedRequest.url(any())).thenReturn(mockedRequest);
-    when(mockedRequest.post()).thenReturn(mockedRequest);
-    when(mockedRequest.contentType(any())).thenReturn(mockedRequest);
-    when(mockedRequest.payload(any())).thenReturn(mockedRequest);
-    when(mockedRequest.execute()).thenReturn(mockedResponse);
-    when(mockedResponse.getStatusCode()).thenReturn(202);
+    stubFor(post(urlEqualTo("/pings"))
+        .willReturn(aResponse()
+                    .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
-    telemetryReporter.reportNow();
+    configuration.getTelemetryReporter().reportNow();
 
     // then
     assertThat(loggingRule.getFilteredLog("Start telemetry sending task").size()).isOne();
@@ -174,24 +184,18 @@ public class TelemetryReporterTest {
   public void shouldLogUnexpectedResponse() {
     // given
     managementService.toggleTelemetry(true);
-    HttpConnector http = mock(HttpConnector.class);
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
-                                                                TELEMETRY_ENDPOINT,
-                                                                createDataToSend(),
-                                                                http);
-    HttpRequest mockedRequest = mock(HttpRequest.class);
-    when(http.createRequest()).thenReturn(mockedRequest);
-    when(mockedRequest.url(any())).thenReturn(mockedRequest);
-    when(mockedRequest.post()).thenReturn(mockedRequest);
-    when(mockedRequest.contentType(any())).thenReturn(mockedRequest);
-    when(mockedRequest.payload(any())).thenReturn(mockedRequest);
-    when(mockedRequest.execute()).thenReturn(null);
+    stubFor(post(urlEqualTo("/pings"))
+        .willReturn(aResponse()
+                    .withStatus(HttpURLConnection.HTTP_NOT_ACCEPTABLE)));
 
     // when
-    telemetryReporter.reportNow();
+    configuration.getTelemetryReporter().reportNow();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Unexpected response while sending telemetry data").size()).isOne();
+    assertThat(loggingRule
+        .getFilteredLog(
+            "Unexpected response while sending telemetry data. Status code: " + HttpURLConnection.HTTP_NOT_ACCEPTABLE)
+        .size()).isOne();
   }
 
   @Test

@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.connect.httpclient.HttpConnector;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetryReporter {
 
@@ -37,18 +38,18 @@ public class TelemetryReporter {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected Data data;
-  protected HttpConnector http;
+  protected Connector<? extends ConnectorRequest<?>> httpConnector;
 
   protected boolean stopped;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            Data data,
-                           HttpConnector http) {
+                           Connector<? extends ConnectorRequest<?>> httpConnector) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
-    this.http = http;
+    this.httpConnector = httpConnector;
     initTelemetrySendingTask();
   }
 
@@ -56,7 +57,7 @@ public class TelemetryReporter {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
                                                     data,
-                                                    http);
+                                                    httpConnector);
   }
 
   public synchronized void start() {

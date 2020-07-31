@@ -39,6 +39,7 @@
 
 <!--   <logger name="org.camunda.bpm.engine.metrics" level="debug" /> -->
 <!--   <logger name="org.camunda.bpm.engine.util" level="debug" /> -->
+<!--   <logger name="org.camunda.bpm.engine.telemetry" level="debug" /> -->
 
 <!--   <logger name="org.camunda.bpm.application" level="debug" /> -->
 <!--   <logger name="org.camunda.bpm.container" level="debug" /> -->
