@@ -15,7 +15,6 @@
   <properties>
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
-    <version.chromedriver>2.27</version.chromedriver>
 
     <!-- Needs to be updated after a new WildFly release (check support on Codehaus Cargo first) -->
     <cargo.wildfly.container.id>wildfly15x</cargo.wildfly.container.id>
