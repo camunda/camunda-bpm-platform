@@ -18,20 +18,31 @@
 var fs = require('fs');
 var through = require('through2');
 
-var commonPackage = fs.readFileSync(__dirname + '/../../package.json', 'utf8');
-
-var excluded = [
-  'bpmn-font',
-  'persistify',
-  'mkdirp'
-];
-
 var included = [
   'angular',
   'moment',
   'camunda-bpm-sdk-js/lib/angularjs/index',
   'camunda-bpm-sdk-js',
   'q',
+  'angular-animate',
+  'angular-cookies',
+  'angular-data-depend',
+  'angular-loader',
+  'angular-mocks',
+  'angular-moment',
+  'angular-resource',
+  'angular-route',
+  'angular-sanitize',
+  'angular-scenario',
+  'angular-touch',
+  'angular-translate',
+  'bootstrap',
+  'bpmn-js',
+  'clipboard',
+  'cmmn-js',
+  'dmn-js',
+  'jquery',
+  'lodash',
 
   // Okay, this looks bad. But hear me out:
   // We create our own DMN editor using DMN-JS
@@ -54,8 +65,6 @@ module.exports = function(grunt, dirname, licensebookConfig) {
   grunt.registerMultiTask('ensureLibs', function() {
 
     var done = this.async();
-
-    var packageJson = JSON.parse(commonPackage);
 
     var browserifyOptions = {
       transform: [
@@ -115,14 +124,6 @@ module.exports = function(grunt, dirname, licensebookConfig) {
 
     var cacheData = {};
 
-    for(var key in packageJson.dependencies) {
-      if(excluded.indexOf(key) === -1) {
-        // Non-linked path
-        includedFiles.add(__dirname + '/../../../../../node_modules/' + key + '/index.js');
-        b.require(key);
-        cacheData[key] = packageJson.dependencies[key];
-      }
-    }
     for(var i = 0; i < included.length; i++) {
       // Non-linked path
       includedFiles.add(__dirname + '/../../../../../node_modules/' + included[i] + '/index.js');
