@@ -191,9 +191,11 @@ public class ExceptionUtil {
     for (SQLException exception : relatedSqlExceptions) {
       String errorMessage = exception.getMessage().toLowerCase();
       int errorCode = exception.getErrorCode();
-      if (errorCode == 40001
-          || errorMessage != null
-          && (errorMessage.contains("restart transaction") || errorMessage.contains("retry txn"))) {
+      if ((errorCode == 40001 || errorMessage != null)
+          && (errorMessage.contains("restart transaction") || errorMessage.contains("retry txn"))
+          // TX retry errors with RETRY_COMMIT_DEADLINE_EXCEEDED are handled
+          // as a ProcessEnginePersistenceException due to a long-running transaction
+          && !errorMessage.contains("retry_commit_deadline_exceeded")) {
         return true;
       }
     }

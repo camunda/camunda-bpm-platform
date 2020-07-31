@@ -44,6 +44,8 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -263,8 +265,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
   }
 
+  /**
+   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
+   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
+   * See CAM-12239 for the performance issue.
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testQueryByLargeListOfProcessInstanceIdIn() {
     // given
     List<String> processInstances = new ArrayList<>();
