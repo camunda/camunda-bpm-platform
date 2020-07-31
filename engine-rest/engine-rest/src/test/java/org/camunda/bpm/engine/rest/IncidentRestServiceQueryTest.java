@@ -408,6 +408,31 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testQueryByIncidentMessageLike() {
+    String incidentMessage = MockProvider.EXAMPLE_INCIDENT_MESSAGE;
+
+    given()
+            .queryParam("incidentMessageLike", incidentMessage)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().get(INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).incidentMessageLike(incidentMessage);
+  }
+
+  @Test
+  public void testQueryByIncidentTimestampBeforeAndAfter() {
+    given()
+            .queryParam("incidentTimestampBefore", MockProvider.EXAMPLE_INCIDENT_TIMESTAMP_BEFORE)
+            .queryParam("incidentTimestampAfter", MockProvider.EXAMPLE_INCIDENT_TIMESTAMP_AFTER)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().get(INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).incidentTimestampBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_INCIDENT_TIMESTAMP_BEFORE));
+    verify(mockedQuery).incidentTimestampAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_INCIDENT_TIMESTAMP_AFTER));
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryByProcessDefinitionId() {
     String processDefinitionId = MockProvider.EXAMPLE_INCIDENT_PROC_DEF_ID;
 

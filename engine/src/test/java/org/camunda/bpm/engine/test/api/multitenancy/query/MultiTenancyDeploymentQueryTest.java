@@ -18,31 +18,35 @@ package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Test;
 
-public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTest {
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
-  @Override
+  @Before
   public void setUp() throws Exception {
     BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
 
-    deployment(emptyProcess);
-    deploymentForTenant(TENANT_ONE, emptyProcess);
-    deploymentForTenant(TENANT_TWO, emptyProcess);
+    testRule.deploy(emptyProcess);
+    testRule.deployForTenant(TENANT_ONE, emptyProcess);
+    testRule.deployForTenant(TENANT_TWO, emptyProcess);
   }
 
+  @Test
   public void testQueryNoTenantIdSet() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery();
@@ -50,6 +54,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
    assertThat(query.count(), is(3L));
   }
 
+  @Test
   public void testQueryByTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -64,6 +69,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryByTenantIds() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -72,6 +78,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(2L));
   }
 
+  @Test
   public void testQueryWithoutTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -80,6 +87,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryByTenantIdsIncludeDeploymentsWithoutTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -103,6 +111,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(3L));
   }
 
+  @Test
   public void testQueryByNonExistingTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -111,6 +120,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(0L));
   }
 
+  @Test
   public void testFailQueryByTenantIdNull() {
     try {
       repositoryService.createDeploymentQuery()
@@ -121,6 +131,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     }
   }
 
+  @Test
   public void testQuerySortingAsc() {
     // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
@@ -134,6 +145,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(deployments.get(1).getTenantId(), is(TENANT_TWO));
   }
 
+  @Test
   public void testQuerySortingDesc() {
     // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
@@ -147,6 +159,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(deployments.get(1).getTenantId(), is(TENANT_ONE));
   }
 
+  @Test
   public void testQueryNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
@@ -154,6 +167,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testQueryAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -165,6 +179,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDeploymentsWithoutTenantId().count(), is(2L));
   }
 
+  @Test
   public void testQueryAuthenticatedTenants() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -176,6 +191,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.withoutTenantId().count(), is(1L));
   }
 
+  @Test
   public void testQueryDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);

@@ -17,7 +17,12 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +33,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -36,11 +40,14 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Test;
 
-public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
+public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
 
-  @Override
+  @After
   public void tearDown() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
@@ -53,6 +60,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   // Test ManagementService#activateJobDefinitionById() /////////////////////////
 
+  @Test
   public void testActivationById_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionById(null);
@@ -61,6 +69,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByIdAndActivateJobsFlag_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionById(null, false);
@@ -75,6 +84,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByIdAndActivateJobsFlagAndExecutionDate_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionById(null, false, null);
@@ -103,6 +113,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -145,6 +156,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByIdAndActivateJobsFlag_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -188,6 +200,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByIdAndActivateJobsFlag_shouldSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -232,6 +245,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldExecuteImmediatelyAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -276,6 +290,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldExecuteImmediatelyAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -320,6 +335,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldExecuteDelayedAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -379,6 +395,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationById_shouldExecuteDelayedAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -438,6 +455,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   // Test ManagementService#activateJobDefinitionByProcessDefinitionId() /////////////////////////
 
+  @Test
   public void testActivationByProcessDefinitionId_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionId(null);
@@ -446,6 +464,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByProcessDefinitionIdAndActivateJobsFlag_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionId(null, false);
@@ -460,6 +479,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByProcessDefinitionIdAndActivateJobsFlagAndExecutionDate_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionId(null, false, null);
@@ -488,6 +508,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -531,6 +552,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionIdAndActivateJobsFlag_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -576,6 +598,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionIdAndActivateJobsFlag_shouldSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -620,6 +643,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldExecuteImmediatelyAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -664,6 +688,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldExecuteImmediatelyAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -709,6 +734,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldExecuteDelayedAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -766,6 +792,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionId_shouldExecuteDelayedAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -824,6 +851,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   // Test ManagementService#activateJobDefinitionByProcessDefinitionKey() /////////////////////////
 
+  @Test
   public void testActivationByProcessDefinitionKey_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionKey(null);
@@ -832,6 +860,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByProcessDefinitionKeyAndActivateJobsFlag_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionKey(null, false);
@@ -846,6 +875,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testActivationByProcessDefinitionKeyAndActivateJobsFlagAndExecutionDate_shouldThrowProcessEngineException() {
     try {
       managementService.activateJobDefinitionByProcessDefinitionKey(null, false, null);
@@ -874,6 +904,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -917,6 +948,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKeyAndActivateJobsFlag_shouldRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -961,6 +993,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKeyAndActivateJobsFlag_shouldSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1006,6 +1039,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldExecuteImmediatelyAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1050,6 +1084,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldExecuteImmediatelyAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1095,6 +1130,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldExecuteDelayedAndRetainJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1153,6 +1189,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKey_shouldExecuteDelayedAndSuspendJobs() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1213,6 +1250,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   // Test ManagementService#activateJobDefinitionByProcessDefinitionKey() with multiple process definition
   // with same process definition key
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKey_shouldRetainJobs() {
     // given
     String key = "suspensionProcess";
@@ -1253,6 +1291,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKeyAndActivateJobsFlag_shouldRetainJobs() {
     // given
     String key = "suspensionProcess";
@@ -1293,6 +1332,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKeyAndActivateJobsFlag_shouldSuspendJobs() {
     // given
     String key = "suspensionProcess";
@@ -1334,6 +1374,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteImmediatelyAndRetainJobs() {
     // given
     String key = "suspensionProcess";
@@ -1375,6 +1416,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteImmediatelyAndSuspendJobs() {
     // given
     String key = "suspensionProcess";
@@ -1416,6 +1458,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteDelayedAndRetainJobs() {
     // given
     String key = "suspensionProcess";
@@ -1473,6 +1516,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testMultipleSuspensionByProcessDefinitionKey_shouldExecuteDelayedAndSuspendJobs() {
     // given
     String key = "suspensionProcess";
@@ -1531,6 +1575,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByIdUsingBuilder() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1563,6 +1608,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionIdUsingBuilder() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1595,6 +1641,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationByProcessDefinitionKeyUsingBuilder() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1625,6 +1672,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testActivationJobDefinitionIncludingJobsUsingBuilder() {
     // given
     // a deployed process definition with asynchronous continuation
@@ -1659,6 +1707,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Test
   public void testDelayedActivationUsingBuilder() {
     // given
     // a deployed process definition with asynchronous continuation

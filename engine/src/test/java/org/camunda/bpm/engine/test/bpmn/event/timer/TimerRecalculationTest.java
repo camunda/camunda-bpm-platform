@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,12 +31,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
+import org.junit.Test;
 
 
 /**
@@ -42,7 +46,7 @@ import org.junit.After;
  * @author Tobias Metzke
  */
 
-public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
+public class TimerRecalculationTest extends PluggableProcessEngineTest {
 	
   private Set<String> jobIds = new HashSet<>();
   
@@ -58,6 +62,7 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
     jobIds = new HashSet<>();
   }
 	  
+  @Test
   public void testUnknownId() {
     try {
       // when
@@ -65,10 +70,11 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
       fail("The recalculation with an unknown job ID should not be possible");
     } catch (ProcessEngineException pe) {
       // then
-      assertTextPresent("No job found with id '" + "unknownID", pe.getMessage());
+      testRule.assertTextPresent("No job found with id '" + "unknownID", pe.getMessage());
     }
   }
   
+  @Test
   public void testEmptyId() {
     try {
       // when
@@ -76,10 +82,11 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
       fail("The recalculation with an unknown job ID should not be possible");
     } catch (ProcessEngineException pe) {
       // then
-      assertTextPresent("The job id is mandatory: jobId is empty", pe.getMessage());
+      testRule.assertTextPresent("The job id is mandatory: jobId is empty", pe.getMessage());
     }
   }
   
+  @Test
   public void testNullId() {
     try {
       // when
@@ -87,11 +94,12 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
       fail("The recalculation with an unknown job ID should not be possible");
     } catch (ProcessEngineException pe) {
       // then
-      assertTextPresent("The job id is mandatory: jobId is null", pe.getMessage());
+      testRule.assertTextPresent("The job id is mandatory: jobId is null", pe.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testFinishedJob() {
     // given
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
@@ -109,7 +117,7 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
     // run the job, finish the process
     managementService.executeJob(jobId);
     assertEquals(0L, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
-    assertProcessEnded(pi1.getProcessInstanceId());
+    testRule.assertProcessEnded(pi1.getProcessInstanceId());
     
     try {
       // when
@@ -117,10 +125,11 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
       fail("The recalculation of a finished job should not be possible");
     } catch (ProcessEngineException pe) {
       // then
-      assertTextPresent("No job found with id '" + jobId, pe.getMessage());
+      testRule.assertTextPresent("No job found with id '" + jobId, pe.getMessage());
     }
   }
   
+  @Test
   public void testEverLivingJob() {
     // given
     Job job = historyService.cleanUpHistoryAsync(true);
@@ -131,6 +140,7 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testMessageJob() {
     // given
     runtimeService.startProcessInstanceByKey("asyncService");
@@ -151,7 +161,7 @@ public class TimerRecalculationTest extends PluggableProcessEngineTestCase {
       fail("The recalculation with an unsupported type should not be possible");
     } catch (ProcessEngineException pe) {
       // then
-      assertTextPresent("Only timer jobs can be recalculated, but the job with id '" + job.getId() + "' is of type '" + type, pe.getMessage());
+      testRule.assertTextPresent("Only timer jobs can be recalculated, but the job with id '" + job.getId() + "' is of type '" + type, pe.getMessage());
     }
   }
 

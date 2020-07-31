@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.hamcrest.CoreMatchers;
+import org.junit.Test;
 
 
 /**
@@ -34,6 +35,7 @@ import org.hamcrest.CoreMatchers;
 public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
   @Deployment
+  @Test
   public void testSimpleProcess() {
     runtimeService.startProcessInstanceByKey("simpleProcess");
 
@@ -45,6 +47,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
   public void testRequiredHistoryLevelAudit() {
 
     assertThat(currentHistoryLevel(),
@@ -53,6 +56,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
   public void testRequiredHistoryLevelActivity() {
 
     assertThat(currentHistoryLevel(),
@@ -62,6 +66,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testRequiredHistoryLevelFull() {
 
     assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));

@@ -16,29 +16,33 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.end;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Kristin Polenz
  * @author Nico Rehwaldt
  */
-public class MessageEndEventTest extends PluggableProcessEngineTestCase {
+public class MessageEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testMessageEndEvent() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     assertNotNull(processInstance);
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testMessageEndEventServiceTaskBehavior() throws Exception {
     Map<String, Object> variables = new HashMap<String, Object>();
 
@@ -49,7 +53,7 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.wasExecuted);
 
     // expression
@@ -61,7 +65,7 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.expressionWasExecuted);
 
     // delegate expression
@@ -73,7 +77,7 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     processInstance = runtimeService.startProcessInstanceByKey("process", variables);
     assertNotNull(processInstance);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.delegateExpressionWasExecuted);
   }
 

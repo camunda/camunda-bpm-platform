@@ -56,8 +56,14 @@ public class Metrics {
   public final static String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
 
   /**
+   * Number of executed Root Process Instance executions.
+   */
+  public final static String ROOT_PROCESS_INSTANCE_START = "root-process-instance-start";
+
+  /**
    * Number of executed decision elements in the DMN engine.
    */
+  public final static String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
   public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
 
   /**

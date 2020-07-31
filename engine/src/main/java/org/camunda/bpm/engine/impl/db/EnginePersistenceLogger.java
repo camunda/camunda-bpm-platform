@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.executor.BatchExecutorException;
 import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
@@ -120,11 +118,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
       Throwable cause) {
 
+    String message = ExceptionUtil.collectExceptionMessages(cause);
     String exceptionMessage = exceptionMessage(
       "004",
       "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
       operation.toString(),
-      cause.getMessage(),
+      message,
       buildStringFromList(operationsToFlush)
     );
 
@@ -668,22 +667,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
     Throwable cause) {
-    String message = cause.getMessage();
 
-    //collect real SQL exception messages in case of batch processing
-    Throwable exCause = cause;
-    do {
-      if (exCause instanceof BatchExecutorException) {
-        final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
-        StringBuilder sb = new StringBuilder();
-        for (SQLException sqlException : relatedSqlExceptions) {
-          sb.append(sqlException).append("\n");
-        }
-        message = message + "\n" + sb.toString();
-      }
-      exCause = exCause.getCause();
-    } while (exCause != null);
-
+    String message = ExceptionUtil.collectExceptionMessages(cause);
     String exceptionMessage = exceptionMessage(
       "083",
       "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
@@ -750,6 +735,70 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Historic instance permissions are disabled, " +
             "please check your process engine configuration."
     ));
+  }
+
+  public void noTelemetryLockPropertyFound() {
+    logDebug(
+        "091", "No telemetry lock property found in the database");
+  }
+
+  public void noTelemetryPropertyFound() {
+    logDebug(
+        "092", "No telemetry property found in the database");
+  }
+
+  public void creatingTelemetryPropertyInDatabase(Boolean telemetryEnabled) {
+    logDebug(
+        "093",
+        "Creating the telemetry property in database with the value: {}", telemetryEnabled);
+  }
+
+  public void errorFetchingTelemetryPropertyInDatabase(Exception exception) {
+    logDebug(
+        "094",
+        "Error while fetching the telemetry property from the database: {}", exception.getMessage());
+  }
+
+  public void errorConfiguringTelemetryProperty(Exception exception) {
+    logDebug(
+        "095",
+        "Error while configurting the telemetry property: {}", exception.getMessage());
+  }
+
+  public void noInstallationIdPropertyFound() {
+    logDebug(
+        "096", "No installation id property found in database");
+  }
+
+  public void creatingInstallationPropertyInDatabase(String value) {
+    logDebug(
+        "097",
+        "Creating the installation id property in database with the value: {}", value);
+  }
+
+  public void couldNotSelectInstallationId(String message) {
+    logDebug(
+        "098",
+        "Could not select installation id property: {}", message);
+  }
+
+  public void noInstallationIdLockPropertyFound() {
+    logDebug(
+        "099", "No installation id lock property found in the database");
+  }
+
+  public void installationIdPropertyFound(String value) {
+    logDebug(
+        "100", "Installation id property found in the database: {}", value);
+  }
+
+  public void ignoreFailureDuePreconditionNotMet(DbOperation ignoredOperation, String preconditionMessage, DbOperation failedOperation) {
+    logDebug(
+        "101",
+        "Ignoring '{}' database operation failure due to an unmet precondition. {}: '{}'",
+        ignoredOperation.toString(),
+        preconditionMessage,
+        failedOperation.toString());
   }
 
 }

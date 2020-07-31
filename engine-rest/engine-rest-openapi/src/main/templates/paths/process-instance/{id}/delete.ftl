@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "deleteProcessInstance"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Deletes a running process instance by id." />
 
   "parameters": [

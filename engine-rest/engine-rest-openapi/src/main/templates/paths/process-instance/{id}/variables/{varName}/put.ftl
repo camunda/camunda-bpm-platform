@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "setProcessInstanceVariable"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Sets a variable of a given process instance by id." />
 
   "parameters": [

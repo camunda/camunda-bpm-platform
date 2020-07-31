@@ -16,10 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,10 +32,14 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.history.DurationReportResult;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
+import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -42,6 +50,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -55,22 +66,24 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   protected String deploymentId;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    deploymentId = testRule.deploy(
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
-  @Override
+  @After
   public void tearDown() {
     super.tearDown();
-    deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnableHistoricInstancePermissions(false);
   }
 
   // historic process instance query //////////////////////////////////////////////////////////
 
+  @Test
   public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -82,6 +95,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testSimpleQueryWithReadHistoryPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -98,6 +112,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(processInstanceId, instance.getId());
   }
 
+  @Test
   public void testSimpleQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -114,6 +129,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(processInstanceId, instance.getId());
   }
 
+  @Test
   public void testSimpleQueryWithMultiple() {
     // given
     startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -129,6 +145,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   // historic process instance query (multiple process instances) ////////////////////////
 
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -147,6 +164,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadHistoryPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -167,6 +185,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 3);
   }
 
+  @Test
   public void testQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -189,6 +208,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   // delete deployment (cascade = false)
 
+  @Test
   public void testQueryAfterDeletingDeployment() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -223,6 +243,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   // delete historic process instance //////////////////////////////
 
+  @Test
   public void testDeleteHistoricProcessInstanceWithoutAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -238,13 +259,14 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(DELETE_HISTORY.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(DELETE_HISTORY.getName(), message);
+      testRule.assertTextPresent(PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testDeleteHistoricProcessInstanceWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -268,6 +290,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     enableAuthorization();
   }
 
+  @Test
   public void testDeleteHistoricProcessInstanceWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -291,6 +314,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     enableAuthorization();
   }
 
+  @Test
   public void testDeleteHistoricProcessInstanceAfterDeletingDeployment() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -320,6 +344,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   // create historic process instance report
 
+  @Test
   public void testHistoricProcessInstanceReportWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -346,6 +371,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     }
   }
 
+  @Test
   public void testHistoricProcessInstanceReportWithHistoryReadPermissionOnAny() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -365,6 +391,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  @Test
   public void testReportWithoutQueryCriteriaAndAnyReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -385,6 +412,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  @Test
   public void testReportWithoutQueryCriteriaAndNoReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -407,6 +435,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     }
   }
 
+  @Test
   public void testReportWithQueryCriterionProcessDefinitionKeyInAndReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -429,6 +458,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  @Test
   public void testReportWithQueryCriterionProcessDefinitionKeyInAndMissingReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -454,6 +484,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     }
   }
 
+  @Test
   public void testReportWithQueryCriterionProcessDefinitionIdInAndReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -476,6 +507,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  @Test
   public void testReportWithQueryCriterionProcessDefinitionIdInAndMissingReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -501,6 +533,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     }
   }
 
+  @Test
   public void testReportWithMixedQueryCriteriaAndReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -524,6 +557,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(0, result.size());
   }
 
+  @Test
   public void testReportWithMixedQueryCriteriaAndMissingReadHistoryPermission() {
     // given
     ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
@@ -550,6 +584,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     }
   }
 
+  @Test
   public void testReportWithQueryCriterionProcessInstanceIdInWrongProcessDefinitionId() {
     // when
     List<DurationReportResult> result = historyService
@@ -561,6 +596,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(0, result.size());
   }
 
+  @Test
   public void testHistoryCleanupReportWithPermissions() {
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
@@ -576,6 +612,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(10, reportResults.get(0).getFinishedProcessInstanceCount());
   }
 
+  @Test
   public void testHistoryCleanupReportWithReadPermissionOnly() {
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
@@ -589,6 +626,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(0, reportResults.size());
   }
 
+  @Test
   public void testHistoryCleanupReportWithReadHistoryPermissionOnly() {
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
@@ -602,6 +640,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(0, reportResults.size());
   }
 
+  @Test
   public void testHistoryCleanupReportWithoutPermissions() {
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
@@ -611,6 +650,228 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     assertEquals(0, reportResults.size());
+  }
+
+  @Test
+  public void testCheckAllHistoricProcessInstancePermissions() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.ALL);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+  }
+
+  @Test
+  public void testCheckReadHistoricProcessInstancePermissions() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
+  }
+
+  @Test
+  public void testCheckNoneHistoricProcessInstancePermission() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    // when
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, ANY, userId,
+        HistoricProcessInstancePermissions.NONE);
+
+    // then
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.NONE, Resources.HISTORIC_PROCESS_INSTANCE)).isTrue();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.READ, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
+
+    assertThat(authorizationService.isUserAuthorized(userId, null,
+        HistoricProcessInstancePermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE)).isFalse();
+  }
+
+  @Test
+  public void testCheckNonePermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list()).isEmpty();
+  }
+
+  @Test
+  public void testCheckReadPermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  @Test
+  public void testCheckReadPermissionOnCompletedHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  @Test
+  public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  @Test
+  public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.NONE);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  @Test
+  public void testHistoricProcessInstancePermissionsAuthorizationDisabled() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getProcessInstanceId();
+
+    disableAuthorization();
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(processInstanceId);
+  }
+
+  @Test
+  public void testDeleteHistoricAuthorizationRelatedToHistoricProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    String taskId = selectSingleTask().getId();
+
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_HISTORY);
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // assume
+    AuthorizationQuery authorizationQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+        .resourceId(processInstanceId);
+
+    assertThat(authorizationQuery.list())
+        .extracting("resourceId")
+        .containsExactly(processInstanceId);
+
+    // when
+    historyService.deleteHistoricProcessInstance(processInstanceId);
+
+    // then
+    authorizationQuery = authorizationService.createAuthorizationQuery()
+        .resourceType(Resources.HISTORIC_PROCESS_INSTANCE)
+        .resourceId(processInstanceId);
+
+    assertThat(authorizationQuery.list()).isEmpty();
   }
 
   // helper ////////////////////////////////////////////////////////

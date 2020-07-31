@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,8 +30,8 @@ import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -57,11 +63,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author Daniel Meyer
@@ -69,14 +70,10 @@ import static org.junit.Assert.fail;
 public class SignalEventTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setJavaSerializationFormatEnabled(true);
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJavaSerializationFormatEnabled(true));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -84,11 +81,11 @@ public class SignalEventTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private RuntimeService runtimeService;
-  private TaskService taskService;
-  private RepositoryService repositoryService;
-  private ManagementService managementService;
-  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected RepositoryService repositoryService;
+  protected ManagementService managementService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   protected boolean defaultEnsureJobDueDateSet;
 
@@ -641,8 +638,8 @@ public class SignalEventTest {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundary.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
   @Test
-  @Ignore
-  public void FAILING_testAsyncSignalBoundary() {
+  @Ignore("CAM-6807")
+  public void testAsyncSignalBoundary() {
     runtimeService.startProcessInstanceByKey("catchSignal");
 
     // given a process instance that throws a signal asynchronously

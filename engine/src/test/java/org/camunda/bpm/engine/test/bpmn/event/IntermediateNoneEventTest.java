@@ -16,13 +16,17 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
-public class IntermediateNoneEventTest extends PluggableProcessEngineTestCase {
+public class IntermediateNoneEventTest extends PluggableProcessEngineTest {
   
   private static boolean listenerExcecuted = false;
   
@@ -33,10 +37,11 @@ public class IntermediateNoneEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testIntermediateNoneTimerEvent() throws Exception {    
     assertFalse(listenerExcecuted);    
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateNoneEventExample");
-    assertProcessEnded(pi.getProcessInstanceId());
+    testRule.assertProcessEnded(pi.getProcessInstanceId());
     assertTrue(listenerExcecuted);    
   }
 

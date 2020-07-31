@@ -32,6 +32,7 @@ public class EntityTypes {
   public static final String HISTORIC_TASK = "HistoricTask";
   public static final String USER = "User";
   public static final String PROCESS_INSTANCE = "ProcessInstance";
+  public static final String HISTORIC_PROCESS_INSTANCE = "HistoricProcessInstance";
   public static final String PROCESS_DEFINITION = "ProcessDefinition";
   public static final String JOB = "Job";
   public static final String JOB_DEFINITION = "JobDefinition";

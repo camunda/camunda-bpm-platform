@@ -1,0 +1,1 @@
+spring.jersey.application-path: "/rest"

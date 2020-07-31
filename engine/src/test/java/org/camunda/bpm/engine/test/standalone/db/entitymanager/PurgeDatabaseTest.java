@@ -16,6 +16,15 @@
  */
 package org.camunda.bpm.engine.test.standalone.db.entitymanager;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.impl.test.TestHelper.assertAndEnsureCleanDbAndCache;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -44,13 +53,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.impl.test.TestHelper.assertAndEnsureCleanDbAndCache;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -199,7 +201,7 @@ public class PurgeDatabaseTest {
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOBDEF"));
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_USER"));
     assertEquals(5, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXECUTION"));
-    assertEquals(10, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
+    assertEquals(12, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
     assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
     assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_PROCDEF"));
     assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT"));

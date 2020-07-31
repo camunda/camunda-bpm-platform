@@ -16,7 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.cmmn;
 
-import static org.camunda.bpm.engine.variable.Variables.*;
+import static org.camunda.bpm.engine.variable.Variables.booleanValue;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.integerValue;
+import static org.camunda.bpm.engine.variable.Variables.stringValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +34,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
@@ -35,35 +42,41 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseServiceTest extends PluggableProcessEngineTestCase {
+public class CaseServiceTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testCreateCaseInstanceQuery() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     assertNotNull(query);
   }
 
+  @Test
   public void testCreateCaseExecutionQuery() {
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
 
     assertNotNull(query);
   }
 
+  @Test
   public void testWithCaseExecution() {
     CaseExecutionCommandBuilder builder = caseService.withCaseExecution("aCaseExecutionId");
 
     assertNotNull(builder);
   }
 
+  @Test
   public void testManualStartInvalidCaseExecution() {
     try {
       caseService
@@ -81,6 +94,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testCompleteInvalidCaseExeuction() {
     try {
       caseService
@@ -101,6 +115,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testCloseInvalidCaseExeuction() {
     try {
       caseService
@@ -121,6 +136,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testTerminateInvalidCaseExeuction() {
     try {
       caseService
@@ -142,6 +158,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariable() {
     // given:
     // a deployed case definition
@@ -206,6 +223,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableTyped() {
     // given:
     // a deployed case definition
@@ -270,6 +288,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariables() {
     // given:
     // a deployed case definition
@@ -337,6 +356,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariablesTyped() {
     // given:
     // a deployed case definition
@@ -404,6 +424,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableAndVariables() {
     // given:
     // a deployed case definition
@@ -476,6 +497,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableAndVariablesTyped() {
     // given:
     // a deployed case definition
@@ -547,6 +569,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableLocal() {
     // given:
     // a deployed case definition
@@ -629,6 +652,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariablesLocal() {
     // given:
     // a deployed case definition
@@ -713,6 +737,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariablesLocalTyped() {
     // given:
     // a deployed case definition
@@ -772,6 +797,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableLocalAndVariablesLocal() {
     // given:
     // a deployed case definition
@@ -863,6 +889,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteSetVariableAndVariablesLocal() {
     // given:
     // a deployed case definition
@@ -951,6 +978,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariable() {
     // given:
     // a deployed case definition
@@ -1000,6 +1028,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariables() {
     // given:
     // a deployed case definition
@@ -1053,6 +1082,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariableAndVariables() {
     // given:
     // a deployed case definition
@@ -1107,6 +1137,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariableLocal() {
     // given:
     // a deployed case definition
@@ -1160,6 +1191,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariablesLocal() {
     // given:
     // a deployed case definition
@@ -1217,6 +1249,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariableLocalAndVariablesLocal() {
     // given:
     // a deployed case definition
@@ -1275,6 +1308,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveVariableAndVariablesLocal() {
     // given:
     // a deployed case definition
@@ -1333,6 +1367,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveAndSetSameVariable() {
     // given:
     // a deployed case definition
@@ -1363,11 +1398,12 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .execute();
     } catch (NotValidException e) {
       // then
-      assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
+      testRule.assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
     }
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testExecuteRemoveAndSetSameLocal() {
     // given:
     // a deployed case definition
@@ -1398,11 +1434,12 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .execute();
     } catch (NotValidException e) {
       // then
-      assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
+      testRule.assertTextPresent("Cannot set and remove a variable with the same variable name: 'aVariableName' within a command.", e.getMessage());
     }
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariables() {
     // given:
     // a deployed case definition
@@ -1440,6 +1477,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesTyped() {
     // given:
     // a deployed case definition
@@ -1476,6 +1514,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertEquals(variables, caseService.getVariablesTyped(caseExecutionId, true));
   }
 
+  @Test
   public void testGetVariablesInvalidCaseExecutionId() {
 
     try {
@@ -1494,6 +1533,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesWithVariableNames() {
     // given:
     // a deployed case definition
@@ -1537,6 +1577,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesWithVariableNamesTyped() {
     // given:
     // a deployed case definition
@@ -1578,6 +1619,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertEquals(variables, caseService.getVariables(caseExecutionId, names));
   }
 
+  @Test
   public void testGetVariablesWithVariablesNamesInvalidCaseExecutionId() {
 
     try {
@@ -1596,6 +1638,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocal() {
     // given:
     // a deployed case definition
@@ -1637,6 +1680,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocalTyped() {
     // given:
     // a deployed case definition
@@ -1677,6 +1721,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertEquals(variables, caseService.getVariablesLocalTyped(caseExecutionId, true));
   }
 
+  @Test
   public void testGetVariablesLocalInvalidCaseExecutionId() {
 
     try {
@@ -1695,6 +1740,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocalWithVariableNames() {
     // given:
     // a deployed case definition
@@ -1740,6 +1786,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocalWithVariableNamesTyped() {
     // given:
     // a deployed case definition
@@ -1783,6 +1830,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
      assertEquals(variables, caseService.getVariablesLocal(caseExecutionId, names));
   }
+  @Test
   public void testGetVariablesLocalWithVariablesNamesInvalidCaseExecutionId() {
 
     try {
@@ -1801,6 +1849,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariable() {
     // given:
     // a deployed case definition
@@ -1832,6 +1881,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertEquals("abc", value);
   }
 
+  @Test
   public void testGetVariableInvalidCaseExecutionId() {
     try {
       caseService.getVariable("invalid", "aVariableName");
@@ -1849,6 +1899,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariableLocal() {
     // given:
     // a deployed case definition
@@ -1883,6 +1934,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertEquals("abc", value);
   }
 
+  @Test
   public void testGetVariableLocalInvalidCaseExecutionId() {
     try {
       caseService.getVariableLocal("invalid", "aVariableName");
@@ -1900,6 +1952,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariableTyped() {
     // given:
     // a deployed case definition
@@ -1937,6 +1990,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertNotNull(serializedObjectValue.getValueSerialized());
   }
 
+  @Test
   public void testGetVariableTypedInvalidCaseExecutionId() {
     try {
       caseService.getVariableTyped("invalid", "aVariableName");
@@ -1954,6 +2008,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testSetVariable() {
     // given:
     // a deployed case definition
@@ -1997,6 +2052,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testSetVariables() {
     // given:
     // a deployed case definition
@@ -2059,6 +2115,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testSetVariableLocal() {
     // given:
     // a deployed case definition
@@ -2102,6 +2159,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testSetVariablesLocal() {
     // given:
     // a deployed case definition
@@ -2164,6 +2222,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariableTypedLocal() {
     // given:
     // a deployed case definition
@@ -2204,6 +2263,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
      assertNotNull(serializedObjectValue.getValueSerialized());
   }
 
+  @Test
   public void testGetVariableLocalTypedInvalidCaseExecutionId() {
     try {
       caseService.getVariableLocalTyped("invalid", "aVariableName");
@@ -2221,6 +2281,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testRemoveVariable() {
     // given:
     // a deployed case definition
@@ -2245,6 +2306,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testRemoveVariables() {
     // given:
     // a deployed case definition
@@ -2276,6 +2338,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testRemoveVariableLocal() {
     // given:
     // a deployed case definition
@@ -2307,6 +2370,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testRemoveVariablesLocal() {
     // given:
     // a deployed case definition
@@ -2346,6 +2410,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  @Test
   public void testCreateCaseInstanceById() {
     // given
     // there exists a deployment containing a case definition with key "loanApplication"
@@ -2381,6 +2446,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  @Test
   public void testCreateCaseInstanceByKey() {
     // given
     // there exists a deployment containing a case definition with key "loanApplication"
@@ -2416,6 +2482,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  @Test
   public void testCaseExecutionQuery() {
     // given
     // there exists a deployment containing a case definition with key "loanApplication"
@@ -2475,6 +2542,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  @Test
   public void testCaseInstanceQuery() {
     // given
     // there exists a deployment containing a case definition with key "loanApplication"
@@ -2510,6 +2578,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesByEmptyList() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
@@ -2523,6 +2592,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesTypedByEmptyList() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
@@ -2536,6 +2606,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocalByEmptyList() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
@@ -2549,6 +2620,7 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testGetVariablesLocalTypedByEmptyList() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();

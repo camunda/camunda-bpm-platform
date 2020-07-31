@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.Random;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -31,11 +36,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Represents the abstract metrics interval test class, which contains methods

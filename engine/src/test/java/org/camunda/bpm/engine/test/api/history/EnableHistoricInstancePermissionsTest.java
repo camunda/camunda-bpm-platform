@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
@@ -28,8 +30,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class EnableHistoricInstancePermissionsTest {
 
@@ -90,7 +90,7 @@ public class EnableHistoricInstancePermissionsTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled() {
+  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled_Task() {
     // given
     config.setEnableHistoricInstancePermissions(false);
 
@@ -102,6 +102,21 @@ public class EnableHistoricInstancePermissionsTest {
     // when
     authorizationService.isUserAuthorized("myUserId", null,
         HistoricTaskPermissions.ALL, Resources.HISTORIC_TASK);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenHistoricInstancePermissionsAreDisabled_ProcessInstance() {
+    // given
+    config.setEnableHistoricInstancePermissions(false);
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("ENGINE-03090 Historic instance permissions are disabled, " +
+        "please check your process engine configuration.");
+
+    // when
+    authorizationService.isUserAuthorized("myUserId", null,
+        HistoricTaskPermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE);
   }
 
 }

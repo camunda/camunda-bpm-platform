@@ -22,6 +22,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -39,6 +45,7 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.Resource;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -52,6 +59,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // query ////////////////////////////////////////////////////////////
 
+  @Test
   public void testSimpleDeploymentQueryWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -65,6 +73,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testSimpleDeploymentQueryWithReadPermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -79,6 +88,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testSimpleDeploymentQueryWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -93,6 +103,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testSimpleDeploymentQueryWithMultiple() {
     // given
     String deploymentId = createDeployment(null);
@@ -108,6 +119,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testDeploymentQueryWithoutAuthorization() {
     // given
     String deploymentId1 = createDeployment("first");
@@ -123,6 +135,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId2);
   }
 
+  @Test
   public void testDeploymentQueryWithReadPermissionOnDeployment() {
     // given
     String deploymentId1 = createDeployment("first");
@@ -139,6 +152,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId2);
   }
 
+  @Test
   public void testDeploymentQueryWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId1 = createDeployment("first");
@@ -157,6 +171,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // create deployment ///////////////////////////////////////////////
 
+  @Test
   public void testCreateDeploymentWithoutAuthoriatzion() {
     // given
 
@@ -170,12 +185,13 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(CREATE.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(CREATE.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
   }
 
+  @Test
   public void testCreateDeployment() {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
@@ -197,6 +213,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // delete deployment //////////////////////////////////////////////
 
+  @Test
   public void testDeleteDeploymentWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -208,14 +225,15 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(DELETE.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(DELETE.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testDeleteDeploymentWithDeletePermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -233,6 +251,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testDeleteDeploymentWithDeletePermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -252,6 +271,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get deployment resource names //////////////////////////////////
 
+  @Test
   public void testGetDeploymentResourceNamesWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -263,14 +283,15 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetDeploymentResourceNamesWithReadPermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -288,6 +309,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetDeploymentResourceNamesWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -307,6 +329,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get deployment resources //////////////////////////////////
 
+  @Test
   public void testGetDeploymentResourcesWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -318,14 +341,15 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetDeploymentResourcesWithReadPermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -341,6 +365,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetDeploymentResourcesWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -358,6 +383,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get resource as stream //////////////////////////////////
 
+  @Test
   public void testGetResourceAsStreamWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -369,14 +395,15 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetResourceAsStreamWithReadPermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -391,6 +418,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetResourceAsStreamWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -407,6 +435,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get resource as stream by id//////////////////////////////////
 
+  @Test
   public void testGetResourceAsStreamByIdWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null);
@@ -423,14 +452,15 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DEPLOYMENT.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetResourceAsStreamByIdWithReadPermissionOnDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -450,6 +480,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetResourceAsStreamByIdWithReadPermissionOnAnyDeployment() {
     // given
     String deploymentId = createDeployment(null);
@@ -471,6 +502,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // should create authorization /////////////////////////////////////
 
+  @Test
   public void testCreateAuthorizationOnDeploy() {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
@@ -497,6 +529,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // clear authorization /////////////////////////////////////
 
+  @Test
   public void testClearAuthorizationOnDeleteDeployment() {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
@@ -526,6 +559,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // register process application ///////////////////////////////////
 
+  @Test
   public void testRegisterProcessApplicationWithoutAuthorization() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
@@ -539,13 +573,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testRegisterProcessApplicationAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
@@ -566,6 +601,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // unregister process application ///////////////////////////////////
 
+  @Test
   public void testUnregisterProcessApplicationWithoutAuthorization() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
@@ -580,13 +616,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testUnregisterProcessApplicationAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
@@ -607,6 +644,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get process application for deployment ///////////////////////////////////
 
+  @Test
   public void testGetProcessApplicationForDeploymentWithoutAuthorization() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
@@ -621,13 +659,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetProcessApplicationForDeploymentAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
@@ -648,6 +687,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // get registered deployments ///////////////////////////////////
 
+  @Test
   public void testGetRegisteredDeploymentsWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -659,13 +699,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testGetRegisteredDeploymentsAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
@@ -683,6 +724,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // register deployment for job executor ///////////////////////////////////
 
+  @Test
   public void testRegisterDeploymentForJobExecutorWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -694,13 +736,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testRegisterDeploymentForJobExecutorAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
@@ -718,6 +761,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   // unregister deployment for job executor ///////////////////////////////////
 
+  @Test
   public void testUnregisterDeploymentForJobExecutorWithoutAuthorization() {
     // given
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -729,13 +773,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
     }
 
     deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testUnregisterDeploymentForJobExecutorAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));

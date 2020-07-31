@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "getActivityInstanceTree"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Retrieves an Activity Instance (Tree) for a given process instance by id." />
 
   "parameters" : [

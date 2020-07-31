@@ -35,6 +35,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles(profiles = { "test-auth-disabled" })
 public abstract class AbstractRestTest {
 
+  public static String CONTEXT_PATH = "/engine-rest";
+  
   @Autowired
   protected TestRestTemplate testRestTemplate;
 

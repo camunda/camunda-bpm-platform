@@ -16,24 +16,30 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
+public class CompensateEventHistoryTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testBoundaryCompensationHandlerHistory.bpmn20.xml")
+  @Test
   public void testBoundaryCompensationHandlerHistoryActivityInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryHandlerProcess");
@@ -62,11 +68,10 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstance.getId(), historicCompensationHandlerInstance.getParentActivityInstanceId());
   }
 
-  /**
-   * Fix CAM-4351
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testBoundaryCompensationHandlerHistory.bpmn20.xml")
-  public void FAILING_testBoundaryCompensationHandlerHistoryVariableInstance() {
+  @Ignore("Fix CAM-4351")
+  @Test
+  public void testBoundaryCompensationHandlerHistoryVariableInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryHandlerProcess");
 
@@ -94,6 +99,7 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testDefaultCompensationHandlerHistory.bpmn20.xml")
+  @Test
   public void testDefaultCompensationHandlerHistoryActivityInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("defaultHandlerProcess");
@@ -126,11 +132,10 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
     assertEquals(subProcessActivityInstanceId, historicCompensationHandlerInstance.getParentActivityInstanceId());
   }
 
-  /**
-   * Fix CAM-4351
-   */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testDefaultCompensationHandlerHistory.bpmn20.xml")
-  public void FAILING_testDefaultCompensationHandlerHistoryVariableInstance() {
+  @Ignore("Fix CAM-4351")
+  @Test
+  public void testDefaultCompensationHandlerHistoryVariableInstance() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("defaultHandlerProcess");
 

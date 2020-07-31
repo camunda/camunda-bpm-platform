@@ -72,12 +72,12 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 
     for (ExternalTaskEntity entity : externalTasks) {
-
+      
       TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
       entity.lock(workerId, fetchInstruction.getLockDuration());
 
-      LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity,
-          fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables() , fetchInstruction.isDeserializeVariables());
+      LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
+          fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
 
       result.add(resultTask);
     }

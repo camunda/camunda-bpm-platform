@@ -42,6 +42,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected String processDefinitionId;
   protected String activityId;
   protected String activityName;
+  protected String activityNameLike;
   protected String activityType;
   protected String assignee;
   protected boolean finished;
@@ -99,6 +100,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
   public HistoricActivityInstanceQueryImpl activityName(String activityName) {
     this.activityName = activityName;
+    return this;
+  }
+
+  public HistoricActivityInstanceQueryImpl activityNameLike(String activityNameLike) {
+    this.activityNameLike = activityNameLike;
     return this;
   }
 

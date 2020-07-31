@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.springboot.project</groupId>
+    <artifactId>qa-webapp</artifactId>
+    <version>7.14.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>qa-webapp-ce-runtime</artifactId>
+  <name>camunda BPM - Spring Boot Starter - QA - Webapps Runtime</name>
+
+  <properties>
+    <version.selenium>2.45.0</version.selenium>
+    <version.jersey-json>1.15</version.jersey-json>
+    <version.h2>1.4.199</version.h2>
+    <version.glassfish-jaxb>2.3.1</version.glassfish-jaxb>
+    <version.jersey-apache-client>1.15</version.jersey-apache-client>
+    <version.junit>4.12</version.junit>
+    <version.chromedriver>78.0.3904.70</version.chromedriver>
+
+    <http.port>58080</http.port>
+    <http.ctx-path.webapp>camunda/</http.ctx-path.webapp>
+    <http.ctx-path.rest>engine-rest/</http.ctx-path.rest>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>integration-test-spring-boot-starter</id>
+
+      <dependencies>
+        <!-- Web Applications -->
+        <dependency>
+          <groupId>org.camunda.bpm.springboot</groupId>
+          <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+
+        <!-- REST API -->
+        <dependency>
+          <groupId>org.camunda.bpm.springboot</groupId>
+          <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-integration-tests-webapps</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm.springboot.project</groupId>
+          <artifactId>qa-webapp-invoice-example</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-apache-client4</artifactId>
+          <version>${version.jersey-apache-client}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-java</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-server</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-remote-driver</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-chrome-driver</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-api</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-support</artifactId>
+          <version>${version.selenium}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-json</artifactId>
+          <version>${version.jersey-json}</version>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${version.spring-boot}</version>
+            <configuration>
+              <mainClass>org.camunda.bpm.qa.Application</mainClass>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pre-integration-test</id>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>post-integration-test</id>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M3</version>
+            <configuration>
+              <dependenciesToScan>
+                <dependency>org.camunda.bpm.qa:camunda-qa-integration-tests-webapps</dependency>
+              </dependenciesToScan>
+              <skipTests>false</skipTests>
+            </configuration>
+            <executions>
+              <execution>
+                <id>default-test</id>
+                <configuration>
+                  <skip>true</skip>
+                </configuration>
+              </execution>
+              <execution>
+                <id>integration-tests</id>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <includes>
+                    <include>**/*IT.*</include>
+                  </includes>
+
+                  <excludes>
+                    <exclude>**/ErrorPageIT.*</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>1.3.0</version>
+            <executions>
+              <execution>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <url>https://chromedriver.storage.googleapis.com/${version.chromedriver}/chromedriver_${os.type}.zip</url>
+                  <outputFileName>chromedriver.zip</outputFileName>
+                  <unpack>true</unpack>
+                  <outputDirectory>${project.build.directory}/chromedriver</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +37,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInvocationContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Tests a concurrent attempt of a bootstrapping Process Engine to reconfigure
@@ -45,7 +51,7 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
   private static final String PROCESS_ENGINE_NAME = "historyCleanupJobEngine";
 
-  @Override
+  @Before
   public void setUp() throws Exception {
 
     // Ensure that current time is outside batch window
@@ -54,13 +60,9 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     ClockUtil.setCurrentTime(timeOfDay.getTime());
 
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
-
-    super.setUp();
   }
 
-  @Override
   protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
     final ProcessEngine otherProcessEngine = ProcessEngines.getProcessEngine(PROCESS_ENGINE_NAME);
     if (otherProcessEngine != null) {
 
@@ -84,29 +86,28 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     }
   }
 
-  @Override
+  @After
   public void tearDown() throws Exception {
-    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 
-        List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
-        if (jobs.size() > 0) {
-          assertEquals(1, jobs.size());
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
-
-        return null;
+      List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
+      if (jobs.size() > 0) {
+        assertEquals(1, jobs.size());
+        String jobId = jobs.get(0).getId();
+        commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
       }
+
+      return null;
     });
     ClockUtil.setCurrentTime(new Date());
-    super.tearDown();
+    closeDownProcessEngine();
   }
 
+  @Test
   public void testConcurrentHistoryCleanupJobReconfigurationExecution() throws InterruptedException {
 
-    getProcessEngine().getHistoryService().cleanUpHistoryAsync(true);
+    processEngine.getHistoryService().cleanUpHistoryAsync(true);
 
     ThreadControl thread1 = executeControllableCommand(new ControllableJobExecutionCommand());
     thread1.reportInterrupts();

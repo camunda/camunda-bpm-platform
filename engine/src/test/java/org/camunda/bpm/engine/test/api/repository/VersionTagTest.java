@@ -16,17 +16,21 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel.
  */
-public class VersionTagTest extends PluggableProcessEngineTestCase {
+public class VersionTagTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testParsingVersionTag() {
     ProcessDefinition process = repositoryService
       .createProcessDefinitionQuery()
@@ -38,6 +42,7 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
+  @Test
   public void testParsingNullVersionTag() {
     ProcessDefinition process = repositoryService
       .createProcessDefinitionQuery()
@@ -49,6 +54,7 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/versionTag.dmn"})
+  @Test
   public void testParsingVersionTagDecisionDefinition() {
     DecisionDefinition decision = repositoryService
     .createDecisionDefinitionQuery()
@@ -60,6 +66,7 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/noVersionTag.dmn"})
+  @Test
   public void testParsingNullVersionTagDecisionDefinition() {
     DecisionDefinition decision = repositoryService
       .createDecisionDefinitionQuery()

@@ -122,6 +122,7 @@
 
     <@lib.response
         code = "400"
+        dto = "ExceptionDto"
         last = true
         desc = "Returned if:
                 * no `messageName` was supplied

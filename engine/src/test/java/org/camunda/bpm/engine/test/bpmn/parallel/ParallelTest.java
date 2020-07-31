@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.parallel;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class ParallelTest extends PluggableProcessEngineTestCase {
+public class ParallelTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testParallel() {
     runtimeService.startProcessInstanceByKey("myProc");
   }

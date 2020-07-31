@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.MilestoneActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -25,14 +28,13 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionOccurTest extends PvmTestCase {
+public class CaseExecutionOccurTest {
 
   @Test
   public void testOccurMilestone() {

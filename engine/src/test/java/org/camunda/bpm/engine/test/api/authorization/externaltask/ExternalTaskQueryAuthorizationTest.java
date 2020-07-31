@@ -21,9 +21,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -32,13 +35,12 @@ import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
-
   protected String instance1Id;
   protected String instance2Id;
 
-  @Override
-  protected void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+  @Before
+  public void setUp() throws Exception {
+    deploymentId = testRule.deploy(
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml").getId();
 
@@ -47,12 +49,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testQueryWithoutAuthorization() {
     // when
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
@@ -61,6 +58,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
@@ -73,6 +71,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, query.list().get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testQueryWithReadOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -84,6 +83,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithReadInstanceOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE);
@@ -96,6 +96,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, query.list().get(0).getProcessInstanceId());
   }
 
+  @Test
   public void testQueryWithReadInstanceOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
@@ -107,6 +108,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithReadInstanceWithMultiple() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);

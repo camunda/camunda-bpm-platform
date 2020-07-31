@@ -16,29 +16,37 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  * @author Ingo Richtsmeier
  */
-public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
+public class DeploymentQueryTest extends PluggableProcessEngineTest {
 
   private String deploymentOneId;
   private String deploymentTwoId;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     deploymentOneId = repositoryService
       .createDeployment()
       .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
@@ -54,16 +62,17 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .deploy()
       .getId();
 
-    super.setUp();
+
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
+
     repositoryService.deleteDeployment(deploymentOneId, true);
     repositoryService.deleteDeployment(deploymentTwoId, true);
   }
 
+  @Test
   public void testQueryNoCriteria() {
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertEquals(2, query.list().size());
@@ -75,6 +84,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByDeploymentId() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentOneId);
     assertNotNull(query.singleResult());
@@ -82,6 +92,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidDeploymentId() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId("invalid");
     assertNull(query.singleResult());
@@ -94,6 +105,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByName() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml");
     assertNotNull(query.singleResult());
@@ -101,6 +113,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidName() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("invalid");
     assertNull(query.singleResult());
@@ -113,6 +126,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNameLike() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%camunda%");
     assertEquals(2, query.list().size());
@@ -124,6 +138,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", query.singleResult().getName());
   }
 
+  @Test
   public void testQueryByInvalidNameLike() {
     DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("invalid");
     assertNull(query.singleResult());
@@ -136,6 +151,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByDeploymentBefore() throws Exception {
     Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
     Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
@@ -154,6 +170,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryDeploymentAfter() throws Exception {
     Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
     Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
@@ -172,6 +189,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryBySource() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -181,6 +199,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByNullSource() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -190,6 +209,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidSource() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -199,6 +219,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.count());
   }
 
+  @Test
   public void testQueryDeploymentBetween() throws Exception {
     Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
     Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
@@ -231,6 +252,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, count);
   }
 
+  @Test
   public void testVerifyDeploymentProperties() {
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
       .orderByDeploymentName()
@@ -250,6 +272,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertNull(deploymentTwo.getTenantId());
   }
 
+  @Test
   public void testQuerySorting() {
     assertEquals(2, repositoryService.createDeploymentQuery()
         .orderByDeploymentName()

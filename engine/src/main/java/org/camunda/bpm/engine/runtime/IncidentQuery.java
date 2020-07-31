@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.runtime;
 
 import org.camunda.bpm.engine.query.Query;
 
+import java.util.Date;
+
 /**
  * @author roman.smirnov
  */
@@ -32,6 +34,14 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   /** Only select incidents which have the given incident message. **/
   IncidentQuery incidentMessage(String incidentMessage);
 
+  /**
+   * Only select incidents which incident message is like the given value.
+   *
+   * @param incidentMessageLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  IncidentQuery incidentMessageLike(String incidentMessageLike);
+
   /** Only select incidents which have the given process definition id. **/
   IncidentQuery processDefinitionId(String processDefinitionId);
 
@@ -43,6 +53,12 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
 
   /** Only select incidents with the given id. **/
   IncidentQuery executionId(String executionId);
+
+  /** Only select incidents which have an incidentTimestamp date before the given date **/
+  IncidentQuery incidentTimestampBefore(Date incidentTimestampBefore);
+
+  /** Only select incidents which have an incidentTimestamp date after the given date **/
+  IncidentQuery incidentTimestampAfter(Date incidentTimestampAfter);
 
   /** Only select incidents which contain an activity with the given id. **/
   IncidentQuery activityId(String activityId);

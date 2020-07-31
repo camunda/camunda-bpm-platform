@@ -16,21 +16,26 @@
  */
 package org.camunda.bpm.engine.rest.optimize;
 
+import io.restassured.response.Response;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import java.util.Collections;
 import java.util.Date;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -136,6 +141,27 @@ public class OptimizeHistoricIdentityLinkLogRestServiceTest extends AbstractRest
 
     verify(mockedOptimizeService).getHistoricIdentityLinkLogs(now, now, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
+  }
+
+  @Test
+  public void testPresenceOfProcessInstanceIdProperty() {
+    final OptimizeHistoricIdentityLinkLogEntity mock = mock(OptimizeHistoricIdentityLinkLogEntity.class);
+    when(mock.getProcessInstanceId()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mockedOptimizeService.getHistoricIdentityLinkLogs(null, null, Integer.MAX_VALUE))
+      .thenReturn(Collections.singletonList(mock));
+
+    final Response response = given()
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(MediaType.APPLICATION_JSON)
+      .when()
+        .get(OPTIMIZE_HISTORIC_IDENTITY_LINK_LOG_PATH);
+
+    String content = response.asString();
+    String processInstanceId = from(content).getString("[0].processInstanceId");
+
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, processInstanceId);
   }
 
 }

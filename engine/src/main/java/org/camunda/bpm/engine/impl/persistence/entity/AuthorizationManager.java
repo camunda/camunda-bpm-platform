@@ -26,6 +26,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
@@ -49,6 +50,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -431,6 +433,18 @@ public class AuthorizationManager extends AbstractManager {
 
   // delete authorizations //////////////////////////////////////////////////
 
+  public void deleteAuthorizationsByResourceIds(Resources resource,
+                                                List<String> resourceIds) {
+
+    if(resourceIds == null) {
+      throw new IllegalArgumentException("Resource ids cannot be null");
+    }
+
+    resourceIds.forEach(resourceId ->
+        deleteAuthorizationsByResourceId(resource, resourceId));
+
+  }
+
   public void deleteAuthorizationsByResourceId(Resource resource, String resourceId) {
 
     if(resourceId == null) {
@@ -676,13 +690,53 @@ public class AuthorizationManager extends AbstractManager {
   // historic process instance query ///////////////////////////////////
 
   public void configureHistoricProcessInstanceQuery(HistoricProcessInstanceQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheck(PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "SELF.ID_",
+              HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // historic activity instance query /////////////////////////////////
 
   public void configureHistoricActivityInstanceQuery(HistoricActivityInstanceQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // historic task instance query ////////////////////////////////////
@@ -702,6 +756,8 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
           .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
           .atomicCheck(HISTORIC_TASK, "RES.ID_", HistoricTaskPermissions.READ)
           .build();
 
@@ -746,6 +802,8 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
           .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", processDefinitionPermission)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
           .atomicCheck(HISTORIC_TASK, "TI.ID_", historicTaskPermission)
           .build();
 
@@ -757,13 +815,53 @@ public class AuthorizationManager extends AbstractManager {
   // historic job log query ////////////////////////////////
 
   public void configureHistoricJobLogQuery(HistoricJobLogQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY)
+            .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROCESS_INSTANCE_ID_",
+                HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // historic incident query ////////////////////////////////
 
   public void configureHistoricIncidentQuery(HistoricIncidentQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+            .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+                HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   //historic identity link query ////////////////////////////////
@@ -783,6 +881,8 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
           .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "TI.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
           .atomicCheck(HISTORIC_TASK, "RES.TASK_ID_", HistoricTaskPermissions.READ)
           .build();
 
@@ -798,19 +898,54 @@ public class AuthorizationManager extends AbstractManager {
   // historic external task log query /////////////////////////////////
 
   public void configureHistoricExternalTaskLogQuery(HistoricExternalTaskLogQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (!isHistoricInstancePermissionsEnabled) {
+      configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+
+    } else {
+      configureQuery(query);
+
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+            .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+                HistoricProcessInstancePermissions.READ)
+          .build();
+
+      addPermissionCheck(authCheck, permissionCheck);
+
+    }
   }
 
   // user operation log query ///////////////////////////////
 
   public void configureUserOperationLogQuery(UserOperationLogQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+    PermissionCheckBuilder permissionCheckBuilder = new PermissionCheckBuilder()
         .disjunctive()
           .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
-          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ)
-        .build();
-    addPermissionCheck(query.getAuthCheck(), permissionCheck);
+          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ);
+
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    boolean isHistoricInstancePermissionsEnabled = isHistoricInstancePermissionsEnabled();
+    authCheck.setHistoricInstancePermissionsEnabled(isHistoricInstancePermissionsEnabled);
+
+    if (isHistoricInstancePermissionsEnabled) {
+      permissionCheckBuilder
+          .atomicCheck(HISTORIC_PROCESS_INSTANCE, "RES.PROC_INST_ID_",
+              HistoricProcessInstancePermissions.READ)
+          .atomicCheck(HISTORIC_TASK, "RES.TASK_ID_",
+              HistoricTaskPermissions.READ);
+    }
+
+    CompositePermissionCheck permissionCheck = permissionCheckBuilder.build();
+
+    addPermissionCheck(authCheck, permissionCheck);
   }
 
   // batch

@@ -18,6 +18,11 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -25,7 +30,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -35,13 +39,15 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngineTestCase {
+public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngineTest {
 
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
@@ -52,6 +58,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   protected static final String SYNC_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationAtActivitiesTest.synchronous.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSingleActivityInstantiation() {
     // when
     ProcessInstance instance = runtimeService
@@ -72,10 +79,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSingleActivityInstantiationById() {
     // given
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -99,10 +107,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSingleActivityInstantiationSetBusinessKey() {
     // when
     ProcessInstance instance = runtimeService
@@ -117,6 +126,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testSingleActivityInstantiationSetCaseInstanceId() {
     // when
     ProcessInstance instance = runtimeService
@@ -131,6 +141,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartEventInstantiation() {
     // when
     ProcessInstance instance = runtimeService
@@ -151,10 +162,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartEventInstantiationWithVariables() {
     // when
     ProcessInstance instance = runtimeService
@@ -170,6 +182,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartWithInvalidInitialActivity() {
     try {
       // when
@@ -180,11 +193,12 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
-      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testMultipleActivitiesInstantiation() {
 
     // when
@@ -210,10 +224,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // and it is possible to end the process
     completeTasksInOrder("task1", "task2", "task1");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testMultipleActivitiesInstantiationWithVariables() {
     // when
     runtimeService
@@ -244,6 +259,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = SUBPROCESS_PROCESS)
+  @Test
   public void testNestedActivitiesInstantiation() {
     // when
     ProcessInstance instance = runtimeService
@@ -269,25 +285,27 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // and it is possible to end the process
     completeTasksInOrder("innerTask", "innerTask", "outerTask", "innerTask");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
+  @Test
   public void testStartNonExistingProcessDefinition() {
     try {
       runtimeService.createProcessInstanceById("I don't exist").startBeforeActivity("start").execute();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed process definition found with id", e.getMessage());
+      testRule.assertTextPresent("no deployed process definition found with id", e.getMessage());
     }
 
     try {
       runtimeService.createProcessInstanceByKey("I don't exist either").startBeforeActivity("start").execute();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no processes deployed with key", e.getMessage());
+      testRule.assertTextPresent("no processes deployed with key", e.getMessage());
     }
   }
 
+  @Test
   public void testStartNullProcessDefinition() {
     try {
       runtimeService.createProcessInstanceById(null).startBeforeActivity("start").execute();
@@ -305,6 +323,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = LISTENERS_PROCESS)
+  @Test
   public void testListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -342,6 +361,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = LISTENERS_PROCESS)
+  @Test
   public void testSkipListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -366,6 +386,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = IO_PROCESS)
+  @Test
   public void testIoMappingInvocation() {
     // when
     runtimeService
@@ -391,6 +412,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = IO_PROCESS)
+  @Test
   public void testSkipIoMappingInvocation() {
     // when
     runtimeService
@@ -403,6 +425,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = SUBPROCESS_PROCESS)
+  @Test
   public void testSetProcessInstanceVariable() {
     // when
     ProcessInstance instance = runtimeService
@@ -438,6 +461,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = ASYNC_PROCESS)
+  @Test
   public void testStartAsyncTask() {
     // when
     ProcessInstance instance = runtimeService
@@ -462,10 +486,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     managementService.executeJob(job.getId());
 
     completeTasksInOrder("task2");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = SYNC_PROCESS)
+  @Test
   public void testStartMultipleTasksInSyncProcess() {
     RecorderExecutionListener.clear();
 
@@ -479,7 +504,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     // then the request was successful even though the process instance has already ended
     assertNotNull(instance);
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
 
     // and the execution listener was invoked correctly
     List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
@@ -513,6 +538,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   }
 
   @Deployment
+  @Test
   public void testInitiatorVariable() {
     // given
     identityService.setAuthenticatedUserId("kermit");

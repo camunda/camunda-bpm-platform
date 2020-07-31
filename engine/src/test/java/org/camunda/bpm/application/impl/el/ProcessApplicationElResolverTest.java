@@ -16,23 +16,30 @@
  */
 package org.camunda.bpm.application.impl.el;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessApplicationElResolverTest extends PluggableProcessEngineTestCase {
+public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest {
 
   RuntimeContainerDelegate runtimeContainerDelegate = null;
 
   CallingProcessApplication callingApp;
   CalledProcessApplication calledApp;
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
     runtimeContainerDelegate.registerProcessEngine(processEngine);
 
@@ -43,6 +50,7 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
     calledApp.deploy();
   }
 
+  @After
   public void tearDown() {
 
     callingApp.undeploy();
@@ -57,6 +65,7 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
    * Tests that an expression for a call activity output parameter is resolved
    * in the context of the called process definition's application.
    */
+  @Test
   public void testCallActivityOutputExpression() {
     // given an instance of the calling process that calls the called process
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
@@ -74,6 +83,7 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
    * Tests that an expression on an outgoing flow leaving a call activity
    * is resolved in the context of the calling process definition's application.
    */
+  @Test
   public void testCallActivityConditionalOutgoingFlow() {
     // given an instance of the calling process that calls the called process
     runtimeService.startProcessInstanceByKey("callingProcessConditionalFlow");

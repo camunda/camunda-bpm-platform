@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,28 +33,34 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.CaseExecutionContext;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class VariableListenerTest extends PluggableProcessEngineTestCase {
+public class VariableListenerTest extends PluggableProcessEngineTest {
 
   protected Map<Object, Object> beans = null;
 
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
 
     LogVariableListener.reset();
     beans = processEngineConfiguration.getBeans();
   }
 
   @Deployment
+  @Test
   public void testAnyEventListenerByClass() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -110,6 +122,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testCreateEventListenerByClass() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -148,6 +161,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUpdateEventListenerByClass() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -189,6 +203,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment
+  @Test
   public void testVariableListenerInvokedFromSourceScope() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -223,6 +238,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDeleteEventListenerByClass() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -262,6 +278,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerByDelegateExpression() {
     beans.put("listener", new LogVariableListener());
 
@@ -290,6 +307,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerByExpression() {
     SimpleBean simpleBean = new SimpleBean();
     beans.put("bean", simpleBean);
@@ -310,6 +328,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerByScript() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -329,6 +348,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testListenerOnParentScope.cmmn")
+  @Test
   public void testListenerSourceExecution() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -357,6 +377,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testListenerOnParentScope() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -383,6 +404,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testChildListenersNotInvoked() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -398,6 +420,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testListenerOnAncestorScope() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -428,6 +451,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testInvalidListenerClassName() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -450,6 +474,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testListenerDoesNotImplementInterface() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -472,6 +497,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDelegateInstanceIsProcessEngineAware() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -491,7 +517,9 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
    * TODO: add when history for case execution variables is implemented
    */
   @Deployment
-  public void FAILING_testListenerDoesNotInterfereWithHistory() {
+  @Ignore
+  @Test
+  public void testListenerDoesNotInterfereWithHistory() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
       .create();
@@ -523,6 +551,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testListenerInvocationFinishesBeforeSubsequentInvocations() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -571,6 +600,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTwoListenersOnSameScope() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -608,6 +638,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerByClassWithFieldExpressions() {
     caseService
       .withCaseDefinitionByKey("case")
@@ -631,6 +662,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerByDelegateExpressionWithFieldExpressions() {
     beans.put("listener", new LogInjectedValuesListener());
 
@@ -656,6 +688,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableListenerExecutionContext() {
     CaseInstance caseInstance = caseService
       .withCaseDefinitionByKey("case")
@@ -682,6 +715,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testInvokeBuiltinListenersOnly() {
     // disable custom variable listener invocation
     processEngineConfiguration.setInvokeCustomVariableListeners(false);
@@ -718,6 +752,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setInvokeCustomVariableListeners(true);
   }
 
+  @Test
   public void testDefaultCustomListenerInvocationSetting() {
     assertTrue(processEngineConfiguration.isInvokeCustomVariableListeners());
   }
@@ -726,6 +761,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testVariableListenerWithProcessTask.cmmn",
       "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testVariableListenerWithProcessTask.bpmn20.xml"
       })
+  @Test
   public void testVariableListenerWithProcessTask() {
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("case");
 
@@ -754,10 +790,11 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
     LogVariableListener.reset();
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     beans.clear();
 
-    super.tearDown();
+
   }
 
 }

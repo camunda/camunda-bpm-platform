@@ -16,20 +16,25 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
  */
-public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTestCase {
+public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testScriptExpression() {
     String[] directions = new String[] { "left", "right" };
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -46,12 +51,13 @@ public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testScriptExpressionWithNonBooleanResult() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail("expected exception: invalid return value in script");
     } catch (ProcessEngineException e) {
-      assertTextPresent("condition script returns non-Boolean", e.getMessage());
+      testRule.assertTextPresent("condition script returns non-Boolean", e.getMessage());
     }
   }
 
@@ -59,6 +65,7 @@ public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTes
     "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.testScriptResourceExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/sequenceflow/condition-left.groovy"
   })
+  @Test
   public void testScriptResourceExpression() {
     String[] directions = new String[] { "left", "right" };
     Map<String, Object> variables = new HashMap<String, Object>();

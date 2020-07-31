@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -47,8 +48,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import junit.framework.AssertionFailedError;
 
 public class MultiTenancySingleProcessInstanceModificationAsyncTest {
 
@@ -136,7 +135,7 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
 
     // complete the process
     completeTasksInOrder("task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {

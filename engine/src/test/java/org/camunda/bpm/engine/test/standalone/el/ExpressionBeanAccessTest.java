@@ -16,23 +16,44 @@
  */
 package org.camunda.bpm.engine.test.standalone.el;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 
 /**
  * @author Frederik Heremans
  */
-public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
+public class ExpressionBeanAccessTest {
 
-  public ExpressionBeanAccessTest() {
-    super("org/camunda/bpm/engine/test/standalone/el/camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/el/camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
   }
 
   @Deployment
+  @Test
   public void testConfigurationBeanAccess() {
     // Exposed bean returns 'I'm exposed' when to-string is called in first service-task
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionBeanAccess");

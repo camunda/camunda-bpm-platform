@@ -19,14 +19,16 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
-public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -43,6 +45,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
   protected static final String RESULT_OF_VERSION_TAG_ONE = "A";
   protected static final String RESULT_OF_VERSION_TAG_TWO = "C";
 
+  @Test
   public void testEvaluateDecisionWithDeploymentBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -56,8 +59,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, process, DMN_FILE_VERSION_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -71,6 +74,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithLatestBindingSameVersion() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -84,8 +88,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, process, DMN_FILE_VERSION_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -99,6 +103,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithLatestBindingDifferentVersions() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -112,10 +117,10 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE, process);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_TWO, process, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -129,6 +134,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithVersionBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -143,11 +149,11 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE, process);
-    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, process, DMN_FILE_VERSION_TWO);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -161,10 +167,11 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
+  @Test
   public void testEvaluateDecisionWithVersionTagBinding() {
     // given
-    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TAG);
-    deployment(Bpmn.createExecutableProcess("process")
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE_VERSION_TAG);
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
           .camundaDecisionRef("decision")
@@ -186,6 +193,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionWithVersionTagBinding_ResolveTenantFromDefinition() {
     // given
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -200,8 +208,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
           .camundaAsyncBefore()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TAG, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TAG_TWO, process);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE_VERSION_TAG);
+    testRule.deployForTenant(TENANT_TWO, process, DMN_FILE_VERSION_TAG_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -215,6 +223,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_TWO));
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -226,8 +235,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, process);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       runtimeService.createProcessInstanceByKey("process")
@@ -240,6 +249,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     }
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithLatestBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -251,8 +261,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, process);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       runtimeService.createProcessInstanceByKey("process")
@@ -265,6 +275,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     }
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithVersionBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -277,10 +288,10 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE, process);
+    testRule.deployForTenant(TENANT_ONE, process, DMN_FILE);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE);
 
     try {
       runtimeService.createProcessInstanceByKey("process")
@@ -293,6 +304,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     }
   }
 
+  @Test
   public void testFailEvaluateDecisionFromOtherTenantWithVersionTagBinding() {
     // given
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -307,9 +319,9 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, process);
+    testRule.deployForTenant(TENANT_ONE, process);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TAG);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TAG);
 
     try {
       // when
@@ -324,6 +336,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     }
   }
 
+  @Test
   public void testEvaluateDecisionTenantIdConstant() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -338,9 +351,9 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
-    deployment(process);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(process);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
@@ -348,6 +361,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionWithoutTenantIdConstant() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -362,9 +376,9 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deployment(DMN_FILE);
-    deploymentForTenant(TENANT_ONE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(DMN_FILE);
+    testRule.deployForTenant(TENANT_ONE, process);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
@@ -372,6 +386,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionTenantIdExpression() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -386,9 +401,9 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .endEvent()
         .done();
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
-    deployment(process);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(process);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
@@ -396,6 +411,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  @Test
   public void testEvaluateDecisionTenantIdCompositeExpression() {
     // given
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -409,9 +425,9 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .camundaAsyncAfter()
       .endEvent()
       .done();
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
-    deployment(process);
+    testRule.deployForTenant(TENANT_ONE, DMN_FILE);
+    testRule.deployForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+   testRule.deploy(process);
 
     // when
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")

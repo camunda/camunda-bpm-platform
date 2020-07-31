@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.List;
 
@@ -27,7 +34,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
@@ -35,34 +41,39 @@ import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  * @author Thorben Lindhauer
  */
-public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
+public class BpmnDeploymentTest extends PluggableProcessEngineTest {
 
   DeploymentHandlerFactory defaultDeploymentHandlerFactory;
   DeploymentHandlerFactory customDeploymentHandlerFactory;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     defaultDeploymentHandlerFactory = processEngineConfiguration.getDeploymentHandlerFactory();
     customDeploymentHandlerFactory = new VersionedDeploymentHandlerFactory();
 
-    super.setUp();
+
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
-    super.tearDown();
+
   }
 
   @Deployment
+  @Test
   public void testGetBpmnXmlFileThroughService() {
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
@@ -103,13 +114,14 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
         .deploy();
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("id can be maximum 64 characters", e.getMessage());
+      testRule.assertTextPresent("id can be maximum 64 characters", e.getMessage());
     }
 
     // Verify that nothing is deployed
     assertEquals(0, repositoryService.createDeploymentQuery().count());
   }
 
+  @Test
   public void testDeploySameFileTwice() {
     String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
     repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
@@ -128,6 +140,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testDuplicateFilteringDefaultBehavior() {
     // given
     BpmnModelInstance oldModel = Bpmn.createExecutableProcess("versionedProcess")
@@ -135,24 +148,23 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance newModel = Bpmn.createExecutableProcess("versionedProcess")
       .camundaVersionTag("1").done();
 
-    deploymentIds.add(repositoryService.createDeployment()
+    testRule.deploy(repositoryService.createDeployment()
       .enableDuplicateFiltering(true)
       .addModelInstance("model", oldModel)
-      .name("defaultDeploymentHandling")
-      .deploy().getId());
+      .name("defaultDeploymentHandling"));
 
     // when
-    deploymentIds.add(repositoryService.createDeployment()
+    testRule.deploy(repositoryService.createDeployment()
       .enableDuplicateFiltering(true)
       .addModelInstance("model", newModel)
-      .name("defaultDeploymentHandling")
-      .deploy().getId());
+      .name("defaultDeploymentHandling"));
 
     // then
     long deploymentCount = repositoryService.createDeploymentQuery().count();
     assertEquals(2, deploymentCount);
   }
 
+  @Test
   public void testDuplicateFilteringCustomBehavior() {
     // given
     processEngineConfiguration.setDeploymentHandlerFactory(customDeploymentHandlerFactory);
@@ -161,20 +173,17 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance newModel = Bpmn.createExecutableProcess("versionedProcess")
       .camundaVersionTag("2").done();
 
-    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+    org.camunda.bpm.engine.repository.Deployment deployment1 = testRule
+        .deploy(repositoryService.createDeployment()
         .enableDuplicateFiltering(true)
         .addModelInstance("model.bpmn", oldModel)
-        .name("customDeploymentHandling")
-        .deploy();
-    deploymentIds.add(deployment1.getId());
+        .name("customDeploymentHandling"));
 
     // when
-    deploymentIds.add(repositoryService.createDeployment()
+    testRule.deploy(repositoryService.createDeployment()
         .enableDuplicateFiltering(true)
         .addModelInstance("model.bpmn", newModel)
-        .name("customDeploymentHandling")
-        .deploy()
-        .getId());
+        .name("customDeploymentHandling"));
 
     org.camunda.bpm.engine.repository.Deployment deployment3 = repositoryService.createDeployment()
         .enableDuplicateFiltering(true)
@@ -188,6 +197,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals(deployment1.getId(), deployment3.getId());
   }
 
+  @Test
   public void testPartialChangesDeployAll() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
@@ -220,6 +230,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deployment2.getId());
   }
 
+  @Test
   public void testPartialChangesDeployChangedOnly() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
@@ -275,6 +286,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deployment3.getId());
   }
 
+  @Test
   public void testPartialChangesRedeployOldVersion() {
     // deployment 1 deploys process version 1
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
@@ -306,6 +318,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deployment3.getId());
   }
 
+  @Test
   public void testDeployTwoProcessesWithDuplicateIdAtTheSameTime() {
     try {
       String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
@@ -321,6 +334,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeployDifferentFiles() {
     String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
     repositoryService.createDeployment().enableDuplicateFiltering(false).addClasspathResource(bpmnResourceName).name("twice").deploy();
@@ -340,6 +354,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deploymentList);
   }
 
+  @Test
   public void testDiagramCreationDisabled() {
     repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseDiagramInterchangeElements.bpmn20.xml").deploy();
 
@@ -368,6 +383,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg"
   })
+  @Test
   public void testProcessDiagramResource() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -377,7 +393,9 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     String diagramResourceName = processDefinition.getDiagramResourceName();
     assertEquals("org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg", diagramResourceName);
 
-    InputStream diagramStream = repositoryService.getResourceAsStream(deploymentId, "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg");
+    InputStream diagramStream = repositoryService
+        .getResourceAsStream(processDefinition.getDeploymentId(),
+                             "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.jpg");
     byte[] diagramBytes = IoUtil.readInputStream(diagramStream, "diagram stream");
     assertEquals(33343, diagramBytes.length);
   }
@@ -388,6 +406,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.b.jpg",
           "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testMultipleDiagramResourcesProvided.c.jpg"
         })
+  @Test
   public void testMultipleDiagramResourcesProvided() {
     ProcessDefinition processA = repositoryService.createProcessDefinitionQuery().processDefinitionKey("a").singleResult();
     ProcessDefinition processB = repositoryService.createProcessDefinitionQuery().processDefinitionKey("b").singleResult();
@@ -399,12 +418,14 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testProcessDefinitionDescription() {
     String id = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(id);
     assertEquals("This is really good process documentation!", processDefinition.getDescription());
   }
 
+  @Test
   public void testDeployInvalidExpression() {
     // ACT-1391: Deploying a process with invalid expressions inside should cause the deployment to fail, since
     // the process is not deployed and useless...
@@ -418,11 +439,12 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     catch(ProcessEngineException expected) {
       // Check if no deployments are made
       assertEquals(0, repositoryService.createDeploymentQuery().count());
-      assertTextPresent("ENGINE-01009 Error while parsing process", expected.getMessage());
+      testRule.assertTextPresent("ENGINE-01009 Error while parsing process", expected.getMessage());
     }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml"})
+  @Test
   public void testDeploymentIdOfResource() {
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
 
@@ -439,28 +461,30 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeployBpmnModelInstance() throws Exception {
 
     // given
     final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
 
     // when
-    deploymentWithBuilder(repositoryService.createDeployment()
+    testRule.deploy(repositoryService.createDeployment()
         .addModelInstance("foo.bpmn", modelInstance));
 
     // then
     assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionResourceName("foo.bpmn").singleResult());
   }
 
+  @Test
   public void testDeployAndGetProcessDefinition() throws Exception {
 
     // given process model
     final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
 
     // when process model is deployed
-    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
-    deploymentIds.add(deployment.getId());
+    DeploymentWithDefinitions deployment = testRule.deploy(
+        repositoryService.createDeployment()
+            .addModelInstance("foo.bpmn", modelInstance));
 
     // then deployment contains deployed process definitions
     List<ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
@@ -476,15 +500,15 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals(persistedProcDef.getId(), deployedProcessDefinitions.get(0).getId());
   }
 
+  @Test
   public void testDeployNonExecutableProcess() throws Exception {
 
     // given non executable process definition
     final BpmnModelInstance modelInstance = Bpmn.createProcess("foo").startEvent().userTask().endEvent().done();
 
     // when process model is deployed
-    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
-    deploymentIds.add(deployment.getId());
+    DeploymentWithDefinitions deployment = testRule.deploy(repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance));
 
     // then deployment contains no deployed process definition
     assertNull(deployment.getDeployedProcessDefinitions());

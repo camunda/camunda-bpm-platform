@@ -18,17 +18,44 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class CancelAcquiredJobTest extends PluggableProcessEngineTestCase {
+public class CancelAcquiredJobTest {
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void initializeServices() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+  }
 
   @Deployment
+  @Test
   public void testBothJobsAcquiredAtSameTime() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -36,7 +63,7 @@ public class CancelAcquiredJobTest extends PluggableProcessEngineTestCase {
     // move clock by 20 seconds -> both jobs are acquirable:
     ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + (20 * 1000)));
 
-    waitForJobExecutorToProcessAllJobs(6000);
+    testRule.waitForJobExecutorToProcessAllJobs(6000);
 
   }
 

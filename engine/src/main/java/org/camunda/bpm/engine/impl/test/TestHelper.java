@@ -16,10 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.test;
 
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
@@ -29,14 +41,14 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
@@ -50,11 +62,6 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
-
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.*;
 
 
 /**
@@ -489,55 +496,47 @@ public abstract class TestHelper {
 
   public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
-        .execute(new Command<Object>() {
-          public Object execute(CommandContext commandContext) {
+        .execute(commandContext -> {
 
-            commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
-            return null;
-          }
+          commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
+          return null;
         });
   }
 
   public static void dropSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
-        .execute(new Command<Object>() {
-         public Object execute(CommandContext commandContext) {
-           commandContext.getDbSqlSession().dbSchemaDrop();
-           return null;
-         }
+        .execute(commandContext -> {
+          commandContext.getDbSqlSession().dbSchemaDrop();
+          return null;
         });
   }
 
   public static void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           if (processEngineConfiguration.getHistoryLevel().getId() != new Integer(historyLevelProperty.getValue())) {
-             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
-             dbEntityManager.merge(historyLevelProperty);
-           }
-         } else {
-           HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
-         }
-         return null;
-       }
+      .execute(commandContext -> {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
+        if (historyLevelProperty != null) {
+          if (processEngineConfiguration.getHistoryLevel().getId() != new Integer(historyLevelProperty.getValue())) {
+            historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
+            dbEntityManager.merge(historyLevelProperty);
+          }
+        } else {
+          HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
+        }
+        return null;
       });
   }
 
   public static void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           dbEntityManager.delete(historyLevelProperty);
-         }
-         return null;
-       }
+      .execute(commandContext -> {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
+        if (historyLevelProperty != null) {
+          dbEntityManager.delete(historyLevelProperty);
+        }
+        return null;
       });
   }
 
@@ -551,7 +550,33 @@ public abstract class TestHelper {
     }
   }
 
+  public static void deleteTelemetryProperty(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(commandContext -> {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity telemetryProperty = dbEntityManager.selectById(PropertyEntity.class, "camunda.telemetry.enabled");
+        if (telemetryProperty != null) {
+          dbEntityManager.delete(telemetryProperty);
+        }
+        return null;
+      });
+  }
 
+  public static void deleteInstallationId(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(commandContext -> {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity installationIdProperty = dbEntityManager.selectById(PropertyEntity.class, "camunda.installation.id");
+        if (installationIdProperty != null) {
+          dbEntityManager.delete(installationIdProperty);
+        }
+        return null;
+      });
+  }
 
-
+  public static Object defaultManualActivation() {
+    Expression expression = new FixedValue(true);
+    CaseControlRuleImpl caseControlRule = new CaseControlRuleImpl(expression);
+    return caseControlRule;
+  }
 }

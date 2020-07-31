@@ -17,10 +17,10 @@
 package org.camunda.bpm.engine.test.api.authorization.history;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 
@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -57,7 +58,7 @@ import org.junit.Test;
 public class UserOperationIdTest {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Rule
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -80,7 +81,6 @@ public class UserOperationIdTest {
     taskService = engineRule.getTaskService();
     formService = engineRule.getFormService();
     identityService = engineRule.getIdentityService();
-
   }
 
   @Test

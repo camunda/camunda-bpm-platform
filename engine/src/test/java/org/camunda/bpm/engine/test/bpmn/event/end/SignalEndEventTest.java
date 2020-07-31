@@ -16,20 +16,25 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.end;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Kristin Polenz
  */
-public class SignalEndEventTest extends PluggableProcessEngineTestCase {
+public class SignalEndEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testCatchSignalEndEventInEmbeddedSubprocess() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignalEndEventInEmbeddedSubprocess");
     assertNotNull(processInstance);
@@ -45,13 +50,14 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     assertEquals("task after catching the signal", task.getName());
 
     taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources={
       "org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml"
     })
+  @Test
   public void testCatchSignalEndEventInCallActivity() throws Exception {
     // first, start process to wait of the signal event
     ProcessInstance processInstanceCatchEvent = runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
@@ -64,7 +70,7 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     // start process which throw the signal end event
     ProcessInstance processInstanceEndEvent = runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
     assertNotNull(processInstanceEndEvent);
-    assertProcessEnded(processInstanceEndEvent.getId());
+    testRule.assertProcessEnded(processInstanceEndEvent.getId());
 
     // user task of process catchSignalEndEvent
     assertEquals(1, taskService.createTaskQuery().count());
@@ -74,11 +80,12 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     // complete user task
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstanceCatchEvent.getId());
+    testRule.assertProcessEnded(processInstanceCatchEvent.getId());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
+  @Test
   public void testPropagateOutputVariablesWhileThrowSignal() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
@@ -95,6 +102,7 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal2.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
+  @Test
   public void testPropagateOutputVariablesWhileThrowSignal2() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();

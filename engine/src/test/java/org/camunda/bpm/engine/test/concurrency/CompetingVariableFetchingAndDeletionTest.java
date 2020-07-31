@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.model.bpmn.Bpmn.createExecutableProcess;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.junit.Test;
 
 /**
  * This test makes sure that if one thread loads a variable
@@ -73,9 +76,10 @@ public class CompetingVariableFetchingAndDeletionTest extends ConcurrencyTestCas
 
   private ThreadControl asyncThread;
 
+  @Test
   public void testConcurrentFetchAndDelete() {
 
-    deployment(createExecutableProcess("test")
+   testRule.deploy(createExecutableProcess("test")
         .startEvent()
           .userTask()
         .endEvent()

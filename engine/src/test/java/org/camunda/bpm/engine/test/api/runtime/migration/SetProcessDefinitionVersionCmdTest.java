@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +32,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -37,13 +40,15 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 
 /**
  * @author Falko Menge
  */
-public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTestCase {
+public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTest {
 
   private static final String TEST_PROCESS_WITH_PARALLEL_GATEWAY = "org/camunda/bpm/engine/test/bpmn/gateway/ParallelGatewayTest.testForkJoin.bpmn20.xml";
   private static final String TEST_PROCESS = "org/camunda/bpm/engine/test/api/runtime/migration/SetProcessDefinitionVersionCmdTest.testSetProcessDefinitionVersion.bpmn20.xml";
@@ -63,47 +68,50 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
 
   private static final String TEST_PROCESS_ATTACHED_TIMER = "org/camunda/bpm/engine/test/api/runtime/migration/SetProcessDefinitionVersionCmdTest.testAttachedTimer.bpmn20.xml";
 
+  @Test
   public void testSetProcessDefinitionVersionEmptyArguments() {
     try {
       new SetProcessDefinitionVersionCmd(null, 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory: processInstanceId is null", ae.getMessage());
+      testRule.assertTextPresent("The process instance id is mandatory: processInstanceId is null", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("", 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory: processInstanceId is empty", ae.getMessage());
+       testRule.assertTextPresent("The process instance id is mandatory: processInstanceId is empty", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version is mandatory: processDefinitionVersion is null", ae.getMessage());
+       testRule.assertTextPresent("The process definition version is mandatory: processDefinitionVersion is null", ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", -1);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version must be positive: processDefinitionVersion is not greater than 0", ae.getMessage());
+       testRule.assertTextPresent("The process definition version must be positive: processDefinitionVersion is not greater than 0", ae.getMessage());
     }
   }
 
+  @Test
   public void testSetProcessDefinitionVersionNonExistingPI() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     try {
       commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("No process instance found for id = '42'.", ae.getMessage());
+       testRule.assertTextPresent("No process instance found for id = '42'.", ae.getMessage());
     }
   }
 
   @Deployment(resources = {TEST_PROCESS_WITH_PARALLEL_GATEWAY})
+  @Test
   public void testSetProcessDefinitionVersionPIIsSubExecution() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
@@ -117,11 +125,12 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       commandExecutor.execute(command);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("A process instance id is required, but the provided id '"+execution.getId()+"' points to a child execution of process instance '"+pi.getId()+"'. Please invoke the "+command.getClass().getSimpleName()+" with a root execution id.", ae.getMessage());
+       testRule.assertTextPresent("A process instance id is required, but the provided id '"+execution.getId()+"' points to a child execution of process instance '"+pi.getId()+"'. Please invoke the "+command.getClass().getSimpleName()+" with a root execution id.", ae.getMessage());
     }
   }
 
   @Deployment(resources = {TEST_PROCESS})
+  @Test
   public void testSetProcessDefinitionVersionNonExistingPD() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
@@ -131,11 +140,12 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no processes deployed with key = 'receiveTask', version = '23'", ae.getMessage());
+       testRule.assertTextPresent("no processes deployed with key = 'receiveTask', version = '23'", ae.getMessage());
     }
   }
 
   @Deployment(resources = {TEST_PROCESS})
+  @Test
   public void testSetProcessDefinitionVersionActivityMissing() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
@@ -160,7 +170,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       commandExecutor.execute(setProcessDefinitionVersionCmd);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '", ae.getMessage());
+       testRule.assertTextPresent("The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '", ae.getMessage());
     }
 
     // undeploy "manually" deployed process definition
@@ -168,6 +178,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment
+  @Test
   public void testSetProcessDefinitionVersion() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
@@ -219,6 +230,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = {TEST_PROCESS_WITH_PARALLEL_GATEWAY})
+  @Test
   public void testSetProcessDefinitionVersionSubExecutions() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
@@ -255,6 +267,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = {TEST_PROCESS_CALL_ACTIVITY})
+  @Test
   public void testSetProcessDefinitionVersionWithCallActivity() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("parentProcess");
@@ -288,6 +301,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = {TEST_PROCESS_USER_TASK_V1})
+  @Test
   public void testSetProcessDefinitionVersionWithWithTask() {
     try {
     // start process instance
@@ -316,7 +330,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     // continue
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
 
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
@@ -327,6 +341,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = TEST_PROCESS_SERVICE_TASK_V1)
+  @Test
   public void testSetProcessDefinitionVersionWithFollowUpTask() {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -350,6 +365,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = {TEST_PROCESS_WITH_MULTIPLE_PARENTS})
+  @Test
   public void testSetProcessDefinitionVersionWithMultipleParents(){
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleJoins");
@@ -401,6 +417,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
+  @Test
   public void testSetProcessDefinitionVersionMigrateJob() {
     // given a process instance
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneJobProcess");
@@ -439,6 +456,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = TEST_PROCESS_TWO_JOBS)
+  @Test
   public void testMigrateJobWithMultipleDefinitionsOnActivity() {
     // given a process instance
     ProcessInstance asyncAfterInstance = runtimeService.startProcessInstanceByKey("twoJobsProcess");
@@ -499,13 +517,14 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
+  @Test
   public void testSetProcessDefinitionVersionMigrateIncident() {
     // given a process instance
     ProcessInstance instance =
         runtimeService.startProcessInstanceByKey("oneJobProcess", Variables.createVariables().putValue("shouldFail", true));
 
     // with a failed job
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // and an incident
     Incident incident = runtimeService.createIncidentQuery().singleResult();
@@ -539,12 +558,13 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
+  @Test
   public void testPreserveTimestampOnUpdatedIncident() {
     // given
     ProcessInstance instance =
         runtimeService.startProcessInstanceByKey("oneJobProcess", Variables.createVariables().putValue("shouldFail", true));
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     Incident incident = runtimeService.createIncidentQuery().singleResult();
     assertNotNull(incident);
@@ -574,6 +594,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = TEST_PROCESS_ATTACHED_TIMER)
+  @Test
   public void testSetProcessDefinitionVersionAttachedTimer() {
     // given a process instance
     ProcessInstance instance =
@@ -600,6 +621,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
   public void testHistoryOfSetProcessDefinitionVersionCmd() {
     // given
     String resource = "org/camunda/bpm/engine/test/api/runtime/migration/SetProcessDefinitionVersionCmdTest.bpmn";
@@ -652,6 +674,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     repositoryService.deleteDeployment(secondDeployment.getId(), true);
   }
 
+  @Test
   public void testOpLogSetProcessDefinitionVersionCmd() {
     // given
     try {

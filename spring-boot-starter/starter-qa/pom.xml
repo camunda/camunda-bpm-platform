@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <packaging>pom</packaging>
@@ -14,18 +14,16 @@
   <artifactId>camunda-bpm-spring-boot-starter-qa</artifactId>
   <name>camunda BPM - Spring Boot Starter - QA - Root Pom</name>
 
-  <modules>
-    <module>integration-test-simple</module>
-    <module>integration-test-webapp</module>
-    <module>integration-test-plugins</module>
-  </modules>
-
   <profiles>  
     <profile>
       <id>distro</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <modules>
+        <module>integration-test-simple</module>
+        <module>integration-test-plugins</module>
+      </modules>
       <build>
         <pluginManagement>
           <plugins>
@@ -39,6 +37,39 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>integration-test-webapp</module>
+      </modules>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <skipTests>true</skipTests>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>distro-starter</id>
+      <!-- This profile is run in the release CI for building the enterprise artifacts
+          It can be removed if the webapp repo is merged to the platform and
+          distro-ce is not used for building the spring boot starter -->
+      <modules>
+        <module>integration-test-simple</module>
+        <module>integration-test-plugins</module>
+        <module>integration-test-webapp</module>
+      </modules>
     </profile>
   </profiles>
 

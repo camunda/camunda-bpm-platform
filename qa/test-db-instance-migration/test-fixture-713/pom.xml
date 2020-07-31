@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-713</artifactId>
@@ -12,23 +12,20 @@
   <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.13.0</name>
 
   <properties>
-    <!-- comment when 7.X is released -->
-    <camunda.version.current>${project.version}</camunda.version.current>
     <camunda.version.previous>7.12.0</camunda.version.previous>
   </properties>
 
-  <!-- uncomment when 7.X is released -->
-  <!-- <dependencyManagement>
+  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
-        <version>7.X.0</version>
+        <version>7.13.0</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
     </dependencies>
-  </dependencyManagement> -->
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -66,38 +63,6 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-current-sql-scripts</id>
-              <phase>generate-test-sources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.distro</groupId>
-                    <artifactId>camunda-sql-scripts</artifactId>
-                    <!-- Replace after 7.13.0 release -->
-                    <version>${camunda.version.current}</version>
-                    <!--<version>7.13.0</version>-->
-                    <type>test-jar</type>
-                    <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                    <overWrite>true</overWrite>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <profiles>
@@ -147,6 +112,27 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-current-sql-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>7.13.0</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
 
           <!-- parse version properties from qa/pom.xml -->
@@ -161,9 +147,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <!-- Replace after 7.13.0 release -->
-                  <versionString>${camunda.version.current}</versionString>
-                  <!--<versionString>7.13.0</versionString>-->
+                  <versionString>7.13.0</versionString>
                 </configuration>
               </execution>
               <execution>
@@ -231,8 +215,7 @@
               -->
             </executions>
           </plugin>
-          <!-- uncomment when 7.X is released -->
-          <!--<plugin>
+          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
@@ -253,7 +236,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>-->
+          </plugin>
         </plugins>
       </build>
     </profile>

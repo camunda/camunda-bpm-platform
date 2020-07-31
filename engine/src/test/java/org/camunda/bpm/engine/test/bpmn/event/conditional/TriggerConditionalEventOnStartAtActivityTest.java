@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>

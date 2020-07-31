@@ -35,6 +35,8 @@ public class DbEntityOperation extends DbOperation {
   protected DbEntity entity;
 
   protected Set<String> flushRelevantEntityReferences;
+  
+  protected DbOperation dependentOperation;
 
   public void recycle() {
     entity = null;
@@ -60,6 +62,14 @@ public class DbEntityOperation extends DbOperation {
 
   public String toString() {
     return operationType + " " + ClassNameUtil.getClassNameWithoutPackage(entity)+"["+entity.getId()+"]";
+  }
+  
+  public void setDependency(DbOperation owner) {
+    dependentOperation = owner;
+  }
+  
+  public DbOperation getDependentOperation() {
+    return dependentOperation;
   }
 
   @Override

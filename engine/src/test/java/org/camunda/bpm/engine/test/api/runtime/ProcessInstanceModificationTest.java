@@ -22,7 +22,13 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +36,6 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -41,13 +46,15 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationTest extends PluggableProcessEngineTest {
 
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
@@ -67,6 +74,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   protected static final String CALL_ACTIVITY_CHILD_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityChildProcess.bpmn";
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -87,10 +95,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testCancellationThatEndsProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
 
@@ -101,10 +110,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
       .execute();
       
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  @Test
   public void testCancellationWithWrongProcessInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
 
@@ -115,7 +125,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
         .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
         .execute();
-      assertProcessEnded(processInstance.getId());
+      testRule.assertProcessEnded(processInstance.getId());
 
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), startsWith("ENGINE-13036"));
@@ -124,6 +134,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartBefore() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -145,10 +156,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartBeforeWithAncestorInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -172,10 +184,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartBeforeWithAncestorInstanceIdTwoScopesUp() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -222,10 +235,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartBeforeWithInvalidAncestorInstanceId() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -236,7 +250,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance 'noValidActivityInstanceId'; "
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance 'noValidActivityInstanceId'; "
           + "Ancestor activity instance 'noValidActivityInstanceId' does not exist", e.getMessage());
     }
 
@@ -245,7 +259,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
+      testRule.assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
@@ -256,12 +270,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance '" + subProcessTaskId + "'; "
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance '" + subProcessTaskId + "'; "
           + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'subProcess'", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartBeforeNonExistingActivity() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
@@ -272,7 +287,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
-      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
     }
   }
 
@@ -280,6 +295,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
    * CAM-3718
    */
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testEndProcessInstanceIntermediately() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -301,10 +317,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartTransition() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -326,10 +343,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartTransitionWithAncestorInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -353,10 +371,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartTransitionWithAncestorInstanceIdTwoScopesUp() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -403,10 +422,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartTransitionWithInvalidAncestorInstanceId() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -417,7 +437,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance 'noValidActivityInstanceId'; "
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance 'noValidActivityInstanceId'; "
           + "Ancestor activity instance 'noValidActivityInstanceId' does not exist", e.getMessage());
     }
 
@@ -426,7 +446,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
+      testRule.assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
@@ -437,12 +457,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance '" + subProcessTaskId + "'; "
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance '" + subProcessTaskId + "'; "
           + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartTransitionCase2() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -464,10 +485,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task1");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartTransitionInvalidTransitionId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -479,12 +501,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start transition 'invalidFlowId'; " + "Element 'invalidFlowId' does not exist in process '"
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start transition 'invalidFlowId'; " + "Element 'invalidFlowId' does not exist in process '"
           + processInstance.getProcessDefinitionId() + "'", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartAfter() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -506,10 +529,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task1");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartAfterWithAncestorInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -533,10 +557,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("task1", "task1");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartAfterWithAncestorInstanceIdTwoScopesUp() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -583,10 +608,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // complete the process
     completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = DOUBLE_NESTED_SUB_PROCESS)
+  @Test
   public void testStartAfterWithInvalidAncestorInstanceId() {
     // given two instances of the outer subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
@@ -598,7 +624,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent(
+      testRule.assertTextPresent(
           "Cannot perform instruction: " + "Start after activity 'innerSubProcessStart' with ancestor activity instance 'noValidActivityInstanceId'; "
               + "Ancestor activity instance 'noValidActivityInstanceId' does not exist",
           e.getMessage());
@@ -609,7 +635,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
+      testRule.assertTextPresent("ancestorActivityInstanceId is null", e.getMessage());
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
@@ -620,12 +646,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: " + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + subProcessTaskId
+      testRule.assertTextPresent("Cannot perform instruction: " + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + subProcessTaskId
           + "'; " + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartAfterActivityAmbiguousTransitions() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -637,11 +664,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("activity has more than one outgoing sequence flow", e.getMessage());
+      testRule.assertTextPresent("activity has more than one outgoing sequence flow", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartAfterActivityNoOutgoingTransitions() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -653,11 +681,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("activity has no outgoing sequence flow to take", e.getMessage());
+      testRule.assertTextPresent("activity has no outgoing sequence flow to take", e.getMessage());
     }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartAfterNonExistingActivity() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
@@ -668,12 +697,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
-      assertTextPresentIgnoreCase("Cannot perform instruction: " + "Start after activity 'someNonExistingActivity'; "
+      testRule.assertTextPresentIgnoreCase("Cannot perform instruction: " + "Start after activity 'someNonExistingActivity'; "
           + "Activity 'someNonExistingActivity' does not exist: activity is null", e.getMessage());
     }
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testScopeTaskStartBefore() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -693,10 +723,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     assertEquals(2, taskService.createTaskQuery().count());
     completeTasksInOrder("theTask", "theTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testScopeTaskStartAfter() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -730,10 +761,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .concurrent().noScope().child("theTask").scope().done());
 
     completeTasksInOrder("theTask", "theTask");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = SUBPROCESS_BOUNDARY_EVENTS_PROCESS)
+  @Test
   public void testStartBeforeEventSubscription() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
 
@@ -762,6 +794,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = SUBPROCESS_LISTENER_PROCESS)
+  @Test
   public void testActivityExecutionListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -808,6 +841,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = SUBPROCESS_LISTENER_PROCESS)
+  @Test
   public void testSkipListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -842,6 +876,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = TASK_LISTENER_PROCESS)
+  @Test
   public void testSkipTaskListenerInvocation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess",
         Collections.<String, Object> singletonMap("listener", new RecorderTaskListener()));
@@ -867,6 +902,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = IO_MAPPING_PROCESS)
+  @Test
   public void testSkipIoMappings() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
 
@@ -887,6 +923,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS)
+  @Test
   public void testSkipIoMappingsOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -902,6 +939,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
    * completing within the modification command.
    */
   @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
+  @Test
   public void testSkipIoMappingsOnSubProcessNested() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -912,6 +950,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = LISTENERS_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
+  @Test
   public void testSkipListenersOnSubProcessNested() {
     RecorderExecutionListener.clear();
 
@@ -920,13 +959,14 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("boundaryEvent").execute(true, false);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     // then the output mapping should not have executed
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
   }
 
   @Deployment(resources = TRANSITION_LISTENER_PROCESS)
+  @Test
   public void testStartTransitionListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -956,10 +996,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     completeTasksInOrder("task1", "task2", "task2");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = TRANSITION_LISTENER_PROCESS)
+  @Test
   public void testStartAfterActivityListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -989,10 +1030,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     completeTasksInOrder("task1", "task2", "task2");
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testStartBeforeWithVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
@@ -1016,10 +1058,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals("localMapValue", runtimeService.getVariableLocal(task2ExecutionId, "localMapVar"));
 
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testCancellationAndStartBefore() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -1040,10 +1083,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertThat(executionTree).matches(describeExecutionTree("task2").scope().done());
 
     completeTasksInOrder("task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCompensationRemovalOnCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
 
@@ -1064,6 +1108,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment
+  @Test
   public void testCompensationCreation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
 
@@ -1090,10 +1135,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     // complete process
     completeTasksInOrder("taskAfterSubprocess", "innerAfterBoundaryTask", "outerAfterBoundaryTask");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testNoCompensationCreatedOnCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
@@ -1114,10 +1160,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartActivityInTransactionWithCompensation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -1146,10 +1193,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotSame(task.getId(), newTask.getId());
 
     completeTasksInOrder("undoTask", "afterCancel");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartActivityWithAncestorInTransactionWithCompensation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -1171,10 +1219,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .endScope().beginScope("tx").activity("txEnd").activity("undoTask").done());
 
     completeTasksInOrder("undoTask", "undoTask", "afterCancel", "afterCancel");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartAfterActivityDuringCompensation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -1189,10 +1238,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals("afterCancel", task.getTaskDefinitionKey());
 
     completeTasksInOrder("afterCancel");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testCancelCompensatingTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1201,10 +1251,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask")).execute();
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testCancelCompensatingTaskAndStartActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1219,10 +1270,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testCancelCompensatingTaskAndStartActivityWithAncestor() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1237,10 +1289,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartActivityAndCancelCompensatingTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1255,10 +1308,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartCompensatingTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -1271,10 +1325,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartAdditionalCompensatingTaskAndCompleteOldCompensationTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1294,10 +1349,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartAdditionalCompensatingTaskAndCompleteNewCompensatingTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1323,10 +1379,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartCompensationBoundary() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -1335,7 +1392,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
       fail("should not succeed");
     } catch (ProcessEngineException e) {
-      assertTextPresent("compensation boundary event", e.getMessage());
+      testRule.assertTextPresent("compensation boundary event", e.getMessage());
     }
 
     try {
@@ -1343,11 +1400,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
       fail("should not succeed");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no outgoing sequence flow", e.getMessage());
+      testRule.assertTextPresent("no outgoing sequence flow", e.getMessage());
     }
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartCancelEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1359,10 +1417,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartCancelBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1374,10 +1433,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  @Test
   public void testStartTaskAfterCancelBoundaryEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
@@ -1390,10 +1450,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     completeTasksInOrder("afterCancel", "undoTask", "afterCancel");
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testCancelNonExistingActivityInstance() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
@@ -1403,13 +1464,14 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       runtimeService.createProcessInstanceModification(instance.getId()).cancelActivityInstance("nonExistingActivityInstance").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
-      assertTextPresent("Cannot perform instruction: Cancel activity instance 'nonExistingActivityInstance'; "
+      testRule.assertTextPresent("Cannot perform instruction: Cancel activity instance 'nonExistingActivityInstance'; "
           + "Activity instance 'nonExistingActivityInstance' does not exist", e.getMessage());
     }
 
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  @Test
   public void testCancelNonExistingTranisitionInstance() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
@@ -1419,7 +1481,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
       runtimeService.createProcessInstanceModification(instance.getId()).cancelTransitionInstance("nonExistingActivityInstance").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
-      assertTextPresent("Cannot perform instruction: Cancel transition instance 'nonExistingActivityInstance'; "
+      testRule.assertTextPresent("Cannot perform instruction: Cancel transition instance 'nonExistingActivityInstance'; "
           + "Transition instance 'nonExistingActivityInstance' does not exist", e.getMessage());
     }
 
@@ -1438,15 +1500,16 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
         .cancelActivityInstance(getInstanceIdForActivity(subProcessActivityInst, "innerTask")).execute();
 
     // then
-    assertProcessEnded(parentprocess.getId());
+    testRule.assertProcessEnded(parentprocess.getId());
   }
 
+  @Test
   public void testModifyNullProcessInstance() {
     try {
       runtimeService.createProcessInstanceModification(null).startBeforeActivity("someActivity").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
-      assertTextPresent("processInstanceId is null", e.getMessage());
+      testRule.assertTextPresent("processInstanceId is null", e.getMessage());
     }
   }
 

@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.cmmn;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,20 +31,22 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase {
+public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKey() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -74,6 +83,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(caseInstance.isEnabled(), instance.isEnabled());
   }
 
+  @Test
   public void testCreateByInvalidKey() {
     try {
       caseService
@@ -92,6 +102,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateById() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -129,6 +140,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
 
   }
 
+  @Test
   public void testCreateByInvalidId() {
     try {
       caseService
@@ -147,6 +159,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithBusinessKey() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -186,6 +199,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithBusinessKey() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -225,6 +239,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithVariable() {
     // given a deployed case definition
 
@@ -266,6 +281,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithVariables() {
     // given a deployed case definition
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -310,6 +326,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithVariable() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -355,6 +372,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithVariables() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -404,6 +422,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testManualStart() {
     // given:
     // a deployed case definition
@@ -430,6 +449,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testDisable() {
     // given:
     // a deployed case definition
@@ -455,6 +475,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testReenable() {
     // given:
     // a deployed case definition
@@ -480,6 +501,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testCompleteWithEnabledTask() {
     // given:
     // a deployed case definition
@@ -520,6 +542,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testCompleteWithEnabledStage() {
     // given:
     // a deployed case definition
@@ -574,6 +597,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCompleteWithActiveTask() {
     // given:
     // a deployed case definition
@@ -617,6 +641,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Test
   public void testCompleteWithActiveStage() {
     // given:
     // a deployed case definition
@@ -667,6 +692,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyCasePlanModelCase.cmmn"})
+  @Test
   public void testAutoCompletionOfEmptyCase() {
     // given:
     // a deployed case definition
@@ -691,6 +717,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCloseAnActiveCaseInstance() {
     // given:
     // a deployed case definition
@@ -723,6 +750,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testCloseACompletedCaseInstance() {
     // given:
     // a deployed case definition
@@ -761,6 +789,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testTerminateActiveCaseInstance() {
     // given:
     String caseDefinitionId = repositoryService
@@ -788,6 +817,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testTerminateNonActiveCaseInstance() {
     // given:
     String caseDefinitionId = repositoryService
@@ -818,6 +848,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testTerminateActiveCaseInstanceNonFluent() {
     // given:
     String caseDefinitionId = repositoryService
@@ -844,6 +875,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -879,6 +911,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -914,6 +947,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithBusinessKeyNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -949,6 +983,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithBusinessKeyNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -984,6 +1019,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithVariablesNonFluent() {
     // given a deployed case definition
 
@@ -1006,6 +1042,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithVariablesNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -1031,6 +1068,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByKeyWithVariablesAndBusinessKeyNonFluent() {
     // given a deployed case definition
 
@@ -1050,6 +1088,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCreateByIdWithVariablesAndBusinessKeyNonFluent() {
     // given a deployed case definition
     String caseDefinitionId = repositoryService
@@ -1073,6 +1112,7 @@ public class CaseServiceCaseInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
+  @Test
   public void testCloseNonFluent() {
     // given:
     // a deployed case definition

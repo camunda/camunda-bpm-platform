@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.application.impl.embedded;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Set;
 
@@ -24,16 +29,19 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCase {
+public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTest {
 
   protected RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
   protected boolean defaultEngineRegistered;
@@ -43,18 +51,19 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     defaultEngineRegistered = true;
   }
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     defaultEngineRegistered = false;
   }
 
-  @Override
+  @After
   public void tearDown() {
     if (defaultEngineRegistered) {
       runtimeContainerDelegate.unregisterProcessEngine(processEngine);
     }
   }
 
+  @Test
   public void testDeployAppWithoutEngine() {
 
     TestApplicationWithoutEngine processApplication = new TestApplicationWithoutEngine();
@@ -64,6 +73,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testDeployAppWithoutProcesses() {
 
     registerProcessEngine();
@@ -79,6 +89,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testDeployAppWithCustomEngine() {
 
     TestApplicationWithCustomEngine processApplication = new TestApplicationWithCustomEngine();
@@ -100,6 +111,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testDeployAppWithCustomDefaultEngine() {
 
     // Test if it's possible to set a custom default engine name.
@@ -123,6 +135,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     processApplication.undeploy();
   }
 
+  @Test
   public void testDeployAppReusingExistingEngine() {
 
     registerProcessEngine();
@@ -138,6 +151,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testDeployAppWithAdditionalResourceSuffixes() {
     registerProcessEngine();
 
@@ -156,6 +170,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     assertEquals(0, repositoryService.createDeploymentQuery().count());
   }
 
+  @Test
   public void testDeployAppWithResources() {
     registerProcessEngine();
 
@@ -173,6 +188,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     assertEquals(0, repositoryService.createDeploymentQuery().count());
   }
 
+  @Test
   public void testDeploymentSourceProperty() {
     registerProcessEngine();
 
@@ -187,6 +203,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     processApplication.undeploy();
   }
 
+  @Test
   public void testDeployProcessApplicationWithNameAttribute() {
     TestApplicationWithCustomName pa = new TestApplicationWithCustomName();
 
@@ -199,6 +216,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     pa.undeploy();
   }
 
+  @Test
   public void testDeployWithTenantIds() {
     registerProcessEngine();
 
@@ -218,6 +236,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     processApplication.undeploy();
   }
 
+  @Test
   public void testDeployWithoutTenantId() {
     registerProcessEngine();
 

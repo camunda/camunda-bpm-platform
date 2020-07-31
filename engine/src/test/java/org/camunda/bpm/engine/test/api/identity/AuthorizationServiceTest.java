@@ -28,6 +28,10 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DASHBOARD;
 import static org.camunda.bpm.engine.authorization.Resources.REPORT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,23 +53,26 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
+public class AuthorizationServiceTest extends PluggableProcessEngineTest {
 
   protected String userId = "test";
   protected String groupId = "accounting";
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     cleanupAfterTest();
-    super.tearDown();
+
   }
 
+  @Test
   public void testGlobalAuthorizationType() {
     Authorization globalAuthorization = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     // I can set userId = null
@@ -79,7 +86,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
 
     } catch (Exception e) {
-      assertTextPresent("ENGINE-03028 Illegal value 'something' for userId for GLOBAL authorization. Must be '*'", e.getMessage());
+      testRule.assertTextPresent("ENGINE-03028 Illegal value 'something' for userId for GLOBAL authorization. Must be '*'", e.getMessage());
 
     }
 
@@ -92,10 +99,11 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
 
     } catch (Exception e) {
-      assertTextPresent("ENGINE-03027 Cannot use 'groupId' for GLOBAL authorization", e.getMessage());
+      testRule.assertTextPresent("ENGINE-03027 Cannot use 'groupId' for GLOBAL authorization", e.getMessage());
     }
   }
 
+  @Test
   public void testGrantAuthorizationType() {
     Authorization grantAuthorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     // I can set userId = null
@@ -110,6 +118,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     grantAuthorization.setGroupId("something");
   }
 
+  @Test
   public void testRevokeAuthorizationType() {
     Authorization revokeAuthorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
     // I can set userId = null
@@ -124,17 +133,19 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     revokeAuthorization.setGroupId("something");
   }
 
+  @Test
   public void testDeleteNonExistingAuthorization() {
 
     try {
       authorizationService.deleteAuthorization("nonExisiting");
       fail();
     } catch (Exception e) {
-      assertTextPresent("Authorization for Id 'nonExisiting' does not exist: authorization is null", e.getMessage());
+      testRule.assertTextPresent("Authorization for Id 'nonExisiting' does not exist: authorization is null", e.getMessage());
     }
 
   }
 
+  @Test
   public void testCreateAuthorizationWithUserId() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -158,6 +169,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testCreateAuthorizationWithGroupId() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -181,6 +193,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testInvalidCreateAuthorization() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -208,7 +221,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorizationService.saveAuthorization(authorization);
       fail("exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Authorization must either have a 'userId' or a 'groupId'.", e.getMessage());
+      testRule.assertTextPresent("Authorization must either have a 'userId' or a 'groupId'.", e.getMessage());
     }
 
     // case 3: no resourceType ////////////
@@ -236,6 +249,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUniqueUserConstraints() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -288,6 +302,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUniqueGroupConstraints() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -341,6 +356,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGlobalUniqueConstraints() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -366,6 +382,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUpdateNewAuthorization() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -404,6 +421,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testUpdatePersistentAuthorization() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -441,6 +459,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testPermissions() {
 
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -503,6 +522,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGrantAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
@@ -526,11 +546,12 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionRevoked(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
+      testRule.assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
     }
 
   }
 
+  @Test
   public void testGlobalAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
@@ -554,11 +575,12 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionRevoked(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
+      testRule.assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
     }
 
   }
 
+  @Test
   public void testRevokeAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_REVOKE);
@@ -578,11 +600,12 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionGranted(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("ENGINE-03026 Method 'isPermissionGranted' cannot be used for authorization with type 'REVOKE'.", e.getMessage());
+      testRule.assertTextPresent("ENGINE-03026 Method 'isPermissionGranted' cannot be used for authorization with type 'REVOKE'.", e.getMessage());
     }
 
   }
 
+  @Test
   public void testGlobalGrantAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
@@ -610,6 +633,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
+  @Test
   public void testDisabledAuthorizationCheck() {
     // given
     Resource resource1 = TestResource.RESOURCE1;
@@ -621,6 +645,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(isAuthorized);
   }
 
+  @Test
   public void testConcurrentIsUserAuthorized() throws Exception {
     int threadCount = 2;
     int invocationCount = 500;
@@ -661,6 +686,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testReportResourceAuthorization() {
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
@@ -674,6 +700,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
+  @Test
   public void testReportResourcePermissions() {
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
@@ -693,6 +720,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
+  @Test
   public void testDashboardResourceAuthorization() {
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
@@ -706,6 +734,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
+  @Test
   public void testDashboardResourcePermission() {
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
@@ -725,6 +754,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
+  @Test
   public void testIsPermissionGrantedAccess() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -743,6 +773,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(authorizationResult.isPermissionGranted(ProcessDefinitionPermissions.RETRY_JOB));
   }
 
+  @Test
   public void testIsPermissionGrantedRetryJob() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -761,6 +792,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(authorizationResult.isPermissionGranted(ProcessDefinitionPermissions.RETRY_JOB));
   }
 
+  @Test
   public void testIsPermissionGrantedBatchResource() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -783,6 +815,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(authorizationResult.isPermissionGranted(Permissions.CREATE));
   }
 
+  @Test
   public void testIsPermissionRevokedAccess() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
@@ -801,6 +834,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(authorizationResult.isPermissionRevoked(ProcessDefinitionPermissions.RETRY_JOB));
   }
 
+  @Test
   public void testIsPermissionRevokedRetryJob() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
@@ -819,6 +853,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(authorizationResult.isPermissionRevoked(ProcessDefinitionPermissions.RETRY_JOB));
   }
 
+  @Test
   public void testIsPermissionRevokedBatchResource() {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);

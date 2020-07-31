@@ -16,23 +16,28 @@
  */
 package org.camunda.bpm.engine.test.bpmn.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Task;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractProcessEngineServicesAccessTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractProcessEngineServicesAccessTest extends PluggableProcessEngineTest {
 
   private static final String TASK_DEF_KEY = "someTask";
 
@@ -42,14 +47,15 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
 
   protected List<String> deploymentIds = new ArrayList<String>();
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     for (String deploymentId : deploymentIds) {
       repositoryService.deleteDeployment(deploymentId, true);
     }
-    super.tearDown();
+
   }
 
+  @Test
   public void testServicesAccessible() {
     // this test makes sure that the process engine services can be accessed and are non-null.
     createAndDeployModelForClass(getTestServiceAccessibleClass());
@@ -58,6 +64,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
   }
 
+  @Test
   public void testQueryAccessible() {
     // this test makes sure we can perform a query
     createAndDeployModelForClass(getQueryClass());
@@ -66,6 +73,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
   }
 
+  @Test
   public void testStartProcessInstance() {
 
     // given
@@ -74,6 +82,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     assertStartProcessInstance();
   }
 
+  @Test
   public void testStartProcessInstanceFails() {
 
     // given
@@ -82,6 +91,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     assertStartProcessInstanceFails();
   }
 
+  @Test
   public void testProcessEngineStartProcessInstance() {
 
     // given
@@ -106,7 +116,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
       runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
       fail("exception expected");
     } catch(RuntimeException e) {
-      assertTextPresent("BOOOM", e.getMessage());
+      testRule.assertTextPresent("BOOOM", e.getMessage());
     }
 
     // then
@@ -162,6 +172,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_DEF_KEY).count());
   }
 
+  @Test
   public void testProcessEngineStartProcessInstanceFails() {
 
     // given

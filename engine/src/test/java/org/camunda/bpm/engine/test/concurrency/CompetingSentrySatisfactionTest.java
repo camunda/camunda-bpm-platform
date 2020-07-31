@@ -16,26 +16,50 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.StateTransitionCaseExecutionCmd;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CompetingSentrySatisfactionTest extends PluggableProcessEngineTestCase {
+public class CompetingSentrySatisfactionTest {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
-  Thread testThread = Thread.currentThread();
-  static ControllableThread activeThread;
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected CaseService caseService;
+
+  protected static ControllableThread activeThread;
+
+  @Before
+  public void initializeServices() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    caseService = engineRule.getCaseService();
+  }
 
   public abstract class SingleThread extends ControllableThread {
 
@@ -83,6 +107,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithAndSentry.cmmn"})
+  @Test
   public void testEntryCriteriaWithAndSentry() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -120,11 +145,12 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertNotNull(threadTwo.exception);
 
     String message = threadTwo.exception.getMessage();
-    assertTextPresent("CaseSentryPartEntity", message);
-    assertTextPresent("was updated by another transaction concurrently", message);
+    testRule.assertTextPresent("CaseSentryPartEntity", message);
+    testRule.assertTextPresent("was updated by another transaction concurrently", message);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithAndSentry.cmmn"})
+  @Test
   public void testExitCriteriaWithAndSentry() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -162,11 +188,12 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertNotNull(threadTwo.exception);
 
     String message = threadTwo.exception.getMessage();
-    assertTextPresent("CaseSentryPartEntity", message);
-    assertTextPresent("was updated by another transaction concurrently", message);
+    testRule.assertTextPresent("CaseSentryPartEntity", message);
+    testRule.assertTextPresent("was updated by another transaction concurrently", message);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithOrSentry.cmmn"})
+  @Test
   public void testEntryCriteriaWithOrSentry() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -204,12 +231,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertNotNull(threadTwo.exception);
 
     String message = threadTwo.exception.getMessage();
-    assertTextPresent("CaseExecutionEntity", message);
-    assertTextPresent("was updated by another transaction concurrently", message);
+    testRule.assertTextPresent("CaseExecutionEntity", message);
+    testRule.assertTextPresent("was updated by another transaction concurrently", message);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithOrSentry.cmmn",
       "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testExitCriteriaWithOrSentry() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -254,8 +282,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertNotNull(threadTwo.exception);
 
     String message = threadTwo.exception.getMessage();
-    assertTextPresent("CaseExecutionEntity", message);
-    assertTextPresent("was updated by another transaction concurrently", message);
+    testRule.assertTextPresent("CaseExecutionEntity", message);
+    testRule.assertTextPresent("was updated by another transaction concurrently", message);
   }
 
 }

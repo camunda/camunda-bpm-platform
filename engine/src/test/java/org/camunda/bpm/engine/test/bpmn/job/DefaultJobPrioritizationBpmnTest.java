@@ -16,18 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.job;
 
-import java.util.List;
+import static org.junit.Assert.assertTrue;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class DefaultJobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
+public class DefaultJobPrioritizationBpmnTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testDefaultProducePrioritizedJobsSetting() {
     assertTrue(processEngineConfiguration.isProducePrioritizedJobs());
   }

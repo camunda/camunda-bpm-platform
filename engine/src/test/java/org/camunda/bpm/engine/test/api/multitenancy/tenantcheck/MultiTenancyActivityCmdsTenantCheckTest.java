@@ -18,7 +18,9 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import java.util.Arrays;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;

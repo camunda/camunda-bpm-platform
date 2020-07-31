@@ -17,24 +17,29 @@
 package org.camunda.bpm.engine.test.bpmn.job;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.ParseException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTestCase {
+public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTest {
 
   protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testDefaultPrioritizationAsyncBefore() {
     // when
     runtimeService
@@ -49,6 +54,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testDefaultPrioritizationAsyncAfter() {
     // given
     runtimeService
@@ -66,6 +72,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTimerProcess.bpmn20.xml")
+  @Test
   public void testDefaultPrioritizationTimer() {
     // when
     runtimeService
@@ -80,6 +87,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testProcessDefinitionPrioritizationAsyncBefore() {
     // when
     runtimeService
@@ -94,6 +102,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testProcessDefinitionPrioritizationAsyncAfter() {
     // given
     runtimeService
@@ -111,6 +120,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
+  @Test
   public void testProcessDefinitionPrioritizationTimer() {
     // when
     runtimeService
@@ -125,6 +135,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testActivityPrioritizationAsyncBefore() {
     // when
     runtimeService
@@ -139,6 +150,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testActivityPrioritizationAsyncAfter() {
     // given
     runtimeService
@@ -156,6 +168,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
+  @Test
   public void testActivityPrioritizationTimer() {
     // when
     runtimeService
@@ -170,6 +183,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/subProcessJobPrioProcess.bpmn20.xml")
+  @Test
   public void testSubProcessPriorityIsNotDefaultForContainedActivities() {
     // when starting an activity contained in the sub process where the
     // sub process has job priority 20
@@ -184,6 +198,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     assertEquals(10, job.getPriority());
   }
 
+  @Test
   public void testFailOnMalformedInput() {
     try {
       repositoryService
@@ -192,12 +207,13 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
         .deploy();
       fail("deploying a process with malformed priority should not succeed");
     } catch (ParseException e) {
-      assertTextPresentIgnoreCase("value 'thisIsNotANumber' for attribute 'jobPriority' "
+      testRule.assertTextPresentIgnoreCase("value 'thisIsNotANumber' for attribute 'jobPriority' "
           + "is not a valid number", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("task2");
     }
   }
 
+  @Test
   public void testParsePriorityOnNonAsyncActivity() {
 
     // deploying a process definition where the activity
@@ -211,6 +227,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     repositoryService.deleteDeployment(deployment.getId());
   }
 
+  @Test
   public void testTimerStartEventPriorityOnProcessDefinition() {
     // given a timer start job
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
@@ -227,6 +244,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
   public void testTimerStartEventPriorityOnActivity() {
     // given a timer start job
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
@@ -244,6 +262,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/boundaryTimerJobPrioProcess.bpmn20.xml")
+  @Test
   public void testBoundaryTimerEventPriority() {
     // given an active boundary event timer
     runtimeService.startProcessInstanceByKey("boundaryTimerJobPrioProcess");
@@ -255,6 +274,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/eventSubprocessTimerJobPrioProcess.bpmn20.xml")
+  @Test
   public void testEventSubprocessTimerPriority() {
     // given an active event subprocess timer
     runtimeService.startProcessInstanceByKey("eventSubprocessTimerJobPrioProcess");
@@ -268,6 +288,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalAsyncProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalCatchJobPrioProcess.bpmn20.xml"})
+  @Test
   public void testAsyncSignalThrowingEventActivityPriority() {
     // given a receiving process instance with two subscriptions
     runtimeService.startProcessInstanceByKey("intermediateSignalCatchJobPrioProcess");
@@ -290,6 +311,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalAsyncProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/job/signalStartJobPrioProcess.bpmn20.xml"})
+  @Test
   public void testAsyncSignalThrowingEventSignalStartActivityPriority() {
     // given a process instance that executes an async signal throwing event
     runtimeService.startProcessInstanceByKey("intermediateSignalJobPrioProcess");
@@ -314,6 +336,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/miInnerAsyncProcess.bpmn20.xml")
+  @Test
   public void testMultiInstanceInnerActivityPriority() {
     // given a process instance that executes an async mi inner activity
     runtimeService.startProcessInstanceByKey("miBodyAsyncPriorityProcess");

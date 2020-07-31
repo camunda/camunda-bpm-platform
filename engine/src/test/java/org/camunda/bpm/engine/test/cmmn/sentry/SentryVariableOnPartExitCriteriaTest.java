@@ -16,18 +16,24 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
+import org.junit.Test;
 
 /**
  * 
  * @author Deivarayan Azhagappan
  *
  */
-public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryVariableOnPartExitCriteriaTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
+  @Test
   public void testExitTaskWithVariableOnPartSatisfied() {
     // given
     createCaseInstance();
@@ -55,6 +61,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
+  @Test
   public void testExitTaskWithVariableOnPartNotSatisfied() {
     // given
     createCaseInstance();
@@ -83,6 +90,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithMultipleOnPart.cmmn"})
+  @Test
   public void testExitTaskWithMultipleOnPartSatisfied() {
     // given
     createCaseInstance();
@@ -113,6 +121,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTasksOfDifferentScopes.cmmn"})
+  @Test
   public void testExitMultipleTasksOfDifferentScopes() {
     // given
     createCaseInstance();

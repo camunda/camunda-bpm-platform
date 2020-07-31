@@ -60,4 +60,16 @@ public class HttpHeaderSecurityDefaultsTest extends ParsePropertiesHelper {
     assertThat(properties.getInitParams()).doesNotContainKey("contentTypeOptionsDisabled");
   }
 
+  @Test
+  public void shouldCheckHsts() {
+    // given
+
+    // when
+    HeaderSecurityProperties properties = webapp.getHeaderSecurity();
+
+    // then
+    assertThat(properties.isHstsDisabled()).isTrue();
+    assertThat(properties.getInitParams()).doesNotContainKey("hstsDisabled");
+  }
+
 }

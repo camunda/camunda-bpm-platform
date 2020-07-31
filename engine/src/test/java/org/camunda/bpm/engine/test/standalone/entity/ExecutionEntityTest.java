@@ -16,8 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -28,16 +33,13 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  *
@@ -47,7 +49,7 @@ import static org.junit.Assert.fail;
 public class ExecutionEntityTest {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
   @Rule
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
   @Rule

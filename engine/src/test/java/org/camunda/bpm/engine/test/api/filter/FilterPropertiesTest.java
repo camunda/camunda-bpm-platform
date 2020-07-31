@@ -16,51 +16,85 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
+public class FilterPropertiesTest {
 
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  protected FilterService filterService;
   protected Filter filter;
   protected String nestedJsonObject = "{\"id\":\"nested\"}";
   protected String nestedJsonArray = "[\"a\",\"b\"]";
 
-
+  @Before
   public void setUp() {
-    filter = filterService.newTaskFilter("name").setOwner("owner").setProperties(new HashMap<String, Object>());
+    filterService = engineRule.getFilterService();
+    filter = filterService.newTaskFilter("name").setOwner("owner").setProperties(new HashMap<>());
   }
 
-  protected void tearDown() throws Exception {
-    if (filter.getId() != null)
-    {
+  @After
+  public void tearDown() throws Exception {
+    for (Filter filter : filterService.createFilterQuery().list()) {
       filterService.deleteFilter(filter.getId());
     }
   }
 
 
+  @Test
   public void testPropertiesFromNull() {
     filter.setProperties(null);
     assertNull(filter.getProperties());
-
-    filter.setProperties((Map<String, Object>) null);
-    assertNull(filter.getProperties());
   }
 
+  @Test
+  public void testPropertiesInternalFromNull() {
+    // given
+    Filter noPropsFilter = filterService.
+        newTaskFilter("no props filter")
+        .setOwner("demo")
+        .setProperties(null);
+    filterService.saveFilter(noPropsFilter);
+
+    // when
+    FilterEntity noPropsFilterEntity = (FilterEntity) filterService
+        .createTaskFilterQuery()
+        .filterOwner("demo")
+        .singleResult();
+
+    // then
+    assertThat(noPropsFilterEntity.getPropertiesInternal(), is("{}"));
+  }
+
+  @Test
   public void testPropertiesFromMap() {
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("color", "#123456");
     properties.put("priority", 42);
     properties.put("userDefined", true);
@@ -71,22 +105,10 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     assertTestProperties();
   }
 
-  protected void assertTestProperties() {
-    filterService.saveFilter(filter);
-    filter = filterService.getFilter(filter.getId());
-
-    Map<String, Object> properties = filter.getProperties();
-    assertEquals(5, properties.size());
-    assertEquals("#123456", properties.get("color"));
-    assertEquals(42, properties.get("priority"));
-    assertEquals(true, properties.get("userDefined"));
-    assertEquals(nestedJsonObject, properties.get("object"));
-    assertEquals(nestedJsonArray, properties.get("array"));
-  }
-
+  @Test
   public void testNullProperty() {
     // given
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("null", null);
     filter.setProperties(properties);
     filterService.saveFilter(filter);
@@ -102,6 +124,7 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testMapContainingListProperty() {
     // given
     Map properties = Collections.singletonMap("foo", Collections.singletonList("bar"));
@@ -122,6 +145,7 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     assertThat(string.toString(), is("bar"));
   }
 
+  @Test
   public void testMapContainingMapProperty() {
     // given
     Map properties = Collections.singletonMap("foo", Collections.singletonMap("bar", "foo"));
@@ -142,6 +166,7 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     assertThat(string.toString(), is("foo"));
   }
 
+  @Test
   public void testMapContainingMapContainingListProperty() {
     // given
     Map properties = Collections.singletonMap("foo", Collections.singletonMap("bar", Collections.singletonList("foo")));
@@ -163,6 +188,7 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     assertThat(string.toString(), is("foo"));
   }
 
+  @Test
   public void testMapContainingListContainingMapProperty_DeserializePrimitives() {
     // given
     Map<String, Object> primitives = new HashMap<>();
@@ -189,15 +215,16 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
 
     // then
     assertThat(deserialisedProperties.size(), is(1));
-    assertThat((String) map.get("string"), is("aStringValue"));
-    assertThat((int) map.get("int"), is(47));
-    assertThat((long) map.get("intOutOfRange"), is(Integer.MAX_VALUE + 1L));
-    assertThat((long) map.get("long"), is(Long.MAX_VALUE));
-    assertThat((double) map.get("double"), is(3.14159265359D));
-    assertThat((boolean) map.get("boolean"), is(true));
+    assertThat(map.get("string"), is("aStringValue"));
+    assertThat(map.get("int"), is(47));
+    assertThat(map.get("intOutOfRange"), is(Integer.MAX_VALUE + 1L));
+    assertThat(map.get("long"), is(Long.MAX_VALUE));
+    assertThat(map.get("double"), is(3.14159265359D));
+    assertThat(map.get("boolean"), is(true));
     assertThat(map.get("null"), nullValue());
   }
 
+  @Test
   public void testMapContainingMapContainingListProperty_DeserializePrimitives() {
     // given
     List<Object> primitives = new ArrayList<>();
@@ -224,13 +251,25 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     // then
     assertThat(deserialisedProperties.size(), is(1));
 
-    assertThat((String) list.get(0), is("aStringValue"));
-    assertThat((int) list.get(1), is(47));
-    assertThat((long) list.get(2), is(Integer.MAX_VALUE + 1L));
-    assertThat((long) list.get(3), is(Long.MAX_VALUE));
-    assertThat((double) list.get(4), is(3.14159265359D));
-    assertThat((boolean) list.get(5), is(true));
+    assertThat(list.get(0), is("aStringValue"));
+    assertThat(list.get(1), is(47));
+    assertThat(list.get(2), is(Integer.MAX_VALUE + 1L));
+    assertThat(list.get(3), is(Long.MAX_VALUE));
+    assertThat(list.get(4), is(3.14159265359D));
+    assertThat(list.get(5), is(true));
     assertThat(list.get(6), nullValue());
   }
 
+  protected void assertTestProperties() {
+    filterService.saveFilter(filter);
+    filter = filterService.getFilter(filter.getId());
+
+    Map<String, Object> properties = filter.getProperties();
+    assertEquals(5, properties.size());
+    assertEquals("#123456", properties.get("color"));
+    assertEquals(42, properties.get("priority"));
+    assertEquals(true, properties.get("userDefined"));
+    assertEquals(nestedJsonObject, properties.get("object"));
+    assertEquals(nestedJsonArray, properties.get("array"));
+  }
 }

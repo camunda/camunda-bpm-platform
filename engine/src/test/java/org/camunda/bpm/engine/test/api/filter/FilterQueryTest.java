@@ -19,6 +19,10 @@ package org.camunda.bpm.engine.test.api.filter;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,16 +33,20 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterQueryTest extends PluggableProcessEngineTestCase {
+public class FilterQueryTest extends PluggableProcessEngineTest {
 
   protected List<String> filterIds = new ArrayList<String>();
 
+  @Before
   public void setUp() {
     saveFilter("b", "b");
     saveFilter("d", "d");
@@ -54,6 +62,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     filterIds.add(filter.getId());
   }
 
+  @After
   public void tearDown() {
     // delete all filters
     for (Filter filter : filterService.createFilterQuery().list()) {
@@ -61,6 +70,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryNoCriteria() {
     FilterQuery query = filterService.createFilterQuery();
     assertEquals(4, query.count());
@@ -74,6 +84,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByFilterId() {
     FilterQuery query = filterService.createFilterQuery().filterId(filterIds.get(0));
     assertNotNull(query.singleResult());
@@ -81,6 +92,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidFilterId() {
     FilterQuery query = filterService.createFilterQuery().filterId("invalid");
     assertNull(query.singleResult());
@@ -96,6 +108,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByResourceType() {
     FilterQuery query = filterService.createFilterQuery().filterResourceType(EntityTypes.TASK);
     try {
@@ -109,6 +122,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, query.count());
   }
 
+  @Test
   public void testQueryByInvalidResourceType() {
     FilterQuery query = filterService.createFilterQuery().filterResourceType("invalid");
     assertNull(query.singleResult());
@@ -124,6 +138,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByName() {
     FilterQuery query = filterService.createFilterQuery().filterName("a");
     assertNotNull(query.singleResult());
@@ -131,6 +146,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByNameLike() {
     FilterQuery query = filterService.createFilterQuery().filterNameLike("%\\_");
     assertNotNull(query.singleResult());
@@ -138,6 +154,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidName() {
     FilterQuery query = filterService.createFilterQuery().filterName("invalid");
     assertNull(query.singleResult());
@@ -153,6 +170,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByOwner() {
     FilterQuery query = filterService.createFilterQuery().filterOwner("a");
     assertNotNull(query.singleResult());
@@ -160,6 +178,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  @Test
   public void testQueryByInvalidOwner() {
     FilterQuery query = filterService.createFilterQuery().filterOwner("invalid");
     assertNull(query.singleResult());
@@ -175,6 +194,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryPaging() {
     FilterQuery query = filterService.createFilterQuery();
 
@@ -196,6 +216,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testQuerySorting() {
     List<String> sortedIds = new ArrayList<String>(filterIds);
     Collections.sort(sortedIds);
@@ -259,6 +280,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, filterService.createFilterQuery().orderByFilterId().filterName("a").desc().list().size());
   }
 
+  @Test
   public void testNativeQuery() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
@@ -278,6 +300,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = #{filterName}").parameter("filterName", "a").count());
   }
 
+  @Test
   public void testNativeQueryPaging() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));

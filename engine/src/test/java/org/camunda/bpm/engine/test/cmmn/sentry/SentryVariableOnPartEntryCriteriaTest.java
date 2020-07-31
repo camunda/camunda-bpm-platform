@@ -16,19 +16,25 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
+import org.junit.Test;
 
 /**
  * 
  * @author Deivarayan Azhagappan
  *
  */
-public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryVariableOnPartEntryCriteriaTest extends CmmnTest {
 
   // Basic tests - create, update, delete variable
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn"})
+  @Test
   public void testVariableCreate() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -42,6 +48,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn"})
+  @Test
   public void testUnknownVariableCreate() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -52,6 +59,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableUpdate.cmmn"})
+  @Test
   public void testVariableUpdate() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -67,6 +75,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }  
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableDelete.cmmn"})
+  @Test
   public void testVariableDelete() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -87,6 +96,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
   // different variable name and variable event test
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableName.cmmn"})
+  @Test
   public void testDifferentVariableName() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
     
@@ -110,6 +120,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableEvents.cmmn"})
+  @Test
   public void testDifferentVariableEventsButSameName() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
     
@@ -134,6 +145,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
   // Multiple variableOnParts test
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMoreVariableOnPart.cmmn"})
+  @Test
   public void testMultipleVariableOnParts() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -154,6 +166,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleSentryMultipleVariableOnPart.cmmn"})
+  @Test
   public void testMultipleSentryMultipleVariableOnParts() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -177,6 +190,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
   // IfPart, OnPart and VariableOnPart combination test
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testOnPartIfPartAndVariableOnPart.cmmn"})
+  @Test
   public void testOnPartIfPartAndVariableOnPart() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -203,6 +217,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   
   // Variable scope tests
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableScope.cmmn"})
+  @Test
   public void testVariableCreateScope() {
     
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
@@ -228,6 +243,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStageScope.cmmn"})
+  @Test
   public void testStageScope() {
     
     caseService.createCaseInstanceByKey("Case_1");
@@ -255,6 +271,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn"})
+  @Test
   public void testStagesScope() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -271,6 +288,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn"})
+  @Test
   public void testStageLocalScope() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -300,6 +318,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleOnPartsInStage.cmmn"})
+  @Test
   public void testMultipleOnPartsInStages() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
     
@@ -321,6 +340,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.sentryEvaluationBeforeCreation.cmmn"})
+  @Test
   public void testShouldnotEvaluateSentryBeforeSentryCreation() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -349,6 +369,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   // Evaluation of not affected sentries test
   // i.e: Evaluation of a sentry's ifPart condition even if there are no evaluation of variableOnParts defined in the sentry
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSentryShouldNotBeEvaluatedAfterStageComplete.cmmn"})
+  @Test
   public void testEvaluationOfNotAffectedSentries() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -369,6 +390,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testNotAffectedSentriesInMultipleStageScopes.cmmn"})
+  @Test
   public void testNotAffectedSentriesInMultipleStageScopes() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -395,6 +417,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Test
   public void testSameVariableNameInDifferentScopes() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -430,6 +453,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Test
   public void testNestedScopes() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -455,6 +479,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Test
   public void testNestedScopesWithNullVariableValue() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -484,6 +509,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableNameInDifferentScope.cmmn"})
+  @Test
   public void testNestedScopesOfDifferentVariableNames() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -521,6 +547,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableOnPartAsEntryAndExitCriteria.cmmn"})
+  @Test
   public void testSameVariableOnPartAsEntryAndExitCriteria() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 

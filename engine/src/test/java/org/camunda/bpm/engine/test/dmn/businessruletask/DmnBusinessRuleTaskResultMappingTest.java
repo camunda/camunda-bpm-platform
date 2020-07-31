@@ -17,6 +17,10 @@
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,18 +28,19 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.junit.Test;
 
 /**
  * Tests the mapping of the decision result.  
  *
  * @author Philipp Ossler
  */
-public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngineTestCase {
+public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngineTest {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.dmn11.xml";
   protected static final String CUSTOM_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.testCustomOutputMapping.bpmn20.xml";
@@ -48,6 +53,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   protected static final String OVERRIDE_DECISION_RESULT_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.testOverrideVariable.bpmn20.xml";
 
   @Deployment(resources = {CUSTOM_MAPPING_BPMN, TEST_DECISION })
+  @Test
   public void testCustomOutputMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
@@ -59,6 +65,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION})
+  @Test
   public void testSingleEntryMapping() {
     ProcessInstance processInstance = startTestProcess("single entry");
 
@@ -67,6 +74,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
+  @Test
   public void testSingleResultMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
@@ -79,6 +87,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
+  @Test
   public void testCollectEntriesMapping() {
     ProcessInstance processInstance = startTestProcess("single entry list");
 
@@ -91,6 +100,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { RESULT_LIST_BPMN, TEST_DECISION })
+  @Test
   public void testResultListMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
@@ -106,6 +116,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
+  @Test
   public void testDefaultResultMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
@@ -122,66 +133,70 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
+  @Test
   public void testSingleEntryMappingFailureMultipleOutputs() {
     try {
       startTestProcess("single entry list");
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-22001", e.getMessage());
+      testRule.assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
   @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
+  @Test
   public void testSingleEntryMappingFailureMultipleValues() {
     try {
       startTestProcess("multiple entries");
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-22001", e.getMessage());
+      testRule.assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
   @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
+  @Test
   public void testSingleResultMappingFailure() {
     try {
       startTestProcess("single entry list");
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-22001", e.getMessage());
+      testRule.assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
   @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
+  @Test
   public void testCollectEntriesMappingFailure() {
     try {
       startTestProcess("multiple entries");
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-22002", e.getMessage());
+      testRule.assertTextPresent("ENGINE-22002", e.getMessage());
     }
   }
 
+  @Test
   public void testInvalidMapping() {
     try {
-      deploymentId = repositoryService
+      testRule.deploy(repositoryService
           .createDeployment()
-          .addClasspathResource(INVALID_MAPPING_BPMN)
-          .deploy()
-          .getId();
+          .addClasspathResource(INVALID_MAPPING_BPMN));
 
       fail("expect parse exception");
     } catch (ParseException e) {
-      assertTextPresent("No decision result mapper found for name 'invalid'", e.getMessage());
+      testRule.assertTextPresent("No decision result mapper found for name 'invalid'", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().size()).isEqualTo(1);
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("ruleTask");
     }
   }
 
   @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
+  @Test
   public void testTransientDecisionResult() {
     // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
     ProcessInstance processInstance = startTestProcess("single entry");
@@ -193,6 +208,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { OVERRIDE_DECISION_RESULT_BPMN, TEST_DECISION })
+  @Test
   public void testFailedToOverrideDecisionResultVariable() {
     try {
       // the transient variable "decisionResult" should not be overridden by the task result variable
@@ -200,11 +216,12 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
       fail("expect exception");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("transient variable with name decisionResult to non-transient", e.getMessage());
+      testRule.assertTextPresent("transient variable with name decisionResult to non-transient", e.getMessage());
     }
   }
 
   @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
+  @Test
   public void testSingleEntryEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
@@ -215,6 +232,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
+  @Test
   public void testSingleResultEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
@@ -226,6 +244,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
   @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
   @SuppressWarnings("unchecked")
+  @Test
   public void testCollectEntriesEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
@@ -235,6 +254,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
   @Deployment(resources = { RESULT_LIST_BPMN, TEST_DECISION })
   @SuppressWarnings("unchecked")
+  @Test
   public void testResultListEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
@@ -244,6 +264,7 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
   @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
   @SuppressWarnings("unchecked")
+  @Test
   public void testDefaultMappingEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 

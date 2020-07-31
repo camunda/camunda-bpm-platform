@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "setRetriesByProcessHistoricQueryBased"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Create a batch to set retries of jobs asynchronously based on a historic process instance query." />
 
   <@lib.requestBody

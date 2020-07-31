@@ -5,9 +5,12 @@
 camunda.bpm:
 # https://docs.camunda.org/manual/latest/user-guide/security/#http-header-security-in-webapps
 # https://docs.camunda.org/manual/latest/webapps/shared-options/header-security/
-  webapp.csrf:
-    enable-same-site-cookie: true
-    same-site-cookie-option: STRICT
+  webapp:
+    csrf:
+      enable-same-site-cookie: true
+      same-site-cookie-option: STRICT
+    header-security:
+      hsts-disabled: false
 
 # https://docs.camunda.org/manual/latest/user-guide/security/#authorization
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/
@@ -15,12 +18,12 @@ camunda.bpm:
 
   generic-properties.properties:
 # https://docs.camunda.org/manual/latest/user-guide/security/#variable-values-from-untrusted-sources
-    deserializationTypeValidationEnabled: true
-    deserializationAllowedPackages:
-    deserializationAllowedClasses:
+    deserialization-type-validation-enabled: true
+    deserialization-allowed-packages:
+    deserialization-allowed-classes:
 # https://docs.camunda.org/manual/latest/user-guide/security/#password-policy
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/password-policy/
-    enablePasswordPolicy: true
+    enable-password-policy: true
 
   run:
 # https://docs.camunda.org/manual/latest/user-guide/security/#authentication

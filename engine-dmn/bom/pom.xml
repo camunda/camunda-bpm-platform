@@ -3,16 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.camunda</groupId>
-    <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.0.0</version>
-    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-    <relativePath />
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.14.0-SNAPSHOT</version>
+    <relativePath>../../</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm.dmn</groupId>
   <artifactId>camunda-engine-dmn-bom</artifactId>
-  <version>7.13.0-SNAPSHOT</version>
+  <version>7.14.0-SNAPSHOT</version>
   <name>camunda DMN - engine - bom</name>
   <packaging>pom</packaging>
 

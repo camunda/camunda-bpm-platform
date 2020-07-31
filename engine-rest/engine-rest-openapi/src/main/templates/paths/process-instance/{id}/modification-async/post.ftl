@@ -2,7 +2,7 @@
 
   <@lib.endpointInfo
       id = "modifyProcessInstanceAsyncOperation"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Submits a list of modification instructions to change a process instance's execution state async.
               A modification instruction is one of the following:
       
@@ -80,7 +80,7 @@
 
     <@lib.response
         code = "403"
-        dto = "ExceptionDto"
+        dto = "AuthorizationExceptionDto"
         desc = "Forbidden
                 If the user is not allowed to execute batches. See the Introduction for the error response format."/>
 

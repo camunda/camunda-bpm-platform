@@ -18,7 +18,12 @@ package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,14 +35,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  *
@@ -47,7 +54,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Christian Lipphardt (Groovy)
  *
  */
-public class ScriptTaskTest extends PluggableProcessEngineTestCase {
+public class ScriptTaskTest extends PluggableProcessEngineTest {
 
   private static final String JAVASCRIPT = "javascript";
   private static final String PYTHON = "python";
@@ -57,11 +64,12 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   private List<String> deploymentIds = new ArrayList<String>();
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     deploymentIds.forEach(deploymentId -> repositoryService.deleteDeployment(deploymentId, true));
   }
 
+  @Test
   public void testJavascriptProcessVarVisibility() {
 
     deployProcess(JAVASCRIPT,
@@ -106,6 +114,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testPythonProcessVarAssignment() {
 
     deployProcess(PYTHON,
@@ -147,6 +156,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testRubyProcessVarVisibility() {
 
     deployProcess(RUBY,
@@ -189,6 +199,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGroovyProcessVarVisibility() {
 
     deployProcess(GROOVY,
@@ -233,6 +244,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testJavascriptFunctionInvocation() {
 
     deployProcess(JAVASCRIPT,
@@ -262,6 +274,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testPythonFunctionInvocation() {
 
     deployProcess(PYTHON,
@@ -289,6 +302,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testRubyFunctionInvocation() {
 
     deployProcess(RUBY,
@@ -318,6 +332,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGroovyFunctionInvocation() {
 
     deployProcess(GROOVY,
@@ -347,6 +362,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testJsVariable() {
 
     String scriptText = "var foo = 1;";
@@ -359,6 +375,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testPythonVariable() {
 
     String scriptText = "foo = 1";
@@ -371,6 +388,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testRubyVariable() {
 
     String scriptText = "foo = 1";
@@ -383,6 +401,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGroovyVariable() {
 
     String scriptText = "def foo = 1";
@@ -395,6 +414,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testJuelExpression() {
     deployProcess(JUEL, "${execution.setVariable('foo', 'bar')}");
 
@@ -404,6 +424,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  @Test
   public void testJuelCapitalizedExpression() {
     deployProcess(JUEL.toUpperCase(), "${execution.setVariable('foo', 'bar')}");
 
@@ -413,6 +434,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  @Test
   public void testSourceAsExpressionAsVariable() {
     deployProcess(PYTHON, "${scriptSource}");
 
@@ -424,6 +446,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  @Test
   public void testSourceAsExpressionAsNonExistingVariable() {
     deployProcess(PYTHON, "${scriptSource}");
 
@@ -432,10 +455,11 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Process variable 'scriptSource' not defined");
     }
     catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptSource'", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptSource'", e.getMessage());
     }
   }
 
+  @Test
   public void testSourceAsExpressionAsBean() {
     deployProcess(PYTHON, "#{scriptResourceBean.getSource()}");
 
@@ -447,6 +471,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  @Test
   public void testSourceAsExpressionWithWhitespace() {
     deployProcess(PYTHON, "\t\n  \t \n  ${scriptSource}");
 
@@ -458,6 +483,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  @Test
   public void testJavascriptVariableSerialization() {
     deployProcess(JAVASCRIPT, "execution.setVariable('date', new java.util.Date(0));");
 
@@ -474,6 +500,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("test", myVar.getName());
   }
 
+  @Test
   public void testPythonVariableSerialization() {
     deployProcess(PYTHON, "import java.util.Date\nexecution.setVariable('date', java.util.Date(0))");
 
@@ -491,6 +518,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("test", myVar.getName());
   }
 
+  @Test
   public void testRubyVariableSerialization() {
     deployProcess(RUBY, "require 'java'\n$execution.setVariable('date', java.util.Date.new(0))");
 
@@ -507,6 +535,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("test", myVar.getName());
   }
 
+  @Test
   public void testGroovyVariableSerialization() {
     deployProcess(GROOVY, "execution.setVariable('date', new java.util.Date(0))");
 
@@ -523,6 +552,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("test", myVar.getName());
   }
 
+  @Test
   public void testGroovyNotExistingImport() {
     deployProcess(GROOVY, "import unknown");
 
@@ -531,10 +561,11 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Should fail during script compilation");
     }
     catch (ScriptCompilationException e) {
-      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("import unknown", e.getMessage());
     }
   }
 
+  @Test
   public void testGroovyNotExistingImportWithoutCompilation() {
     // disable script compilation
     processEngineConfiguration.setEnableScriptCompilation(false);
@@ -546,7 +577,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Should fail during script evaluation");
     }
     catch (ScriptEvaluationException e) {
-      assertTextPresentIgnoreCase("import unknown", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("import unknown", e.getMessage());
     }
     finally {
       // re-enable script compilation
@@ -554,6 +585,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testShouldNotDeployProcessWithMissingScriptElementAndResource() {
     try {
       deployProcess(Bpmn.createExecutableProcess("testProcess")
@@ -570,6 +602,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testShouldUseJuelAsDefaultScriptLanguage() {
     deployProcess(Bpmn.createExecutableProcess("testProcess")
       .startEvent()
@@ -610,11 +643,13 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testAutoStoreScriptVarsOff() {
     assertFalse(processEngineConfiguration.isAutoStoreScriptVariables());
   }
 
   @org.camunda.bpm.engine.test.Deployment
+  @Test
   public void testPreviousTaskShouldNotHandleException(){
     try {
       runtimeService.startProcessInstanceByKey("process");
@@ -630,6 +665,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @org.camunda.bpm.engine.test.Deployment
+  @Test
   public void testSetScriptResultToProcessVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("echo", "hello");
@@ -642,6 +678,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @org.camunda.bpm.engine.test.Deployment
+  @Test
   public void testGroovyScriptExecution() {
     try {
 
@@ -658,6 +695,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @org.camunda.bpm.engine.test.Deployment
+  @Test
   public void testGroovySetVariableThroughExecutionInScript() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptVariableThroughExecution");
 
@@ -668,12 +706,13 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @org.camunda.bpm.engine.test.Deployment
+  @Test
   public void testScriptEvaluationException() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process_1").singleResult();
     try {
       runtimeService.startProcessInstanceByKey("Process_1");
     } catch (ScriptEvaluationException e) {
-      assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
+      testRule.assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
     }
   }
 }

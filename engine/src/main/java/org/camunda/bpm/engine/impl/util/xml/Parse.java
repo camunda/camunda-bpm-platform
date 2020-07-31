@@ -46,16 +46,19 @@ import org.xml.sax.helpers.DefaultHandler;
 public class Parse extends DefaultHandler {
 
 
-  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+  protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
-  private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
-  private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-  private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-  private static final String XXE_PROCESSING = "http://xml.org/sax/features/external-general-entities";
+  protected static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+  protected static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+  protected static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+  protected static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+  protected static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+  protected static final String LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+  protected static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
 
-  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
-  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
-  private static final String JAXP_ACCESS_EXTERNAL_SCHEMA_ALL = "all";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_ALL = "all";
 
   protected Parser parser;
   protected String name;
@@ -119,11 +122,6 @@ public class Parse extends DefaultHandler {
     return this;
   }
 
-  public Parse xxeProcessing(boolean enable) {
-    setEnableXxeProcessing(enable);
-    return this;
-  }
-
   protected void setStreamSource(StreamSource streamSource) {
     if (this.streamSource!=null) {
       throw LOG.multipleSourcesException(this.streamSource, streamSource);
@@ -140,7 +138,11 @@ public class Parse extends DefaultHandler {
       InputStream inputStream = streamSource.getInputStream();
 
       SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
-      saxParserFactory.setFeature(XXE_PROCESSING, enableXxeProcessing);
+      saxParserFactory.setFeature(EXTERNAL_GENERAL_ENTITIES, enableXxeProcessing);
+      saxParserFactory.setFeature(DISALLOW_DOCTYPE_DECL, !enableXxeProcessing);
+      saxParserFactory.setFeature(LOAD_EXTERNAL_DTD, enableXxeProcessing);
+      saxParserFactory.setFeature(EXTERNAL_PARAMETER_ENTITIES, enableXxeProcessing);
+      saxParserFactory.setXIncludeAware(enableXxeProcessing);
       saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
       if (schemaResource == null) { // must be done before parser is created

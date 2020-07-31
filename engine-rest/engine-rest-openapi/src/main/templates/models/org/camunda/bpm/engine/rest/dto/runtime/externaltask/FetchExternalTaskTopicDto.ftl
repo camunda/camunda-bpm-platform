@@ -82,7 +82,6 @@
         name = "deserializeValues"
         type = "boolean"
         defaultValue = 'false'
-        last = true
         desc = "Determines whether serializable variable values (typically variables that store custom Java objects)
                 should be deserialized on server side (default `false`).
 
@@ -92,6 +91,14 @@
 
                 If set to `false`, a serializable variable will be returned in its serialized format. For example, a
                 variable that is serialized as XML will be returned as a JSON string containing XML." />
+
+    <@lib.property
+        name = "includeExtensionProperties"
+        type = "boolean"
+        defaultValue = 'false'
+        last = true
+        desc = "Determines whether custom extension properties defined in the BPMN activity of the external task (e.g.
+                via the Extensions tab in the Camunda modeler) should be included in the response. Default: false" />
 
 
 </@lib.dto>

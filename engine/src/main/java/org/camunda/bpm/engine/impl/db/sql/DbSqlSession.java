@@ -184,12 +184,19 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected void entityDeletePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+    
     if (failure != null) {
       operation.setRowsAffected(0);
       operation.setFailure(failure);
 
+      DbOperation dependencyOperation = operation.getDependentOperation();
+
       if (isConcurrentModificationException(operation, failure)) {
         operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
+      } else if (dependencyOperation != null && dependencyOperation.getState() != null && dependencyOperation.getState() != State.APPLIED) {
+        // the owning operation was not successful, so the prerequisite for this operation was not given
+        LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
+        operation.setState(State.NOT_APPLIED);
       } else {
         operation.setState(State.FAILED_ERROR);
       }

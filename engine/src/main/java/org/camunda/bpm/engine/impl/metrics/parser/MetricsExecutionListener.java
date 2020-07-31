@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.metrics.parser;
 
+import java.util.function.Function;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -27,15 +29,24 @@ import org.camunda.bpm.engine.impl.context.Context;
 public class MetricsExecutionListener implements ExecutionListener {
 
   protected String metricsName;
+  protected Function<DelegateExecution, Boolean> condition;
 
   public MetricsExecutionListener(String metricsName) {
+    this(metricsName, delegateExecution -> true);
+  }
+
+  public MetricsExecutionListener(String metricsName,
+                                  Function<DelegateExecution, Boolean> condition) {
     this.metricsName = metricsName;
+    this.condition = condition;
   }
 
   public void notify(DelegateExecution execution) throws Exception {
-    Context.getProcessEngineConfiguration()
-      .getMetricsRegistry()
-      .markOccurrence(metricsName);
+    if (condition.apply(execution)) {
+      Context.getProcessEngineConfiguration()
+          .getMetricsRegistry()
+          .markOccurrence(metricsName);
+    }
   }
 
 }

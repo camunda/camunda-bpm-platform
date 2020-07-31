@@ -19,27 +19,33 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchRestartHelper;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
+import org.junit.Test;
 
 
-public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngineTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -54,14 +60,15 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
   @After
   public void tearDown() throws Exception {
-    super.tearDown();
+
     authorizationService.createAuthorizationQuery();
     batchHelper.removeAllRunningAndHistoricBatches();
   }
 
+  @Test
   public void testStartProcessInstanceByKeyAndTenantId() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionTenantId(TENANT_ONE)
@@ -70,8 +77,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByKeyForAnyTenant() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .execute();
@@ -79,9 +87,10 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByKeyWithoutTenantId() {
-    deployment(PROCESS);
-    deploymentForTenant(TENANT_ONE, PROCESS);
+   testRule.deploy(PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionWithoutTenantId()
@@ -92,8 +101,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.singleResult().getTenantId(), is(nullValue()));
   }
 
+  @Test
   public void testFailToStartProcessInstanceByKeyForOtherTenant() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -106,9 +116,10 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceByKeyForMultipleTenants() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -120,8 +131,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceByIdAndTenantId() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -136,8 +148,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceByIdWithoutTenantId() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -152,9 +165,10 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testStartProcessInstanceAtActivityByKeyAndTenantId() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionTenantId(TENANT_ONE)
@@ -164,8 +178,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceAtActivityByKeyForAnyTenant() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .startBeforeActivity("userTask")
@@ -174,9 +189,10 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceAtActivityByKeyWithoutTenantId() {
-    deployment(PROCESS);
-    deploymentForTenant(TENANT_ONE, PROCESS);
+   testRule.deploy(PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionWithoutTenantId()
@@ -188,8 +204,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.singleResult().getTenantId(), is(nullValue()));
   }
 
+  @Test
   public void testFailToStartProcessInstanceAtActivityByKeyForOtherTenant() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -203,9 +220,10 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceAtActivityByKeyForMultipleTenants() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -218,8 +236,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceAtActivityByIdAndTenantId() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -235,8 +254,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceAtActivityByIdWithoutTenantId() {
-    deployment(PROCESS);
+   testRule.deploy(PROCESS);
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -252,10 +272,11 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testStartProcessInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deployment(PROCESS);
+   testRule.deploy(PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionWithoutTenantId()
@@ -265,10 +286,11 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.count(), is(1L));
   }
 
+  @Test
   public void testFailToStartProcessInstanceByKeyNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -280,10 +302,11 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
@@ -296,8 +319,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceByIdNoAuthenticatedTenants() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     ProcessDefinition processDefinition = repositoryService
       .createProcessDefinitionQuery()
@@ -315,11 +339,12 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testStartProcessInstanceByKeyWithTenantIdAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionTenantId(TENANT_ONE)
@@ -330,8 +355,9 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByIdAuthenticatedTenant() {
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -347,11 +373,12 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByKeyWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess").execute();
 
@@ -360,11 +387,12 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByKeyWithTenantIdDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
       .processDefinitionTenantId(TENANT_ONE)
@@ -376,6 +404,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testRestartProcessInstanceSyncWithTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -397,6 +426,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testRestartProcessInstanceAsyncWithTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -420,6 +450,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testFailToRestartProcessInstanceSyncWithOtherTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -441,6 +472,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testFailToRestartProcessInstanceAsyncWithOtherTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -461,6 +493,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testRestartProcessInstanceSyncWithTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -483,6 +516,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testRestartProcessInstanceAsyncWithTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -507,6 +541,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testFailToRestartProcessInstanceSyncWithOtherTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -529,6 +564,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testFailToRestartProcessInstanceAsyncWithOtherTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -551,8 +587,11 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
 
   public ProcessInstance startAndDeleteProcessInstance(String tenantId, BpmnModelInstance modelInstance) {
-    String deploymentId = deploymentForTenant(TENANT_ONE, PROCESS);
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
+    Deployment deployment = testRule.deployForTenant(TENANT_ONE, PROCESS);
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(deployment.getId())
+        .singleResult();
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 

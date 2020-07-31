@@ -21,9 +21,9 @@ import static org.camunda.bpm.spring.boot.starter.util.CamundaSpringBootUtil.joi
 import java.util.List;
 import java.util.Optional;
 
-import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.NotifyAcquisitionRejectedJobsHandler;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.engine.spring.components.jobexecutor.SpringJobExecutor;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaJobConfiguration;
@@ -103,7 +103,7 @@ public class DefaultJobConfiguration extends AbstractCamundaConfiguration implem
     public static JobExecutor jobExecutor(@Qualifier(CAMUNDA_TASK_EXECUTOR_QUALIFIER) final TaskExecutor taskExecutor, CamundaBpmProperties properties) {
       final SpringJobExecutor springJobExecutor = new SpringJobExecutor();
       springJobExecutor.setTaskExecutor(taskExecutor);
-      springJobExecutor.setRejectedJobsHandler(new CallerRunsRejectedJobsHandler());
+      springJobExecutor.setRejectedJobsHandler(new NotifyAcquisitionRejectedJobsHandler());
 
       JobExecutionProperty jobExecution = properties.getJobExecution();
       Optional.ofNullable(jobExecution.getLockTimeInMillis()).ifPresent(springJobExecutor::setLockTimeInMillis);

@@ -565,6 +565,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidIncidentMessage() {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
 
@@ -836,6 +837,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertThat(processDefinitionList.get(1).getVersionTag()).isEqualTo("ver_tag_2");
   }
 
+  @Test
   public void testQueryByStartableInTasklist() {
     assertThat(repositoryService.createProcessDefinitionQuery().startableInTasklist().count()).isEqualTo(4);
   }

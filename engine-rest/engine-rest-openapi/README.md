@@ -17,6 +17,7 @@ Aligned with OpeanAPI specification version [3.0.2](https://github.com/OAI/OpenA
  + [reuse](#reuse)
  + [descriptions](#descriptions)
  + [formats](#formats)
+ + [nullable](#nullable)
  + [examples](#examples)
 3. [Reviews](#reviews)
 
@@ -127,10 +128,10 @@ NOTE: The endpoints' paths are automatically resolved from the folder structure,
 The endpoints' paths are ordered lexicographically. 
 * the dynamic endpoints should be structured with brakes like `process-instance/{id}/variables/{varName}/data`,
 then the path parameters (`id` and `varName`) should always be included in the endpoint definition and marked as `required`.
-* endpoints that are almost similar but have a different paths (e.g. [Get Activity Instance Statistics](https://docs.camunda.org/manual/7.12/reference/rest/process-definition/get-activity-statistics/)) needs to be separated in different files. A unique `operationId` should be assigne to each of them. You can consider adding the common parts of the endpoints in [lib/commons](#commons).
+* endpoints that are almost similar but have a different paths (e.g. [Get Activity Instance Statistics](https://docs.camunda.org/manual/7.12/reference/rest/process-definition/get-activity-statistics/)) needs to be separated in different files. A unique `operationId` should be assigned to each of them. You can consider adding the common parts of the endpoints in [lib/commons](#commons).
 * the name of the method's request (GET, POST, PUT, DELETE, OPTIONS) is the name of the template file (get.ftl, post.frl, etc.).
 * each endpoint definition has a unique `operationId` that will be used for the generation of clients.
-* for async endpoints make sure to add `Operation` suffix to prevent collisions in generated C# clients, e.g. `setExternalTaskRetriesAsync` -> `setExternalTaskRetriesAsyncOperation`, `modifyProcessInstanceAsync` -> `modifyProcessInstanceAsyncOperation`
+* for `async` endpoints make sure to add `Operation` suffix to prevent collisions in generated C# clients, e.g. `setExternalTaskRetriesAsync` -> `setExternalTaskRetriesAsyncOperation`, `modifyProcessInstanceAsync` -> `modifyProcessInstanceAsyncOperation`
 In most of the cases, the java method name should be used (e.g. `deleteProcessInstancesAsync`). When this is not possible, please define it according to the Java conventions.
 * each endpoint definition contains a tag of its resource (e.g. `Process instance`, `Deployment`).
 * each endpoint definition contains a description.
@@ -219,6 +220,19 @@ Specify the `date-time` format of the date properties whenever is possible,
                        the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., 2013-01-23T14:42:45.000+0200." />
 ```
 That will improve the clients that are generated from the OpenAPI documentation. **Note:** When using a 'date-time' in a 'GET' request (as URL parameter), it is important to use proper URL encoding as described in the [Date Format Overview](https://docs.camunda.org/manual/develop/reference/rest/overview/date-format/)
+
+#### Nullable
+
+Disable `nullable` field to the properties of type `boolean` or with `format` field to specify that they cannot be `null`
+since the default value for those properties is `nullable=true` which ensures working C# clients:
+```
+    <@lib.property
+         name = "version"
+         type = "integer"
+         format = "int32"
+         nullable = false
+         desc = "The version of the process definition that the engine assigned to it." />
+```
 
 #### Examples
 

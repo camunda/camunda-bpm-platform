@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import junit.framework.AssertionFailedError;
+
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -36,7 +39,10 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -47,11 +53,10 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import junit.framework.AssertionFailedError;
 
 public class ProcessEngineTestRule extends TestWatcher {
 
@@ -117,8 +122,8 @@ public class ProcessEngineTestRule extends TestWatcher {
     return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
-  public DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder) {
-    DeploymentWithDefinitions deployment = deploymentBuilder.deployWithResult();
+  public <T extends DeploymentWithDefinitions> T deploy(DeploymentBuilder deploymentBuilder) {
+    T deployment = (T) deploymentBuilder.deployWithResult();
 
     processEngineRule.manageDeployment(deployment);
 
@@ -242,7 +247,11 @@ public class ProcessEngineTestRule extends TestWatcher {
    * Execute all available jobs recursively till no more jobs found.
    */
   public void executeAvailableJobs() {
-    executeAvailableJobs(0, Integer.MAX_VALUE);
+    executeAvailableJobs(0, Integer.MAX_VALUE, true);
+  }
+
+  public void executeAvailableJobs(Boolean recursive) {
+    executeAvailableJobs(0, Integer.MAX_VALUE, recursive);
   }
 
   /**
@@ -254,11 +263,15 @@ public class ProcessEngineTestRule extends TestWatcher {
    *
    * @see #executeAvailableJobs()
    */
-  public void executeAvailableJobs(int expectedExecutions){
-    executeAvailableJobs(0, expectedExecutions);
+  public void executeAvailableJobs(int expectedExecutions) {
+    executeAvailableJobs(0, expectedExecutions, true);
   }
 
-  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions) {
+  public void executeAvailableJobs(int expectedExecutions, Boolean recursive) {
+    executeAvailableJobs(0, expectedExecutions, recursive);
+  }
+
+  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions, Boolean recursive) {
     List<Job> jobs = processEngine.getManagementService().createJobQuery().withRetriesLeft().list();
 
     if (jobs.isEmpty()) {
@@ -278,7 +291,9 @@ public class ProcessEngineTestRule extends TestWatcher {
     assertThat("executed more jobs than expected.",
         jobsExecuted, lessThanOrEqualTo(expectedExecutions));
 
-    executeAvailableJobs(jobsExecuted, expectedExecutions);
+    if (recursive) {
+      executeAvailableJobs(jobsExecuted, expectedExecutions, recursive);
+    }
   }
 
   public void completeTask(String taskKey) {
@@ -353,6 +368,48 @@ public class ProcessEngineTestRule extends TestWatcher {
     Expression expression = new FixedValue(true);
     CaseControlRuleImpl caseControlRule = new CaseControlRuleImpl(expression);
     return caseControlRule;
+  }
+  
+
+  public void deleteHistoryCleanupJobs() {
+    HistoryService historyService = processEngine.getHistoryService();
+    final List<Job> jobs = historyService.findHistoryCleanupJobs();
+    for (final Job job : jobs) {
+      final String jobId = job.getId();
+      
+      processEngineRule
+        .getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
+        .execute((Command<Void>) commandContext -> {
+          JobManager jobManager = commandContext.getJobManager();
+          
+          JobEntity jobEntity = jobManager.findJobById(jobId);
+          
+          jobEntity.delete();
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
+          return null;
+        });
+    }
+  }
+  
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, null, null);
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, businessKey, null);
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, VariableMap variables) {
+    return createCaseInstanceByKey(caseDefinitionKey, null, variables);
+  }
+
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, VariableMap variables) {
+    return processEngine.getCaseService()
+        .withCaseDefinitionByKey(caseDefinitionKey)
+        .businessKey(businessKey)
+        .setVariables(variables)
+        .create();
   }
 
   protected static class InterruptTask extends TimerTask {

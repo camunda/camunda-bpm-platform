@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,21 +32,23 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTestCase {
+public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetVariableOnProcessInstanceStart() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("testVar", "testValue");
@@ -59,10 +64,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetVariableLocalOnUserTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -85,10 +91,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(taskExecution.getActivityInstanceId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetVariableOnProcessIntanceStartAndSetVariableLocalOnUserTask() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("testVar", "testValue");
@@ -119,10 +126,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(taskExecution.getActivityInstanceId(), secondVar.getActivityInstanceId());
 
     taskService.complete(task.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testSetVariableOnUserTaskInsideSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
 
@@ -139,10 +147,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     taskService.complete(task.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSetVariableOnServiceTaskInsideSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -153,10 +162,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     // the variable is in the process instance scope
     assertEquals(pi.getId(), variable.getActivityInstanceId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSetVariableLocalOnServiceTaskInsideSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -172,10 +182,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     // the variable is in the sub process scope
     assertEquals(activityInstanceId, variable.getActivityInstanceId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSetVariableLocalOnTaskInsideParallelBranch() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -197,10 +208,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceScopeTest.testSetVariableLocalOnTaskInsideParallelBranch.bpmn"})
+  @Test
   public void testSetVariableOnTaskInsideParallelBranch() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -218,10 +230,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSetVariableOnServiceTaskInsideParallelBranch() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -232,10 +245,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     // the variable is in the process instance scope
     assertEquals(pi.getId(), variable.getActivityInstanceId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSetVariableLocalOnServiceTaskInsideParallelBranch() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -251,10 +265,11 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     // the variable is in the service task scope
     assertEquals(serviceTask.getId(), variable.getActivityInstanceId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testHistoricCaseVariableInstanceQuery() {
     // start case instance with variables
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -288,6 +303,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testInputMappings() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -356,6 +372,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCmmnActivityInstanceIdOnCaseInstance() {
 
     // given
@@ -394,6 +411,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCmmnActivityInstanceIdOnCaseExecution() {
 
     // given
@@ -432,6 +450,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCmmnActivityInstanceIdOnTask() {
 
     // given

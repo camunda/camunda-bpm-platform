@@ -18,6 +18,17 @@ package org.camunda.bpm.engine.rest.security.auth;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.IdentityService;
+
+/**
+ * Serves as DTO to hold the result of an authentication request performed
+ * through an {@link AuthenticationProvider}.
+ * 
+ * Note that when implementing a custom {@link AuthenticationProvider}, it is
+ * not required to set groups or tenants for an AuthenticationResult, as they
+ * will be resolved later via the {@link IdentityService} (e.g.
+ * {@link ProcessEngineAuthenticationFilter#setAuthenticatedUser}).
+ */
 public class AuthenticationResult {
 
   protected boolean isAuthenticated;

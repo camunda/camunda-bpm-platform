@@ -16,10 +16,18 @@
  */
 package org.camunda.bpm.engine.test.api.delegate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * Tests for the execution hierarchy methods exposed in delegate execution
@@ -27,17 +35,18 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Daniel Meyer
  *
  */
-public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCase {
+public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTest {
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     AssertingJavaDelegate.clear();
-    super.tearDown();
+
   }
 
+  @Test
   public void testSingleNonScopeActivity() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
+   testRule.deploy(Bpmn.createExecutableProcess("testProcess")
       .startEvent()
       .serviceTask()
         .camundaClass(AssertingJavaDelegate.class.getName())
@@ -57,9 +66,10 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testConcurrentServiceTasks() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
+   testRule.deploy(Bpmn.createExecutableProcess("testProcess")
       .startEvent()
       .parallelGateway("fork")
         .serviceTask()
@@ -85,8 +95,9 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Test
   public void testTaskInsideEmbeddedSubprocess() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
+   testRule.deploy(Bpmn.createExecutableProcess("testProcess")
         .startEvent()
         .subProcess()
           .embeddedSubProcess()
@@ -110,9 +121,10 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
     runtimeService.startProcessInstanceByKey("testProcess");
   }
 
+  @Test
   public void testSubProcessInstance() {
 
-    deployment(
+   testRule.deploy(
       Bpmn.createExecutableProcess("testProcess")
         .startEvent()
         .callActivity()

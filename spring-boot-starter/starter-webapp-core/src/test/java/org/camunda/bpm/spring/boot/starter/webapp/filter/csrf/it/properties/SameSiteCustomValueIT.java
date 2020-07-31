@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
 
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
@@ -45,12 +46,13 @@ public class SameSiteCustomValueIT {
 
   @Test
   public void shouldSetSameSiteCookieCustomValue() {
-    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=aCustomValue");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=aCustomValue");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);

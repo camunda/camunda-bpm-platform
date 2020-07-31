@@ -16,19 +16,25 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.end;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class EndEventTest extends PluggableProcessEngineTestCase {
+public class EndEventTest extends PluggableProcessEngineTest {
 
   // Test case for ACT-1259
   @Deployment
+  @Test
   public void testConcurrentEndOfSameProcess() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithDelay");
     Task task = taskService.createTaskQuery().singleResult();
@@ -59,7 +65,7 @@ public class EndEventTest extends PluggableProcessEngineTestCase {
     }
     
     assertEquals("(Only) one thread should have been able to successfully end the process", 1, successCount);
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
   
   /** Helper class for concurrent testing */

@@ -62,7 +62,7 @@ public class ProductionConfigurationIT {
   @Test
   public void shouldStartWithProductionConfiguration() {
     // when
-    Response engineResponse = when().get(container.getBaseUrl() + "/rest/engine");
+    Response engineResponse = when().get(container.getBaseUrl() + "/engine-rest/engine");
 
     // then
     engineResponse.then()

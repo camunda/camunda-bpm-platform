@@ -268,8 +268,17 @@
 
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <!--
+          HEADS-UP!!!
+          If you change something here, you should probably also change it the EE Webapp
+          See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicProcessInstance.xml
+        -->
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ in (
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            SELF.ID_,
+        </if>
+        SELF.PROC_DEF_KEY_, '*'))
     </if>
 
     <bind name="INC_JOIN" value="false" />
@@ -543,6 +552,11 @@
       </foreach>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        <!--
+          HEADS-UP!!!
+          If you change something here, you should probably also change it the EE Webapp
+          See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicProcessInstance.xml
+        -->
         and (
         (SELF.PROC_DEF_KEY_ is not null
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>

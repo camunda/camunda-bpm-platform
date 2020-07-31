@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "deleteAsyncHistoricQueryBased"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Deletes a set of process instances asynchronously (batch) based on a historic process instance query." />
 
 

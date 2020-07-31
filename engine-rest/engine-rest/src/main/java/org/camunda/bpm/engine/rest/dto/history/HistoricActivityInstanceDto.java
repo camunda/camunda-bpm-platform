@@ -128,9 +128,8 @@ public class HistoricActivityInstanceDto {
     return rootProcessInstanceId;
   }
 
-  public static HistoricActivityInstanceDto fromHistoricActivityInstance(HistoricActivityInstance historicActivityInstance) {
-
-    HistoricActivityInstanceDto dto = new HistoricActivityInstanceDto();
+  public static void fromHistoricActivityInstance(HistoricActivityInstanceDto dto,
+                                                  HistoricActivityInstance historicActivityInstance) {
 
     dto.id = historicActivityInstance.getId();
     dto.parentActivityInstanceId = historicActivityInstance.getParentActivityInstanceId();
@@ -153,7 +152,5 @@ public class HistoricActivityInstanceDto {
     dto.tenantId = historicActivityInstance.getTenantId();
     dto.removalTime = historicActivityInstance.getRemovalTime();
     dto.rootProcessInstanceId = historicActivityInstance.getRootProcessInstanceId();
-
-    return dto;
   }
 }

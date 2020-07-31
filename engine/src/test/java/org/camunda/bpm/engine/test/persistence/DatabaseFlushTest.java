@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 public class DatabaseFlushTest extends ConcurrencyTestCase {
 
@@ -63,10 +64,11 @@ public class DatabaseFlushTest extends ConcurrencyTestCase {
   // note: This test is also excluded via pom.xml on MariaDB Galera cluster
   // due to instability; see CAM-10576
   @RequiredDatabase(excludes = DbSqlSessionFactory.DB2)
+  @Test
   public void testNoIncompleteFlushOnConstraintViolation()
   {
     // given
-    deployment(GW_PROCESS);
+   testRule.deploy(GW_PROCESS);
 
     runtimeService.startProcessInstanceByKey("process");
 

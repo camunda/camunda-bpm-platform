@@ -23,15 +23,16 @@ import static org.junit.Assert.assertThat;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
-public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCase {
+public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTest {
 
   protected BpmnModelInstance signalStartProcess(String processId) {
     return Bpmn.createExecutableProcess(processId)
@@ -52,16 +53,18 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
       .done();
   }
 
+  @Test
   public void testSendSignalToStartEvent() {
-    deployment(signalStartProcess("signalStart"));
+    testRule.deploy(signalStartProcess("signalStart"));
 
     runtimeService.createSignalEvent("signal").send();
 
     assertThat(taskService.createTaskQuery().count(), is(1L));
   }
 
+  @Test
   public void testSendSignalToIntermediateCatchEvent() {
-    deployment(signalCatchProcess("signalCatch"));
+    testRule.deploy(signalCatchProcess("signalCatch"));
 
     runtimeService.startProcessInstanceByKey("signalCatch");
 
@@ -70,8 +73,9 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(taskService.createTaskQuery().count(), is(1L));
   }
 
+  @Test
   public void testSendSignalToStartAndIntermediateCatchEvent() {
-    deployment(signalStartProcess("signalStart"), signalCatchProcess("signalCatch"));
+    testRule.deploy(signalStartProcess("signalStart"), signalCatchProcess("signalCatch"));
 
     runtimeService.startProcessInstanceByKey("signalCatch");
 
@@ -80,16 +84,18 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(taskService.createTaskQuery().count(), is(2L));
   }
 
+  @Test
   public void testSendSignalToMultipleStartEvents() {
-    deployment(signalStartProcess("signalStart"), signalStartProcess("signalStart2"));
+    testRule.deploy(signalStartProcess("signalStart"), signalStartProcess("signalStart2"));
 
     runtimeService.createSignalEvent("signal").send();
 
     assertThat(taskService.createTaskQuery().count(), is(2L));
   }
 
+  @Test
   public void testSendSignalToMultipleIntermediateCatchEvents() {
-    deployment(signalCatchProcess("signalCatch"), signalCatchProcess("signalCatch2"));
+    testRule.deploy(signalCatchProcess("signalCatch"), signalCatchProcess("signalCatch2"));
 
     runtimeService.startProcessInstanceByKey("signalCatch");
     runtimeService.startProcessInstanceByKey("signalCatch2");
@@ -99,8 +105,9 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(taskService.createTaskQuery().count(), is(2L));
   }
 
+  @Test
   public void testSendSignalWithExecutionId() {
-    deployment(signalCatchProcess("signalCatch"), signalCatchProcess("signalCatch2"));
+    testRule.deploy(signalCatchProcess("signalCatch"), signalCatchProcess("signalCatch2"));
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalCatch");
     runtimeService.startProcessInstanceByKey("signalCatch2");
@@ -113,8 +120,9 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(taskService.createTaskQuery().count(), is(1L));
   }
 
+  @Test
   public void testSendSignalToStartEventWithVariables() {
-    deployment(signalStartProcess("signalStart"));
+    testRule.deploy(signalStartProcess("signalStart"));
 
     Map<String, Object> variables = Variables.createVariables()
         .putValue("var1", "a")
@@ -126,8 +134,9 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(runtimeService.getVariables(execution.getId()), is(variables));
   }
 
+  @Test
   public void testSendSignalToIntermediateCatchEventWithVariables() {
-    deployment(signalCatchProcess("signalCatch"));
+    testRule.deploy(signalCatchProcess("signalCatch"));
 
     runtimeService.startProcessInstanceByKey("signalCatch");
 
@@ -141,11 +150,13 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     assertThat(runtimeService.getVariables(execution.getId()), is(variables));
   }
 
+  @Test
   public void testNoSignalEventSubscription() {
     // assert that no exception is thrown
     runtimeService.createSignalEvent("signal").send();
   }
 
+  @Test
   public void testNonExistingExecutionId() {
 
     try {
@@ -156,8 +167,9 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     }
   }
 
+  @Test
   public void testNoSignalEventSubscriptionWithExecutionId() {
-    deployment(Bpmn.createExecutableProcess("noSignal")
+    testRule.deploy(Bpmn.createExecutableProcess("noSignal")
         .startEvent()
         .userTask()
         .endEvent()

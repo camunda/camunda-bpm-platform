@@ -16,17 +16,22 @@
  */
 package org.camunda.bpm.engine.test.standalone.initialization;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  * @author Stefan Hentschel
  * @author Roman Smirnov
  */
-public class ProcessEngineInitializationTest extends PvmTestCase {
+public class ProcessEngineInitializationTest {
 
+  @Test
   public void testNoTables() {
     try {
       ProcessEngineConfiguration
@@ -35,10 +40,14 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
       fail("expected exception");
     } catch (Exception e) {
       // OK
-      assertTextPresent("ENGINE-03057 There are no Camunda tables in the database. Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e.getMessage());
+      assertThat(e.getMessage()).contains("ENGINE-03057 There are no Camunda tables in the database. " +
+        "Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" " +
+        "(use create-drop for testing only!) in bean processEngineConfiguration " +
+        "in camunda.cfg.xml for automatic schema creation");
     }
   }
 
+  @Test
   public void testDefaultRetries() {
     ProcessEngineConfiguration configuration = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/defaultretries.camunda.cfg.xml");
@@ -46,6 +55,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
     assertEquals(JobEntity.DEFAULT_RETRIES, configuration.getDefaultNumberOfRetries());
   }
 
+  @Test
   public void testCustomDefaultRetries() {
     ProcessEngineConfiguration configuration = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/customdefaultretries.camunda.cfg.xml");

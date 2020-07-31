@@ -16,13 +16,17 @@
  */
 package org.camunda.bpm.container.impl.jmx.kernel;
 
-import java.util.List;
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import junit.framework.TestCase;
+import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.util.FailingDeploymentOperationStep;
@@ -31,6 +35,9 @@ import org.camunda.bpm.container.impl.jmx.kernel.util.StopServiceDeploymentOpera
 import org.camunda.bpm.container.impl.jmx.kernel.util.TestService;
 import org.camunda.bpm.container.impl.jmx.kernel.util.TestServiceType;
 import org.camunda.bpm.container.impl.spi.PlatformService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Testcases for the {@link MBeanServiceContainer} Kernel.
@@ -38,7 +45,7 @@ import org.camunda.bpm.container.impl.spi.PlatformService;
  * @author Daniel Meyer
  *
  */
-public class MBeanServiceContainerTest extends TestCase {
+public class MBeanServiceContainerTest {
 
   private MBeanServiceContainer serviceContainer;
 
@@ -57,13 +64,13 @@ public class MBeanServiceContainerTest extends TestCase {
   private TestService service3 = new TestService();
   private TestService service4 = new TestService();
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     serviceContainer = new MBeanServiceContainer();
-    super.setUp();
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     // make sure all MBeans are removed after each test
     MBeanServer mBeanServer = serviceContainer.getmBeanServer();
     if(mBeanServer.isRegistered(service1ObjectName)) {
@@ -78,9 +85,9 @@ public class MBeanServiceContainerTest extends TestCase {
     if(mBeanServer.isRegistered(service4ObjectName)) {
       mBeanServer.unregisterMBean(service4ObjectName);
     }
-    super.tearDown();
   }
 
+  @Test
   public void testStartService() {
 
     // initially the service is not present:
@@ -106,6 +113,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testStopService() {
 
     // start some service
@@ -127,6 +135,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testGetServicesByType() {
 
     serviceContainer.startService(service1Name, service1);
@@ -149,6 +158,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testGetServiceValuesByType() {
 
     // start some services
@@ -177,6 +187,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testGetServiceNames() {
 
     // start some services
@@ -207,6 +218,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testDeploymentOperation() {
 
     serviceContainer.createDeploymentOperation("test op")
@@ -220,6 +232,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testFailingDeploymentOperation() {
 
     try {
@@ -262,6 +275,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testUndeploymentOperation() {
 
     // lets first start some services:
@@ -280,6 +294,7 @@ public class MBeanServiceContainerTest extends TestCase {
 
   }
 
+  @Test
   public void testFailingUndeploymentOperation() {
 
     // lets first start some services:

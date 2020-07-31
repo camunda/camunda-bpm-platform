@@ -16,16 +16,22 @@
  */
 package org.camunda.bpm.engine.test.bpmn.receivetask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * see https://app.camunda.com/jira/browse/CAM-1612
@@ -34,7 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Danny Gräf
  * @author Falko Menge
  */
-public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
+public class ReceiveTaskTest extends PluggableProcessEngineTest {
 
   private List<EventSubscription> getEventSubscriptionList() {
     return runtimeService.createEventSubscriptionQuery()
@@ -52,6 +58,7 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.simpleReceiveTask.bpmn20.xml")
+  @Test
   public void testReceiveTaskWithoutMessageReference() {
 
     // given: a process instance waiting in the receive task
@@ -64,10 +71,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     runtimeService.signal(processInstance.getId());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsLegacySignalingOnSingleReceiveTask() {
 
     // given: a process instance waiting in the receive task
@@ -83,10 +91,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnSingleReceiveTask() {
 
     // given: a process instance waiting in the receive task
@@ -104,10 +113,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsCorrelateMessageOnSingleReceiveTask() {
 
     // given: a process instance waiting in the receive task
@@ -125,10 +135,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.singleReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsCorrelateMessageByBusinessKeyOnSingleReceiveTask() {
 
     // given: a process instance with business key 23 waiting in the receive task
@@ -148,7 +159,7 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(1, getEventSubscriptionList().size());
 
     // expect: this ends the process instance with business key 23
-    assertProcessEnded(processInstance23.getId());
+    testRule.assertProcessEnded(processInstance23.getId());
 
     // expect: other process instance is still running
     assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance42.getId()).count());
@@ -160,10 +171,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance42.getId());
+    testRule.assertProcessEnded(processInstance42.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiSequentialReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsLegacySignalingOnSequentialMultiReceiveTask() {
 
     // given: a process instance waiting in the first receive tasks
@@ -195,10 +207,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiSequentialReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnSequentialMultiReceiveTask() {
 
     // given: a process instance waiting in the first receive tasks
@@ -230,10 +243,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiSequentialReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsCorrelateMessageOnSequentialMultiReceiveTask() {
 
     // given: a process instance waiting in the first receive tasks
@@ -265,10 +279,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsLegacySignalingOnParallelMultiReceiveTask() {
 
     // given: a process instance waiting in two receive tasks
@@ -292,10 +307,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnParallelMultiReceiveTask() {
 
     // given: a process instance waiting in two receive tasks
@@ -313,10 +329,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTask.bpmn20.xml")
+  @Test
   public void testNotSupportsCorrelateMessageOnParallelMultiReceiveTask() {
 
     // given: a process instance waiting in two receive tasks
@@ -336,6 +353,7 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTaskCompensate.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnParallelMultiReceiveTaskWithCompensation() {
 
     // given: a process instance waiting in two receive tasks
@@ -364,10 +382,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTaskBoundary.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnParallelMultiInstanceWithBoundary() {
 
     // given: a process instance waiting in two receive tasks
@@ -388,10 +407,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiParallelReceiveTaskBoundary.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnParallelMultiInstanceWithBoundaryEventReceived() {
 
     // given: a process instance waiting in two receive tasks
@@ -412,10 +432,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.subProcessReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnSubProcessReceiveTask() {
 
     // given: a process instance waiting in the sub-process receive task
@@ -433,10 +454,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.multiSubProcessReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnMultiSubProcessReceiveTask() {
 
     // given: a process instance waiting in two parallel sub-process receive tasks
@@ -454,10 +476,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.parallelGatewayReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsMessageEventReceivedOnReceiveTaskBehindParallelGateway() {
 
     // given: a process instance waiting in two receive tasks
@@ -475,10 +498,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.parallelGatewayReceiveTask.bpmn20.xml")
+  @Test
   public void testSupportsCorrelateMessageOnReceiveTaskBehindParallelGateway() {
 
     // given: a process instance waiting in two receive tasks
@@ -496,10 +520,11 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, getEventSubscriptionList().size());
 
     // expect: this ends the process instance
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testWaitStateBehavior() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
     Execution execution = runtimeService.createExecutionQuery()
@@ -509,6 +534,6 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(execution);
 
     runtimeService.signal(execution.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 }

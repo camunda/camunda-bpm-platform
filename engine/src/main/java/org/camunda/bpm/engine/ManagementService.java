@@ -1343,4 +1343,16 @@ public interface ManagementService {
    */
   SchemaLogQuery createSchemaLogQuery();
 
+  /**
+   * Enable/disable sending telemetry data to Camunda
+   * 
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  void toggleTelemetry(boolean enabled);
+
+  /**
+   * Checks if sending telemetry data to Camunda is enabled/disabled
+   */
+  boolean isTelemetryEnabled();
 }

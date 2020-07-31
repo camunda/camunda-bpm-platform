@@ -16,24 +16,34 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngineTestCase {
-
+public class TaskQueryDisabledStoredExpressionsTest {
 
   protected static final String EXPECTED_STORED_QUERY_FAILURE_MESSAGE =
       "Expressions are forbidden in stored queries. This behavior can be toggled in the process engine configuration";
@@ -42,14 +52,28 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
 
   public static long MUTABLE_FIELD = 0;
 
-  public TaskQueryDisabledStoredExpressionsTest() {
-    super("org/camunda/bpm/engine/test/api/task/task-query-disabled-stored-expressions-test.camunda.cfg.xml");
-  }
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/task/task-query-disabled-stored-expressions-test.camunda.cfg.xml");
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  protected void setUp() throws Exception {
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected TaskService taskService;
+  protected FilterService filterService;
+
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    taskService = engineRule.getTaskService();
+    filterService = engineRule.getFilterService();
     MUTABLE_FIELD = 0;
   }
 
+  @Test
   public void testStoreFilterWithoutExpression() {
     TaskQuery taskQuery = taskService.createTaskQuery().dueAfter(new Date());
     Filter filter = filterService.newTaskFilter("filter");
@@ -63,6 +87,7 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     filterService.deleteFilter(filter.getId());
   }
 
+  @Test
   public void testStoreFilterWithExpression() {
     TaskQuery taskQuery = taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
     Filter filter = filterService.newTaskFilter("filter");
@@ -71,11 +96,12 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     try {
       filterService.saveFilter(filter);
     } catch (ProcessEngineException e) {
-      assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
     assertTrue(fieldIsUnchanged());
   }
 
+  @Test
   public void testUpdateFilterWithExpression() {
     // given a stored filter
     TaskQuery taskQuery = taskService.createTaskQuery().dueAfter(new Date());
@@ -90,7 +116,7 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     try {
       filterService.saveFilter(filter);
     } catch (ProcessEngineException e) {
-      assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
     assertTrue(fieldIsUnchanged());
 
@@ -98,20 +124,18 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     filterService.deleteFilter(filter.getId());
   }
 
+  @Test
   public void testCannotExecuteStoredFilter() {
     final TaskQuery filterQuery = taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
 
     // store a filter bypassing validation
     // the API way of doing this would be by reconfiguring the engine
-    String filterId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
-
-      public String execute(CommandContext commandContext) {
-        FilterEntity filter = new FilterEntity(EntityTypes.TASK);
-        filter.setQuery(filterQuery);
-        filter.setName("filter");
-        commandContext.getDbEntityManager().insert(filter);
-        return filter.getId();
-      }
+    String filterId = processEngineConfiguration.getCommandExecutorTxRequired().execute(commandContext -> {
+      FilterEntity filter = new FilterEntity(EntityTypes.TASK);
+      filter.setQuery(filterQuery);
+      filter.setName("filter");
+      commandContext.getDbEntityManager().insert(filter);
+      return filter.getId();
     });
 
     extendFilterAndValidateFailingQuery(filterId, null);
@@ -128,7 +152,7 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     try {
       filterService.list(filterId, query);
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());
@@ -136,7 +160,7 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
     try {
       filterService.count(filterId, query);
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_STORED_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());

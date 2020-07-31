@@ -16,27 +16,32 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByPriority;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.camunda.bpm.engine.externaltask.ExternalTask;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByPriority;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Christopher Zell
  */
-public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestCase {
+public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  @Test
   public void testOrderByPriority() {
     // given five jobs with priorities from 1 to 5
     //each process has two external tasks - one with priority expression and one without priority
@@ -53,6 +58,7 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  @Test
   public void testFilterByExternalTaskPriorityLowerThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     //each process has two external tasks - one with priority expression and one without priority
@@ -74,6 +80,7 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  @Test
   public void testFilterByExternalTaskPriorityLowerThanOrEqualsAndHigherThanOrEqual() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -93,6 +100,7 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  @Test
   public void testFilterByExternalTaskPriorityHigherThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -119,6 +127,7 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  @Test
   public void testFilterByExternalTaskPriorityLowerAndHigher() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();

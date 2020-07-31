@@ -17,9 +17,12 @@
 package org.camunda.bpm.engine.test.standalone.deploy;
 
 import static org.camunda.bpm.engine.test.standalone.deploy.TestCmmnTransformListener.numberOfRegistered;
+import static org.junit.Assert.assertEquals;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
@@ -33,14 +36,27 @@ import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
  */
-public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
+public class CmmnTransformListenerTest {
 
-  public CmmnTransformListenerTest() {
-    super("org/camunda/bpm/engine/test/standalone/deploy/cmmn.transform.listener.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/deploy/cmmn.transform.listener.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RepositoryService repositoryService;
+
+  @Before
+  public void setUp() {
+    repositoryService = engineRule.getRepositoryService();
   }
 
   @After
@@ -49,6 +65,7 @@ public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testListenerInvocation() {
     // Check if case definition has different key
     assertEquals(0, repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCase").count());

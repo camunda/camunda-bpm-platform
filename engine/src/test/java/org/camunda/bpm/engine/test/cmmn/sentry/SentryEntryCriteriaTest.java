@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotAllowedException;
@@ -23,20 +30,22 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
+public class SentryEntryCriteriaTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceEnableTask.cmmn"})
+  @Test
   public void testSequenceEnableTask() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -68,6 +77,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceAutoStartTask.cmmn"})
+  @Test
   public void testSequenceAutoStartTask() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -101,6 +111,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceEnableStage.cmmn"})
+  @Test
   public void testSequenceEnableStage() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -133,6 +144,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceAutoStartStage.cmmn"})
+  @Test
   public void testSequenceAutoStartStage() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -177,6 +189,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceOccurMilestone.cmmn"})
+  @Test
   public void testSequenceOccurMilestone() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -209,6 +222,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequence.cmmn"})
+  @Test
   public void testSequence() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -273,6 +287,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceWithIfPart.cmmn"})
+  @Test
   public void testSequenceWithIfPartNotSatisfied() {
     // given
     createCaseInstance();
@@ -301,6 +316,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceWithIfPart.cmmn"})
+  @Test
   public void testSequenceWithIfPartSatisfied() {
     // given
     createCaseInstance();
@@ -329,6 +345,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testAndFork.cmmn"})
+  @Test
   public void testAndFork() {
     // given
     createCaseInstance();
@@ -365,6 +382,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testAndJoin.cmmn"})
+  @Test
   public void testAndJoin() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -403,6 +421,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceCombinedWithAndJoin.cmmn"})
+  @Test
   public void testSequenceCombinedWithAndJoin() {
     // given
     createCaseInstance();
@@ -439,6 +458,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testOrFork.cmmn"})
+  @Test
   public void testOrFork() {
     // given
     createCaseInstance();
@@ -471,6 +491,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testOrJoin.cmmn"})
+  @Test
   public void testOrJoin() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -507,6 +528,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testCycle.cmmn"})
+  @Test
   public void testCycle() {
     // given
     createCaseInstance();
@@ -546,6 +568,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testEnableByInstanceCreation.cmmn"})
+  @Test
   public void testEnableByInstanceCreation() {
     // given + when
     createCaseInstance();
@@ -698,6 +721,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testFireAlsoNotAffectedSentries.cmmn"})
+  @Test
   public void testFireAlsoNotAffectedSentries() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -748,6 +772,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testCaseFileItemOnPart() {
     createCaseInstance().getId();
 
@@ -758,6 +783,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testReusableStage() {
     // given
     createCaseInstance();
@@ -812,6 +838,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
    * CAM-3226
    */
   @Deployment
+  @Test
   public void testSentryShouldNotBeEvaluatedAfterStageComplete() {
     // given
     String caseInstanceId = createCaseInstance().getId();
@@ -844,6 +871,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testIfPartOnCaseInstanceCreate() {
 
     // when
@@ -856,6 +884,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testIfPartOnCaseInstanceCreateWithSentry() {
 
     // when
@@ -871,6 +900,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testShouldNotTriggerCompletionTwice.cmmn",
       "org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.noop.bpmn20.xml"
   })
+  @Test
   public void testShouldNotTriggerCompletionTwice() {
     // when
     CaseInstance ci = caseService.createCaseInstanceByKey("case");

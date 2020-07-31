@@ -16,25 +16,29 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestCase {
+public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testCompleteTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -48,6 +52,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testAssignTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -61,6 +66,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testClaimTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -73,6 +79,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
     verifyNoUserOperationLogged();
   }
 
+  @Test
   public void testCreateTask() {
     // when
     Task task = taskService.newTask("a-task-id");
@@ -85,6 +92,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testDelegateTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -98,6 +106,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testResolveTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -111,6 +120,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testSetOwnerTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -124,6 +134,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testSetPriorityTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -137,6 +148,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testUpdateTask() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -151,6 +163,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testActivateProcessInstance() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -163,6 +176,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testSuspendProcessInstance() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -175,6 +189,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml")
+  @Test
   public void testActivateJobDefinition() {
     // given
     runtimeService.startProcessInstanceByKey("oneFailingServiceTaskProcess");
@@ -188,6 +203,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml")
+  @Test
   public void testSuspendJobDefinition() {
     // given
     runtimeService.startProcessInstanceByKey("oneFailingServiceTaskProcess");
@@ -201,6 +217,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml")
+  @Test
   public void testActivateJob() {
     // given
     runtimeService.startProcessInstanceByKey("oneFailingServiceTaskProcess");
@@ -214,6 +231,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml")
+  @Test
   public void testSuspendJob() {
     // given
     runtimeService.startProcessInstanceByKey("oneFailingServiceTaskProcess");
@@ -227,6 +245,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml")
+  @Test
   public void testSetJobRetries() {
     // given
     runtimeService.startProcessInstanceByKey("oneFailingServiceTaskProcess");
@@ -240,6 +259,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testActivateProcessDefinition() {
     // when
     repositoryService.activateProcessDefinitionByKey(PROCESS_KEY);
@@ -249,6 +269,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testSuspendProcessDefinition() {
     // when
     repositoryService.suspendProcessDefinitionByKey(PROCESS_KEY);
@@ -258,6 +279,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testModifyProcessInstance() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -273,6 +295,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testSetVariable() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -285,6 +308,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testRemoveVariable() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -299,6 +323,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   
   @Deployment(resources = PROCESS_PATH)
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteHistoricVariable() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -317,6 +342,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   
   @Deployment(resources = PROCESS_PATH)
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteAllHistoricVariables() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -334,6 +360,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testQueryDeleteVariableHistoryOperationOnCase() {
     // given
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
@@ -350,6 +377,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
   
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
     // given
     Task task = taskService.newTask();

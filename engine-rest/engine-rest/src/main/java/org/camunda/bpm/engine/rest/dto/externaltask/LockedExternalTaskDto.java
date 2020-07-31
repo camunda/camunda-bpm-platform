@@ -49,6 +49,7 @@ public class LockedExternalTaskDto {
   protected Map<String, VariableValueDto> variables;
   protected long priority;
   protected String businessKey;
+  protected Map<String, String> extensionProperties;
 
   public String getActivityId() {
     return activityId;
@@ -111,6 +112,10 @@ public class LockedExternalTaskDto {
     return businessKey;
   }
 
+  public Map<String, String> getExtensionProperties(){
+    return extensionProperties;
+  }
+
   public static LockedExternalTaskDto fromLockedExternalTask(LockedExternalTask task) {
     LockedExternalTaskDto dto = new LockedExternalTaskDto();
     dto.activityId = task.getActivityId();
@@ -131,6 +136,7 @@ public class LockedExternalTaskDto {
     dto.variables = VariableValueDto.fromMap(task.getVariables());
     dto.priority = task.getPriority();
     dto.businessKey = task.getBusinessKey();
+    dto.extensionProperties = task.getExtensionProperties();
 
     return dto;
   }

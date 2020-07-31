@@ -16,11 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * Tests things that BPMN describes as 'uncontrolled flow':
@@ -29,9 +33,10 @@ import org.camunda.bpm.engine.test.Deployment;
  *
  * @author Thorben Lindhauer
  */
-public class UncontrolledFlowTest extends PluggableProcessEngineTestCase {
+public class UncontrolledFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSubProcessTwoOutgoingFlowsCorrelateMessage() {
     // given a process instance
     runtimeService.startProcessInstanceByKey("process");
@@ -50,11 +55,12 @@ public class UncontrolledFlowTest extends PluggableProcessEngineTestCase {
       runtimeService.correlateMessage("Message1");
       fail("should not succeed");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot correlate message 'Message1'", e.getMessage());
+      testRule.assertTextPresent("Cannot correlate message 'Message1'", e.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testSubProcessTwoOutgoingFlowsEndProcess() {
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -65,6 +71,6 @@ public class UncontrolledFlowTest extends PluggableProcessEngineTestCase {
     taskService.complete(innerTask.getId());
 
     // then the process instance is finished
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 }

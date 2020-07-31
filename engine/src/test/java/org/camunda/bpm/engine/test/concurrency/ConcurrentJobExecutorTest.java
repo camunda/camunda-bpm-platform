@@ -73,13 +73,11 @@ public class ConcurrentJobExecutorTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
   protected ManagementService managementService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  protected Thread testThread = Thread.currentThread();
   protected static ControllableThread activeThread;
 
   protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")

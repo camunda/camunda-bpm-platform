@@ -66,7 +66,6 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   protected int revision = 0;
 
   protected FilterEntity() {
-
   }
 
   public FilterEntity(String resourceType) {
@@ -136,13 +135,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   }
 
   public Map<String, Object> getProperties() {
-    if (properties != null) {
-      JsonObject json = JsonUtil.asObject(properties);
-      return JsonUtil.asMap(json);
-    }
-    else {
-      return null;
-    }
+    return properties;
   }
 
   public String getPropertiesInternal() {

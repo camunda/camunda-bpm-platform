@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.pvm;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
@@ -23,14 +25,14 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Decision;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
-public class PvmTest extends TestCase {
+public class PvmTest {
 
+  @Test
   public void testPvmWaitState() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("a")
@@ -64,6 +66,7 @@ public class PvmTest extends TestCase {
     assertNotNull(activityInstance);
   }
 
+  @Test
   public void testPvmAutomatic() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("a")
@@ -86,6 +89,7 @@ public class PvmTest extends TestCase {
     assertNotNull(processInstance.findExecution("c"));
   }
 
+  @Test
   public void testPvmDecision() {
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")

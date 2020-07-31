@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,13 +35,14 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class JobExecutorTest extends JobExecutorTestCase {
 
+  @Test
   public void testBasicJobExecutorOperation() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
@@ -54,7 +59,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
       }
     });
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     Set<String> messages = new HashSet<String>(tweetHandler.getMessages());
     Set<String> expectedMessages = new HashSet<String>();
@@ -87,6 +92,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
     });
   }
 
+  @Test
   public void testJobExecutorHintConfiguration() {
     ProcessEngineConfiguration engineConfig1 =
         ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
@@ -104,6 +110,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
     assertTrue(engineConfig3.isHintJobExecutor());
   }
 
+  @Test
   public void testAcquiredJobs() {
     List<String> firstBatch = new ArrayList<String>(Arrays.asList("a", "b", "c"));
     List<String> secondBatch = new ArrayList<String>(Arrays.asList("d", "e", "f"));

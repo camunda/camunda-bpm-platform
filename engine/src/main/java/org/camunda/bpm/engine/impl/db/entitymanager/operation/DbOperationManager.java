@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -133,6 +134,8 @@ public class DbOperationManager {
     addSortedInserts(flush);
     // then UPDATEs + DELETEs
     addSortedModifications(flush);
+    
+    determineDependencies(flush);
     return flush;
   }
 
@@ -242,5 +245,29 @@ public class DbOperationManager {
     }
 
     return opList;
+  }
+
+  protected void determineDependencies(List<DbOperation> flush) {
+    TreeSet<DbEntityOperation> defaultValue = new TreeSet<DbEntityOperation>();
+    for (DbOperation operation : flush) {
+      if (operation instanceof DbEntityOperation) {
+        DbEntity entity = ((DbEntityOperation) operation).getEntity();
+        if (entity instanceof HasDbReferences) {
+          Map<String, Class> dependentEntities = ((HasDbReferences) entity).getDependentEntities();
+
+          if (dependentEntities != null) {
+            dependentEntities.forEach((id, type) -> {
+
+              deletes.getOrDefault(type, defaultValue).forEach(o -> {
+                if (id.equals(o.getEntity().getId())) {
+                  o.setDependency(operation);
+                }
+              });
+            });
+          }
+
+        }
+      }
+    }
   }
 }

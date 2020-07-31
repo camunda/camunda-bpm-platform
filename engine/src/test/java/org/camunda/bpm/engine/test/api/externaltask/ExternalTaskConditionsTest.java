@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;

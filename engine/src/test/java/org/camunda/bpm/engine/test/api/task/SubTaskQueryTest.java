@@ -16,24 +16,31 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for cub-tasks querying
  * @author Ionut Paduraru
  * @see TaskQueryTest 
  */
-public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
+public class SubTaskQueryTest extends PluggableProcessEngineTest {
 
   private List<String> taskIds;
 
+  @Before
   public void setUp() throws Exception {
 
     identityService.saveUser(identityService.newUser("kermit"));
@@ -48,6 +55,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     taskIds = generateTestSubTasks();
   }
 
+  @After
   public void tearDown() throws Exception {
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup("management");
@@ -59,6 +67,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion (no other filters, no sort) 
    */
+  @Test
   public void testQueryExcludeSubtasks() throws Exception {
     // query all tasks, including subtasks
     TaskQuery query = taskService.createTaskQuery();
@@ -73,6 +82,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion (no other filters, no sort) 
    */
+  @Test
   public void testQueryWithPagination() throws Exception {
     // query all tasks, including subtasks
     TaskQuery query = taskService.createTaskQuery();
@@ -87,6 +97,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion (no other filters, order by task assignee ) 
    */
+  @Test
   public void testQueryExcludeSubtasksSorted() throws Exception {
     // query all tasks, including subtasks
     TaskQuery query = taskService.createTaskQuery().orderByTaskAssignee().asc();
@@ -101,6 +112,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion when additional filter is specified (like assignee), no order. 
    */ 
+  @Test
   public void testQueryByAssigneeExcludeSubtasks() throws Exception {
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
@@ -128,6 +140,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion when additional filter is specified (like assignee), no order. 
    */ 
+  @Test
   public void testQueryByAssigneeExcludeSubtasksPaginated() throws Exception {
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
@@ -155,6 +168,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered. 
    */ 
+  @Test
   public void testQueryByAssigneeExcludeSubtasksOrdered() throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
@@ -188,6 +202,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   /**
    * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered. 
    */ 
+  @Test
   public void testQueryByAssigneeExcludeSubtasksOrderedAndPaginated() throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 

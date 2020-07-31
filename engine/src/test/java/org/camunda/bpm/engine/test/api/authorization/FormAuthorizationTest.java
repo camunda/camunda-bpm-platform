@@ -24,10 +24,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_TASK_VARIABLE;
-import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
@@ -38,6 +42,9 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -52,8 +59,9 @@ public class FormAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
   protected boolean ensureSpecificVariablePermission;
 
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    deploymentId = testRule.deploy(
         "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/form/start.form",
         "org/camunda/bpm/engine/test/api/form/task.form",
@@ -63,14 +71,15 @@ public class FormAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @After
   public void tearDown() {
     super.tearDown();
-    deleteDeployment(deploymentId);
     processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // get start form data ///////////////////////////////////////////
 
+  @Test
   public void testGetStartFormDataWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -82,13 +91,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetStartFormData() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -104,6 +114,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get rendered start form /////////////////////////////////////
 
+  @Test
   public void testGetRenderedStartFormWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
@@ -115,13 +126,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetRenderedStartForm() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
@@ -136,6 +148,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get start form variables //////////////////////////////////
 
+  @Test
   public void testGetStartFormVariablesWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
@@ -147,13 +160,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetStartFormVariables() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(RENDERED_FORM_PROCESS_KEY).getId();
@@ -169,6 +183,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // submit start form /////////////////////////////////////////
 
+  @Test
   public void testSubmitStartFormWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -180,12 +195,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(CREATE.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(CREATE.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
     }
   }
 
+  @Test
   public void testSubmitStartFormWithCreatePermissionOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -198,13 +214,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(CREATE_INSTANCE.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(CREATE_INSTANCE.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testSubmitStartFormWithCreateInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -217,12 +234,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(CREATE.getName(), message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(CREATE.getName(), message);
+      testRule.assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
     }
   }
 
+  @Test
   public void testSubmitStartForm() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -238,6 +256,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form data (standalone task) /////////////////////////////////
 
+  @Test
   public void testStandaloneTaskGetTaskFormDataWithoutAuthorization() {
     // given
     String taskId = "myTask";
@@ -250,10 +269,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     // given (2)
@@ -266,15 +285,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskFormData() {
     // given
     String taskId = "myTask";
@@ -291,6 +311,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskFormDataWithReadVariablePermission() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -310,6 +331,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form data (process task) /////////////////////////////////
 
+  @Test
   public void testProcessTaskGetTaskFormDataWithoutAuthorization() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -322,13 +344,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
 
     // given (2)
@@ -341,16 +363,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testProcessTaskGetTaskFormDataWithReadPermissionOnTask() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -364,6 +387,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskFormData);
   }
 
+  @Test
   public void testProcessTaskGetTaskFormDataWithReadTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -377,6 +401,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskFormData);
   }
 
+  @Test
   public void testProcessTaskGetTaskFormDataWithReadVariablePermissionOnTask() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -391,6 +416,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskFormData);
   }
 
+  @Test
   public void testProcessTaskGetTaskFormDataWithReadTaskVariablePermissionOnProcessDefinition() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -405,6 +431,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskFormData);
   }
 
+  @Test
   public void testProcessTaskGetTaskFormData() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -421,9 +448,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form data (case task) /////////////////////////////////
 
+  @Test
   public void testCaseTaskGetTaskFormData() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -435,6 +463,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get rendered task form (standalone task) //////////////////
 
+  @Test
   public void testStandaloneTaskGetTaskRenderedFormWithoutAuthorization() {
     // given
     String taskId = "myTask";
@@ -447,10 +476,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     // given (2)
@@ -463,16 +492,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
 
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskRenderedForm() {
     // given
     String taskId = "myTask";
@@ -488,6 +518,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskRenderedFormWithReadVariablePermission() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -506,6 +537,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get rendered task form (process task) /////////////////////////////////
 
+  @Test
   public void testProcessTaskGetRenderedTaskFormWithoutAuthorization() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -518,13 +550,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
 
     // given (2)
@@ -537,16 +569,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testProcessTaskGetRenderedTaskFormWithReadPermissionOnTask() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -560,6 +593,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskForm);
   }
 
+  @Test
   public void testProcessTaskGetRenderedTaskFormWithReadTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -573,6 +607,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskForm);
   }
 
+  @Test
   public void testProcessTaskGetRenderedTaskFormWithReadTaskVariablesPermissionOnProcessDefinition() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -587,6 +622,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskForm);
   }
 
+  @Test
   public void testProcessTaskGetRenderedTaskFormWithReadVariablePermissionOnTask() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -601,6 +637,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(taskForm);
   }
 
+  @Test
   public void testProcessTaskGetRenderedTaskForm() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -617,9 +654,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get rendered task form (case task) /////////////////////////////////
 
+  @Test
   public void testCaseTaskGetRenderedTaskForm() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -631,6 +669,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form variables (standalone task) ////////////////////////
 
+  @Test
   public void testStandaloneTaskGetTaskFormVariablesWithoutAuthorization() {
     // given
     String taskId = "myTask";
@@ -643,10 +682,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     // given (2)
@@ -659,15 +698,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskFormVariables() {
     // given
     String taskId = "myTask";
@@ -683,6 +723,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskGetTaskFormVariablesWithReadVariablePermission() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -701,6 +742,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form variables (process task) /////////////////////////////////
 
+  @Test
   public void testProcessTaskGetTaskFormVariablesWithoutAuthorization() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -713,13 +755,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
 
     // given (2)
@@ -732,16 +774,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_VARIABLE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
-      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_VARIABLE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      testRule.assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testProcessTaskGetTaskFormVariablesWithReadPermissionOnTask() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -756,6 +799,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
   }
 
+  @Test
   public void testProcessTaskGetTaskFormVariablesWithReadTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -770,6 +814,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
   }
 
+  @Test
   public void testProcessTaskGetTaskFormVariables() {
     // given
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
@@ -785,6 +830,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
   }
 
+  @Test
   public void testProcessTaskGetTaskFormVariablesWithReadVariablePermissionOnTask() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -800,6 +846,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
   }
 
+  @Test
   public void testProcessTaskGetTaskFormVariablesWithReadTaskVariablePermissionOnProcessDefinition() {
     // given
     setReadVariableAsDefaultReadVariablePermission();
@@ -817,9 +864,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form variables (case task) /////////////////////////////////
 
+  @Test
   public void testCaseTaskGetTaskFormVariables() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -832,6 +880,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // submit task form (standalone task) ////////////////////////////////
 
+  @Test
   public void testStandaloneTaskSubmitTaskFormWithoutAuthorization() {
     // given
     String taskId = "myTask";
@@ -844,15 +893,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
 
     deleteTask(taskId, true);
   }
 
+  @Test
   public void testStandaloneTaskSubmitTaskForm() {
     // given
     String taskId = "myTask";
@@ -871,6 +921,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // submit task form (process task) ////////////////////////////////
 
+  @Test
   public void testProcessTaskSubmitTaskFormWithoutAuthorization() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -883,16 +934,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(taskId, message);
-      assertTextPresent(TASK.resourceName(), message);
-      assertTextPresent(UPDATE_TASK.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_TASK.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testProcessTaskSubmitTaskFormWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -908,6 +960,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNull(task);
   }
 
+  @Test
   public void testProcessTaskSubmitTaskFormWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -923,6 +976,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNull(task);
   }
 
+  @Test
   public void testProcessTaskSubmitTaskForm() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -940,9 +994,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // submit task form (case task) ////////////////////////////////
 
+  @Test
   public void testCaseTaskSubmitTaskForm() {
     // given
-    createCaseInstanceByKey(CASE_KEY);
+    testRule.createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
 
     // when
@@ -955,6 +1010,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get start form key ////////////////////////////////////////
 
+  @Test
   public void testGetStartFormKeyWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -966,13 +1022,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetStartFormKey() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -987,6 +1044,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get task form key ////////////////////////////////////////
 
+  @Test
   public void testGetTaskFormKeyWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -998,13 +1056,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetTaskFormKey() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -1019,6 +1078,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   // get deployed start form////////////////////////////////////////
 
+  @Test
   public void testGetDeployedStartForm() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -1029,6 +1089,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(inputStream);
   }
 
+  @Test
   public void testGetDeployedStartFormWithoutAuthorization() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
@@ -1040,15 +1101,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   // get deployed task form////////////////////////////////////////
 
+  @Test
   public void testGetDeployedTaskForm() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -1060,6 +1122,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(inputStream);
   }
 
+  @Test
   public void testGetDeployedTaskFormWithoutAuthorization() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
@@ -1072,10 +1135,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_PROCESS_KEY, message);
-      assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(FORM_PROCESS_KEY, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
     }
   }
 

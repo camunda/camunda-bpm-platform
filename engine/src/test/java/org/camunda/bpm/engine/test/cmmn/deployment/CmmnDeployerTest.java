@@ -16,26 +16,37 @@
  */
 package org.camunda.bpm.engine.test.cmmn.deployment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
+public class CmmnDeployerTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testCmmnDeployment() {
     String deploymentId = processEngine
         .getRepositoryService()
@@ -60,6 +71,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     processEngine.getRepositoryService().deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testDeployTwoCasesWithDuplicateIdAtTheSameTime() {
     try {
       String cmmnResourceName1 = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";
@@ -78,7 +90,9 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.cmmn",
       "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.png" })
+  @Test
   public void testCaseDiagramResource() {
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     final CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
     assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testCaseDiagramResource.cmmn", caseDefinition.getResourceName());
@@ -97,6 +111,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.a.png",
       "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.b.png",
       "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.c.png" })
+  @Test
   public void testMultipleDiagramResourcesProvided() {
     final CaseDefinition caseA = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("a").singleResult();
     final CaseDefinition caseB = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("b").singleResult();
@@ -107,11 +122,13 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.c.png", caseC.getDiagramResourceName());
   }
 
+  @Test
   public void testDeployCmmn10XmlFile() {
     verifyCmmnResourceDeployed("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCmmn10XmlFile.cmmn10.xml");
 
   }
 
+  @Test
   public void testDeployCmmn11XmlFile() {
     verifyCmmnResourceDeployed("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCmmn11XmlFile.cmmn11.xml");
   }
@@ -141,12 +158,13 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testDeployCmmnModelInstance() throws Exception {
     // given
     CmmnModelInstance modelInstance = createCmmnModelInstance();
 
     // when
-    deploymentWithBuilder(repositoryService.createDeployment().addModelInstance("foo.cmmn", modelInstance));
+    testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.cmmn", modelInstance));
 
     // then
     assertNotNull(repositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("foo.cmmn").singleResult());
@@ -170,14 +188,14 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     return modelInstance;
   }
 
+  @Test
   public void testDeployAndGetCaseDefinition() throws Exception {
     // given case model
     final CmmnModelInstance modelInstance = createCmmnModelInstance();
 
     // when case model is deployed
-    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deployWithResult();
-    deploymentIds.add(deployment.getId());
+    DeploymentWithDefinitions deployment = testRule.deploy(repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance));
 
     // then deployment contains deployed case definition
     List<CaseDefinition> deployedCaseDefinitions = deployment.getDeployedCaseDefinitions();
@@ -191,6 +209,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     assertEquals(persistedCaseDefinition.getId(), deployedCaseDefinitions.get(0).getId());
   }
 
+  @Test
   public void testDeployEmptyCaseDefinition() throws Exception {
 
     // given empty case model
@@ -200,9 +219,8 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     modelInstance.setDefinitions(definitions);
 
     // when case model is deployed
-    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deployWithResult();
-    deploymentIds.add(deployment.getId());
+    DeploymentWithDefinitions deployment = testRule.deploy(repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance));
 
     // then no case definition is deployed
     assertNull(deployment.getDeployedCaseDefinitions());
@@ -212,6 +230,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithIntegerHistoryTimeToLive.cmmn")
+  @Test
   public void testDeployCaseDefinitionWithIntegerHistoryTimeToLive() {
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
     Integer historyTimeToLive = caseDefinition.getHistoryTimeToLive();
@@ -220,6 +239,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithStringHistoryTimeToLive.cmmn")
+  @Test
   public void testDeployCaseDefinitionWithStringHistoryTimeToLive() {
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
     Integer historyTimeToLive = caseDefinition.getHistoryTimeToLive();
@@ -227,9 +247,10 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     assertEquals((int) historyTimeToLive, 5);
   }
 
+  @Test
   public void testDeployCaseDefinitionWithMalformedHistoryTimeToLive() {
     try {
-      deployment("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithMalformedHistoryTimeToLive.cmmn");
+     testRule.deploy("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithMalformedHistoryTimeToLive.cmmn");
       fail("Exception expected");
     } catch (ProcessEngineException e) {
       assertTrue(e.getCause().getMessage().contains("Cannot parse historyTimeToLive"));

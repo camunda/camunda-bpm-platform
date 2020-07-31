@@ -16,26 +16,32 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
+public class JobDefinitionPriorityTest extends PluggableProcessEngineTest {
 
   protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  @Test
   public void testSetJobDefinitionPriority() {
     // given a process instance with a job with default priority and a corresponding job definition
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("asyncTaskProcess")
@@ -68,6 +74,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  @Test
   public void testSetJobDefinitionPriorityWithCascade() {
     // given a process instance with a job with default priority and a corresponding job definition
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("asyncTaskProcess")
@@ -100,6 +107,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testSetJobDefinitionPriorityOverridesBpmnPriority() {
     // given a process instance with a job with default priority and a corresponding job definition
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("jobPrioProcess")
@@ -133,6 +141,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testSetJobDefinitionPriorityWithCascadeOverridesBpmnPriority() {
     // given a process instance with a job with default priority and a corresponding job definition
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("jobPrioProcess")
@@ -166,6 +175,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testRedeployOverridesSetJobDefinitionPriority() {
     // given a process instance with a job with default priority and a corresponding job definition
     runtimeService.createProcessInstanceByKey("jobPrioProcess")
@@ -203,6 +213,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  @Test
   public void testResetJobDefinitionPriority() {
 
     // given a job definition
@@ -229,6 +240,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  @Test
   public void testResetJobDefinitionPriorityWhenPriorityIsNull() {
 
     // given a job definition with null priority
@@ -245,6 +257,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
+  @Test
   public void testGetJobDefinitionDefaultPriority() {
     // with a process with job definitions deployed
     // then the definitions have a default null priority, meaning that they don't override the
@@ -258,13 +271,14 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     assertNull(jobDefinitions.get(3).getOverridingJobPriority());
   }
 
+  @Test
   public void testSetNonExistingJobDefinitionPriority() {
     try {
       managementService.setOverridingJobPriorityForJobDefinition("someNonExistingJobDefinitionId", 42);
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
-      assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
+      testRule.assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
           e.getMessage());
     }
 
@@ -273,29 +287,31 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
-      assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
+      testRule.assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
           e.getMessage());
     }
   }
 
+  @Test
   public void testResetNonExistingJobDefinitionPriority() {
     try {
       managementService.clearOverridingJobPriorityForJobDefinition("someNonExistingJobDefinitionId");
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
-      assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
+      testRule.assertTextPresentIgnoreCase("job definition with id 'someNonExistingJobDefinitionId' does not exist",
           e.getMessage());
     }
   }
 
+  @Test
   public void testSetNullJobDefinitionPriority() {
     try {
       managementService.setOverridingJobPriorityForJobDefinition(null, 42);
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
     }
 
     try {
@@ -303,21 +319,23 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
     }
   }
 
+  @Test
   public void testResetNullJobDefinitionPriority() {
     try {
       managementService.clearOverridingJobPriorityForJobDefinition(null);
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("jobDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  @Test
   public void testSetJobDefinitionPriorityToExtremeValues() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 

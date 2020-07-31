@@ -16,18 +16,23 @@
  */
 package org.camunda.bpm.engine.test.api.cmmn;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
+public class CaseServiceMilestoneTest extends PluggableProcessEngineTest {
 
   protected final String DEFINITION_KEY = "oneMilestoneCase";
   protected final String MILESTONE_KEY = "PI_Milestone_1";
@@ -35,6 +40,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testManualStart() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -53,6 +59,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testDisable() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -71,6 +78,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testReenable() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -89,6 +97,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testComplete() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -107,6 +116,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testTerminate() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -124,6 +134,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
       })
+  @Test
   public void testTerminateNonFluent() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();

@@ -40,6 +40,12 @@ values ('history.cleanup.job.lock', '0', 1);
 insert into ACT_GE_PROPERTY
 values ('startup.lock', '0', 1);
 
+insert into ACT_GE_PROPERTY
+values ('telemetry.lock', '0', 1);
+
+insert into ACT_GE_PROPERTY
+values ('installationId.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64) not null,
     REV_ integer,
@@ -63,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.13.0');
+values ('0', CURRENT_TIMESTAMP, '7.14.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64) not null,

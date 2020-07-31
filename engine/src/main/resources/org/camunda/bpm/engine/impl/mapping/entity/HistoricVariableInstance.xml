@@ -292,18 +292,16 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       <if test="authCheck.isHistoricInstancePermissionsEnabled">
-        left join ${prefix}ACT_HI_PROCINST PI
-          on PI.ID_ = RES.PROC_INST_ID_
-
         left join ${prefix}ACT_HI_TASKINST TI
-          on TI.PROC_INST_ID_ = PI.ID_ <!-- Include process tasks -->
+          on TI.PROC_INST_ID_ = RES.PROC_INST_ID_ <!-- Include process tasks -->
           or TI.ID_ = RES.TASK_ID_ <!-- Include standalone tasks -->
       </if>
       <if test="!authCheck.revokeAuthorizationCheckEnabled">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
           AUTH ON (AUTH.RESOURCE_ID_ in (
             <if test="authCheck.isHistoricInstancePermissionsEnabled">
-            TI.ID_,
+              RES.PROC_INST_ID_,
+              TI.ID_,
             </if>
             RES.PROC_DEF_KEY_
             , '*'

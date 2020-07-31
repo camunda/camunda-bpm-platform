@@ -16,19 +16,22 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  *
  * @author Daniel Meyer
  */
-public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskVariablesTest extends PluggableProcessEngineTest {
   
   static boolean isNullInDelegate2;
   static boolean isNullInDelegate3;
@@ -74,13 +77,14 @@ public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testSerializedVariablesBothAsync() {
     
     // in this test, there is an async cont. both before the second and the
     // third service task in the sequence
     
     runtimeService.startProcessInstanceByKey("process");
-    waitForJobExecutorToProcessAllJobs(10000);
+    testRule.waitForJobExecutorToProcessAllJobs(10000);
     
     synchronized (ServiceTaskVariablesTest.class) {
       assertTrue(isNullInDelegate2);
@@ -89,12 +93,13 @@ public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSerializedVariablesThirdAsync() {
     
     // in this test, only the third service task is async
         
     runtimeService.startProcessInstanceByKey("process");
-    waitForJobExecutorToProcessAllJobs(10000);
+    testRule.waitForJobExecutorToProcessAllJobs(10000);
     
     synchronized (ServiceTaskVariablesTest.class) {
       assertTrue(isNullInDelegate2); 

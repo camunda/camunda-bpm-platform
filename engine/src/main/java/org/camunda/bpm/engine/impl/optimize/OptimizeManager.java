@@ -121,9 +121,12 @@ public class OptimizeManager extends AbstractManager {
     checkIsAuthorizedToReadHistoryAndTenants();
 
     String[] operationTypes = new String[]{
-      UserOperationLogEntry.OPERATION_TYPE_ASSIGN,
-      UserOperationLogEntry.OPERATION_TYPE_CLAIM,
-      UserOperationLogEntry.OPERATION_TYPE_COMPLETE};
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB,
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION,
+      UserOperationLogEntry.OPERATION_TYPE_SUSPEND,
+      UserOperationLogEntry.OPERATION_TYPE_ACTIVATE};
     Map<String, Object> params = new HashMap<>();
     params.put("occurredAfter", occurredAfter);
     params.put("occurredAt", occurredAt);
@@ -210,8 +213,12 @@ public class OptimizeManager extends AbstractManager {
         .includeInputs()
         .includeOutputs();
 
-    getHistoricDecisionInstanceManager()
-      .enrichHistoricDecisionsWithInputsAndOutputs(query, decisionInstances);
+    List<List<HistoricDecisionInstance>> partitions = CollectionUtil.partition(decisionInstances, DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+
+    for (List<HistoricDecisionInstance> partition : partitions) {
+      getHistoricDecisionInstanceManager()
+        .enrichHistoricDecisionsWithInputsAndOutputs(query, partition);
+    }
 
     return decisionInstances;
   }

@@ -16,23 +16,32 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  */
-public class UserQueryTest extends PluggableProcessEngineTestCase {
+public class UserQueryTest extends PluggableProcessEngineTest {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
 
     createUser("kermit", "Kermit_", "The_frog", "kermit_@muppetshow.com");
     createUser("fozzie", "Fozzie", "Bear", "fozzie@muppetshow.com");
@@ -60,8 +69,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     return user;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     identityService.deleteUser("kermit");
     identityService.deleteUser("fozzie");
     identityService.deleteUser("gonzo");
@@ -71,19 +80,22 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
 
     identityService.deleteTenant("tenant");
 
-    super.tearDown();
+
   }
 
+  @Test
   public void testQueryByNoCriteria() {
     UserQuery query = identityService.createUserQuery();
     verifyQueryResults(query, 3);
   }
 
+  @Test
   public void testQueryById() {
     UserQuery query = identityService.createUserQuery().userId("kermit");
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidId() {
     UserQuery query = identityService.createUserQuery().userId("invalid");
     verifyQueryResults(query, 0);
@@ -94,6 +106,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByFirstName() {
     UserQuery query = identityService.createUserQuery().userFirstName("Gonzo");
     verifyQueryResults(query, 1);
@@ -102,6 +115,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("gonzo", result.getId());
   }
 
+  @Test
   public void testQueryByInvalidFirstName() {
     UserQuery query = identityService.createUserQuery().userFirstName("invalid");
     verifyQueryResults(query, 0);
@@ -112,6 +126,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByFirstNameLike() {
     UserQuery query = identityService.createUserQuery().userFirstNameLike("%o%");
     verifyQueryResults(query, 2);
@@ -123,6 +138,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidFirstNameLike() {
     UserQuery query = identityService.createUserQuery().userFirstNameLike("%mispiggy%");
     verifyQueryResults(query, 0);
@@ -133,6 +149,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByLastName() {
     UserQuery query = identityService.createUserQuery().userLastName("Bear");
     verifyQueryResults(query, 1);
@@ -141,6 +158,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("fozzie", result.getId());
   }
 
+  @Test
   public void testQueryByInvalidLastName() {
     UserQuery query = identityService.createUserQuery().userLastName("invalid");
     verifyQueryResults(query, 0);
@@ -151,6 +169,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByLastNameLike() {
     UserQuery query = identityService.createUserQuery().userLastNameLike("%\\_frog%");
     verifyQueryResults(query, 1);
@@ -159,6 +178,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryByInvalidLastNameLike() {
     UserQuery query = identityService.createUserQuery().userLastNameLike("%invalid%");
     verifyQueryResults(query, 0);
@@ -169,11 +189,13 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByEmail() {
     UserQuery query = identityService.createUserQuery().userEmail("kermit_@muppetshow.com");
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidEmail() {
     UserQuery query = identityService.createUserQuery().userEmail("invalid");
     verifyQueryResults(query, 0);
@@ -184,6 +206,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByEmailLike() {
     UserQuery query = identityService.createUserQuery().userEmailLike("%muppetshow.com");
     verifyQueryResults(query, 3);
@@ -192,6 +215,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidEmailLike() {
     UserQuery query = identityService.createUserQuery().userEmailLike("%invalid%");
     verifyQueryResults(query, 0);
@@ -202,6 +226,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQuerySorting() {
     // asc
     assertEquals(3, identityService.createUserQuery().orderByUserId().asc().count());
@@ -223,6 +248,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("Gonzo", users.get(1).getFirstName());
   }
 
+  @Test
   public void testQueryInvalidSortingUsage() {
     try {
       identityService.createUserQuery().orderByUserId().list();
@@ -235,6 +261,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByMemberOfGroup() {
     UserQuery query = identityService.createUserQuery().memberOfGroup("muppets");
     verifyQueryResults(query, 3);
@@ -246,6 +273,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("kermit", result.getId());
   }
 
+  @Test
   public void testQueryByInvalidMemberOfGoup() {
     UserQuery query = identityService.createUserQuery().memberOfGroup("invalid");
     verifyQueryResults(query, 0);
@@ -256,6 +284,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) { }
   }
 
+  @Test
   public void testQueryByMemberOfTenant() {
     UserQuery query = identityService.createUserQuery().memberOfTenant("nonExisting");
     verifyQueryResults(query, 0);
@@ -287,6 +316,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByIdIn() {
 
     // empty list
@@ -314,6 +344,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testNativeQuery() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
@@ -325,6 +356,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(userCount, identityService.createNativeUserQuery().sql("SELECT count(*) FROM " + managementService.getTableName(UserEntity.class)).count());
   }
 
+  @Test
   public void testNativeQueryOrLike() {
     String searchPattern = "%frog";
 
@@ -335,6 +367,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses).parameter("searchPattern", searchPattern).count());
   }
 
+  @Test
   public void testNativeQueryPaging() {
     assertEquals(2, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(1, 2).size());
     assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(2, 1).size());

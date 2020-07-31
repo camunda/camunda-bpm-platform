@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -25,10 +29,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class JobExecutorAcquireCleanupJobs extends AbstractJobExecutorAcquireJobsTest {
 

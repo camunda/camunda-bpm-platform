@@ -16,23 +16,29 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
+public class AuthorizationQueryTest extends PluggableProcessEngineTest {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
 
     Resource resource1 = TestResource.RESOURCE1;
     Resource resource2 = TestResource.RESOURCE2;
@@ -48,12 +54,13 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     createAuthorization(null, "group3", resource2, "resource2-3", TestPermissions.DELETE);
 
   }
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     List<Authorization> list = authorizationService.createAuthorizationQuery().list();
     for (Authorization authorization : list) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
-    super.tearDown();
+
   }
 
   protected void createAuthorization(String userId, String groupId, Resource resourceType, String resourceId, Permission... permissions) {
@@ -71,6 +78,7 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     authorizationService.saveAuthorization(authorization);
   }
 
+  @Test
   public void testValidQueryCounts() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -120,6 +128,7 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1").resourceType(nonExisting).count());
   }
 
+  @Test
   public void testValidQueryLists() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -167,6 +176,7 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1").resourceType(nonExisting).list().size());
   }
 
+  @Test
   public void testOrderByQueries() {
 
     Resource resource1 = TestResource.RESOURCE1;
@@ -214,36 +224,38 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testInvalidOrderByQueries() {
     try {
       authorizationService.createAuthorizationQuery().orderByResourceType().list();
       fail("Exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+      testRule.assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().orderByResourceId().list();
       fail("Exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+      testRule.assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().orderByResourceId().orderByResourceType().list();
       fail("Exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+      testRule.assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().orderByResourceType().orderByResourceId().list();
       fail("Exception expected");
     } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+      testRule.assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
     }
   }
 
+  @Test
   public void testInvalidQueries() {
 
     // cannot query for user id and group id at the same time
@@ -251,13 +263,13 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     try {
       authorizationService.createAuthorizationQuery().groupIdIn("a").userIdIn("b").count();
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
+      testRule.assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().userIdIn("b").groupIdIn("a").count();
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
+      testRule.assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
     }
 
   }

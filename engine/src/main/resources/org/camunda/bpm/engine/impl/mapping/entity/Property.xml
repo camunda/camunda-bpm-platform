@@ -98,4 +98,20 @@
     SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'startup.lock'
   </select>
 
+  <select id="lockTelemetryLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'telemetry.lock' ${constant_for_update}
+  </select>
+
+  <select id="lockTelemetryLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'telemetry.lock'
+  </select>
+
+  <select id="lockInstallationIdLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'installationId.lock' ${constant_for_update}
+  </select>
+
+  <select id="lockInstallationIdLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'installationId.lock'
+  </select>
+
 </mapper>

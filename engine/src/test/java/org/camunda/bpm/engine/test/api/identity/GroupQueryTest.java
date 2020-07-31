@@ -16,22 +16,31 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  */
-public class GroupQueryTest extends PluggableProcessEngineTestCase {
+public class GroupQueryTest extends PluggableProcessEngineTest {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
 
     createGroup("muppets", "Muppet show characters_", "user");
     createGroup("frogs", "Famous frogs", "user");
@@ -67,8 +76,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     return group;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     identityService.deleteUser("kermit");
     identityService.deleteUser("fozzie");
     identityService.deleteUser("mispiggy");
@@ -80,14 +89,16 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
 
     identityService.deleteTenant("tenant");
 
-    super.tearDown();
+
   }
 
+  @Test
   public void testQueryById() {
     GroupQuery query = identityService.createGroupQuery().groupId("muppets");
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidId() {
     GroupQuery query = identityService.createGroupQuery().groupId("invalid");
     verifyQueryResults(query, 0);
@@ -98,6 +109,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByIdIn() {
     // empty list
     assertTrue(identityService.createGroupQuery().groupIdIn("a", "b").list().isEmpty());
@@ -124,6 +136,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByName() {
     GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters_");
     verifyQueryResults(query, 1);
@@ -132,6 +145,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidName() {
     GroupQuery query = identityService.createGroupQuery().groupName("invalid");
     verifyQueryResults(query, 0);
@@ -142,6 +156,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByNameLike() {
     GroupQuery query = identityService.createGroupQuery().groupNameLike("%Famous%");
     verifyQueryResults(query, 2);
@@ -156,6 +171,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testQueryByInvalidNameLike() {
     GroupQuery query = identityService.createGroupQuery().groupNameLike("%invalid%");
     verifyQueryResults(query, 0);
@@ -166,6 +182,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByType() {
     GroupQuery query = identityService.createGroupQuery().groupType("user");
     verifyQueryResults(query, 3);
@@ -174,6 +191,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryByInvalidType() {
     GroupQuery query = identityService.createGroupQuery().groupType("invalid");
     verifyQueryResults(query, 0);
@@ -184,6 +202,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByMember() {
     GroupQuery query = identityService.createGroupQuery().groupMember("fozzie");
     verifyQueryResults(query, 2);
@@ -205,6 +224,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("muppets", groups.get(1).getId());
   }
 
+  @Test
   public void testQueryByInvalidMember() {
     GroupQuery query = identityService.createGroupQuery().groupMember("invalid");
     verifyQueryResults(query, 0);
@@ -215,6 +235,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Test
   public void testQueryByMemberOfTenant() {
     GroupQuery query = identityService.createGroupQuery().memberOfTenant("nonExisting");
     verifyQueryResults(query, 0);
@@ -226,6 +247,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("frogs", group.getId());
   }
 
+  @Test
   public void testQuerySorting() {
     // asc
     assertEquals(4, identityService.createGroupQuery().orderByGroupId().asc().count());
@@ -253,6 +275,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("frogs", groups.get(3).getId());
   }
 
+  @Test
   public void testQueryInvalidSortingUsage() {
     try {
       identityService.createGroupQuery().orderByGroupId().list();

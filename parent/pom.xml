@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -26,13 +26,15 @@
     <version.jersey2>2.25.1</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
-    <version.openjpa>1.2.2</version.openjpa>
+    <version.openjpa>2.4.3</version.openjpa>
+    <version.httpclient>4.5.9</version.httpclient>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
     <version.junit>4.12</version.junit>
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>1.9.5</version.mockito>
+    <version.wiremock>1.58</version.wiremock>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
@@ -44,7 +46,7 @@
 
     <!-- This version is mirrored in the external task client.
     If you change it here, also change it there -->
-    <version.tomcat>9.0.33</version.tomcat>
+    <version.tomcat>9.0.36</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
@@ -162,7 +164,11 @@
         <groupId>javax.persistence</groupId>
         <artifactId>persistence-api</artifactId>
         <version>1.0</version>
-        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <version>1.0.1.Final</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -216,7 +222,6 @@
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
         <version>${version.openjpa}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
@@ -334,11 +339,6 @@
         <groupId>wsdl4j</groupId>
         <artifactId>wsdl4j</artifactId>
         <version>1.6.2</version>
-      </dependency>
-      <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
-        <version>2.9.1</version>
       </dependency>
       <!-- Camel integration -->
       <dependency>
@@ -458,6 +458,19 @@
         <version>${version.freemarker}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${version.httpclient}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.tomakehurst</groupId>
+        <artifactId>wiremock</artifactId>
+        <version>${version.wiremock}</version>
+        <scope>test</scope>
+      </dependency>
+
     </dependencies>
 
   </dependencyManagement>
@@ -509,7 +522,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>3.2.1</version>
+          <version>3.2.3</version>
           <configuration>
             <createSourcesJar>true</createSourcesJar>
           </configuration>

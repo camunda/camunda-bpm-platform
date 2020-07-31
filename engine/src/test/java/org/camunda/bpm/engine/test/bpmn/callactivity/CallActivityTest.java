@@ -20,7 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +38,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -42,6 +47,7 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -52,6 +58,7 @@ import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
@@ -59,12 +66,13 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
  * @author Bernd Ruecker
  * @author Falko Menge
  */
-public class CallActivityTest extends PluggableProcessEngineTestCase {
+public class CallActivityTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testCallSimpleSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -85,13 +93,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessParentVariableAccess.bpmn20.xml"
   })
+  @Test
   public void testAccessSuperInstanceVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -115,6 +124,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/concurrentSubProcessParentVariableAccess.bpmn20.xml"
   })
+  @Test
   public void testAccessSuperInstanceVariablesFromConcurrentExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -136,6 +146,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testCallSimpleSubProcessWithExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -161,7 +172,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   /**
@@ -171,6 +182,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessEndsSuperProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessEndsSuperProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEndsSuperProcess");
 
@@ -181,13 +193,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing this task ends the subprocess which leads to the end of the whole process instance
     taskService.complete(taskBeforeSubProcess.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallParallelSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleParallelSubProcess.bpmn20.xml"})
+  @Test
   public void testCallParallelSubProcess() {
     runtimeService.startProcessInstanceByKey("callParallelSubProcess");
 
@@ -217,6 +230,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess2.bpmn20.xml"})
+  @Test
   public void testCallSequentialSubProcessWithExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSequentialSubProcess");
@@ -266,12 +280,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testTimerOnCallActivity() {
     // After process start, the task in the subprocess should be active
     runtimeService.startProcessInstanceByKey("timerOnCallActivity");
@@ -298,6 +313,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithDataInputOutput() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
@@ -349,7 +365,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // and end last task in Super process
     taskService.complete(taskAfterSecondSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
@@ -360,6 +376,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLimitedDataInputOutputTypedApi.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithLimitedDataInputOutputTypedApi() {
 
     TypedValue superVariable = Variables.stringValue(null);
@@ -392,7 +409,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // Completing this task ends the super process which leads to a task in the super process
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
@@ -403,6 +420,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithAllDataInputOutputTypedApi() {
 
     TypedValue superVariable = Variables.stringValue(null);
@@ -432,13 +450,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // Completing this task ends the super process which leads to a task in the super process
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
   /**
    * Test case for handing over process variables without target attribute set
    */
+  @Test
   public void testSubProcessWithDataInputOutputWithoutTarget() {
     String processId = "subProcessDataInputOutputWithoutTarget";
 
@@ -502,6 +521,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithNullDataInput() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
 
@@ -549,6 +569,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithNullDataInputAsExpression() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("superVariable", null);
@@ -596,6 +617,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithNullDataOutput() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
 
@@ -649,6 +671,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessWithNullDataOutputAsExpression() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("superVariable", null);
@@ -709,7 +732,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
       fail("Exception expected");
     } catch (ParseException e) {
-      assertTextPresent("Missing attribute 'target'", e.getMessage());
+       testRule.assertTextPresent("Missing attribute 'target'", e.getMessage());
       assertThat(e.getResorceReports().get(0).getErrors().get(0).getMainElementId()).isEqualTo("callActivity");
     } finally {
       if (deploymentId != null) {
@@ -724,6 +747,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testTwoSubProcesses() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
 
@@ -752,6 +776,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessAllDataInputOutput() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
@@ -796,7 +821,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
@@ -806,6 +831,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputWithAdditionalInputMapping.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessAllDataInputOutputWithAdditionalInputMapping() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
@@ -851,7 +877,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
@@ -865,6 +891,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessAllDataOutput() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessAllDataInputOutput");
@@ -898,13 +925,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessLocalInputAllVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -943,6 +971,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessLocalInputSingleVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -982,6 +1011,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessLocalInputSingleVariableExpression() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1012,13 +1042,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       taskService.complete(beforeSecondCallActivityTask.getId());
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
+       testRule.assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
     }
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessLocalOutputAllVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1056,6 +1087,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessLocalOutputSingleVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1096,6 +1128,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessBusinessKeyInput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSubProcessBusinessKeyInput() {
     String businessKey = "myBusinessKey";
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessBusinessKeyInput", businessKey);
@@ -1132,7 +1165,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskAfterSubProcess.getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
 
     if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1145,6 +1178,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithHashExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testCallSimpleSubProcessWithHashExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -1170,11 +1204,12 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing this task end the process instance
     taskService.complete(taskAfterSubProcess.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml"})
+  @Test
   public void testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
 
@@ -1202,12 +1237,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // Complete the task inside the called process instance
     taskService.complete(taskAfterMessageStartEvent.getId());
 
-    assertProcessEnded(calledProcessInstanceId);
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(calledProcessInstanceId);
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml"})
+  @Test
   public void testInterruptingSignalEventSubProcessEventSubscriptionsInsideCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
 
@@ -1235,14 +1271,15 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // Complete the task inside the called process instance
     taskService.complete(taskAfterSignalStartEvent.getId());
 
-    assertProcessEnded(calledProcessInstanceId);
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(calledProcessInstanceId);
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testInputParameterLiteralSourceExpression() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -1260,6 +1297,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testOutputParameterLiteralSourceExpression() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -1277,6 +1315,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnError.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
+  @Test
   public void testSubProcessDataOutputOnError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
@@ -1301,6 +1340,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnThrownError.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
   })
+  @Test
   public void testSubProcessDataOutputOnThrownError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
@@ -1326,6 +1366,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcess.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
+  @Test
   public void testTwoSubProcessesDataOutputOnError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
@@ -1352,6 +1393,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcessWithLimitedOutMapping.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
+  @Test
   public void testTwoSubProcessesLimitedDataOutputOnError() {
     String variableName1 = "subSubVariable1";
     String variableName2 = "subSubVariable2";
@@ -1391,6 +1433,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityAdvancedTest.testCallProcessByVersionAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
   })
+  @Test
   public void testCallCaseByVersionAsExpression() {
     // given
 
@@ -1432,6 +1475,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityAdvancedTest.testCallProcessByVersionAsDelegateExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
   })
+  @Test
   public void testCallCaseByVersionAsDelegateExpression() {
     processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
 
@@ -1471,11 +1515,12 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Test
   public void testCallProcessByVersionTag() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -1489,11 +1534,12 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Test
   public void testCallProcessByVersionTagAsExpression() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${versionTagExpr}");
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     // when
     VariableMap variables = Variables.createVariables().putValue("versionTagExpr", "ver_tag_1");
@@ -1508,12 +1554,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Test
   public void testCallProcessByVersionTagAsDelegateExpression() {
     // given
     processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${myDelegate.getVersionTag()}");
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -1526,6 +1573,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     cleanupDeployments();
   }
 
+  @Test
   public void testCallProcessWithoutVersionTag() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
@@ -1538,7 +1586,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      deployment(modelInstance);
+     testRule.deploy(modelInstance);
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
@@ -1547,11 +1595,12 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testCallProcessByVersionTagNoneSubprocess() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     try {
       // when
@@ -1564,12 +1613,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Test
   public void testCallProcessByVersionTagTwoSubprocesses() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
-    deployment(modelInstance);
-    deployment("org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
+   testRule.deploy(modelInstance);
+   testRule.deploy("org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
 
     try {
       // when
@@ -1588,6 +1638,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/orderProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
   })
+  @Test
   public void testOrderProcessWithCallActivity() {
     // After the process has started, the 'verify credit history' task should be active
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
@@ -1613,6 +1664,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testDeleteProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -1654,6 +1706,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Test
   public void testSingleDeletionWithTwoSubProcesses() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
@@ -1696,6 +1749,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testDeleteMultilevelProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("nestedCallActivity");
@@ -1746,6 +1800,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testDoubleNestedCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Test
   public void testDeleteDoubleNestedProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("doubleNestedCallActivity");
@@ -1785,6 +1840,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testTransientVariableInputMapping() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("simpleSubProcess")
@@ -1795,8 +1851,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       .endEvent()
       .done();
 
-    deployment("org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml");
-    deployment(modelInstance);
+   testRule.deploy("org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml");
+   testRule.deploy(modelInstance);
 
     VariableMap variables = Variables.createVariables().putValue("var", Variables.stringValue("value", true));
 
@@ -1812,6 +1868,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
 
+  @Test
   public void testTransientVariableOutputMapping() {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("superProcess")
@@ -1825,8 +1882,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       .endEvent()
       .done();
 
-    deployment(modelInstance);
-    deployment("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
+   testRule.deploy(modelInstance);
+   testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
 
     runtimeService.startProcessInstanceByKey("superProcess");
     Task task = taskService.createTaskQuery().singleResult();

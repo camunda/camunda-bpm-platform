@@ -17,6 +17,10 @@
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,19 +30,21 @@ import java.util.Map;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
+public class ExclusiveGatewayTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testDivergingExclusiveGateway() {
     for (int i = 1; i <= 3; i++) {
       ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveGwDiverging", CollectionUtil.singletonMap("input", i));
@@ -48,6 +54,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMergingExclusiveGateway() {
     runtimeService.startProcessInstanceByKey("exclusiveGwMerging");
     assertEquals(3, taskService.createTaskQuery().count());
@@ -56,18 +63,20 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   // If there are multiple outgoing seqFlow with valid conditions, the first
   // defined one should be chosen.
   @Deployment
+  @Test
   public void testMultipleValidConditions() {
     runtimeService.startProcessInstanceByKey("exclusiveGwMultipleValidConditions", CollectionUtil.singletonMap("input", 5));
     assertEquals("Task 2", taskService.createTaskQuery().singleResult().getName());
   }
 
   @Deployment
+  @Test
   public void testNoSequenceFlowSelected() {
     try {
       runtimeService.startProcessInstanceByKey("exclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-02004 No outgoing sequence flow for the element with id 'exclusiveGw' could be selected for continuing the process.", e.getMessage());
+      testRule.assertTextPresent("ENGINE-02004 No outgoing sequence flow for the element with id 'exclusiveGw' could be selected for continuing the process.", e.getMessage());
     }
   }
 
@@ -75,6 +84,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
    * Test for bug ACT-10: whitespaces/newlines in expressions lead to exceptions
    */
   @Deployment
+  @Test
   public void testWhitespaceInExpression() {
     // Starting a process instance will lead to an exception if whitespace are incorrectly handled
     runtimeService.startProcessInstanceByKey("whiteSpaceInExpression",
@@ -82,6 +92,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/gateway/ExclusiveGatewayTest.testDivergingExclusiveGateway.bpmn20.xml"})
+  @Test
   public void testUnknownVariableInExpression() {
     // Instead of 'input' we're starting a process instance with the name 'iinput' (ie. a typo)
     try {
@@ -89,11 +100,12 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
             "exclusiveGwDiverging", CollectionUtil.singletonMap("iinput", 1));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("Unknown property used in expression", e.getMessage());
+      testRule.assertTextPresent("Unknown property used in expression", e.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testDecideBasedOnBeanProperty() {
     runtimeService.startProcessInstanceByKey("decisionBasedOnBeanProperty",
             CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(150)));
@@ -104,6 +116,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDecideBasedOnListOrArrayOfBeans() {
     List<ExclusiveGatewayTestOrder> orders = new ArrayList<ExclusiveGatewayTestOrder>();
     orders.add(new ExclusiveGatewayTestOrder(50));
@@ -130,6 +143,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDecideBasedOnBeanMethod() {
     runtimeService.startProcessInstanceByKey("decisionBasedOnBeanMethod",
             CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(300)));
@@ -140,17 +154,19 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testInvalidMethodExpression() {
     try {
       runtimeService.startProcessInstanceByKey("invalidMethodExpression",
             CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(50)));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("Unknown method used in expression", e.getMessage());
+      testRule.assertTextPresent("Unknown method used in expression", e.getMessage());
     }
   }
 
   @Deployment
+  @Test
   public void testDefaultSequenceFlow() {
 
     // Input == 1 -> default is not selected
@@ -167,12 +183,14 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testNoIdOnSequenceFlow() {
     runtimeService.startProcessInstanceByKey("noIdOnSequenceFlow", CollectionUtil.singletonMap("input", 3));
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Input is more than one", task.getName());
   }
 
+  @Test
   public void testFlowWithoutConditionNoDefaultFlow() {
     String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
@@ -203,6 +221,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDefaultFlowWithCondition() {
     String defaultFlowWithCondition = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
@@ -234,6 +253,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testNoOutgoingFlow() {
     String noOutgoingFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
@@ -256,6 +276,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   // see CAM-4172
   @Deployment
+  @Test
   public void testLoopWithManyIterations() {
     int numOfIterations = 1000;
 
@@ -269,6 +290,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
    * goes to another task, allowing us to test the decision very easily.
    */
   @Deployment
+  @Test
   public void testDecisionFunctionality() {
 
     Map<String, Object> variables = new HashMap<String, Object>();

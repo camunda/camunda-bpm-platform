@@ -17,24 +17,29 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class TaskVariablesTest extends PluggableProcessEngineTestCase {
+public class TaskVariablesTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testStandaloneTaskVariables() {
     Task task = taskService.newTask();
     task.setName("gonzoTask");
@@ -48,6 +53,7 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/task/TaskVariablesTest.testTaskExecutionVariables.bpmn20.xml"})
+  @Test
   public void testTaskExecutionVariableLongValue() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
 
@@ -67,6 +73,7 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTaskExecutionVariables() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
     String taskId = taskService.createTaskQuery().singleResult().getId();

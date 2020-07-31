@@ -3,7 +3,6 @@
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
         format=""
-        itemType=""
         required=false
         last=false >
   {
@@ -21,12 +20,10 @@
         "default": ${defaultValue},
       </#if>
 
-      "type": "${type}"
-
-      <#if type == "array">,
-        "items": {
-          "type": "${itemType}"
-        }
+      <#if type == "array">
+        "type": "string"
+      <#else>
+        "type": "${type}"
       </#if>
 
       <#if format?has_content>,
@@ -44,11 +41,38 @@
   <#if !last> , </#if> <#-- if not a last parameter add a comma-->
 </#macro>
 
+<#macro parameters
+        object
+        skip = []
+        last = false>
+  <#local result>
+    <#list object as key, value>
+      <#if !skip?seq_contains(key)>
+        <@lib.parameter
+            name = key
+            location = "query"
+            type = value["type"]
+            format = value["format"]
+            defaultValue = value["defaultValue"]
+            enumValues = value["enumValues"]
+            last = true
+            desc = value["desc"] />,
+      </#if>
+    </#list>
+  </#local>
+  <#if last>
+    ${result?keep_before_last(",")}
+  <#else>
+    ${result}
+  </#if>
+</#macro>
+
 <#-- Generates a DTO Property JSON object -->
 <#macro property name type
         desc=""
         enumValues=[]
         defaultValue="" <#-- it will work for boolean, integer, string -->
+        nullable=true
         minimum=""
         deprecated=false
         additionalProperties=false
@@ -66,6 +90,15 @@
 
         <#if format?has_content>
           "format": "${format}",
+          <#if nullable>
+            "nullable": true,
+          </#if>
+        </#if>
+
+        <#if type == "boolean">
+          <#if nullable>
+            "nullable": true,
+          </#if>
         </#if>
 
         <#if enumValues?size != 0>
@@ -111,6 +144,32 @@
     }
 
     <#if !last> , </#if> <#-- if not a last property add a comma-->
+</#macro>
+
+<#macro properties
+        object
+        skip = []
+        last = false>
+  <#local result>
+    <#list object as key, value>
+      <#if !skip?seq_contains(key)>
+        <@lib.property name = key
+            type = value["type"]
+            enumValues = value["enumValues"]
+            format = value["format"]
+            dto = value["dto"]
+            itemType = value["itemType"]
+            defaultValue = value["defaultValue"]
+            last = true
+            desc = value["desc"]/>,
+      </#if>
+    </#list>
+  </#local>
+  <#if last>
+    ${result?keep_before_last(",")}
+  <#else>
+    ${result}
+  </#if>
 </#macro>
 
 <#-- Generates a DTO JSON object -->
@@ -191,7 +250,8 @@
 <#-- Generates an HTTP Response JSON object
      * `dto` needs to be defined if `mediaType` is, the default, "application/json" -->
 <#macro response code desc
-        dto="ExceptionDto"
+        flatType=""
+        dto=""
         array=false
         additionalProperties=false
         mediaType="application/json"
@@ -222,12 +282,17 @@
                    "additionalProperties": {
                  </#if>
 
+                 <#if dto?has_content>
                    "$ref": "#/components/schemas/${dto}"
+                 </#if>
+
+                 <#if flatType?has_content>
+                  "type": "${flatType}"
+                 </#if>
 
                  <#if array || additionalProperties >
                    }
                  </#if>
-
                }
            </#if>
 
@@ -270,11 +335,17 @@
 <#macro endpointInfo
         id
         tag
-        desc >
+        desc
+        summary = "" >
     "operationId": "${id}",
     "tags": [
       "${tag}"
     ],
+
+    <#if summary?has_content>
+      "summary": "${summary}",
+    </#if>
+
     "description": "${removeIndentation(desc)}",
 </#macro>
 

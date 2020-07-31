@@ -16,26 +16,48 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class AuditHistoryTest extends ResourceProcessEngineTestCase {
+public class AuditHistoryTest {
 
-  public AuditHistoryTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/audithistory.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/history/audithistory.camunda.cfg.xml");
+
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+  protected HistoryService historyService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
+    historyService = engineRule.getHistoryService();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testReceivesNoHistoricVariableUpdatesAsDetails() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

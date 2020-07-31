@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm.webapp</groupId>
@@ -13,6 +13,13 @@
   <packaging>war</packaging>
   <name>camunda BPM - webapp - JBoss Standalone</name>
 
+  <properties>
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+  
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -74,12 +81,10 @@
       <artifactId>camunda-webapp-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>

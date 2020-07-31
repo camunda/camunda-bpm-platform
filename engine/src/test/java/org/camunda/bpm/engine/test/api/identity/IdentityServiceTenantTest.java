@@ -147,8 +147,9 @@ public class IdentityServiceTenantTest {
   @Test
   public void testInvalidTenantId() {
     String invalidId = "john's tenant";
+    Tenant tenant = identityService.newTenant(invalidId);
     try {
-      identityService.newTenant(invalidId);
+      identityService.saveTenant(tenant);
       fail("Invalid tenant id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Tenant", invalidId), ex.getMessage());
@@ -178,8 +179,9 @@ public class IdentityServiceTenantTest {
 
     String invalidId = "john's tenant";
 
+    Tenant tenant = processEngine.getIdentityService().newTenant(invalidId);
     try {
-      processEngine.getIdentityService().newTenant(invalidId);
+      processEngine.getIdentityService().saveTenant(tenant);
       fail("Invalid tenant id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Tenant", invalidId), ex.getMessage());

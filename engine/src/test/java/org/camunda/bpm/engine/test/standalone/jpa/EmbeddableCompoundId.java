@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import java.io.Serializable;
-
 import javax.persistence.Embeddable;
+
+import java.io.Serializable;
 
 /**
  * @author Frederik Heremans

@@ -20,6 +20,7 @@ public class CamundaBpmRunCorsProperty {
 
   public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".cors";
   public static final String DEFAULT_ORIGINS = "*";
+  public static final String DEFAULT_HTTP_METHODS = "GET,POST,HEAD,OPTIONS,PUT,DELETE";
 
   boolean enabled;
   String allowedOrigins;

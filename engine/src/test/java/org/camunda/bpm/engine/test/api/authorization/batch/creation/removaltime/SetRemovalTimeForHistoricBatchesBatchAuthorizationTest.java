@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch.creation.removaltime;
 
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -27,13 +34,6 @@ import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 /**
  * @author Tassilo Weidner

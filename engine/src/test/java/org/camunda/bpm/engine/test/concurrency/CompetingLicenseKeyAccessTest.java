@@ -17,25 +17,27 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.SetLicenseKeyCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class CompetingLicenseKeyAccessTest extends ConcurrencyTestCase {
 
   private ThreadControl asyncThread;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
     managementService.setLicenseKey("testLicenseKey");
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
+  @After
+  public void tearDown() throws Exception {
     managementService.deleteLicenseKey();
   }
 
@@ -48,6 +50,7 @@ public class CompetingLicenseKeyAccessTest extends ConcurrencyTestCase {
    *  t=2: fetch and delete license key
    *  t=3: commit transaction
    */
+  @Test
   public void testConcurrentlyDeleteAndSetLicense() {
     managementService.setLicenseKey("testLicenseKey");
 
@@ -74,6 +77,7 @@ public class CompetingLicenseKeyAccessTest extends ConcurrencyTestCase {
    *  t=2: fetch and update license key
    *  t=3: commit transaction
    */
+  @Test
   public void testConcurrentlyAlterLicense() {
     managementService.setLicenseKey("testLicenseKey");
 

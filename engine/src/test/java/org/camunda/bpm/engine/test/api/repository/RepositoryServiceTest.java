@@ -16,6 +16,25 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -33,7 +52,6 @@ import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -43,7 +61,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -59,34 +76,25 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.junit.Test;
 
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  * @author Roman Smirnov
  */
-public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
+public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   private static final String NAMESPACE = "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'";
   private static final String TARGET_NAMESPACE = "targetNamespace='" + BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS + "'";
 
-  @Override
+  @After
   public void tearDown() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
@@ -106,6 +114,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUTF8DeploymentMethod() throws IOException {
     //given utf8 charset
     Charset utf8Charset = Charset.forName("UTF-8");
@@ -143,6 +152,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testStartProcessInstanceById() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertEquals(1, processDefinitions.size());
@@ -154,6 +164,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testFindProcessDefinitionById() {
     List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
     assertEquals(1, definitions.size());
@@ -169,6 +180,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testDeleteDeploymentWithRunningInstances() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertEquals(1, processDefinitions.size());
@@ -186,6 +198,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteDeploymentSkipCustomListeners() {
     DeploymentBuilder deploymentBuilder =
         repositoryService
@@ -210,6 +223,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testDeleteDeploymentSkipCustomTaskListeners() {
     DeploymentBuilder deploymentBuilder =
         repositoryService
@@ -235,6 +249,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     RecorderTaskListener.clear();
   }
 
+  @Test
   public void testDeleteDeploymentSkipIoMappings() {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteDeploymentSkipIoMappings.bpmn20.xml");
@@ -250,6 +265,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteDeploymentWithoutSkipIoMappings() {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteDeploymentSkipIoMappings.bpmn20.xml");
@@ -264,31 +280,34 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     } catch (Exception e) {
       // Exception expected when deleting deployment with running process
       // assert (e.getMessage().contains("Exception when output mapping is executed"));
-      assertTextPresent("Exception when output mapping is executed", e.getMessage());
+      testRule.assertTextPresent("Exception when output mapping is executed", e.getMessage());
     }
 
     repositoryService.deleteDeployment(deploymentId, true, false, true);
   }
 
+  @Test
   public void testDeleteDeploymentNullDeploymentId() {
     try {
       repositoryService.deleteDeployment(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("deploymentId is null", ae.getMessage());
+      testRule.assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testDeleteDeploymentCascadeNullDeploymentId() {
     try {
       repositoryService.deleteDeployment(null, true);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("deploymentId is null", ae.getMessage());
+      testRule.assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testDeleteDeploymentCascadeWithRunningInstances() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertEquals(1, processDefinitions.size());
@@ -303,7 +322,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/repository/one.cmmn"})
+  @Test
   public void testDeleteDeploymentClearsCache() {
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
 
     // fetch definition ids
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -329,25 +350,28 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertNull(deploymentCache.getCmmnModelInstanceCache().get(caseDefinitionId));
   }
 
+  @Test
   public void testFindDeploymentResourceNamesNullDeploymentId() {
     try {
       repositoryService.getDeploymentResourceNames(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("deploymentId is null", ae.getMessage());
+      testRule.assertTextPresent("deploymentId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testFindDeploymentResourcesNullDeploymentId() {
     try {
       repositoryService.getDeploymentResources(null);
       fail("ProcessEngineException expected");
     }
     catch (ProcessEngineException e) {
-      assertTextPresent("deploymentId is null", e.getMessage());
+      testRule.assertTextPresent("deploymentId is null", e.getMessage());
     }
   }
 
+  @Test
   public void testDeploymentWithDelayedProcessDefinitionActivation() {
 
     Date startTime = new Date();
@@ -371,7 +395,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("suspended", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
 
     List<Job> jobs = managementService.createJobQuery().list();
@@ -391,6 +415,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
   public void testDeploymentWithDelayedProcessDefinitionAndJobDefinitionActivation() {
 
     Date startTime = new Date();
@@ -418,7 +443,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("suspended", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
 
     Job job = managementService.createJobQuery().singleResult();
@@ -443,6 +468,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testGetResourceAsStreamUnexistingResourceInExistingDeployment() {
     // Get hold of the deployment id
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
@@ -451,39 +477,42 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       repositoryService.getResourceAsStream(deployment.getId(), "org/camunda/bpm/engine/test/api/unexistingProcess.bpmn.xml");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no resource found with name", ae.getMessage());
+      testRule.assertTextPresent("no resource found with name", ae.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testGetResourceAsStreamUnexistingDeployment() {
 
     try {
       repositoryService.getResourceAsStream("unexistingdeployment", "org/camunda/bpm/engine/test/api/unexistingProcess.bpmn.xml");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no resource found with name", ae.getMessage());
+      testRule.assertTextPresent("no resource found with name", ae.getMessage());
     }
   }
 
 
+  @Test
   public void testGetResourceAsStreamNullArguments() {
     try {
       repositoryService.getResourceAsStream(null, "resource");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("deploymentId is null", ae.getMessage());
+      testRule.assertTextPresent("deploymentId is null", ae.getMessage());
     }
 
     try {
       repositoryService.getResourceAsStream("deployment", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("resourceName is null", ae.getMessage());
+      testRule.assertTextPresent("resourceName is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.cmmn" })
+  @Test
   public void testGetCaseDefinition() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -496,22 +525,24 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(caseDefinitionId, definition.getId());
   }
 
+  @Test
   public void testGetCaseDefinitionByInvalidId() {
     try {
       repositoryService.getCaseDefinition("invalid");
     } catch (NotFoundException e) {
-      assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getCaseDefinition(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("caseDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("caseDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.cmmn" })
+  @Test
   public void testGetCaseModel() throws Exception {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
@@ -530,22 +561,24 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     IoUtil.closeSilently(caseModel);
   }
 
+  @Test
   public void testGetCaseModelByInvalidId() throws Exception {
     try {
       repositoryService.getCaseModel("invalid");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed case definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getCaseModel(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("caseDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("caseDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
+  @Test
   public void testGetDecisionDefinition() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
@@ -558,23 +591,25 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(decisionDefinitionId, definition.getId());
   }
 
+  @Test
   public void testGetDecisionDefinitionByInvalidId() {
     try {
       repositoryService.getDecisionDefinition("invalid");
       fail();
     } catch (NotFoundException e) {
-      assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getDecisionDefinition(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("decisionDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("decisionDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn" })
+  @Test
   public void testGetDecisionRequirementsDefinition() {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
 
@@ -587,23 +622,25 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(decisionRequirementsDefinitionId, definition.getId());
   }
 
+  @Test
   public void testGetDecisionRequirementsDefinitionByInvalidId() {
     try {
       repositoryService.getDecisionRequirementsDefinition("invalid");
       fail();
     } catch (Exception e) {
-      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getDecisionRequirementsDefinition(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
+  @Test
   public void testGetDecisionModel() throws Exception {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
@@ -622,22 +659,24 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     IoUtil.closeSilently(decisionModel);
   }
 
+  @Test
   public void testGetDecisionModelByInvalidId() throws Exception {
     try {
       repositoryService.getDecisionModel("invalid");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getDecisionModel(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("decisionDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("decisionDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn" })
+  @Test
   public void testGetDecisionRequirementsModel() throws Exception {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
 
@@ -655,23 +694,25 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     IoUtil.closeSilently(decisionRequirementsModel);
   }
 
+  @Test
   public void testGetDecisionRequirementsModelByInvalidId() throws Exception {
     try {
       repositoryService.getDecisionRequirementsModel("invalid");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getDecisionRequirementsModel(null);
       fail();
     } catch (NotValidException e) {
-      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn",
                            "org/camunda/bpm/engine/test/repository/drg.png" })
+  @Test
   public void testGetDecisionRequirementsDiagram() throws Exception {
 
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
@@ -684,20 +725,22 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(actualDrd);
   }
 
+  @Test
   public void testGetDecisionRequirementsDiagramByInvalidId() throws Exception {
     try {
       repositoryService.getDecisionRequirementsDiagram("invalid");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+      testRule.assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
     }
 
     try {
       repositoryService.getDecisionRequirementsDiagram(null);
     } catch (ProcessEngineException e) {
-      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }
 
+  @Test
   public void testDeployRevisedProcessAfterDeleteOnOtherProcessEngine() {
 
     // Setup both process engines
@@ -759,6 +802,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     processEngine2.close();
   }
 
+  @Test
   public void testDeploymentPersistence() {
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
       .createDeployment()
@@ -791,6 +835,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testProcessDefinitionPersistence() {
     String deploymentId = repositoryService
       .createDeployment()
@@ -810,6 +855,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Test
   public void testDecisionDefinitionUpdateTimeToLiveWithUserOperationLog() {
     //given
     identityService.setAuthenticatedUserId("userId");
@@ -846,6 +892,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Test
   public void testDecisionDefinitionUpdateTimeToLiveNull() {
     //given
     DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
@@ -860,6 +907,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Test
   public void testDecisionDefinitionUpdateTimeToLiveNegative() {
     //given
     DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
@@ -875,6 +923,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testProcessDefinitionUpdateTimeToLive() {
     //given
     ProcessDefinition processDefinition = findOnlyProcessDefinition();
@@ -889,6 +938,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testProcessDefinitionUpdateTimeToLiveNull() {
     //given
     ProcessDefinition processDefinition = findOnlyProcessDefinition();
@@ -903,6 +953,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testProcessDefinitionUpdateTimeToLiveNegative() {
     //given
     ProcessDefinition processDefinition = findOnlyProcessDefinition();
@@ -919,6 +970,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testProcessDefinitionUpdateHistoryTimeToLiveWithUserOperationLog() {
     //given
     ProcessDefinition processDefinition = findOnlyProcessDefinition();
@@ -945,6 +997,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCaseDefinitionUpdateHistoryTimeToLiveWithUserOperationLog() {
     // given
     identityService.setAuthenticatedUserId("userId");
@@ -981,6 +1034,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testUpdateHistoryTimeToLiveNull() {
     // given
     // there exists a deployment containing a case definition with key "oneTaskCase"
@@ -997,6 +1051,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testUpdateHistoryTimeToLiveNegative() {
     // given
     // there exists a deployment containing a case definition with key "oneTaskCase"
@@ -1013,6 +1068,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testUpdateHistoryTimeToLiveInCache() {
     // given
     // there exists a deployment containing a case definition with key "oneTaskCase"
@@ -1050,6 +1106,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     return decisionDefinitions.get(0);
   }
 
+  @Test
   public void testProcessDefinitionIntrospection() {
     String deploymentId = repositoryService
       .createDeployment()
@@ -1088,6 +1145,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  @Test
   public void testProcessDefinitionQuery() {
     String deployment1Id = repositoryService
       .createDeployment()
@@ -1116,6 +1174,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     deleteDeployments(Arrays.asList(deployment1Id, deployment2Id));
   }
 
+  @Test
   public void testGetProcessDefinitions() {
     List<String> deploymentIds = new ArrayList<String>();
     deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' isExecutable='true' />" + "</definitions>")));
@@ -1167,6 +1226,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deploymentIds);
   }
 
+  @Test
   public void testDeployIdenticalProcessDefinitions() {
     List<String> deploymentIds = new ArrayList<String>();
     deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' isExecutable='true' />" + "</definitions>")));

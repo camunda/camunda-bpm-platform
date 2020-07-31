@@ -1,6 +1,11 @@
 <@lib.dto
     required = [ "type" ] >
 
+    <#-- NOTE: Please consider adjusting the RestartProcessInstanceModificationInstructionDto
+         if the properties are valid there as well.
+         The DTO was created separately as it does not contain
+         all of these properties and the description differs too much. -->
+
     <@lib.property
         name = "type"
         type = "string"
@@ -57,10 +62,5 @@
         type = "boolean"
         last = true
         desc = "Can be used with instructions of type cancel. Prevents the deletion of new created activity instances." />
-
-<#--  TODO CAM-11364
-  "discriminator" : {
-    "propertyName" : "type"
-  }, -->
 
 </@lib.dto>

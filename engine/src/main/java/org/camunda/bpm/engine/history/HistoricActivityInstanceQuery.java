@@ -48,6 +48,14 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   /** Only select historic activity instances for activities with the given name */
   HistoricActivityInstanceQuery activityName(String activityName);
 
+  /**
+   * Only select historic activity instances for activities which activityName is like the given value.
+   *
+   * @param activityNameLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  HistoricActivityInstanceQuery activityNameLike(String activityNameLike);
+
   /** Only select historic activity instances for activities with the given activity type */
   HistoricActivityInstanceQuery activityType(String activityType);
 

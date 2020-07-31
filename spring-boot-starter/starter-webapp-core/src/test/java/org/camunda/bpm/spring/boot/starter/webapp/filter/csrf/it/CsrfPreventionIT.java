@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
 
-import org.apache.commons.io.IOUtils;
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
@@ -27,15 +27,14 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {"server.error.include-message=always"})
 public class CsrfPreventionIT {
 
   @Rule
@@ -46,12 +45,13 @@ public class CsrfPreventionIT {
 
   @Test
   public void shouldSetCookieWebapp() {
-    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
@@ -59,12 +59,13 @@ public class CsrfPreventionIT {
 
   @Test
   public void shouldSetCookieWebappRest() {
-    headerRule.performRequest("http://localhost:" + port + "/api/engine/engine/");
+    headerRule.performRequest("http://localhost:" + port + "/camunda/api/engine/engine/");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue();
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};" +
+        "Path=" + WebappProperty.DEFAULT_APP_PATH + ";SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
@@ -75,8 +76,9 @@ public class CsrfPreventionIT {
     // given
 
     // when
-    URLConnection urlConnection = headerRule.performPostRequest("http://localhost:" + port + "/api/admin/auth/user/default/login/welcome",
-      "Content-Type", "application/x-www-form-urlencoded");
+    URLConnection urlConnection = headerRule.performPostRequest("http://localhost:" + port +
+            "/camunda/api/admin/auth/user/default/login/welcome", "Content-Type",
+        "application/x-www-form-urlencoded");
 
     try {
       urlConnection.getContent();

@@ -16,25 +16,55 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 
 /**
  * @author Tom Baeyens
  */
-public class CompetingSubprocessCompletionTest extends PluggableProcessEngineTestCase {
+public class CompetingSubprocessCompletionTest {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
 
   static ControllableThread activeThread;
+
+
+  @Before
+  public void initializeServices() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+  }
 
   public class CompleteTaskThread extends ControllableThread {
     String taskId;
@@ -64,6 +94,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
    * that all threads attempt compaction by which synchronization happens "by accident"
    */
   @Deployment
+  @Test
   public void testCompetingSubprocessEnd() throws Exception {
     runtimeService.startProcessInstanceByKey("CompetingSubprocessEndProcess");
 
@@ -85,7 +116,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    testRule.assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
   }
 
 }

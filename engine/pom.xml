@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -42,6 +42,8 @@
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-impl</artifactId>
         </exclusion>
+        <!-- these exclusions are needed when building with Maven >= 3.3
+          see CAM-11822 for details -->
         <exclusion>
           <groupId>org.camunda.feel</groupId>
           <artifactId>feel-engine</artifactId>
@@ -85,7 +87,11 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
     </dependency>
 
     <!-- provided dependencies -->
@@ -103,11 +109,11 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -251,6 +257,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>${version.wiremock}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
@@ -262,6 +274,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    
+    <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
+    for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -367,9 +383,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
           <artifactSet>
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>
@@ -378,11 +395,9 @@
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>
-              <exclude>org.apache.commons:*</exclude>
               <exclude>com.sun.mail:*</exclude>
               <exclude>javax.activation:*</exclude>
               <exclude>org.mybatis:mybatis:*</exclude>
-              <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
             </excludes>
           </artifactSet>
@@ -391,11 +406,26 @@
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
             </relocation>
+            <relocation>
+              <pattern>org.apache.http</pattern>
+              <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.commons.codec</pattern>
+              <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.apache.commons.logging</pattern>
+              <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
+            </relocation>
           </relocations>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
-          <shadeTestJar>true</shadeTestJar>
+          <!-- shading test jar is disabled due to
+               the httpclient and dependencies that it brings have *-tests.jar and we prevent their shading,
+               otherwise the tests of those libraries are unpacked and executed (via surefire plugin) in the upgrade setups -->
+          <shadeTestJar>false</shadeTestJar> 
         </configuration>
       </plugin>
     </plugins>
@@ -726,7 +756,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx700m</argLine>
+              <argLine>-Xmx968m</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -777,6 +807,7 @@
                 <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
+                <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

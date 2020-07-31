@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.application.impl.deployment.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +30,8 @@ import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngineException;
-
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>The testcases for the {@link ProcessesXmlParser}</p>
@@ -34,20 +39,20 @@ import junit.framework.TestCase;
  * @author Daniel Meyer
  *
  */
-public class ProcessesXmlParserTest extends TestCase {
+public class ProcessesXmlParserTest {
 
   private ProcessesXmlParser parser;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     parser = new ProcessesXmlParser();
-    super.setUp();
   }
 
   protected URL getStreamUrl(String filename) {
     return ProcessesXmlParserTest.class.getResource(filename);
   }
 
+  @Test
   public void testParseProcessesXmlOneEngine() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -75,6 +80,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlTwoEngines() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -111,6 +117,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlOneArchive() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -141,6 +148,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlTwoArchives() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -185,6 +193,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlTwoArchivesAndTwoEngines() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -254,6 +263,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlEngineNoName() {
 
     // this test is to make sure that XML Schema Validation works.
@@ -286,6 +296,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlNsPrefix() {
 
     ProcessesXml processesXml = parser.createParse()
@@ -300,6 +311,7 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlTenantId() {
 
     ProcessesXml processesXml = parser.createParse()

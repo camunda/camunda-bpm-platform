@@ -20,12 +20,18 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -38,13 +44,15 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngineTest {
 
   protected static final String EXCLUSIVE_GATEWAY_ASYNC_BEFORE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
 
@@ -65,6 +73,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   protected static final String ASYNC_BEFORE_FAILING_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.asyncBeforeFailingTaskProcess.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testStartBeforeAsync() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -101,7 +110,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     // when the async job is executed
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // then there is the task
     task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
@@ -118,13 +127,14 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
 
     completeTasksInOrder("task1", "task2");
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   /**
    * starting after a task should not respect that tasks asyncAfter setting
    */
   @Deployment
+  @Test
   public void testStartAfterAsync() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
@@ -144,10 +154,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     // end process
     completeTasksInOrder("task1");
     managementService.executeJob(job.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelParentScopeOfAsyncBeforeActivity() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -176,11 +187,12 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
 
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelParentScopeOfAsyncBeforeScopeActivity() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -209,11 +221,12 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
 
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelParentScopeOfParallelAsyncBeforeScopeActivity() {
     // given a process instance with two concurrent async scope tasks in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedConcurrentTasksProcess");
@@ -242,11 +255,12 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
 
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelAsyncActivityInstanceFails() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -260,11 +274,12 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
         .execute();
       fail("should not succeed");
     } catch (ProcessEngineException e) {
-      assertTextPresent("activityInstance is null", e.getMessage());
+      testRule.assertTextPresent("activityInstance is null", e.getMessage());
     }
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelAsyncBeforeTransitionInstance() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -297,11 +312,12 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     // and the process can be completed successfully
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
 
   @Deployment(resources = ASYNC_BEFORE_ONE_TASK_PROCESS)
+  @Test
   public void testCancelAsyncBeforeTransitionInstanceEndsProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -313,10 +329,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .execute();
 
     // then the process instance has ended
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ASYNC_BEFORE_ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelAsyncBeforeScopeTransitionInstanceEndsProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -328,10 +345,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .execute();
 
     // then the process instance has ended
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ASYNC_BEFORE_ONE_TASK_PROCESS)
+  @Test
   public void testCancelAndStartAsyncBeforeTransitionInstance() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -365,12 +383,13 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     .done());
 
     // and the process can be completed successfully
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
     completeTasksInOrder("theTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelNestedConcurrentTransitionInstance() {
     // given a process instance with an instance of outerTask and two asynchronous tasks nested
     // in a subprocess
@@ -418,10 +437,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     managementService.executeJob(innerTask2Job.getId());
     completeTasksInOrder("innerTask2");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelNestedConcurrentTransitionInstanceWithConcurrentScopeTask() {
     // given a process instance where the job for innerTask2 is already executed
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedConcurrentTasksProcess");
@@ -465,10 +485,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     // and completing the process should succeed
     completeTasksInOrder("innerTask2", "outerTask");
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_IO_LISTENER_PROCESS)
+  @Test
   public void testCancelTransitionInstanceShouldNotInvokeIoMappingAndListenersOfTargetActivity() {
     RecorderExecutionListener.clear();
 
@@ -491,10 +512,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     // and the process can be completed successfully
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = NESTED_ASYNC_AFTER_TASK_PROCESS)
+  @Test
   public void testCancelAsyncAfterTransitionInstance() {
     // given a process instance with an asyncAfter task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -531,10 +553,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     // and the process can be completed successfully
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = NESTED_ASYNC_AFTER_END_EVENT_PROCESS)
+  @Test
   public void testCancelAsyncAfterEndEventTransitionInstance() {
     // given a process instance with an asyncAfter end event in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedAsyncEndEventProcess");
@@ -567,10 +590,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     // and the process can be completed successfully
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = ASYNC_AFTER_ONE_TASK_PROCESS)
+  @Test
   public void testCancelAsyncAfterTransitionInstanceEndsProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -586,10 +610,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .execute();
 
     // then the process instance has ended
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment
+  @Test
   public void testCancelAsyncAfterTransitionInstanceInvokesParentListeners() {
     RecorderExecutionListener.clear();
 
@@ -611,6 +636,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelAllCancelsTransitionInstances() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
@@ -641,10 +667,11 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
     // and the process can be completed successfully
     completeTasksInOrder("outerTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = ASYNC_AFTER_FAILING_TASK_PROCESS)
+  @Test
   public void testStartBeforeAsyncAfterTask() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingAfterAsyncTask");
@@ -666,7 +693,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .done());
 
     // when all jobs are executed
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // then the tree is still the same, since the jobs failed
     tree = runtimeService.getActivityInstance(processInstance.getId());
@@ -678,6 +705,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = ASYNC_AFTER_FAILING_TASK_PROCESS)
+  @Test
   public void testStartBeforeAsyncAfterTaskActivityStatistics() {
     // given a process instance with an async task in a subprocess
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingAfterAsyncTask");
@@ -718,7 +746,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
 
 
     // when all jobs are executed
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
   }
 
@@ -727,6 +755,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelAllTransitionInstanceInScope() {
     // given there are two transition instances in an inner scope
     // and an active activity instance in an outer scope
@@ -767,6 +796,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelTransitionInstanceTwiceFails() {
     // given there are two transition instances in an inner scope
     // and an active activity instance in an outer scope
@@ -790,7 +820,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
         .execute();
       fail("should not be possible to cancel the first instance twice");
     } catch (NotValidException e) {
-      assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
+      testRule.assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
           + "'; Transition instance '" + transitionInstanceId + "' does not exist: transitionInstance is null",
           e.getMessage());
     }
@@ -800,6 +830,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  @Test
   public void testCancelTransitionInstanceTwiceFailsCase2() {
     // given there are two transition instances in an inner scope
     // and an active activity instance in an outer scope
@@ -830,7 +861,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       fail("should not be possible to cancel the first instance twice");
     } catch (NotValidException e) {
       String transitionInstanceId = transitionInstances[1].getId();
-      assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
+      testRule.assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
           + "'; Transition instance '" + transitionInstanceId + "' does not exist: transitionInstance is null",
           e.getMessage());
     }
@@ -840,6 +871,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelStartCancelInScope() {
     // given there are two transition instances in an inner scope
     // and an active activity instance in an outer scope
@@ -886,6 +918,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testStartAndCancelAllForTransitionInstance() {
     // given there is one transition instance in a scope
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
@@ -924,6 +957,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testRepeatedStartAndCancellationForTransitionInstance() {
     // given there is one transition instance in a scope
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
@@ -946,13 +980,14 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .execute();
 
     // then the process has ended
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
   /**
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testRepeatedCancellationAndStartForTransitionInstance() {
     // given there is one transition instance in a scope
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
@@ -998,6 +1033,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testStartBeforeAndCancelSingleTransitionInstance() {
     // given there is one transition instance in a scope
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
@@ -1037,6 +1073,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
    * CAM-4090
    */
   @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  @Test
   public void testStartBeforeSyncEndAndCancelSingleTransitionInstance() {
     // given there is one transition instance in a scope and an outer activity instance
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
@@ -1072,13 +1109,14 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   }
 
   @Deployment(resources = ASYNC_BEFORE_FAILING_TASK_PROCESS)
+  @Test
   public void testRestartAFailedServiceTask() {
     // given a failed job
     ProcessInstance instance = runtimeService.createProcessInstanceByKey("failingAfterBeforeTask")
       .startBeforeActivity("task2")
       .execute();
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
     Incident incident = runtimeService.createIncidentQuery().singleResult();
     assertNotNull(incident);
 
@@ -1089,7 +1127,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
       .cancelTransitionInstance(tree.getTransitionInstances("task2")[0].getId())
       .execute();
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // then executing the task has failed again and there is a new incident
     Incident newIncident = runtimeService.createIncidentQuery().singleResult();

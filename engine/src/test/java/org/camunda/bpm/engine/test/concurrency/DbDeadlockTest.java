@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -58,6 +60,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
    * Deadlocks may occur if readers are not properly isolated from writers.
    *
    */
+  @Test
   public void testTransactionIsolation() {
 
     thread1 = executeControllableCommand(new TestCommand("p1"));
@@ -115,8 +118,8 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
 
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
 
     // end interaction with Thread 2
     thread2.waitUntilDone();

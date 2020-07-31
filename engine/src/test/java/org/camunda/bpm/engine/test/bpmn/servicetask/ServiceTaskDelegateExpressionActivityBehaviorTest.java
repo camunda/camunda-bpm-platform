@@ -18,21 +18,22 @@ package org.camunda.bpm.engine.test.bpmn.servicetask;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Test;
 
 /**
  * @author Ronny Bräunlich
  *
  */
-public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTest {
 
   @Deployment
   @Test

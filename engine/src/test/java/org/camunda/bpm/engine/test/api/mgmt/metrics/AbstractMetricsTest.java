@@ -18,20 +18,57 @@ package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public abstract class AbstractMetricsTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractMetricsTest {
 
-  protected void setUp() throws Exception {
+  protected final ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected final ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected CaseService caseService;
+  protected HistoryService historyService;
+  protected RepositoryService repositoryService;
+  protected ManagementService managementService;
+
+  @Before
+  public void initializeServices() throws Exception {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    caseService = engineRule.getCaseService();
+    historyService = engineRule.getHistoryService();
+    repositoryService = engineRule.getRepositoryService();
+    managementService = engineRule.getManagementService();
+
     clearMetrics();
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void cleanUpMetrics() throws Exception {
     clearMetrics();
   }
 

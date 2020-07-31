@@ -19,17 +19,33 @@ package org.camunda.bpm.engine.test.api.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 
-public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
+public class IdGeneratorDataSourceTest {
 
-  public IdGeneratorDataSourceTest() {
-    super("org/camunda/bpm/engine/test/api/cfg/IdGeneratorDataSourceTest.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/cfg/IdGeneratorDataSourceTest.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
   }
 
   @Deployment
+  @Test
   public void testIdGeneratorDataSource() {
     List<Thread> threads = new ArrayList<Thread>();
     for (int i=0; i<20; i++) {

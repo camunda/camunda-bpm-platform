@@ -17,13 +17,13 @@
 package org.camunda.bpm.container.impl.parser;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
 import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
@@ -31,6 +31,8 @@ import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>The testcases for the {@link BpmPlatformXmlParser}</p>
@@ -38,19 +40,20 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
  * @author Daniel Meyer
  *
  */
-public class BpmPlatformXmlParserTest extends TestCase {
+public class BpmPlatformXmlParserTest {
 
   private BpmPlatformXmlParser parser;
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     parser = new BpmPlatformXmlParser();
-    super.setUp();
   }
 
   protected URL getStreamUrl(String filename) {
     return BpmPlatformXmlParserTest.class.getResource(filename);
   }
 
+  @Test
   public void testParseBpmPlatformXmlNoEngine() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
@@ -73,6 +76,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseBpmPlatformXmlOneEngine() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
@@ -108,6 +112,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseBpmPlatformXmlEnginePlugin() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
@@ -144,6 +149,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseBpmPlatformXmlMultipleEnginePlugins() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
@@ -163,6 +169,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
   }
 
+  @Test
   public void testParseProcessesXmlAntStyleProperties() {
 
     BpmPlatformXml platformXml = parser.createParse()

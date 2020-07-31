@@ -16,22 +16,26 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Frederik Heremans
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class HistoricTaskInstanceUpdateTest extends PluggableProcessEngineTestCase {
+public class HistoricTaskInstanceUpdateTest extends PluggableProcessEngineTest {
 
 
   @Deployment
+  @Test
   public void testHistoricTaskInstanceUpdate() {
     runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
 

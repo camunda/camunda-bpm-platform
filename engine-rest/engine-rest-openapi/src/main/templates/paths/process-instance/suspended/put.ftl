@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "updateSuspensionState"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Activates or suspends process instances by providing certain criteria:
 
               # Activate/Suspend Process Instance By Process Definition Id

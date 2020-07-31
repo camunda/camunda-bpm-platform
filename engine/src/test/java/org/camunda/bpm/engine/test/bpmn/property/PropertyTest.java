@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.property;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class PropertyTest extends PluggableProcessEngineTestCase {
+public class PropertyTest extends PluggableProcessEngineTest {
 
 
   @Deployment
+  @Test
   public void testUserTaskSrcProperty() {
 
     // DO NOT DELETE: WILL BE REACTIVATED SOON!
@@ -67,6 +69,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUserTaskSrcExprProperty() {
 
 //    // Start the process -> waits in usertask
@@ -91,6 +94,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUserTaskDstProperty() {
 
 //    ProcessInstance pi = deployer.getProcessService().startProcessInstanceByKey("testUserTaskDstProperty");
@@ -115,6 +119,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUserTaskDstExprProperty() {
 
 //    Order order = new Order();
@@ -147,6 +152,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUserTaskLinkProperty() {
 
 //    // Start the process -> waits in usertask

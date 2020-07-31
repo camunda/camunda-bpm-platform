@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,22 +46,19 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-
   protected static final String DRG_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.dmn";
-  
   protected static final String DRD_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.png";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
-
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  protected String decisionRequirementsDefinitionId;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ExpectedException thrown= ExpectedException.none();
+
+  protected String decisionRequirementsDefinitionId;
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;

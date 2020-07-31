@@ -16,18 +16,24 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
+public class CaseInstanceListenerTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn"})
+  @Test
   public void testCreateListenerByClass() {
     // given
 
@@ -52,6 +58,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByDelegateExpression.cmmn"})
+  @Test
   public void testCreateListenerByDelegateExpression() {
     // given
 
@@ -77,6 +84,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByExpression.cmmn"})
+  @Test
   public void testCreateListenerByExpression() {
     // given
 
@@ -102,6 +110,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByScript.cmmn"})
+  @Test
   public void testCreateListenerByScript() {
     // given
 
@@ -126,6 +135,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByClass.cmmn"})
+  @Test
   public void testCompleteListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -153,6 +163,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByDelegateExpression.cmmn"})
+  @Test
   public void testCompleteListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -181,6 +192,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByExpression.cmmn"})
+  @Test
   public void testCompleteListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -209,6 +221,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByScript.cmmn"})
+  @Test
   public void testCompleteListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -236,6 +249,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByClass.cmmn"})
+  @Test
   public void testTerminateListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -261,6 +275,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByDelegateExpression.cmmn"})
+  @Test
   public void testTerminateListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -287,6 +302,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByExpression.cmmn"})
+  @Test
   public void testTerminateListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -313,6 +329,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByScript.cmmn"})
+  @Test
   public void testTerminateListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -338,6 +355,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByClass.cmmn"})
+  @Test
   public void testSuspendListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -363,6 +381,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByDelegateExpression.cmmn"})
+  @Test
   public void testSuspendListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -389,6 +408,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByExpression.cmmn"})
+  @Test
   public void testSuspendListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -415,6 +435,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByScript.cmmn"})
+  @Test
   public void testSuspendListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -440,6 +461,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByClass.cmmn"})
+  @Test
   public void testReActivateListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -469,6 +491,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByDelegateExpression.cmmn"})
+  @Test
   public void testReActivateListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -497,6 +520,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByExpression.cmmn"})
+  @Test
   public void testReActivateListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -525,6 +549,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByScript.cmmn"})
+  @Test
   public void testReActivateListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -554,6 +579,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByClass.cmmn"})
+  @Test
   public void testCloseListenerByClass() {
     CloseCaseExecutionListener.clear();
 
@@ -584,6 +610,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByDelegateExpression.cmmn"})
+  @Test
   public void testCloseListenerByDelegateExpression() {
     CloseCaseExecutionListener.clear();
 
@@ -613,6 +640,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByExpression.cmmn"})
+  @Test
   public void testCloseListenerByExpression() {
     CloseCaseExecutionListener.clear();
 
@@ -642,6 +670,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByScript.cmmn"})
+  @Test
   public void testCloseListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -664,6 +693,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByClass.cmmn"})
+  @Test
   public void testAllListenerByClass() {
     // given
 
@@ -717,6 +747,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Test
   public void testAllListenerByDelegateExpression() {
     // given
 
@@ -771,6 +802,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByExpression.cmmn"})
+  @Test
   public void testAllListenerByExpression() {
     // given
 
@@ -825,6 +857,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByScript.cmmn"})
+  @Test
   public void testAllListenerByScript() {
     // given
 
@@ -878,6 +911,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByClass.cmmn"})
+  @Test
   public void testFieldInjectionByClass() {
     // given
 
@@ -902,6 +936,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByDelegateExpression.cmmn"})
+  @Test
   public void testFieldInjectionByDelegateExpression() {
     // given
 
@@ -930,6 +965,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testListenerByScriptResource.cmmn",
       "org/camunda/bpm/engine/test/cmmn/listener/caseExecutionListener.groovy"
       })
+  @Test
   public void testListenerByScriptResource() {
     // given
 
@@ -970,6 +1006,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByClass.cmmn"})
+  @Test
   public void testDoesNotImplementCaseExecutionListenerInterfaceByClass() {
     // given
 
@@ -982,12 +1019,13 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-05016 Class 'org.camunda.bpm.engine.test.cmmn.listener.NotCaseExecutionListener' doesn't implement '"+CaseExecutionListener.class.getName() + "'", message);
+      testRule.assertTextPresent("ENGINE-05016 Class 'org.camunda.bpm.engine.test.cmmn.listener.NotCaseExecutionListener' doesn't implement '"+CaseExecutionListener.class.getName() + "'", message);
     }
 
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByDelegateExpression.cmmn"})
+  @Test
   public void testDoesNotImplementCaseExecutionListenerInterfaceByDelegateExpression() {
     // given
 
@@ -1000,12 +1038,13 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("Delegate expression ${myListener} did not resolve to an implementation of interface "+CaseExecutionListener.class.getName(), message);
+      testRule.assertTextPresent("Delegate expression ${myListener} did not resolve to an implementation of interface "+CaseExecutionListener.class.getName(), message);
     }
 
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testListenerDoesNotExist.cmmn"})
+  @Test
   public void testListenerDoesNotExist() {
     // given
 
@@ -1018,7 +1057,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("Exception while instantiating class", message);
+      testRule.assertTextPresent("Exception while instantiating class", message);
     }
 
   }

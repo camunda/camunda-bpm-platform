@@ -32,7 +32,13 @@ import static org.camunda.bpm.engine.authorization.Resources.TENANT_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -53,25 +59,28 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTestCase {
+public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTest {
 
   private final static String jonny2 = "jonny2";
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
     cleanupAfterTest();
-    super.tearDown();
+
   }
 
+  @Test
   public void testUserCreateAuthorizations() {
 
     // add base permission which allows nobody to create users:
@@ -111,6 +120,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testUserDeleteAuthorizations() {
 
     // crate user while still in god-mode:
@@ -141,6 +151,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantAuthorizationAfterDeleteUser() {
     // given jonny2 who is allowed to do user operations
     User jonny = identityService.newUser(jonny2);
@@ -178,6 +189,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(jonny1Id).count(), is(0L));
   }
 
+  @Test
   public void testUserUpdateAuthorizations() {
 
     // crate user while still in god-mode:
@@ -217,6 +229,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @Test
   public void testUserUnlock() throws ParseException {
 
     // crate user while still in god-mode:
@@ -256,6 +269,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertEquals(0, lockedUser.getAttempts());
   }
 
+  @Test
   public void testUserUnlockWithoutAuthorization() throws ParseException {
 
     // crate user while still in god-mode:
@@ -295,6 +309,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertEquals(maxNumOfLoginAttempts, lockedUser.getAttempts());
   }
 
+  @Test
   public void testGroupCreateAuthorizations() {
 
     // add base permission which allows nobody to create groups:
@@ -334,6 +349,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testGroupDeleteAuthorizations() {
 
     // crate group while still in god-mode:
@@ -365,6 +381,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @Test
   public void testTenantAuthorizationAfterDeleteGroup() {
     // given jonny2 who is allowed to do group operations
     User jonny = identityService.newUser(jonny2);
@@ -402,6 +419,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   }
 
 
+  @Test
   public void testGroupUpdateAuthorizations() {
 
     // crate group while still in god-mode:
@@ -441,6 +459,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @Test
   public void testTenantCreateAuthorizations() {
 
     // add base permission which allows nobody to create tenants:
@@ -480,6 +499,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantDeleteAuthorizations() {
 
     // create tenant
@@ -510,6 +530,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantUpdateAuthorizations() {
 
     // create tenant
@@ -548,6 +569,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveTenant(newTenant);
   }
 
+  @Test
   public void testMembershipCreateAuthorizations() {
 
     User jonny1 = identityService.newUser("jonny1");
@@ -579,6 +601,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testMembershipDeleteAuthorizations() {
 
     User jonny1 = identityService.newUser("jonny1");
@@ -610,6 +633,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantUserMembershipCreateAuthorizations() {
 
     User jonny1 = identityService.newUser("jonny1");
@@ -641,6 +665,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantGroupMembershipCreateAuthorizations() {
 
     Group group1 = identityService.newGroup("group1");
@@ -672,6 +697,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenantUserMembershipDeleteAuthorizations() {
 
     User jonny1 = identityService.newUser("jonny1");
@@ -703,6 +729,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testTenanGroupMembershipDeleteAuthorizations() {
 
     Group group1 = identityService.newGroup("group1");
@@ -734,6 +761,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testUserQueryAuthorizations() {
 
     // we are jonny2
@@ -816,6 +844,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @Test
   public void testUserQueryAuthorizationsMultipleGroups() {
 
     // we are jonny2
@@ -979,6 +1008,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
   }
 
+  @Test
   public void testGroupQueryAuthorizations() {
 
     // we are jonny2
@@ -1060,6 +1090,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @Test
   public void testTenantQueryAuthorizations() {
     // we are jonny2
     String authUserId = "jonny2";

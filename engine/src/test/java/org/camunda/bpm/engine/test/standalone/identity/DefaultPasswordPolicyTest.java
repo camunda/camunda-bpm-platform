@@ -20,10 +20,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.notNullValue;
+
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
@@ -32,7 +34,9 @@ import org.camunda.bpm.engine.impl.identity.PasswordPolicyLengthRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyLowerCaseRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicySpecialCharacterRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyUpperCaseRuleImpl;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyUserDataRuleImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +49,7 @@ import org.junit.rules.ExpectedException;
 public class DefaultPasswordPolicyTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(true);
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -76,7 +80,7 @@ public class DefaultPasswordPolicyTest {
   public void testGoodPassword() {
     PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd");
     assertThat(result.getViolatedRules().size(), is(0));
-    assertThat(result.getFulfilledRules().size(), is(5));
+    assertThat(result.getFulfilledRules().size(), is(6));
     assertThat(result.isValid(), is(true));
   }
 
@@ -205,9 +209,70 @@ public class DefaultPasswordPolicyTest {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
+  public void shouldCheckUserRuleWithPolicyPassed() {
+    // given
+    User user = identityService.newUser("myUserId");
+    String candidatePassword = "myUserId";
+
+    // when
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, candidatePassword, user);
+
+    // then
+    Assertions.assertThat(result.getViolatedRules())
+        .extracting("placeholder")
+        .contains(PasswordPolicyUserDataRuleImpl.PLACEHOLDER);
+  }
+
+  @Test
+  public void shouldCheckPasswordNull() {
+    // given
+    User user = identityService.newUser("myUserId");
+    String candidatePassword = null;
+
+    // then
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("password is null");
+
+    // when
+    identityService.checkPasswordAgainstPolicy(candidatePassword, user);
+  }
+
+  @Test
+  public void shouldCheckPasswordEmpty() {
+    // given
+    User user = identityService.newUser("myUserId");
+    String candidatePassword = "";
+
+    // when
+    PasswordPolicyResult result =
+        identityService.checkPasswordAgainstPolicy(candidatePassword, user);
+
+    // then
+    Assertions.assertThat(result.getFulfilledRules())
+        .extracting("placeholder")
+        .contains(PasswordPolicyUserDataRuleImpl.PLACEHOLDER);
+  }
+
+  @Test
+  public void shouldCheckUserNull() {
+    // given
+    User user = null;
+    String candidatePassword = "my-password";
+
+    // when
+    PasswordPolicyResult result =
+        identityService.checkPasswordAgainstPolicy(candidatePassword, user);
+
+    // then
+    Assertions.assertThat(result.getFulfilledRules())
+        .extracting("placeholder")
+        .contains(PasswordPolicyUserDataRuleImpl.PLACEHOLDER);
+  }
+
   private void checkThatPasswordWasInvalid(PasswordPolicyResult result) {
     assertThat(result.getViolatedRules().size(), is(1));
-    assertThat(result.getFulfilledRules().size(), is(4));
+    assertThat(result.getFulfilledRules().size(), is(5));
     assertThat(result.isValid(), is(false));
   }
 }

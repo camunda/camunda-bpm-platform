@@ -16,20 +16,37 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Frederik Heremans
  */
-public class BoundaryTimerEventFullHistoryTest extends ResourceProcessEngineTestCase {
+public class BoundaryTimerEventFullHistoryTest {
 
-  public BoundaryTimerEventFullHistoryTest() {
-    super("org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");
+
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
   }
 
   @Deployment
+  @Test
   public void testSetProcessVariablesFromTaskWhenTimerOnTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");
     runtimeService.setVariable(processInstance.getId(), "myVar", 123456L);

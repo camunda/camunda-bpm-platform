@@ -8,8 +8,17 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <!-- generate a bom of dependencies for the license book.
+    We include compile and provided scope dependencies; 
+    all the dependencies that we include in only one of the 
+    runtime-specific-WARs are in provided scope -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+    <third-party-bom-scopes>compile|provided</third-party-bom-scopes>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -22,20 +31,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-jaxrs2</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- dependencies only used for assemblies should be scope provided -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- dependencies only used for assemblies should be scope provided -->
-    <dependency>
-      <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
 

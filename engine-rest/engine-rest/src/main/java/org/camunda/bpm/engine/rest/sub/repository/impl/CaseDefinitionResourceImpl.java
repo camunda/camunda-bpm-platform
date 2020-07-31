@@ -173,7 +173,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       return Response.noContent().build();
     } else {
       String fileName = definition.getDiagramResourceName();
-      return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
+      return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
   }

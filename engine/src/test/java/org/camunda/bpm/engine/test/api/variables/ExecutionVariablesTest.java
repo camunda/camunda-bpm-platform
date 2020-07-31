@@ -16,21 +16,26 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
+public class ExecutionVariablesTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testTreeCompactionWithLocalVariableOnConcurrentExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -62,6 +67,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionWithLocalVariableOnConcurrentExecution.bpmn20.xml")
+  @Test
   public void testStableVariableInstanceIdsOnCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -93,6 +99,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  @Test
   public void testStableVariableInstanceIdsOnCompactionAndExpansion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -124,6 +131,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTreeCompactionForkParallelGateway() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -151,6 +159,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTreeCompactionNestedForkParallelGateway() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -179,6 +188,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  @Test
   public void testTreeCompactionWithVariablesOnScopeAndConcurrentExecution() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -207,6 +217,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testForkWithThreeBranchesAndJoinOfTwoBranchesParallelGateway() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -226,6 +237,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testForkWithThreeBranchesAndJoinOfTwoBranchesInclusiveGateway() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -245,6 +257,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  @Test
   public void testTreeCompactionAndExpansionWithConcurrentLocalVariables() {
 
     // given
@@ -271,6 +284,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  @Test
   public void testTreeCompactionAndExpansionWithScopeExecutionVariables() {
 
     // given

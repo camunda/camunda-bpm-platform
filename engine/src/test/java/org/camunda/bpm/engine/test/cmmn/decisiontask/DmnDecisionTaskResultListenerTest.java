@@ -16,18 +16,26 @@
  */
 package org.camunda.bpm.engine.test.cmmn.decisiontask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase {
+public class DmnDecisionTaskResultListenerTest extends CmmnTest {
 
   protected static final String TEST_CASE = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskResultListenerTest.cmmn";
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
@@ -37,6 +45,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   protected DmnDecisionResult results;
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testNoOutput() {
     startTestCase("no output");
 
@@ -44,6 +53,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testEmptyOutput() {
     startTestCase("empty output");
 
@@ -54,6 +64,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testEmptyMap() {
     startTestCase("empty map");
 
@@ -65,6 +76,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testSingleEntry() {
     startTestCase("single entry");
 
@@ -74,6 +86,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testMultipleEntries() {
     startTestCase("multiple entries");
 
@@ -86,6 +99,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testSingleEntryList() {
     startTestCase("single entry list");
 
@@ -98,6 +112,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Test
   public void testMultipleEntriesList() {
     startTestCase("multiple entries list");
 
@@ -114,6 +129,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION_COLLECT_COUNT })
+  @Test
   public void testCollectCountHitPolicyNoOutput() {
     startTestCase("no output");
 
@@ -125,6 +141,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicyNoOutput() {
     startTestCase("no output");
 
@@ -132,6 +149,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicySingleEntry() {
     startTestCase("single entry");
 
@@ -143,6 +161,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   @Deployment(resources = { TEST_CASE, TEST_DECISION_COLLECT_SUM })
+  @Test
   public void testCollectSumHitPolicySingleEntryList() {
     startTestCase("single entry list");
 
@@ -160,8 +179,8 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     return caseInstance;
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     // reset the invoked execution listener
     DecisionResultTestListener.reset();
   }

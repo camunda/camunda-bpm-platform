@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.beans;
 
-import org.junit.Assert;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

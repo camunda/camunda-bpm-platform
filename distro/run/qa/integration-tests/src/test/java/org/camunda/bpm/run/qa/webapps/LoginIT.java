@@ -118,11 +118,21 @@ public class LoginIT extends AbstractWebappUiIT {
 
   @After
   public void logout() {
-    wait.until(presenceOfElementLocated(By.cssSelector(".account .dropdown-toggle")))
-        .click();
+    if (appName.equals("cockpit")) {
+      wait.until(presenceOfElementLocated(By.cssSelector(".UserInformation .user")))
+          .click();
 
-    wait.until(presenceOfElementLocated(By.cssSelector(".logout")))
-        .click();
+      wait.until(presenceOfElementLocated(By.xpath("//button[text()='Log out']")))
+          .click();
+
+    } else {
+      wait.until(presenceOfElementLocated(By.cssSelector(".account .dropdown-toggle")))
+          .click();
+
+      wait.until(presenceOfElementLocated(By.cssSelector(".logout")))
+          .click();
+
+    }
   }
 
   @Test

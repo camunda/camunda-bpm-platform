@@ -24,6 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
@@ -77,6 +78,24 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     // then
     assertEquals(200, response.getStatus());
     assertTrue(isHeaderPresent("X-Content-Type-Options", "nosniff", response));
+
+    // cleanup
+    response.close();
+  }
+
+  @Test(timeout=10000)
+  public void shouldCheckAbsenceOfHsts() {
+    // given
+
+    // when
+    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
+        .get(ClientResponse.class);
+
+    // then
+    assertEquals(200, response.getStatus());
+    MultivaluedMap<String, String> headers = response.getHeaders();
+    List<String> values = headers.get("Strict-Transport-Security");
+    assertNull(values);
 
     // cleanup
     response.close();

@@ -16,26 +16,33 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.servicetask.util.GenderBean;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
  */
-public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
+public class JavaServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testJavaServiceDelegation() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation", CollectionUtil.singletonMap("input", "Activiti BPM Engine"));
     Execution execution = runtimeService.createExecutionQuery()
@@ -46,6 +53,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testFieldInjection() {
     // Process contains 2 service-tasks using field-injection. One should use the exposed setter,
     // the other is using the private field.
@@ -60,6 +68,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testExpressionFieldInjection() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("name", "kermit");
@@ -77,6 +86,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUnexistingClassDelegation() {
     try {
       runtimeService.startProcessInstanceByKey("unexistingClassDelegation");
@@ -88,6 +98,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testIllegalUseOfResultVariableName() {
     try {
       repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml").deploy();
@@ -98,6 +109,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testExceptionHandling() {
 
     // If variable value is != 'throw-exception', process goes
@@ -117,6 +129,7 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetBusinessKeyFromDelegateExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("businessKeyProcess", "1234567890");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("businessKeyProcess").count());

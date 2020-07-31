@@ -16,31 +16,42 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
+public class StandaloneTaskTest extends PluggableProcessEngineTest {
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
+
     identityService.saveUser(identityService.newUser("kermit"));
     identityService.saveUser(identityService.newUser("gonzo"));
   }
 
+  @After
   public void tearDown() throws Exception {
     identityService.deleteUser("kermit");
     identityService.deleteUser("gonzo");
-    super.tearDown();
+
   }
 
+  @Test
   public void testCreateToComplete() {
 
     // Create and save task
@@ -78,6 +89,7 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
     assertNull(taskService.createTaskQuery().taskId(taskId).singleResult());
   }
 
+  @Test
   public void testOptimisticLockingThrownOnMultipleUpdates() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -103,6 +115,7 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
   }
 
   // See http://jira.codehaus.org/browse/ACT-1290
+  @Test
   public void testRevisionUpdatedOnSave() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -119,13 +132,14 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testSaveTaskWithGenericResourceId() {
     Task task = taskService.newTask("*");
     try {
       taskService.saveTask(task);
       fail("it should not be possible to save a task with the generic resource id *");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Entity Task[*] has an invalid id: id cannot be *. * is a reserved identifier", e.getMessage());
+      testRule.assertTextPresent("Entity Task[*] has an invalid id: id cannot be *. * is a reserved identifier", e.getMessage());
     }
   }
 

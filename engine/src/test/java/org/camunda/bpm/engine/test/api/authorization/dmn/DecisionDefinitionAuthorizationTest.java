@@ -20,6 +20,10 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
@@ -28,6 +32,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Philipp Ossler
@@ -37,21 +43,15 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "testProcess";
   protected static final String DECISION_DEFINITION_KEY = "sampleDecision";
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    testRule.deploy(
         "org/camunda/bpm/engine/test/api/authorization/singleDecision.dmn11.xml",
-        "org/camunda/bpm/engine/test/api/authorization/anotherDecision.dmn11.xml")
-        .getId();
+        "org/camunda/bpm/engine/test/api/authorization/anotherDecision.dmn11.xml");
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
+  @Test
   public void testQueryWithoutAuthorization() {
     // given user is not authorized to read any decision definition
 
@@ -62,6 +62,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnAnyDecisionDefinition() {
     // given user gets read permission on any decision definition
     createGrantAuthorization(DECISION_DEFINITION, ANY, userId, READ);
@@ -73,6 +74,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testQueryWithReadPermissionOnOneDecisionDefinition() {
     // given user gets read permission on the decision definition
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ);
@@ -88,6 +90,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(DECISION_DEFINITION_KEY, definition.getKey());
   }
 
+  @Test
   public void testQueryWithMultiple() {
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ);
     createGrantAuthorization(DECISION_DEFINITION, ANY, userId, READ);
@@ -99,6 +102,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
+  @Test
   public void testGetDecisionDefinitionWithoutAuthorizations() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -111,13 +115,14 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DECISION_DEFINITION_KEY, message);
-      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DECISION_DEFINITION_KEY, message);
+      testRule.assertTextPresent(DECISION_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetDecisionDefinition() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -130,6 +135,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertNotNull(decisionDefinition);
   }
 
+  @Test
   public void testGetDecisionDiagramWithoutAuthorizations() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -142,13 +148,14 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DECISION_DEFINITION_KEY, message);
-      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DECISION_DEFINITION_KEY, message);
+      testRule.assertTextPresent(DECISION_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetDecisionDiagram() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -162,6 +169,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertNull(stream);
   }
 
+  @Test
   public void testGetDecisionModelWithoutAuthorizations() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -174,13 +182,14 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DECISION_DEFINITION_KEY, message);
-      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DECISION_DEFINITION_KEY, message);
+      testRule.assertTextPresent(DECISION_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetDecisionModel() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -193,6 +202,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertNotNull(stream);
   }
 
+  @Test
   public void testGetDmnModelInstanceWithoutAuthorizations() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -205,13 +215,14 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(DECISION_DEFINITION_KEY, message);
-      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(DECISION_DEFINITION_KEY, message);
+      testRule.assertTextPresent(DECISION_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetDmnModelInstance() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -224,6 +235,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertNotNull(modelInstance);
   }
 
+  @Test
   public void testDecisionDefinitionUpdateTimeToLive() {
     //given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -237,6 +249,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
 
   }
 
+  @Test
   public void testDecisionDefinitionUpdateTimeToLiveWithoutAuthorizations() {
     //given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -248,10 +261,10 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(DECISION_DEFINITION_KEY, message);
-      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(DECISION_DEFINITION_KEY, message);
+      testRule.assertTextPresent(DECISION_DEFINITION.resourceName(), message);
     }
 
   }

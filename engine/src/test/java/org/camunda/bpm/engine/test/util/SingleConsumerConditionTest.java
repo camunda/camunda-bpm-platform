@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.test.util;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.camunda.bpm.engine.impl.util.SingleConsumerCondition;
 import org.junit.Assert;
 import org.junit.Test;

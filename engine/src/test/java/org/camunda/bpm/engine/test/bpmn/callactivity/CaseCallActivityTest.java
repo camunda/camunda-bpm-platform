@@ -17,7 +17,13 @@
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +32,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -34,15 +39,17 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
+public class CaseCallActivityTest extends CmmnTest {
 
   protected final String PROCESS_DEFINITION_KEY= "process";
   protected final String ONE_TASK_CASE = "oneTaskCase";
@@ -54,6 +61,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseAsConstant() {
     // given
     // a deployed process definition and case definition
@@ -74,13 +82,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsExpressionStartsWithDollar.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseAsExpressionStartsWithDollar() {
     // given
     // a deployed process definition and case definition
@@ -101,13 +110,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsExpressionStartsWithHash.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseAsExpressionStartsWithHash() {
     // given
     // a deployed process definition and case definition
@@ -128,13 +138,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseWithCompositeExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
   })
+  @Test
   public void testCallCaseWithCompositeExpression() {
     // given
     // a deployed process definition and case definition
@@ -155,13 +166,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallLatestCase.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallLatestCase() {
     // given
     String cmmnResourceName = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
@@ -197,7 +209,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
   }
@@ -206,6 +218,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseByDeployment.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseByDeployment() {
     // given
 
@@ -246,7 +259,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
     repositoryService.deleteDeployment(deploymentId, true);
   }
@@ -255,6 +268,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseByVersion.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseByVersion() {
     // given
 
@@ -295,7 +309,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
@@ -305,6 +319,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseByVersionAsExpression.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCallCaseByVersionAsExpression() {
     // given
 
@@ -345,13 +360,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml" })
+  @Test
   public void testCaseNotFound() {
     // given
 
@@ -367,6 +383,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputBusinessKey.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputBusinessKey() {
     // given
     String businessKey = "myBusinessKey";
@@ -388,13 +405,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputDifferentBusinessKey.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputDifferentBusinessKey() {
     // given
     String myBusinessKey = "myBusinessKey";
@@ -419,13 +437,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSource.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputSource() {
     // given
 
@@ -469,13 +488,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSourceDifferentTarget.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputSourceDifferentTarget() {
     // given
 
@@ -517,7 +537,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -525,6 +545,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSource.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputSourceNullValue() {
     // given
 
@@ -562,13 +583,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSourceExpression.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputSourceExpression() {
     // given
     VariableMap parameters = Variables.createVariables()
@@ -610,13 +632,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSourceAsCompositeExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
   })
+  @Test
   public void testInputSourceAsCompositeExpression() {
     // given
     VariableMap parameters = Variables.createVariables()
@@ -658,13 +681,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testInputAll() {
     // given
     VariableMap parameters = Variables.createVariables()
@@ -704,7 +728,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -712,6 +736,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCompleteCase.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testCompleteCase() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -732,10 +757,10 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     taskService.complete(userTask.getId());
-    assertCaseEnded(superProcessInstanceId);
+    testRule.assertCaseEnded(superProcessInstanceId);
 
   }
 
@@ -743,6 +768,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSource.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputSource() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -784,11 +810,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -796,6 +822,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSourceDifferentTarget.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputSourceDifferentTarget() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -836,11 +863,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -848,6 +875,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSource.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputSourceNullValue() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -882,11 +910,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -894,6 +922,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSourceExpression.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputSourceExpression() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -934,11 +963,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -946,6 +975,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSourceAsCompositeExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
   })
+  @Test
   public void testOutputSourceAsCompositeExpression() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -986,11 +1016,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -998,6 +1028,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputAll() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1038,11 +1069,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -1050,6 +1081,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testOutputVariablesShouldNotExistAnymore() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1087,11 +1119,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -1099,6 +1131,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testVariablesRoundtrip.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testVariablesRoundtrip() {
     // given
     VariableMap parameters = Variables.createVariables()
@@ -1144,11 +1177,11 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     // complete ////////////////////////////////////////////////////////
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
     taskService.complete(taskId);
-    assertProcessEnded(superProcessInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
 
   }
 
@@ -1156,6 +1189,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
+  @Test
   public void testCallCaseOutputAllVariablesTypedToProcess(){
     startProcessInstanceByKey("process");
     CaseInstance caseInstance = queryOneTaskCaseInstance();
@@ -1180,6 +1214,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testDeleteProcessInstance() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1198,13 +1233,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     terminate(subCaseInstanceId);
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testSuspendProcessInstance() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1237,17 +1273,15 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     complete(humanTaskId);
     close(subCaseInstance.getId());
-    assertCaseEnded(subCaseInstanceId);
-    assertProcessEnded(superProcessInstanceId);
-
-    repositoryService.deleteDeployment(deploymentId, true);
-
+    testRule.assertCaseEnded(subCaseInstanceId);
+    testRule.assertProcessEnded(superProcessInstanceId);
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
+  @Test
   public void testTerminateSubCaseInstance() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1267,7 +1301,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     runtimeService.deleteProcessInstance(superProcessInstanceId, null);
   }
@@ -1276,6 +1310,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
+  @Test
   public void testSuspendSubCaseInstance() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1295,7 +1330,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
 
     close(subCaseInstanceId);
-    assertCaseEnded(subCaseInstanceId);
+    testRule.assertCaseEnded(subCaseInstanceId);
 
     runtimeService.deleteProcessInstance(superProcessInstanceId, null);
   }
@@ -1304,6 +1339,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCompletionOfCaseWithTwoTasks.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
     })
+  @Test
   public void testCompletionOfTwoHumanTasks() {
     // given
     String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
@@ -1333,6 +1369,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
   public void testSubProcessLocalInputAllVariables() {
     ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1370,6 +1407,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
   public void testSubProcessLocalInputSingleVariable() {
     ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1408,6 +1446,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
   public void testSubProcessLocalInputSingleVariableExpression() {
     ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1438,13 +1477,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       taskService.complete(beforeSecondCallActivityTask.getId());
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
+      testRule.assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
     }
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn" })
+  @Test
   public void testSubProcessLocalOutputAllVariables() {
     ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalOutputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1482,6 +1522,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
   public void testSubProcessLocalOutputSingleVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();

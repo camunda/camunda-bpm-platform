@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.bpmn.exclusive;
 
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
@@ -24,39 +27,42 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class ExclusiveTaskReuseCacheTest extends ExclusiveTaskTest {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
     processEngineConfiguration.setDbEntityCacheReuseEnabled(true);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setDbEntityCacheReuseEnabled(false);
-    super.tearDown();
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTaskTest.testNonExclusiveService.bpmn20.xml"})
+  @Test
   public void testNonExclusiveService() {
     super.testNonExclusiveService();
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTaskTest.testExclusiveService.bpmn20.xml"})
+  @Test
   public void testExclusiveService() {
     super.testExclusiveService();
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTaskTest.testExclusiveServiceConcurrent.bpmn20.xml"})
+  @Test
   public void testExclusiveServiceConcurrent() {
     super.testExclusiveServiceConcurrent();
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTaskTest.testExclusiveSequence2.bpmn20.xml"})
+  @Test
   public void testExclusiveSequence2() {
     super.testExclusiveSequence2();
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/exclusive/ExclusiveTaskTest.testExclusiveSequence3.bpmn20.xml"})
+  @Test
   public void testExclusiveSequence3() {
     super.testExclusiveSequence3();
   }

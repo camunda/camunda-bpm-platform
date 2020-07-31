@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,21 +32,25 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
+public class TaskDecoratorTest extends PluggableProcessEngineTest {
 
   protected TaskEntity task;
   protected TaskDefinition taskDefinition;
   protected TaskDecorator taskDecorator;
   protected ExpressionManager expressionManager;
 
+  @Before
   public void setUp() {
     task = (TaskEntity) taskService.newTask();
     taskService.saveTask(task);
@@ -55,6 +62,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
   }
 
+  @After
   public void tearDown() {
     processEngineConfiguration
       .getCommandExecutorTxRequired()
@@ -67,6 +75,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
       .execute(new DecorateTaskCommand(task, decorator));
   }
 
+  @Test
   public void testDecorateName() {
     // given
     String aTaskName = "A Task Name";
@@ -80,6 +89,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aTaskName, task.getName());
   }
 
+  @Test
   public void testDecorateNameFromVariable() {
     // given
     String aTaskName = "A Task Name";
@@ -95,6 +105,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aTaskName, task.getName());
   }
 
+  @Test
   public void testDecorateDescription() {
     // given
     String aDescription = "This is a Task";
@@ -108,6 +119,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aDescription, task.getDescription());
   }
 
+  @Test
   public void testDecorateDescriptionFromVariable() {
     // given
     String aDescription = "This is a Task";
@@ -123,6 +135,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aDescription, task.getDescription());
   }
 
+  @Test
   public void testDecorateDueDate() {
     // given
     String aDueDate = "2014-06-01";
@@ -138,6 +151,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(dueDate, task.getDueDate());
   }
 
+  @Test
   public void testDecorateDueDateFromVariable() {
     // given
     String aDueDate = "2014-06-01";
@@ -154,6 +168,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(dueDate, task.getDueDate());
   }
 
+  @Test
   public void testDecorateFollowUpDate() {
     // given
     String aFollowUpDate = "2014-06-01";
@@ -169,6 +184,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(followUpDate, task.getFollowUpDate());
   }
 
+  @Test
   public void testDecorateFollowUpDateFromVariable() {
     // given
     String aFollowUpDateDate = "2014-06-01";
@@ -185,6 +201,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(followUpDate, task.getFollowUpDate());
   }
 
+  @Test
   public void testDecoratePriority() {
     // given
     String aPriority = "10";
@@ -198,6 +215,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(Integer.parseInt(aPriority), task.getPriority());
   }
 
+  @Test
   public void testDecoratePriorityFromVariable() {
     // given
     int aPriority = 10;
@@ -213,6 +231,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aPriority, task.getPriority());
   }
 
+  @Test
   public void testDecorateAssignee() {
     // given
     String aAssignee = "john";
@@ -226,6 +245,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aAssignee, task.getAssignee());
   }
 
+  @Test
   public void testDecorateAssigneeFromVariable() {
     // given
     String aAssignee = "john";
@@ -241,6 +261,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     assertEquals(aAssignee, task.getAssignee());
   }
 
+  @Test
   public void testDecorateCandidateUsers() {
     // given
     List<String> aCandidateUserList = new ArrayList<String>();
@@ -280,6 +301,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testDecorateCandidateUsersFromVariable() {
     // given
     taskService.setVariable(task.getId(), "john", "john");
@@ -322,6 +344,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDecorateCandidateGroups() {
     // given
     List<String> aCandidateGroupList = new ArrayList<String>();
@@ -361,6 +384,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testDecorateCandidateGroupsFromVariable() {
     // given
     taskService.setVariable(task.getId(), "management", "management");

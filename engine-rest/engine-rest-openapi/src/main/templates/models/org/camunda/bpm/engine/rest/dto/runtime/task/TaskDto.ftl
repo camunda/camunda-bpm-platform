@@ -24,6 +24,7 @@
         name = "created"
         type = "string"
         format = "date-time"
+        nullable = false
         desc = "The date the task was created on.
                 [Default format](${docsUrl}/reference/rest/overview/date-format/)
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />

@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -28,48 +29,66 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  *  @author Philipp Ossler
  */
-public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
+public class JdbcStatementTimeoutTest extends ConcurrencyTestHelper {
 
   private static final int STATEMENT_TIMEOUT_IN_SECONDS = 1;
   // some databases (like mysql and oracle) need more time to cancel the statement
   private static final int TEST_TIMEOUT_IN_MILLIS = 10000;
   private static final String JOB_ENTITY_ID = "42";
 
-  private ThreadControl thread1;
-  private ThreadControl thread2;
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+          configuration.setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS));
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  @Override
-  protected void runTest() throws Throwable {
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-    if ((DbSqlSessionFactory.DB2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType))
-      && processEngine.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-      // skip test method - if database is DB2 and MariaDB and Batch mode on
-    } else {
-      // invoke the test method
-      super.runTest();
+  private ConcurrencyTestHelper.ThreadControl thread1;
+  private ConcurrencyTestHelper.ThreadControl thread2;
+
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+  }
+
+
+  @After
+  public void tearDown() throws Exception {
+    if (thread1 != null) {
+      thread1.waitUntilDone();
+      deleteJobEntities();
     }
+
+    // wait for all spawned threads to end
+    for (ConcurrencyTestCase.ControllableCommand<?> controllableCommand : controllableCommands) {
+      ConcurrencyTestHelper.ThreadControl threadControl = controllableCommand.monitor;
+      threadControl.executingThread.interrupt();
+      threadControl.executingThread.join();
+    }
+
+    // clear the test thread's interruption state
+    Thread.interrupted();
   }
 
-  @Override
-  protected void initializeProcessEngine() {
-    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS)
-        .buildProcessEngine();
-  }
-
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    processEngine = null;
-  }
-
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.DB2 })
   public void testTimeoutOnUpdate() {
     createJobEntity();
 
@@ -93,14 +112,6 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
     thread2.waitForSync(TEST_TIMEOUT_IN_MILLIS);
 
     assertNotNull("expected timeout exception", thread2.getException());
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    if (thread1 != null) {
-      thread1.waitUntilDone();
-      deleteJobEntities();
-    }
   }
 
   private void createJobEntity() {

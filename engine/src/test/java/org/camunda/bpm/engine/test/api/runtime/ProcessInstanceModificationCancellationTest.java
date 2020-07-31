@@ -20,23 +20,27 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * Tests cancellation of four basic patterns of active activities in a scope:
@@ -49,7 +53,7 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  * @author Thorben Lindhauer
  */
-public class ProcessInstanceModificationCancellationTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationCancellationTest extends PluggableProcessEngineTest {
 
   // the four patterns as described above
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";
@@ -77,6 +81,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testCancellationInOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -88,10 +93,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "theTask"))
       .execute();
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testCancelAllInOneTaskProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -108,10 +114,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelAllForActivity("theTask")
       .execute();
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testCancellationAndCreationInOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -124,7 +131,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("theTask")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -149,10 +156,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testCreationAndCancellationInOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -165,7 +173,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "theTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -189,10 +197,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancellationInOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -204,10 +213,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "theTask"))
       .execute();
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancelAllInOneScopeTaskProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -225,10 +235,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelAllForActivity("theTask")
       .execute();
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancellationAndCreationInOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -241,7 +252,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("theTask")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -266,10 +277,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCreationAndCancellationInOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -282,7 +294,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "theTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -307,10 +319,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_PROCESS)
+  @Test
   public void testCancellationInConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -322,7 +335,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -345,10 +358,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_PROCESS)
+  @Test
   public void testCancelAllInConcurrentProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
@@ -364,7 +378,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelAllForActivity("task1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -387,11 +401,12 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
 
   @Deployment(resources = CONCURRENT_PROCESS)
+  @Test
   public void testCancellationAndCreationInConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -404,7 +419,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("task1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -434,10 +449,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_PROCESS)
+  @Test
   public void testCreationAndCancellationInConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -450,7 +466,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -480,10 +496,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCancellationInConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -495,7 +512,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -520,10 +537,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCancelAllInConcurrentScopeTasksProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
@@ -542,7 +560,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelAllForActivity("task1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -566,10 +584,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCancellationAndCreationInConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -582,7 +601,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("task1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -614,10 +633,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCreationAndCancellationInConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
@@ -630,7 +650,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -662,10 +682,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_TASK_PROCESS)
+  @Test
   public void testCancellationInNestedOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -677,7 +698,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -700,12 +721,13 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_TASK_PROCESS)
+  @Test
   public void testScopeCancellationInNestedOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -717,7 +739,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "subProcess"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -740,10 +762,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_TASK_PROCESS)
+  @Test
   public void testCancellationAndCreationInNestedOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -756,7 +779,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("innerTask")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -789,10 +812,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_TASK_PROCESS)
+  @Test
   public void testCreationAndCancellationInNestedOneTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -805,7 +829,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -838,10 +862,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancellationInNestedOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneScopeTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -853,7 +878,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -876,10 +901,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testScopeCancellationInNestedOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneScopeTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -891,7 +917,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "subProcess"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -914,10 +940,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     // assert successful completion of process
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCancellationAndCreationInNestedOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneScopeTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -930,7 +957,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("innerTask")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -964,10 +991,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_ONE_SCOPE_TASK_PROCESS)
+  @Test
   public void testCreationAndCancellationInNestedOneScopeTaskProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedOneScopeTaskProcess");
     String processInstanceId = processInstance.getId();
@@ -980,7 +1008,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1014,10 +1042,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_PROCESS)
+  @Test
   public void testCancellationInNestedConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGateway");
     String processInstanceId = processInstance.getId();
@@ -1029,7 +1058,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1060,10 +1089,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_PROCESS)
+  @Test
   public void testScopeCancellationInNestedConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGateway");
     String processInstanceId = processInstance.getId();
@@ -1075,7 +1105,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "subProcess"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1099,10 +1129,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_PROCESS)
+  @Test
   public void testCancellationAndCreationInNestedConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGateway");
     String processInstanceId = processInstance.getId();
@@ -1115,7 +1146,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("innerTask1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1150,10 +1181,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_PROCESS)
+  @Test
   public void testCreationAndCancellationInNestedConcurrentProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGateway");
     String processInstanceId = processInstance.getId();
@@ -1166,7 +1198,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1201,10 +1233,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCancellationInNestedConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGatewayScopeTasks");
     String processInstanceId = processInstance.getId();
@@ -1216,7 +1249,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1248,10 +1281,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testScopeCancellationInNestedConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGatewayScopeTasks");
     String processInstanceId = processInstance.getId();
@@ -1263,7 +1297,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "subProcess"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1287,10 +1321,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCancellationAndCreationInNestedConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGatewayScopeTasks");
     String processInstanceId = processInstance.getId();
@@ -1303,7 +1338,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("innerTask1")
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1341,10 +1376,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = NESTED_PARALLEL_CONCURRENT_SCOPE_TASKS_PROCESS)
+  @Test
   public void testCreationAndCancellationInNestedConcurrentScopeTasksProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedParallelGatewayScopeTasks");
     String processInstanceId = processInstance.getId();
@@ -1357,7 +1393,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask1"))
       .execute();
 
-    assertProcessNotEnded(processInstanceId);
+    testRule.assertProcessNotEnded(processInstanceId);
 
     // assert activity instance
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1395,10 +1431,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     for (Task task : tasks) {
       taskService.complete(task.getId());
     }
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
   @Deployment(resources = LISTENER_PROCESS)
+  @Test
   public void testEndListenerInvocation() {
     RecorderExecutionListener.clear();
 
@@ -1461,6 +1498,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
    * that do not exist yet when the activities are cancelled
    */
   @Deployment(resources = FAILING_OUTPUT_MAPPINGS_PROCESS)
+  @Test
   public void testSkipOutputMappingsOnCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingOutputMappingProcess");
 
@@ -1478,10 +1516,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "outerTask"))
       .execute(false, true);
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
+  @Test
   public void testProcessInstanceEventSubscriptionsPreservedOnIntermediateCancellation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -1507,6 +1546,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  @Test
   public void testProcessInstanceVariablesPreservedOnIntermediateCancellation() {
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceByKey("oneTaskProcess", Variables.createVariables().putValue("var", "value"));
@@ -1559,6 +1599,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     SIMPLE_SUBPROCESS,
     CALL_ACTIVITY_PROCESS
   })
+  @Test
   public void testCancellationInCallActivitySubProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -1586,7 +1627,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
 
     // then
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
 
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
@@ -1598,6 +1639,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     SIMPLE_SUBPROCESS,
     CALL_ACTIVITY_PROCESS
   })
+  @Test
   public void testCancellationAndRestartInCallActivitySubProcess() {
     // given
     runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -1639,6 +1681,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     SIMPLE_SUBPROCESS,
     TWO_SUBPROCESSES
   })
+  @Test
   public void testSingleCancellationWithTwoSubProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
@@ -1686,6 +1729,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     NESTED_CALL_ACTIVITY,
     CALL_ACTIVITY_PROCESS
   })
+  @Test
   public void testCancellationMultilevelProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("nestedCallActivity");

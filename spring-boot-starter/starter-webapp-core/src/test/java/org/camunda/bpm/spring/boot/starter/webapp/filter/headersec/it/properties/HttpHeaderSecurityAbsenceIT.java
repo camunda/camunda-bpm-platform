@@ -34,7 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
   "camunda.bpm.webapp.headerSecurity.xssProtectionDisabled=true",
   "camunda.bpm.webapp.headerSecurity.contentSecurityPolicyDisabled=true",
-  "camunda.bpm.webapp.headerSecurity.contentTypeOptionsDisabled=true"
+  "camunda.bpm.webapp.headerSecurity.contentTypeOptionsDisabled=true",
+  "camunda.bpm.webapp.headerSecurity.hstsDisabled=true"
 })
 public class HttpHeaderSecurityAbsenceIT {
 
@@ -80,6 +81,17 @@ public class HttpHeaderSecurityAbsenceIT {
 
     // then
     assertThat(headerRule.headerExists("X-Content-Type-Options")).isFalse();
+  }
+
+  @Test
+  public void shouldCheckAbsenceOfHsts() {
+    // given
+
+    // when
+    headerRule.performRequest();
+
+    // then
+    assertThat(headerRule.headerExists("Strict-Transport-Security")).isFalse();
   }
 
 }

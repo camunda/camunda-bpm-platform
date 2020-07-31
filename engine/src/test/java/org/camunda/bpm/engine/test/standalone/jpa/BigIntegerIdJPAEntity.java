@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import java.math.BigInteger;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import java.math.BigInteger;
 
 /**
  * @author Frederik Heremans
@@ -29,7 +29,7 @@ import javax.persistence.Id;
 public class BigIntegerIdJPAEntity {
 
   @Id
-  @Column(name = "ID_")
+  @Column(name = "ID_", columnDefinition = "DECIMAL(65535, 32767)")
   private BigInteger bigIntegerId;
 
   public BigInteger getBigIntegerId() {

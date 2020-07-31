@@ -16,23 +16,28 @@
  */
 package org.camunda.bpm.engine.test.bpmn.el;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Frederik Heremans
  */
-public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
+public class ExpressionManagerTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testMethodExpressions() {
     // Process contains 2 service tasks. one containing a method with no params, the other
     // contains a method with 2 params. When the process completes without exception,
@@ -45,6 +50,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testExecutionAvailable() {
     Map<String, Object> vars = new HashMap<String, Object>();
 
@@ -58,6 +64,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testAuthenticatedUserIdAvailable() {
     try {
       // Setup authentication
@@ -75,6 +82,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testResolvesVariablesFromDifferentScopes() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("assignee", "michael");
@@ -91,6 +99,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testSetVariableByExpressionFromListener() {
     // given
     runtimeService.startProcessInstanceByKey("fieldInjectionTest", Variables.putValue("myCounter", 5));

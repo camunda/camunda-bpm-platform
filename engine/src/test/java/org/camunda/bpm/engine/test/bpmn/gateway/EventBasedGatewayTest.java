@@ -17,11 +17,14 @@
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 
 import org.camunda.bpm.engine.ParseException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -29,16 +32,19 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Daniel Meyer
  */
-public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
+public class EventBasedGatewayTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={
           "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.throwAlertSignal.bpmn20.xml"})
+  @Test
   public void testCatchSignalCancelsTimer() {
 
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -66,6 +72,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
           "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml"
           })
+  @Test
   public void testCatchTimerCancelsSignal() {
 
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -77,7 +84,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
     try {
       // wait for timer to fire
-      waitForJobExecutorToProcessAllJobs(10000);
+      testRule.waitForJobExecutorToProcessAllJobs(10000);
 
       assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -96,6 +103,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testCatchSignalAndMessageAndTimer() {
 
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -136,6 +144,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testConnectedToActitity() {
 
     try {
@@ -150,6 +159,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testInvalidSequenceFlow() {
 
     try {
@@ -165,6 +175,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTimeCycle() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -179,7 +190,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
 }

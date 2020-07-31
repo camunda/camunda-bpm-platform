@@ -30,6 +30,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.springframework.core.io.Resource;
@@ -40,6 +41,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  *
  */
 public class SchemaLogTestCase {
+
   protected final static String BASE_PATH = "org/camunda/bpm/engine/db";
   protected final static String CREATE_SCRIPT_FOLDER = BASE_PATH + "/create";
   protected final static String UPGRADE_SCRIPT_FOLDER = BASE_PATH + "/upgrade";
@@ -47,7 +49,8 @@ public class SchemaLogTestCase {
   protected final static String[] DATABASES = DbSqlSessionFactory.SUPPORTED_DATABASES;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule();
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
+
   public ProcessEngine processEngine;
 
   protected String folderPath;

@@ -16,27 +16,31 @@
  */
 package org.camunda.bpm.engine.test.cmmn.activation;
 
-import java.util.Collections;
-
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Ignore;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
+
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
+public class ManualActivationRuleTest extends PluggableProcessEngineTest {
 
   /**
    * CAM-3170
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testManualActivationRuleEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", true));
 
@@ -50,6 +54,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
    * CAM-3170
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
+  @Test
   public void testManualActivationRuleEvaluatesToFalse() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", false));
 
@@ -60,6 +65,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultManualActivationRuleEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", true));
 
@@ -70,6 +76,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testDefaultVariableBasedRule.cmmn")
+  @Test
   public void testDefaultManualActivationRuleEvaluatesToFalse() {
     caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", false));
 
@@ -80,6 +87,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutDefinition.cmmn")
+  @Test
   public void testActivationWithoutManualActivationDefined() {
     caseService.createCaseInstanceByKey("case");
 
@@ -90,6 +98,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationExpressionDefined.cmmn")
+  @Test
   public void testActivationWithoutManualActivationExpressionDefined() {
     caseService.createCaseInstanceByKey("case");
 
@@ -100,6 +109,7 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationConditionDefined.cmmn")
+  @Test
   public void testActivationWithoutManualActivationConditionDefined() {
     caseService.createCaseInstanceByKey("case");
 

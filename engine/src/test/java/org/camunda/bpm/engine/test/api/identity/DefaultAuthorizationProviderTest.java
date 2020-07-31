@@ -16,15 +16,25 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Test authorizations provided by {@link DefaultAuthorizationProvider}</p>
@@ -32,9 +42,10 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Daniel Meyer
  *
  */
-public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTestCase {
+public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest {
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     // we are jonny
     identityService.setAuthenticatedUserId("jonny");
     // make sure we can do stuff:
@@ -61,18 +72,20 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
 
     // enable authorizations
     processEngineConfiguration.setAuthorizationEnabled(true);
-    super.setUp();
+
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
     List<Authorization> jonnysAuths = authorizationService.createAuthorizationQuery().userIdIn("jonny").list();
     for (Authorization authorization : jonnysAuths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
-    super.tearDown();
+
   }
 
+  @Test
   public void testCreateUser() {
     // initially there are no authorizations for jonny2:
     assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("jonny2").count());
@@ -95,6 +108,7 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("jonny2").count());
   }
 
+  @Test
   public void testCreateGroup() {
     // initially there are no authorizations for group "sales":
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("sales").count());

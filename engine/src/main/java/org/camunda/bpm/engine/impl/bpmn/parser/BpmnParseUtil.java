@@ -18,7 +18,9 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -235,6 +237,16 @@ public final class BpmnParseUtil {
         throw new BpmnParseException("Unable to process script", scriptElement, e);
       }
     }
+  }
+  
+  
+  public static Map<String, String> parseCamundaExtensionProperties(Element element){
+    Element propertiesElement = findCamundaExtensionElement(element, "properties");
+    if(propertiesElement != null) {
+      List<Element> properties = propertiesElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "property");
+      return properties.stream().collect(Collectors.toMap(e -> e.attribute("name"), e -> e.attribute("value")));
+    }
+    return null;
   }
 
   protected static ExpressionManager getExpressionManager() {

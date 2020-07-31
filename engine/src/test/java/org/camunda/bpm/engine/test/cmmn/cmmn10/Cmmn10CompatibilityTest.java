@@ -16,22 +16,30 @@
  */
 package org.camunda.bpm.engine.test.cmmn.cmmn10;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
+public class Cmmn10CompatibilityTest extends CmmnTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRequiredRule.cmmn")
+  @Test
   public void testRequiredRule() {
     CaseInstance caseInstance =
         createCaseInstanceByKey("case", Variables.createVariables().putValue("required", true));
@@ -50,6 +58,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testManualActivationRule.cmmn")
+  @Test
   public void testManualActivationRule() {
     createCaseInstanceByKey("case", Variables.createVariables().putValue("manual", false));
 
@@ -60,6 +69,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testManualActivationRuleWithoutCondition.cmmn")
+  @Test
   public void testManualActivationRuleWithoutCondition() {
     createCaseInstanceByKey("case", Variables.createVariables().putValue("manual", false));
 
@@ -70,6 +80,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRule.cmmn")
+  @Test
   public void testRepetitionRule() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
@@ -88,6 +99,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleWithoutEntryCriteria.cmmn")
+  @Test
   public void testRepetitionRuleWithoutEntryCriteria() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
@@ -106,6 +118,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleCustomStandardEvent.cmmn")
+  @Test
   public void testRepetitionRuleWithoutEntryCriteriaAndCustomStandardEvent() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
@@ -125,6 +138,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testPlanItemEntryCriterion.cmmn")
+  @Test
   public void testPlanItemEntryCriterion() {
     // given
     createCaseInstanceByKey("case");
@@ -138,6 +152,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testPlanItemExitCriterion.cmmn")
+  @Test
   public void testPlanItemExitCriterion() {
     // given
     createCaseInstanceByKey("case");
@@ -152,6 +167,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testCasePlanModelExitCriterion.cmmn")
+  @Test
   public void testCasePlanModelExitCriterion() {
     // given
     String caseInstanceId = createCaseInstanceByKey("case").getId();
@@ -166,6 +182,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testSentryIfPartCondition.cmmn")
+  @Test
   public void testSentryIfPartCondition() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("value", 99));
@@ -186,6 +203,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testDescription.cmmn")
+  @Test
   public void testDescription() {
     // given
     createCaseInstanceByKey("case");

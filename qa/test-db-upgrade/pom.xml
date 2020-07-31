@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -17,9 +17,7 @@
 
          See CAM-6338
     -->
-    <camunda.version.old>
-      7.12.0
-    </camunda.version.old>
+    <camunda.version.old>7.13.0</camunda.version.old>
   </properties>
 
   <artifactId>camunda-qa-db-upgrade</artifactId>
@@ -488,6 +486,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
       <scope>test</scope>
     </dependency>
 

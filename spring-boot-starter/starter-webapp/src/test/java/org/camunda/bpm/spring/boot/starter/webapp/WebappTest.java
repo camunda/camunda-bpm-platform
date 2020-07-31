@@ -42,14 +42,16 @@ public class WebappTest {
 
   @Test
   public void testEeResourceNotAvailable() {
-    final ResponseEntity<String> response = testRestTemplate.getForEntity("/plugin/adminEE/app/plugin.js", String.class);
+    ResponseEntity<String> response =
+        testRestTemplate.getForEntity("/camunda/plugin/adminEE/app/plugin.js", String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test
   public void testAdminEndpointAvailable() {
-    final ResponseEntity<String> response = testRestTemplate.getForEntity("/app/admin/", String.class);
+    ResponseEntity<String> response =
+        testRestTemplate.getForEntity("/camunda/app/admin/", String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
   }

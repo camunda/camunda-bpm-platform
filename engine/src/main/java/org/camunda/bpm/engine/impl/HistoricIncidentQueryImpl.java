@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
+import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -38,11 +39,17 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String id;
   protected String incidentType;
   protected String incidentMessage;
+  protected String incidentMessageLike;
   protected String executionId;
   protected String activityId;
+  protected Date createTimeBefore;
+  protected Date createTimeAfter;
+  protected Date endTimeBefore;
+  protected Date endTimeAfter;
   protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
@@ -78,9 +85,39 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery incidentMessageLike(String incidentMessageLike) {
+    ensureNotNull("incidentMessageLike", incidentMessageLike);
+    this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
   public HistoricIncidentQuery executionId(String executionId) {
     ensureNotNull("executionId", executionId);
     this.executionId = executionId;
+    return this;
+  }
+
+  public HistoricIncidentQuery createTimeBefore(Date createTimeBefore) {
+    ensureNotNull("createTimeBefore", createTimeBefore);
+    this.createTimeBefore = createTimeBefore;
+    return this;
+  }
+
+  public HistoricIncidentQuery createTimeAfter(Date createTimeAfter) {
+    ensureNotNull("createTimeAfter", createTimeAfter);
+    this.createTimeAfter = createTimeAfter;
+    return this;
+  }
+
+  public HistoricIncidentQuery endTimeBefore(Date endTimeBefore) {
+    ensureNotNull("endTimeBefore", endTimeBefore);
+    this.endTimeBefore = endTimeBefore;
+    return this;
+  }
+
+  public HistoricIncidentQuery endTimeAfter(Date endTimeAfter) {
+    ensureNotNull("endTimeAfter", endTimeAfter);
+    this.endTimeAfter = endTimeAfter;
     return this;
   }
 
@@ -105,6 +142,12 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery processDefinitionId(String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public HistoricIncidentQuery processDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
@@ -224,6 +267,11 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public HistoricIncidentQuery orderByProcessInstanceId() {
     orderBy(HistoricIncidentQueryProperty.PROCESS_INSTANCE_ID);
+    return this;
+  }
+
+  public HistoricIncidentQuery orderByProcessDefinitionKey() {
+    orderBy(HistoricIncidentQueryProperty.PROCESS_DEFINITION_KEY);
     return this;
   }
 

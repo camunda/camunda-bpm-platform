@@ -22,10 +22,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -33,12 +31,11 @@ import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 
 /**
  * Represents a test class, which uses parse listeners
@@ -52,22 +49,19 @@ import org.junit.rules.RuleChain;
 public class JobDefinitionDeletionWithParseListenerTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      List<BpmnParseListener> listeners = new ArrayList<>();
-      listeners.add(new AbstractBpmnParseListener(){
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
 
-        @Override
-        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
-          activity.setAsyncBefore(false);
-        }
-      });
+    List<BpmnParseListener> listeners = new ArrayList<>();
+    listeners.add(new AbstractBpmnParseListener(){
 
-      configuration.setCustomPreBPMNParseListeners(listeners);
-      return configuration;
-    }
-  };
+      @Override
+      public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+        activity.setAsyncBefore(false);
+      }
+    });
+
+    configuration.setCustomPreBPMNParseListeners(listeners);
+  });
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
@@ -85,7 +79,6 @@ public class JobDefinitionDeletionWithParseListenerTest {
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertNull(query.singleResult());
   }
-
 
   @Test
   public void testDeleteJobDefinitionWithParseListenerAndAsyncInXml() {

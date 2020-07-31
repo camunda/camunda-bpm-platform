@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -25,46 +30,51 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  * @author Thorben Lindhauer
  */
-public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase {
+public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTest {
 
   protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
   protected TweetNestedCommandExceptionHandler nestedCommandExceptionHandler = new TweetNestedCommandExceptionHandler();
 
-  @Override
+  @Before
   public void setUp() throws Exception {
     processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
     processEngineConfiguration.getJobHandlers().put(nestedCommandExceptionHandler.getType(), nestedCommandExceptionHandler);
   }
 
-  @Override
+  @After
   public void tearDown() throws Exception {
     processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
     processEngineConfiguration.getJobHandlers().remove(nestedCommandExceptionHandler.getType());
     clearDatabase();
   }
 
+  @Test
   public void testJobCommandsWith2Exceptions() {
     // create a job
     createJob(TweetExceptionHandler.TYPE);
 
     // execute the existing job
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // the job was successfully executed
     JobQuery query = managementService.createJobQuery().noRetriesLeft();
     assertEquals(0, query.count());
   }
 
+  @Test
   public void testJobCommandsWith3Exceptions() {
     // set the execptionsRemaining to 3 so that
     // the created job will fail 3 times and a failed
@@ -75,7 +85,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     createJob(TweetExceptionHandler.TYPE);
 
     // execute the existing job
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // the job execution failed (job.retries = 0)
     Job job = managementService.createJobQuery().noRetriesLeft().singleResult();
@@ -83,6 +93,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertEquals(0, job.getRetries());
   }
 
+  @Test
   public void testMultipleFailingJobs() {
     // set the execptionsRemaining to 600 so that
     // each created job will fail 3 times and 40 failed
@@ -95,7 +106,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     }
 
     // execute the existing jobs
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // now there are 40 jobs with retries = 0:
     List<Job> jobList = managementService.createJobQuery().list();
@@ -107,6 +118,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     }
   }
 
+  @Test
   public void testJobCommandsWithNestedFailingCommand() {
     // create a job
     createJob(TweetNestedCommandExceptionHandler.TYPE);
@@ -126,7 +138,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     job = managementService.createJobQuery().singleResult();
     assertEquals(2, job.getRetries());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     // the job execution failed (job.retries = 0)
     job = managementService.createJobQuery().noRetriesLeft().singleResult();
@@ -135,6 +147,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
+  @Test
   public void testJobRetriesDecrementedOnFailedFlush() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -146,7 +159,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertEquals(3, job.getRetries());
 
     // if we execute the job
-    waitForJobExecutorToProcessAllJobs(6000);
+    testRule.waitForJobExecutorToProcessAllJobs(6000);
 
     // the job is still present
     job = managementService.createJobQuery().singleResult();
@@ -155,9 +168,10 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertEquals(0, job.getRetries());
   }
 
+  @Test
   public void testFailingTransactionListener() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
+   testRule.deploy(Bpmn.createExecutableProcess("testProcess")
         .startEvent()
         .serviceTask()
           .camundaClass(FailingTransactionListenerDelegate.class.getName())
@@ -174,7 +188,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertEquals(3, job.getRetries());
 
     // if we execute the job
-    waitForJobExecutorToProcessAllJobs(6000);
+    testRule.waitForJobExecutorToProcessAllJobs(6000);
 
     // the job is still present
     job = managementService.createJobQuery().singleResult();

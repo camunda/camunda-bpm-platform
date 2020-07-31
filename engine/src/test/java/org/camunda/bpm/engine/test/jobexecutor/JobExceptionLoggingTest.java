@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
@@ -44,7 +45,7 @@ public class JobExceptionLoggingTest {
   private static final String JOBEXECUTOR_LOGGER = "org.camunda.bpm.engine.jobexecutor";
   private static final String CONTEXT_LOGGER = "org.camunda.bpm.engine.context";
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch(CONTEXT_LOGGER, JOBEXECUTOR_LOGGER).level(Level.DEBUG);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   @Rule

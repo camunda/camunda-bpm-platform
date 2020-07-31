@@ -18,21 +18,37 @@ package org.camunda.bpm.engine.test.api.identity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Simon Jonischkeit
  *
  */
-public class WriteMultipleEntitiesInOneTransactionTest extends ResourceProcessEngineTestCase {
+public class WriteMultipleEntitiesInOneTransactionTest {
 
-  public WriteMultipleEntitiesInOneTransactionTest() {
-    super("org/camunda/bpm/engine/test/api/identity/WriteMultipleEntitiesInOneTransactionTest.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/identity/WriteMultipleEntitiesInOneTransactionTest.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected IdentityService identityService;
+
+  @Before
+  public void setUp() {
+    identityService = engineRule.getIdentityService();
   }
 
+  @Test
   public void testWriteMultipleEntitiesInOneTransaction(){
 
     // the identity service provider registered with the engine creates a user, a group, and a membership

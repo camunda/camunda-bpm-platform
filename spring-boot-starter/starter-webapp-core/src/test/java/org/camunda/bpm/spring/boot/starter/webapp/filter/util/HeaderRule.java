@@ -31,7 +31,8 @@ import java.util.Map;
 public class HeaderRule extends ExternalResource {
 
   public static final String PORT_PLACEHOLDER_WEBAPP_URL = "{PORT}";
-  public static final String WEBAPP_URL = "http://localhost:" + PORT_PLACEHOLDER_WEBAPP_URL + "/app/tasklist/default";
+  public static final String WEBAPP_URL = "http://localhost:" + PORT_PLACEHOLDER_WEBAPP_URL +
+      "/camunda/app/tasklist/default";
 
   protected Integer port = null;
   protected HttpURLConnection connection = null;
@@ -69,6 +70,8 @@ public class HeaderRule extends ExternalResource {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+    connection.setInstanceFollowRedirects(false);
 
     if ("POST".equals(method)) {
       try {

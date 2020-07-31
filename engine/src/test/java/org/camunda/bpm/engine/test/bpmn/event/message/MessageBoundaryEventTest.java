@@ -17,6 +17,11 @@
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,12 +31,13 @@ import org.camunda.bpm.engine.Problem;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -39,9 +45,10 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Kristin Polenz (camunda)
  * @author Christian Lipphardt (camunda)
  */
-public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
+public class MessageBoundaryEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSingleBoundaryMessageEvent() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -86,6 +93,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testDoubleBoundaryMessageEventSameMessageId() {
     // deployment fails when two boundary message events have the same messageId
     try {
@@ -95,7 +103,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
           .deploy();
       fail("Deployment should fail because Activiti cannot handle two boundary message events with same messageId.");
     } catch (ParseException e) {
-      assertTextPresent("Cannot have more than one message event subscription with name 'messageName' for scope 'task'", e.getMessage());
+      testRule.assertTextPresent("Cannot have more than one message event subscription with name 'messageName' for scope 'task'", e.getMessage());
       assertEquals(0, repositoryService.createDeploymentQuery().count());
       List<Problem> errors = e.getResorceReports().get(0).getErrors();
       assertThat(errors).hasSize(1);
@@ -104,6 +112,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDoubleBoundaryMessageEvent() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -134,7 +143,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
+      testRule.assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
     }
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -169,6 +178,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDoubleBoundaryMessageEventMultiInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     // assume we have 7 executions
@@ -193,7 +203,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
+      testRule.assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
     }
 
     // only process instance left
@@ -203,7 +213,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertNotNull(userTask);
     assertEquals("taskAfterMessage_1", userTask.getTaskDefinitionKey());
     taskService.complete(userTask.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -262,10 +272,11 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertNotNull(userTask);
     assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
     taskService.complete(userTask.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testBoundaryMessageEventInsideSubprocess() {
 
     // this time the boundary events are placed on a user task that is contained inside a sub process
@@ -315,6 +326,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testBoundaryMessageEventOnSubprocessAndInsideSubprocess() {
 
     // this time the boundary events are placed on a user task that is contained inside a sub process
@@ -453,6 +465,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment
+  @Test
   public void testBoundaryMessageEventOnSubprocess() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -521,6 +534,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testBoundaryMessageEventOnSubprocessWithIntermediateMessageCatch() {
 
     // given
@@ -533,7 +547,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // then
     // the process instance is ended
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // and all activity instances in history have an end time set
@@ -545,6 +559,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testBoundaryMessageEventOnSubprocessAndInsideSubprocessMultiInstance() {
 
     // this time the boundary events are placed on a user task that is contained inside a sub process
@@ -598,6 +613,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
    * of a boundary event for a concurrent task
    */
   @Deployment
+  @Test
   public void testBoundaryMessageEventConcurrent() {
     runtimeService.startProcessInstanceByKey("boundaryEvent");
 
@@ -617,6 +633,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testExpressionInBoundaryMessageEventName() {
 
     // given a process instance with its variables

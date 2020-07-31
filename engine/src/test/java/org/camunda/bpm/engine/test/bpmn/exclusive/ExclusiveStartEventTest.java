@@ -16,17 +16,24 @@
  */
 package org.camunda.bpm.engine.test.bpmn.exclusive;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel
  */
-public class ExclusiveStartEventTest extends PluggableProcessEngineTestCase {
+public class ExclusiveStartEventTest extends PluggableProcessEngineTest {
   
   @Deployment
+  @Test
   public void testNonExclusiveStartEvent() {
     // start process 
     runtimeService.startProcessInstanceByKey("exclusive");
@@ -34,14 +41,15 @@ public class ExclusiveStartEventTest extends PluggableProcessEngineTestCase {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     assertFalse(((JobEntity)job).isExclusive());
-               
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    testRule.waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      
   }
 
   @Deployment
+  @Test
   public void testExclusiveStartEvent() {
     // start process 
     runtimeService.startProcessInstanceByKey("exclusive");
@@ -49,8 +57,8 @@ public class ExclusiveStartEventTest extends PluggableProcessEngineTestCase {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     assertTrue(((JobEntity)job).isExclusive());
-               
-    waitForJobExecutorToProcessAllJobs(6000L);
+
+    testRule.waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      

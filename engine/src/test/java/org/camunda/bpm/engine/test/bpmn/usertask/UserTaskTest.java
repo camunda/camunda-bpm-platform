@@ -16,21 +16,28 @@
  */
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  */
-public class UserTaskTest extends PluggableProcessEngineTestCase {
+public class UserTaskTest extends PluggableProcessEngineTest {
 
+  @Before
   public void setUp() throws Exception {
     identityService.saveUser(identityService.newUser("fozzie"));
     identityService.saveUser(identityService.newUser("kermit"));
@@ -42,6 +49,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     identityService.createMembership("kermit", "management");
   }
 
+  @After
   public void tearDown() throws Exception {
     identityService.deleteUser("fozzie");
     identityService.deleteUser("kermit");
@@ -50,6 +58,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTaskPropertiesNotNull() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -74,12 +83,14 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testQuerySortingWithParameter() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
   }
 
   @Deployment
+  @Test
   public void testCompleteAfterParallelGateway() throws InterruptedException {
 	  // related to http://jira.codehaus.org/browse/ACT-1054
 
@@ -98,6 +109,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
 	}
 
   @Deployment
+  @Test
   public void testComplexScenarioWithSubprocessesAndParallelGateways() {
     runtimeService.startProcessInstanceByKey("processWithSubProcessesAndParallelGateways");
 
@@ -108,6 +120,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSimpleProcess() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
@@ -133,6 +146,6 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("Verify monthly financial report", tasks.get(0).getName());
     taskService.complete(tasks.get(0).getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 }

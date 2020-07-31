@@ -61,7 +61,7 @@ public class ExpressionManager {
   // Default implementation (does nothing)
   protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
-  protected ELResolver elResolver;
+  protected volatile ELResolver elResolver; // why volatile? => https://jira.camunda.com/browse/CAM-12106
 
   public ExpressionManager() {
     this(null);

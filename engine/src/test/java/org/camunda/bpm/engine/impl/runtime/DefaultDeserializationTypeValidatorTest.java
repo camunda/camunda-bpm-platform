@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
+
 import org.junit.Before;
 import org.junit.Test;
 

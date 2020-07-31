@@ -16,11 +16,14 @@
  */
 package org.camunda.bpm.engine.test.cmmn.tasklistener;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.FieldInjectionTaskListener;
@@ -28,19 +31,17 @@ import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MySpecialTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MyTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.TaskDeleteListener;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TaskListenerTest extends PluggableProcessEngineTestCase {
+public class TaskListenerTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByClass.cmmn"})
+  @Test
   public void testCreateListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -68,6 +69,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByExpression.cmmn"})
+  @Test
   public void testCreateListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -90,6 +92,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByDelegateExpression.cmmn"})
+  @Test
   public void testCreateListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -120,6 +123,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByScript.cmmn"})
+  @Test
   public void testCreateListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -140,6 +144,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByClass.cmmn"})
+  @Test
   public void testCompleteListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -172,6 +177,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByExpression.cmmn"})
+  @Test
   public void testCompleteListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -205,6 +211,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByDelegateExpression.cmmn"})
+  @Test
   public void testCompleteListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -238,6 +245,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByScript.cmmn"})
+  @Test
   public void testCompleteListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -269,6 +277,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByClass.cmmn"})
+  @Test
   public void testDeleteListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -299,6 +308,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByExpression.cmmn"})
+  @Test
   public void testDeleteListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -330,6 +340,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByDelegateExpression.cmmn"})
+  @Test
   public void testDeleteListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -361,6 +372,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByScript.cmmn"})
+  @Test
   public void testDeleteListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -390,6 +402,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByCaseInstanceDeletion.cmmn"})
+  @Test
   public void testDeleteListenerByCaseInstanceDeletion() {
     TaskDeleteListener.clear();
 
@@ -426,6 +439,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByClass.cmmn"})
+  @Test
   public void testAssignmentListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -462,6 +476,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByExpression.cmmn"})
+  @Test
   public void testAssignmentListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -499,6 +514,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByDelegateExpression.cmmn"})
+  @Test
   public void testAssignmentListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -536,6 +552,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByScript.cmmn"})
+  @Test
   public void testAssignmentListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -571,6 +588,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByInitialInstantiation.cmmn"})
+  @Test
   public void testAssignmentListenerByInitialInstantiation() {
     // given
     String caseInstanceId = caseService
@@ -598,6 +616,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testUpdateListenerByClass.cmmn"})
+  @Test
   public void testUpdateListenerByClass() {
     // given
     String caseInstanceId = caseService
@@ -634,6 +653,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testUpdateListenerByExpression.cmmn"})
+  @Test
   public void testUpdateListenerByExpression() {
     // given
     String caseInstanceId = caseService
@@ -671,6 +691,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testUpdateListenerByDelegateExpression.cmmn"})
+  @Test
   public void testUpdateListenerByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -707,6 +728,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testUpdateListenerByScript.cmmn"})
+  @Test
   public void testUpdateListenerByScript() {
     // given
     String caseInstanceId = caseService
@@ -742,6 +764,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testUpdateListenerByInitialInstantiation.cmmn"})
+  @Test
   public void testUpdateListenerNotInvokedByInitialInstantiation() {
     // given
     String caseInstanceId = caseService
@@ -764,6 +787,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn"})
+  @Test
   public void testAllListenerByClassExcludingDeletion() {
     // given
     String caseInstanceId = caseService
@@ -814,6 +838,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn"})
+  @Test
   public void testAllListenerByClassExcludingCompletion() {
     // given
     String caseInstanceId = caseService
@@ -863,6 +888,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn"})
+  @Test
   public void testAllListenerByExpressionExcludingDeletion() {
     // given
     String caseInstanceId = caseService
@@ -915,6 +941,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn"})
+  @Test
   public void testAllListenerByExpressionExcludingCompletion() {
     // given
     String caseInstanceId = caseService
@@ -965,6 +992,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Test
   public void testAllListenerByDelegateExpressionExcludingDeletion() {
     // given
     String caseInstanceId = caseService
@@ -1017,6 +1045,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Test
   public void testAllListenerByDelegateExpressionExcludingCompletion() {
     // given
     String caseInstanceId = caseService
@@ -1066,6 +1095,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn"})
+  @Test
   public void testAllListenerByScriptExcludingDeletion() {
     // given
     String caseInstanceId = caseService
@@ -1116,6 +1146,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn"})
+  @Test
   public void testAllListenerByScriptExcludingCompletion() {
     // given
     String caseInstanceId = caseService
@@ -1164,6 +1195,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByClass.cmmn"})
+  @Test
   public void testFieldInjectionByClass() {
     // given
     String caseInstanceId = caseService
@@ -1192,6 +1224,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByDelegateExpression.cmmn"})
+  @Test
   public void testFieldInjectionByDelegateExpression() {
     // given
     String caseInstanceId = caseService
@@ -1224,6 +1257,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testListenerByScriptResource.cmmn",
       "org/camunda/bpm/engine/test/cmmn/tasklistener/taskListener.groovy"
       })
+  @Test
   public void testListenerByScriptResource() {
     // given
     String caseInstanceId = caseService
@@ -1270,6 +1304,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByClass.cmmn"})
+  @Test
   public void testDoesNotImplementTaskListenerInterfaceByClass() {
     try {
       caseService
@@ -1281,12 +1316,13 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("NotTaskListener doesn't implement "+TaskListener.class, message);
+      testRule.assertTextPresent("NotTaskListener doesn't implement "+TaskListener.class, message);
     }
 
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByDelegateExpression.cmmn"})
+  @Test
   public void testDoesNotImplementTaskListenerInterfaceByDelegateExpression() {
     try {
       caseService
@@ -1299,12 +1335,13 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("Delegate expression ${myTaskListener} did not resolve to an implementation of interface "+TaskListener.class.getName(), message);
+      testRule.assertTextPresent("Delegate expression ${myTaskListener} did not resolve to an implementation of interface "+TaskListener.class.getName(), message);
     }
 
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testTaskListenerDoesNotExist.cmmn"})
+  @Test
   public void testTaskListenerDoesNotExist() {
 
     try {
@@ -1317,7 +1354,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotExistingTaskListener'", message);
+      testRule.assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotExistingTaskListener'", message);
     }
 
   }

@@ -556,6 +556,7 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
   public static final String EXAMPLE_HISTORIC_ACTIVITY_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
+  public static final long EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER = 10L;
 
   // Historic Case Activity Instance
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ID = "aCaseActivityInstanceId";
@@ -670,7 +671,9 @@ public abstract class MockProvider {
 
   // Incident
   public static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
-  public static final String EXAMPLE_INCIDENT_TIMESTAMP = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_INCIDENT_TIMESTAMP = withTimezone("2014-01-02T00:00:00");
+  public static final String EXAMPLE_INCIDENT_TIMESTAMP_AFTER = withTimezone("2014-01-03T00:00:00");
+  public static final String EXAMPLE_INCIDENT_TIMESTAMP_BEFORE = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_INCIDENT_ACTIVITY_ID = "anActivityId";
@@ -682,13 +685,16 @@ public abstract class MockProvider {
   public static final String EXAMPLE_INCIDENT_CONFIGURATION = "aConfiguration";
   public static final String EXAMPLE_INCIDENT_MESSAGE = "anIncidentMessage";
   public static final String EXAMPLE_INCIDENT_MESSAGE_LIKE = "%anIncidentMessageLike%";
-
   public static final int EXAMPLE_INCIDENT_COUNT = 1;
 
   // Historic Incident
   public static final String EXAMPLE_HIST_INCIDENT_ID = "anIncidentId";
-  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = withTimezone("2014-01-01T00:00:00");
-  public static final String EXAMPLE_HIST_INCIDENT_END_TIME = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = withTimezone("2014-01-02T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME_AFTER = withTimezone("2014-01-03T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME_BEFORE = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_END_TIME = withTimezone("2014-01-02T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_END_TIME_AFTER = withTimezone("2014-01-03T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_END_TIME_BEFORE = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HIST_INCIDENT_REMOVAL_TIME = withTimezone("2018-01-01T00:00:00");
   public static final String EXAMPLE_HIST_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_HIST_INCIDENT_EXECUTION_ID = "anExecutionId";
@@ -1244,6 +1250,10 @@ public abstract class MockProvider {
   }
 
   public static EventSubscription createMockEventSubscription() {
+    return createMockEventSubscription(EXAMPLE_TENANT_ID);
+  }
+
+  public static EventSubscription createMockEventSubscription(String tenantId) {
     EventSubscription mock = mock(EventSubscription.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_ID);
@@ -1253,7 +1263,7 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(mock.getCreated()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE));
-    when(mock.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }

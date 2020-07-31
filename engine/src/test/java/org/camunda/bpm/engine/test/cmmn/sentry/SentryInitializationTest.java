@@ -16,22 +16,28 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.cmmn.CmmnTest;
 import org.camunda.bpm.model.cmmn.VariableTransition;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class SentryInitializationTest extends CmmnProcessEngineTestCase {
+public class SentryInitializationTest extends CmmnTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPart.cmmn"})
+  @Test
   public void testOnPart() {
     // given
     String caseDefinitionId = repositoryService
@@ -63,6 +69,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testVariableOnPart.cmmn"})
+  @Test
   public void testVariableOnPart() {
     // given
     String caseDefinitionId = repositoryService
@@ -94,6 +101,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testIfPart.cmmn"})
+  @Test
   public void testIfPart() {
     // given
     String caseDefinitionId = repositoryService
@@ -126,6 +134,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPartIfPartAndVariableOnPart.cmmn"})
+  @Test
   public void testOnPartIfPartAndVariableOnPart() {
     // given
     String caseDefinitionId = repositoryService
@@ -180,6 +189,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentries.cmmn"})
+  @Test
   public void testMultipleSentries() {
     // given
     String caseDefinitionId = repositoryService
@@ -225,6 +235,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentriesWithinStage.cmmn"})
+  @Test
   public void testMultipleSentriesWithinStage() {
     // given
     String caseDefinitionId = repositoryService

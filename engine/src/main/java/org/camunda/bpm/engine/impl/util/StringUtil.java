@@ -100,11 +100,12 @@ public final class StringUtil {
   }
 
   /**
-   * converts a byte array into a string using the current process engines default charset as
-   * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}
+   * Converts a byte array into a string using the current process engines default charset as
+   * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}. The converted string
+   * is empty if the provided byte array is empty or <code>null</code>.
    *
    * @param bytes the byte array
-   * @return a string representing the bytes
+   * @return a string representing the bytes, empty String if byte array is <code>null</code>
    */
   public static String fromBytes(byte[] bytes) {
     EnsureUtil.ensureActiveCommandContext("StringUtil.fromBytes");
@@ -113,17 +114,18 @@ public final class StringUtil {
   }
 
   /**
-   * converts a byte array into a string using the provided process engine's default charset as
-   * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}
+   * Converts a byte array into a string using the current process engines default charset as
+   * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}. The converted string
+   * is empty if the provided byte array is empty or <code>null</code>.
    *
    * @param bytes the byte array
    * @param processEngine the process engine
-   * @return a string representing the bytes
+   * @return a string representing the bytes, empty String if byte array is <code>null</code>
    */
   public static String fromBytes(byte[] bytes, ProcessEngine processEngine) {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     Charset charset = processEngineConfiguration.getDefaultCharset();
-    return new String(bytes, charset);
+    return bytes != null ? new String(bytes, charset) : new String();
   }
 
   public static Reader readerFromBytes(byte[] bytes) {

@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,10 +34,11 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * <p>Testcase verifying support for form matadata provided using
@@ -40,9 +47,10 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Daniel Meyer
  *
  */
-public class FormDataTest extends PluggableProcessEngineTestCase {
+public class FormDataTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testGetFormFieldBasicProperties() {
 
     runtimeService.startProcessInstanceByKey("FormDataTest.testGetFormFieldBasicProperties");
@@ -72,6 +80,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetFormFieldBuiltInTypes() {
 
     runtimeService.startProcessInstanceByKey("FormDataTest.testGetFormFieldBuiltInTypes");
@@ -130,6 +139,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetFormFieldProperties() {
 
     runtimeService.startProcessInstanceByKey("FormDataTest.testGetFormFieldProperties");
@@ -148,6 +158,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetFormFieldValidationConstraints() {
 
     runtimeService.startProcessInstanceByKey("FormDataTest.testGetFormFieldValidationConstraints");
@@ -170,6 +181,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testFormFieldSubmit() {
 
     // valid submit
@@ -219,6 +231,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSubmitFormDataWithEmptyDate() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testSubmitFormDataWithEmptyDate");
@@ -236,6 +249,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMissingFormVariables()
   {
     // given process definition with defined form varaibles
@@ -254,6 +268,7 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/form/FormDataTest.testDoubleQuotesAreEscapedInGeneratedTaskForms.bpmn20.xml")
+  @Test
   public void testDoubleQuotesAreEscapedInGeneratedTaskForms() {
 
     // given

@@ -196,6 +196,7 @@ public class DecisionTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     assertTrue(behavior instanceof DmnDecisionTaskActivityBehavior);
   }
 
+  @Test
   public void testIsBlockingEqualsTrueProperty() {
     // given
 

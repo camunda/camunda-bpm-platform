@@ -16,23 +16,27 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricActivityInstanceSequenceCounterTest extends PluggableProcessEngineTestCase {
+public class HistoricActivityInstanceSequenceCounterTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testSequence.bpmn20.xml"})
+  @Test
   public void testSequence() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -48,6 +52,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testForkSameSequenceLengthWithoutWaitStates.bpmn20.xml"})
+  @Test
   public void testFork() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -75,6 +80,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testForkAndJoinDifferentSequenceLength.bpmn20.xml"})
+  @Test
   public void testForkAndJoin() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -117,6 +123,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testSequenceInsideSubProcess.bpmn20.xml"})
+  @Test
   public void testSequenceInsideSubProcess() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -148,6 +155,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testSequentialMultiInstance.bpmn20.xml"})
+  @Test
   public void testSequentialMultiInstance() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -180,6 +188,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testParallelMultiInstance.bpmn20.xml"})
+  @Test
   public void testParallelMultiInstance() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -211,6 +220,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testLoop.bpmn20.xml"})
+  @Test
   public void testLoop() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -227,6 +237,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testInterruptingBoundaryEvent.bpmn20.xml"})
+  @Test
   public void testInterruptingBoundaryEvent() {
     // given
     HistoricActivityInstanceQuery query = historyService
@@ -255,6 +266,7 @@ public class HistoricActivityInstanceSequenceCounterTest extends PluggableProces
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testNonInterruptingBoundaryEvent.bpmn20.xml"})
+  @Test
   public void testNonInterruptingBoundaryEvent() {
     // given
     HistoricActivityInstanceQuery query = historyService

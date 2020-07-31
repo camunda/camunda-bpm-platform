@@ -17,8 +17,6 @@
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.hamcrest.CoreMatchers.is;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -28,18 +26,14 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.AssigneeAssignment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.CandidateUserAssignment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.CompletingTaskListener;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{

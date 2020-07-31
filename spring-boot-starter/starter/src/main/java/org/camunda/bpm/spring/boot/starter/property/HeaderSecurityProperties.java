@@ -36,6 +36,11 @@ public class HeaderSecurityProperties {
   protected boolean contentTypeOptionsDisabled = false;
   protected String contentTypeOptionsValue;
 
+  protected boolean hstsDisabled = true;
+  protected boolean hstsIncludeSubdomainsDisabled = true;
+  protected String hstsMaxAge;
+  protected String hstsValue;
+
   public Map<String, String> getInitParams() {
     Map<String, String> initParams = new HashMap<>();
 
@@ -61,6 +66,19 @@ public class HeaderSecurityProperties {
     }
     if (StringUtils.isNotBlank(contentTypeOptionsValue)) {
       initParams.put("contentTypeOptionsValue", contentTypeOptionsValue);
+    }
+
+    if (!hstsDisabled) { // default is true
+      initParams.put("hstsDisabled", String.valueOf(false));
+    }
+    if (StringUtils.isNotBlank(hstsMaxAge)) {
+      initParams.put("hstsMaxAge", hstsMaxAge);
+    }
+    if (!hstsIncludeSubdomainsDisabled) { // default is true
+      initParams.put("hstsIncludeSubdomainsDisabled", String.valueOf(false));
+    }
+    if (StringUtils.isNotBlank(hstsValue)) {
+      initParams.put("hstsValue", hstsValue);
     }
 
     return initParams;
@@ -122,6 +140,38 @@ public class HeaderSecurityProperties {
     this.contentTypeOptionsValue = contentTypeOptionsValue;
   }
 
+  public boolean isHstsDisabled() {
+    return hstsDisabled;
+  }
+
+  public void setHstsDisabled(boolean hstsDisabled) {
+    this.hstsDisabled = hstsDisabled;
+  }
+
+  public boolean isHstsIncludeSubdomainsDisabled() {
+    return hstsIncludeSubdomainsDisabled;
+  }
+
+  public void setHstsIncludeSubdomainsDisabled(boolean hstsIncludeSubdomainsDisabled) {
+    this.hstsIncludeSubdomainsDisabled = hstsIncludeSubdomainsDisabled;
+  }
+
+  public String getHstsValue() {
+    return hstsValue;
+  }
+
+  public void setHstsValue(String hstsValue) {
+    this.hstsValue = hstsValue;
+  }
+
+  public String getHstsMaxAge() {
+    return hstsMaxAge;
+  }
+
+  public void setHstsMaxAge(String hstsMaxAge) {
+    this.hstsMaxAge = hstsMaxAge;
+  }
+
   @Override
   public String toString() {
     StringJoiner joinedString = joinOn(this.getClass())
@@ -134,7 +184,12 @@ public class HeaderSecurityProperties {
       .add("contentSecurityPolicyValue=" + contentSecurityPolicyValue)
 
       .add("contentTypeOptionsDisabled=" + contentTypeOptionsDisabled)
-      .add("contentTypeOptionsValue=" + contentTypeOptionsValue);
+      .add("contentTypeOptionsValue=" + contentTypeOptionsValue)
+
+      .add("hstsDisabled=" + hstsDisabled)
+      .add("hstsMaxAge=" + hstsMaxAge)
+      .add("hstsIncludeSubdomainsDisabled=" + hstsIncludeSubdomainsDisabled)
+      .add("hstsValue=" + hstsValue);
 
     return joinedString.toString();
   }

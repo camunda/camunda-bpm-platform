@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.container.impl.deployment.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,8 +38,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Daniel Meyer

@@ -84,7 +84,7 @@ public class ComponentAvailabilityIT {
 
   @Test
   public void shouldFindEngineViaRestApiRequest() {
-    Response response = when().get(container.getBaseUrl() + "/rest/engine");
+    Response response = when().get(container.getBaseUrl() + "/engine-rest/engine");
     if (restAvailable) {
       response.then()
         .body("size()", is(1))
@@ -97,7 +97,7 @@ public class ComponentAvailabilityIT {
 
   @Test
   public void shouldFindWelcomeApp() {
-    Response response = when().get(container.getBaseUrl() + "/app/welcome/default");
+    Response response = when().get(container.getBaseUrl() + "/camunda/app/welcome/default");
     if (webappsAvailable) {
       response.then()
         .statusCode(200)

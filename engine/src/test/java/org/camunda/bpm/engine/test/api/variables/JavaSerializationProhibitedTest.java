@@ -16,9 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueDeserialized;
+import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -26,8 +32,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
-import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
-import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -43,11 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueDeserialized;
-import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Svetlana Dorokhova

@@ -16,11 +16,19 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * This test makes sure that if the transaction synchronization / transaction listener ExclusiveJobAddedNotification is
@@ -31,12 +39,27 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class TransactionListenerThreadContextTest extends ResourceProcessEngineTestCase {
+public class TransactionListenerThreadContextTest {
 
-  public TransactionListenerThreadContextTest() {
-    super("org/camunda/bpm/engine/test/jobexecutor/TransactionListenerThreadContextTest.cfg.xml");
+  @Rule
+  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/jobexecutor/TransactionListenerThreadContextTest.cfg.xml");
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
+    repositoryService = engineRule.getRepositoryService();
   }
 
+  @Test
   public void testTxListenersInvokeAsync() {
     BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
       .startEvent()
@@ -51,10 +74,10 @@ public class TransactionListenerThreadContextTest extends ResourceProcessEngineT
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    waitForJobExecutorToProcessAllJobs(6000);
+    testRule.waitForJobExecutorToProcessAllJobs(6000);
 
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }

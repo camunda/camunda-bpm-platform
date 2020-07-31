@@ -16,18 +16,24 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.filter.Filter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngineTestCase {
+public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngineTest {
 
   protected static final String EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE = "Expressions are forbidden in adhoc queries. "
       + "This behavior can be toggled in the process engine configuration";
@@ -36,15 +42,18 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
 
   public static long MUTABLE_FIELD = 0;
 
+  @Test
   public void testDefaultSetting() {
     assertTrue(processEngineConfiguration.isEnableExpressionsInStoredQueries());
     assertFalse(processEngineConfiguration.isEnableExpressionsInAdhocQueries());
   }
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     MUTABLE_FIELD = 0;
   }
 
+  @Test
   public void testAdhocExpressionsFail() {
     executeAndValidateFailingQuery(taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION));
     executeAndValidateFailingQuery(taskService.createTaskQuery().dueBeforeExpression(STATE_MANIPULATING_EXPRESSION));
@@ -63,6 +72,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     executeAndValidateFailingQuery(taskService.createTaskQuery().taskOwnerExpression(STATE_MANIPULATING_EXPRESSION));
   }
 
+  @Test
   public void testExtendStoredFilterByExpression() {
 
     // given a stored filter
@@ -82,6 +92,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     filterService.deleteFilter(filter.getId());
   }
 
+  @Test
   public void testExtendStoredFilterByScalar() {
     // given a stored filter
     TaskQuery taskQuery = taskService.createTaskQuery().dueAfterExpression("${now()}");
@@ -109,7 +120,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     try {
       query.list();
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());
@@ -117,7 +128,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     try {
       query.count();
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());
@@ -127,7 +138,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     try {
       filterService.list(filter.getId(), query);
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());
@@ -135,7 +146,7 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     try {
       filterService.count(filter.getId(), query);
     } catch (BadUserRequestException e) {
-      assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
+      testRule.assertTextPresent(EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE, e.getMessage());
     }
 
     assertTrue(fieldIsUnchanged());

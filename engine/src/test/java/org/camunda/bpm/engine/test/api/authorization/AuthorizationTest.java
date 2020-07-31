@@ -23,6 +23,10 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOK
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +42,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -48,14 +51,16 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * @author Roman Smirnov
- *
  */
-public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
+public abstract class AuthorizationTest extends PluggableProcessEngineTest {
 
   protected String userId = "test";
   protected String groupId = "accounting";
@@ -65,8 +70,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     user = createUser(userId);
     group = createGroup(groupId);
 
@@ -76,7 +81,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
-  @Override
+  @After
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (User user : identityService.createUserQuery().list()) {
@@ -130,18 +135,17 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   // group //////////////////////////////////////////////////////////////
 
   protected Group createGroup(final String groupId) {
-    return runWithoutAuthorization(new Callable<Group>() {
-      public Group call() throws Exception {
-        Group group = identityService.newGroup(groupId);
-        identityService.saveGroup(group);
-        return group;
-      }
+    return runWithoutAuthorization(() -> {
+      Group group = identityService.newGroup(groupId);
+      identityService.saveGroup(group);
+      return group;
     });
   }
 
   // authorization ///////////////////////////////////////////////////////
 
-  protected Authorization createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+  protected Authorization createGrantAuthorization(Resource resource, String resourceId,
+                                                   String userId, Permission... permissions) {
     Authorization authorization = createGrantAuthorization(resource, resourceId);
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
@@ -150,8 +154,11 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     saveAuthorization(authorization);
     return authorization;
   }
-  
-  protected Authorization createGrantAuthorizationWithoutAuthentication(Resource resource, String resourceId, String userId, Permission... permissions) {
+
+  protected Authorization createGrantAuthorizationWithoutAuthentication(Resource resource,
+                                                                        String resourceId,
+                                                                        String userId,
+                                                                        Permission... permissions) {
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
     identityService.clearAuthentication();
     try {
@@ -161,7 +168,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void createGrantAuthorizationGroup(Resource resource, String resourceId, String groupId, Permission... permissions) {
+  protected void createGrantAuthorizationGroup(Resource resource, String resourceId,
+                                               String groupId, Permission... permissions) {
     Authorization authorization = createGrantAuthorization(resource, resourceId);
     authorization.setGroupId(groupId);
     for (Permission permission : permissions) {
@@ -169,8 +177,10 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
     saveAuthorization(authorization);
   }
-  
-  protected void createRevokeAuthorizationWithoutAuthentication(Resource resource, String resourceId, String userId, Permission... permissions) {
+
+  protected void createRevokeAuthorizationWithoutAuthentication(Resource resource,
+                                                                String resourceId, String userId,
+                                                                Permission... permissions) {
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
     identityService.clearAuthentication();
     try {
@@ -180,7 +190,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void createRevokeAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+  protected void createRevokeAuthorization(Resource resource, String resourceId, String userId,
+                                           Permission... permissions) {
     Authorization authorization = createRevokeAuthorization(resource, resourceId);
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
@@ -235,327 +246,250 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return startProcessInstanceByKey(key, null);
   }
 
-  protected ProcessInstance startProcessInstanceByKey(final String key, final Map<String, Object> variables) {
-    return runWithoutAuthorization(new Callable<ProcessInstance>() {
-      public ProcessInstance call() throws Exception {
-        return runtimeService.startProcessInstanceByKey(key, variables);
-      }
-    });
+  protected ProcessInstance startProcessInstanceByKey(final String key,
+                                                      final Map<String, Object> variables) {
+    return runWithoutAuthorization(() -> runtimeService.startProcessInstanceByKey(key, variables));
   }
 
-  @Override
   public void executeAvailableJobs() {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        AuthorizationTest.super.executeAvailableJobs();
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      testRule.executeAvailableJobs();
+      return null;
     });
   }
 
-  protected CaseInstance createCaseInstanceByKey(String key) {
-    return createCaseInstanceByKey(key, null);
-  }
-
-  protected CaseInstance createCaseInstanceByKey(final String key, final Map<String, Object> variables) {
-    return runWithoutAuthorization(new Callable<CaseInstance>() {
-      public CaseInstance call() throws Exception {
-        return caseService.createCaseInstanceByKey(key, variables);
-      }
-    });
+  protected CaseInstance createCaseInstanceByKey(final String key,
+                                                 final Map<String, Object> variables) {
+    return runWithoutAuthorization(() -> caseService.createCaseInstanceByKey(key, variables));
   }
 
   protected void createTask(final String taskId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        Task task = taskService.newTask(taskId);
-        taskService.saveTask(task);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      Task task = taskService.newTask(taskId);
+      taskService.saveTask(task);
+      return null;
     });
   }
 
   protected void deleteTask(final String taskId, final boolean cascade) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.deleteTask(taskId, cascade);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.deleteTask(taskId, cascade);
+      return null;
     });
   }
 
   protected void addCandidateUser(final String taskId, final String user) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.addCandidateUser(taskId, user);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.addCandidateUser(taskId, user);
+      return null;
     });
   }
 
   protected void addCandidateGroup(final String taskId, final String group) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.addCandidateGroup(taskId, group);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.addCandidateGroup(taskId, group);
+      return null;
     });
   }
 
   protected void setAssignee(final String taskId, final String userId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.setAssignee(taskId, userId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.setAssignee(taskId, userId);
+      return null;
     });
   }
 
   protected void delegateTask(final String taskId, final String userId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.delegateTask(taskId, userId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.delegateTask(taskId, userId);
+      return null;
     });
   }
 
   protected Task selectSingleTask() {
-    return runWithoutAuthorization(new Callable<Task>() {
-      public Task call() throws Exception {
-        return taskService.createTaskQuery().singleResult();
-      }
+    return runWithoutAuthorization(() -> taskService.createTaskQuery().singleResult());
+  }
+
+  protected void setTaskVariables(final String taskId,
+                                  final Map<String, ? extends Object> variables) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.setVariables(taskId, variables);
+      return null;
     });
   }
 
-  protected void setTaskVariables(final String taskId, final Map<String, ? extends Object> variables) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.setVariables(taskId, variables);
-        return null;
-      }
-    });
-  }
-
-  protected void setTaskVariablesLocal(final String taskId, final Map<String, ? extends Object> variables) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.setVariablesLocal(taskId, variables);
-        return null;
-      }
+  protected void setTaskVariablesLocal(final String taskId,
+                                       final Map<String, ? extends Object> variables) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.setVariablesLocal(taskId, variables);
+      return null;
     });
   }
 
   protected void setTaskVariable(final String taskId, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.setVariable(taskId, name, value);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.setVariable(taskId, name, value);
+      return null;
     });
   }
 
   protected void setTaskVariableLocal(final String taskId, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        taskService.setVariableLocal(taskId, name, value);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      taskService.setVariableLocal(taskId, name, value);
+      return null;
     });
   }
 
-  protected void setExecutionVariable(final String executionId, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        runtimeService.setVariable(executionId, name, value);
-        return null;
-      }
+  protected void setExecutionVariable(final String executionId, final String name,
+                                      final Object value) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      runtimeService.setVariable(executionId, name, value);
+      return null;
     });
   }
 
-  protected void setExecutionVariableLocal(final String executionId, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        runtimeService.setVariableLocal(executionId, name, value);
-        return null;
-      }
+  protected void setExecutionVariableLocal(final String executionId, final String name,
+                                           final Object value) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      runtimeService.setVariableLocal(executionId, name, value);
+      return null;
     });
   }
 
-  protected void setCaseVariable(final String caseExecution, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        caseService.setVariable(caseExecution, name, value);
-        return null;
-      }
+  protected void setCaseVariable(final String caseExecution, final String name,
+                                 final Object value) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      caseService.setVariable(caseExecution, name, value);
+      return null;
     });
   }
 
-  protected void setCaseVariableLocal(final String caseExecution, final String name, final Object value) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        caseService.setVariableLocal(caseExecution, name, value);
-        return null;
-      }
+  protected void setCaseVariableLocal(final String caseExecution, final String name,
+                                      final Object value) {
+    runWithoutAuthorization((Callable<Void>) () -> {
+      caseService.setVariableLocal(caseExecution, name, value);
+      return null;
     });
   }
 
   protected ProcessDefinition selectProcessDefinitionByKey(final String processDefinitionKey) {
-    return runWithoutAuthorization(new Callable<ProcessDefinition>() {
-      public ProcessDefinition call() throws Exception {
-        return repositoryService
-            .createProcessDefinitionQuery()
-            .processDefinitionKey(processDefinitionKey)
-            .singleResult();
-      }
-    });
+    return runWithoutAuthorization(() -> repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .singleResult());
   }
 
   protected ProcessInstance selectSingleProcessInstance() {
-    return runWithoutAuthorization(new Callable<ProcessInstance>() {
-      public ProcessInstance call() throws Exception {
-        return runtimeService
-            .createProcessInstanceQuery()
-            .singleResult();
-      }
-    });
+    return runWithoutAuthorization(() -> runtimeService
+        .createProcessInstanceQuery()
+        .singleResult());
   }
 
   protected void suspendProcessDefinitionByKey(final String processDefinitionKey) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        repositoryService.suspendProcessDefinitionByKey(processDefinitionKey);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      repositoryService.suspendProcessDefinitionByKey(processDefinitionKey);
+      return null;
     });
   }
 
   protected void suspendProcessDefinitionById(final String processDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        repositoryService.suspendProcessDefinitionById(processDefinitionId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      repositoryService.suspendProcessDefinitionById(processDefinitionId);
+      return null;
     });
   }
 
   protected void suspendProcessInstanceById(final String processInstanceId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        runtimeService.suspendProcessInstanceById(processInstanceId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      runtimeService.suspendProcessInstanceById(processInstanceId);
+      return null;
     });
   }
 
   protected void suspendJobById(final String jobId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobById(jobId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobById(jobId);
+      return null;
     });
   }
 
   protected void suspendJobByProcessInstanceId(final String processInstanceId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobByProcessInstanceId(processInstanceId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobByProcessInstanceId(processInstanceId);
+      return null;
     });
   }
 
   protected void suspendJobByJobDefinitionId(final String jobDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobByJobDefinitionId(jobDefinitionId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobByJobDefinitionId(jobDefinitionId);
+      return null;
     });
   }
 
   protected void suspendJobByProcessDefinitionId(final String processDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobByProcessDefinitionId(processDefinitionId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobByProcessDefinitionId(processDefinitionId);
+      return null;
     });
   }
 
   protected void suspendJobByProcessDefinitionKey(final String processDefinitionKey) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobByProcessDefinitionKey(processDefinitionKey);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobByProcessDefinitionKey(processDefinitionKey);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionById(final String jobDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionById(jobDefinitionId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionById(jobDefinitionId);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionByProcessDefinitionId(final String processDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionByProcessDefinitionKey(final String processDefinitionKey) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionIncludingJobsById(final String jobDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionById(jobDefinitionId, true);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionById(jobDefinitionId, true);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionIncludingJobsByProcessDefinitionId(final String processDefinitionId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
+      return null;
     });
   }
 
   protected void suspendJobDefinitionIncludingJobsByProcessDefinitionKey(final String processDefinitionKey) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, true);
-        return null;
-      }
+    runWithoutAuthorization((Callable<Void>) () -> {
+      managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, true);
+      return null;
     });
   }
 
   protected Deployment createDeployment(final String name, final String... resources) {
-    return runWithoutAuthorization(new Callable<Deployment>() {
-      public Deployment call() throws Exception {
-        DeploymentBuilder builder = repositoryService.createDeployment();
-        for (String resource : resources) {
-          builder.addClasspathResource(resource);
-        }
-        return builder.deploy();
+    return runWithoutAuthorization(() -> {
+      DeploymentBuilder builder = repositoryService.createDeployment();
+      for (String resource : resources) {
+        builder.addClasspathResource(resource);
       }
+      return builder.deploy();
     });
   }
 
@@ -565,13 +499,11 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
   protected void deleteDeployment(final String deploymentId, final boolean cascade) {
     Authentication authentication = identityService.getCurrentAuthentication();
-    try  {
+    try {
       identityService.clearAuthentication();
-      runWithoutAuthorization(new Callable<Void>() {
-        public Void call() throws Exception {
-          repositoryService.deleteDeployment(deploymentId, cascade);
-          return null;
-        }
+      runWithoutAuthorization((Callable<Void>) () -> {
+        repositoryService.deleteDeployment(deploymentId, cascade);
+        return null;
       });
     } finally {
       if (authentication != null) {
@@ -581,46 +513,40 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   }
 
   protected ProcessInstance startProcessAndExecuteJob(final String key) {
-    return runWithoutAuthorization(new Callable<ProcessInstance>() {
-      public ProcessInstance call() throws Exception {
-        ProcessInstance processInstance = startProcessInstanceByKey(key);
-        executeAvailableJobs(key);
-        return processInstance;
-      }
+    return runWithoutAuthorization(() -> {
+      ProcessInstance processInstance = startProcessInstanceByKey(key);
+      executeAvailableJobs(key);
+      return processInstance;
     });
   }
 
   protected void executeAvailableJobs(final String key) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
+    runWithoutAuthorization((Callable<Void>) () -> {
+      List<Job> jobs =
+          managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
 
-        if (jobs.isEmpty()) {
-          enableAuthorization();
-          return null;
-        }
-
-        for (Job job : jobs) {
-          try {
-            managementService.executeJob(job.getId());
-          } catch (Exception e) {}
-        }
-
-        executeAvailableJobs(key);
+      if (jobs.isEmpty()) {
+        enableAuthorization();
         return null;
       }
+
+      for (Job job : jobs) {
+        try {
+          managementService.executeJob(job.getId());
+        } catch (Exception e) {
+        }
+      }
+
+      executeAvailableJobs(key);
+      return null;
     });
   }
 
   protected DecisionDefinition selectDecisionDefinitionByKey(final String decisionDefinitionKey) {
-    return runWithoutAuthorization(new Callable<DecisionDefinition>() {
-      public DecisionDefinition call() throws Exception {
-        return repositoryService
-            .createDecisionDefinitionQuery()
-            .decisionDefinitionKey(decisionDefinitionKey)
-            .singleResult();
-      }
-    });
+    return runWithoutAuthorization(() -> repositoryService
+        .createDecisionDefinitionQuery()
+        .decisionDefinitionKey(decisionDefinitionKey)
+        .singleResult());
   }
 
   // verify query results ////////////////////////////////////////////////////////
@@ -631,7 +557,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -642,13 +568,15 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public Permission getDefaultTaskPermissionForUser() {
     // get the default task assignee permission
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
-      .getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration =
+        (ProcessEngineConfigurationImpl) processEngine
+            .getProcessEngineConfiguration();
 
     return processEngineConfiguration.getDefaultUserPermissionForTask();
   }

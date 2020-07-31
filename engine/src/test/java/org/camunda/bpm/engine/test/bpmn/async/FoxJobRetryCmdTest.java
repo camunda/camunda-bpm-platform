@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,24 +36,26 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.junit.Assert;
+import org.junit.Test;
 
-public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
+public class FoxJobRetryCmdTest extends PluggableProcessEngineTest {
 
   SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  @Test
   public void testFailedServiceTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
 
@@ -55,6 +63,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedUserTask.bpmn20.xml" })
+  @Test
   public void testFailedUserTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedUserTask");
 
@@ -62,6 +71,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedBusinessRuleTask.bpmn20.xml" })
+  @Test
   public void testFailedBusinessRuleTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedBusinessRuleTask");
 
@@ -69,6 +79,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedCallActivity.bpmn20.xml" })
+  @Test
   public void testFailedCallActivity() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedCallActivity");
 
@@ -76,6 +87,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedScriptTask.bpmn20.xml" })
+  @Test
   public void testFailedScriptTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedScriptTask");
 
@@ -83,6 +95,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedSendTask.bpmn20.xml" })
+  @Test
   public void testFailedSendTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedSendTask");
 
@@ -90,6 +103,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedSubProcess.bpmn20.xml" })
+  @Test
   public void testFailedSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedSubProcess");
 
@@ -97,6 +111,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedTask.bpmn20.xml" })
+  @Test
   public void testFailedTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedTask");
 
@@ -104,6 +119,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedTransaction.bpmn20.xml" })
+  @Test
   public void testFailedTransaction() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedTask");
 
@@ -111,6 +127,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedReceiveTask.bpmn20.xml" })
+  @Test
   public void testFailedReceiveTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedReceiveTask");
 
@@ -118,6 +135,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedBoundaryTimerEvent.bpmn20.xml" })
+  @Test
   public void testFailedBoundaryTimerEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedBoundaryTimerEvent");
 
@@ -125,6 +143,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedIntermediateCatchingTimerEvent.bpmn20.xml" })
+  @Test
   public void testFailedIntermediateCatchingTimerEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedIntermediateCatchingTimerEvent");
 
@@ -132,6 +151,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testFailingMultiInstanceBody() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failingMultiInstance");
 
@@ -140,6 +160,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testFailingMultiInstanceInnerActivity() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failingMultiInstance");
 
@@ -148,6 +169,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testBrokenFoxJobRetryValue.bpmn20.xml" })
+  @Test
   public void testBrokenFoxJobRetryValue() {
     Job job = managementService.createJobQuery().list().get(0);
     assertNotNull(job);
@@ -160,6 +182,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedStartTimerEvent.bpmn20.xml" })
+  @Test
   public void testFailedTimerStartEvent() {
     // After process start, there should be timer created
     JobQuery jobQuery = managementService.createJobQuery();
@@ -213,6 +236,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testRetryOnTimerStartEventInEventSubProcess() {
     runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -232,6 +256,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(4, job.getRetries());
   }
 
+  @Test
   public void testRetryOnServiceTaskLikeMessageThrowEvent() {
     // given
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
@@ -248,7 +273,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     MessageEventDefinition messageDefinition = bpmnModelInstance.getModelElementById("messageDefinition");
     messageDefinition.setCamundaClass(FailingDelegate.class.getName());
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -316,6 +341,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     ClockUtil.reset();
   }
 
+  @Test
   public void testFailedJobRetryTimeCycleWithExpression() {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -326,7 +352,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
 
@@ -344,6 +370,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(9, job.getRetries());
   }
 
+  @Test
   public void testFailedJobRetryTimeCycleWithUndefinedVar() {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -354,7 +381,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -372,6 +399,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(2, job.getRetries()); // default behaviour
   }
 
+  @Test
   public void testFailedJobRetryTimeCycleWithChangingExpression() throws ParseException {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -385,7 +413,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Date startDate = simpleDateFormat.parse("2017-01-01T09:55:00");
     ClockUtil.setCurrentTime(startDate);
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
 
@@ -421,6 +449,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, duedateTime);
   }
 
+  @Test
   public void testRetryOnTimerStartEventWithExpression() {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -431,7 +460,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -447,6 +476,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(2, job.getRetries()); // default behaviour
   }
 
+  @Test
   public void testRetryOnAsyncStartEvent() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -457,7 +487,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -483,6 +513,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testIntermediateCatchEvent() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -494,7 +525,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -520,6 +551,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testEndEvent() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -529,7 +561,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
           .camundaExecutionListenerClass("start", "foo")
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -555,6 +587,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testExclusiveGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -565,7 +598,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -591,6 +624,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testInclusiveGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -601,7 +635,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -627,6 +661,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testEventBasedGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -639,7 +674,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -665,6 +700,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testParallelGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -675,7 +711,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
     ClockUtil.setCurrentTime(startDate);
@@ -701,6 +737,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, job.getDuedate());
   }
 
+  @Test
   public void testFailingIntermidiateBoundaryTimerJobWithCustomRetries() throws ParseException {
     try {
       // given
@@ -716,7 +753,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-      deployment(bpmnModelInstance);
+     testRule.deploy(bpmnModelInstance);
 
       Date startDate = simpleDateFormat.parse("2019-01-01T10:00:00");
       ClockUtil.setCurrentTime(startDate);
@@ -754,6 +791,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testExecuteSecondJobWhenJobFailedWithCustomJobRetriesInSameProcess() {
     // given
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
@@ -771,7 +809,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .userTask("afterPassing")
       .done();
 
-    deployment(bpmnModelInstance);
+   testRule.deploy(bpmnModelInstance);
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -787,7 +825,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     // when one failed job and one passing are present
     // only the passing should be executed
-    waitForJobExecutorToProcessAllJobs(5000);
+    testRule.waitForJobExecutorToProcessAllJobs(5000);
 
     // then the passing service task has been executed
     task = taskService.createTaskQuery().taskDefinitionKey("afterPassing").singleResult();

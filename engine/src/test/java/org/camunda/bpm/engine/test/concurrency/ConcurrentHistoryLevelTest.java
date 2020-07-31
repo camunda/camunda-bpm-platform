@@ -16,14 +16,21 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assumptions.assumeThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.sql.Connection;
 
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Tests cluster scenario with two nodes trying to write the history level property in parallel.</p>
@@ -34,27 +41,16 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
     TestHelper.deleteHistoryLevel(processEngineConfiguration);
   }
 
-  @Override
-  protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType)
-        || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
-
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.MARIADB })
   public void test() throws InterruptedException {
+    Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
     ThreadControl thread1 = executeControllableCommand(new ControllableUpdateHistoryLevelCommand());
     thread1.waitForSync();
 

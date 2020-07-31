@@ -20,13 +20,16 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -34,13 +37,15 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationMultiInstanceTest extends PluggableProcessEngineTestCase {
+public class ProcessInstanceModificationMultiInstanceTest extends PluggableProcessEngineTest {
 
   public static final String PARALLEL_MULTI_INSTANCE_TASK_PROCESS =
       "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasks.bpmn20.xml";
@@ -61,6 +66,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.nestedParallelTasks.bpmn20.xml";
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeMultiInstanceBodyParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -105,10 +111,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "afterTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeMultiInstanceBodyParallelSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -172,10 +179,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
         "subProcessTask", "subProcessTask", "afterTask", "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_COMPLETION_CONDITION_PROCESS)
+  @Test
   public void testStartInnerActivityParallelTasksWithCompletionCondition() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasksCompletionCondition");
@@ -189,10 +197,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // then the process is able to complete successfully and respects the completion condition
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_COMPLETION_CONDITION_PROCESS)
+  @Test
   public void testStartInnerActivityParallelSubprocessWithCompletionCondition() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocessCompletionCondition");
@@ -207,10 +216,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // then the process is able to complete successfully and respects the completion condition
     completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
         "subProcessTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeMultiInstanceBodySequentialTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -245,10 +255,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "afterTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeMultiInstanceBodySequentialSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -290,10 +301,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
         "subProcessTask", "subProcessTask", "subProcessTask", "afterTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -341,10 +353,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityParallelSubprocess() {
     // given the mi body is already instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -405,10 +418,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
         "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodyParallelTasks() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -452,10 +466,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     completeTasksInOrder(
         "miTasks", "afterTask", "beforeTask", "miTasks",
         "miTasks", "miTasks", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodyParallelTasksActivityStatistics() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -480,6 +495,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocess() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -526,10 +542,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     completeTasksInOrder(
         "subProcessTask", "afterTask", "beforeTask", "subProcessTask",
         "subProcessTask", "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocessActivityStatistics() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -555,6 +572,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySetNrOfInstancesParallelSubprocess() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -610,10 +628,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the remainder of the process completes successfully
     completeTasksInOrder("beforeTask", "subProcessTask", "afterTask",
         "subProcessTask", "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivitySequentialTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -628,13 +647,14 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
+      testRule.assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
           + "in scope miTasks#multiInstanceBody");
     }
 
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivitySequentialSubprocess() {
     // given the mi body is already instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -649,12 +669,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
         .execute();
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
+       testRule.assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
           + "in scope miSubProcess#multiInstanceBody");
     }
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySequentialTasks() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -695,10 +716,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "afterTask",
         "beforeTask", "miTasks", "miTasks", "miTasks", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySequentialTasksActivityStatistics() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -732,6 +754,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySequentialSubprocess() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -775,10 +798,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "afterTask",
         "beforeTask", "subProcessTask", "subProcessTask", "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySequentialSubprocessActivityStatistics() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -803,6 +827,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testStartBeforeInnerActivityWithMiBodySetNrOfInstancesSequentialSubprocess() {
     // given the mi body is not yet instantiated
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -868,10 +893,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     // and the remainder of the process completes successfully
     completeTasksInOrder("subProcessTask", "beforeTask", "subProcessTask",
         "subProcessTask", "subProcessTask", "afterTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelMultiInstanceBodyParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -884,10 +910,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testCancelMultiInstanceBodyParallelSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -900,10 +927,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelMultiInstanceBodySequentialTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -916,10 +944,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testCancelMultiInstanceBodySequentialSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -932,10 +961,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelInnerActivityParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -969,10 +999,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelAllInnerActivityParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -985,10 +1016,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelAllInnerActivityNestedParallelTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedMiParallelUserTasks");
@@ -1001,7 +1033,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   /**
@@ -1009,6 +1041,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
    * because parallel MI requires this
    */
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelInnerActivityParallelTasksAllButOne() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
@@ -1042,10 +1075,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testCancelInnerActivityParallelSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
@@ -1084,10 +1118,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "subProcessTask", "afterTask");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelInnerActivitySequentialTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -1101,10 +1136,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  @Test
   public void testCancelAllInnerActivitySequentialTasks() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
@@ -1117,10 +1153,11 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  @Test
   public void testCancelInnerActivitySequentialSubprocess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -1134,7 +1171,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .execute();
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   protected void completeTasksInOrder(String... taskNames) {

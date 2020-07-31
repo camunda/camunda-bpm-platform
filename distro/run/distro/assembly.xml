@@ -23,13 +23,6 @@
     </dependencySet>
 
     <dependencySet>
-      <outputDirectory>configuration/userlib/</outputDirectory>
-      <includes>
-        <include>com.h2database:h2</include>
-      </includes>
-    </dependencySet>
-
-    <dependencySet>
       <unpack>true</unpack>
       <unpackOptions>
         <includes>

@@ -16,16 +16,15 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -33,6 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartitioningTest {
 
+  @Test
   public void testConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();

@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.subprocess;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -28,13 +31,16 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  */
-public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestCase {
+public class InterruptingEventSubProcessTest extends PluggableProcessEngineTest {
 
   @Deployment(resources="org/camunda/bpm/engine/test/bpmn/subprocess/InterruptingEventSubProcessTest.testCancelEventSubscriptions.bpmn")
+  @Test
   public void testCancelEventSubscriptionsWhenReceivingAMessage() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -65,10 +71,11 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/bpmn/subprocess/InterruptingEventSubProcessTest.testCancelEventSubscriptions.bpmn")
+  @Test
   public void testCancelEventSubscriptionsWhenReceivingASignal() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -99,10 +106,11 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testCancelTimer() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -126,10 +134,11 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testKeepCompensation() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -153,10 +162,11 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTimeCycle() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -182,7 +192,7 @@ public class InterruptingEventSubProcessTest extends PluggableProcessEngineTestC
 
     taskService.complete(task.getId());
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
 
 }

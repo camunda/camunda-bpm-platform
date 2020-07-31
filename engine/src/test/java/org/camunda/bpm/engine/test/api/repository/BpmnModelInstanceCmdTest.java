@@ -16,25 +16,30 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Collection;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.junit.Test;
 
 
 /**
  * @author Sebastian Menski
  */
-public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTestCase {
+public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTest {
 
   private final static String PROCESS_KEY = "one";
 
   @Deployment(resources = "org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
+  @Test
   public void testRepositoryService() {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_KEY).singleResult().getId();
 

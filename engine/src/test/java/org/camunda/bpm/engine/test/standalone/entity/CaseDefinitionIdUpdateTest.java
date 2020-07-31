@@ -26,10 +26,12 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
-public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
+public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testUpdateCaseDefinitionIdInTask() {
     // given
     final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
@@ -59,6 +61,7 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
     deleteCaseDefinition(caseDefinitionEntity2);
   }
 
+  @Test
   public void testUpdateCaseDefinitionIdInCaseExecutionEntity() {
     // given
     final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());

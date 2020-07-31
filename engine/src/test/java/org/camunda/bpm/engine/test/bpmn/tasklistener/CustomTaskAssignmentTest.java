@@ -16,12 +16,19 @@
  */
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -29,11 +36,11 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Falko Menge <falko.menge@camunda.com>
  * @author Frederik Heremans
  */
-public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
+public class CustomTaskAssignmentTest extends PluggableProcessEngineTest {
   
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+
     
     identityService.saveUser(identityService.newUser("kermit"));
     identityService.saveUser(identityService.newUser("fozzie"));
@@ -44,16 +51,17 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
     identityService.createMembership("kermit", "management");
   }
   
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     identityService.deleteUser("kermit");
     identityService.deleteUser("fozzie");
     identityService.deleteUser("gonzo");
     identityService.deleteGroup("management");
-    super.tearDown();
+
   }
   
   @Deployment
+  @Test
   public void testCandidateGroupAssignment() {
     runtimeService.startProcessInstanceByKey("customTaskAssignment");
     assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("management").count());
@@ -62,6 +70,7 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testCandidateUserAssignment() {
     runtimeService.startProcessInstanceByKey("customTaskAssignment");
     assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
@@ -70,6 +79,7 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testAssigneeAssignment() {
     runtimeService.startProcessInstanceByKey("setAssigneeInListener");
     assertNotNull(taskService.createTaskQuery().taskAssignee("kermit").singleResult());
@@ -78,6 +88,7 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testOverwriteExistingAssignments() {
     runtimeService.startProcessInstanceByKey("overrideAssigneeInListener");
     assertNotNull(taskService.createTaskQuery().taskAssignee("kermit").singleResult());
@@ -86,6 +97,7 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testOverwriteExistingAssignmentsFromVariable() {
     // prepare variables
     Map<String, String> assigneeMappingTable = new HashMap<String, String>();
@@ -104,6 +116,7 @@ public class CustomTaskAssignmentTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
+  @Test
   public void testReleaseTask() throws Exception {
     runtimeService.startProcessInstanceByKey("releaseTaskProcess");
     

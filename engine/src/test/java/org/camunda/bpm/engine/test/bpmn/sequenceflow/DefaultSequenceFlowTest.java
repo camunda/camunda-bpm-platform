@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.gateway.ExclusiveGatewayTest;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -27,9 +30,10 @@ import org.camunda.bpm.engine.test.bpmn.gateway.ExclusiveGatewayTest;
  * 
  * @author Joram Barrez
  */
-public class DefaultSequenceFlowTest extends PluggableProcessEngineTestCase {
+public class DefaultSequenceFlowTest extends PluggableProcessEngineTest {
   
   @Deployment
+  @Test
   public void testDefaultSequenceFlowOnTask() {
     String procId = runtimeService.startProcessInstanceByKey("defaultSeqFlow",
             CollectionUtil.singletonMap("input", 2)).getId();

@@ -16,11 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.subprocess;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -31,15 +35,18 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.subprocess.util.GetActInstanceDelegate;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class SubProcessTest extends PluggableProcessEngineTestCase {
+public class SubProcessTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSimpleSubProcess() {
 
     // After staring the process, the task in the subprocess should be active
@@ -72,13 +79,15 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
    * Same test case as before, but now with all automatic steps
    */
   @Deployment
+  @Test
   public void testSimpleAutomaticSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessAutomatic");
     assertTrue(pi.isEnded());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testSimpleSubProcessWithTimer() {
 
     Date startTime = new Date();
@@ -105,7 +114,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000 ) + 1000));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // The subprocess should be left, and the escalated task should be active
     Task escalationTask = taskService.createTaskQuery()
@@ -146,7 +155,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     // Completing the two tasks should end the process instance
     taskService.complete(taskAfterTimer1.getId());
     taskService.complete(taskAfterTimer2.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   /**
@@ -154,6 +163,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
    * is nested within another subprocess.
    */
   @Deployment
+  @Test
   public void testNestedSimpleSubProcess() {
 
     // Start and delete a process with a nested subprocess when it is not yet ended
@@ -189,10 +199,11 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     assertNotNull(taskAfterSubProcesses);
     assertEquals("Task after subprocesses", taskAfterSubProcesses.getName());
     taskService.complete(taskAfterSubProcesses.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {
     Date startTime = new Date();
 
@@ -220,7 +231,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and fire up the job executor
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ( 60 * 60 * 1000 ) + 1000));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // The inner subprocess should be destoyed, and the escalated task should be active
     Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -250,6 +261,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
    * is nested within two other sub processes
    */
   @Deployment
+  @Test
   public void testDoubleNestedSimpleSubProcess() {
     // After staring the process, the task in the inner subprocess must be active
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
@@ -264,6 +276,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSimpleParallelSubProcess() {
 
     // After starting the process, the two task in the subprocess should be active
@@ -300,6 +313,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSimpleParallelSubProcessWithTimer() {
 
     // After staring the process, the tasks in the subprocess should be active
@@ -325,10 +339,11 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Completing the task after the timer ends the process instance
     taskService.complete(taskAfterTimer.getId());
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment
+  @Test
   public void testTwoSubProcessInParallel() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallel");
     TaskQuery taskQuery = taskService
@@ -372,10 +387,11 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTwoSubProcessInParallelWithinSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
     TaskQuery taskQuery = taskService
@@ -414,10 +430,11 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Completing this task should end the process
     taskService.complete(taskAfterSubProcess.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTwoNestedSubProcessesInParallelWithTimer() {
 
 //    Date startTime = new Date();
@@ -438,7 +455,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Firing the timer should destroy all three subprocesses and activate the task after the timer
 //    ClockUtil.setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000 ) + 1000));
-//    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+//    testRule.waitForJobExecutorToProcessAllJobs(5000L, 50L);
     Job job = managementService.createJobQuery().singleResult();
     managementService.executeJob(job.getId());
 
@@ -447,37 +464,41 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
     // Completing the task should end the process instance
     taskService.complete(taskAfterTimer.getId());
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   /**
-   * @see http://jira.codehaus.org/browse/ACT-1072
+   * @see <a href="http://jira.codehaus.org/browse/ACT-1072">http://jira.codehaus.org/browse/ACT-1072</a>
    */
   @Deployment
+  @Test
   public void testNestedSimpleSubProcessWithoutEndEvent() {
     testNestedSimpleSubProcess();
   }
 
   /**
-   * @see http://jira.codehaus.org/browse/ACT-1072
+   * @see <a href="http://jira.codehaus.org/browse/ACT-1072">http://jira.codehaus.org/browse/ACT-1072</a>
    */
   @Deployment
+  @Test
   public void testSimpleSubProcessWithoutEndEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSimpleSubProcessWithoutEndEvent");
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   /**
-   * @see http://jira.codehaus.org/browse/ACT-1072
+   * @see <a href="http://jira.codehaus.org/browse/ACT-1072">http://jira.codehaus.org/browse/ACT-1072</a>
    */
   @Deployment
+  @Test
   public void testNestedSubProcessesWithoutEndEvents() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testNestedSubProcessesWithoutEndEvents");
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
   // SEE https://app.camunda.com/jira/browse/CAM-2169
+  @Test
   public void testActivityInstanceTreeNestedCmd() {
     GetActInstanceDelegate.activityInstance = null;
     runtimeService.startProcessInstanceByKey("process");
@@ -496,6 +517,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   // SEE https://app.camunda.com/jira/browse/CAM-2169
+  @Test
   public void testActivityInstanceTreeNestedCmdAfterTx() {
     GetActInstanceDelegate.activityInstance = null;
     runtimeService.startProcessInstanceByKey("process");
@@ -515,6 +537,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals("ServiceTask_1", serviceTaskInstance.getActivityId());
   }
 
+  @Test
   public void testConcurrencyInSubProcess() {
 
     org.camunda.bpm.engine.repository.Deployment deployment =

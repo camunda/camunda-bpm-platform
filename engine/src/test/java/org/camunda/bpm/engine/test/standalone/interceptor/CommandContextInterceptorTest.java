@@ -16,21 +16,29 @@
  */
 package org.camunda.bpm.engine.test.standalone.interceptor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
-public class CommandContextInterceptorTest extends PluggableProcessEngineTestCase {
+public class CommandContextInterceptorTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testCommandContextGetCurrentAfterException() {
     try {
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
@@ -47,6 +55,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
     assertNull(Context.getCommandContext());
   }
 
+  @Test
   public void testCommandContextNestedFailingCommands() {
     final ExceptionThrowingCmd innerCommand1 = new ExceptionThrowingCmd(new IdentifiableRuntimeException(1));
     final ExceptionThrowingCmd innerCommand2 = new ExceptionThrowingCmd(new IdentifiableRuntimeException(2));
@@ -72,6 +81,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
     assertFalse(innerCommand2.executed);
   }
 
+  @Test
   public void testCommandContextNestedTryCatch() {
     final ExceptionThrowingCmd innerCommand = new ExceptionThrowingCmd(new IdentifiableRuntimeException(1));
 
@@ -94,6 +104,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
   public void testCommandContextNestedFailingCommandsNotExceptions() {
     final BpmnModelInstance modelInstance =
       Bpmn.createExecutableProcess("processThrowingThrowable")
@@ -102,7 +113,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
           .camundaClass(ThrowErrorJavaDelegate.class)
         .endEvent().done();
 
-    deployment(modelInstance);
+   testRule.deploy(modelInstance);
 
     boolean errorThrown = false;
     try {

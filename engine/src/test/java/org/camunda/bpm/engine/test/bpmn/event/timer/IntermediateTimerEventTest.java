@@ -17,7 +17,10 @@
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,19 +28,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.joda.time.LocalDateTime;
+import org.junit.Test;
 
 
-public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
+public class IntermediateTimerEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testCatchingTimerEvent() throws Exception {
 
     // Set the clock fixed
@@ -50,13 +55,14 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '50minutes and 5 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, jobQuery.count());
-    assertProcessEnded(pi.getProcessInstanceId());
+    testRule.assertProcessEnded(pi.getProcessInstanceId());
   }
 
   @Deployment
+  @Test
   public void testExpression() {
     // Set the clock fixed
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
@@ -82,11 +88,12 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi2.getId()).count());
 
-    assertProcessEnded(pi1.getProcessInstanceId());
-    assertProcessEnded(pi2.getProcessInstanceId());
+    testRule.assertProcessEnded(pi1.getProcessInstanceId());
+    testRule.assertProcessEnded(pi2.getProcessInstanceId());
   }
   
   @Deployment
+  @Test
   public void testExpressionRecalculateCurrentDateBased() throws Exception {
     // Set the clock fixed
     HashMap<String, Object> variables = new HashMap<String, Object>();
@@ -114,13 +121,14 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     
     // After waiting for sixteen minutes the timer should fire
     ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
-    assertProcessEnded(pi1.getProcessInstanceId());
+    testRule.assertProcessEnded(pi1.getProcessInstanceId());
   }
   
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpressionRecalculateCurrentDateBased.bpmn20.xml")
+  @Test
   public void testExpressionRecalculateCreationDateBased() throws Exception {
     // Set the clock fixed
     HashMap<String, Object> variables = new HashMap<String, Object>();
@@ -147,13 +155,14 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     
     // After waiting for sixteen minutes the timer should fire
     ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
-    assertProcessEnded(pi1.getProcessInstanceId());
+    testRule.assertProcessEnded(pi1.getProcessInstanceId());
   }
 
   @Deployment
+  @Test
   public void testTimeCycle() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -168,10 +177,11 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
   
   @Deployment
+  @Test
   public void testRecalculateTimeCycleExpressionCurrentDateBased() {
     // given
     Map<String, Object> variables = new HashMap<>();
@@ -196,10 +206,11 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
   
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testRecalculateTimeCycleExpressionCurrentDateBased.bpmn20.xml")
+  @Test
   public void testRecalculateTimeCycleExpressionCreationDateBased() {
     // given
     Map<String, Object> variables = new HashMap<>();
@@ -227,7 +238,7 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    assertProcessEnded(processInstanceId);
+    testRule.assertProcessEnded(processInstanceId);
   }
   
   private void moveByMinutes(int minutes) throws Exception {

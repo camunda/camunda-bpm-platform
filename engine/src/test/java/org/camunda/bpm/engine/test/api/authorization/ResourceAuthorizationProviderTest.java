@@ -22,9 +22,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import java.util.Arrays;
+import java.util.Collections;
 
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -32,43 +37,57 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTestCase {
+public class ResourceAuthorizationProviderTest {
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/authorization/resource.authorization.provider.camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected IdentityService identityService;
+  protected AuthorizationService authorizationService;
+  protected TaskService taskService;
 
   protected String userId = "test";
   protected String groupId = "accounting";
   protected User user;
   protected Group group;
 
-  public ResourceAuthorizationProviderTest() {
-    super("org/camunda/bpm/engine/test/api/authorization/resource.authorization.provider.camunda.cfg.xml");
-  }
-
-  protected void initializeProcessEngine() {
-    super.initializeProcessEngine();
-
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     processEngineConfiguration.setResourceAuthorizationProvider(new MyResourceAuthorizationProvider());
 
-    identityService = processEngineConfiguration.getIdentityService();
-    authorizationService = processEngineConfiguration.getAuthorizationService();
+    identityService = engineRule.getIdentityService();
+    taskService = engineRule.getTaskService();
+    authorizationService = engineRule.getAuthorizationService();
 
     user = createUser(userId);
     group = createGroup(groupId);
 
     identityService.createMembership(userId, groupId);
 
-    identityService.setAuthentication(userId, Arrays.asList(groupId));
+    identityService.setAuthentication(userId, Collections.singletonList(groupId));
     processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
+  @After
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (User user : identityService.createUserQuery().list()) {
@@ -82,6 +101,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     }
   }
 
+  @Test
   public void testNewTaskAssignee() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -111,6 +131,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testNewTaskOwner() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -140,6 +161,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testAddCandidateUser() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -160,6 +182,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testAddUserIdentityLink() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -180,6 +203,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testAddCandidateGroup() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -200,6 +224,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testAddGroupIdentityLink() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -220,6 +245,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testDeleteUserIdentityLink() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -241,6 +267,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testDeleteGroupIdentityLink() {
     // given
     MyResourceAuthorizationProvider.clearProperties();
@@ -287,7 +314,7 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
 
   protected Group createGroup(String groupId) {
     Group group = identityService.newGroup(groupId);
-    identityService.saveGroup(group);;
+    identityService.saveGroup(group);
     return group;
   }
 

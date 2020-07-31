@@ -293,8 +293,17 @@
     from ${prefix}ACT_HI_INCIDENT RES
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <!--
+        HEADS-UP!!!
+        If you change something here, you should probably also change it the EE Webapp
+        See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicIncident.xml
+      -->
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (
+      <if test="authCheck.isHistoricInstancePermissionsEnabled">
+      RES.PROC_INST_ID_,
+      </if>
+      RES.PROC_DEF_KEY_, '*'))
     </if>
 
     <where>
@@ -307,11 +316,26 @@
       <if test="incidentMessage != null">
         and RES.INCIDENT_MSG_ = #{incidentMessage}
       </if>
+      <if test="incidentMessageLike != null">
+        and RES.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="createTimeAfter != null">
+        and RES.CREATE_TIME_ &gt; #{createTimeAfter}
+      </if>
+      <if test="createTimeBefore != null">
+        and RES.CREATE_TIME_ &lt; #{createTimeBefore}
+      </if>
+      <if test="endTimeAfter != null">
+        and RES.END_TIME_ &gt; #{endTimeAfter}
+      </if>
+      <if test="endTimeBefore != null">
+        and RES.END_TIME_ &lt; #{endTimeBefore}
       </if>
       <if test="failedActivityId != null">
         and RES.FAILED_ACTIVITY_ID_ = #{failedActivityId}
@@ -321,6 +345,9 @@
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
       </if>
       <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
         and RES.PROC_DEF_KEY_ in
@@ -362,6 +389,11 @@
       </if>
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        <!--
+          HEADS-UP!!!
+          If you change something here, you should probably also change it the EE Webapp
+          See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicIncident.xml
+        -->
         <!-- incident exists in context of a process definition -->
         and (
           (RES.PROC_DEF_ID_ is not null

@@ -49,12 +49,10 @@ import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJobConfigur
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJpaConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultMetricsConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultProcessEngineConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.EnterLicenseKeyConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.GenericPropertiesConfiguration;
 import org.camunda.bpm.spring.boot.starter.event.EventPublisherPlugin;
 import org.camunda.bpm.spring.boot.starter.jdbc.HistoryLevelDeterminator;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
-import org.camunda.bpm.spring.boot.starter.util.CamundaBpmVersion;
 import org.camunda.bpm.spring.boot.starter.util.CamundaSpringBootUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -166,12 +164,6 @@ public class CamundaBpmConfiguration {
   @ConditionalOnProperty(prefix = "camunda.bpm.admin-user", name = "id")
   public CreateAdminUserConfiguration createAdminUserConfiguration() {
     return new CreateAdminUserConfiguration();
-  }
-
-  @Bean
-  @ConditionalOnProperty(prefix = CamundaBpmProperties.PREFIX, name = CamundaBpmVersion.IS_ENTERPRISE, havingValue = "true")
-  public EnterLicenseKeyConfiguration enterLicenseKeyConfiguration() {
-    return new EnterLicenseKeyConfiguration();
   }
 
   @Bean

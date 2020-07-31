@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.test.api.runtime;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import junit.framework.TestCase;
 
+import junit.framework.TestCase;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;

@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm.springboot.project</groupId>
@@ -18,14 +18,6 @@
   <inceptionYear>2015</inceptionYear>
 
   <packaging>pom</packaging>
-
-  <modules>
-    <module>starter</module>
-    <module>starter-rest</module>
-    <module>starter-webapp-core</module>
-    <module>starter-webapp</module>
-    <module>starter-test</module>
-  </modules>
 
   <properties>
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
@@ -88,13 +80,43 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>starter</module>
+        <module>starter-rest</module>
+        <module>starter-test</module>
+        <module>starter-qa</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>starter-webapp-core</module>
+        <module>starter-webapp</module>
+        <module>starter-qa</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-starter</id>
+      <!-- This profile is run in the release CI for building the enterprise artifacts
+          It can be removed if the webapp repo is merged to the platform and
+          distro-ce is not used for building the spring boot starter -->
+      <modules>
+        <module>starter-webapp-core</module>
+        <module>starter-webapp</module>
         <module>starter-qa</module>
       </modules>
     </profile>
     <profile>
       <id>integration-test-spring-boot-starter</id>
       <modules>
+        <!-- All modules that contain *IT.java test classes need to be listed here -->
+
         <module>starter-qa</module>
+        <module>starter</module>
+        <module>starter-rest</module>
+        <module>starter-webapp-core</module>
       </modules>
       <build>
         <plugins>
@@ -109,6 +131,13 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
           </plugin>
         </plugins>
       </build>

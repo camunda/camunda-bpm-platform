@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,12 +51,13 @@ import org.junit.Test;
 public class SchemaLogQueryTest {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
-  ManagementService managementService;
-  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
-  SchemaLogEntryEntity dummySchemaLogEntry;
-  long initialEntryCount;
+  protected ManagementService managementService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  protected SchemaLogEntryEntity dummySchemaLogEntry;
+  protected long initialEntryCount;
 
   @Before
   public void init() {

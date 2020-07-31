@@ -16,8 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Frederik Heremans
@@ -25,8 +29,9 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Saeid Mizaei
  * @author Joram Barrez
  */
-public class ManagementServiceTableCountTest extends PluggableProcessEngineTestCase {
+public class ManagementServiceTableCountTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testTableCount() {
     Map<String, Long> tableCount = managementService.getTableCount();
 

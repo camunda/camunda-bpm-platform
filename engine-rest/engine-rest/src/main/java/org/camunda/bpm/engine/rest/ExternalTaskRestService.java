@@ -91,4 +91,11 @@ public interface ExternalTaskRestService {
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto);
 
+  @GET
+  @Path("/topic-names")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<String> getTopicNames(@QueryParam("withLockedTasks") boolean withLockedTasks,
+      @QueryParam("withUnlockedTasks") boolean withUnlockedTasks,
+      @QueryParam("withRetriesLeft") boolean withRetriesLeft);
+
 }

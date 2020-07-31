@@ -21,9 +21,8 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
+
 import org.camunda.bpm.engine.authorization.Groups;
-import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
-import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -31,11 +30,6 @@ import org.junit.Test;
  *
  */
 public class SchemaLogQueryAuthorizationTest extends AuthorizationTest {
-
-  @After
-  public void tearDown() {
-    super.tearDown();
-  }
 
   @Test
   public void testSimpleQueryWithoutAuthorization() {

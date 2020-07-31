@@ -21,6 +21,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -29,6 +35,8 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -38,25 +46,18 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
 
-  protected String deploymentId;
-
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    testRule.deploy("org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml");
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     super.setUp();
   }
 
-  @Override
-  public void tearDown() {
-    super.tearDown();
-    deleteDeployment(deploymentId);
-  }
-
   // without any authorization
 
+  @Test
   public void testQueryWithoutAuthorizations() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -68,15 +69,16 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
-      assertTextPresent(ONE_INCIDENT_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ.getName(), message);
+      testRule.assertTextPresent(ONE_INCIDENT_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   // including instances //////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingInstancesWithoutAuthorizationOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -90,6 +92,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryIncludingInstancesWithReadPermissionOnOneProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -112,6 +115,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryIncludingInstancesWithMany() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -135,6 +139,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryIncludingInstancesWithReadPermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -153,6 +158,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryIncludingInstancesWithReadInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -172,6 +178,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   // including failed jobs //////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingFailedJobsWithoutAuthorizationOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -188,6 +195,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertNull(statistics);
   }
 
+  @Test
   public void testQueryIncludingFailedJobsWithReadPermissionOnOneProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -213,6 +221,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryIncludingFailedJobsWithReadPermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -234,6 +243,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
+  @Test
   public void testQueryIncludingFailedJobsWithReadInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -256,6 +266,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   // including incidents //////////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingIncidentsWithoutAuthorizationOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -272,6 +283,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertNull(statistics);
   }
 
+  @Test
   public void testQueryIncludingIncidentsWithReadPermissionOnOneProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -299,6 +311,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testQueryIncludingIncidentsWithReadPermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -322,6 +335,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(3, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testQueryIncludingIncidentsWithReadInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -346,6 +360,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   // including incidents and failed jobs //////////////////////////////////////////////////////////
 
+  @Test
   public void testQueryIncludingIncidentsAndFailedJobsWithoutAuthorizationOnProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -363,6 +378,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertNull(statistics);
   }
 
+  @Test
   public void testQueryIncludingIncidentsAndFailedJobsWithReadPermissionOnOneProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -391,6 +407,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testQueryIncludingIncidentsAndFailedJobsWithReadPermissionOnAnyProcessInstance() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -415,6 +432,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(3, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testQueryIncludingIncidentsAndFailedJobsWithReadInstancePermissionOnProcessDefinition() {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
@@ -438,6 +456,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(3, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testManyAuthorizationsActivityStatisticsQueryIncludingFailedJobsAndIncidents() {
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
@@ -462,6 +481,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     assertEquals(3, incidentStatistics.getIncidentCount());
   }
 
+  @Test
   public void testManyAuthorizationsActivityStatisticsQuery() {
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 

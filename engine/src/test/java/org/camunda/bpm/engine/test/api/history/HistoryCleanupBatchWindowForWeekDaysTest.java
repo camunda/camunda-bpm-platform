@@ -16,12 +16,17 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -43,9 +48,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -60,29 +62,25 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
   protected String defaultEndTime;
   protected int defaultBatchSize;
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setHistoryCleanupBatchSize(20);
-      configuration.setHistoryCleanupBatchThreshold(10);
-      configuration.setDefaultNumberOfRetries(5);
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+    configuration.setHistoryCleanupBatchSize(20);
+    configuration.setHistoryCleanupBatchThreshold(10);
+    configuration.setDefaultNumberOfRetries(5);
 
-      configuration.setMondayHistoryCleanupBatchWindowStartTime("22:00");
-      configuration.setMondayHistoryCleanupBatchWindowEndTime("01:00");
-      configuration.setTuesdayHistoryCleanupBatchWindowStartTime("22:00");
-      configuration.setTuesdayHistoryCleanupBatchWindowEndTime("23:00");
-      configuration.setWednesdayHistoryCleanupBatchWindowStartTime("15:00");
-      configuration.setWednesdayHistoryCleanupBatchWindowEndTime("20:00");
-      configuration.setFridayHistoryCleanupBatchWindowStartTime("22:00");
-      configuration.setFridayHistoryCleanupBatchWindowEndTime("01:00");
-      configuration.setSundayHistoryCleanupBatchWindowStartTime("10:00");
-      configuration.setSundayHistoryCleanupBatchWindowEndTime("20:00");
-
-      return configuration;
-    }
-  };
+    configuration.setMondayHistoryCleanupBatchWindowStartTime("22:00");
+    configuration.setMondayHistoryCleanupBatchWindowEndTime("01:00");
+    configuration.setTuesdayHistoryCleanupBatchWindowStartTime("22:00");
+    configuration.setTuesdayHistoryCleanupBatchWindowEndTime("23:00");
+    configuration.setWednesdayHistoryCleanupBatchWindowStartTime("15:00");
+    configuration.setWednesdayHistoryCleanupBatchWindowEndTime("20:00");
+    configuration.setFridayHistoryCleanupBatchWindowStartTime("22:00");
+    configuration.setFridayHistoryCleanupBatchWindowEndTime("01:00");
+    configuration.setSundayHistoryCleanupBatchWindowStartTime("10:00");
+    configuration.setSundayHistoryCleanupBatchWindowEndTime("20:00");
+  });
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);

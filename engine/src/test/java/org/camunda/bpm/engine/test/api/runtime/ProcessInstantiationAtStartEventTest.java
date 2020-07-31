@@ -20,29 +20,33 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngineTestCase {
+public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 
-  @Override
-  protected void setUp() throws Exception {
-    deployment(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+  @Before
+  public void setUp() throws Exception {
+   testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
         .startEvent()
         .userTask()
         .endEvent()
         .done());
   }
 
+  @Test
   public void testStartProcessInstanceById() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
@@ -51,6 +55,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceByKey() {
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute();
@@ -58,6 +63,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
   }
 
+  @Test
   public void testStartProcessInstanceAndSetBusinessKey() {
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).businessKey("businessKey").execute();
@@ -67,6 +73,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(processInstance.getBusinessKey(), is("businessKey"));
   }
 
+  @Test
   public void testStartProcessInstanceAndSetCaseInstanceId() {
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).caseInstanceId("caseInstanceId").execute();
@@ -76,6 +83,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(processInstance.getCaseInstanceId(), is("caseInstanceId"));
   }
 
+  @Test
   public void testStartProcessInstanceAndSetVariable() {
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariable("var", "value").execute();
@@ -85,6 +93,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(variable, is((Object) "value"));
   }
 
+  @Test
   public void testStartProcessInstanceAndSetVariables() {
     Map<String, Object> variables = Variables.createVariables().putValue("var1", "v1").putValue("var2", "v2");
 
@@ -93,6 +102,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(runtimeService.getVariables(processInstance.getId()), is(variables));
   }
 
+  @Test
   public void testStartProcessInstanceNoSkipping() {
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(false, false);
@@ -100,6 +110,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
   }
 
+  @Test
   public void testFailToStartProcessInstanceSkipListeners() {
     try {
       runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(true, false);
@@ -110,6 +121,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     }
   }
 
+  @Test
   public void testFailToStartProcessInstanceSkipInputOutputMapping() {
     try {
       runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(false, true);

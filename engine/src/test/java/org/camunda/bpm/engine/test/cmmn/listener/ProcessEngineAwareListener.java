@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 
 /**
  * @author Thorben Lindhauer

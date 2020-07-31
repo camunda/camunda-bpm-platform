@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -36,6 +42,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -45,7 +52,7 @@ import org.junit.Test;
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
+public class VariableInstanceQueryTest extends PluggableProcessEngineTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
@@ -2297,6 +2304,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSimpleSubProcessVariables() {
     // given
     Map<String, Object> processVariables = new HashMap<String, Object>();
@@ -2434,7 +2442,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
         typedValue.getValue();
       }
       catch(IllegalStateException e) {
-        assertTextPresent("Object is not deserialized", e.getMessage());
+        testRule.assertTextPresent("Object is not deserialized", e.getMessage());
       }
       assertNotNull(typedValue.getValueSerialized());
     }
@@ -2679,8 +2687,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-
   @Deployment
+  @Test
   public void testSequentialMultiInstanceSubProcess() {
     // given a process instance in sequential MI
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
@@ -2705,6 +2713,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testParallelMultiInstanceSubProcess() {
     // given a process instance in sequential MI
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");

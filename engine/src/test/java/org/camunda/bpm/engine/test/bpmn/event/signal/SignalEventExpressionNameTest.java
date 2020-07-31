@@ -16,23 +16,29 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import java.util.HashMap;
+
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.HashMap;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Johannes Heinemann
  */
-public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCase {
+public class SignalEventExpressionNameTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSignalCatchIntermediate() {
 
     // given
@@ -48,6 +54,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml"})
+  @Test
   public void testSignalCatchIntermediateActsOnEventReceive() {
 
     // given
@@ -65,6 +72,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml"})
+  @Test
   public void testSignalThrowCatchIntermediate() {
 
     // given
@@ -86,6 +94,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowEnd.bpmn20.xml"})
+  @Test
   public void testSignalThrowEndCatchIntermediate() {
 
     // given
@@ -107,6 +116,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchBoundary.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml"})
+  @Test
   public void testSignalCatchBoundary() {
 
     // given
@@ -126,6 +136,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalStartEvent.bpmn20.xml"})
+  @Test
   public void testSignalStartEvent() {
 
     // given
@@ -141,6 +152,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment
+  @Test
   public void testSignalStartEventInEventSubProcess() {
 
     // given
@@ -168,6 +180,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalStartEvent.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.throwAlertSignalAsync.bpmn20.xml"})
+  @Test
   public void testAsyncSignalStartEvent() {
     ProcessDefinition catchingProcessDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -194,6 +207,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml"})
+  @Test
   public void testSignalExpressionErrorHandling() {
 
     String expectedErrorMessage = "Unknown property used in expression: alert-${var}. Cannot resolve identifier 'var'";

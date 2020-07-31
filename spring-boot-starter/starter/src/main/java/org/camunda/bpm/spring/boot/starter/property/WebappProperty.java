@@ -21,6 +21,9 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
 public class WebappProperty {
+
+  public static final String DEFAULT_APP_PATH = "/camunda";
+
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".webapp";
 
   private boolean indexRedirectEnabled = true;
@@ -28,6 +31,8 @@ public class WebappProperty {
   private String webjarClasspath = "/META-INF/resources/webjars/camunda";
 
   private String securityConfigFile = "/securityFilterRules.json";
+
+  protected String applicationPath = DEFAULT_APP_PATH;
 
   @NestedConfigurationProperty
   private CsrfProperties csrf = new CsrfProperties();
@@ -59,6 +64,30 @@ public class WebappProperty {
     this.securityConfigFile = securityConfigFile;
   }
 
+  public String getApplicationPath() {
+    return applicationPath;
+  }
+
+  public void setApplicationPath(String applicationPath) {
+    this.applicationPath = sanitizeApplicationPath(applicationPath);
+  }
+
+  protected String sanitizeApplicationPath(String applicationPath) {
+    if (applicationPath == null || applicationPath.isEmpty()) {
+      return "";
+    }
+
+    if (!applicationPath.startsWith("/")) {
+      applicationPath = "/" + applicationPath;
+    }
+
+    if (applicationPath.endsWith("/")) {
+      applicationPath = applicationPath.substring(0, applicationPath.length() - 1);
+    }
+
+    return applicationPath;
+  }
+
   public CsrfProperties getCsrf() {
     return csrf;
   }
@@ -81,6 +110,7 @@ public class WebappProperty {
       .add("indexRedirectEnabled=" + indexRedirectEnabled)
       .add("webjarClasspath='" + webjarClasspath + '\'')
       .add("securityConfigFile='" + securityConfigFile + '\'')
+      .add("webappPath='" + applicationPath + '\'')
       .add("csrf='" + csrf + '\'')
       .add("headerSecurityProperties='" + headerSecurity + '\'')
       .toString();

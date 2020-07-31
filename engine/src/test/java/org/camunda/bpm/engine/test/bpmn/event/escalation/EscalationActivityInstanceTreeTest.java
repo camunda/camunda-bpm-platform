@@ -19,17 +19,19 @@ package org.camunda.bpm.engine.test.bpmn.event.escalation;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Philipp Ossler
  */
-public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTestCase {
+public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testThrowEscalationEventFromEmbeddedSubprocess.bpmn20.xml")
+  @Test
   public void testNonInterruptingEscalationBoundaryEvent(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by non-interrupting boundary event on subprocess
@@ -44,6 +46,7 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testInterruptingEscalationBoundaryEvent.bpmn20.xml")
+  @Test
   public void testInterruptingEscalationBoundaryEvent(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by interrupting boundary event on subprocess
@@ -56,6 +59,7 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventInsideSubprocess.bpmn20.xml")
+  @Test
   public void testNonInterruptingEscalationEventSubprocessInsideSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by non-interrupting event subprocess inside the subprocess
@@ -71,6 +75,7 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventFromEmbeddedSubprocess.bpmn20.xml")
+  @Test
   public void testNonInterruptingEscalationEventSubprocessOutsideSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by non-interrupting event subprocess outside the subprocess
@@ -87,6 +92,7 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptionEscalationEventSubprocess.bpmn20.xml")
+  @Test
   public void testInterruptingEscalationEventSubprocessInsideSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by interrupting event subprocess inside the subprocess

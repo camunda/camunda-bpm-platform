@@ -1,7 +1,7 @@
 {
   <@lib.endpointInfo
       id = "updateSuspensionStateAsyncOperation"
-      tag = "Process instance"
+      tag = "Process Instance"
       desc = "Activates or suspends process instances asynchronously with a list of process instance ids,
               a process instance query, and/or a historical process instance query." />
 

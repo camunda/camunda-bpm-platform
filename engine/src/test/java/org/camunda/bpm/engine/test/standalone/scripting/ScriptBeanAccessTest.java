@@ -16,21 +16,38 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Tom Baeyens
  */
-public class ScriptBeanAccessTest extends ResourceProcessEngineTestCase {
+public class ScriptBeanAccessTest {
 
-  public ScriptBeanAccessTest() {
-    super("org/camunda/bpm/engine/test/standalone/scripting/camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/standalone/scripting/camunda.cfg.xml");
+  @Rule
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
   }
 
   @Deployment
+  @Test
   public void testConfigurationBeanAccess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");
     assertEquals("myValue", runtimeService.getVariable(pi.getId(), "myVariable"));

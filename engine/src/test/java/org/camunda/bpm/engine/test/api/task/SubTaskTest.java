@@ -16,21 +16,26 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Tom Baeyens
  */
-public class SubTaskTest extends PluggableProcessEngineTestCase {
+public class SubTaskTest extends PluggableProcessEngineTest {
 
+  @Test
   public void testSubTask() {
     Task gonzoTask = taskService.newTask();
     gonzoTask.setName("gonzoTask");

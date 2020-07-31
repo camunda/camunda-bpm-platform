@@ -17,14 +17,16 @@
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -32,12 +34,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.joda.time.LocalDateTime;
+import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
+public class BoundaryTimerEventTest extends PluggableProcessEngineTest {
 
   /*
    * Test for when multiple boundary timer events are defined on the same user
@@ -49,6 +53,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
    * See process image next to the process xml resource
    */
   @Deployment
+  @Test
   public void testMultipleTimersOnUserTask() {
 
     // Set the clock fixed
@@ -62,7 +67,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means that the third task is reached
@@ -71,6 +76,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTimerOnNestingOfSubprocesses() {
 
     runtimeService.startProcessInstanceByKey("timerOnNestedSubprocesses");
@@ -87,6 +93,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testExpressionOnTimer(){
     // Set the clock fixed
     Date startTime = new Date();
@@ -103,14 +110,15 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testRecalculateUnchangedExpressionOnTimerCurrentDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
@@ -140,14 +148,15 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '1 hour and 6 min', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.MINUTES.toMillis(6L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  @Test
   public void testRecalculateUnchangedExpressionOnTimerCreationDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
@@ -173,14 +182,15 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '1 hour and 15 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.SECONDS.toMillis(15L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  @Test
   public void testRecalculateChangedExpressionOnTimerCurrentDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
@@ -207,14 +217,15 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '16 minutes', the timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(2L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  @Test
   public void testRecalculateChangedExpressionOnTimerCreationDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
@@ -241,14 +252,15 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '16 minutes', the timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(16L)));
-    waitForJobExecutorToProcessAllJobs(5000L);
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTimerInSingleTransactionProcess() {
     // make sure that if a PI completes in single transaction, JobEntities associated with the execution are deleted.
     // broken before 5.10, see ACT-1133
@@ -257,6 +269,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testRepeatingTimerWithCancelActivity() {
     runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
     assertEquals(1, managementService.createJobQuery().count());
@@ -272,6 +285,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMultipleOutgoingSequenceFlows() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("interruptingTimer");
 
@@ -289,10 +303,11 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testMultipleOutgoingSequenceFlowsOnSubprocess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("interruptingTimer");
 
@@ -310,10 +325,11 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testMultipleOutgoingSequenceFlowsOnSubprocessMi() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("interruptingTimer");
 
@@ -331,10 +347,11 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
       taskService.complete(task.getId());
     }
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testInterruptingTimerDuration() {
 
     // Start process instance

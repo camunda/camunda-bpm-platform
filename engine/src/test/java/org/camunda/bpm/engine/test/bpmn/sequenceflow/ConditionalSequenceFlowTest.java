@@ -16,23 +16,29 @@
  */
 package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
  * @author Joram Barrez
  * @author Falko Menge (camunda)
  */
-public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase {
+public class ConditionalSequenceFlowTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testUelExpression() {
     Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
@@ -47,6 +53,7 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment
+  @Test
   public void testValueAndMethodExpression() {
     // An order of price 150 is a standard order (goes through an UEL value expression)
     ConditionalSequenceFlowTestOrder order = new ConditionalSequenceFlowTestOrder(150);
@@ -74,16 +81,17 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
    * BPMN 2.0.1 p. 436 (PDF 466):
    * "The inclusive gateway throws an exception in case all conditions evaluate to false and a default flow has not been specified."
    *
-   * @see https://app.camunda.com/jira/browse/CAM-1773
+   * @see <a href="https://app.camunda.com/jira/browse/CAM-1773">https://app.camunda.com/jira/browse/CAM-1773</a>
    */
   @Deployment
+  @Test
   public void testNoExpressionTrueThrowsException() {
     Map<String, Object> variables = CollectionUtil.singletonMap("input", "non-existing-value");
     try {
       runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
       fail("Expected ProcessEngineException");
     } catch (ProcessEngineException e) {
-      assertTextPresent("No conditional sequence flow leaving the Flow Node 'theStart' could be selected for continuing the process", e.getMessage());
+      testRule.assertTextPresent("No conditional sequence flow leaving the Flow Node 'theStart' could be selected for continuing the process", e.getMessage());
     }
   }
 

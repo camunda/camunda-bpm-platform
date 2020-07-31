@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class SendMessageDelegate implements JavaDelegate {
 

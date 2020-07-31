@@ -192,4 +192,24 @@ public class ExceptionUtil {
 
     return null;
   }
+
+  public static String collectExceptionMessages(Throwable cause) {
+    String message = cause.getMessage();
+
+    //collect real SQL exception messages in case of batch processing
+    Throwable exCause = cause;
+    do {
+      if (exCause instanceof BatchExecutorException) {
+        final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
+        StringBuilder sb = new StringBuilder();
+        for (SQLException sqlException : relatedSqlExceptions) {
+          sb.append(sqlException).append("\n");
+        }
+        message = message + "\n" + sb.toString();
+      }
+      exCause = exCause.getCause();
+    } while (exCause != null);
+
+    return message;
+  }
 }

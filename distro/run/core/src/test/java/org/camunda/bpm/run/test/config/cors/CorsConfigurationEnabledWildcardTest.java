@@ -32,6 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Note: To run this test via an IDE you must set the system property
  * {@code sun.net.http.allowRestrictedHeaders} to {@code true}.
+ * (e.g. System.setProperty("sun.net.http.allowRestrictedHeaders", "true");)
  * 
  * @see https://jira.camunda.com/browse/CAM-11290
  */
@@ -48,7 +49,7 @@ public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
     headers.add(HttpHeaders.ORIGIN, origin);
 
     // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+    ResponseEntity<List> response = testRestTemplate.exchange(CONTEXT_PATH + "/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -65,7 +66,7 @@ public class CorsConfigurationEnabledWildcardTest extends AbstractRestTest {
     headers.add("Origin", origin);
 
     // when
-    ResponseEntity<List> response = testRestTemplate.exchange("/rest/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
+    ResponseEntity<List> response = testRestTemplate.exchange(CONTEXT_PATH + "/task", HttpMethod.GET, new HttpEntity<>(headers), List.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

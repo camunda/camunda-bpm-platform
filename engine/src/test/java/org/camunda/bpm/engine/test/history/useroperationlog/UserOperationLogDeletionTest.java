@@ -16,6 +16,19 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -25,14 +38,9 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -46,7 +54,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
-  @Override
+  @Before
   public void setUp() throws Exception {
     DefaultDmnEngineConfiguration dmnEngineConfiguration =
         processEngineConfiguration.getDmnEngineConfiguration();
@@ -55,11 +63,11 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
         .enableFeelLegacyBehavior(true)
         .init();
 
-    super.setUp();
+
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     DefaultDmnEngineConfiguration dmnEngineConfiguration =
         processEngineConfiguration.getDmnEngineConfiguration();
 
@@ -67,10 +75,11 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
         .enableFeelLegacyBehavior(false)
         .init();
 
-    super.tearDown();
+
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testDeleteProcessTaskKeepTaskOperationLog() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -98,6 +107,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
+  @Test
   public void testDeleteStandaloneTaskKeepUserOperationLog() {
     // given
     String taskId = "my-task";
@@ -120,6 +130,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testDeleteCaseTaskKeepUserOperationLog() {
     // given
     caseService
@@ -149,6 +160,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testDeleteProcessInstanceKeepUserOperationLog() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -180,6 +192,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testDeleteCaseInstanceKeepUserOperationLog() {
     // given
     String caseInstanceId = caseService
@@ -219,6 +232,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testDeleteProcessDefinitionKeepUserOperationLog() {
     // given
     String processDefinitionId = repositoryService
@@ -242,13 +256,12 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertEquals(2, query.count());
   }
 
+  @Test
   public void testDeleteProcessDefinitionsByKey() {
     // given
     for (int i = 0; i < 3; i++) {
-      deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(PROCESS_PATH)
-        .deploy().getId();
-      deploymentIds.add(deploymentId);
+      testRule.deploy(repositoryService.createDeployment()
+        .addClasspathResource(PROCESS_PATH));
     }
 
     // when
@@ -261,13 +274,12 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertUserOperationLogs();
   }
 
+  @Test
   public void testDeleteProcessDefinitionsByKeyCascading() {
     // given
     for (int i = 0; i < 3; i++) {
-      deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(PROCESS_PATH)
-        .deploy().getId();
-      deploymentIds.add(deploymentId);
+      testRule.deploy(repositoryService.createDeployment()
+                          .addClasspathResource(PROCESS_PATH));
     }
 
     // when
@@ -281,13 +293,12 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertUserOperationLogs();
   }
 
+  @Test
   public void testDeleteProcessDefinitionsByIds() {
     // given
     for (int i = 0; i < 3; i++) {
-      deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(PROCESS_PATH)
-        .deploy().getId();
-      deploymentIds.add(deploymentId);
+      testRule.deploy(repositoryService.createDeployment()
+                          .addClasspathResource(PROCESS_PATH));
     }
 
     // when
@@ -299,13 +310,12 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertUserOperationLogs();
   }
 
+  @Test
   public void testDeleteProcessDefinitionsByIdsCascading() {
     // given
     for (int i = 0; i < 3; i++) {
-      deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(PROCESS_PATH)
-        .deploy().getId();
-      deploymentIds.add(deploymentId);
+      testRule.deploy(repositoryService.createDeployment()
+                          .addClasspathResource(PROCESS_PATH));
     }
 
     // when
@@ -319,6 +329,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = PROCESS_PATH)
+  @Test
   public void testDeleteDeploymentKeepUserOperationLog() {
     // given
     String deploymentId = repositoryService
@@ -346,6 +357,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDeleteDecisionInstanceByDecisionDefinition() {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -368,6 +380,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDeleteDecisionInstanceById() {
 
     Map<String, Object> variables = new HashMap<String, Object>();

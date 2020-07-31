@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
-import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 
 public class StartServiceDeploymentOperationStep extends DeploymentOperationStep {
 

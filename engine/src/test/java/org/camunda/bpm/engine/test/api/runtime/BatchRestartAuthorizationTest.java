@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;

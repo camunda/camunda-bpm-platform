@@ -22,6 +22,9 @@ import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -29,6 +32,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
@@ -38,6 +42,7 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY_TWO = "trueConditionProcess";
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML, TRUE_CONDITIONAL_XML })
+  @Test
   public void testWithAllPermissions() {
     // given two deployed processes with conditional start event
 
@@ -56,6 +61,7 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   }
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  @Test
   public void testWithoutProcessDefinitionPermissions() {
     // given deployed process with conditional start event
 
@@ -76,6 +82,7 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   }
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  @Test
   public void testWithoutCreateInstancePermissions() {
     // given deployed process with conditional start event
 
@@ -97,6 +104,7 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   }
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  @Test
   public void testWithoutProcessInstanccePermission() {
     // given deployed process with conditional start event
 
@@ -117,6 +125,7 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   }
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  @Test
   public void testWithRevokeAuthorizations() {
     // given deployed process with conditional start event
 

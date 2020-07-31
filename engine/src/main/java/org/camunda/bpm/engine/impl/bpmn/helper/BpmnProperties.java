@@ -76,4 +76,5 @@ public class BpmnProperties {
 
   public static final PropertyKey<ConditionalEventDefinition> CONDITIONAL_EVENT_DEFINITION = new PropertyKey<ConditionalEventDefinition>("conditionalEventDefinition");
 
+  public static final PropertyKey<Map<String, String>> EXTENSION_PROPERTIES = new PropertyKey<>("extensionProperties");
 }

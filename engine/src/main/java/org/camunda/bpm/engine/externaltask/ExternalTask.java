@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.externaltask;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ExternalTaskService;
 
@@ -121,6 +122,12 @@ public interface ExternalTask {
    */
   long getPriority();
 
+  /**
+   * Returns a map containing all custom extension properties of the external task.
+   * 
+   * @return the properties, never <code>null</code>
+   */
+  Map<String, String> getExtensionProperties();
 
   /**
    * Returns the business key of the process instance the external task belongs to

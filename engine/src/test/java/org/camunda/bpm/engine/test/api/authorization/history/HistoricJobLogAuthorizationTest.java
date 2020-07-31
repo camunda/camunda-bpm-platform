@@ -16,15 +16,24 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -36,6 +45,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -48,18 +60,20 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
   protected static final String TIMER_BOUNDARY_PROCESS_KEY = "timerBoundaryProcess";
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
 
+  protected String batchId;
   protected String deploymentId;
 
-  @Override
+  @Before
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null,
+    deploymentId = testRule.deploy(
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
-  @Override
+  @After
   public void tearDown() {
     super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -69,11 +83,17 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
         return null;
       }
     });
-    deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnableHistoricInstancePermissions(false);
+
+    if (batchId != null) {
+      managementService.deleteBatch(batchId, true);
+      batchId = null;
+    }
   }
 
   // historic job log query (start timer job) ////////////////////////////////
 
+  @Test
   public void testStartTimerJobLogQueryWithoutAuthorization() {
     // given
 
@@ -85,6 +105,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testStartTimerJobLogQueryWithReadHistoryPermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, TIMER_START_PROCESS_KEY, userId, READ_HISTORY);
@@ -96,6 +117,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
+  @Test
   public void testStartTimerJobLogQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
@@ -109,6 +131,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // historic job log query ////////////////////////////////////////////////
 
+  @Test
   public void testSimpleQueryWithoutAuthorization() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -120,6 +143,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testSimpleQueryWithHistoryReadPermissionOnProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -132,6 +156,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 4);
   }
 
+  @Test
   public void testSimpleQueryWithHistoryReadPermissionOnAnyProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -144,6 +169,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 5);
   }
 
+  @Test
   public void testSimpleQueryWithMultiple() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -159,6 +185,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // historic job log query (multiple process instance) ////////////////////////////////////////////////
 
+  @Test
   public void testQueryWithoutAuthorization() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -179,6 +206,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
+  @Test
   public void testQueryWithHistoryReadPermissionOnProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -201,6 +229,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 12);
   }
 
+  @Test
   public void testQueryWithHistoryReadPermissionOnAnyProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -225,6 +254,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // historic job log query (standalone job) ///////////////////////
 
+  @Test
   public void testQueryAfterStandaloneJob() {
     // given
     disableAuthorization();
@@ -250,6 +280,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // delete deployment (cascade = false)
 
+  @Test
   public void testQueryAfterDeletingDeployment() {
     // given
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
@@ -284,6 +315,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // get historic job log exception stacktrace (standalone) /////////////////////
 
+  @Test
   public void testGetHistoricStandaloneJobLogExceptionStacktrace() {
     // given
     disableAuthorization();
@@ -307,6 +339,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   // get historic job log exception stacktrace /////////////////////
 
+  @Test
   public void testGetHistoricJobLogExceptionStacktraceWithoutAuthorization() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -322,13 +355,14 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(READ_HISTORY.getName(), message);
-      assertTextPresent(ONE_INCIDENT_PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(READ_HISTORY.getName(), message);
+      testRule.assertTextPresent(ONE_INCIDENT_PROCESS_KEY, message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
+  @Test
   public void testGetHistoricJobLogExceptionStacktraceWithReadHistoryPermissionOnProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -346,6 +380,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     assertNotNull(stacktrace);
   }
 
+  @Test
   public void testGetHistoricJobLogExceptionStacktraceWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -361,6 +396,171 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(stacktrace);
+  }
+
+  @Test
+  public void testCheckNonePermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list()).isEmpty();
+  }
+
+  @Test
+  public void testCheckReadPermissionOnHistoricProcessInstance() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(
+            processInstanceId,
+            processInstanceId,
+            processInstanceId,
+            processInstanceId
+        );
+  }
+
+  @Test
+  public void testCheckNoneOnHistoricProcessInstanceAndReadHistoryPermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.NONE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(
+            processInstanceId,
+            processInstanceId,
+            processInstanceId,
+            processInstanceId
+        );
+  }
+
+  @Test
+  public void testCheckReadOnHistoricProcessInstanceAndNonePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    createGrantAuthorization(Resources.HISTORIC_PROCESS_INSTANCE, processInstanceId, userId,
+        HistoricProcessInstancePermissions.READ);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.NONE);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(
+            processInstanceId,
+            processInstanceId,
+            processInstanceId,
+            processInstanceId
+        );
+  }
+
+  @Test
+  public void testHistoricProcessInstancePermissionsAuthorizationDisabled() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    disableAuthorization();
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processInstanceId(processInstanceId);
+
+    // then
+    assertThat(query.list())
+        .extracting("processInstanceId")
+        .containsExactly(
+            processInstanceId,
+            processInstanceId,
+            processInstanceId,
+            processInstanceId
+        );
+  }
+
+  @Test
+  public void testSkipAuthOnNonProcessJob() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    disableAuthorization();
+    batchId =
+        runtimeService.deleteProcessInstancesAsync(Arrays.asList(processInstanceId), "bar")
+            .getId();
+    enableAuthorization();
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("jobDefinitionType", "processInstanceId")
+        .containsExactly(tuple("batch-seed-job", null));
+  }
+
+  @Test
+  public void testSkipAuthOnNonProcessJob_HistoricInstancePermissionsEnabled() {
+    // given
+    processEngineConfiguration.setEnableHistoricInstancePermissions(true);
+
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY)
+        .getProcessInstanceId();
+
+    disableAuthorization();
+    batchId =
+        runtimeService.deleteProcessInstancesAsync(Arrays.asList(processInstanceId), "bar")
+            .getId();
+    enableAuthorization();
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    assertThat(query.list())
+        .extracting("jobDefinitionType", "processInstanceId")
+        .containsExactly(tuple("batch-seed-job", null));
   }
 
   // helper ////////////////////////////////////////////////////////

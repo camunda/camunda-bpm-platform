@@ -16,15 +16,18 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 
 /**
@@ -33,7 +36,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Saeid Mirzaei
  */
 
-public class TimeExpressionTest extends PluggableProcessEngineTestCase {
+public class TimeExpressionTest extends PluggableProcessEngineTest {
 	
 	  
 	  private Date testExpression(String timeExpression) {
@@ -52,6 +55,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	  
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
+  @Test
 	  public void testTimeExpressionComplete() throws Exception {
 		    Date dt = new Date();
 		    
@@ -60,6 +64,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	  
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
+  @Test
 	  public void testTimeExpressionWithoutSeconds() throws Exception {
 		    Date dt = new Date();
 		    
@@ -68,6 +73,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	  
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	 
+  @Test
 	  public void testTimeExpressionWithoutMinutes() throws Exception {
 		    Date dt = new Date();
 
@@ -76,6 +82,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	  
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
+  @Test
 	  public void testTimeExpressionWithoutTime() throws Exception {
 		    Date dt = new Date();
 
@@ -84,6 +91,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
+  @Test
 	  public void testTimeExpressionWithoutDay() throws Exception {
 		    Date dt = new Date();
 
@@ -92,6 +100,7 @@ public class TimeExpressionTest extends PluggableProcessEngineTestCase {
 	  }
 	  
 	  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml"})	  
+  @Test
 	  public void testTimeExpressionWithoutMonth() throws Exception {
 		    Date dt = new Date();
 		    

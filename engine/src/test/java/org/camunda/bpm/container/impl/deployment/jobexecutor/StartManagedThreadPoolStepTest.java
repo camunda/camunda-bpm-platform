@@ -17,15 +17,15 @@
 package org.camunda.bpm.container.impl.deployment.jobexecutor;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+
+import javax.management.ObjectName;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.ObjectName;
 
 import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
 import org.camunda.bpm.container.impl.deployment.Attachments;

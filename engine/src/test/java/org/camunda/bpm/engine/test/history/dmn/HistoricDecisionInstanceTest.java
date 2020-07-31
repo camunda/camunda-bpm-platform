@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -43,17 +42,21 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.history.DecisionServiceDelegate;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Philipp Ossler
  * @author Ingo Richtsmeier
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase {
+public class HistoricDecisionInstanceTest extends PluggableProcessEngineTest {
 
   public static final String DECISION_CASE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.caseWithDecisionTask.cmmn";
   public static final String DECISION_CASE_WITH_DECISION_SERVICE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.testCaseDecisionEvaluatedWithDecisionServiceInsideDelegate.cmmn";
@@ -75,8 +78,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
   public static final String DECISION_DEFINITION_KEY = "testDecision";
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     DefaultDmnEngineConfiguration dmnEngineConfiguration =
         processEngineConfiguration.getDmnEngineConfiguration();
 
@@ -84,11 +87,11 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
         .enableFeelLegacyBehavior(true)
         .init();
 
-    super.setUp();
+
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     DefaultDmnEngineConfiguration dmnEngineConfiguration =
         processEngineConfiguration.getDmnEngineConfiguration();
 
@@ -96,10 +99,11 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
         .enableFeelLegacyBehavior(false)
         .init();
 
-    super.tearDown();
+
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionInstanceProperties() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -137,6 +141,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_CASE, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testCaseDecisionInstanceProperties() {
 
     CaseInstance caseInstance = createCaseInstanceAndEvaluateDecision();
@@ -180,6 +185,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionInputInstanceProperties() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -196,6 +202,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testMultipleDecisionInstances() {
 
     startProcessInstanceAndEvaluateDecision("a");
@@ -219,6 +226,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_MULTIPLE_INPUT_DMN})
+  @Test
   public void testMultipleDecisionInputInstances() {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -235,6 +243,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDisableDecisionInputInstanceByteValue() {
 
     byte[] bytes = "object".getBytes();
@@ -250,6 +259,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionOutputInstanceProperties() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -271,6 +281,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_MULTIPLE_OUTPUT_DMN })
+  @Test
   public void testMultipleDecisionOutputInstances() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -295,6 +306,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_COMPOUND_OUTPUT_DMN })
+  @Test
   public void testCompoundDecisionOutputInstances() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -319,6 +331,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_COLLECT_SUM_DMN })
+  @Test
   public void testCollectResultValue() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -330,6 +343,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = DECISION_LITERAL_EXPRESSION_DMN)
+  @Test
   public void testDecisionInstancePropertiesOfDecisionLiteralExpression() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
@@ -364,6 +378,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = DRG_DMN)
+  @Test
   public void testDecisionInstancePropertiesOfDrdDecision() {
 
     decisionService.evaluateDecisionTableByKey("dish-decision")
@@ -393,6 +408,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDeleteHistoricDecisionInstances() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY);
 
@@ -407,6 +423,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDeleteHistoricDecisionInstanceByInstanceId() {
 
     // given
@@ -424,6 +441,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.count(), is(0L));
   }
 
+  @Test
   public void testDeleteHistoricDecisionInstanceByUndeployment() {
     String firstDeploymentId = repositoryService.createDeployment()
       .addClasspathResource(DECISION_PROCESS)
@@ -448,6 +466,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionEvaluatedWithDecisionService() {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -475,6 +494,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionEvaluatedWithAuthenticatedUser() {
     identityService.setAuthenticatedUserId("demo");
     VariableMap variables = Variables.putValue("input1", "test");
@@ -488,6 +508,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionEvaluatedWithAuthenticatedUserFromProcess() {
     identityService.setAuthenticatedUserId("demo");
     startProcessInstanceAndEvaluateDecision();
@@ -500,6 +521,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testDecisionEvaluatedWithAuthenticatedUserFromCase() {
     identityService.setAuthenticatedUserId("demo");
     createCaseInstanceAndEvaluateDecision();
@@ -514,6 +536,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })
+  @Test
   public void testCaseDecisionEvaluatedWithDecisionServiceInsideDelegate() {
 
     CaseInstance caseInstance = createCaseInstanceAndEvaluateDecision();
@@ -557,6 +580,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE_INSIDE_RULE, DECISION_RETURNS_TRUE })
+  @Test
   public void testManualActivationRuleEvaluatesDecision() {
 
     CaseInstance caseInstance = caseService
@@ -604,6 +628,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE_INSIDE_IF_PART, DECISION_RETURNS_TRUE })
+  @Test
   public void testIfPartEvaluatesDecision() {
 
     CaseInstance caseInstance = caseService
@@ -657,6 +682,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
   }
 
+  @Test
   public void testTableNames() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 

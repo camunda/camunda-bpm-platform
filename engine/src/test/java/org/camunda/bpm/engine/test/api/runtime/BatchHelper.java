@@ -30,22 +30,22 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
 public abstract class BatchHelper {
 
   protected ProcessEngineRule engineRule;
-  protected PluggableProcessEngineTestCase testCase;
+  protected PluggableProcessEngineTest testCase;
 
   public BatchHelper(ProcessEngineRule engineRule) {
     this.engineRule = engineRule;
   }
 
-  public BatchHelper(PluggableProcessEngineTestCase testCase) {
+  public BatchHelper(PluggableProcessEngineTest testCase) {
     this.testCase = testCase;
   }
 

@@ -90,6 +90,13 @@ public interface IdentityService {
   /**
    * Saves the user. If the user already existed, the user is updated.
    * @param user user to save, cannot be null.
+   * @throws ProcessEngineException when {@link ProcessEngineConfiguration#enablePasswordPolicy}
+   *                                is {@code true} and password violates password policy
+   * @throws ProcessEngineException when user id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#userResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException when a user with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
    * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#USER} (update existing user)
@@ -135,6 +142,11 @@ public interface IdentityService {
   /**
    * Saves the group. If the group already existed, the group is updated.
    * @param group group to save. Cannot be null.
+   * @throws ProcessEngineException when group id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#groupResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException when a group with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
    * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#GROUP} (update existing group)
@@ -197,6 +209,11 @@ public interface IdentityService {
    *
    * @param tenant
    *          the tenant to save. Cannot be <code>null</code>.
+   * @throws ProcessEngineException when tenant id violates:
+   *         <ul>
+   *           <li>{@link ProcessEngineConfiguration#generalResourceWhitelistPattern} OR</li>
+   *           <li>{@link ProcessEngineConfiguration#tenantResourceWhitelistPattern}</li>
+   *         </ul>
    * @throws RuntimeException
    *           when a tenant with the same name already exists.
    * @throws UnsupportedOperationException
@@ -318,6 +335,21 @@ public interface IdentityService {
   PasswordPolicyResult checkPasswordAgainstPolicy(String password);
 
   /**
+   * Check a given password against the configured {@link PasswordPolicy}. The result
+   * is returned as {@link PasswordPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
+   *
+   * @param candidatePassword
+   *          which is checked against a password policy
+   * @param user
+   *          to be taken into account when checking the candidate password
+   * @return a {@link PasswordPolicyResult} containing passed and
+   *         failed rules
+   */
+  PasswordPolicyResult checkPasswordAgainstPolicy(String candidatePassword, User user);
+
+  /**
    * Check a given password against a given {@link PasswordPolicy}. The result
    * is returned as {@link PasswordPolicyResult} which contains all
    * passed and violated rules as well as a flag indicating if the password is
@@ -331,6 +363,25 @@ public interface IdentityService {
    *         failed rules
    */
   PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
+
+  /**
+   * Check a given password against a given {@link PasswordPolicy}. The result
+   * is returned as {@link PasswordPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
+   *
+   * @param policy
+   *          the {@link PasswordPolicy} against which the password is tested
+   * @param candidatePassword
+   *          which is checked against a password policy
+   * @param user
+   *          to be taken into account when checking the candidate password
+   * @return a {@link PasswordPolicyResult} containing passed and
+   *         failed rules
+   */
+  PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy,
+                                                  String candidatePassword,
+                                                  User user);
 
   /**
    * Returns the {@link PasswordPolicy} that is currently configured in the

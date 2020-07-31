@@ -161,6 +161,10 @@ public class ProcessEngineImpl implements ProcessEngine {
       processEngineConfiguration.getDbMetricsReporter().stop();
     }
 
+    if (processEngineConfiguration.getTelemetryReporter() != null) {
+      processEngineConfiguration.getTelemetryReporter().stop();
+    }
+
     if ((jobExecutor != null)) {
       // unregister process engine with Job Executor
       jobExecutor.unregisterProcessEngine(this);

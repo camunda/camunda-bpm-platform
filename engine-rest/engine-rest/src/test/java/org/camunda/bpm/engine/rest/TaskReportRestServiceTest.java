@@ -149,7 +149,7 @@ public class TaskReportRestServiceTest extends AbstractRestServiceTest {
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("text/csv")
-          .header("Content-Disposition", "attachment; filename=task-count-by-candidate-group.csv")
+          .header("Content-Disposition", "attachment; filename=\"task-count-by-candidate-group.csv\"")
       .when()
         .get(CANDIDATE_GROUP_REPORT_URL);
 
@@ -167,7 +167,7 @@ public class TaskReportRestServiceTest extends AbstractRestServiceTest {
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("application/csv")
-          .header("Content-Disposition", "attachment; filename=task-count-by-candidate-group.csv")
+          .header("Content-Disposition", "attachment; filename=\"task-count-by-candidate-group.csv\"")
         .when()
           .get(CANDIDATE_GROUP_REPORT_URL);
 

@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -28,13 +33,17 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
+public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
 
   protected User testUser;
 
@@ -43,7 +52,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
   protected Authorization readAuthorization;
   protected Authorization deleteAuthorization;
 
-  @Override
+  @Before
   public void setUp() {
     testUser = createTestUser("test");
 
@@ -56,7 +65,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     identityService.setAuthenticatedUserId(testUser.getId());
   }
 
-  @Override
+  @After
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (Filter filter : filterService.createFilterQuery().list()) {
@@ -70,6 +79,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testCreateFilterNotPermitted() {
     try {
       filterService.newTaskFilter();
@@ -80,12 +90,14 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testCreateFilterPermitted() {
     grantCreateFilter();
     Filter filter = filterService.newTaskFilter();
     assertNotNull(filter);
   }
 
+  @Test
   public void testSaveFilterNotPermitted() {
     Filter filter = new FilterEntity(EntityTypes.TASK);
     try {
@@ -97,6 +109,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testSaveFilterPermitted() {
     Filter filter = new FilterEntity(EntityTypes.TASK)
       .setName("testFilter");
@@ -108,6 +121,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertNotNull(filter.getId());
   }
 
+  @Test
   public void testUpdateFilterNotPermitted() {
     Filter filter = createTestFilter();
 
@@ -122,6 +136,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUpdateFilterPermitted() {
     Filter filter = createTestFilter();
 
@@ -133,6 +148,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertEquals("anotherName", filter.getName());
   }
 
+  @Test
   public void testDeleteFilterNotPermitted() {
     Filter filter = createTestFilter();
 
@@ -145,6 +161,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteFilterPermitted() {
     Filter filter = createTestFilter();
 
@@ -156,6 +173,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertEquals(0, count);
   }
 
+  @Test
   public void testReadFilterNotPermitted() {
     Filter filter = createTestFilter();
 
@@ -206,6 +224,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testReadFilterPermitted() {
     Filter filter = createTestFilter();
 
@@ -245,6 +264,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testReadFilterPermittedWithMultiple() {
     Filter filter = createTestFilter();
 
@@ -268,6 +288,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
   }
 
+  @Test
   public void testDefaultFilterAuthorization() {
     // create two other users beside testUser
     User ownerUser = createTestUser("ownerUser");
@@ -298,6 +319,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertFilterPermission(Permissions.DELETE, anotherUser, filter.getId(), false);
   }
 
+  @Test
   public void testCreateFilterGenericOwnerId() {
     grantCreateFilter();
 
@@ -308,15 +330,14 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
       filterService.saveFilter(filter);
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot create default authorization for filter owner *: "
+      testRule.assertTextPresent("Cannot create default authorization for filter owner *: "
           + "id cannot be *. * is a reserved identifier.", e.getMessage());
     }
   }
 
-  /**
-   * CAM-4889
-   */
-  public void FAILING_testUpdateFilterGenericOwnerId() {
+  @Ignore("CAM-4889")
+  @Test
+  public void testUpdateFilterGenericOwnerId() {
     grantCreateFilter();
 
     Filter filter = filterService.newTaskFilter("someName");
@@ -329,7 +350,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
       filterService.saveFilter(filter);
       fail("it should not be possible to save a filter with the generic owner id");
     } catch (ProcessEngineException e) {
-      assertTextPresent("foo", e.getMessage());
+      testRule.assertTextPresent("foo", e.getMessage());
     }
   }
 

@@ -16,20 +16,24 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.servicetask.util.OkReturningService;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Christian Stettler
  */
-public class MethodExpressionServiceTaskTest extends PluggableProcessEngineTestCase {
+public class MethodExpressionServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSetServiceResultToProcessVariables() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("okReturningService", new OkReturningService());

@@ -47,4 +47,14 @@ public class PropertyManager extends AbstractManager {
 
   }
 
+  public void acquireExclusiveLockForTelemetry() {
+    // We lock a special telemetry lock property
+    getDbEntityManager().lock("lockTelemetryLockProperty");
+  }
+
+  public void acquireExclusiveLockForInstallationId() {
+    // We lock a special installation id lock property
+    getDbEntityManager().lock("lockInstallationIdLockProperty");
+  }
+
 }

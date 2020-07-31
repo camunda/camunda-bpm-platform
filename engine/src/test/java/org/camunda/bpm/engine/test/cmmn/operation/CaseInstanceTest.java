@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,14 +29,14 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceTest extends PvmTestCase {
+public class CaseInstanceTest {
 
   /**
    *
@@ -59,7 +62,7 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .behavior(new TaskWaitState())
       .endActivity()
       .buildCaseDefinition();
@@ -139,20 +142,20 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .behavior(new StageActivityBehavior())
         .createActivity("A")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("B")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new TaskWaitState())
         .endActivity()
       .endActivity()
@@ -259,7 +262,7 @@ public class CaseInstanceTest extends PvmTestCase {
             .listener("create", stateTransitionCollector)
             .listener("enable", stateTransitionCollector)
             .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
             .behavior(new StageActivityBehavior())
           .createActivity("A")
             .listener("create", stateTransitionCollector)
@@ -384,27 +387,27 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .behavior(new TaskWaitState())
       .endActivity()
       .createActivity("X1")
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .behavior(new StageActivityBehavior())
         .createActivity("A2")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("B1")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new TaskWaitState())
         .endActivity()
       .endActivity()
@@ -412,33 +415,33 @@ public class CaseInstanceTest extends PvmTestCase {
         .listener("create", stateTransitionCollector)
         .listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
-        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
         .behavior(new StageActivityBehavior())
         .createActivity("C")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new TaskWaitState())
         .endActivity()
         .createActivity("X2")
           .listener("create", stateTransitionCollector)
           .listener("enable", stateTransitionCollector)
           .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
           .behavior(new StageActivityBehavior())
           .createActivity("A3")
             .listener("create", stateTransitionCollector)
             .listener("enable", stateTransitionCollector)
             .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
             .behavior(new TaskWaitState())
           .endActivity()
           .createActivity("B2")
             .listener("create", stateTransitionCollector)
             .listener("enable", stateTransitionCollector)
             .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, TestHelper.defaultManualActivation())
             .behavior(new TaskWaitState())
           .endActivity()
         .endActivity()

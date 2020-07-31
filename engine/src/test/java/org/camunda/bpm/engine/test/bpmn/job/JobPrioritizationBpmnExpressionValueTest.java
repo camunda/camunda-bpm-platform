@@ -16,19 +16,28 @@
  */
 package org.camunda.bpm.engine.test.bpmn.job;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEngineTestCase {
+public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEngineTest {
 
   protected static final long EXPECTED_DEFAULT_PRIORITY = 123;
   protected static final long EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 296;
@@ -36,7 +45,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   protected long originalDefaultPriority;
   protected long originalDefaultPriorityOnFailure;
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     originalDefaultPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
     originalDefaultPriorityOnFailure = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
 
@@ -44,13 +54,15 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
     DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     // reset default priorities
     DefaultJobPriorityProvider.DEFAULT_PRIORITY = originalDefaultPriority;
     DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = originalDefaultPriorityOnFailure;
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testConstantValueExpressionPrioritization() {
     // when
     runtimeService
@@ -65,6 +77,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testConstantValueHashExpressionPrioritization() {
     // when
     runtimeService
@@ -79,6 +92,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testVariableValueExpressionPrioritization() {
     // when
     runtimeService
@@ -97,7 +111,9 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
    * Can't distinguish this case from the cases we have to tolerate due to CAM-4207
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
-  public void FAILING_testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
+  @Ignore("CAM-4207")
+  @Test
+  public void testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
     // when
     try {
       runtimeService
@@ -107,13 +123,14 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
       fail("this should not succeed since the priority variable is not defined");
     } catch (ProcessEngineException e) {
 
-      assertTextPresentIgnoreCase("Unknown property used in expression: ${priority}. "
+      testRule.assertTextPresentIgnoreCase("Unknown property used in expression: ${priority}. "
           + "Cause: Cannot resolve identifier 'priority'",
           e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testExecutionExpressionPrioritization() {
     // when
     runtimeService
@@ -129,6 +146,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testExpressionEvaluatesToNull() {
     // when
     try {
@@ -139,11 +157,12 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
         .execute();
       fail("this should not succeed since the priority variable is not defined");
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testExpressionEvaluatesToNonNumericalValue() {
     // when
     try {
@@ -154,11 +173,12 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
         .execute();
       fail("this should not succeed since the priority must be integer");
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testExpressionEvaluatesToNonIntegerValue() {
     // when
     try {
@@ -169,12 +189,13 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
         .execute();
       fail("this should not succeed since the priority must be integer");
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long",
+      testRule.assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long",
           e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testConcurrentLocalVariablesAreAccessible() {
     // when
     runtimeService
@@ -198,6 +219,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
    * context switch)
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testDefaultPriorityWhenBeanMisses() {
     // creating a job with a priority that can't be resolved does not fail entirely but uses a default priority
     runtimeService
@@ -211,6 +233,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  @Test
   public void testDisableGracefulDegradation() {
     try {
       processEngineConfiguration.setEnableGracefulDegradationOnContextSwitchFailure(false);
@@ -222,7 +245,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
           .execute();
         fail("should not succeed due to missing variable");
       } catch (ProcessEngineException e) {
-        assertTextPresentIgnoreCase("unknown property used in expression", e.getMessage());
+        testRule.assertTextPresentIgnoreCase("unknown property used in expression", e.getMessage());
       }
 
     } finally {
@@ -230,6 +253,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
     }
   }
 
+  @Test
   public void testDefaultEngineConfigurationSetting() {
     ProcessEngineConfigurationImpl config = new StandaloneInMemProcessEngineConfiguration();
 

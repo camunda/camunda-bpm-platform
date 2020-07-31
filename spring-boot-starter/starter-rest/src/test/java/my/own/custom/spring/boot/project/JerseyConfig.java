@@ -22,7 +22,7 @@ import org.camunda.bpm.spring.boot.starter.rest.CamundaJerseyResourceConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-@ApplicationPath("/rest")
+@ApplicationPath("/engine-rest")
 public class JerseyConfig extends CamundaJerseyResourceConfig {
 
   @Override

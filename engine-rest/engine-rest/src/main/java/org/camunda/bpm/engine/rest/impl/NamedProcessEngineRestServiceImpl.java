@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.EventSubscriptionRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.FilterRestService;
@@ -57,6 +58,7 @@ import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SchemaLogRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.TelemetryRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
@@ -260,6 +262,18 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     return super.getSchemaLogRestService(engineName);
   }
 
+  @Override
+  @Path("/{name}" + EventSubscriptionRestService.PATH)
+  public EventSubscriptionRestService getEventSubscriptionRestService(@PathParam("name") String engineName) {
+    return super.getEventSubscriptionRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + TelemetryRestService.PATH)
+  public TelemetryRestService getTelemetryRestService(@PathParam("name") String engineName) {
+    return super.getTelemetryRestService(engineName);
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessEngineDto> getProcessEngineNames() {
@@ -285,7 +299,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-    if(iterator.hasNext()) {
+    if (iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
       return provider;
     } else {

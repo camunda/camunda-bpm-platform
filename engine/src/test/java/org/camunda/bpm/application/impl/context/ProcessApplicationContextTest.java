@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.application.impl.context;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -36,28 +37,32 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessApplicationContextTest extends PluggableProcessEngineTestCase {
+public class ProcessApplicationContextTest extends PluggableProcessEngineTest {
 
   protected TestApplicationWithoutEngine pa;
 
-  @Override
+  @Before
   public void setUp() {
     pa = new TestApplicationWithoutEngine();
     pa.deploy();
   }
 
-  @Override
+  @After
   public void tearDown() {
     pa.undeploy();
   }
 
+  @Test
   public void testSetPAContextByName() throws ProcessApplicationUnavailableException {
 
     Assert.assertNull(Context.getCurrentProcessApplication());
@@ -73,6 +78,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testExecutionInPAContextByName() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
@@ -91,6 +97,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testSetPAContextByReference() throws ProcessApplicationUnavailableException {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
@@ -105,6 +112,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testExecutionInPAContextByReference() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
@@ -123,6 +131,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testSetPAContextByRawPA() throws ProcessApplicationUnavailableException {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
@@ -137,6 +146,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testExecutionInPAContextbyRawPA() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
@@ -155,6 +165,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertNull(Context.getCurrentProcessApplication());
   }
 
+  @Test
   public void testCannotSetUnregisteredProcessApplicationName() {
 
     String nonExistingName = pa.getName() + pa.getName();
@@ -167,7 +178,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
         fail("should not succeed");
 
       } catch (ProcessEngineException e) {
-        assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
+        testRule.assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
       }
 
     } finally {
@@ -175,6 +186,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     }
   }
 
+  @Test
   public void testCannotExecuteInUnregisteredPaContext() throws Exception {
     String nonExistingName = pa.getName() + pa.getName();
 
@@ -191,12 +203,13 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
       fail("should not succeed");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
+      testRule.assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
     }
 
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testExecuteWithInvocationContext() throws Exception {
     // given a process application which extends the default one
     // - using a spy for verify the invocations

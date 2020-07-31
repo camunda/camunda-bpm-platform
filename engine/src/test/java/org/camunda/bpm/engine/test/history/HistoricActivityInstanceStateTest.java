@@ -16,14 +16,20 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  *
@@ -32,9 +38,10 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTestCase {
+public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testSingleEndEvent() {
     startProcess();
 
@@ -48,6 +55,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testSingleEndActivity() {
     startProcess();
 
@@ -61,6 +69,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testSingleEndEventAfterParallelJoin() {
     startProcess();
 
@@ -74,6 +83,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEndParallelJoin() {
     startProcess();
 
@@ -90,6 +100,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testTwoEndEvents() {
     startProcess();
 
@@ -106,6 +117,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testTwoEndActivities() {
     startProcess();
 
@@ -122,6 +134,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testSingleEndEventAndSingleEndActivity() {
     startProcess();
 
@@ -138,6 +151,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testSimpleSubProcess() {
     startProcess();
 
@@ -154,6 +168,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testParallelMultiInstanceSubProcess() {
     startProcess();
 
@@ -177,6 +192,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testSequentialMultiInstanceSubProcess() {
     startProcess();
 
@@ -200,6 +216,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testIntermediateTask() {
     startProcess();
 
@@ -213,10 +230,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testBoundaryErrorCancel() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
@@ -247,6 +265,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testBoundarySignalCancel() {
     ProcessInstance processInstance = startProcess();
 
@@ -272,10 +291,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEventSubprocessErrorCancel() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -293,6 +313,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEventSubprocessMessageCancel() {
     startProcess();
 
@@ -313,10 +334,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEventSubprocessSignalCancel() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -335,10 +357,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEndTerminateEventCancel() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -351,10 +374,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEndTerminateEventCancelInSubprocess() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -373,10 +397,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testEndTerminateEventCancelWithSubprocess() {
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -393,10 +418,11 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
   @Deployment (resources={ "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testCancelProcessInstanceInUserTask.bpmn",
       "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testEndTerminateEventWithCallActivity.bpmn" })
+  @Test
   public void testEndTerminateEventCancelWithCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1");
     runtimeService.correlateMessage("continue");
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -412,6 +438,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testCancelProcessInstanceInUserTask() {
     ProcessInstance processInstance = startProcess();
 
@@ -425,6 +452,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testCancelProcessInstanceInSubprocess() {
     ProcessInstance processInstance = startProcess();
 
@@ -441,6 +469,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testCancelProcessWithParallelGateway() {
     ProcessInstance processInstance = startProcess();
 

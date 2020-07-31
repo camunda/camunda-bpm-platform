@@ -9,6 +9,7 @@
       name = "newDuration"
       type = "integer"
       format = "int64"
+      nullable = false
       last = true
       desc = "An amount of time (in milliseconds). This is the new lock duration starting from the current moment." />
 

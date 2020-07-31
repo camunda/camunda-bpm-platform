@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static java.util.Collections.singletonList;
-
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByTenantId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;

@@ -5,12 +5,18 @@
   <parent>
     <groupId>org.camunda.bpm.dmn</groupId>
     <artifactId>camunda-engine-dmn-root</artifactId>
-    <version>7.13.0-SNAPSHOT</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-feel-juel</artifactId>
   <name>camunda DMN - engine FEEL - JUEL</name>
 
+  <properties>
+    <!-- We shade artifacts into the jar, so we need to generate 
+    a dependency BOM for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
