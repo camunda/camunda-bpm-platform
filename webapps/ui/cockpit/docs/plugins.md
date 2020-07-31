@@ -27,7 +27,7 @@ export default {
 `render`: Function, the heart of your Plugin. Arguments are (`DOMNode`|`BPMNioViewerInstance`, additionalData (`Object`)). The function **must not return anything**. Using the Node, render your Plugin into the DOM.
 The second argument contains constants like a processDefinitionId. The details of which data is passed into the Plugin can be found at the PluginPoint definition.
 
-`cleanup`: Optional function which is called when the Plugin is unmounted. Use this to cleanup any listeners you or your Framework might have registered.
+`unmount`: Optional function which is called when the Plugin is unmounted. Use this to cleanup any listeners you or your Framework might have registered.
 
 `label`: Optional, String. Displayed as heading for a tab or menu entry.
 

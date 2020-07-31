@@ -34,7 +34,7 @@ export default {
       container
     );
   },
-  cleanup: () => {
+  unmount: () => {
     ReactDOM.unmountComponentAtNode(container);
   }
 };
