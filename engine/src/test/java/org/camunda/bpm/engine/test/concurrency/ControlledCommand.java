@@ -37,4 +37,9 @@ public class ControlledCommand<T> implements Command<T> {
     controllableThread.returnControlToTestThreadAndWait();
     return result;
   }
+  
+  @Override
+  public boolean isRetryable() {
+    return command.isRetryable();
+  }
 }

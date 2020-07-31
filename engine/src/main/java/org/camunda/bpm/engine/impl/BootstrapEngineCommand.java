@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
@@ -78,13 +77,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
         @Override
         public OptimisticLockingResult failedOperation(DbOperation operation) {
-
-          // When CockroachDB is used, the Process Engine bootstrap
-          // is retried since the OLE can't be ignored.
-          String databaseType = commandContext.getProcessEngineConfiguration().getDatabaseType();
-          if (operation.isFatalFailure() && DbSqlSessionFactory.CRDB.equals(databaseType)) {
-            return OptimisticLockingResult.RETRY;
-          }
 
           // nothing do to, reconfiguration will be handled later on
           return OptimisticLockingResult.IGNORE;

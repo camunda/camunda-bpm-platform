@@ -184,9 +184,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       operation.setFailure(failure);
 
       State failedState = State.FAILED_ERROR;
-      if (isCrdbTransactionRetryException(failure)) {
-        failedState = State.FAILED_CONCURRENT_MODIFICATION;
-        operation.setFatalFailure(true);
+      if (isCrdbConcurrencyConflict(failure)) {
+        failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
       }
       operation.setState(failedState);
     } else {
@@ -223,10 +222,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     DbOperation dependencyOperation = operation.getDependentOperation();
 
     State failedState;
-    if (isCrdbTransactionRetryException(failure)) {
-
-      operation.setFatalFailure(true);
-      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+    if (isCrdbConcurrencyConflict(failure)) {
+      failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
+      
     } else if (isConcurrentModificationException(operation, failure)) {
 
       failedState = State.FAILED_CONCURRENT_MODIFICATION;
@@ -284,7 +282,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
    * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
    *          Otherwise, it's false.
    */
-  protected boolean isCrdbTransactionRetryException(Throwable cause) {
+  public static boolean isCrdbConcurrencyConflict(Throwable cause) {
     // only check when CRDB is used
     String databaseType = Context.getProcessEngineConfiguration().getDatabaseType();
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
