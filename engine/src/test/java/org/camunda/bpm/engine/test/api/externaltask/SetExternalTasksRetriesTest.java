@@ -37,6 +37,8 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -344,8 +346,14 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
     }
   }
 
+  /**
+   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
+   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
+   * See CAM-12239 for the performance.
+   */
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void shouldSetExternalTaskRetriesWithLargeList() {
     // given
     engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1010);
