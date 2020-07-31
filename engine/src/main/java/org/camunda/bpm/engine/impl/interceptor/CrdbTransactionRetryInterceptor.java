@@ -40,12 +40,11 @@ public class CrdbTransactionRetryInterceptor extends CommandInterceptor {
     int remainingTries = retries + 1;
     while (remainingTries > 0) {
       try {
-
         // delegate to next interceptor in chain
         return next.execute(command);
       } catch (CrdbTransactionRetryException e) {
         remainingTries--;
-        if (remainingTries == 0) {
+        if (!command.isRetryable() || remainingTries == 0) {
           throw e;
         } else {
           LOG.crdbTransactionRetryAttempt(e);

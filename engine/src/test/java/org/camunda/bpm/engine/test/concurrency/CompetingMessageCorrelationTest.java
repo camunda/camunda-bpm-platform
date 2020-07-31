@@ -116,7 +116,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     } else {
       // In CRDB, the changes from thread1 cause an TransactionRetryException
       // in thread2 and the whole transaction needs to be retried.
-      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
     }
 
     // the first thread ended successfully without an exception
@@ -223,7 +223,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
       // in CRDB, we don't call a second waitForSync since thread2
       // never reaches the second sync due to the OLE
       thread2.waitUntilDone(true);
-      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
 
       // the service task was executed the second time
       assertEquals(1, InvocationLogListener.getInvocations());

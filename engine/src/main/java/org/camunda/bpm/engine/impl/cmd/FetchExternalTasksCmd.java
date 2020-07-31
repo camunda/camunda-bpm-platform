@@ -16,7 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -26,7 +30,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.externaltask.LockedExternalTaskImpl;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -95,6 +98,11 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     return result;
   }
+  
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
 
   protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
     commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
@@ -107,13 +115,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       @Override
       public OptimisticLockingResult failedOperation(DbOperation operation) {
 
-        // When CockroachDB is used, the transaction can't be
-        // continued since the OLE can't be ignored, so it's completely retried.
-        String databaseType = commandContext.getProcessEngineConfiguration().getDatabaseType();
-        if (operation.isFatalFailure() && DbSqlSessionFactory.CRDB.equals(databaseType)) {
-
-          return OptimisticLockingResult.RETRY;
-        } else if (!operation.isFatalFailure() && operation instanceof DbEntityOperation) {
+        if (operation instanceof DbEntityOperation) {
           DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
           DbEntity dbEntity = dbEntityOperation.getEntity();
 
