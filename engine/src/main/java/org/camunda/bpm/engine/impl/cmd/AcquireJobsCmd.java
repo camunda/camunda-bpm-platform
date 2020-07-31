@@ -16,22 +16,25 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-
-import java.util.*;
 
 
 /**
@@ -94,6 +97,11 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     return acquiredJobs;
   }
+  
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
 
   protected void lockJob(AcquirableJobEntity job) {
     String lockOwner = jobExecutor.getLockOwner();
@@ -115,13 +123,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
   @Override
   public OptimisticLockingResult failedOperation(DbOperation operation) {
 
-    // When CockroachDB is used, the transaction can't be
-    // continued since the OLE can't be ignored, so it's completely retried.
-    String databaseType = Context.getCommandContext().getProcessEngineConfiguration().getDatabaseType();
-    if (operation.isFatalFailure() && DbSqlSessionFactory.CRDB.equals(databaseType)) {
-
-      return OptimisticLockingResult.RETRY;
-    } else if (!operation.isFatalFailure() && operation instanceof DbEntityOperation) {
+    if (operation instanceof DbEntityOperation) {
 
       DbEntityOperation entityOperation = (DbEntityOperation) operation;
       

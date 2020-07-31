@@ -35,13 +35,6 @@ public abstract class DbOperation implements Recyclable {
   protected int rowsAffected;
   protected Exception failure;
   protected State state;
-  
-  /**
-   * An operation that received a fatal failure can't be recovered from,
-   * or ignored, in the same transaction. Instead, the transaction in which
-   * this operation was executed in must be rolled back and retried.
-   */
-  protected boolean isFatalFailure = false;
 
   /**
    * The type of the DbEntity this operation is executed on.
@@ -81,7 +74,9 @@ public abstract class DbOperation implements Recyclable {
   }
 
   public boolean isFailed() {
-    return state == State.FAILED_CONCURRENT_MODIFICATION || state == State.FAILED_ERROR;
+    return state == State.FAILED_CONCURRENT_MODIFICATION 
+        || state == State.FAILED_CONCURRENT_MODIFICATION_CRDB 
+        || state == State.FAILED_ERROR;
   }
 
   public State getState() {
@@ -90,14 +85,6 @@ public abstract class DbOperation implements Recyclable {
 
   public void setState(State state) {
     this.state = state;
-  }
-
-  public boolean isFatalFailure() {
-    return isFatalFailure;
-  }
-
-  public void setFatalFailure(boolean isFatalFailure) {
-    this.isFatalFailure = isFatalFailure;
   }
 
   public Exception getFailure() {
@@ -122,8 +109,15 @@ public abstract class DbOperation implements Recyclable {
     /**
      * Indicates that the operation was not performed and that the reason
      * was a concurrent modification to the data to be updated.
+     * Applies to databases with isolation level READ_COMMITTED.
      */
-    FAILED_CONCURRENT_MODIFICATION
+    FAILED_CONCURRENT_MODIFICATION,
+
+    /**
+     * Indicates that the operation was not performed and was a concurrency
+     * conflict. Applies to CockroachDB (with isolation level SERIALIZABLE).
+     */
+    FAILED_CONCURRENT_MODIFICATION_CRDB
   }
 
 }

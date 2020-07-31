@@ -268,8 +268,21 @@ public abstract class TestHelper {
         }
       }
     }
+    
+    String[] includes = annotation.includes();
+    
+    if (includes != null && includes.length > 0) {
+      for (String include : includes) {
+        if (include.equals(actualDbType)) {
+          return true;
+        }
+      }
+      
+      return false;
+    } else {
+      return true;
+    }
 
-    return true;
   }
 
 

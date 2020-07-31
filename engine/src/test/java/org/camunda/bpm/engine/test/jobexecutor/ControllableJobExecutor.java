@@ -134,11 +134,11 @@ public class ControllableJobExecutor extends JobExecutor {
 
   public class ControllableAcquisitionCommand extends ControllableCommand<AcquiredJobs> {
 
-    protected int numJobsToAcquire;
-
+    protected AcquireJobsCmd wrappedCommand;
+    
     public ControllableAcquisitionCommand(ThreadControl threadControl, int numJobsToAcquire) {
       super(threadControl);
-      this.numJobsToAcquire = numJobsToAcquire;
+      this.wrappedCommand = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire);
     }
 
     public AcquiredJobs execute(CommandContext commandContext) {
@@ -149,11 +149,16 @@ public class ControllableJobExecutor extends JobExecutor {
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
-      AcquiredJobs acquiredJobs = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire).execute(commandContext);
+      AcquiredJobs acquiredJobs = wrappedCommand.execute(commandContext);
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
       return acquiredJobs;
+    }
+    
+    @Override
+    public boolean isRetryable() {
+      return wrappedCommand.isRetryable();
     }
 
     protected void rethrowOptimisticLockingException(CommandContext commandContext) {

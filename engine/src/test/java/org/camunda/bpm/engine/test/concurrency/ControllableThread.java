@@ -63,16 +63,22 @@ public class ControllableThread extends Thread {
     }
   }
 
-  public synchronized void returnControlToControllableThreadAndWait() {
-    // just for understanding the test case
-    returnControlToTestThreadAndWait();
-  }
-
   public synchronized void proceedAndWaitTillDone() {
     LOG.debug("test thread will notify "+getName()+" and wait until it completes");
     notify();
     try {
       join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+  
+
+  public synchronized void proceedAndWaitForSync() {
+    LOG.debug("test thread will notify "+getName()+" and wait until it completes");
+    notify();
+    try {
+      wait();
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

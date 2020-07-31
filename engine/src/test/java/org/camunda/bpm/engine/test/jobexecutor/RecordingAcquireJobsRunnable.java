@@ -67,17 +67,22 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
 
     long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
-    waitEvents.add(new RecordedWaitEvent(System.currentTimeMillis(), timeBetweenCurrentAndNextAcquisition));
+    waitEvents.add(new RecordedWaitEvent(
+        System.currentTimeMillis(), 
+        timeBetweenCurrentAndNextAcquisition,
+        acquisitionContext.getAcquisitionException()));
   }
 
   public static class RecordedWaitEvent {
 
     protected long timestamp;
     protected long timeBetweenAcquisitions;
+    protected Exception acquisitionException;
 
-    public RecordedWaitEvent(long timestamp, long timeBetweenAcquisitions) {
+    public RecordedWaitEvent(long timestamp, long timeBetweenAcquisitions, Exception acquisitionException) {
       this.timestamp = timestamp;
       this.timeBetweenAcquisitions = timeBetweenAcquisitions;
+      this.acquisitionException = acquisitionException;
     }
 
     public long getTimestamp() {
@@ -85,6 +90,9 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     }
     public long getTimeBetweenAcquisitions() {
       return timeBetweenAcquisitions;
+    }
+    public Exception getAcquisitionException() {
+      return acquisitionException;
     }
   }
 

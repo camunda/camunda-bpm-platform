@@ -18,11 +18,14 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -68,7 +71,7 @@ public class CompetingExternalTaskFetchingTest {
     protected int results;
     protected String topic;
 
-    protected List<LockedExternalTask> fetchedTasks;
+    protected List<LockedExternalTask> fetchedTasks = Collections.emptyList();
     protected OptimisticLockingException exception;
 
     public ExternalTaskFetcherThread(String workerId, int results, String topic) {
@@ -83,9 +86,12 @@ public class CompetingExternalTaskFetchingTest {
       TopicFetchInstruction instruction = new TopicFetchInstruction(topic, 10000L);
       instructions.put(topic, instruction);
 
+      ControlledCommand<List<LockedExternalTask>> cmd = new ControlledCommand<>(
+          (ControllableThread) Thread.currentThread(), 
+          new FetchExternalTasksCmd(workerId, results, instructions));
+      
       try {
-        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired().execute(
-            new FetchExternalTasksCmd(workerId, results, instructions));
+        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired().execute(cmd);
       } catch (OptimisticLockingException e) {
         exception = e;
       }
@@ -113,6 +119,11 @@ public class CompetingExternalTaskFetchingTest {
     thread2.proceedAndWaitTillDone();
     assertEquals(0, thread2.fetchedTasks.size());
     // but does not fail with an OptimisticLockingException
-    assertNull(thread2.exception);
+    if (testRule.databaseSupportsIgnoredOLE()) {
+      assertNull(thread2.exception);
+    } else {
+      // CockroachDb
+      assertTrue(thread2.exception instanceof CrdbTransactionRetryException);
+    }
   }
 }
