@@ -39,7 +39,7 @@ import {
   processes
 } from "./angularBridges";
 import PluginPoint from "utils/PluginPoint";
-import { UserProvider } from "./modules/HOC/withUser";
+import { UserProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
 
 function AngularRoute({ component, ...props }) {
