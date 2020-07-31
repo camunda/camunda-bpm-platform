@@ -61,7 +61,7 @@ export default function setup(module) {
           getPassthroughData(plugin.pluginPoint, scope),
           scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
         );
-        scope.$on("$destroy", plugin.cleanup);
+        scope.$on("$destroy", plugin.unmount);
       }
     ];
 
@@ -77,7 +77,7 @@ export default function setup(module) {
             );
 
             element[0].appendChild(isolatedContainer);
-            scope.$on("$destroy", plugin.cleanup);
+            scope.$on("$destroy", plugin.unmount);
           }
         };
       }

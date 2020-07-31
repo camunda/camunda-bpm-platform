@@ -62,7 +62,7 @@ const diagramPlugin = {
 //       getIncidentsLogs(el.id);
 //     };
 //   },
-//   cleanup: () => {
+//   unmount: () => {
 //     cb = () => {};
 //   }
 // };

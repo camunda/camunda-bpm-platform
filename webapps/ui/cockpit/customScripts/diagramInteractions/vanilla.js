@@ -104,7 +104,7 @@ const tabPlugin = {
       getIncidentsLogs(el.id);
     };
   },
-  cleanup: () => {
+  unmount: () => {
     cb = () => {};
   }
 };
