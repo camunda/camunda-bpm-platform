@@ -18,6 +18,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPlugins } from "utils/config";
+import { getCSRFToken } from "utils/request";
 
 export default function PluginPoint({
   location,
@@ -50,6 +51,7 @@ function Plugin({
   const urlParams = useParams();
 
   const params = pluginPoint === "cockpit.route" ? urlParams : data;
+  params.CSRFToken = getCSRFToken();
 
   const ref = useRef(null);
   const [reactContent, setReactContent] = useState();

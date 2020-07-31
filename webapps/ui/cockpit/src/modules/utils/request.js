@@ -67,17 +67,22 @@ export function removeHandler(fct) {
   );
 }
 
+export function getCSRFToken() {
+  const CSRFCookieName = getCSRFCookieName();
+  return document.cookie.replace(
+    new RegExp(`(?:(?:^|.*;*)${CSRFCookieName}*=*([^;]*).*$)|^.*$`),
+    "$1"
+  );
+}
+
 export async function request(payload) {
   const { url, method, body, query, headers } = payload;
-  const CSRFCookieName = getCSRFCookieName();
   const resourceUrl = query
     ? `${replaceApiPlaceholders(url)}?${formatQuery(query)}`
     : replaceApiPlaceholders(url);
 
-  const XSRFToken = document.cookie.replace(
-    new RegExp(`(?:(?:^|.*;*)${CSRFCookieName}*=*([^;]*).*$)|^.*$`),
-    "$1"
-  );
+  const XSRFToken = getCSRFToken();
+
   let requestHeaders = {
     "Content-Type": "application/json",
     "X-Authorized-Engine": "default",

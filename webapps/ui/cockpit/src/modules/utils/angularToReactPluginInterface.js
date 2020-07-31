@@ -15,88 +15,90 @@
  * limitations under the License.
  */
 
+import { getCSRFToken } from "utils/request";
+
 export default function(pluginPoint, scope) {
   let result = {};
 
   switch (pluginPoint) {
-    case 'cockpit.processDefinition.runtime.tab':
-    case 'cockpit.processDefinition.runtime.action':
-    case 'cockpit.processDefinition.history.action':
-    case 'cockpit.processDefinition.history.tab':
+    case "cockpit.processDefinition.runtime.tab":
+    case "cockpit.processDefinition.runtime.action":
+    case "cockpit.processDefinition.history.action":
+    case "cockpit.processDefinition.history.tab":
       result.processDefinitionId = scope.processDefinition.id;
       break;
 
-    case 'cockpit.processInstance.runtime.tab':
-    case 'cockpit.processInstance.runtime.action':
-    case 'cockpit.processInstance.history.tab':
-    case 'cockpit.processInstance.history.action':
+    case "cockpit.processInstance.runtime.tab":
+    case "cockpit.processInstance.runtime.action":
+    case "cockpit.processInstance.history.tab":
+    case "cockpit.processInstance.history.action":
       result.processInstanceId = scope.processInstance.id;
       break;
 
-    case 'cockpit.processDefinition.diagram.plugin':
-    case 'cockpit.processDefinition.history.diagram.plugin':
+    case "cockpit.processDefinition.diagram.plugin":
+    case "cockpit.processDefinition.history.diagram.plugin":
       result.processDefinitionId = scope.key;
       break;
 
-    case 'cockpit.processInstance.diagram.plugin':
-    case 'cockpit.processInstance.history.diagram.plugin':
-      result.processInstanceId = window.location.hash.split('/')[2];
+    case "cockpit.processInstance.diagram.plugin":
+    case "cockpit.processInstance.history.diagram.plugin":
+      result.processInstanceId = window.location.hash.split("/")[2];
       break;
 
-    case 'cockpit.jobDefinition.action':
+    case "cockpit.jobDefinition.action":
       result.jobDefinitionId = scope.jobDefinition.id;
       break;
 
-    case 'cockpit.decisionDefinition.tab':
-    case 'cockpit.decisionDefinition.action':
+    case "cockpit.decisionDefinition.tab":
+    case "cockpit.decisionDefinition.action":
       result.decisionDefinitionId = scope.decisionDefinition.id;
       break;
 
-    case 'cockpit.decisionInstance.tab':
-    case 'cockpit.decisionInstance.action':
+    case "cockpit.decisionInstance.tab":
+    case "cockpit.decisionInstance.action":
       result.decisionInstanceId = scope.decisionInstance.id;
       break;
 
-    case 'cockpit.caseDefinition.tab':
-    case 'cockpit.caseDefinition.action':
+    case "cockpit.caseDefinition.tab":
+    case "cockpit.caseDefinition.action":
       result.caseDefinitionId = scope.definition.id;
       break;
 
-    case 'cockpit.caseInstance.tab':
-    case 'cockpit.caseInstance.action':
+    case "cockpit.caseInstance.tab":
+    case "cockpit.caseInstance.action":
       result.caseInstanceId = scope.instance.id;
       break;
 
-    case 'cockpit.repository.resource.action':
+    case "cockpit.repository.resource.action":
       result.deploymentId = scope.deployment.id;
       result.resourceId = scope.resource.id;
       break;
 
-    case 'cockpit.incident.action':
+    case "cockpit.incident.action":
       result.incidentId = scope.incident.id;
       break;
 
-    case 'cockpit.drd.definition.tab':
+    case "cockpit.drd.definition.tab":
       result.drdDefinitionId = scope.tabsApi.getDefinition().id;
       break;
 
-    case 'cockpit.drd.instance.tab':
+    case "cockpit.drd.instance.tab":
       result.rootDecisionInstanceId = scope.tabsApi.processParams(
         {}
       ).rootDecisionInstanceId;
       break;
 
-    case 'cockpit.processDefinition.diagram.action':
-    case 'cockpit.processDefinition.history.diagram.action':
+    case "cockpit.processDefinition.diagram.action":
+    case "cockpit.processDefinition.history.diagram.action":
       result.viewer = scope.viewer;
-      result.processDefinitionId = window.location.hash.split('/')[2];
+      result.processDefinitionId = window.location.hash.split("/")[2];
       break;
 
-    case 'cockpit.processes.action':
+    case "cockpit.processes.action":
       result.processDefinitionId = scope.pd.id;
       break;
 
-    case 'cockpit.repository.deployment.action':
+    case "cockpit.repository.deployment.action":
       result.deploymentId = scope.deployment.id;
       break;
 
@@ -104,6 +106,8 @@ export default function(pluginPoint, scope) {
       result = {};
       break;
   }
+
+  result.CSRFToken = getCSRFToken();
 
   return result;
 }
