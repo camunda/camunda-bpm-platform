@@ -69,7 +69,7 @@ import java.util.Date;
  *   "base" permission for a resource.</li>
  *   <li><strong>Grant Authorizations</strong> ({@link #AUTH_TYPE_GRANT}) range over
  *   users and groups and grant a set of permissions. Grant authorizations are commonly
- *   used for adding permissions to a user or group that the global authorization revokes.</li>
+ *   used for adding permissions to a user or group that the global authorization does not grant.</li>
  *   <li><strong>Revoke Authorizations</strong> ({@link #AUTH_TYPE_REVOKE}) range over
  *   users and groups and revoke a set of permissions. Revoke authorizations are commonly
  *   used for revoking permissions to a user or group the the global authorization grants.</li>
@@ -77,15 +77,15 @@ import java.util.Date;
  * </p>
  *
  * <h2>Authorization Precedence</h2>
- * <p>Authorizations may range over all users, an individual user or a group of users or .
+ * <p>Authorizations may range over all users, an individual user or a group of users.
  * They may apply to an individual resource instance or all instances of the same type
  * (resourceId = {@link #ANY}). The precedence is as follows:
  * <ol>
- *  <li>An authorization applying to an individual resource instance preceds over an authorization
+ *  <li>An authorization applying to an individual resource instance precedes an authorization
  *  applying to all instances of the same resource type.</li>
- *  <li>An authorization for an individual user preceds over an authorization for a group.</li>
- *  <li>A Group authorization preced over a {@link #AUTH_TYPE_GLOBAL GLOBAL} authorization.</li>
- *  <li>A Group {@link #AUTH_TYPE_REVOKE REVOKE} authorization preced over a Group
+ *  <li>An authorization for an individual user precedes an authorization for a group.</li>
+ *  <li>A Group authorization precedes a {@link #AUTH_TYPE_GLOBAL GLOBAL} authorization.</li>
+ *  <li>A Group {@link #AUTH_TYPE_REVOKE REVOKE} authorization precedes a Group
  *  {@link #AUTH_TYPE_GRANT GRANT} authorization.</li>
  * </ol>
  * </p>
