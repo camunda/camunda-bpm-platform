@@ -24,8 +24,12 @@ try {
   fs.unlinkSync(srcDirectory + "/enterprise");
 } catch {}
 
-fs.symlinkSync(
-  srcDirectory + "/enterprise_modules",
-  srcDirectory + "/enterprise",
-  "dir"
-);
+try {
+  fs.symlinkSync(
+    srcDirectory + "/enterprise_modules",
+    srcDirectory + "/enterprise",
+    "dir"
+  );
+} catch {
+  console.log("Could not link Enterprise modules.");
+}
