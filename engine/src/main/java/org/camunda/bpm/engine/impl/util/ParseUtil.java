@@ -102,4 +102,18 @@ public class ParseUtil {
       return null;
     }
   }
+
+  public static ProcessEngineDetails parseProcessEngineVersion(String packageImplementationVersion, boolean trimSuffixEE) {
+    String version = packageImplementationVersion;
+    String edition = ProcessEngineDetails.EDITION_COMMUNITY;
+
+    if (version != null && version.contains("-ee")) {
+      edition = ProcessEngineDetails.EDITION_ENTERPRISE;
+      if (trimSuffixEE) {
+        version = version.replace("-ee", ""); // trim `-ee` suffix
+      }
+    }
+
+    return new ProcessEngineDetails(version, edition);
+  }
 }
