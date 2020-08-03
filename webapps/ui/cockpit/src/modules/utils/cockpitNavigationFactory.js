@@ -17,6 +17,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
+import translate from "./translation";
 
 export default function(id, label, priority, path) {
   return {
@@ -24,6 +25,6 @@ export default function(id, label, priority, path) {
     pluginPoint: "cockpit.navigation",
     priority: priority,
     path: path || id,
-    render: () => <Link to={"/" + id}>{label}</Link>
+    render: () => <Link to={"/" + id}>{translate(label)}</Link>
   };
 }
