@@ -53,11 +53,6 @@ public class OptimizeApiPageSizeTest {
     generator.generateData();
   }
 
-  @AfterClass
-  public static void tearDown() {
-    TestHelper.assertAndEnsureCleanDbAndCache(processEngineRule.getProcessEngine(), false);
-  }
-
   @Test
   @Parameters(method = "optimizeServiceFunctions")
   public void databaseCanCopeWithPageSize(TestScenario scenario) {
