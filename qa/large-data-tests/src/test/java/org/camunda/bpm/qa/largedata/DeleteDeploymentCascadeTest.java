@@ -61,7 +61,6 @@ public class DeleteDeploymentCascadeTest {
   public void teardown() {
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentName(generator.getDeploymentName()).singleResult();
     if (deployment != null) {
-      repositoryService.deleteDeployment(deployment.getId(), false);
       List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
           .processDefinitionKey(generator.getAutoCompleteProcessKey()).list();
       if (!processInstances.isEmpty()) {
@@ -71,6 +70,7 @@ public class DeleteDeploymentCascadeTest {
           historyService.deleteHistoricProcessInstances(partition);
         }
       }
+      repositoryService.deleteDeployment(deployment.getId(), false);
     }
   }
 
