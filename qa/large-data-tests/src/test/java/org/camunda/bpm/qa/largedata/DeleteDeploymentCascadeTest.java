@@ -19,57 +19,74 @@ package org.camunda.bpm.qa.largedata;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.qa.largedata.util.EngineDataGenerator;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class DeleteDeploymentCascadeTest {
 
-  @ClassRule
-  public static ProcessEngineRule processEngineRule = new ProcessEngineRule("camunda.cfg.xml");
+  @Rule
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule("camunda.cfg.xml");
+
+  protected static final String DATA_PREFIX = DeleteDeploymentCascadeTest.class.getSimpleName();
 
   protected int GENERATE_PROCESS_INSTANCES_COUNT = 2500;
   protected RepositoryService repositoryService;
   protected HistoryService historyService;
-
+  protected EngineDataGenerator generator;
+  
   @Before
   public void init() {
-    repositoryService = processEngineRule.getRepositoryService();
-    historyService = processEngineRule.getHistoryService();
+    repositoryService = processEngineRule.getProcessEngine().getRepositoryService();
+    historyService = processEngineRule.getProcessEngine().getHistoryService();
 
     // generate data
-    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), GENERATE_PROCESS_INSTANCES_COUNT);
+    generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), GENERATE_PROCESS_INSTANCES_COUNT, DATA_PREFIX);
     generator.deployDefinitions();
     generator.generateCompletedProcessInstanceData();
   }
 
   @After
-  public void tearDown() {
-    TestHelper.assertAndEnsureCleanDbAndCache(processEngineRule.getProcessEngine(), false);
+  public void teardown() {
+    Deployment deployment = repositoryService.createDeploymentQuery().deploymentName(generator.getDeploymentName()).singleResult();
+    if (deployment != null) {
+      List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+          .processDefinitionKey(generator.getAutoCompleteProcessKey()).list();
+      if (!processInstances.isEmpty()) {
+        List<String> processInstanceIds = processInstances.stream().map(HistoricProcessInstance::getId).collect(Collectors.toList());
+        List<List<String>> partitions = CollectionUtil.partition(processInstanceIds, DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+        for (List<String> partition : partitions) {
+          historyService.deleteHistoricProcessInstances(partition);
+        }
+      }
+      repositoryService.deleteDeployment(deployment.getId(), false);
+    }
   }
 
   @Test
   public void shouldDeleteCascadeWithLargeParameterCount() {
     // given
-    Deployment deployment = repositoryService.createDeploymentQuery().deploymentName(EngineDataGenerator.DEPLOYMENT_NAME).singleResult();
+    Deployment deployment = repositoryService.createDeploymentQuery().deploymentName(generator.getDeploymentName()).singleResult();
 
     // when
     repositoryService.deleteDeployment(deployment.getId(), true);
 
     // then
-    deployment = repositoryService.createDeploymentQuery().deploymentName(EngineDataGenerator.DEPLOYMENT_NAME).singleResult();
+    deployment = repositoryService.createDeploymentQuery().deploymentName(generator.getDeploymentName()).singleResult();
     assertThat(deployment).isNull();
     List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
-        .processDefinitionKey(EngineDataGenerator.AUTO_COMPLETE_PROCESS_KEY).list();
+        .processDefinitionKey(generator.getAutoCompleteProcessKey()).list();
     assertThat(instances).isEmpty();
   }
 }

@@ -49,7 +49,7 @@ public class OptimizeApiPageSizeTest {
 
     // given the generated engine data
     // make sure that there are at least two pages of each entity available
-    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2);
+    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2, OptimizeApiPageSizeTest.class.getSimpleName());
     generator.generateData();
   }
 
