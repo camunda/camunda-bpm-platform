@@ -54,9 +54,69 @@ public class ProcessEngineDetailsTest {
   // process engine version and edition ////////////////////////////////////////////////////////////
 
   @Test
+  public void shouldAssertProcessEngineVersionSnapshotTrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-SNAPSHOT", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-SNAPSHOT");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_COMMUNITY);
+  }
+
+  @Test
+  public void shouldAssertProcessEngineVersionAlphaTrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-alpha1");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_COMMUNITY);
+  }
+
+  @Test
+  public void shouldAssertProcessEngineVersionSnapshotAlphaEETrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1-ee", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-alpha1");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
+  }
+
+  @Test
+  public void shouldAssertProcessEngineVersionSnapshotMinorTrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_COMMUNITY);
+  }
+
+  @Test
+  public void shouldAssertProcessEngineVersionSnapshotMinorEETrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-ee", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
+  }
+
+  @Test
+  public void shouldAssertProcessEngineVersionSnapshotPatchTrimSuffix() {
+    // when
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.1-ee", true);
+
+    // then
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.1");
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
+  }
+
+  @Test
   public void shouldAssertProcessEngineVersionSnapshot() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-SNAPSHOT");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-SNAPSHOT", false);
 
     // then
     assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-SNAPSHOT");
@@ -66,7 +126,7 @@ public class ProcessEngineDetailsTest {
   @Test
   public void shouldAssertProcessEngineVersionAlpha() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1", false);
 
     // then
     assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-alpha1");
@@ -76,17 +136,17 @@ public class ProcessEngineDetailsTest {
   @Test
   public void shouldAssertProcessEngineVersionSnapshotAlphaEE() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1-ee");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-alpha1-ee", false);
 
     // then
-    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-alpha1");
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-alpha1-ee");
     assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
   }
 
   @Test
   public void shouldAssertProcessEngineVersionSnapshotMinor() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0", false);
 
     // then
     assertThat(engineInfo.getVersion()).isEqualTo("7.14.0");
@@ -96,20 +156,20 @@ public class ProcessEngineDetailsTest {
   @Test
   public void shouldAssertProcessEngineVersionSnapshotMinorEE() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-ee");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.0-ee", false);
 
     // then
-    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0");
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.0-ee");
     assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
   }
 
   @Test
   public void shouldAssertProcessEngineVersionSnapshotPatch() {
     // when
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.1-ee");
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion("7.14.1-ee", false);
 
     // then
-    assertThat(engineInfo.getVersion()).isEqualTo("7.14.1");
+    assertThat(engineInfo.getVersion()).isEqualTo("7.14.1-ee");
     assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
   }
 }

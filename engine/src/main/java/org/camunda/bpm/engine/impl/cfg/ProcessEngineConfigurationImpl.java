@@ -2595,7 +2595,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       Internals internals = new Internals(database);
 
       ProcessEngineDetails engineInfo = ParseUtil
-          .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion());
+          .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion(), true);
 
       Product product = new Product(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
 
