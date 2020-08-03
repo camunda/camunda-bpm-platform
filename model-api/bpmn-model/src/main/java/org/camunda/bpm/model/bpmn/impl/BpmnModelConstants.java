@@ -41,7 +41,7 @@ public final class BpmnModelConstants {
   public static final String DI_NS = "http://www.omg.org/spec/DD/20100524/DI";
 
   /** The location of the BPMN 2.0 XML schema. */
-  public static final String BPMN_20_SCHEMA_LOCATION = "BPMN20.xsd";
+  public static final String BPMN_20_SCHEMA_LOCATION = "org/camunda/bpm/model/bpmn/schema/BPMN20.xsd";
 
   /** Xml Schema is the default type language */
   public static final String XML_SCHEMA_NS = "http://www.w3.org/2001/XMLSchema";
