@@ -2775,6 +2775,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return authorizationService;
   }
 
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
   public ProcessEngineConfigurationImpl setManagementService(ManagementService managementService) {
     this.managementService = managementService;
     return this;
