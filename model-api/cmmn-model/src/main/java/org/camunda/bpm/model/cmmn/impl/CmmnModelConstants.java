@@ -29,10 +29,10 @@ public class CmmnModelConstants {
   public static final String CMMN11_NS = "http://www.omg.org/spec/CMMN/20151109/MODEL";
 
   /** The location of the CMMN 1.0 XML schema. */
-  public static final String CMMN_10_SCHEMA_LOCATION = "cmmn10/CMMN10.xsd";
+  public static final String CMMN_10_SCHEMA_LOCATION = "org/camunda/bpm/model/cmmn/schema/cmmn10/CMMN10.xsd";
 
   /** The location of the CMMN 1.1 XML schema. */
-  public static final String CMMN_11_SCHEMA_LOCATION = "cmmn11/CMMN11.xsd";
+  public static final String CMMN_11_SCHEMA_LOCATION = "org/camunda/bpm/model/cmmn/schema/cmmn11/CMMN11.xsd";
 
   /** Xml Schema is the default type language */
   public static final String XML_SCHEMA_NS = "http://www.w3.org/2001/XMLSchema";
