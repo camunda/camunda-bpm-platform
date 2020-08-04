@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -98,7 +99,7 @@ public class CompetingTransactionsOptimisticLockingTest {
   @Deployment
   @Test
   @RequiredDatabase(excludes = DbSqlSessionFactory.POSTGRES)
-  public void testCompetingTransactionsOptimisticLocking() throws Exception {
+  public void testCompetingTransactionsOptimisticLocking() {
     // given
     runtimeService.startProcessInstanceByKey("competingTransactionsProcess");
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -118,6 +119,13 @@ public class CompetingTransactionsOptimisticLockingTest {
 
     thread1.proceedAndWaitTillDone();
     assertNotNull(thread1.exception);
-    assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+    } else {
+      // on CRDB, the transaction needs to be rolled back and retried,
+      // so a CrdbTransactionRetryException is thrown.
+      assertEquals(CrdbTransactionRetryException.class, thread1.exception.getClass());
+    }
   }
 }

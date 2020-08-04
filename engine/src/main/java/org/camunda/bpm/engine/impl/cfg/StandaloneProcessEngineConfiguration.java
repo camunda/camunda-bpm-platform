@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 

@@ -26,12 +26,16 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
@@ -78,7 +82,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         @Override
         public OptimisticLockingResult failedOperation(DbOperation operation) {
 
-          // nothing do to, reconfiguration will be handled later on
+          // nothing to do, reconfiguration will be handled later on
           return OptimisticLockingResult.IGNORE;
         }
       });
@@ -110,7 +114,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
       checkTelemetryLockExists(commandContext);
 
-      commandContext.getPropertyManager().acquireExclusiveLockForTelemetry();
+      acquireExclusiveTelemetryLock(commandContext);
       PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
 
       ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
@@ -168,7 +172,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
     if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
 
-      commandContext.getPropertyManager().acquireExclusiveLockForInstallationId();
+      acquireExclusiveInstallationIdLock(commandContext);
       databaseInstallationId = databaseInstallationId(commandContext);
 
       if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
@@ -242,5 +246,36 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
       }
     }
+  }
+
+  protected void acquireExclusiveTelemetryLock(CommandContext commandContext) {
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForTelemetry();
+  }
+
+  protected void acquireExclusiveInstallationIdLock(CommandContext commandContext) {
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForInstallationId();
+  }
+
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The BootstrapEngine command only executes internal code, so we are certain that
+   * a retry of a failed engine bootstrap will not impact user data, and may be
+   * performed multiple times.
+   */
+  @Override
+  public boolean isRetryable() {
+    return true;
   }
 }

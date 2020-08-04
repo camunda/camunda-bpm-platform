@@ -55,7 +55,7 @@ public abstract class AbstractMetricsTest {
   protected ManagementService managementService;
 
   @Before
-  public void initializeServices() throws Exception {
+  public void initializeServices() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
@@ -68,7 +68,7 @@ public abstract class AbstractMetricsTest {
   }
 
   @After
-  public void cleanUpMetrics() throws Exception {
+  public void cleanUpMetrics() {
     clearMetrics();
   }
 

@@ -18,12 +18,10 @@ package org.camunda.bpm.engine.test.concurrency.partitioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
@@ -33,54 +31,18 @@ import org.junit.Test;
 
 public class CompetingHistoricVariableInstancePartitioningTest extends AbstractPartitioningTest {
 
-  final protected String VARIABLE_NAME = "aVariableName";
+  protected final String VARIABLE_NAME = "aVariableName";
   final protected String VARIABLE_VALUE = "aVariableValue";
   final protected String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
 
   @Test
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB })
   public void shouldSuppressOleOnConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
       Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId));
-
-    asyncThread.waitForSync();
-
-    commandExecutor.execute((Command<Void>) commandContext -> {
-      HistoricVariableInstanceEntity historicVariableInstanceEntity =
-        (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
-
-      commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
-
-      return null;
-    });
-
-    // assume
-    assertThat(historyService.createHistoricVariableInstanceQuery().singleResult()).isNull();
-
-    // when
-    asyncThread.makeContinue();
-    asyncThread.waitUntilDone();
-
-    // then
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getValue()).isEqualTo(ANOTHER_VARIABLE_VALUE);
-  }
-
-  @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.MSSQL, DbSqlSessionFactory.ORACLE,
-      DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB,
-      DbSqlSessionFactory.H2 })
-  public void testConcurrentFetchAndDelete() {
-    // given
-    String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
-      Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
-
-    ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId));
     asyncThread.reportInterrupts();
-
     asyncThread.waitForSync();
 
     commandExecutor.execute((Command<Void>) commandContext -> {
@@ -100,8 +62,13 @@ public class CompetingHistoricVariableInstancePartitioningTest extends AbstractP
     asyncThread.waitUntilDone();
 
     // then
-    // TODO: consider additional assertions that show that the OLE prevented the changes in the original test
-    assertThat(asyncThread.getException()).isInstanceOf(OptimisticLockingException.class);
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
+      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getValue()).isEqualTo(ANOTHER_VARIABLE_VALUE);
+    } else {
+      // with CockroachDB, the OLE can't be ignored, the TX will fail and be rolled-back
+      assertThat(asyncThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+    }
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

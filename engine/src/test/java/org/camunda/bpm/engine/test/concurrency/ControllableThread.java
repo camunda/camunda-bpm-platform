@@ -72,15 +72,4 @@ public class ControllableThread extends Thread {
       e.printStackTrace();
     }
   }
-  
-
-  public synchronized void proceedAndWaitForSync() {
-    LOG.debug("test thread will notify "+getName()+" and wait until it completes");
-    notify();
-    try {
-      wait();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
 }

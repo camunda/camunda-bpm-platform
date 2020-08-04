@@ -119,10 +119,12 @@ public class CompetingExternalTaskFetchingTest {
     thread2.proceedAndWaitTillDone();
     assertEquals(0, thread2.fetchedTasks.size());
     // but does not fail with an OptimisticLockingException
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(thread2.exception);
     } else {
-      // CockroachDb
+      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
+      // like the `FetchExternalTasksCmd` will not be retried, but report
+      // a `CrdbTransactionRetryException` to the caller.
       assertTrue(thread2.exception instanceof CrdbTransactionRetryException);
     }
   }

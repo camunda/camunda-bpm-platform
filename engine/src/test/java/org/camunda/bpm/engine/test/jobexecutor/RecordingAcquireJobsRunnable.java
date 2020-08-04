@@ -55,22 +55,23 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     return super.acquireJobs(context, configuration, currentProcessEngine);
   }
 
+  @Override
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+    super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
+
+    long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
+    waitEvents.add(new RecordedWaitEvent(
+        System.currentTimeMillis(),
+        timeBetweenCurrentAndNextAcquisition,
+        acquisitionContext.getAcquisitionException()));
+  }
+
   public List<RecordedWaitEvent> getWaitEvents() {
     return waitEvents;
   }
 
   public List<RecordedAcquisitionEvent> getAcquisitionEvents() {
     return acquisitionEvents;
-  }
-
-  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
-    super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
-
-    long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
-    waitEvents.add(new RecordedWaitEvent(
-        System.currentTimeMillis(), 
-        timeBetweenCurrentAndNextAcquisition,
-        acquisitionContext.getAcquisitionException()));
   }
 
   public static class RecordedWaitEvent {

@@ -125,7 +125,7 @@ public class JobAcquisitionBackoffTest {
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
     RecordedWaitEvent waitEvent = jobExecutor2WaitEvents.get(0);
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       // we don't know the exact wait time,
       // since there is random jitter applied
       JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
@@ -162,7 +162,7 @@ public class JobAcquisitionBackoffTest {
     RecordedWaitEvent secondWaitEvent = jobExecutor2WaitEvents.get(1);
     long expectedBackoffTime = BASE_BACKOFF_TIME * BACKOFF_FACTOR; // 1000 * 2^1
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       // then thread 2 has tried to acquire 6 jobs this time
       Assert.assertEquals(6, secondAcquisitionAttempt.getNumJobsToAcquire());
       // and again increased its backoff
@@ -219,7 +219,7 @@ public class JobAcquisitionBackoffTest {
     acquisitionThread2.makeContinueAndWaitForSync(); // acquire
     acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       for (int i = 1; i < BACKOFF_DECREASE_THRESHOLD; i++) {
         // backoff has not decreased yet
         Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
