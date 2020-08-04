@@ -68,8 +68,17 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
         createDeploymentBuilder().enableDuplicateFiltering(false));
 
     // ensure that although both transactions were run concurrently, only one deployment was constructed.
+    assertThat(thread1.getException()).isNull();
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-    assertThat(deploymentQuery.count(), is(1L));
+    assertThat(deploymentQuery.count()).isEqualTo(1L);
+
+    if (!testRule.isOptimisticLockingExceptionSuppressible()) {
+      // on CockroachDB, the deployment pessimistic lock is disabled
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
+      assertCockroachDBConcurrentFailure();
+    }
   }
 
   @Test
@@ -87,9 +96,20 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
         .asc()
         .list();
 
-    assertThat(processDefinitions.size(), is(2));
-    assertThat(processDefinitions.get(0).getVersion(), is(1));
-    assertThat(processDefinitions.get(1).getVersion(), is(2));
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(processDefinitions.size()).isEqualTo(2);
+      assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
+      assertThat(processDefinitions.get(1).getVersion()).isEqualTo(2);
+    } else {
+      assertThat(thread1.getException()).isNull();
+      assertThat(processDefinitions.size()).isEqualTo(1);
+      assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
+      // on CockroachDB, the deployment pessimistic lock is disabled
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
+      assertCockroachDBConcurrentFailure();
+    }
   }
 
   protected DeploymentBuilder createDeploymentBuilder() {
@@ -129,6 +149,10 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     // STEP 5: wait for Thread 2 to terminate
     thread2.waitForSync();
     thread2.waitUntilDone();
+  }
+
+  protected void assertCockroachDBConcurrentFailure() {
+    assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
   }
 
   @After

@@ -44,17 +44,16 @@ import org.junit.rules.RuleChain;
  * the HistoryCleanupJob, overwriting the retires and stack trace. The following diagram explains this
  * in more detail:
  *
- * TX1 (job retries)   			      |	TX2 (Bootstrap command)
+ * TX1 (job retries)              | TX2 (Bootstrap command)
  * ------------------------------------------------------------------------------------------------------
- * READ HistoryCleanupJob    			|
+ * READ HistoryCleanupJob         |
  * WRITE Job Retries              |
- *     ---> CRDB TX Write Intent	|	-> READ (check for HistoryCleanupJob) -> CRDB TX Block
- * Thread SYNC									  |
- * COMMIT									        |   -> CRDB TX Unblock
- * 								          			|   Continue regular execution to reconfigure HistoryCleanupJob
- * 								          			|     * Set default retries (3)
- * 								          			|     * Clear exception stacktrace
- *
+ *     ---> CRDB TX Write Intent  | -> READ (check for HistoryCleanupJob) -> CRDB TX Block
+ * Thread SYNC                    |
+ * COMMIT                         | -> CRDB TX Unblock
+ *                                |    Continue regular execution to reconfigure HistoryCleanupJob
+ *                                |     * Set default retries (3)
+ *                                |     * Clear exception stacktrace
  */
 @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
 public class ConcurrentHistoryCleanupUpdateOfFailingJobTest extends ConcurrencyTestHelper {

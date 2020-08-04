@@ -18,14 +18,14 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -85,6 +85,7 @@ public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestHelp
     makeEverLivingJobFail(jobId);
 
     ThreadControl engineOne = executeControllableCommand(new EngineOne());
+    engineOne.reportInterrupts();
     ThreadControl engineTwo = executeControllableCommand(new EngineTwo());
     engineTwo.reportInterrupts();
 
@@ -96,12 +97,18 @@ public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestHelp
     // then
     engineTwo.makeContinue(); // reconfigure job & flush
     engineTwo.join();
-    if (testRule.databaseSupportsIgnoredOLE()) {
+
+    // there were no failures for the first job reconfiguration
+    assertThat(engineOne.getException()).isNull();
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertThat(engineTwo.getException()).isNull();
     } else {
       // on CockroachDB, a concurrent reconfiguration of the HistoryCleanupJobs will result
-      // in an un-ignorable OptimisticLockingException and the whole command will need to be retried.
-      assertThat(engineTwo.getException()).isInstanceOf(OptimisticLockingException.class);
+      // in an un-ignorable CrdbTransactionRetryException and the whole command will need to be retried.
+      // By default, the CRDB-related `commandRetries` property is 0. So any retryable commands,
+      // like the `BootstrapEngineCommand` will not be retried, but report a `CrdbTransactionRetryException`
+      // to the caller.
+      assertThat(engineTwo.getException()).isInstanceOf(CrdbTransactionRetryException.class);
     }
   }
 

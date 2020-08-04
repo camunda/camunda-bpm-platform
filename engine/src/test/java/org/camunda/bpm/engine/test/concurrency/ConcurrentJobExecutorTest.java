@@ -62,13 +62,8 @@ import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 /**
- * This test covers the behavior of two competing JobAcquisition threads.
- *
- * In the test:
- * 1. The first JobAcquisition thread is started.
- * 1.1.
- *
  * @author Thorben Lindhauer
+ *
  */
 public class ConcurrentJobExecutorTest {
 
@@ -282,7 +277,7 @@ public class ConcurrentJobExecutorTest {
     // then the acquisition will not fail with optimistic locking
     assertNull(jobSuspensionThread.exception);
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(acquisitionThread.exception);
       // but the job will also not be acquired
       assertEquals(0, acquisitionThread.acquiredJobs.size());
@@ -383,7 +378,7 @@ public class ConcurrentJobExecutorTest {
     executionThread.proceedAndWaitTillDone();
 
     long remainingJobCount = managementService.createJobQuery().count();
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(executionThread.exception);
 
       // and ultimately only one job with an updated priority is left

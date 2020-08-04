@@ -832,4 +832,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     );
   }
 
+  public void debugDisabledPessimisticLocks() {
+    logDebug(
+      "106", "No exclusive lock is acquired on CockroachDB or H2, " +
+            "as pessimistic locks are disabled on these databases.");
+  }
 }
