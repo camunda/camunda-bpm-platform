@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.Date;
@@ -122,11 +124,9 @@ public class HistoryCleanupCmd implements Command<Job> {
   protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
 
-    PropertyManager propertyManager = commandContext.getPropertyManager();
     JobManager jobManager = commandContext.getJobManager();
 
-    //exclusive lock
-    propertyManager.acquireExclusiveLockForHistoryCleanupJob();
+    acquireExclusiveLock(commandContext);
 
     //check again after lock
     List<Job> historyCleanupJobs = getHistoryCleanupJobs();
@@ -222,4 +222,18 @@ public class HistoryCleanupCmd implements Command<Job> {
         .isHistoryCleanupEnabled();
   }
 
+  protected void acquireExclusiveLock(CommandContext commandContext) {
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+      PropertyManager propertyManager = commandContext.getPropertyManager();
+      //exclusive lock
+      propertyManager.acquireExclusiveLockForHistoryCleanupJob();
+    } else {
+      LOG.debugDisabledHistoryCleanupLock();
+    }
+  }
+
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
 }

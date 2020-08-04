@@ -423,7 +423,15 @@ public class ProcessEngineTestRule extends TestWatcher {
         .getDatabaseType();
   }
 
-  public boolean databaseSupportsIgnoredOLE() {
+  /**
+   * This methods is used to determine if the currently used database
+   * allows for OptimisticLockingExceptions to be ignored, or handled,
+   * without a transaction rollback and retry. Otherwise, it is false.
+   *
+   * Currently, the method only returns false when CockroachDB is used
+   * since this database implements its own OLE mechanism.
+   */
+  public boolean isOptimisticLockingExceptionSuppressible() {
     return !DbSqlSessionFactory.CRDB.equals(getDatabaseType());
   }
 

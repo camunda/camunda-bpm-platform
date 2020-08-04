@@ -119,7 +119,7 @@ public class CompetingExternalTaskFetchingTest {
     thread2.proceedAndWaitTillDone();
     assertEquals(0, thread2.fetchedTasks.size());
     // but does not fail with an OptimisticLockingException
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertNull(thread2.exception);
     } else {
       // CockroachDb

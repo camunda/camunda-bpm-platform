@@ -43,6 +43,8 @@ public interface OptimisticLockingListener {
    * Signifies that an operation failed due to optimistic locking.
    *
    * @param operation the failed operation.
+   * @return {@link OptimisticLockingResult} that instructs the caller how to handle
+   *            the result of the failed operation.
    */
   OptimisticLockingResult failedOperation(DbOperation operation);
 

@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -150,19 +150,21 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     thread2.waitUntilDone(true);
 
     assertNull(thread1.getException());
-    assertNull(thread2.getException());
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(thread2.getException());
       assertNull(bootstrapCommand.getContextSpy().getThrowable());
-    } else {
-      // When CockroachDB is used, the OptimisticLockingException can't be ignored,
-      // and the ProcessEngineBootstrapCommand must be retried
-      assertThat(bootstrapCommand.getContextSpy().getThrowable()).isInstanceOf(OptimisticLockingException.class);
-    }
 
-    // the Process Engine is successfully registered even when run on CRDB
-    // since the OLE is caught and handled during the Process Engine Bootstrap command
-    assertNotNull(ProcessEngines.getProcessEngines().get(PROCESS_ENGINE_NAME));
+      // the Process Engine is successfully registered even when run on CRDB
+      // since the OLE is caught and handled during the Process Engine Bootstrap command
+      assertNotNull(ProcessEngines.getProcessEngines().get(PROCESS_ENGINE_NAME));
+    } else {
+      // When CockroachDB is used, the CrdbTransactionRetryException can't be ignored, if retries = 0
+      // and the ProcessEngineBootstrapCommand must be manually retried
+      assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+      // and the process engine is not registered
+      assertThat(ProcessEngines.getProcessEngines().keySet()).doesNotContain(PROCESS_ENGINE_NAME);
+    }
   }
 
   protected static class ControllableProcessEngineBootstrapCommand extends ControllableCommand<Void> {

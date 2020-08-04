@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -284,8 +285,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
    */
   public static boolean isCrdbConcurrencyConflict(Throwable cause) {
     // only check when CRDB is used
-    String databaseType = Context.getProcessEngineConfiguration().getDatabaseType();
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
       boolean isCrdbTxRetryException = ExceptionUtil.checkCrdbTransactionRetryException(cause);
       if (isCrdbTxRetryException) {
         return true;
@@ -603,10 +603,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         schema = dbSqlSessionFactory.getDatabaseSchema();
       }
 
-      String databaseType = dbSqlSessionFactory.getDatabaseType();
-
-      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)
-          || DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
         tableName = tableName.toLowerCase();
       }
 
@@ -641,10 +638,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           String schema = getDbSqlSessionFactory().getDatabaseSchema();
           String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
-          // for postgres we have to use lower case
-          String databaseType = getDbSqlSessionFactory().getDatabaseType();
-          if (DbSqlSessionFactory.POSTGRES.equals(databaseType)
-              || DbSqlSessionFactory.CRDB.equals(databaseType)) {
+          // for postgres or cockroachdb, we have to use lower case
+          if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
             schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }

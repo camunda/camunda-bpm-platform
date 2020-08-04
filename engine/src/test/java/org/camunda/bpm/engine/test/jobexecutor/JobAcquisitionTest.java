@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
@@ -117,7 +116,7 @@ public class JobAcquisitionTest {
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
     } else {
       // In CRDB, Job Acquisition failures result in a complete rollback and retry of the transaction.

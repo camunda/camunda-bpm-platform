@@ -20,6 +20,9 @@ package org.camunda.bpm.engine.impl.cfg;
 import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -41,9 +44,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -101,7 +101,6 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.batch.variables.BatchSetVariablesHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
@@ -110,6 +109,7 @@ import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandl
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.update.UpdateProcessInstancesSuspendStateJobHandler;
+import org.camunda.bpm.engine.impl.batch.variables.BatchSetVariablesHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -462,7 +462,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected CommandExecutor commandExecutorSchemaOperations;
 
-  // TODO: document which commands this affects and that it only applies to CRDB
+  /**
+   * Allows for specific commands to be retried when using CockroachDB. This is due to the fact that
+   * OptimisticLockingExceptions can't be handled on CockroachDB and transactions must be rolled back.
+   * The commands where CockroachDB retries are possible are:
+   *
+   * <ul>
+   *   <li>BootstrapEngineCommand</li>
+   *   <li>AcquireJobsCmd</li>
+   *   <li>DeployCmd</li>
+   *   <li>FetchExternalTasksCmd</li>
+   *   <li>HistoryCleanupCmd</li>
+   *   <li>HistoryLevelSetupCommand</li>
+   * </ul>
+   */
   protected int commandRetries = 0;
 
   // SESSION FACTORIES ////////////////////////////////////////////////////////
@@ -736,7 +749,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDeploymentLockUsed = true;
 
   /**
-   * If true then several deployments will be processed strictly sequentally. When false they may be processed in parallel.
+   * If true then several deployments will be processed strictly sequentially. When false they may be processed in parallel.
    */
   protected boolean isDeploymentSynchronized = true;
 

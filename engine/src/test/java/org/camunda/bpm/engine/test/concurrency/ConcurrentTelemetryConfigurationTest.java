@@ -47,7 +47,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
   @Test
   @RequiredDatabase(excludes = {DbSqlSessionFactory.H2, DbSqlSessionFactory.MARIADB})
-  public void testEnableTelemetryWithoutConcurancyIssue() throws InterruptedException {
+  public void testEnableTelemetryWithoutConcurrencyIssue() throws InterruptedException {
 
     Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
     assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));

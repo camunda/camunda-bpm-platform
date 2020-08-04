@@ -19,9 +19,11 @@ package org.camunda.bpm.engine.test.concurrency;
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -52,9 +54,11 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
     Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
     assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
     ThreadControl thread1 = executeControllableCommand(new ControllableUpdateHistoryLevelCommand());
+    thread1.reportInterrupts();
     thread1.waitForSync();
 
     ThreadControl thread2 = executeControllableCommand(new ControllableUpdateHistoryLevelCommand());
+    thread2.reportInterrupts();
     thread2.waitForSync();
 
     thread1.makeContinue();
@@ -69,8 +73,15 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
     thread2.waitForSync();
     thread2.waitUntilDone();
 
-    assertNull(thread1.exception);
-    assertNull(thread2.exception);
+    assertNull(thread1.getException());
+    Throwable thread2Exception = thread2.getException();
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(thread2Exception);
+    } else {
+      // on CRDB, the pessimistic lock is disabled and the concurrent transaction
+      // with fail with a CrdbTransactionRetryException and will need to be retried
+      assertThat(thread2Exception).isInstanceOf(CrdbTransactionRetryException.class);
+    }
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     assertEquals("full", historyLevel.getName());
   }

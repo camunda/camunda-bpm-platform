@@ -21,6 +21,12 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 
+/**
+ * A CockroachDB-specific Command interceptor to catch optimistic locking
+ * errors (classified as a {@link CrdbTransactionRetryException}). The
+ * interceptor then retries the Command multiple times, according to the
+ * retries set by the {@link org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl#commandRetries} property.
+ */
 public class CrdbTransactionRetryInterceptor extends CommandInterceptor {
 
   private static final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;

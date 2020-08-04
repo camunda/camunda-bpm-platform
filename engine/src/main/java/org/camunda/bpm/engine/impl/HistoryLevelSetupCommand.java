@@ -23,10 +23,13 @@ import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 
 public final class HistoryLevelSetupCommand implements Command<Void> {
 
@@ -45,7 +48,7 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
 
     if (databaseHistoryLevel == null) {
 
-      commandContext.getPropertyManager().acquireExclusiveLockForStartup();
+      acquireExclusiveLock(commandContext);
       databaseHistoryLevel = new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()).execute(commandContext);
 
       if (databaseHistoryLevel == null) {
@@ -110,4 +113,18 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
     }
   }
 
+  protected void acquireExclusiveLock(CommandContext commandContext) {
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+      PropertyManager propertyManager = commandContext.getPropertyManager();
+      //exclusive lock
+      propertyManager.acquireExclusiveLockForStartup();
+    } else {
+      LOG.debugDisabledStartupLock();
+    }
+  }
+
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
 }

@@ -352,10 +352,7 @@
         <includes>
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
-          <include>**/camunda.cfg.db.xml</include>
-          <include>**/camunda.cfg.plugins.xml</include>
-          <include>**/camunda.cfg.prefix.xml</include>
-          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
+          <include>**/camunda.cfg.*.xml</include>
         </includes>
       </testResource>
     </testResources>

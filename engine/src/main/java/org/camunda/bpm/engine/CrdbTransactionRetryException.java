@@ -17,7 +17,11 @@
 package org.camunda.bpm.engine;
 
 /**
- * TODO: Add Javadoc for exception
+ * Exception that is thrown when an optimistic locking error occurs in
+ * CockroachDB, caused by concurrent access to the same data entries by
+ * multiple transactions. CockroachDB optimistic locking errors can't be
+ * handled in application code, so the transaction must be rolled back
+ * and the involved commands retried.
  */
 public class CrdbTransactionRetryException extends OptimisticLockingException {
 

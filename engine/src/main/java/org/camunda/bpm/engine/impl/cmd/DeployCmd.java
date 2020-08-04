@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
@@ -55,6 +56,7 @@ import org.camunda.bpm.engine.impl.repository.CandidateDeploymentImpl;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.CandidateDeployment;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -186,7 +188,8 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {
-    if (commandContext.getProcessEngineConfiguration().isDeploymentLockUsed()) {
+    if (commandContext.getProcessEngineConfiguration().isDeploymentLockUsed()
+        && !DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
       // Acquire global exclusive lock: this ensures that there can be only one
       // transaction in the cluster which is allowed to perform deployments.
       // This is important to ensure that duplicate filtering works correctly
@@ -636,5 +639,10 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
       throw new NotFoundException(builder.toString());
     }
+  }
+
+  @Override
+  public boolean isRetryable() {
+    return true;
   }
 }

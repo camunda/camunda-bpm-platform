@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.db.entitymanager;
+package org.camunda.bpm.engine.impl.util;
 
-public enum OptimisticLockingResult {
+import java.util.Arrays;
 
-  /**
-   * Marks that that an {@link OptimisticLockingListener} resulted
-   * in successfully handling, or ignoring, an {@link org.camunda.bpm.engine.OptimisticLockingException}.
-   */
-  IGNORE,
+import org.camunda.bpm.engine.impl.context.Context;
+
+public class DatabaseUtil {
 
   /**
-   * Marks that that an {@link OptimisticLockingListener} resulted
-   * in a failure when handling an {@link org.camunda.bpm.engine.OptimisticLockingException}
-   * and the exception should be re-thrown to the caller.
+   * Checks if the currently used database is of a given database type.
+   *
+   * @param databaseTypes to check for
+   * @return true if any of the provided types match the used one. Otherwise false.
    */
-  THROW;
+  public static boolean checkDatabaseType(String... databaseTypes) {
+      String dbType = Context.getCommandContext().getProcessEngineConfiguration().getDatabaseType();
+      return Arrays.stream(databaseTypes).anyMatch(dbType::equals);
+  }
 }

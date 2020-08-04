@@ -21,11 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -96,7 +94,7 @@ public class ConcurrentHistoryCleanupReconfigureTest extends ConcurrencyTestHelp
     // then
     engineTwo.makeContinue(); // reconfigure job & flush
     engineTwo.join();
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertThat(engineTwo.getException()).isNull();
     } else {
       // on CockroachDB, a concurrent reconfiguration of the HistoryCleanupJobs will result

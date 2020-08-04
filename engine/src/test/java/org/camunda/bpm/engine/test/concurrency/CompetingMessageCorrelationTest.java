@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -71,9 +70,15 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(0, processEngine.getHistoryService().createHistoricJobLogQuery().list().size());
   }
 
+  /**
+   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
+   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
+   *
+   * @throws InterruptedException
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
   public void testConcurrentExclusiveCorrelation() throws InterruptedException {
     InvocationLogListener.reset();
 
@@ -109,15 +114,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread2.waitForSync();
     assertTrue(thread2.getException() != null);
     assertTrue(thread2.getException() instanceof ProcessEngineException);
-
-    if (testRule.databaseSupportsIgnoredOLE()) {
-      assertThat(thread2.getException().getMessage())
-          .contains("does not have a subscription to a message event with name 'Message'");
-    } else {
-      // In CRDB, the changes from thread1 cause an TransactionRetryException
-      // in thread2 and the whole transaction needs to be retried.
-      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
-    }
+    assertThat(thread2.getException().getMessage())
+        .contains("does not have a subscription to a message event with name 'Message'");
 
     // the first thread ended successfully without an exception
     thread1.join();
@@ -172,8 +170,13 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread2.getException() instanceof OptimisticLockingException);
   }
 
+  /**
+   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
+   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
     InvocationLogListener.reset();
 
@@ -207,29 +210,18 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread1.waitUntilDone();
     assertNull(thread1.getException());
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
-      // thread2 should be able to continue at least after thread1 has finished and released its lock
-      thread2.waitForSync();
+    // thread2 should be able to continue at least after thread1 has finished and released its lock
+    thread2.waitForSync();
 
-      // thread 2 completes successfully
-      thread2.waitUntilDone();
+    // the service task was executed the second time
+    assertEquals(2, InvocationLogListener.getInvocations());
 
-      assertNull(thread2.getException());
-      // the service task was executed the second time
-      assertEquals(2, InvocationLogListener.getInvocations());
-      // the follow-up task was reached in both instances
-      assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
-    } else {
-      // in CRDB, we don't call a second waitForSync since thread2
-      // never reaches the second sync due to the OLE
-      thread2.waitUntilDone(true);
-      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
+    // thread 2 completes successfully
+    thread2.waitUntilDone();
+    assertNull(thread2.getException());
 
-      // the service task was executed the second time
-      assertEquals(1, InvocationLogListener.getInvocations());
-      // the follow-up task was reached in both instances
-      assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
-    }
+    // the follow-up task was reached in both instances
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
   /**

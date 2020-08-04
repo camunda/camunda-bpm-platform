@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -51,13 +50,13 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   protected ProcessEngine processEngine;
 
   @Before
-  public void saveJobExecutor() throws Exception {
+  public void saveJobExecutor() {
     processEngine = engineRule.getProcessEngine();
     defaultJobExecutor = processEngineConfiguration.getJobExecutor();
   }
 
   @After
-  public void restoreJobExecutor() throws Exception {
+  public void restoreJobExecutor() {
     processEngineConfiguration.setJobExecutor(defaultJobExecutor);
   }
 
@@ -80,7 +79,18 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     long acquiredJobs = managementService.createMetricsQuery()
         .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
-    assertEquals(3, acquiredJobs);
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertEquals(3, acquiredJobs);
+    } else {
+      // on CRDB there are additional job failures due to a self-referencing foreign
+      // key constraint on the ACT_RU_EXECUTION table which causes a TransactionRetryError,
+      // leading to a larger number of job acquisitions
+      assertTrue(acquiredJobs >= 3);
+      // however, only 3 jobs are successfully executed
+      long successfulJobs = managementService.createMetricsQuery()
+        .name(Metrics.JOB_SUCCESSFUL).sum();
+      assertTrue(successfulJobs == 3);
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")
@@ -127,7 +137,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     long acquiredJobsFailure = managementService.createMetricsQuery()
         .name(Metrics.JOB_ACQUIRED_FAILURE).sum();
     
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       assertEquals(3, acquiredJobsFailure);
     } else {
       // in the case of CRDB, the acquisitionCmd could not tell the job executor
@@ -155,23 +165,33 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // when
-    testRule.waitForJobExecutorToProcessAllJobs(5000);
+    // extend waiting time for CRDB since it takes longer to process all the jobs there
+    // see CAM-12239 for more details
+    long maxMillisToWait = testRule.isOptimisticLockingExceptionSuppressible()? 5000L : 10000L;
+    testRule.waitForJobExecutorToProcessAllJobs(maxMillisToWait);
 
     // then
     long jobsSuccessful = managementService.createMetricsQuery().name(Metrics.JOB_SUCCESSFUL).sum();
-    assertEquals(3, jobsSuccessful);
-
     long jobsFailed = managementService.createMetricsQuery().name(Metrics.JOB_FAILED).sum();
-    // 2 jobs * 3 tries
-    assertEquals(6, jobsFailed);
+    long jobCandidatesForAcquisition = managementService.createMetricsQuery().name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
 
-    long jobCandidatesForAcquisition = managementService.createMetricsQuery()
-        .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
-    assertEquals(3 + 6, jobCandidatesForAcquisition);
+    assertEquals(3, jobsSuccessful);
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      // 2 jobs * 3 tries
+      assertEquals(6, jobsFailed);
+      assertEquals(3 + 6, jobCandidatesForAcquisition);
+    } else {
+      // on CRDB there are additional job failures due to a self-referencing foreign
+      // key constraint on the ACT_RU_EXECUTION table which causes a TransactionRetryError
+      assertTrue(jobsFailed >= 6);
+      // this leads to additional job acquisitions and retries
+      // 3 successful job executions + more than 6 job failures
+      assertTrue(jobCandidatesForAcquisition >= 9);
+    }
   }
 
   @Deployment
-   @Test
+  @Test
   public void testJobExecutionMetricExclusiveFollowUp() {
     // given
     for (int i = 0; i < 3; i++) {
@@ -183,20 +203,27 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     // then
     long jobsSuccessful = managementService.createMetricsQuery().name(Metrics.JOB_SUCCESSFUL).sum();
-    assertEquals(6, jobsSuccessful);
-
     long jobsFailed = managementService.createMetricsQuery().name(Metrics.JOB_FAILED).sum();
-    assertEquals(0, jobsFailed);
-
-    // the respective follow-up jobs are exclusive and have been executed right away without
-    // acquisition
     long jobCandidatesForAcquisition = managementService.createMetricsQuery()
-        .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
-    assertEquals(3, jobCandidatesForAcquisition);
-
+      .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
     long exclusiveFollowupJobs = managementService.createMetricsQuery()
-        .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
-    assertEquals(3, exclusiveFollowupJobs);
+      .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
+
+    assertEquals(6, jobsSuccessful);
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertEquals(0, jobsFailed);
+      // the respective follow-up jobs are exclusive and have been executed right away without
+      // acquisition
+      assertEquals(3, jobCandidatesForAcquisition);
+      assertEquals(3, exclusiveFollowupJobs);
+    } else {
+      // on CRDB there are additional job failures due to a self-referencing foreign
+      // key constraint on the ACT_RU_EXECUTION table which causes a TransactionRetryError
+      assertTrue(jobsFailed > 0);
+      // this leads to more job retries and acquisitions
+      assertTrue(jobCandidatesForAcquisition >= 3);
+      assertEquals(3, exclusiveFollowupJobs);
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/metrics/asyncServiceTaskProcess.bpmn20.xml")

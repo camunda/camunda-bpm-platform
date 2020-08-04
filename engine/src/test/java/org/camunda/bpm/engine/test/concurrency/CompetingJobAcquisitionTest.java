@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.test.Deployment;
@@ -100,7 +99,7 @@ public class CompetingJobAcquisitionTest {
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
 
-    if (testRule.databaseSupportsIgnoredOLE()) {
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
       // the acquisition did NOT fail
       assertNull(threadTwo.exception);
       // but the job was not acquired

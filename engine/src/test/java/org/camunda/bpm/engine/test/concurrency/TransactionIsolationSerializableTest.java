@@ -16,132 +16,241 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import java.util.Date;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
+import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.junit.After;
 import org.junit.Test;
 
 /**
  * We only test Serializable Transaction Isolation on CockroachDB.
- *
- * @author Daniel Meyer
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-@RequiredDatabase(excludes = { DbSqlSessionFactory.DB2, DbSqlSessionFactory.MSSQL, DbSqlSessionFactory.ORACLE,
-                               DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.MARIADB,
-                               DbSqlSessionFactory.H2 })
+@RequiredDatabase(includes = DbSqlSessionFactory.CRDB)
 public class TransactionIsolationSerializableTest extends ConcurrencyTestCase {
 
-  private ThreadControl thread1;
-  private ThreadControl thread2;
+  protected static final String PROC_DEF_KEY = "oneTaskProcess";
+  protected static final String VAR_NAME = "testVariableName";
+  protected static final String VAR_INIT_VAL = "initialValue";
+  protected static final String VAR_FIRST_VAL = "firstValue";
+  protected static final String VAR_SECOND_VAL = "secondValue";
 
   /**
    * In this test, we run two transactions concurrently.
    * The transactions have the following behavior:
    *
-   * (1) INSERT row into a table
-   * (2) SELECT ALL rows from that table
+   * (1) READ row from a table
+   * (2) WRITE (update) the row from that table
    *
    * We execute it with two threads in the following interleaving:
    *
    *      Thread 1             Thread 2
    *      ========             ========
-   * ------INSERT---------------------------   |
-   * ---------------------------INSERT------   |
-   * ------SELECT---------------------------   v time
-   * ---------------------------SELECT------
+   * ------READ---------------------------
+   * ---------------------------READ------
+   * ------WRITE--------------------------
+   * ---------------------------WRITE----- | FAILS due to concurrent update
    *
-   * Deadlocks may occur if readers are not properly isolated from writers.
-   *
+   * Data may become inconsistent if transactions are not ordered properly
    */
-  
-  // TODO: ignore on CockroachDB and at a later point create dedicated concurrency test cases
-  // for CockroachDB that reproduce the scenarios described in https://docs.google.com/document/d/1jf1hsFoLBL0xAkwasV2-S5uf0iGw93FITwMMLJVZjz0/edit 
-  // and verify that our implementation can handle them
   @Test
-  public void testTransactionIsolation() {
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/oneTaskProcess.bpmn20.xml")
+  public void shouldHandleConcurrentWriteConflictWithTX2Failure() {
+    // given
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey(PROC_DEF_KEY, Collections.singletonMap(VAR_NAME, VAR_INIT_VAL))
+        .getId();
+    ThreadControl updateVarThread1 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_FIRST_VAL));
+    updateVarThread1.waitForSync();
+    updateVarThread1.reportInterrupts();
+    ThreadControl updateVarThread2 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_SECOND_VAL));
+    updateVarThread2.waitForSync();
+    updateVarThread2.reportInterrupts();
 
-    thread1 = executeControllableCommand(new TestCommand("p1"));
+    // the first thread updates the variable and flushes the changes
+    updateVarThread1.makeContinue();
+    updateVarThread1.waitUntilDone();
 
-    // wait for Thread 1 to perform INSERT
-    thread1.waitForSync();
+    // when
+    // the second thread attempts to update the variable
+    updateVarThread2.makeContinue();
+    updateVarThread2.waitUntilDone();
 
-    thread2 = executeControllableCommand(new TestCommand("p2"));
-
-    // wait for Thread 2 to perform INSERT
-    thread2.waitForSync();
-
-    // wait for Thread 1  to perform same SELECT => deadlock
-    thread1.waitUntilDone(true);
-
-    // wait for Thread 2 to perform SELECT
-    thread2.makeContinue();
-    thread2.waitForSync();
+    // then
+    // a exception is expected with a `TransactionRetryWithProtoRefreshError` as the cause
+    assertThat(updateVarThread2.getException().getCause().getMessage())
+        .containsIgnoringCase("TransactionRetryWithProtoRefreshError");
+    VariableInstance var = runtimeService.createVariableInstanceQuery().variableName(VAR_NAME).singleResult();
+    assertThat(var.getValue()).isEqualTo(VAR_FIRST_VAL);
   }
 
-  static class TestCommand extends ControllableCommand<Void> {
+  /**
+   * In this test, we run two transactions concurrently.
+   * The transactions have the following behavior:
+   *
+   * (1) READ row from a table
+   * (2) WRITE (update) the row from that table
+   *
+   * We execute it with two threads in the following interleaving:
+   *
+   *      Thread 1             Thread 2
+   *      ========             ========
+   * ------READ---------------------------
+   * ---------------------------READ------
+   * ------WRITE-------------------------- | FAILS due to concurrent update
+   * ---------------------------WRITE----- | PASSES since to changes were made
+   *
+   * Data may become inconsistent if transactions are not ordered properly
+   */
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/oneTaskProcess.bpmn20.xml")
+  public void shouldHandleConcurrentWriteConflictWithTX1Failure() {
+    // given
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey(PROC_DEF_KEY, Collections.singletonMap(VAR_NAME, VAR_INIT_VAL))
+        .getId();
+    ThreadControl updateVarThread1 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_FIRST_VAL, true));
+    updateVarThread1.waitForSync();
+    updateVarThread1.reportInterrupts();
+    ThreadControl updateVarThread2 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_SECOND_VAL));
+    updateVarThread2.waitForSync();
+    updateVarThread2.reportInterrupts();
 
-    protected String id;
+    // when
+    // the first thread updates the variable,
+    // but fails with an unrelated exception and is rolled-back
+    updateVarThread1.makeContinue();
+    updateVarThread1.waitUntilDone();
 
-    public TestCommand(String id) {
-      this.id = id;
+    // the second thread attempts to update the variable
+    updateVarThread2.makeContinue();
+    updateVarThread2.waitUntilDone();
+
+    // then
+    // the second transaction is successful
+    assertThat(updateVarThread1.getException()).isInstanceOf(RuntimeException.class);
+    assertThat(updateVarThread2.getException()).isNull();
+
+    VariableInstance var = runtimeService.createVariableInstanceQuery().variableName(VAR_NAME).singleResult();
+    assertThat(var.getValue()).isEqualTo(VAR_SECOND_VAL);
+  }
+
+  /**
+   * In this test, we run two transactions concurrently.
+   * The transactions have the following behavior:
+   *
+   * (1) READ row from a table
+   * (2) WRITE (update) the row from that table
+   *
+   * We execute it with two threads in the following interleaving:
+   *
+   *        TX1                  TX2
+   *        TS1        <         TS2 = TS1+N     | TX1 has a lower timestamp
+   *      ========             ========
+   * ---------------------------READ------ | performs a read with a higher timestamp
+   * ------WRITE-------------------------- | TS1 is pushed to TS2 + 1
+   * ---------------------------WRITE----- | will fail since TX1 made changes (out-of-scope for this case)
+   *
+   * Data may become inconsistent if transactions are not ordered properly
+   */
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/oneTaskProcess.bpmn20.xml")
+  public void shouldHandleConcurrentWriteAfterReadConflict() throws InterruptedException {
+    // given
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey(PROC_DEF_KEY, Collections.singletonMap(VAR_NAME, VAR_INIT_VAL))
+        .getId();
+
+    // TX1 with a lower TX timestamp
+    ThreadControl updateVarThread1 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_FIRST_VAL, false, false));
+    updateVarThread1.waitForSync();
+    updateVarThread1.reportInterrupts();
+
+    // Introduce a larger difference between TX timestamps
+    Thread.sleep(1000L);
+
+    // TX2 with a higher TX timestamp that first performs a READ
+    ThreadControl updateVarThread2 = executeControllableCommand(
+        new ControllableVariableWriteCommand(processInstanceId, VAR_SECOND_VAL, false, true));
+    updateVarThread2.waitForSync();
+    updateVarThread2.reportInterrupts();
+
+    // when
+    // TX1 attempts to write a new variable value
+    updateVarThread1.makeContinue();
+    updateVarThread1.waitUntilDone();
+
+    // then
+    // the TX1 timestamp is set to TX2_timestamp + 1, and TX1 is successful
+    // NOTE: it's not possible to verify this since the timestamp is not available until after the TX is committed
+    assertThat(updateVarThread1.getException()).isNull();
+
+    VariableInstance var = runtimeService.createVariableInstanceQuery().variableName(VAR_NAME).singleResult();
+    assertThat(var.getValue()).isEqualTo(VAR_FIRST_VAL);
+
+    // cleanup
+    updateVarThread2.waitUntilDone(true);
+  }
+
+  public class ControllableVariableWriteCommand extends ControllableCommand<Void> {
+
+    protected String processInstanceId;
+    protected String newVariableValue;
+    protected boolean rollback;
+    protected boolean readVariable;
+
+    ControllableVariableWriteCommand(String processInstanceId, String newVariableValue) {
+      this(processInstanceId, newVariableValue, false, true);
+    }
+
+    ControllableVariableWriteCommand(String processInstanceId, String newVariableValue, boolean rollback) {
+      this(processInstanceId, newVariableValue, rollback, true);
+    }
+
+    ControllableVariableWriteCommand(String processInstanceId, String newVariableValue, boolean rollback, boolean readVariable) {
+      this.processInstanceId = processInstanceId;
+      this.newVariableValue = newVariableValue;
+      this.rollback = rollback;
+      this.readVariable = readVariable;
     }
 
     public Void execute(CommandContext commandContext) {
-      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
-      DbEntityManager newEntityManager = dbEntityManagerFactory.openSession();
 
-      HistoricProcessInstanceEventEntity hpi = new HistoricProcessInstanceEventEntity();
-      hpi.setId(id);
-      hpi.setProcessInstanceId(id);
-      hpi.setProcessDefinitionId("someProcDefId");
-      hpi.setStartTime(new Date());
-      hpi.setState(HistoricProcessInstance.STATE_ACTIVE);
-
-      newEntityManager.insert(hpi);
-      newEntityManager.flush();
+      // add a read entry for the TX in the CRDB timestamp log
+      if (readVariable) {
+        commandContext.getProcessEngineConfiguration()
+            .getRuntimeService()
+            .createVariableInstanceQuery()
+            .processInstanceIdIn(processInstanceId)
+            .variableName(VAR_NAME)
+            .list();
+      }
 
       monitor.sync();
 
-      DbEntityManager cmdEntityManager = commandContext.getDbEntityManager();
-      cmdEntityManager.createHistoricProcessInstanceQuery().list();
+      commandContext.getProcessEngineConfiguration()
+          .getRuntimeService()
+          .setVariable(processInstanceId, VAR_NAME, newVariableValue);
 
-      monitor.sync();
+      if (rollback) {
+        throw new RuntimeException();
+      }
 
       return null;
     }
 
-  }
-
-  @After
-  public void tearDown() throws Exception {
-
-    // end interaction with Thread 2
-    thread2.waitUntilDone();
-
-    // end interaction with Thread 1
-    thread1.waitUntilDone();
-
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute((Command<Void>) commandContext -> {
-        List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
-        for (HistoricProcessInstance historicProcessInstance : list) {
-          commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
-        }
-        return null;
-      });
   }
 
 }

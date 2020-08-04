@@ -66,7 +66,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   @Override
   public List<LockedExternalTask> execute(CommandContext commandContext) {
     validateInput();
-    
+
     for (TopicFetchInstruction instruction : fetchInstructions.values()) {
       instruction.ensureVariablesInitialized();
     }

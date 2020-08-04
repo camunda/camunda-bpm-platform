@@ -396,7 +396,10 @@ public class BatchMigrationTest {
       Batch batch = helper.migrateProcessInstancesAsyncForTenant(10, "someTenantId");
       helper.completeSeedJobs(batch);
 
-      testRule.waitForJobExecutorToProcessAllJobs();
+      // extend waiting time for CRDB since it takes longer to process all the jobs there
+      // see CAM-12239 for more details
+      long maxMillisToWait = testRule.isOptimisticLockingExceptionSuppressible()? 10000L : 20000L;
+      testRule.waitForJobExecutorToProcessAllJobs(maxMillisToWait);
 
       // then all process instances where migrated
       assertEquals(0, helper.countSourceProcessInstances());
