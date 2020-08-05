@@ -51,7 +51,6 @@
     <@lib.property
         name = "rootCauseIncidentId"
         type = "string"
-        format = "date-time"
         desc = "The id of the associated root cause incident which has been triggered." />
 
     <@lib.property
