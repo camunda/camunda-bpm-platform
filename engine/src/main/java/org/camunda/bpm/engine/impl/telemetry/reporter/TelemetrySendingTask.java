@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.assemleRequestParameters;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class TelemetrySendingTask extends TimerTask {
       if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
         try {
           String telemetryData = JsonUtil.asString(data);
-          Map<String, Object> requestParams = assemleRequestParameters(METHOD_NAME_POST,
+          Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
                                                                        telemetryEndpoint,
                                                                        MediaType.APPLICATION_JSON,
                                                                        telemetryData);
@@ -80,7 +80,7 @@ public class TelemetrySendingTask extends TimerTask {
             // wls and was without connect plugin enabled
             httpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
             if (httpConnector == null) {
-              LOG.unableToConfigureHttpConnector();
+              LOG.unableToConfigureHttpConnectorWarning();
               return null;
             }
           }

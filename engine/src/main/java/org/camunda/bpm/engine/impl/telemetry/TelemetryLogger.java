@@ -70,9 +70,9 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "009", "An exception occured during scheduling telemetry task: {}", message);
   }
 
-  public void unableToConfigureHttpConnector() {
-    logDebug(
-        "010", "The http connector used to send telemetry is `null`, telemetry data will not be sent.");
+  public void unableToConfigureHttpConnectorWarning() {
+    logWarn(
+        "010","The http connector used to send telemetry is `null`, telemetry data will not be sent.");
   }
 
   public void unexpectedExceptionDuringHttpConnectorConfiguration(Exception e) {

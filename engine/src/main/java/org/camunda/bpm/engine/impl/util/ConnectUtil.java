@@ -38,7 +38,7 @@ public class ConnectUtil {
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
 
   // helper methods
-  public static Map<String, Object> assemleRequestParameters(String methodName,
+  public static Map<String, Object> assembleRequestParameters(String methodName,
                                                              String url,
                                                              String contentType,
                                                              String payload) {

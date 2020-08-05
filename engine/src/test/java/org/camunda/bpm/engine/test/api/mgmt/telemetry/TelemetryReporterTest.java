@@ -29,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.HttpURLConnection;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
@@ -56,8 +58,8 @@ public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
 
-  @Rule
-  public ProcessEngineBootstrapRule bootstrapRule =
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule =
       new ProcessEngineBootstrapRule(configuration ->
       configuration.setTelemetryEndpoint(TELEMETRY_ENDPOINT));
 
@@ -125,7 +127,7 @@ public class TelemetryReporterTest {
     stubFor(post(urlEqualTo("/pings"))
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
-    processEngineConfiguration.buildProcessEngine();
+    ProcessEngine engine = processEngineConfiguration.buildProcessEngine();
   
     // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
@@ -135,6 +137,10 @@ public class TelemetryReporterTest {
     verify(postRequestedFor(urlEqualTo("/pings"))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
+
+    // cleanup
+    engine.close();
+    ProcessEngines.unregister(engine);
   }
 
   @Test

@@ -339,6 +339,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -2583,12 +2584,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     try {
       if (telemetryHttpConnector == null ) {
-        if (Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID) == null) {
-          Connectors.loadConnectors();
-        }
+        // initialize connectors with process engine class loader
+        ClassLoader classloader = ClassLoaderUtil.getClassloader(ProcessEngine.class);
+        Connectors.loadConnectors(classloader);
+
         telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
         if (telemetryHttpConnector == null) {
-          ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnector();
+          ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
         }
       }
     } catch (Exception e) {

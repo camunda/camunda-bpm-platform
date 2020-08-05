@@ -31,10 +31,6 @@ import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StopJcaExecutorServiceStep;
-import org.camunda.connect.Connectors;
-import org.camunda.connect.spi.Connector;
-import org.camunda.connect.spi.ConnectorRequest;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
@@ -43,7 +39,6 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,16 +71,12 @@ public class EjbBpmPlatformBootstrap {
       .addStep(new DiscoverBpmPlatformPluginsStep())
       .addStep(new StartJcaExecutorServiceStep(executorServiceBean))
       .addStep(new StartJobExecutorStep())
+      .addStep(new InitializeConnectors())
       .addStep(new PlatformXmlStartProcessEnginesStep())
       .execute();
 
     processEngineService = containerDelegate.getProcessEngineService();
     processApplicationService = containerDelegate.getProcessApplicationService();
-
-    Set<Connector<? extends ConnectorRequest<?>>> availableConnectors = Connectors.getAvailableConnectors();
-    if (availableConnectors == null || availableConnectors.isEmpty()) {
-      Connectors.loadConnectors();
-    }
 
     LOGGER.log(Level.INFO, "camunda BPM platform started successfully.");
   }
