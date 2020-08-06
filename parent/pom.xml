@@ -18,8 +18,7 @@
   </description>
 
   <properties>
-    <version.spring.framework.standalone.webapps>4.3.23.RELEASE</version.spring.framework.standalone.webapps>
-    <version.spring.framework>3.2.18.RELEASE</version.spring.framework>
+    <version.spring.framework>5.2.8.RELEASE</version.spring.framework>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.10.0.Final</version.resteasy3>
@@ -27,6 +26,7 @@
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
+    <version.hibernate>5.4.18.Final</version.hibernate>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
@@ -158,11 +158,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>persistence-api</artifactId>
-        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>

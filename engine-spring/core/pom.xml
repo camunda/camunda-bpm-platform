@@ -11,10 +11,6 @@
     <version>7.14.0-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <version.hibernate>3.3.2.GA</version.hibernate>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -70,8 +66,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -113,20 +109,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- needed by Spring 3 -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
-      <version>${version.hibernate}</version>
-      <scope>test</scope>
-      <exclusions>
-        <!-- hibernate uses an older slf4j version -->
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <dependency>
       <groupId>commons-dbcp</groupId>
@@ -155,8 +137,12 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <argLine>-Xmx768m</argLine>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <argLine>-Xmx768m</argLine>
+          <classpathDependencyExcludes>
+            <!-- JPA 2.0 is for compile time, upon testing we use the environment defined by the hibernate and spring context (e.g. JPA 2.2) -->
+            <classpathDependencyExclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
 

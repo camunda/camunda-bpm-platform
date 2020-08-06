@@ -16,16 +16,11 @@
  */
 package org.camunda.bpm.engine.spring.test;
 
-import org.camunda.bpm.engine.spring.test.SpringTestHelper;
 import org.springframework.test.annotation.DirtiesContext.HierarchyMode;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestExecutionListener;
 
-/**
- * This is the same as the Spring3Test helper, but it is
- * important to compile the helper against Spring 5 for it to work.
- */
 public class Spring5TestHelper implements SpringTestHelper {
 
   @Override
@@ -50,7 +45,6 @@ public class Spring5TestHelper implements SpringTestHelper {
 
       @Override
       public void afterTestClass(TestContext testContext) throws Exception {
-        // ensures that the application context is not cached beyond this test
         testContext.markApplicationContextDirty(HierarchyMode.EXHAUSTIVE);
       }
     });
