@@ -27,7 +27,7 @@ Before you ask a question, search the forum. The answer may have already been pr
 
 You can contribute code that fixes bugs and/or implements features.
 
-* [Start with an EasyPick](https://app.camunda.com/jira/issues/?jql=project%20%3D%20CAM%20AND%20labels%20%3D%20EasyPick%20AND%20status%20%3D%20Open): In our Jira we label issues which we consider small and easy to start on as EasyPicks.
+* [Start with an EasyPick](https://app.camunda.com/jira/issues?jql=project%20%3D%20CAM%20AND%20labels%3D%20EasyPick%20AND%20status%20%3D%20Open): In our Jira we label issues which we consider small and easy to start on as EasyPicks.
 * Have a look on [what we are working on](https://app.camunda.com/jira/secure/RapidBoard.jspa?rapidView=39) first to check that we do not perform duplicated work
 * Read through our contribution guide lines
 * Implement the feature or bug fix on a [feature branch and submit the result as a pull request](http://lefedt.de/blog/posts/2013/contributing-to-oss-through-pull-requests/)
