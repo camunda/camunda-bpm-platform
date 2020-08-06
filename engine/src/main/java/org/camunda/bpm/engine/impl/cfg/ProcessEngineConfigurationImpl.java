@@ -2584,10 +2584,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     try {
       if (telemetryHttpConnector == null ) {
-        // initialize connectors with process engine class loader
-        ClassLoader classloader = ClassLoaderUtil.getClassloader(ProcessEngine.class);
-        Connectors.loadConnectors(classloader);
-
         telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
         if (telemetryHttpConnector == null) {
           ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
