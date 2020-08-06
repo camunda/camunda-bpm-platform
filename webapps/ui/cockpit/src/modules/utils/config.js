@@ -86,6 +86,10 @@ async function loadPlugins() {
 
   const loadedPlugins = (await Promise.all(fetchers)).reduce((acc, module) => {
     const plugins = module.default;
+    if (!plugins) {
+      return acc;
+    }
+
     if (Array.isArray(plugins)) {
       acc.push(...plugins);
     } else {
