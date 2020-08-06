@@ -8,7 +8,6 @@
     <version>7.14.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-spring-compatibility-root</artifactId>
 
   <packaging>pom</packaging>
@@ -16,33 +15,14 @@
 
   <!--
   Why this module structure?
-  Core is the user-facing camunda-engine-spring artifact and is compiled against Spring 3 and JPA 1.0.
-  The compatibility* modules run the tests contained in core with Spring 4 and 5 respectively.
+  Core is the user-facing camunda-engine-spring artifact and is compiled against Spring 5 and JPA 2.0.
+  The compatibility module runs the tests contained in core with Spring 4 respectively.
   This is implemented as separate modules and not as profiles of the core module, in order
-  to test the artifact that was compiled against Spring 3 (i.e. to ensure binary compatibility).
+  to test the artifact that was compiled against Spring 5 (i.e. to ensure binary compatibility).
   -->
-  <profiles>
-    <profile>
-      <id>java7</id>
-      <activation>
-        <jdk>(,1.8)</jdk>
-      </activation>
-      <modules>
-        <!-- Spring 5 requires Java 8 -->
-        <module>core</module>
-        <module>compatibility-test-spring4</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>java-other</id>
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-      <modules>
-        <module>core</module>
-        <module>compatibility-test-spring4</module>
-        <module>compatibility-test-spring5</module>
-      </modules>
-    </profile>
-  </profiles>
+  <modules>
+    <module>core</module>
+    <module>compatibility-test-spring4</module>
+  </modules>
+  
 </project>
