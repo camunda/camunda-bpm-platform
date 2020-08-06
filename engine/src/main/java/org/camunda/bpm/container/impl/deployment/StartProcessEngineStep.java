@@ -102,6 +102,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
     // instantiate plugins:
     configurePlugins(configuration, processEngineXml, classLoader);
+    addAdditionalPlugins(configuration);
 
     if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
       JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
@@ -147,6 +148,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
   }
 
+
   protected JobExecutor getJobExecutorService(final PlatformServiceContainer serviceContainer) {
     // lookup container managed job executor
     String jobAcquisitionName = processEngineXml.getJobAcquisitionName();
@@ -174,6 +176,13 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     catch (ClassCastException e) {
       throw LOG.configurationClassHasWrongType(className, clazz, e);
     }
+  }
+
+  /**
+   * Add additional plugins that are not declared in the process engine xml.
+   */
+  public void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
+    // do nothing
   }
 
 }
