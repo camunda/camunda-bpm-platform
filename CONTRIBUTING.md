@@ -75,7 +75,7 @@ Best practices for writing test cases:
 
 ## License headers
 
-Every source file needs to contain the following license header at it's top:
+Every source file needs to contain the following license header at the top:
 
 ```
 Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
