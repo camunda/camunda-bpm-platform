@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.connect.Connectors;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -75,15 +74,6 @@ public class TelemetrySendingTask extends TimerTask {
                                                                        telemetryEndpoint,
                                                                        MediaType.APPLICATION_JSON,
                                                                        telemetryData);
-          if (httpConnector == null) {
-            // try to fetch the connector in case it's initialized later that the engine init
-            // wls and was without connect plugin enabled
-            httpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
-            if (httpConnector == null) {
-              LOG.unableToConfigureHttpConnectorWarning();
-              return null;
-            }
-          }
           ConnectorRequest<?> request = httpConnector.createRequest();
           request.setRequestParameters(requestParams);
           CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();

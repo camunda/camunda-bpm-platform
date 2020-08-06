@@ -339,7 +339,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -2583,20 +2582,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       initTelemetryData();
     }
     try {
-      if (telemetryHttpConnector == null ) {
+      if (telemetryHttpConnector == null) {
         telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
-        if (telemetryHttpConnector == null) {
-          ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
-        }
       }
     } catch (Exception e) {
       ProcessEngineLogger.TELEMETRY_LOGGER.unexpectedExceptionDuringHttpConnectorConfiguration(e);
     }
-    if (telemetryReporter == null) {
-      telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
-          telemetryEndpoint,
-          telemetryData,
-          telemetryHttpConnector);
+    if (telemetryHttpConnector == null) {
+      ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
+    } else {
+      if (telemetryReporter == null) {
+        telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
+                                                  telemetryEndpoint,
+                                                  telemetryData,
+                                                  telemetryHttpConnector);
+      }
     }
   }
 

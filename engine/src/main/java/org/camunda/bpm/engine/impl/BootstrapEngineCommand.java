@@ -194,7 +194,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   protected void startTelemetryReporter(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     // start telemetry reporter only if the telemetry is enabled
-    if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
+    if (processEngineConfiguration.getManagementService().isTelemetryEnabled() &&
+        processEngineConfiguration.getTelemetryReporter() != null) {
       processEngineConfiguration.getTelemetryReporter().start();
     }
   }
