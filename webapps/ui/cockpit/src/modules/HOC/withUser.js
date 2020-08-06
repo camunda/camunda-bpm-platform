@@ -52,6 +52,9 @@ export function UserProvider({ children }) {
       setUser(user);
       return user;
     } catch (err) {
+      if (err.status === 404) {
+        window.location.href = "#/login";
+      }
       setUser(null);
     }
   };
