@@ -110,4 +110,8 @@ public class TelemetryReporter {
     return telemetryEndpoint;
   }
 
+  public Connector<? extends ConnectorRequest<?>> getHttpConnector() {
+    return httpConnector;
+  }
+
 }
