@@ -75,6 +75,7 @@ public class TelemetryReporterTest {
   @ClassRule
   public static WireMockRule wireMockRule = new WireMockRule(8082);
 
+  ProcessEngine engine;
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementService managementService;
 
@@ -87,6 +88,11 @@ public class TelemetryReporterTest {
   @After
   public void tearDown() {
     managementService.toggleTelemetry(false);
+
+    if (engine != null) {
+      engine.close();
+      ProcessEngines.unregister(engine);
+    }
   }
 
   @Test
@@ -127,7 +133,7 @@ public class TelemetryReporterTest {
     stubFor(post(urlEqualTo("/pings"))
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
-    ProcessEngine engine = processEngineConfiguration.buildProcessEngine();
+    engine = processEngineConfiguration.buildProcessEngine();
   
     // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
@@ -137,10 +143,6 @@ public class TelemetryReporterTest {
     verify(postRequestedFor(urlEqualTo("/pings"))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
-
-    // cleanup
-    engine.close();
-    ProcessEngines.unregister(engine);
   }
 
   @Test
