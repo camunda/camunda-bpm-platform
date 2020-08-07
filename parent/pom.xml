@@ -27,7 +27,6 @@
     <version.groovy>2.4.13</version.groovy>
     <version.gson>2.8.5</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
-    <version.httpclient>4.5.9</version.httpclient>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
@@ -458,11 +457,6 @@
         <version>${version.freemarker}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>${version.httpclient}</version>
-      </dependency>
 
       <dependency>
         <groupId>com.github.tomakehurst</groupId>

@@ -18,6 +18,7 @@ package org.camunda.bpm.container.impl.jboss.service;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
+import org.camunda.bpm.container.impl.jboss.plugin.JBossConnectProcessEnginePlugin;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
@@ -62,6 +63,8 @@ import java.util.logging.Logger;
 public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   private final static Logger LOGGER = Logger.getLogger(MscManagedProcessEngineController.class.getName());
+
+  protected static final String CONNECT_PROCESS_ENGINE_PLUGIN_NAME = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
 
   protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
 
@@ -182,6 +185,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // add process engine plugins:
     List<ProcessEnginePluginXml> pluginConfigurations = processEngineMetadata.getPluginConfigurations();
 
+    boolean isConnectPluginAdded = false;
+
     for (ProcessEnginePluginXml pluginXml : pluginConfigurations) {
       // create plugin instance
       ProcessEnginePlugin plugin = null;
@@ -198,6 +203,15 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
       // add to configuration
       processEngineConfiguration.getProcessEnginePlugins().add(plugin);
+
+      if(pluginClassName.equals(CONNECT_PROCESS_ENGINE_PLUGIN_NAME)) {
+        isConnectPluginAdded = true;
+      }
+    }
+
+    // add connect plugin to load connectors
+    if (!isConnectPluginAdded) {
+      processEngineConfiguration.getProcessEnginePlugins().add(new JBossConnectProcessEnginePlugin());
     }
   }
 

@@ -14,37 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.connect.plugin.impl;
+package org.camunda.bpm.container.impl.ejb.plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.container.impl.ejb.EjbBpmPlatformBootstrap;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.connect.Connectors;
 
-public class ConnectProcessEnginePlugin extends AbstractProcessEnginePlugin {
+public class EjbConnectProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     // use classloader which loaded the plugin
-    ClassLoader classloader = ClassLoaderUtil.getClassloader(ConnectProcessEnginePlugin.class);
+    ClassLoader classloader = ClassLoaderUtil.getClassloader(EjbBpmPlatformBootstrap.class);
     Connectors.loadConnectors(classloader);
-
-    addConnectorParseListener(processEngineConfiguration);
 
     processEngineConfiguration.setTelemetryHttpConnector(Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID));
   }
-
-  private void addConnectorParseListener(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    List<BpmnParseListener> preParseListeners = processEngineConfiguration.getCustomPreBPMNParseListeners();
-    if(preParseListeners == null) {
-      preParseListeners = new ArrayList<BpmnParseListener>();
-      processEngineConfiguration.setCustomPreBPMNParseListeners(preParseListeners);
-    }
-    preParseListeners.add(new ConnectorParseListener());
-  }
-
 }

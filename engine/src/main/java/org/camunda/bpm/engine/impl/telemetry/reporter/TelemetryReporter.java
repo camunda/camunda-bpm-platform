@@ -18,11 +18,12 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 
 import java.util.Timer;
 
-import org.apache.http.client.HttpClient;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetryReporter {
 
@@ -37,18 +38,18 @@ public class TelemetryReporter {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected Data data;
-  protected HttpClient httpClient;
+  protected Connector<? extends ConnectorRequest<?>> httpConnector;
 
   protected boolean stopped;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            Data data,
-                           HttpClient httpClient) {
+                           Connector<? extends ConnectorRequest<?>> httpConnector) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
-    this.httpClient = httpClient;
+    this.httpConnector = httpConnector;
     initTelemetrySendingTask();
   }
 
@@ -56,7 +57,7 @@ public class TelemetryReporter {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
                                                     data,
-                                                    httpClient);
+                                                    httpConnector);
   }
 
   public synchronized void start() {
@@ -107,6 +108,10 @@ public class TelemetryReporter {
 
   public String getTelemetryEndpoint() {
     return telemetryEndpoint;
+  }
+
+  public Connector<? extends ConnectorRequest<?>> getHttpConnector() {
+    return httpConnector;
   }
 
 }

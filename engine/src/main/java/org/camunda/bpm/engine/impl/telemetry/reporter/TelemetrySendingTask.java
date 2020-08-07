@@ -16,22 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import java.nio.charset.StandardCharsets;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
+
+import java.net.HttpURLConnection;
+import java.util.Map;
 import java.util.TimerTask;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.connect.spi.CloseableConnectorResponse;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
@@ -40,16 +42,16 @@ public class TelemetrySendingTask extends TimerTask {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected Data data;
-  protected HttpClient httpClient;
+  protected Connector<? extends ConnectorRequest<?>> httpConnector;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               Data data,
-                              HttpClient httpClient) {
+                              Connector<? extends ConnectorRequest<?>> httpConnector) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.data = data;
-    this.httpClient = httpClient;
+    this.httpConnector = httpConnector;
   }
 
   @Override
@@ -58,7 +60,7 @@ public class TelemetrySendingTask extends TimerTask {
     try {
       sendData();
     } catch (Exception e) {
-      LOG.exceptionWhileSendingTelemetryData(e.getMessage());
+      LOG.exceptionWhileSendingTelemetryData(e);
     }
   }
 
@@ -67,20 +69,27 @@ public class TelemetrySendingTask extends TimerTask {
       // send data only if telemetry is enabled
       if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
         try {
-          HttpPost request = new HttpPost(telemetryEndpoint);
           String telemetryData = JsonUtil.asString(data);
-          StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-          request.setEntity(requestBody);
-          HttpResponse response = httpClient.execute(request);
+          Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
+                                                                       telemetryEndpoint,
+                                                                       MediaType.APPLICATION_JSON,
+                                                                       telemetryData);
+          ConnectorRequest<?> request = httpConnector.createRequest();
+          request.setRequestParameters(requestParams);
+          CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
 
-          if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
+          if (response == null) {
             LOG.unexpectedResponseWhileSendingTelemetryData();
           } else {
-            LOG.telemetryDataSent(telemetryData);
+            int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
+            if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
+              LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
+            } else {
+              LOG.telemetryDataSent(telemetryData);
+            }
           }
         } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e.getMessage());
+          LOG.exceptionWhileSendingTelemetryData(e);
         }
       } else {
         LOG.telemetryDisabled();
@@ -88,5 +97,6 @@ public class TelemetrySendingTask extends TimerTask {
       return null;
     });
   }
+
 
 }

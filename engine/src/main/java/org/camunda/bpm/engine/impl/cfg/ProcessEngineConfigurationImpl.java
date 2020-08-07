@@ -44,8 +44,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -92,6 +90,7 @@ import org.camunda.bpm.engine.impl.ModificationBatchJobHandler;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.PriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.RestartProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -371,6 +370,9 @@ import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.connect.Connectors;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 
 /**
@@ -888,7 +890,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
   protected TelemetryReporter telemetryReporter;
   /** http client used for sending telemetry */
-  protected HttpClient telemetryHttpClient;
+  protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
   protected Data telemetryData;
 
 
@@ -2579,14 +2581,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (telemetryData == null) {
       initTelemetryData();
     }
-    if (telemetryHttpClient == null) {
-      telemetryHttpClient = HttpClientBuilder.create().useSystemProperties().build();
+    try {
+      if (telemetryHttpConnector == null) {
+        telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
+      }
+    } catch (Exception e) {
+      ProcessEngineLogger.TELEMETRY_LOGGER.unexpectedExceptionDuringHttpConnectorConfiguration(e);
     }
-    if (telemetryReporter == null) {
-      telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
-          telemetryEndpoint,
-          telemetryData,
-          telemetryHttpClient);
+    if (telemetryHttpConnector == null) {
+      ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
+    } else {
+      if (telemetryReporter == null) {
+        telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
+                                                  telemetryEndpoint,
+                                                  telemetryData,
+                                                  telemetryHttpConnector);
+      }
     }
   }
 
@@ -4705,13 +4715,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public HttpClient getTelemetryHttpClient() {
-    return telemetryHttpClient;
+  public Connector<? extends ConnectorRequest<?>> getTelemetryHttpConnector() {
+    return telemetryHttpConnector;
   }
- 
-  public ProcessEngineConfigurationImpl setTelemetryHttpClient(HttpClient telemetryHttpClient) {
-    this.telemetryHttpClient = telemetryHttpClient;
-    return this;
+
+  public void setTelemetryHttpConnector(Connector<? extends ConnectorRequest<?>> telemetryHttp) {
+    this.telemetryHttpConnector = telemetryHttp;
   }
 
   public Data getTelemetryData() {

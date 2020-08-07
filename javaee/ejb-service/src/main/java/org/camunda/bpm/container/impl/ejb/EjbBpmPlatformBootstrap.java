@@ -22,16 +22,15 @@ import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
 import org.camunda.bpm.container.impl.deployment.DiscoverBpmPlatformPluginsStep;
-import org.camunda.bpm.container.impl.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.deployment.StopProcessEnginesStep;
 import org.camunda.bpm.container.impl.deployment.UnregisterBpmPlatformPluginsStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StartJobExecutorStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
+import org.camunda.bpm.container.impl.ejb.deployment.EjbPlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StopJcaExecutorServiceStep;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
@@ -72,7 +71,7 @@ public class EjbBpmPlatformBootstrap {
       .addStep(new DiscoverBpmPlatformPluginsStep())
       .addStep(new StartJcaExecutorServiceStep(executorServiceBean))
       .addStep(new StartJobExecutorStep())
-      .addStep(new PlatformXmlStartProcessEnginesStep())
+      .addStep(new EjbPlatformXmlStartProcessEnginesStep())
       .execute();
 
     processEngineService = containerDelegate.getProcessEngineService();
