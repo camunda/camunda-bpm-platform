@@ -39,6 +39,9 @@
 
     <module name="org.camunda.bpm.camunda-engine-plugins" optional="true" />
 
+    <module name="org.camunda.connect.camunda-connect-core" />
+    <module name="org.camunda.connect.camunda-connect-http-client" services="import" />
+
     <!-- for LDAP plugin only -->
     <module name="sun.jdk" />
 

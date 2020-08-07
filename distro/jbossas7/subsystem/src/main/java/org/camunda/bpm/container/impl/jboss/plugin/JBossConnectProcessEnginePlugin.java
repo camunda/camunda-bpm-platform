@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.container.impl.jboss;
+package org.camunda.bpm.container.impl.jboss.plugin;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
@@ -26,7 +26,7 @@ public class JBossConnectProcessEnginePlugin extends AbstractProcessEnginePlugin
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    ClassLoader classloader = ClassLoaderUtil.getClassloader(ProcessEngine.class); 
+    ClassLoader classloader = ClassLoaderUtil.getClassloader(MscManagedProcessEngineController.class); 
     Connectors.loadConnectors(classloader);
 
     processEngineConfiguration.setTelemetryHttpConnector(Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID));
