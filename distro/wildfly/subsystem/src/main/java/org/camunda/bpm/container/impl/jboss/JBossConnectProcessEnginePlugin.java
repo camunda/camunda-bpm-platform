@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm.container.impl.jboss;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.connect.Connectors;
 
 public class JBossConnectProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-//    ClassLoader classloader = ClassLoaderUtil.getClassloader(); TODO
-    Connectors.loadConnectors();
+    ClassLoader classloader = ClassLoaderUtil.getClassloader(ProcessEngine.class); 
+    Connectors.loadConnectors(classloader);
 
     processEngineConfiguration.setTelemetryHttpConnector(Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID));
   }
