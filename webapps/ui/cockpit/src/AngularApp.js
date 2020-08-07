@@ -25,23 +25,28 @@ export default function AngularApp({ component }) {
   const ref = useRef(null);
 
   useEffect(() => {
-    const { node, module } = component();
+    const promise = new Promise(resolve => {
+      const { node, module } = component();
 
-    setup(module);
+      setup(module);
 
-    const domNode = ref.current;
-    domNode.appendChild(node);
+      const domNode = ref.current;
+      domNode.appendChild(node);
 
-    node.classList.add("angular-app");
+      node.classList.add("angular-app");
 
-    angular.bootstrap(node, [module.name]);
+      angular.bootstrap(node, [module.name]);
+      resolve({ node, domNode });
+    });
 
     return () => {
-      angular
-        .element(node)
-        .scope()
-        .$destroy();
-      domNode.removeChild(node);
+      promise.then(({ node, domNode }) => {
+        angular
+          .element(node)
+          .scope()
+          .$destroy();
+        domNode.removeChild(node);
+      });
     };
   }, [component]);
 
