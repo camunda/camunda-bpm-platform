@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
  */
 public class EjbStartProcessEngineStep extends StartProcessEngineStep {
 
+  protected static final String CONNECT_PROCESS_ENGINE_PLUGIN = "org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin";
+
   public EjbStartProcessEngineStep(ProcessEngineXml processEngineXml) {
     super(processEngineXml);
   }
@@ -39,8 +41,7 @@ public class EjbStartProcessEngineStep extends StartProcessEngineStep {
     boolean isConnectPluginAdded = false;
     List<ProcessEnginePlugin> processEnginePlugins = configuration.getProcessEnginePlugins();
     for (ProcessEnginePlugin processEnginePlugin : processEnginePlugins) {
-      if (processEnginePlugin.getClass().getCanonicalName()
-          .equals("org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin")) {
+      if (processEnginePlugin.getClass().getCanonicalName().equals(CONNECT_PROCESS_ENGINE_PLUGIN)) {
         isConnectPluginAdded = true;
         break;
       }
