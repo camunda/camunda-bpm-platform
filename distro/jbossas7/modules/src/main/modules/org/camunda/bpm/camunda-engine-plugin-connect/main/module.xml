@@ -9,8 +9,8 @@
 
     <module name="org.camunda.bpm.camunda-engine" />
 
-    <module name="org.camunda.connect.camunda-connect-core" />
-    <module name="org.camunda.connect.camunda-connect-http-client" services="import" />
+    <module name="org.camunda.connect.camunda-connect-core" export="true" />
+    <module name="org.camunda.connect.camunda-connect-http-client" export="true" services="import" />
     <module name="org.camunda.connect.camunda-connect-soap-http-client" services="import" />
 
   </dependencies>

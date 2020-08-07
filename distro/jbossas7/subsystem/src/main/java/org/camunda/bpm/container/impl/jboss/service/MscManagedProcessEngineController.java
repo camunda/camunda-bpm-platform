@@ -182,6 +182,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // add process engine plugins:
     List<ProcessEnginePluginXml> pluginConfigurations = processEngineMetadata.getPluginConfigurations();
 
+    boolean isConnectPluginAdded = false;
+
     for (ProcessEnginePluginXml pluginXml : pluginConfigurations) {
       // create plugin instance
       ProcessEnginePlugin plugin = null;
@@ -198,6 +200,15 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
       // add to configuration
       processEngineConfiguration.getProcessEnginePlugins().add(plugin);
+
+      if(pluginClassName.equals("org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin")) {
+        isConnectPluginAdded = true;
+      }
+    }
+
+    // add connect plugin to load connectors
+    if (!isConnectPluginAdded) {
+      processEngineConfiguration.getProcessEnginePlugins().add(new JBossConnectProcessEnginePlugin());
     }
   }
 
