@@ -75,7 +75,7 @@ public class TelemetryReporterTest {
   @ClassRule
   public static WireMockRule wireMockRule = new WireMockRule(8082);
 
-  ProcessEngine standaloneProcessEngine;
+  protected ProcessEngine standaloneProcessEngine;
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementService managementService;
 
