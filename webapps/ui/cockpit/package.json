@@ -17,7 +17,7 @@
     "angular-translate": "2.18.2",
     "bootstrap": "3.4.1",
     "bpmn-js": "6.2.1",
-    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
+    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations.git#master",
     "chart.js": "2.8.0",
     "classnames": "2.2.6",
     "clipboard": "2.0.4",
