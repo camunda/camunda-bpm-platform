@@ -99,7 +99,7 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2
+                  cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2
                 """
               }
             }
@@ -116,13 +116,13 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Prolling-update,h2
+                  cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Prolling-update,h2
                 """
               }
             }
           }
         }
-        stage('Upgrade old engine') {
+        stage('QA: Upgrade old engine from 7.13') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -139,7 +139,7 @@ pipeline{
             }
           }
         }
-        stage('Upgrade tests from 7.13') {
+        stage('QA: Upgrade database from 7.13') {
           agent {
             kubernetes {
               yaml getMavenAgent()
