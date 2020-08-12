@@ -44,7 +44,7 @@ pipeline{
           sh '''
             curl -s -O https://deb.nodesource.com/node_14.x/pool/main/n/nodejs/nodejs_14.6.0-1nodesource1_amd64.deb
             dpkg -i nodejs_14.6.0-1nodesource1_amd64.deb
-            apt install -y g++ make
+            apt -qq update && apt install -y g++ make
           '''
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
