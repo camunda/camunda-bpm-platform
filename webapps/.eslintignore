@@ -1,0 +1,7 @@
+node_modules/**/*.js
+ui/**/*test*/**/*.js
+ui/**/grunt/**/*.js
+grunt/
+Gruntfile.js
+camunda-commons-ui/
+camunda-bpm-sdk-js/
