@@ -86,7 +86,7 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2 -B
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2
                 """
               }
             }
@@ -137,7 +137,7 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa\test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pupgrade-db,h2
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pupgrade-db,h2
                 """
               }
             }
