@@ -116,7 +116,7 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Prolling-update,h2
+                  cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,h2
                 """
               }
             }
