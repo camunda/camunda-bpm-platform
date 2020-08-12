@@ -13,7 +13,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: maven
-    image: ubuntu:20.04
+    image: maven:3.6.3-openjdk-8
     command: ["cat"]
     tty: true
     env:
@@ -41,18 +41,15 @@ pipeline{
       steps{
         container("maven"){
           // Install asdf
-          sh """
-            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
-            echo '. /root/.asdf/asdf.sh' > ~/.bashrc
-            . /root/.asdf/asdf.sh
-            for plugin in \$(cat .tool-versions | awk '{print \$1}'); do
-                asdf plugin add \${plugin};
-            done
-            asdf install
-          """
+          sh '''
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            apt install -y nodejs
+          '''
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-            sh("mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean install -D skipTests")
+            sh """
+              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean install -D skipTests
+            """
           }
         }
       }
