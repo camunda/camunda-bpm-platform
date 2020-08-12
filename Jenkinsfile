@@ -43,8 +43,8 @@ pipeline{
           // Install asdf
           sh """
             git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
-            echo '. $HOME/.asdf/asdf.sh' > ~/.bashrc
-            . $HOME/.asdf/asdf.sh
+            echo '. /root/.asdf/asdf.sh' > ~/.bashrc
+            . /root/.asdf/asdf.sh
             for plugin in \$(cat .tool-versions | awk '{print \$1}'); do
                 asdf plugin add \${plugin};
             done
