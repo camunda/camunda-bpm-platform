@@ -42,8 +42,9 @@ pipeline{
         container("maven"){
           // Install asdf
           sh '''
-            curl -sL https://deb.nodesource.com/setup_14.x | bash -
-            apt install -y g++ make nodejs
+            curl -s -O https://deb.nodesource.com/node_14.x/pool/main/n/nodejs/nodejs_14.6.0-1nodesource1_amd64.deb
+            dpkg -i nodejs_14.6.0-1nodesource1_amd64.deb
+            apt install -y g++ make
           '''
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
