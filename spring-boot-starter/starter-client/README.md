@@ -44,7 +44,7 @@ In order to enable the external task subscriptions you have to do use the `Enabl
 
 ```java
 @Configuration
-@EnableExternalTaskSubscriptions(baseUrl = "http://localhost:8080/rest")
+@EnableExternalTaskSubscriptions(baseUrl = "http://localhost:8080/engine-rest")
 public class SimpleConfiguration {
 }
 ```
@@ -55,7 +55,7 @@ You can also use other ways to configure it via normal Spring possibilities:
 camunda:
   bpm:
     client:
-      base-url: http://localhost:8080/rest
+      base-url: http://localhost:8080/engine-rest
 ```
 
 
