@@ -75,7 +75,7 @@ pipeline{
             }
           }
         }
-        stage('Upgrade tests') {
+        stage('Upgrade old engine') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -86,7 +86,24 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pold-engine,h2
+                """
+              }
+            }
+          }
+        }
+        stage('Upgrade tests from 7.13') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pupgrade-db,h2
                 """
               }
             }
