@@ -99,7 +99,7 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
-                  cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2
+                  cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,h2
                 """
               }
             }
