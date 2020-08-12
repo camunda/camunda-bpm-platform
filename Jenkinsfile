@@ -40,8 +40,17 @@ pipeline{
       }
       steps{
         container("maven"){
-          // Install npm
-          sh "apt update -qq && apt install -qq -y npm"
+          // Install asdf
+          sh """
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
+            echo '. $HOME/.asdf/asdf.sh' > ~/.bashrc
+            . $HOME/.asdf/asdf.sh
+            for plugin in $(cat .tool-versions | awk '{print $1}'); do
+                asdf plugin add ${plugin};
+            done
+            asdf install
+          """
+          // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh("mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean install -D skipTests")
           }
