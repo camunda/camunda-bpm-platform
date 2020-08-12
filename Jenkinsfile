@@ -69,6 +69,18 @@ pipeline{
               // Run maven
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  cd model-api/xml-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                """
+                sh """
+                  cd model-api/bpmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                """
+                sh """
+                  cd model-api/dmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                """
+                sh """
+                  cd model-api/cmmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                """
+                sh """
                   cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
                 """
               }
