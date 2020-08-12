@@ -1,0 +1,32 @@
+<div ng-show="!diagramState.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-if="diagramState.$loaded">
+  <div ng-hide="diagram.definition && diagram.xml"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'NO_DIAGRAM' | translate }}
+  </div>
+
+  <div ng-if="processDefinition && diagram.xml">
+    <div class="diagram-pane"
+         cam-widget-bpmn-viewer
+         diagram-data="diagram.xml"
+         on-load="highlightTask()"
+         control="control">
+    </div>
+  </div>
+
+  <div ng-if="caseDefinition && diagram.xml">
+    <div class="diagram-pane"
+         cam-widget-cmmn-viewer
+         diagram-data="diagram.xml"
+         on-load="highlightTask()"
+         control="control">
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,19 @@
+<div class="loader-state loaded"
+     ng-show="loadingState === 'LOADED'"
+     ng-transclude></div>
+
+<div class="loader-state loading"
+     ng-if="loadingState === 'LOADING'">
+  <span class="glyphicon glyphicon-refresh animate-spin"></span>
+  {{ textLoading }}
+</div>
+
+<div class="loader-state empty"
+     ng-if="loadingState === 'EMPTY'">
+  {{ textEmpty }}
+</div>
+
+<div uib-alert class="loader-state alert alert-danger"
+     ng-if="loadingState === 'ERROR'">
+  {{ textError }}
+</div>

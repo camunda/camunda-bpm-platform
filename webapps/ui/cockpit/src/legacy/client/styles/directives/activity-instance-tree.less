@@ -1,0 +1,240 @@
+.btn-control,
+.btn-control-link,
+.btn.btn-control {
+  color: @text-color;
+}
+
+.instance-tree {
+  * {
+    display: block;
+  }
+  [class^="icon-"],
+  [class*=" icon-"] {
+    display: inline-block;
+    &:before {
+      position: relative;
+      z-index: 99;
+      background-color: @filters-bg;
+      .transition(transform .218s ease .218s);
+    }
+  }
+
+  li {
+    position: relative;
+    z-index: 10;
+    &:hover {
+      z-index: 99;
+      > .tree-node > .tree-node-group > .tree-node-label {
+        > [class^="icon-"],
+        > [class*=" icon-"] {
+          &:before {
+            .scale(3);
+          }
+        }
+      }
+    }
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  li {
+    margin: 3px 0;
+  }
+
+  .btn-control-link {
+    padding: 0;
+    text-decoration: none;
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .tree-node {
+    padding-left: 20px;
+  }
+  > .tree-node {
+    padding: 0;
+  }
+
+  li {
+    margin: -1px 0 0 0;
+    &:last-child {
+      margin: -1px 0 3px 0;
+    }
+  }
+
+  .tree-node-group {
+    position: relative;
+    vertical-align: middle;
+    height: 25px;
+    &:hover {
+      z-index: 99;
+    }
+  }
+
+  .tree-node-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    border: 1px solid darken(@gray-lighter, 15%);
+    border-radius: @border-radius-base;
+
+    a {
+      font-size: 12px;
+      color: @text-color;
+      text-decoration: none;
+
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 20px;
+      right: 20px;
+      bottom: 0;
+      padding: 0 4px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 24px;
+      vertical-align: middle;
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+    }
+
+    .btn-toggle {
+      left: 4px;
+    }
+
+    .remove {
+      right: 24px;
+      display: none;
+      z-index: 10;
+    }
+
+    &.has-children {
+      a {
+        left: 20px;
+      }
+    }
+
+    &.selected {
+      background-color: @bpmn-highlight-bg;
+      border-color: @bpmn-highlight-border-color;
+      z-index: 11;
+      [class^="icon-"],
+      [class*=" icon-"] {
+        &:before {
+          background-color: @bpmn-highlight-bg;
+          border-color: @bpmn-highlight-border-color;
+        }
+      }
+
+      .remove {
+        display: block;
+      }
+      a {
+        right: 20px;
+        padding-right: 24px;
+      }
+    }
+  }
+
+  .tree-node-addon {
+    display: block;
+    padding: 4px;
+    border-radius: 0 @border-radius-base @border-radius-base 0;
+    background-color: @canceled-color;
+    border-left: 0;
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    right: 1px;
+    z-index: 12;
+
+
+    &.activity-instance-completed {
+      background-color: @completed-color;
+    }
+
+    &.activity-instance-running {
+      background-color: @running-color;
+    }
+  }
+}
+
+.key,
+.quick-filters,
+.version-filter {
+  .name {
+    font-weight: bolder;
+  }
+}
+
+.quick-filters,
+.state-filter {
+  .quick-filter {
+    min-height: 40px;
+    position: relative;
+    max-width: 100%;
+    margin-top: 3px;
+  }
+
+  label {
+    background-image: none;
+    &.running {
+      background-color: @running-color;
+      border-color: @running-darker;
+    }
+    &.completed,
+    &.finished {
+      background-color: @completed-color;
+      border-color: @completed-darker;
+    }
+    &.canceled {
+      background-color: @canceled-color;
+      border-color: @canceled-darker;
+    }
+  }
+
+  .name-filter {
+    overflow: hidden;
+    max-width: 100%;
+
+    input {
+      max-width: 100%;
+    }
+  }
+
+  .input-append {
+    margin: 0;
+    width: auto;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+
+    input {
+      line-height: 20px;
+      height: 26px;
+    }
+
+    .add-on {
+      line-height: 20px;
+      height: 26px;
+      padding: 2px 5px;
+    }
+  }
+}
+
+.state-filter > .name {
+  font-weight: bolder;
+  display: inline-block;
+}

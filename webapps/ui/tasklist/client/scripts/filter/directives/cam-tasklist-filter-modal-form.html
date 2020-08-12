@@ -1,0 +1,87 @@
+<form name="filterForm" role="form">
+
+  <uib-accordion close-others="true">
+
+    <div uib-accordion-group is-open="group.general" class="panel-default">
+
+      <uib-accordion-heading>
+        {{ 'FILTER_FORM_BASICS' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterGeneralForm')"></span>
+      </uib-accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_BASICS_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-general
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </div>
+
+    <div uib-accordion-group is-open="group.criteria" class="panel-default">
+      <uib-accordion-heading>
+        {{ 'FILTER_FORM_CRITERIA' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterCriteriaForm')"></span>
+      </uib-accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_CRITERIA_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-criteria
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </div>
+
+    <div uib-accordion-group is-open="group.permission" class="panel-default">
+      <uib-accordion-heading>
+        {{ 'FILTER_FORM_PERMISSIONS' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterPermissionForm')"></span>
+      </uib-accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_PERMISSIONS_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-permission
+           filter="filter"
+           accesses="accesses"
+           filter-modal-form-data="filterModalFormData"
+           is-open="group.permission">
+      </div>
+
+    </div>
+
+    <div uib-accordion-group is-open="group.variable" class="panel-default">
+      <uib-accordion-heading>
+        {{ 'FILTER_FORM_VARIABLES' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterVariableForm')"></span>
+      </uib-accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_VARIABLES_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-variable
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </div>
+
+  </uib-accordion>
+
+</form>
+

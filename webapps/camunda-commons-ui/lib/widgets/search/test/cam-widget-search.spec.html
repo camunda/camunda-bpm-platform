@@ -1,0 +1,279 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Search</h1>
+      </div>
+    </header>
+
+    <section class='widget-description'>
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>The search widget implements a highly customizable search functionality which is used in the Cockpit and Tasklist app. A search always consists of one or more search pills.</p>
+      <p>The search widget persists valid searches in the URL bar, it is therefore not possible to include more than one search widget per page.</p>
+    </section>
+
+    <section class='widget-reference'>
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> cam-widget-search-searches</dt>
+        <dd>An array containing all searches. The elements of the array are objects which represent a single search pill. The properties of the objects are explained in the <a href='/lib/widgets/search-pill/test/cam-widget-search-pill.spec.html'>seach pill widget documentation</a>. Functions, invalid-text and delete-text are not included. </dd>
+        <dt><span class="badge">=</span> cam-widget-search-valid-searches</dt>
+        <dd>Like cam-widget-search-searches, but only includes valid searches.</dd>
+        <dt><span class="badge">=</span> cam-widget-search-types</dt>
+        <dd>An array of possible search types. Every type is an object containing the following properties:
+          <ul>
+            <li><b>id</b>: An object containing the properties key and value - corresponding to the type field of the search-pill widget</li>
+            <li><b>operators</b>: An array containing objects describing possible operators for the type, corresponding to the operator.values array of the search-pill widget. If omitted, available operators are determined by variable type and the cam-widget-search-operators property.</li>
+            <li><b>default</b>: Boolean indicating if this is the default type. The default type is used to create search pills if the user enters a string in the text input, which can not be matched with any type. Can not be used in combination with groups.</li>
+            <li><b>allowDates</b>: Corresponds to the allowDates property of the search-pill widget</li>
+            <li><b>enforceDates</b>: Corresponds to the enforceDates property of the search-pill widget</li>
+            <li><b>enforceString</b>: Corresponds to the enforceString property of the search-pill widget</li>
+            <li><b>extended</b>: Corresponds to the extended property of the search-pill widget</li>
+            <li><b>basic</b>: Corresponds to the basic property of the search-pill widget</li>
+            <li><b>groups</b>: An array containing the groups this type is member of. A search query can only contain search elements which are in the same group.</li>
+            <li><b>options</b>: Corresponds to the options property of the search-pill widget</li>
+          </ul>
+        </dd>
+        <dt><span class="badge">=</span> cam-widget-search-operators</dt>
+        <dd>An object specifying the available operator by variable type. Is used when the type does not specify an operators array. Keys of the object are variable types. Each key must contain an array specifying the operators according to the operator.values array of the search-pill widget. Available variable types are <b>undefined, number, string, object, date, boolean</b>.</dd>
+        <dt><span class="badge">=</span> cam-widget-search-translations</dt>
+        <dd>An object specifying the tooltips for the search. Available keys are: <b>inputPlaceholder, invalid, deleteSearch, type, name, operator and value</b>. Value must be a string.</dd>
+        <dt><span class="badge">@</span> cam-widget-search-id</dt>
+        <dd><b>Optional.</b> A string specifying the id of the search. This should be used when having multiple instances of the search widget on the same page.</dd>
+        <dt><span class="badge">@</span> cam-widget-search-storage-group</dt>
+        <dd><b>Optional.</b> A string specifying a namespace for local persistence of search criteria.</dd>
+        <dt><span class="badge">@</span> cam-widget-search-mode</dt>
+        <dd><b>Optional.</b> A string specifying the name of an <a href="http://getbootstrap.com/components/#glyphicons">(glyph)icon</a> (generally, you would use either `search` or `filter`).</dd>
+        <dt><span class="badge">=</span> cam-widget-total</dt>
+        <dd><b>Optional.</b> total number of results found</dd>
+      </dl>
+    </section>
+
+    <section class='widget-examples'>
+      <header>
+        <h2>Example</h2>
+      </header>
+
+      <div class='widget-example'
+           id='example1'>
+        <div ng-controller='testController'>
+          <div class="test-container">
+            <div cam-widget-search
+                 cam-widget-search-searches='searches'
+                 cam-widget-search-valid-searches='validSearches'
+                 cam-widget-search-translations='translations'
+                 cam-widget-search-types='types'
+                 cam-widget-search-operators='operators'
+                 cam-widget-search-id='search1'
+                 cam-widget-search-storage-group='"search1"'
+                 cam-widget-search-mode='filter'
+            />
+          </div>
+          <b>All Searches:</b> <span id="allSearchesCount">{{ searches.length }}</span><br />
+          <b>Valid Searches:</b> <span id="validSearchesCount">{{ validSearches.length }}</span>
+
+          <pre ng-non-bindable>
+$scope.searches = [];
+$scope.validSearches = [];
+$scope.translations = {
+  'inputPlaceholder': 'Search for Anything',
+  'invalid': 'This search query is not valid',
+  'deleteSearch': 'Remove search',
+  'type': 'Type',
+  'name': 'Property',
+  'operator': 'Operator',
+  'value': 'Value'
+};
+$scope.types = [
+  {
+    'id': {
+      'key': 'PredefinedOperators',
+      'value': 'Predefined Operators'
+    },
+    'operators': [
+      {'key': 'eq',  'value': '='},
+      {'key': 'lt',  'value': '<'},
+      {'key': 'like','value': 'like'}
+    ],
+    default: true
+  },
+  {
+    'id': {
+      'key': 'EnforceDate',
+      'value': 'Enforce Date'
+    },
+    'operators': [
+      {'key': 'eq', 'value': '='}
+    ],
+    allowDates: true,
+    enforceDates: true
+  },
+  {
+    'id': {
+      'key': 'EnforceString',
+      'value': 'Enforce String'
+    },
+    'operators': [
+      {'key': 'eq', 'value': '='}
+    ],
+    enforceString: true
+  },
+  {
+    'id': {
+      'key': 'variableOperator',
+      'value': 'Variable Operator'
+    },
+    allowDates: true,
+    extended: true
+  },
+  {
+    'id': {
+      'key': 'basicQuery',
+      'value': 'Basic Query'
+    },
+    basic: true
+  }
+];
+$scope.operators =  {
+  'undefined': [
+    {'key': 'eq', 'value': '='},
+    {'key': 'neq','value': '!='}
+  ],
+  'string': [
+    {'key': 'eq',  'value': '='},
+    {'key': 'like','value': 'like'}
+  ],
+  'number': [
+    {'key': 'eq', 'value': '='},
+    {'key': 'neq','value': '!='},
+    {'key': 'gt', 'value': '>'},
+    {'key': 'lt', 'value': '<'}
+  ],
+  'boolean': [
+    {'key': 'eq', 'value': '='}
+  ],
+  'object': [
+    {'key': 'eq', 'value': '='}
+  ],
+  'date': [
+    {'key': 'Before', 'value': 'before'},
+    {'key': 'After',  'value': 'after'}
+  ]
+};
+
+
+&lt;div&gt;
+  &lt;div cam-widget-search
+       cam-widget-search-searches='searches'
+       cam-widget-search-valid-searches='validSearches'
+       cam-widget-search-translations='translations'
+       cam-widget-search-types='types'
+       cam-widget-search-operators='operators'
+       cam-widget-search-id='search1'
+       cam-widget-search-storage-group='"search1"'
+       cam-widget-search-mode='filter'
+  /&gt;
+&lt;/div&gt;
+&lt;b&gt;All Searches:&lt;/b&gt; {{ searches.length }}&lt;br /&gt;
+&lt;b&gt;Valid Searches:&lt;/b&gt; {{ validSearches.length }}</pre>
+        </div>
+      </div><!-- /.widget-example -->
+    </section>
+
+    <section class='widget-examples'>
+      <header>
+        <h2>Groups</h2>
+      </header>
+
+      <div class='widget-example'
+           id='example2'>
+        In this example, we have three types: A, B and C. Type A is in group A and type B is in group B. Therefore, both are mutually exclusive. It is not possible to construct a search query with search components of both types A and B (multiple As and multiple Bs are allowed, as are as many Cs as you like).
+        <br/>
+        The storage group will here be
+        <div ng-controller='testController'>
+          <div class="test-container">
+            <div cam-widget-search
+                 cam-widget-search-searches='searches2'
+                 cam-widget-search-valid-searches='validSearches2'
+                 cam-widget-search-translations='translations'
+                 cam-widget-search-types='types2'
+                 cam-widget-search-operators='operators'
+                 cam-widget-search-id='search2'
+                 cam-widget-search-mode='filter'
+            />
+          </div>
+          <b>All Searches:</b> <span id="allSearchesCount">{{ searches2.length }}</span><br />
+          <b>Valid Searches:</b> <span id="validSearchesCount">{{ validSearches2.length }}</span>
+
+          <pre ng-non-bindable>
+$scope.searches2 = [];
+$scope.validSearches2 = [];
+$scope.types2 = [
+  {
+    'id': {
+      'key': 'A',
+      'value': 'A'
+    },
+    'groups': ['A']
+  },
+  {
+    'id': {
+      'key': 'B',
+      'value': 'B'
+    },
+    'groups': ['B']
+  },
+  {
+    'id': {
+      'key': 'C',
+      'value': 'C'
+    },
+  }
+];
+
+&lt;div&gt;
+  &lt;div cam-widget-search
+       cam-widget-search-searches='searches2'
+       cam-widget-search-valid-searches='validSearches2'
+       cam-widget-search-translations='translations'
+       cam-widget-search-types='types2'
+       cam-widget-search-operators='operators'
+       cam-widget-search-id='search2'
+       cam-widget-search-mode='filter'
+  /&gt;
+&lt;/div&gt;
+&lt;b&gt;All Searches:&lt;/b&gt; {{ searches2.length }}&lt;br /&gt;
+&lt;b&gt;Valid Searches:&lt;/b&gt; {{ validSearches2.length }}</pre>
+        </div>
+      </div><!-- /.widget-example -->
+    </section>
+
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/search/test/cam-widget-search.build.js"></script>
+  </body>
+</html>

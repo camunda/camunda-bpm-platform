@@ -1,0 +1,74 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groups.html -->
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>{{ 'GROUPS_LIST_GROUPS' | translate }}</h3>
+      </div>
+      <div class="col-xs-4 text-right"
+           ng-show="availableOperations.create">
+        <a href="#/group-create"
+           class="btn btn-default">
+          {{ 'GROUPS_CREATE_GROUP' | translate }}
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
+    <div cam-searchable-area
+         config="searchConfig"
+         on-search-change="onSearchChange(query, pages)"
+         loading-state="loadingState"
+         text-empty="{{ 'GROUPS_NO_GROUPS' | translate }}"
+         toolips="translations"
+         storage-group="'ANG'"
+         blocked="blocked">
+      <table class="cam-table group">
+        <thead cam-sortable-table-header
+               default-sort-by="id"
+               default-sort-order="asc"
+               sorting-id="admin-sorting-groups"
+               on-sort-change="onSortChanged(sorting)"
+               on-sort-initialized="onSortInitialized(sorting)">
+          <tr>
+            <th class="group-id"
+                cam-sortable-table-column
+                sort-by-property="id">{{ 'GROUPS_GROUP_ID' | translate }}
+            </th>
+            <th class="group-name"
+                cam-sortable-table-column
+                sort-by-property="name">{{ 'GROUPS_GROUP_NAME' | translate }}
+            </th>
+            <th class="group-type"
+                cam-sortable-table-column
+                sort-by-property="type">{{ 'GROUPS_GROUP_TYPE' | translate }}
+            </th>
+            <th class="action">{{ 'GROUPS_ACTION' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="group in groupList">
+            <td class="group-id">
+              <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
+            </td>
+
+            <td class="group-name">
+              {{group.name}}
+            </td>
+
+            <td class="group-type">
+              {{group.type}}
+            </td>
+
+            <td class="action">
+              <a href="#/groups/{{group.id | escape}}">{{ 'GROUPS_ACTION_EDIT' | translate }}</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groups.html -->

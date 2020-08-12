@@ -1,0 +1,74 @@
+<form class="form-horizontal"
+      role="form">
+
+  <div class="well">Do you approve this invoice?</div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Invoice Document</label>
+    <div class="col-md-8">
+      <a class="form-control-static"
+         cam-file-download="invoiceDocument"></a>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Creditor</label>
+    <div class="col-md-8">
+      <input cam-variable-name="creditor"
+             type="text"
+             name="creditor"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Amount</label>
+    <div class="col-md-8">
+      <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Invoice Category</label>
+    <div class="col-md-8">
+      <input cam-variable-name="invoiceCategory"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Invoice Number</label>
+    <div class="col-md-8">
+      <input cam-variable-name="invoiceNumber"
+             type="text"
+             name="invoiceNumber"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Do you approve? </label>
+    <div class="col-md-8 form-control-static">
+      <input cam-variable-name="approved"
+             cam-variable-type="Boolean"
+             type="checkbox"
+             name="approved"
+             class="form-control" />
+    </div>
+  </div>
+</form>

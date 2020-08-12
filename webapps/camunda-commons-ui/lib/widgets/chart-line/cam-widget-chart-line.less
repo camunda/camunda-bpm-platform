@@ -1,0 +1,27 @@
+// is it clever? not sure.
+// maybe it should be the responsability of a higher level file (which imports this file)
+// to import the animation-spin.less as well
+@import "./../../../resources/less/shared/animation-spin.less";
+
+[cam-widget-chart-line] {
+  > .chart-line-state {
+    &.loading,
+    &.empty,
+    &.alert-danger {
+      text-align: center;
+      margin-top: @padding-base-vertical;
+      margin-bottom: @padding-base-vertical;
+    }
+  }
+
+  > .loading,
+  > .empty {
+    font-style: italic;
+    color: @gray-light;
+  }
+
+  > .loading {
+    cursor: wait;
+    cursor: progress;
+  }
+}

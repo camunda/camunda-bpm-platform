@@ -1,0 +1,126 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "REPOSITORY_SEARCH_TYPE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "name",
+        "value": "REPOSITORY_SEARCH_TYPE_NAME"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "REPOSITORY_SEARCH_TYPE_OPERATOR_LIKE"
+        }
+      ],
+      "default": true
+    },
+    {
+      "id": {
+        "key": "deploymentTime",
+        "value": "REPOSITORY_SEARCH_TYPE_TIME"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "REPOSITORY_SEARCH_TYPE_BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "REPOSITORY_SEARCH_TYPE_AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },
+    {
+      "id": {
+        "key": "source",
+        "value": "REPOSITORY_SEARCH_TYPE_SOURCE"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "withoutSource",
+        "value": "REPOSITORY_SEARCH_TYPE_SOURCE_UNDEFINED"
+      },
+      "basic": true
+    },
+    {
+      "id": {
+        "key": "tenantIdIn",
+        "value": "REPOSITORY_SEARCH_TYPE_TENANT_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "withoutTenantId",
+        "value": "REPOSITORY_SEARCH_TYPE_WITHOUT_TENANT_ID"
+      },
+      "basic": true
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "like",
+        "value": "REPOSITORY_SEARCH_TYPE_OPERATOR_LIKE"
+      }
+    ],
+    "date":       [
+      {
+        "key": "lteq",
+        "value": "REPOSITORY_SEARCH_TYPE_BEFORE"
+      },
+      {
+        "key": "gteq",
+        "value": "REPOSITORY_SEARCH_TYPE_AFTER"
+      }
+    ]
+  },
+  "tooltips": {
+    "inputPlaceholder": "REPOSITORY_SEARCH_ADD_CRITERIA",
+    "invalid": "REPOSITORY_SEARCH_INVALID",
+    "deleteSearch": "REPOSITORY_SEARCH_DELETE_SEARCH",
+    "type": "REPOSITORY_SEARCH_TYPE",
+    "name": "REPOSITORY_SEARCH_NAME",
+    "operator": "REPOSITORY_SEARCH_OPERATOR",
+    "value": "REPOSITORY_SEARCH_VALUE"
+  }
+}

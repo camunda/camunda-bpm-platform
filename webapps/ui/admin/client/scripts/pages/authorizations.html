@@ -1,0 +1,208 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/authorizations.html -->
+<section>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('resource='+res.id)"
+          ng-repeat="res in resourceList | orderBy:'name':false">
+        <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>{{title}} {{'AUTHORIZATION_AUTHORIZATIONS' | translate}}</h3>
+      </div>
+      <div class="col-xs-4 text-right"
+           ng-controller="AuthorizationCreateController">
+        <a ng-click="addNewAuthorization()"
+           class="btn btn-default"
+           ng-hide="loadingState === 'LOADING'">
+          {{ 'AUTHORIZATION_CREATE_NEW_AUTHORIZATION' | translate }}
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
+    <form class="form-horizontal"
+          name="createAuthForm"
+          ng-controller="AuthorizationCreateController">
+      <table class="cam-table">
+        <thead>
+          <tr>
+            <th class="authorization-type">{{ 'AUTHORIZATION_TYPE' | translate }}</th>
+            <th class="user group">{{ 'AUTHORIZATION_USER_GROUP' | translate }}</th>
+            <th class="permissions">{{ 'AUTHORIZATION_PERMISSIONS' | translate }}</th>
+            <th class="resource-id">{{ 'AUTHORIZATION_RESOURCE_ID' | translate }}</th>
+            <th class="action">{{ 'AUTHORIZATION_ACTION' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false"
+              ng-class="{editing: !!authorization.inUpdate}">
+            <td class="authorization-type"
+                ng-if="!authorization.inUpdate || !!authorization.id">
+              {{getType(authorization)}}
+            </td>
+            <td class="authorization-type"
+                ng-if="!!authorization.inUpdate && !authorization.id">
+              <select ng-model="authorization.type"
+                      class="select-auth-type form-control"
+                      ng-change="ensureValidUser(authorization)">
+                <option value="0">{{ 'AUTHORIZATION_GLOBAL' | translate }}</option>
+                <option value="1">{{ 'AUTHORIZATION_ALLOW' | translate }}</option>
+                <option value="2">{{ 'AUTHORIZATION_DENY' | translate }}</option>
+              </select>
+            </td>
+
+            <td class="user group"
+                ng-if="!authorization.inUpdate">
+              <span ng-show="!!authorization.userId"
+                    uib-tooltip="{{ 'AUTHORIZATION_USER' | translate }}">
+                <span class="glyphicon glyphicon-user"></span>
+                {{authorization.userId}}
+              </span>
+
+              <span ng-show="!!authorization.groupId"
+                    uib-tooltip="{{ 'AUTHORIZATION_GROUP' | translate }}">
+                <span class="glyphicon glyphicon-th"></span>
+                {{authorization.groupId}}
+              </span>
+            </td>
+            <td class="identity-id"
+                ng-if="!!authorization.inUpdate">
+              <div class="input-group">
+                <a class="input-group-addon"
+                   ng-disabled="isIdentityIdDisabledFor(authorization)"
+                   ng-click="setIdentityTypeFor(getIdentityTypeFor(authorization) == 'Group' ? 'User' : 'Group', authorization)"
+                   uib-tooltip="{{ getIdentityTypeFor(authorization) == 'Group' ? 'AUTHORIZATION_GROUP' : 'AUTHORIZATION_USER' | translate }}">
+                  <span class="glyphicon"
+                        ng-class="{'glyphicon-th': getIdentityTypeFor(authorization) == 'Group', 'glyphicon-user': getIdentityTypeFor(authorization) == 'User'}"></span>
+                </a>
+
+                <input type="text"
+                       class="input-auth-name form-control"
+                       placeholder="{{ 'AUTHORIZATION_USER_GROUP_ID' | translate }}"
+                       ng-disabled="isIdentityIdDisabledFor(authorization)"
+                       ng-class="{'ng-invalid': !authorization.identityId}"
+                       ng-model="authorization.identityId"/>
+              </div>
+            </td>
+
+            <td class="permissions"
+                ng-if="!authorization.inUpdate">
+              {{formatPermissions(authorization.permissions)}}
+            </td>
+            <td class="permissions"
+                ng-if="!!authorization.inUpdate">
+              <div class="input-group">
+
+                <div class="form-control-static"
+                     ng-click="addAllPermissionsTo(authorization)">
+                  {{ formatPermissions(authorization.permissions) }}
+                </div>
+
+                <div class="input-group-btn dropdown" uib-dropdown auto-close="outsideClick">
+                  <button type="button"
+                          class="btn btn-default dropdown-toggle"
+                          uib-dropdown-toggle
+                          aria-expanded="false">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="caret"></span>
+                  </button>
+
+                  <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right" auto-close="outsideClick">
+                    <div class="selection"
+                         ng-if="availablePermissionsFor().length > 1">
+                      <span ng-show="authorization.permissions != 'ALL'"
+                            ng-click="addAllPermissionsTo(authorization)">
+                        <button
+                          class="btn btn-primary btn-xs"
+                          type="button">
+                          <span class="glyphicon glyphicon-unchecked"></span>
+                        </button> Select all
+                      </span>
+                      <span ng-hide="authorization.permissions != 'ALL'"
+                            ng-click="addNonePermissionsTo(authorization)">
+                        <button
+                          class="btn btn-primary btn-xs"
+                          type="button">
+                          <span class="glyphicon glyphicon-check"></span>
+                        </button> Unselect all
+                      </span>
+                    </div>
+                    <li ng-repeat="perm in availablePermissionsFor()">
+                      <label>
+                        <input type="checkbox" ng-click="changePermissionOf(perm, authorization)" ng-checked="authorization.permissions.indexOf(perm) > -1 || authorization.permissions.indexOf('ALL') > -1">
+                        {{perm}}
+                      </label>
+                    </li>
+                  </ul>
+                </div><!-- /input-btn-group -->
+              </div><!-- /input-group -->
+            </td>
+
+            <td class="resource-id"
+                ng-if="!authorization.inUpdate">
+              {{authorization.resourceId}}
+            </td>
+            <td class="resource-id"
+                ng-if="!!authorization.inUpdate">
+              <input type="text"
+                     id="inputResourceId"
+                     ng-model="authorization.resourceId"
+                     ng-class="{'ng-invalid': !authorization.resourceId}"
+                     class="in-place-edit form-control"
+                        />
+
+              <span ng-show="selectedResourceType==0"
+                    class="text-muted">{{ 'AUTHORIZATION_COCKPIT_OR_TASKLIST' | translate }}</span>
+            </td>
+
+            <td class="action"
+                ng-if="!authorization.inUpdate">
+              <a ng-click="updateAuthorization(authorization)">
+                {{ 'AUTHORIZATION_EDIT' | translate }}
+              </a>
+              <a ng-click="deleteAuthorization(authorization)">
+                {{ 'AUTHORIZATION_DELETE' | translate }}
+              </a>
+            </td>
+            <td class="action"
+                ng-if="!!authorization.inUpdate">
+              <div class="btn-group">
+                <button type="submit"
+                        class="btn btn-primary"
+                        ng-disabled="!isAuthorizationValid(authorization)"
+                        ng-click="confirmUpdateAuthorization(authorization)">
+                  <span class="glyphicon glyphicon-ok "></span>
+                </button>
+
+                <a class="btn btn-default"
+                   ng-click="cancelUpdateAuthorization(authorization)">
+                  <span class="glyphicon glyphicon-ban-circle"></span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ul uib-pagination ng-if="pages.total > pages.size"
+                  class="pagination-sm"
+
+                  page="pages.current"
+                  ng-model="pages.current"
+
+                  total-items="pages.total"
+                  items-per-page="pages.size"
+
+                  max-size="7"
+                  boundary-links="true"></ul>
+
+    </form>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/authorizations.html -->

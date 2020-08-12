@@ -1,0 +1,16 @@
+.UserInformation {
+  .user {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+
+    font-size: 14px;
+    line-height: 42px;
+    float: right;
+    .glyphicon {
+      padding-right: 5px;
+    }
+  }
+}

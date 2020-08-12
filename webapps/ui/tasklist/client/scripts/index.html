@@ -1,0 +1,100 @@
+<div class="three-cols-layout-columns"
+     ng-controller="camLayoutCtrl">
+
+  <!-- # filters column -->
+  <section class="column column-left task-filters"
+           ng-controller="camFiltersCtrl">
+    <header class="three-cols-layout-cell top">
+      <button class="btn btn-link"
+              ng-show="userCanCreateFilter"
+              ng-click="openModal($event)">
+        {{ 'FILTER_CREATE' | translate }}
+        <span class="glyphicon glyphicon-plus-sign"></span>
+      </button>
+
+      <button ng-click="toggleRegion($event)"
+              data-region="filters"
+              class="region-toggle btn btn-link">
+        <span class="glyphicon"></span>
+      </button>
+    </header>
+
+    <div class="three-cols-layout-cell content">
+      <div cam-tasklist-filters
+           filters-data="filtersData"
+           open-modal="openModal"
+           user-can-create-filter="userCanCreateFilter"></div>
+    </div>
+  </section>
+  <!-- / filters column -->
+
+
+
+
+
+  <!-- # list column -->
+  <section class="column column-center tasks-list"
+           ng-controller="camListCtrl">
+    <header class="three-cols-layout-cell top">
+      <view ng-repeat="tasklistHeaderPlugin in tasklistHeaderPlugins"
+            provider="tasklistHeaderPlugin"
+            vars="tasklistVars"></view>
+
+      <button ng-click="toggleRegion($event)"
+              data-region="list"
+              class="region-toggle btn btn-link">
+        <span class="glyphicon"></span>
+      </button>
+    </header>
+
+    <div class="three-cols-layout-cell content">
+      <view ng-repeat="tasklistPlugin in tasklistPlugins"
+            provider="tasklistPlugin"
+            vars="tasklistVars"></view>
+
+      <div cam-tasks
+           tasklist-data="tasklistData"></div>
+    </div>
+  </section>
+  <!-- / list column -->
+
+
+
+
+
+  <!-- # task column -->
+  <section class="column column-right task-details"
+           ng-controller="camTaskActionCtrl">
+    <header class="three-cols-layout-cell top">
+      <button ng-click="toggleRegion($event)"
+              data-region="task"
+              class="region-toggle btn btn-link">
+        <span class="glyphicon"></span>
+      </button>
+
+      <button ng-click="maximizeRegion($event)"
+              data-region="task"
+              class="btn btn-link maximize">
+        <span class="glyphicon glyphicon-resize-full"></span>
+      </button>
+
+      <button ng-click="resetRegions($event)"
+              class="btn btn-link reset-regions">
+        <span class="glyphicon glyphicon-resize-small"></span>
+      </button>
+
+      <div class="task-actions"
+           ng-show="task"
+           ng-repeat="taskAction in taskActions">
+        <view provider="taskAction" vars="taskVars">
+      </div>
+    </header>
+
+    <div class="three-cols-layout-cell content">
+      <div cam-tasklist-task
+           tasklist-data="tasklistData"></div>
+    </div>
+  </section>
+  <!-- # task column -->
+
+</div>

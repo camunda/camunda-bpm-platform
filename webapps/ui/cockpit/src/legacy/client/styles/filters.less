@@ -1,0 +1,172 @@
+.filters {
+  &.tab-content {
+    padding: 10px;
+  }
+  ul {
+    margin-bottom: 0;
+  }
+
+  h5 {
+    margin: 0 0 5px 0;
+    font-weight: 700;
+  }
+
+  .footer {
+    border-top: solid 1px @filters-color;
+    padding-top: 8px;
+  }
+
+  .dropdown-menu {
+    min-width: 50px;
+  }
+
+  .pull-right.glyphicon-plus-sign {
+    top: 3px;
+    margin-right: 5px;
+  }
+
+  .note {
+    line-height: 1.5em;
+    margin-bottom: 10px;
+    h5 {
+      margin-top: 8px;
+    }
+  }
+
+  .note-small {
+    font-size: 0.83em;
+  }
+
+  .note-error {
+    color: @brand-danger;
+  }
+
+  .note code {
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    white-space: normal;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+  }
+
+  form {
+    margin-bottom: 0;
+    overflow: visible;
+  }
+}
+
+.filter {
+  line-height: 25px;
+  padding: 5px 0 8px 0;
+  overflow: visible;
+
+  .name {
+    font-weight: 700;
+  }
+
+  .search-date {
+    display: table;
+    overflow: hidden;
+
+    .removable-input,
+    select {
+      display: table-cell;
+      vertical-align: top;
+    }
+
+    select {
+      min-width: 75px;
+      border-right: none;
+    }
+
+    .note-error {
+      display: block;
+      width: 100%;
+    }
+
+    input[type=text] {
+      margin: 0 0 5px 0;
+    }
+  }
+
+  .search-date,
+  .variable-filter {
+    input[type=text] {
+      margin: 0 0 5px 0;
+    }
+  }
+
+  .removable-input {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+
+    input {
+      padding-right: 25px;
+    }
+
+    button {
+      position: absolute;
+      top: 5px;
+      right: 0;
+    }
+  }
+
+
+  &:last-child {
+    border-style: none;
+  }
+
+  .search {
+    position: relative;
+
+    &.search-text {
+      .form-control-static;
+      margin-bottom: 5px;
+      padding-right: 25px;
+      margin-left: @padding-base-horizontal;
+
+      &:hover {
+        color: @gray-base;
+      }
+    }
+
+    &.search-date .remove-date-filter {
+      display: inline-block;
+      float: none;
+    }
+  }
+
+  .alert {
+    font-size: 0.83em;
+    margin-bottom: 0;
+    line-height: 20px;
+    padding: 8px 14px;
+  }
+
+  &.activity-filter,
+  &.business-key-filter,
+  &.variable-filter {
+    .btn-link.remove {
+      top: 7px;
+      position: absolute;
+      right: 0;
+    }
+  }
+
+  &.date-filter,
+  &.variable-filter {
+    overflow: hidden;
+  }
+
+  label.radio {
+    display: inline-block;
+    input {
+      margin-left: 4px;
+      vertical-align: middle;
+      float: none;
+    }
+  }
+}

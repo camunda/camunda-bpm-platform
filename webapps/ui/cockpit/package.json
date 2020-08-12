@@ -1,0 +1,89 @@
+{
+  "name": "camunda-react-webapp",
+  "version": "7.14.0-SNAPSHOT",
+  "private": true,
+  "homepage": "..",
+  "dependencies": {
+    "@bpmn-io/dmn-migrate": "0.4.3",
+    "@testing-library/jest-dom": "4.2.4",
+    "@testing-library/react": "9.3.2",
+    "@testing-library/user-event": "7.1.2",
+    "angular-animate": "1.8.0",
+    "angular-cookies": "1.8.0",
+    "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend.git#master",
+    "angular-resource": "1.8.0",
+    "angular-route": "1.8.0",
+    "angular-sanitize": "1.8.0",
+    "angular-translate": "2.18.2",
+    "bootstrap": "3.4.1",
+    "bpmn-js": "6.2.1",
+    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations.git#master",
+    "chart.js": "2.8.0",
+    "classnames": "2.2.6",
+    "clipboard": "2.0.4",
+    "cmmn-js": "0.19.2",
+    "dmn-js": "8.0.2",
+    "dmn-js-decision-table": "8.0.2",
+    "dmn-js-drd": "8.0.2",
+    "dmn-js-literal-expression": "8.0.2",
+    "dmn-js-shared": "8.0.2",
+    "fast-xml-parser": "3.16.0",
+    "jquery": "3.5.0",
+    "jquery-ui": "1.12.1",
+    "moment": "2.24.0",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "react-router-dom": "5.1.2",
+    "react-scripts": "3.4.0",
+    "superagent": "5.2.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "styles": "lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles.less public/styles/styles.css && lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles-components.less public/styles/styles-components.css",
+    "translations": "mkdir -p public/locales; cp node_modules/camunda-webapp-translations/cockpit/en.json public/locales/en.json",
+    "build": "react-scripts build",
+    "buildCE": "node scripts/linkCommunity; npm run build",
+    "buildEE": "node scripts/linkEnterprise; npm run build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "postinstall": "node wireModules; node scripts/linkCommunity; npm run translations; npm run styles",
+    "prebuild": "npm run styles; node scripts/prebuild",
+    "postbuild": "node scripts/postbuild"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 edge version"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 edge version"
+    ]
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-camunda-licensed": "0.4.3",
+    "eslint-plugin-prettier": "3.1.2",
+    "http-proxy-middleware": "0.20.0",
+    "husky": "3.1.0",
+    "less": "3.10.3",
+    "lint-staged": "10.0.7",
+    "node-sass": "4.13.1",
+    "prettier": "1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ]
+  }
+}
