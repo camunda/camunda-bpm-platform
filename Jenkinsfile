@@ -57,6 +57,7 @@ pipeline{
       }
     }
     stage("Tests"){
+      failFast true
       parallel {
         stage('Engine unit tests') {
           agent {
