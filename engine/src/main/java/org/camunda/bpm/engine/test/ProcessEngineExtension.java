@@ -1,7 +1,6 @@
-package org.camunda.bpm;
+package org.camunda.bpm.engine.test;
 
 import static java.util.Arrays.stream;
-
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -29,11 +28,18 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.junit.jupiter.api.extension.TestWatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProcessEngineExtension implements ProcessEngineServices, TestWatcher, TestInstancePostProcessor,
-AfterTestExecutionCallback, BeforeTestExecutionCallback {
+AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
+  
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessEngineExtension.class);
 
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
@@ -285,7 +291,6 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback {
     TestHelper.resetIdGenerator(processEngineConfiguration);
     ClockUtil.reset();
 
-
     clearServiceReferences(); 
     
   }
@@ -294,11 +299,9 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback {
   public void beforeTestExecution(ExtensionContext context) throws Exception {
     
     deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(),
-//        context.getTestMethod().get().getName(),
-        null,
-        null
-        // description.getAnnotation(Deployment.class)
-//        context.getElement().get().getAnnotation(Deployment.class)
+        context.getTestMethod().get().getName(),
+//        description.getAnnotation(Deployment.class)
+        context.getElement().get().getAnnotation(Deployment.class)
         );
 
 
@@ -350,5 +353,25 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback {
     decisionService = processEngine.getDecisionService();
   }
 
+  @Override
+  public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    LOG.info("supportsParameter: {}, {}", parameterContext.getParameter(), extensionContext);
+    if (parameterContext.getParameter().getType().equals(ProcessEngine.class)) {
+      LOG.info("supporting only ProcessEngine parameter");
+      return true;
+    } else {
+      return false;
+    }
+  }
 
+  @Override
+  public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    LOG.info("resolveParameter: {}, {}", parameterContext.getParameter(), extensionContext);
+    if (ProcessEngine.class.equals(parameterContext.getParameter().getType())) {
+      LOG.info("return the processEngine");
+      return getProcessEngine();
+    } else {
+      return null;
+    }
+  }
 }

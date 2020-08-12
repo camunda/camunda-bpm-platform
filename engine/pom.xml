@@ -175,6 +175,15 @@
       <artifactId>junit</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.6.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- test dependencies  -->
 
 	<dependency>
 		<groupId>org.junit.jupiter</groupId>
@@ -182,8 +191,6 @@
 		<version>5.6.2</version>
 		<scope>test</scope>
 	</dependency>
-
-    <!-- test dependencies  -->
 
     <dependency>
       <groupId>org.mockito</groupId>
