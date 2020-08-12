@@ -40,6 +40,8 @@ pipeline{
       }
       steps{
         container("maven"){
+          // Install npm
+          sh "apt update -qq && apt install -qq -y npm"
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh("mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean install -D skipTests")
           }
