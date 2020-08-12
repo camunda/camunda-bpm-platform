@@ -50,7 +50,7 @@ pipeline{
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh """
-              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean install -D skipTests
+              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests
             """
           }
         }
