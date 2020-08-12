@@ -75,6 +75,40 @@ pipeline{
             }
           }
         }
+        stage('QA: Instance Migration Tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pinstance-migration,h2 -B
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Rolling Update Tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Prolling-update,h2
+                """
+              }
+            }
+          }
+        }
         stage('Upgrade old engine') {
           agent {
             kubernetes {
