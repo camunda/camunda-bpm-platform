@@ -13,7 +13,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: maven
-    image: maven:3.6.3-openjdk-8
+    image: ubuntu:20.04
     command: ["cat"]
     tty: true
     env:
