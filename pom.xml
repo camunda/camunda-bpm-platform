@@ -67,6 +67,7 @@
 
         <module>qa</module>
 
+        <module>webapps</module>
         <module>webapps/h2-webapp</module>
 
         <module>javaee/ejb-service</module>
