@@ -32,7 +32,7 @@ spec:
 pipeline{
   agent none
   stages{
-    stage("First stage"){
+    stage("Compile all the things!"){
       agent {
         kubernetes {
           yaml getMavenAgent()
@@ -51,6 +51,25 @@ pipeline{
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh """
               mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests
+            """
+          }
+          stash includes: '/root/.m2/repository/org/camunda/bpm/camunda-engine/7.14.0-SNAPSHOT/*', name: 'engineArtifacts'
+        }
+      }
+    }
+    stage("Engine unit tests"){
+      agent {
+        kubernetes {
+          yaml getMavenAgent()
+        }
+      }
+      steps{
+        container("maven"){
+          unstash 'engineArtifacts'
+          // Run maven
+          configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+            sh """
+              cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
             """
           }
         }
