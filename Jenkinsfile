@@ -53,24 +53,43 @@ pipeline{
               mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests
             """
           }
-          stash includes: '/root/.m2/repository/org/camunda/bpm/camunda-engine/7.14.0-SNAPSHOT/*', name: 'engineArtifacts'
         }
       }
     }
-    stage("Engine unit tests"){
-      agent {
-        kubernetes {
-          yaml getMavenAgent()
+    stage("Tests"){
+      parallel {
+        stage('Engine unit tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
+                """
+              }
+            }
+          }
         }
-      }
-      steps{
-        container("maven"){
-          unstash 'engineArtifacts'
-          // Run maven
-          configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-            sh """
-              cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
-            """
+        stage('Upgrade tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
+                """
+              }
+            }
           }
         }
       }
