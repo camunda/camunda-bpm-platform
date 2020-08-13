@@ -318,26 +318,7 @@ pipeline{
             }
           }
         }
-        stage("Engine UNIT: Spring Integration Tests") {
-          agent {
-            kubernetes {
-              yaml getMavenAgent()
-            }
-          }
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-spring/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
-                """
-              }
-            }
-          }
-        }
-        stage('Engine UNIT: CDI Integration & Plugins Tests') {
+        stage('Engine UNIT: CDI Integration / Plugins / Spring Integration Tests') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -366,6 +347,19 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Spring Integration Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine-spring/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
                     """
                   }
                 }
