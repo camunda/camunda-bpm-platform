@@ -172,6 +172,33 @@ pipeline{
             }
           }
         }
+        stage("Engine UNIT: Plugins & Integrations Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-spring/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
+                """
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-cdi/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
+                """
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
+                """
+              }
+            }
+          }
+        }
         stage('QA: Instance Migration Tests') {
           agent {
             kubernetes {
