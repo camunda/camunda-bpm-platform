@@ -153,6 +153,25 @@ pipeline{
             }
           }
         }
+        stage("Engine UNIT: Authorizations Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways -B
+                """
+              }
+            }
+          }
+        }
         stage('QA: Instance Migration Tests') {
           agent {
             kubernetes {
