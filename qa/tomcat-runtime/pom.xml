@@ -23,6 +23,12 @@
       <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>license-book</artifactId>
+        </exclusion>
+      </exclusions> 
     </dependency>
 
     <!--

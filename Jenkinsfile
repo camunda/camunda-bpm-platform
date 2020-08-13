@@ -66,6 +66,27 @@ spec:
   """
 }
 
+String getChromeAgent(Integer cpuLimit = 1){
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: chrome
+    image: 'gcr.io/ci-30-162810/chrome:78v0.1.2'
+    command: ["cat"]
+    tty: true
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
 String getPostgresAgent(String dockerTag = '9.6.18', Integer cpuLimit = 1){
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
@@ -3150,6 +3171,140 @@ pipeline{
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd distro/wildfly/subsystem && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -B
                 """
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+    stage("IT"){
+      agent {
+        kubernetes {
+          yaml getMavenAgent()
+        }
+      }
+      stages {
+        stage('Build Distro') {
+          steps{
+            container("maven"){
+              unstash "artifactStash"
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd distro/license-book && mvn -s \$MAVEN_SETTINGS_XML install -B
+                  cd ../tomcat/assembly && mvn -s \$MAVEN_SETTINGS_XML install -B
+                  cd ../../wildfly/assembly && mvn -s \$MAVEN_SETTINGS_XML install -B
+                """
+              }
+            }
+          }
+        }
+        stage('webapp-IT-tomcat-h2') {
+          steps {
+            container("maven") {
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Ptomcat,h2,webapps-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('webapp-IT-standalone-tomcat') {
+          steps {
+            container("maven") {
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Ptomcat-vanilla,webapps-integration-sa -B
+                """
+              }
+            }
+          }
+        }
+        stage('webapp-IT-wildfly-h2') {
+          steps {
+            container("maven") {
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Pwildfly,h2,webapps-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('webapp-IT-standalone-wildfly') {
+          steps {
+            container("maven") {
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Pwildfly-vanilla,webapps-integration-sa -B
+                """
+              }
+            }
+          }
+        }
+      }
+    }
+    stage("IT spring"){
+      agent {
+        kubernetes {
+          yaml getMavenAgent() + getChromeAgent()
+        }
+      }
+      stages {
+        stage('Unstash 2 + license book') {
+          steps{
+            container("maven"){
+              unstash "artifactStash"
+              // Run maven
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd distro/license-book && mvn -s \$MAVEN_SETTINGS_XML install -B
+                """
+              }
+            }
+          }
+        }
+        stage("IT spring tests") {
+          parallel {
+            stage('Run: IT') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/run && mvn -s \$MAVEN_SETTINGS_XML install -B
+                      mvn -s \$MAVEN_SETTINGS_XML install -Pintegration-test-camunda-run -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Spring Boot Starter: IT') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd spring-boot-starter && mvn -s \$MAVEN_SETTINGS_XML install -B
+                      mvn -s \$MAVEN_SETTINGS_XML install -Pintegration-test-spring-boot-starter -B
+                    """
+                  }
+                }
               }
             }
           }
