@@ -131,7 +131,7 @@ pipeline{
         }
       }
     }
-    stage('Run Tests') {
+    stage('Engine UNIT & QA Tests') {
       failFast true
       parallel {
         stage('Engine unit tests') {
@@ -147,7 +147,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,h2
+                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,h2-in-memory
                 """
               }
             }
@@ -166,13 +166,13 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways -B
+                  cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory,cfgAuthorizationCheckRevokesAlways -B
                 """
               }
             }
           }
         }
-        stage("Engine UNIT: History Level Tests") {
+        stage("Engine UNIT: History Level Activity Tests") {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -187,10 +187,40 @@ pipeline{
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine/ && mvn -s \$MAVEN_SETTINGS_XML verify -Pcfghistoryactivity -B
                 """
+              }
+            }
+          }
+        }
+        stage("Engine UNIT: History Level Audit Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine/ && mvn -s \$MAVEN_SETTINGS_XML verify -Pcfghistoryaudit -B
                 """
+              }
+            }
+          }
+        }
+        stage("Engine UNIT: History Level None Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine/ && mvn -s \$MAVEN_SETTINGS_XML verify -Pcfghistorynone -B
@@ -218,7 +248,7 @@ pipeline{
             }
           }
         }
-        stage("Engine UNIT: Plugins & Integrations Tests") {
+        stage("Engine UNIT: Spring Integration Tests") {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -231,21 +261,51 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-spring/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
-                """
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-cdi/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
-                """
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
+                  cd engine-spring/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
                 """
               }
             }
           }
         }
-        stage('Post Engine UNIT: Plugins-enabled Engine UNIT tests') {
+        stage("Engine UNIT: CDI Integration Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-cdi/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
+                """
+              }
+            }
+          }
+        }
+        stage("Engine UNIT: Plugins Tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
+                """
+              }
+            }
+          }
+        }
+        stage('Engine UNIT: Plugins-enabled Engine UNIT tests') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -259,25 +319,6 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pcheck-plugins -B
-                """
-              }
-            }
-          }
-        }
-        stage('Post Engine UNIT: WLS-compatibility Engine UNIT tests') {
-          agent {
-            kubernetes {
-              yaml getMavenAgent()
-            }
-          }
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  mvn -s \$MAVEN_SETTINGS_XML verify -Pcheck-engine,wls-compatibility,jersey -B
                 """
               }
             }
@@ -354,6 +395,182 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,h2
+                """
+              }
+            }
+          }
+        }
+      }
+    }
+    stage("Rest API Tests"){
+      failFast true
+      parallel {
+        stage('Rest API UNIT Jersey2 tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Pjersey2 -B
+                """
+              }
+            }
+          }
+        }
+        stage('Rest API UNIT Resteasy tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Presteasy -B
+                """
+              }
+            }
+          }
+        }
+        stage('Rest API UNIT Resteasy3 tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Presteasy3 -B
+                """
+              }
+            }
+          }
+        }
+        stage('Rest API UNIT CXF tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Pcxf -B
+                """
+              }
+            }
+          }
+        }
+        stage('Rest API UNIT Wink tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Pwink -B
+                """
+              }
+            }
+          }
+        }
+        stage("Rest API JAX-RS2 Jersey2 tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest-jaxrs2/ && mvn -s \$MAVEN_SETTINGS_XML test -Pjersey2 -B
+                """
+              }
+            }
+          }
+        }
+        stage("Rest API JAX-RS2 Resteasy3 tests") {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest-jaxrs2/ && mvn -s \$MAVEN_SETTINGS_XML test -Presteasy3 -B
+                """
+              }
+            }
+          }
+        }
+        stage('WLS-compatibility tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  mvn -s \$MAVEN_SETTINGS_XML verify -Pcheck-engine,wls-compatibility,jersey -B
+                """
+              }
+            }
+          }
+        }
+        stage('Wildfly-compatibility tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Pwildfly-compatibility,resteasy -B
                 """
               }
             }
