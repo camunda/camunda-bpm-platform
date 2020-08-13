@@ -64,7 +64,74 @@ pipeline{
         }
       }
     }
-    stage("Tests"){
+    stage("Model API tests"){
+      agent {
+        kubernetes {
+          yaml getMavenAgent()
+        }
+      }
+      stages {
+        stage('XML model') {
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd model-api/xml-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                """
+              }
+            }
+          }
+        }
+        stage('MN model') {
+          failFast true
+          parallel {
+            stage('BPMN model') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd model-api/bpmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                    """
+                  }
+                }
+              }
+            }
+            stage('DMN model') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd model-api/dmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                    """
+                  }
+                }
+              }
+            }
+            stage('CMMN model') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd model-api/cmmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('Run Tests') {
       failFast true
       parallel {
         stage('Engine unit tests') {
@@ -78,22 +145,6 @@ pipeline{
               // Run maven
               unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd model-api/xml-model && mvn -s \$MAVEN_SETTINGS_XML -B test
-                """
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd model-api/bpmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
-                """
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd model-api/dmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
-                """
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd model-api/cmmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
-                """
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,h2
