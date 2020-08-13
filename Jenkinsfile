@@ -40,7 +40,7 @@ pipeline{
       }
       steps{
         container("maven"){
-          // Install asdf
+          // Install dependencies
           sh '''
             curl -s -O https://deb.nodesource.com/node_14.x/pool/main/n/nodejs/nodejs_14.6.0-1nodesource1_amd64.deb
             dpkg -i nodejs_14.6.0-1nodesource1_amd64.deb
@@ -50,9 +50,10 @@ pipeline{
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh """
-              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests
+              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests -Dmaven.repo.local=\$(pwd)/.m2
             """
           }
+          stash name: "artifactStash", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
         }
       }
     }
@@ -68,20 +69,26 @@ pipeline{
           steps{
             container("maven"){
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd model-api/xml-model && mvn -s \$MAVEN_SETTINGS_XML -B test
                 """
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd model-api/bpmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
                 """
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd model-api/dmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
                 """
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd model-api/cmmn-model && mvn -s \$MAVEN_SETTINGS_XML -B test
                 """
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
                 """
               }
@@ -97,8 +104,10 @@ pipeline{
           steps{
             container("maven"){
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,h2
                 """
               }
@@ -114,8 +123,10 @@ pipeline{
           steps{
             container("maven"){
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,h2
                 """
               }
@@ -131,8 +142,10 @@ pipeline{
           steps{
             container("maven"){
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pold-engine,h2
                 """
               }
@@ -148,8 +161,10 @@ pipeline{
           steps{
             container("maven"){
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pupgrade-db,h2
                 """
               }
