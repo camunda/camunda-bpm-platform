@@ -1,6 +1,10 @@
 
-def getMavenAgent(){
-    """
+String getMavenAgent(Integer mavenCpuLimit = 3){
+  // assuming one core left for main maven thread
+  String mavenForkCount = mavenCpuLimit - 1;
+  // assuming 2Gig for each core
+  String mavenMemoryLimit = mavenCpuLimit * 2;
+  """
 metadata:
   labels:
     agent: ci-cambpm-camunda-cloud-build
@@ -17,16 +21,18 @@ spec:
     command: ["cat"]
     tty: true
     env:
+    - name: LIMITS_CPU
+      value: ${mavenForkCount}
     - name: TZ
       value: Europe/Berlin
     resources:
       limits:
-        cpu: 3
-        memory: 8Gi
+        cpu: ${mavenCpuLimit}
+        memory: ${mavenMemoryLimit}Gi
       requests:
-        cpu: 3
-        memory: 8Gi
-    """
+        cpu: ${mavenCpuLimit}
+        memory: ${mavenMemoryLimit}Gi
+  """
 }
 
 pipeline{
@@ -50,7 +56,7 @@ pipeline{
           // Run maven
           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
             sh """
-              mvn -s \$MAVEN_SETTINGS_XML -B -T3 clean source:jar install -D skipTests -Dmaven.repo.local=\$(pwd)/.m2
+              mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU clean source:jar install -D skipTests -Dmaven.repo.local=\$(pwd)/.m2
             """
           }
           stash name: "artifactStash", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
@@ -89,7 +95,7 @@ pipeline{
                 """
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T3 test -Pdatabase,h2
+                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,h2
                 """
               }
             }
@@ -146,7 +152,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pold-engine,h2
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,h2
                 """
               }
             }
@@ -165,7 +171,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T3 verify -Pupgrade-db,h2
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,h2
                 """
               }
             }
