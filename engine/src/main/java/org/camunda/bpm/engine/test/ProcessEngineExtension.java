@@ -36,8 +36,9 @@ import org.junit.jupiter.api.extension.TestWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProcessEngineExtension implements ProcessEngineServices, TestWatcher, TestInstancePostProcessor,
-AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
+public class ProcessEngineExtension
+    implements ProcessEngineServices, TestWatcher, TestInstancePostProcessor, 
+    AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
   
   private static final Logger LOG = LoggerFactory.getLogger(ProcessEngineExtension.class);
 
@@ -85,7 +86,14 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
    * this.ensureCleanAfterTest = ensureCleanAfterTest; }
    */
 
+  public static ProcessEngineExtension builder() {
+    return new ProcessEngineExtension();
+  }
   
+  public ProcessEngineExtension configurationResource(String configurationResource) {
+    this.setConfigurationResource(configurationResource);
+    return this;
+  }
   
   ///
   public void setCurrentTime(Date currentTime) {
@@ -298,12 +306,8 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
   @Override
   public void beforeTestExecution(ExtensionContext context) throws Exception {
     
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(),
-        context.getTestMethod().get().getName(),
-//        description.getAnnotation(Deployment.class)
-        context.getElement().get().getAnnotation(Deployment.class)
-        );
-
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(), 
+        context.getTestMethod().get().getName(), context.getElement().get().getAnnotation(Deployment.class));
 
     //apply
     if (processEngine == null) {
@@ -373,5 +377,12 @@ AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
     } else {
       return null;
     }
+  }
+  
+  public ProcessEngineExtension build() {
+    if (processEngine == null) {
+      initializeProcessEngine();
+    }
+    return this;
   }
 }
