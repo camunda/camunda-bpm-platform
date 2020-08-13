@@ -595,6 +595,25 @@ pipeline{
             }
           }
         }
+        stage('Webapp UNIT DB-Table-prefix tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdb-table-prefix -Dskip.frontend.build=true -B
+                """
+              }
+            }
+          }
+        }
         stage('Webapp UNIT: Authorizations tests') {
           agent {
             kubernetes {
