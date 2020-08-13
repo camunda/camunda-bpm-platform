@@ -394,40 +394,38 @@ pipeline{
             }
           }
         }
-        stage('QA: Instance Migration Tests') {
+        stage('QA: Instance Migration & Rolling Update Tests') {
           agent {
             kubernetes {
               yaml getMavenAgent()
             }
           }
-          steps{
-            container("maven"){
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,h2
-                """
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,h2
+                    """
+                  }
+                }
               }
             }
-          }
-        }
-        stage('QA: Rolling Update Tests') {
-          agent {
-            kubernetes {
-              yaml getMavenAgent()
-            }
-          }
-          steps{
-            container("maven"){
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,h2
-                """
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,h2
+                    """
+                  }
+                }
               }
             }
           }
