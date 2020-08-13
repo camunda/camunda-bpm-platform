@@ -199,6 +199,25 @@ pipeline{
             }
           }
         }
+        stage('Engine UNIT: DB-Table-Prefix tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdb-table-prefix -B
+                """
+              }
+            }
+          }
+        }
         stage("Engine UNIT: Plugins & Integrations Tests") {
           agent {
             kubernetes {
@@ -221,6 +240,44 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2 -B
+                """
+              }
+            }
+          }
+        }
+        stage('Post Engine UNIT: Plugins-enabled Engine UNIT tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pcheck-plugins -B
+                """
+              }
+            }
+          }
+        }
+        stage('Post Engine UNIT: WLS-compatibility Engine UNIT tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  mvn -s \$MAVEN_SETTINGS_XML verify -Pcheck-engine,wls-compatibility,jersey -B
                 """
               }
             }
