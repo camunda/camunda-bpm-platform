@@ -134,7 +134,7 @@ pipeline{
     stage('Engine UNIT & QA Tests') {
       failFast true
       parallel {
-        stage('Engine unit tests') {
+        stage('Engine UNIT tests') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -402,7 +402,7 @@ pipeline{
         }
       }
     }
-    stage("Rest API Tests"){
+    stage("Rest API & Webapps Tests"){
       failFast true
       parallel {
         stage('Rest API UNIT Jersey2 tests') {
@@ -571,6 +571,44 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd engine-rest/engine-rest/ && mvn -s \$MAVEN_SETTINGS_XML test -Pwildfly-compatibility,resteasy -B
+                """
+              }
+            }
+          }
+        }
+        stage('Webapp UNIT tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -Dskip.frontend.build=true -B
+                """
+              }
+            }
+          }
+        }
+        stage('Webapp UNIT: Authorizations tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent()
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory,cfgAuthorizationCheckRevokesAlways -Dskip.frontend.build=true -B
                 """
               }
             }
