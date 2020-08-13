@@ -778,5 +778,143 @@ pipeline{
         }
       }
     }
+    stage("Engine & Webapps IT Tests") {
+      failFast true
+      parallel {
+        stage('Engine IT: Tomcat tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Ptomcat,postgresql,engine-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('Engine IT: Wildfly tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,engine-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('Engine IT: Wildfly XA tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,postgresql-xa,engine-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('Engine IT: Wildfly Domain tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly-domain,h2,engine-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('Engine IT: Wildfly Servlet tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,wildfly-servlet,h2,engine-integration -B
+                """
+              }
+            }
+          }
+        }
+        stage('Webapps Rest IT: Embedded Wildfly tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,h2,webapps-integration,embedded-engine-rest -B
+                """
+              }
+            }
+          }
+        }
+        stage('Distro: Wildfly Subsystem UNIT tests') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+            }
+          }
+          steps {
+            container("maven") {
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd distro/wildfly/subsystem && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -B
+                """
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
