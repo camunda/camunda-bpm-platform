@@ -96,6 +96,53 @@ public abstract class TestHelper {
     ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
 
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method, Deployment deploymentAnnotation, boolean onClass) {
+    String deploymentId = null;
+    boolean onMethod = true;
+    if (onClass == true) {
+      onMethod = false;
+    }
+
+    if (deploymentAnnotation == null) {
+      deploymentAnnotation = method.getAnnotation(Deployment.class);
+    }
+    // if not found on method, try on class level
+    if (deploymentAnnotation == null) {
+      onMethod = false;
+      Class<?> lookForAnnotationClass = testClass;
+      while (lookForAnnotationClass != Object.class) {
+        deploymentAnnotation = lookForAnnotationClass.getAnnotation(Deployment.class);
+        if (deploymentAnnotation != null) {
+          testClass = lookForAnnotationClass;
+          break;
+        }
+        lookForAnnotationClass = lookForAnnotationClass.getSuperclass();
+      }
+    }
+
+    if (deploymentAnnotation != null) {
+      LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), method.getName());
+      String[] resources = deploymentAnnotation.resources();
+      if (resources.length == 0 && method != null) {
+        String name = onMethod ? method.getName() : null;
+        String resource = getBpmnProcessDefinitionResource(testClass, name);
+        resources = new String[]{resource};
+      }
+
+      DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService()
+          .createDeployment()
+          .name(ClassNameUtil.getClassNameWithoutPackage(testClass)+"."+method.getName());
+
+      for (String resource: resources) {
+        deploymentBuilder.addClasspathResource(resource);
+      }
+
+      deploymentId = deploymentBuilder.deploy().getId();
+    }
+
+    return deploymentId;
+  }
+
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
     String deploymentId = null;
     Method method = null;
@@ -147,7 +194,7 @@ public abstract class TestHelper {
       deploymentId = deploymentBuilder.deploy().getId();
     }
 
-    return deploymentId;
+    return deploymentId;    
   }
 
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {

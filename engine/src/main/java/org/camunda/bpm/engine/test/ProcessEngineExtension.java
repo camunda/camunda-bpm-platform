@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.test;
 import static java.util.Arrays.stream;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -36,9 +38,41 @@ import org.junit.jupiter.api.extension.TestWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Convenience for ProcessEngine and services initialization in the form of a
+ * JUnit5 extension.
+ * <br>
+ * The extension injects the ProcessEngine in the test class.
+ * 
+ * <p>
+ * Usage:
+ * </p>
+ * Either
+ * <pre>
+ * &#64;ExtendWith(ProcessEngineExtension.class)
+ * public class YourTest {
+ *   ...
+ * }
+ * </pre>
+ * or
+ * <pre>
+ * public class YourTest {
+ *   &#64;RegisterExtension
+ *   ProcessEngineExtension extension = ProcessEngineExtension.builder().configurationResource("my-cmaunda.cfg.xml").build();
+ *   
+ *   public void testSomething() {
+ *     extension.getRuntimeService().startProcessInstanceByKey("myProcess");
+ *     ...
+ *   }
+ * </pre>
+ * 
+ * 
+ * @author Yana Vasileva, Ingo Richtsmeier
+ *
+ */
 public class ProcessEngineExtension
     implements ProcessEngineServices, TestWatcher, TestInstancePostProcessor, 
-    AfterTestExecutionCallback, BeforeTestExecutionCallback, ParameterResolver {
+    BeforeTestExecutionCallback, AfterTestExecutionCallback, ParameterResolver {
   
   private static final Logger LOG = LoggerFactory.getLogger(ProcessEngineExtension.class);
 
@@ -63,35 +97,45 @@ public class ProcessEngineExtension
   protected DecisionService decisionService;
 
   
-  /*
-   * protected boolean ensureCleanAfterTest = false;
-   * 
-   * public ProcessEngineExtension() { this(false); }
-   * 
-   * public ProcessEngineExtension(boolean ensureCleanAfterTest) {
-   * this.ensureCleanAfterTest = ensureCleanAfterTest; }
-   * 
-   * public ProcessEngineExtension(String configurationResource) {
-   * this(configurationResource, false); }
-   * 
-   * public ProcessEngineExtension(String configurationResource, boolean
-   * ensureCleanAfterTest) { this.configurationResource = configurationResource;
-   * this.ensureCleanAfterTest = ensureCleanAfterTest; }
-   * 
-   * public ProcessEngineExtension(ProcessEngine processEngine) {
-   * this(processEngine, false); }
-   * 
-   * public ProcessEngineExtension(ProcessEngine processEngine, boolean
-   * ensureCleanAfterTest) { this.processEngine = processEngine;
-   * this.ensureCleanAfterTest = ensureCleanAfterTest; }
-   */
-
+  protected boolean ensureCleanAfterTest = false;
+  
+  public ProcessEngineExtension() { 
+    this(false); 
+  }
+    
+  public ProcessEngineExtension(boolean ensureCleanAfterTest) {
+    this.ensureCleanAfterTest = ensureCleanAfterTest; 
+  }
+    
+  public ProcessEngineExtension(String configurationResource) {
+    this(configurationResource, false); 
+  }
+    
+  public ProcessEngineExtension(String configurationResource, boolean ensureCleanAfterTest) { 
+    this.configurationResource = configurationResource;
+    this.ensureCleanAfterTest = ensureCleanAfterTest; 
+  }
+    
+  public ProcessEngineExtension(ProcessEngine processEngine) {
+    this(processEngine, false); 
+  }
+    
+  public ProcessEngineExtension(ProcessEngine processEngine, boolean ensureCleanAfterTest) { 
+    this.processEngine = processEngine;
+    this.ensureCleanAfterTest = ensureCleanAfterTest; 
+  }
+   
   public static ProcessEngineExtension builder() {
     return new ProcessEngineExtension();
   }
   
   public ProcessEngineExtension configurationResource(String configurationResource) {
     this.setConfigurationResource(configurationResource);
+    return this;
+  }
+  
+  public ProcessEngineExtension ensureCleanAfterTest(boolean ensureCleanafterTest) {
+    this.ensureCleanAfterTest = ensureCleanafterTest;
     return this;
   }
   
@@ -281,52 +325,51 @@ public class ProcessEngineExtension
   }
 
   @Override
+    public void beforeTestExecution(ExtensionContext context) throws Exception {
+      LOG.debug("beforeTestExecution: {}", context.getDisplayName());
+      
+      Method testMethod = context.getTestMethod().get();
+      Deployment deploymentAnnotation = context.getTestClass().get().getAnnotation(Deployment.class);
+      Deployment methodAnnotation = testMethod.getAnnotation(Deployment.class);
+      // Method annotation overwrites Class annotation
+      deploymentAnnotation = (methodAnnotation == null && deploymentAnnotation != null) ? deploymentAnnotation : methodAnnotation;
+      
+      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(), 
+          testMethod, deploymentAnnotation, (methodAnnotation == null));
+  
+      //apply
+      if (processEngine == null) {
+        initializeProcessEngine();
+      }
+  
+      initializeServices();
+  
+      final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, context.getTestClass().get(), context.getTestMethod().get().getName());
+      Assumptions.assumeTrue(hasRequiredHistoryLevel, "ignored because the current history level is too low");
+  //    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
+  //    Assume.assumeTrue("ignored because the database doesn't match the required ones", runsWithRequiredDatabase);
+    }
+
+  @Override
   public void afterTestExecution(ExtensionContext context) throws Exception {
+    LOG.debug("afterTestExecution: {}", context.getDisplayName());
     identityService.clearAuthentication();
     processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
 
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId,
-        context.getTestClass().get(), context.getTestMethod().get().getName()
-        );
+        context.getTestClass().get(), context.getTestMethod().get().getName());
     for (String additionalDeployment : additionalDeployments) {
       TestHelper.deleteDeployment(processEngine, additionalDeployment);
     }
 
-//    if (ensureCleanAfterTest) {
-//      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
-//    }
+    if (ensureCleanAfterTest) {
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+    }
 
     TestHelper.resetIdGenerator(processEngineConfiguration);
     ClockUtil.reset();
 
     clearServiceReferences(); 
-    
-  }
-
-  @Override
-  public void beforeTestExecution(ExtensionContext context) throws Exception {
-    
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, context.getTestClass().get(), 
-        context.getTestMethod().get().getName(), context.getElement().get().getAnnotation(Deployment.class));
-
-    //apply
-    if (processEngine == null) {
-      initializeProcessEngine();
-    }
-
-    initializeServices();
-
-//    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
-//    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
-//    return new Statement() {
-//
-//      @Override
-//      public void evaluate() throws Throwable {
-//        Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
-//        Assume.assumeTrue("ignored because the database doesn't match the required ones", runsWithRequiredDatabase);
-//        ProcessEngineRule.super.apply(base, description).evaluate();
-//      }
-//    };
   }
 
   protected void initializeProcessEngine() {
@@ -359,9 +402,7 @@ public class ProcessEngineExtension
 
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    LOG.info("supportsParameter: {}, {}", parameterContext.getParameter(), extensionContext);
     if (parameterContext.getParameter().getType().equals(ProcessEngine.class)) {
-      LOG.info("supporting only ProcessEngine parameter");
       return true;
     } else {
       return false;
@@ -370,9 +411,8 @@ public class ProcessEngineExtension
 
   @Override
   public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    LOG.info("resolveParameter: {}, {}", parameterContext.getParameter(), extensionContext);
     if (ProcessEngine.class.equals(parameterContext.getParameter().getType())) {
-      LOG.info("return the processEngine");
+      LOG.debug("resolve the processEngine as parameter");
       return getProcessEngine();
     } else {
       return null;
