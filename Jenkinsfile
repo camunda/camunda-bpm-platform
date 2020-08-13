@@ -1,5 +1,12 @@
 #!/usr/bin/env groovy
 
+String POSTGRES_DB_CONFIG = '-Ddatabase.url=jdbc:postgresql://localhost:5432/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
+String MARIADB_DB_CONFIG = '-Ddatabase.url=jdbc:mariadb://localhost:3306/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
+String MYSQL_DB_CONFIG = '-Ddatabase.url=jdbc:mysql://localhost:3306/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
+String SQLSERVER_DB_CONFIG = '-Ddatabase.url=jdbc:sqlserver://localhost:1433;DatabaseName=process-engine -Ddatabase.username=camunda -Ddatabase.password=Camunda-BPM123'
+String DB2_DB_CONFIG = '-Ddatabase.url=jdbc:db2://localhost:50000/engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
+String ORACLE_DB_CONFIG = '-Ddatabase.url=jdbc:oracle:thin:@localhost:1521:xe -Ddatabase.username=camunda -Ddatabase.password=camunda'
+
 String getMavenAgent(Integer mavenCpuLimit = 4, String dockerTag = '3.6.3-openjdk-8'){
   // assuming one core left for main maven thread
   String mavenForkCount = mavenCpuLimit;
@@ -34,6 +41,186 @@ spec:
         cpu: ${mavenCpuLimit}
         memory: ${mavenMemoryLimit}Gi
   """
+}
+
+String getPostgresAgent(Integer cpuLimit = 1, String dockerTag = '9.6.18'){
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: postgres
+    image: postgres:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    - name: POSTGRES_DB
+      value: process-engine
+    - name: POSTGRES_USER
+      value: camunda
+    - name: POSTGRES_PASSWORD
+      value: camunda
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+String getMariaDbAgent(Integer cpuLimit = 1, String dockerTag = '10.2'){
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: mariadb
+    image: mariadb:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    - name: MYSQL_DATABASE
+      value: process-engine
+    - name: MYSQL_USER
+      value: camunda
+    - name: MYSQL_PASSWORD
+      value: camunda
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+String getMySqlAgent(Integer cpuLimit = 1, String dockerTag = '5.7.31'){
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: mysql
+    image: mysql:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    - name: MYSQL_DATABASE
+      value: process-engine
+    - name: MYSQL_USER
+      value: camunda
+    - name: MYSQL_PASSWORD
+      value: camunda
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+String getDb2Agent(Integer cpuLimit = 1, String dockerTag = '11.5.0.0'){
+  // camunda registry: registry.camunda.cloud/team-cambpm/camunda-ci-db2:10.5 or 11.1
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: ibmcom/db2
+    image: ibmcom/db2:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    - name: LICENSE
+      value: accept
+    - name: DBNAME
+      value: engine
+    - name: DB2INSTANCE
+      value: camunda
+    - name: DB2INST1_PASSWORD
+      value: camunda
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+String getSqlServerAgent(Integer cpuLimit = 1, String dockerTag = '2017-latest'){
+  // camunda registry: registry.camunda.cloud/team-cambpm/camunda-ci-sqlserver:2012 or 2014
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: mcr.microsoft.com/mssql/server
+    image: mcr.microsoft.com/mssql/server:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    - name: ACCEPT_EULA
+      value: Y
+    - name: SA_PASSWORD
+      value: cambpm-123#
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+String getOracleAgent(Integer cpuLimit = 1, String dockerTag = '18'){
+  // only OracleDB 18c is available on the Camunda registry
+  // assuming 2Gig for each core
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: registry.camunda.cloud/team-cambpm/camunda-ci-oracle
+    image: registry.camunda.cloud/team-cambpm/camunda-ci-oracle:${dockerTag}
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
+List getPostgreSqlSupportedVersions() {
+  // tags obtained from: https://hub.docker.com/_/postgres?tab=tags
+  return ["9.6.18", "9.4.26", "10.7", "10.4", "11.1", "11.2", "12.2"];
+}
+
+List getMariaDbSupportedVersions() {
+  // tags obtained from: https://hub.docker.com/_/mariadb?tab=tags
+  return ["10.0.38", "10.2.33", "10.3.24"];
+}
+
+List getMySqlSupportedVersions() {
+  // tags obtained from: https://hub.docker.com/_/mysql
+  // we only test MySQL 5.7
+  return ["5.7.31"/*, "5.6.49"*/];
+}
+
+List getDb2SupportedVersions() {
+  // there are currently no public docker images that we support
+  // check: https://hub.docker.com/r/ibmcom/db2/tags?page=1
+  return [/*"10.5", "11.1"*/];
+}
+
+List getOracleSupportedVersions() {
+  // there are currently no public docker images
+  return ["11g", "12c", "18c", "19c"];
+}
+
+List getSqlServerSupportedVersions() {
+  // added only versions supported by docker images
+  // check: https://hub.docker.com/_/microsoft-mssql-server
+  return ["2017-latest", "2019-latest"/*, "2012", "2014", "2016"*/];
 }
 
 pipeline{
@@ -186,7 +373,7 @@ pipeline{
                     //          errors=$[errors + 1]
                     //      fi
                     //  done
-                    //  
+                    //
                     //  exit $errors
                     //"""
                     sh """
@@ -204,7 +391,7 @@ pipeline{
     stage('Engine UNIT & QA Tests') {
       failFast true
       parallel {
-        stage('Engine UNIT & Authorization tests') {
+        stage('Engine UNIT & Authorization tests - H2') {
           agent {
             kubernetes {
               yaml getMavenAgent(16)
@@ -233,6 +420,42 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory,cfgAuthorizationCheckRevokesAlways -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 9.6') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('9.6.18')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
                     """
                   }
                 }
@@ -384,7 +607,7 @@ pipeline{
             }
           }
         }
-        stage('QA: Instance Migration & Rolling Update Tests') {
+        stage('QA: Instance Migration & Rolling Update Tests - H2') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -420,7 +643,43 @@ pipeline{
             }
           }
         }
-        stage('QA: Upgrade old engine from 7.13') {
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 9.6') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - H2') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -439,7 +698,26 @@ pipeline{
             }
           }
         }
-        stage('QA: Upgrade database from 7.13') {
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 9.6') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - H2') {
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -453,6 +731,25 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,h2
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 9.6') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
                 """
               }
             }
@@ -644,7 +941,7 @@ pipeline{
             }
           }
         }
-        stage('Webapp') {
+        stage('Webapp - H2') {
           when {
             anyOf {
               branch 'hackdays-master';
@@ -697,6 +994,53 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory,cfgAuthorizationCheckRevokesAlways -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 9.6') {
+          when {
+            anyOf {
+              branch 'master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
                     """
                   }
                 }
@@ -795,7 +1139,7 @@ pipeline{
         stage('Engine IT: Tomcat tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
             }
           }
           steps {
@@ -805,7 +1149,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Ptomcat,postgresql,engine-integration -B
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Ptomcat,postgresql,engine-integration ${POSTGRES_DB_CONFIG} -B
                 """
               }
             }
@@ -814,7 +1158,7 @@ pipeline{
         stage('Engine IT: Wildfly tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
             }
           }
           steps {
@@ -824,7 +1168,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,engine-integration -B
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,engine-integration ${POSTGRES_DB_CONFIG} -B
                 """
               }
             }
@@ -833,7 +1177,7 @@ pipeline{
         stage('Engine IT: Wildfly XA tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
             }
           }
           steps {
@@ -843,7 +1187,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,postgresql-xa,engine-integration -B
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,postgresql,postgresql-xa,engine-integration ${POSTGRES_DB_CONFIG} -B
                 """
               }
             }
