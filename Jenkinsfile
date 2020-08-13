@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-String getMavenAgent(Integer mavenCpuLimit = 3){
+String getMavenAgent(Integer mavenCpuLimit = 3, String dockerTag = '3.6.3-openjdk-8'){
   // assuming one core left for main maven thread
   String mavenForkCount = mavenCpuLimit - 1;
   // assuming 2Gig for each core
@@ -18,7 +18,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: maven
-    image: maven:3.6.3-openjdk-8
+    image: maven:${dockerTag}
     command: ["cat"]
     tty: true
     env:
@@ -701,7 +701,7 @@ pipeline{
         stage('Oracle JDK 8 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // NOT SURE WHAT TO PUT HERE
             }
           }
           steps {
@@ -720,7 +720,7 @@ pipeline{
         stage('Oracle JDK 11 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // NOT SURE WHAT TO PUT HERE
             }
           }
           steps {
@@ -739,7 +739,7 @@ pipeline{
         stage('Oracle JDK 12 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // NOT SURE WHAT TO PUT HERE
             }
           }
           steps {
@@ -758,7 +758,7 @@ pipeline{
         stage('Oracle JDK 13 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // NOT SURE WHAT TO PUT HERE
             }
           }
           steps {
@@ -777,7 +777,7 @@ pipeline{
         stage('Oracle JDK 14 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // NOT SURE WHAT TO PUT HERE
             }
           }
           steps {
@@ -796,7 +796,7 @@ pipeline{
         stage('OpenJDK 8 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
             }
           }
           steps {
@@ -815,7 +815,7 @@ pipeline{
         stage('OpenJDK 11 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent( 3, '3.6.3-openjdk-11')
             }
           }
           steps {
@@ -834,7 +834,7 @@ pipeline{
         stage('OpenJDK 12 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // DOES NOT EXIST
             }
           }
           steps {
@@ -853,7 +853,7 @@ pipeline{
         stage('OpenJDK 13 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent() // DOES NOT EXIST
             }
           }
           steps {
@@ -872,7 +872,7 @@ pipeline{
         stage('OpenJDK 14 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent( 3, '3.6.3-openjdk-14')
             }
           }
           steps {
@@ -891,7 +891,7 @@ pipeline{
         stage('IBM JDK 8 tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getMavenAgent(3, '3.6.3-ibmjava-8')
             }
           }
           steps {
