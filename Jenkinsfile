@@ -1,3 +1,4 @@
+#!/usr/bin/env groovy
 
 String getMavenAgent(Integer mavenCpuLimit = 3){
   // assuming one core left for main maven thread
