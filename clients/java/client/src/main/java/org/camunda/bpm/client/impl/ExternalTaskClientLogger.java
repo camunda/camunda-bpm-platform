@@ -64,14 +64,14 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public static final SerializableLogger SERIALIZABLE_FORMAT_LOGGER =
       createLogger(SerializableLogger.class, PROJECT_CODE, PROJECT_LOGGER, "06");
 
-  protected void logError(String id, String messageTemplate, Throwable t) {
+  public void logError(String id, String messageTemplate, Throwable t) {
     if (delegateLogger.isErrorEnabled()) {
       String msg = formatMessageTemplate(id, messageTemplate);
       delegateLogger.error(msg, t);
     }
   }
 
-  protected void logInfo(String id, String messageTemplate, Throwable t) {
+  public void logInfo(String id, String messageTemplate, Throwable t) {
     if(delegateLogger.isInfoEnabled()) {
       String msg = formatMessageTemplate(id, messageTemplate);
       delegateLogger.info(msg, t);
@@ -196,7 +196,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
   }
 
   public ValueMapperException cannotSerializeVariable(String variableName, Throwable e) {
-    return new ValueMapperException(exceptionMessage("025", "Cannot serialize variable '{}'", variableName), e); 
+    return new ValueMapperException(exceptionMessage("025", "Cannot serialize variable '{}'", variableName), e);
   }
 
   public void logDataFormats(Collection<DataFormat> formats) {

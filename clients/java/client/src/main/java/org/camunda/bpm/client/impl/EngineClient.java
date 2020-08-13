@@ -136,4 +136,8 @@ public class EngineClient {
   public void setTypedValues(TypedValues typedValues) {
     this.typedValues = typedValues;
   }
+
+  public boolean isUsePriority() {
+    return usePriority;
+  }
 }

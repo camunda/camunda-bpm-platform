@@ -60,15 +60,15 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "006", "Exception while acquiring tasks.", e);
   }
 
-  protected void taskHandlerIsNull(String topicName) {
+  public void taskHandlerIsNull(String topicName) {
     logError(
       "007",
       String.format("Task handler is null for topic '%s'.", topicName));
   }
-  
+
   protected void fetchAndLock(List<TopicRequestDto> subscriptions) {
     logDebug(
-      "008", 
+      "008",
       String.format("Fetch and lock new external tasks for %d topics", subscriptions.size()));
   }
 
