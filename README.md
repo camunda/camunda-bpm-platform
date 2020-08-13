@@ -1,5 +1,4 @@
-camunda BPM - The open source BPM platform
-==========================================
+# Camunda BPM - The open source BPM platform
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent)
 
@@ -12,8 +11,8 @@ camunda BPM platform is a flexible framework for workflow and process automation
 * Contribution Guidelines: https://camunda.org/contribute/
 * License: The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
 
-Components
-----------
+
+## Components
 
 camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
 
@@ -39,8 +38,8 @@ camunda BPM platform provides a rich set of components centered around the BPM l
  * [Community Extensions](https://docs.camunda.org/manual/7.5/introduction/extensions/) - Extensions on top of Camunda BPM provided and maintained by our great open source community
 
 
-A Framework
-----------
+## A Framework
+
 In contrast to other vendor BPM platforms, camunda BPM strives to be highly integrable and embeddable. We seek to deliver a great experience to developers that want to use BPM technology in their projects.
 
 ### Highly Integrable
@@ -50,121 +49,11 @@ Out of the box, camunda BPM provides infrastructure-level integration with Java 
 Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST Api as a library to your application and assemble your custom BPM platform configuration.
 
 
-Building camunda BPM platform
-----------
+## Contributing
 
-camunda BPM is available on maven central but for development of the platform, you have to add our public nexus repository to your maven settings.xml.
-Add the following lines to it:
+Please see our [contribution guidelines](CONTRIBUTING.md).
 
-```xml
-<profiles>
-  <profile>
-    <id>camunda-bpm</id>
-    <repositories>
-      <repository>
-        <id>camunda-bpm-nexus</id>
-        <name>camunda-bpm-nexus</name>
-        <releases>
-          <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>
-        <url>https://app.camunda.com/nexus/content/groups/public</url>
-      </repository>
-    </repositories>
-  </profile>
-</profiles>
-<activeProfiles>
-  <activeProfile>camunda-bpm</activeProfile>
-</activeProfiles>
-```
 
-Apache Maven 3 and Java JDK 8+ are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+## Tests
 
-```
-mvn clean install
-```
-
-This will build all the modules that make up the camunda BPM platform but will not perform any integration testing. After the build is completed, you will find the distributions under
-
-```
-distro/tomcat/distro/target     (Apache Tomcat 9 Distribution)
-distro/wildfly/distro/target   (WildFly AS Distribution)
-```
-
-Running Integration Tests
-----------
-The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for 
-each server runtime we support. These projects are responsible for taking a runtime container 
-distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
-actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
- * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
- * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
-
-In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
-
-We have different maven profiles for selecting
-* *Runtime containers & environments*: tomcat, wildfly
-* *The testsuite*: engine-integration, webapps-integration
-* *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
-  postgresql are supported in engine-integration tests)
-
-In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
-
-```
-mvn clean install -Pengine-integration,wildfly,h2
-```
-
-If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
-
-```
-mvn clean install -Pengine-integration,wildfly,postgresql,postgresql-xa
-```
-
-You can select multiple testsuites but only a single database and a single runtime container. This is valid:
-
-```
-mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
-```
-
-There is a special profile for the WildFly Application Servers:
-
-* WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
-
-Limiting the number of engine unit tests
-----------
-Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
-
-There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
-
-When using the includes only the packages listed will be include and with excludes the other way around.
-For example calling Maven in the engine directory with
-```
-mvn clean test -Dtest.includes=bpmn
-```
-will test all packages that contain "bpmn". This will include e.g. ``*test.bpmn*`` and ``*api.bpmn*``. If you want to limit this further you have to get more concrete. Additionally, you can combine certain packages with a pipe:
-```
-mvn clean test -Dtest.includes=bpmn|cmmn
-```
-will execute all bpmn and cmmn tests.
-
-The same works for excludes. Also, you can combine both:
-```
-mvn clean test -Dtest.includes=bpmn -Dtest.excludes=bpmn.async
-```
-Please note that excludes take precedence over includes.
-
-To make it easier for you we created some profiles with predefined in- and excludes:
-- testBpmn
-- testCmmn
-- testBpmnCmmn
-- testExceptBpmn
-- testExceptCmmn
-- testExceptBpmnCmmn
-
-So simply call
-```
-mvn clean test -PtestExceptBpmn
-```
-and all the bpmn testcases won't bother you any longer.
+To run the tests in this repository, please see our [testing tips and tricks](TESTING.md).
