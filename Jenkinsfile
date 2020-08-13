@@ -337,40 +337,38 @@ pipeline{
             }
           }
         }
-        stage("Engine UNIT: CDI Integration Tests") {
+        stage('Engine UNIT: CDI Integration & Plugins Tests') {
           agent {
             kubernetes {
               yaml getMavenAgent()
             }
           }
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-cdi/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
-                """
+          stages {
+            stage("Engine UNIT: CDI Integration Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine-cdi/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
+                    """
+                  }
+                }
               }
             }
-          }
-        }
-        stage("Engine UNIT: Plugins Tests") {
-          agent {
-            kubernetes {
-              yaml getMavenAgent()
-            }
-          }
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
-                """
+            stage("Engine UNIT: Plugins Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine-plugins/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,h2-in-memory -B
+                    """
+                  }
+                }
               }
             }
           }
