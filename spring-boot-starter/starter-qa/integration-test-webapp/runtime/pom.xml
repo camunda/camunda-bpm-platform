@@ -178,6 +178,7 @@
 
                   <excludes>
                     <exclude>**/ErrorPageIT.*</exclude>
+                    <exclude>**/LoginIT.*</exclude>
                   </excludes>
                 </configuration>
               </execution>
