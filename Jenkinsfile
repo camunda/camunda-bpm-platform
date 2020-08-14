@@ -615,6 +615,17 @@ pipeline{
           }
         }
         stage('Wildfly-compatibility tests') {
+          when {
+            anyOf {
+              branch 'master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('h2')
+                }
+              }
+            }
+          }
           agent {
             kubernetes {
               yaml getMavenAgent()
@@ -634,6 +645,17 @@ pipeline{
           }
         }
         stage('Webapp') {
+          when {
+            anyOf {
+              branch 'master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('h2')
+                }
+              }
+            }
+          }
           agent {
             kubernetes {
               yaml getMavenAgent()
