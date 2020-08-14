@@ -43,7 +43,7 @@ spec:
   """
 }
 
-String getPostgresAgent(Integer cpuLimit = 1, String dockerTag = '9.6.18'){
+String getPostgresAgent(String dockerTag = '9.6.18', Integer cpuLimit = 1){
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
   """
@@ -68,7 +68,7 @@ String getPostgresAgent(Integer cpuLimit = 1, String dockerTag = '9.6.18'){
   """
 }
 
-String getMariaDbAgent(Integer cpuLimit = 1, String dockerTag = '10.2'){
+String getMariaDbAgent(String dockerTag = '10.2', Integer cpuLimit = 1){
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
   """
@@ -93,7 +93,7 @@ String getMariaDbAgent(Integer cpuLimit = 1, String dockerTag = '10.2'){
   """
 }
 
-String getMySqlAgent(Integer cpuLimit = 1, String dockerTag = '5.7.31'){
+String getMySqlAgent(String dockerTag = '5.7.31', Integer cpuLimit = 1){
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
   """
@@ -118,7 +118,7 @@ String getMySqlAgent(Integer cpuLimit = 1, String dockerTag = '5.7.31'){
   """
 }
 
-String getDb2Agent(Integer cpuLimit = 1, String dockerTag = '11.5.0.0'){
+String getDb2Agent(String dockerTag = '11.5.0.0', Integer cpuLimit = 1){
   // camunda registry: registry.camunda.cloud/team-cambpm/camunda-ci-db2:10.5 or 11.1
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
@@ -146,7 +146,7 @@ String getDb2Agent(Integer cpuLimit = 1, String dockerTag = '11.5.0.0'){
   """
 }
 
-String getSqlServerAgent(Integer cpuLimit = 1, String dockerTag = '2017-latest'){
+String getSqlServerAgent(String dockerTag = '2017-latest', Integer cpuLimit = 1){
   // camunda registry: registry.camunda.cloud/team-cambpm/camunda-ci-sqlserver:2012 or 2014
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
@@ -170,7 +170,7 @@ String getSqlServerAgent(Integer cpuLimit = 1, String dockerTag = '2017-latest')
   """
 }
 
-String getOracleAgent(Integer cpuLimit = 1, String dockerTag = '18'){
+String getOracleAgent(String dockerTag = '18', Integer cpuLimit = 1){
   // only OracleDB 18c is available on the Camunda registry
   // assuming 2Gig for each core
   String memoryLimit = cpuLimit * 2;
