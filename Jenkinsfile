@@ -368,7 +368,7 @@ pipeline{
                 }
               }
             }
-            stage('sql-scripts') {
+            stage('sql-scripts - H2') {
               agent {
                 kubernetes {
                   yaml getMavenAgent()
@@ -401,6 +401,253 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,h2
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 9.6') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 9.4') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 10.4') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 10.7') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 11.1') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 11.2') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - PostgreSQL 12.2') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getPostgresAgent(PG_96)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MariaDB 10.0') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getMariaDbAgent(MDB_100)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MariaDB 10.2') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getMariaDbAgent(MDB_102)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MariaDB 10.3') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getMariaDbAgent(MDB_103)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MySQL 5.7') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getMySqlAgent(MYSQL_57)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,mysql ${MYSQL_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MS-SQL 2017') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getSqlServerAgent(MSSQL_17)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('sql-scripts - MS-SQL 2019') {
+              agent {
+                kubernetes {
+                  yaml getMavenAgent() + getSqlServerAgent(MSSQL_19)
+                }
+              }
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd distro/sql-script && mvn -s \$MAVEN_SETTINGS_XML -B install -Pcheck-sql,sqlserver ${SQLSERVER_DB_CONFIG}
                     """
                   }
                 }
