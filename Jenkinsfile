@@ -3234,20 +3234,20 @@ pipeline{
 //            }
 //          }
 //        }
-        stage('Webapps Rest IT: Embedded Wildfly tests') {
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,h2,webapps-integration,embedded-engine-rest -B
-                """
-              }
-            }
-          }
-        }
+//        stage('Webapps Rest IT: Embedded Wildfly tests') {
+//          steps {
+//            container("maven") {
+//              // Run maven
+//              unstash "artifactStash"
+//              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+//                sh """
+//                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+//                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,h2,webapps-integration,embedded-engine-rest -B
+//                """
+//              }
+//            }
+//          }
+//        }
       }
     }
     stage("Webapp IT spring"){
