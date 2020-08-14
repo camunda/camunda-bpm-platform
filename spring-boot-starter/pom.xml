@@ -181,7 +181,10 @@
           <version>2.22.2</version>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <trimStackTrace>false</trimStackTrace>
+            <trimStackTrace>false</trimStackTrace>	
+			  <excludes>
+                <exclude>**/LoginIT.*</exclude>
+              </excludes>
           </configuration>
         </plugin>
       </plugins>

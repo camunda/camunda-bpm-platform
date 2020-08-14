@@ -3137,25 +3137,6 @@ pipeline{
             }
           }
         }
-        stage('Webapps Rest IT: Embedded Wildfly tests') {
-          agent {
-            kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8')
-            }
-          }
-          steps {
-            container("maven") {
-              // Run maven
-              unstash "artifactStash"
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,h2,webapps-integration,embedded-engine-rest -B
-                """
-              }
-            }
-          }
-        }
         stage('Distro: Wildfly Subsystem UNIT tests') {
           agent {
             kubernetes {
@@ -3178,8 +3159,7 @@ pipeline{
       }
     }
 
-
-    stage("IT"){
+    stage("Webapp IT"){
       agent {
         kubernetes {
           yaml getMavenAgent()
@@ -3209,7 +3189,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Ptomcat,h2,webapps-integration -B
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML install -Ptomcat,h2,webapps-integration -B
                 """
               }
             }
@@ -3222,33 +3202,47 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Ptomcat-vanilla,webapps-integration-sa -B
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML install -Ptomcat-vanilla,webapps-integration-sa -B
                 """
               }
             }
           }
         }
-        stage('webapp-IT-wildfly-h2') {
+//        stage('webapp-IT-wildfly-h2') {
+//          steps {
+//            container("maven") {
+//              // Run maven
+//              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+//                sh """
+//                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+//                  cd qa && mvn -s \$MAVEN_SETTINGS_XML install -Pwildfly,h2,webapps-integration -B
+//                """
+//              }
+//            }
+//          }
+//        }
+//        stage('webapp-IT-standalone-wildfly') {
+//          steps {
+//            container("maven") {
+//              // Run maven
+//              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+//                sh """
+//                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+//                  cd qa && mvn -s \$MAVEN_SETTINGS_XML install -Pwildfly-vanilla,webapps-integration-sa -B
+//                """
+//              }
+//            }
+//          }
+//        }
+        stage('Webapps Rest IT: Embedded Wildfly tests') {
           steps {
             container("maven") {
               // Run maven
+              unstash "artifactStash"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Pwildfly,h2,webapps-integration -B
-                """
-              }
-            }
-          }
-        }
-        stage('webapp-IT-standalone-wildfly') {
-          steps {
-            container("maven") {
-              // Run maven
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh """
-                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd qa && mvn -s \$MAVEN_SETTINGS_XML clean install -Pwildfly-vanilla,webapps-integration-sa -B
+                  cd qa/ && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pwildfly,h2,webapps-integration,embedded-engine-rest -B
                 """
               }
             }
@@ -3256,7 +3250,7 @@ pipeline{
         }
       }
     }
-    stage("IT spring"){
+    stage("Webapp IT spring"){
       agent {
         kubernetes {
           yaml getMavenAgent() + getChromeAgent()
@@ -3277,7 +3271,7 @@ pipeline{
             }
           }
         }
-        stage("IT spring tests") {
+        stage("Webapp IT spring tests") {
           parallel {
             stage('Run: IT') {
               steps {

@@ -142,6 +142,9 @@
               <systemPropertyVariables>
                 <camunda.run.home>${run-home}</camunda.run.home>
               </systemPropertyVariables>
+			  <excludes>
+                <exclude>**/LoginIT.*</exclude>
+              </excludes>
             </configuration>
             <executions>
               <execution>

@@ -241,6 +241,9 @@
             <configuration>
               <skipTests>true</skipTests>
               <skipITs>true</skipITs>
+			  <excludes>
+                <exclude>**/LoginIT.*</exclude>
+              </excludes>
             </configuration>
           </plugin>
         </plugins>
@@ -260,6 +263,9 @@
               <dependenciesToScan>
                 <dependency>org.camunda.bpm.qa:camunda-qa-integration-tests-webapps</dependency>
               </dependenciesToScan>
+			  <excludes>
+                <exclude>**/LoginIT.*</exclude>
+              </excludes>
             </configuration>
           </plugin>
         </plugins>

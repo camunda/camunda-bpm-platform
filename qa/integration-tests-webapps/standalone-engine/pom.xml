@@ -225,6 +225,7 @@
                   <excludes>
                     <exclude>**/RestIT.*</exclude>
                     <exclude>**/RestJaxRs2IT.*</exclude>
+					<exclude>**/LoginIT.*</exclude>
                   </excludes>
                 </configuration>
               </execution>
