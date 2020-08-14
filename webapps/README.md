@@ -129,21 +129,8 @@ The supported browsers are:
 
 ## Contributing
 
-You are __more than welcome__ to take part on the development of this project!
+Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md) for how to contribute to this repository.
 
-### Issues
-
-You can submit issues in the [camunda Jira](https://app.camunda.com/jira/issues/).
-
-### Coding
-
-Clone the repository, add, fix or improve and send us a pull request.
-But please take care about the commit messages, [our conventions can be found
-here](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md).
-
-### Coding style guide
-
-In place of a guide, just follow the formatting of existing code (and / or use the [.editorconfig](http://editorconfig.org/) files provided).
 
 ## Help and support
 
