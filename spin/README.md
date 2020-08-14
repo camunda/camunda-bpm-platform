@@ -69,9 +69,11 @@ at any time by unwrapping it:
 Element e = XML( xmlSource ).childElement("customer").unwrap();
 ```
 
-## How can I contribute to Spin?
 
-Check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines about how to contribute.
+# Contributing
+
+Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md) for how to contribute to this repository.
+
 
 # License:
 
