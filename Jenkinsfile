@@ -463,7 +463,7 @@ pipeline{
     stage("Rest API & Webapps Tests"){
       when {
         anyOf {
-          branch 'master';
+          branch 'hackdays-master';
           allOf {
             changeRequest();
             expression {
@@ -617,7 +617,7 @@ pipeline{
         stage('Wildfly-compatibility tests') {
           when {
             anyOf {
-              branch 'master';
+              branch 'hackdays-master';
               allOf {
                 changeRequest();
                 expression {
@@ -647,7 +647,7 @@ pipeline{
         stage('Webapp') {
           when {
             anyOf {
-              branch 'master';
+              branch 'hackdays-master';
               allOf {
                 changeRequest();
                 expression {
