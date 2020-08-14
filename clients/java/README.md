@@ -46,5 +46,10 @@ If you want to use a JDK higher than 1.8, please add the following dependency to
 </dependency>
 ```
 
+## Contributing
+
+Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md) for how to contribute to this repository.
+
+
 ## License
 The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
