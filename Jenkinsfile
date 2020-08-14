@@ -204,7 +204,6 @@ List getMySqlSupportedVersions() {
   // tags obtained from: https://hub.docker.com/_/mysql
   // we only test MySQL 5.7
   return ["5.7.31"/*, "5.6.49"*/];
-  return ["5.7.31"/*, "5.6.49"*/];
 }
 
 List getDb2SupportedVersions() {
@@ -680,6 +679,150 @@ pipeline{
             }
           }
         }
+        stage('Engine UNIT & Authorization tests - MariaDB 10.0') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getMariaDbAgent('10.0.38')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - MariaDB 10.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getMariaDbAgent('10.2.33')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - MariaDB 10.3') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getMariaDbAgent('10.3.24')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - MySQL 5.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getMySqlAgent('5.7.31')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,mysql ${MYSQL_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mysql,cfgAuthorizationCheckRevokesAlways ${MYSQL_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage("Engine UNIT: History Level Activity Tests") {
           agent {
             kubernetes {
@@ -1112,6 +1255,150 @@ pipeline{
             }
           }
         }
+        stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.0') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.3') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,mariadb ${MARIADB_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - MySQL 5.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,mysql ${MYSQL_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,mysql ${MYSQL_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage('QA: Upgrade old engine from 7.13 - H2') {
           agent {
             kubernetes {
@@ -1264,6 +1551,82 @@ pipeline{
             }
           }
         }
+        stage('QA: Upgrade old engine from 7.13 - MariaDB 10.0') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - MariaDB 10.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - MariaDB 10.3') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - MySQL 5.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,mysql ${MYSQL_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
         stage('QA: Upgrade database from 7.13 - H2') {
           agent {
             kubernetes {
@@ -1411,6 +1774,82 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MariaDB 10.0') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MariaDB 10.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MariaDB 10.3') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,mariadb ${MARIADB_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MySQL 5.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('5.7.31')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,mysql ${MYSQL_DB_CONFIG}
                 """
               }
             }
@@ -1662,7 +2101,7 @@ pipeline{
             }
           }
         }
-        stage('Webapp - PostgreSQL 9.6') {
+        stage('Webapp - MariaDB 10.0') {
           when {
             anyOf {
               branch 'hackdays-master';
@@ -1676,7 +2115,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
             }
           }
           stages {
@@ -1688,7 +2127,7 @@ pipeline{
                   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
                     """
                   }
                 }
@@ -1701,7 +2140,148 @@ pipeline{
                   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - MariaDB 10.2') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - MariaDB 10.3') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mariadb,cfgAuthorizationCheckRevokesAlways ${MARIADB_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - MySQL 5.7') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mysql ${MYSQL_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mysql,cfgAuthorizationCheckRevokesAlways ${MYSQL_DB_CONFIG} -Dskip.frontend.build=true -B
                     """
                   }
                 }
