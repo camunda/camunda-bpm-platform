@@ -466,7 +466,9 @@ pipeline{
           branch 'master';
           allOf {
             changeRequest();
-            pullRequest.labels.contains('rest-api')
+            script {
+              pullRequest.labels.contains('rest-api')
+            }
           }
         }
       }
