@@ -204,6 +204,7 @@ List getMySqlSupportedVersions() {
   // tags obtained from: https://hub.docker.com/_/mysql
   // we only test MySQL 5.7
   return ["5.7.31"/*, "5.6.49"*/];
+  return ["5.7.31"/*, "5.6.49"*/];
 }
 
 List getDb2SupportedVersions() {
@@ -1106,7 +1107,7 @@ pipeline{
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
-                  cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU install source:jar source:test-jar -pl '!distro/jbossas7/subsystem' -Pdistro,distro-ce,distro-wildfly -B
+                  mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU install source:jar source:test-jar -pl '!distro/jbossas7/subsystem' -Pdistro,distro-ce,distro-wildfly -B
                 """
               }
             }
