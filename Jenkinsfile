@@ -2101,6 +2101,335 @@ pipeline{
             }
           }
         }
+        stage('Webapp - PostgreSQL 9.6') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 9.4') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 10.4') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.4')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 10.7') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.7')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 11.1') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.1')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 11.2') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.2')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - PostgreSQL 12.2') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('12.2')
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage('Webapp - MariaDB 10.0') {
           when {
             anyOf {
