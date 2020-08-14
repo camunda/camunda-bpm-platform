@@ -46,6 +46,11 @@ Now you can reference individual commons projects:
 
 Java JRE 1.8+ is required.
 
+## Contributing
+
+Have a look at our [contribution guide](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md) for how to contribute to this repository.
+
+
 ## License:
 
 The source files in this repository are made available under the <a href="LICENSE">Apache License, Version 2.0</a>.
