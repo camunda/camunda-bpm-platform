@@ -461,6 +461,15 @@ pipeline{
       }
     }
     stage("Rest API & Webapps Tests"){
+      when {
+        anyOf {
+          branch 'master';
+          allOf {
+            changeRequest();
+            pullRequest.labels.contains('rest-api')
+          }
+        }
+      }
       failFast true
       parallel {
         stage('Rest API - Jersey2') {
