@@ -192,7 +192,7 @@ String getOracleAgent(String dockerTag = '18', Integer cpuLimit = 1){
 
 List getPostgreSqlSupportedVersions() {
   // tags obtained from: https://hub.docker.com/_/postgres?tab=tags
-  return ["9.6.18", "9.4.26", "10.7", "10.4", "11.1", "11.2", "12.2"];
+  return ["9.6.18", "9.4.26", "10.4", "10.7", "11.1", "11.2", "12.2"];
 }
 
 List getMariaDbSupportedVersions() {
@@ -464,6 +464,222 @@ pipeline{
             }
           }
         }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 9.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('9.4.26')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 10.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('10.4')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 10.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('10.7')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 11.1') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('11.1')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 11.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('11.2')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - PostgreSQL 12.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getPostgresAgent('12.2')
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,postgresql,cfgAuthorizationCheckRevokesAlways ${POSTGRES_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage("Engine UNIT: History Level Activity Tests") {
           agent {
             kubernetes {
@@ -680,6 +896,222 @@ pipeline{
             }
           }
         }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 9.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 10.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.4')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 10.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.7')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 11.1') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.1')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 11.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.2')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 12.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('12.2')
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,postgresql ${POSTGRES_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage('QA: Upgrade old engine from 7.13 - H2') {
           agent {
             kubernetes {
@@ -718,6 +1150,120 @@ pipeline{
             }
           }
         }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 9.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 10.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.4')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 10.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.7')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 11.1') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.1')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 11.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.2')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - PostgreSQL 12.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('12.2')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
         stage('QA: Upgrade database from 7.13 - H2') {
           agent {
             kubernetes {
@@ -741,6 +1287,120 @@ pipeline{
           agent {
             kubernetes {
               yaml getMavenAgent() + getPostgresAgent('9.6.18')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 9.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 10.4') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.4')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 10.7') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('10.7')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 11.1') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.1')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 11.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('11.2')
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,postgresql ${POSTGRES_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - PosgreSQL 12.2') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getPostgresAgent('12.2')
             }
           }
           steps{
