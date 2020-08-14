@@ -33,7 +33,7 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "001", "Exception while fetch and lock task.", e);
   }
 
-  protected void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {
+  public void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {
     logError(
       "002",
       String.format("Exception while executing external task handler '%s'.", topicName), e);
