@@ -3,9 +3,32 @@
 String POSTGRES_DB_CONFIG = '-Ddatabase.url=jdbc:postgresql://localhost:5432/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
 String MARIADB_DB_CONFIG = '-Ddatabase.url=jdbc:mariadb://localhost:3306/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
 String MYSQL_DB_CONFIG = '-Ddatabase.url=jdbc:mysql://localhost:3306/process-engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
-String SQLSERVER_DB_CONFIG = '-Ddatabase.url=jdbc:sqlserver://localhost:1433;DatabaseName=process-engine -Ddatabase.username=camunda -Ddatabase.password=Camunda-BPM123'
+String SQLSERVER_DB_CONFIG = '-Ddatabase.url=jdbc:sqlserver://localhost:1433;DatabaseName=master -Ddatabase.username=sa -Ddatabase.password=cambpm-123#'
 String DB2_DB_CONFIG = '-Ddatabase.url=jdbc:db2://localhost:50000/engine -Ddatabase.username=camunda -Ddatabase.password=camunda'
 String ORACLE_DB_CONFIG = '-Ddatabase.url=jdbc:oracle:thin:@localhost:1521:xe -Ddatabase.username=camunda -Ddatabase.password=camunda'
+
+// tags obtained from: https://hub.docker.com/_/postgres?tab=tags
+String PG_96 = '9.6.18'
+String PG_94 = '9.4.26'
+String PG_104 = '10.4'
+String PG_107 = '10.7'
+String PG_111 = '11.1'
+String PG_112 = '11.2'
+String PG_122 = '12.2'
+
+// tags obtained from: https://hub.docker.com/_/mariadb?tab=tags
+String MDB_100 = '10.0.38'
+String MDB_102 = '10.2.33'
+String MDB_103 = '10.3.24'
+
+// tags obtained from: https://hub.docker.com/_/mysql
+// we only test MySQL 5.7
+String MYSQL_57 = '5.7.31'
+
+// added only versions supported by docker images (we also support 2012, 2014 and 2016)
+// check: https://hub.docker.com/_/microsoft-mssql-server
+String MSSQL_17 = '2017-latest'
+String MSSQL_19 = '2019-latest'
 
 String getMavenAgent(Integer mavenCpuLimit = 4, String dockerTag = '3.6.3-openjdk-8'){
   // assuming one core left for main maven thread
@@ -190,22 +213,6 @@ String getOracleAgent(String dockerTag = '18', Integer cpuLimit = 1){
   """
 }
 
-List getPostgreSqlSupportedVersions() {
-  // tags obtained from: https://hub.docker.com/_/postgres?tab=tags
-  return ["9.6.18", "9.4.26", "10.4", "10.7", "11.1", "11.2", "12.2"];
-}
-
-List getMariaDbSupportedVersions() {
-  // tags obtained from: https://hub.docker.com/_/mariadb?tab=tags
-  return ["10.0.38", "10.2.33", "10.3.24"];
-}
-
-List getMySqlSupportedVersions() {
-  // tags obtained from: https://hub.docker.com/_/mysql
-  // we only test MySQL 5.7
-  return ["5.7.31"/*, "5.6.49"*/];
-}
-
 List getDb2SupportedVersions() {
   // there are currently no public docker images that we support
   // check: https://hub.docker.com/r/ibmcom/db2/tags?page=1
@@ -215,12 +222,6 @@ List getDb2SupportedVersions() {
 List getOracleSupportedVersions() {
   // there are currently no public docker images
   return ["11g", "12c", "18c", "19c"];
-}
-
-List getSqlServerSupportedVersions() {
-  // added only versions supported by docker images
-  // check: https://hub.docker.com/_/microsoft-mssql-server
-  return ["2017-latest", "2019-latest"/*, "2012", "2014", "2016"*/];
 }
 
 pipeline{
@@ -430,7 +431,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 9.6') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('9.6.18')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_96)
             }
           }
           stages {
@@ -466,7 +467,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 9.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('9.4.26')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_94)
             }
           }
           stages {
@@ -502,7 +503,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 10.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('10.4')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_104)
             }
           }
           stages {
@@ -538,7 +539,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 10.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('10.7')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_107)
             }
           }
           stages {
@@ -574,7 +575,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 11.1') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('11.1')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_111)
             }
           }
           stages {
@@ -610,7 +611,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 11.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('11.2')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_112)
             }
           }
           stages {
@@ -646,7 +647,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - PostgreSQL 12.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getPostgresAgent('12.2')
+              yaml getMavenAgent(16) + getPostgresAgent(PG_122)
             }
           }
           stages {
@@ -682,7 +683,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - MariaDB 10.0') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getMariaDbAgent('10.0.38')
+              yaml getMavenAgent(16) + getMariaDbAgent(MDB_100)
             }
           }
           stages {
@@ -718,7 +719,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - MariaDB 10.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getMariaDbAgent('10.2.33')
+              yaml getMavenAgent(16) + getMariaDbAgent(MDB_102)
             }
           }
           stages {
@@ -754,7 +755,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - MariaDB 10.3') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getMariaDbAgent('10.3.24')
+              yaml getMavenAgent(16) + getMariaDbAgent(MDB_103)
             }
           }
           stages {
@@ -790,7 +791,7 @@ pipeline{
         stage('Engine UNIT & Authorization tests - MySQL 5.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent(16) + getMySqlAgent('5.7.31')
+              yaml getMavenAgent(16) + getMySqlAgent(MYSQL_57)
             }
           }
           stages {
@@ -816,6 +817,78 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mysql,cfgAuthorizationCheckRevokesAlways ${MYSQL_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - MS-SQL 2017') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getSqlServerAgent(MSSQL_17)
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver,cfgAuthorizationCheckRevokesAlways ${SQLSERVER_DB_CONFIG} -B -T\$LIMITS_CPU
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Engine UNIT & Authorization tests - MS-SQL 2019') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent(16) + getSqlServerAgent(MSSQL_19)
+            }
+          }
+          stages {
+            stage('Engine UNIT tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU test -Pdatabase,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage("Engine UNIT: Authorizations Tests") {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd engine/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver,cfgAuthorizationCheckRevokesAlways ${SQLSERVER_DB_CONFIG} -B -T\$LIMITS_CPU
                     """
                   }
                 }
@@ -1006,7 +1079,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 9.6') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+              yaml getMavenAgent() + getPostgresAgent(PG_96)
             }
           }
           stages {
@@ -1042,7 +1115,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 9.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+              yaml getMavenAgent() + getPostgresAgent(PG_94)
             }
           }
           stages {
@@ -1078,7 +1151,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 10.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.4')
+              yaml getMavenAgent() + getPostgresAgent(PG_104)
             }
           }
           stages {
@@ -1114,7 +1187,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 10.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.7')
+              yaml getMavenAgent() + getPostgresAgent(PG_107)
             }
           }
           stages {
@@ -1150,7 +1223,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 11.1') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.1')
+              yaml getMavenAgent() + getPostgresAgent(PG_111)
             }
           }
           stages {
@@ -1186,7 +1259,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 11.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_112)
             }
           }
           stages {
@@ -1222,7 +1295,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - PostgreSQL 12.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('12.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_122)
             }
           }
           stages {
@@ -1258,7 +1331,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.0') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_100)
             }
           }
           stages {
@@ -1294,7 +1367,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_102)
             }
           }
           stages {
@@ -1330,7 +1403,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - MariaDB 10.3') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_103)
             }
           }
           stages {
@@ -1366,7 +1439,7 @@ pipeline{
         stage('QA: Instance Migration & Rolling Update Tests - MySQL 5.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+              yaml getMavenAgent() + getMySqlAgent(MYSQL_57)
             }
           }
           stages {
@@ -1399,6 +1472,78 @@ pipeline{
             }
           }
         }
+        stage('QA: Instance Migration & Rolling Update Tests - MS-SQL 2017') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_17)
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('QA: Instance Migration & Rolling Update Tests - MS-SQL 2019') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_19)
+            }
+          }
+          stages {
+            stage('QA: Instance Migration Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-instance-migration && mvn -s \$MAVEN_SETTINGS_XML -B verify -Pinstance-migration,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+            stage('QA: Rolling Update Tests') {
+              steps{
+                container("maven"){
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd qa/test-db-rolling-update && mvn -s \$MAVEN_SETTINGS_XML -B verify -Prolling-update,sqlserver ${SQLSERVER_DB_CONFIG}
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
         stage('QA: Upgrade old engine from 7.13 - H2') {
           agent {
             kubernetes {
@@ -1421,7 +1566,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 9.6') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+              yaml getMavenAgent() + getPostgresAgent(PG_96)
             }
           }
           steps{
@@ -1440,7 +1585,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 9.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+              yaml getMavenAgent() + getPostgresAgent(PG_94)
             }
           }
           steps{
@@ -1459,7 +1604,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 10.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.4')
+              yaml getMavenAgent() + getPostgresAgent(PG_104)
             }
           }
           steps{
@@ -1478,7 +1623,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 10.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.7')
+              yaml getMavenAgent() + getPostgresAgent(PG_107)
             }
           }
           steps{
@@ -1497,7 +1642,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 11.1') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.1')
+              yaml getMavenAgent() + getPostgresAgent(PG_111)
             }
           }
           steps{
@@ -1516,7 +1661,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 11.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_112)
             }
           }
           steps{
@@ -1535,7 +1680,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - PostgreSQL 12.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('12.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_122)
             }
           }
           steps{
@@ -1554,7 +1699,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - MariaDB 10.0') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_100)
             }
           }
           steps{
@@ -1573,7 +1718,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - MariaDB 10.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_102)
             }
           }
           steps{
@@ -1592,7 +1737,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - MariaDB 10.3') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_103)
             }
           }
           steps{
@@ -1611,7 +1756,7 @@ pipeline{
         stage('QA: Upgrade old engine from 7.13 - MySQL 5.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+              yaml getMavenAgent() + getMySqlAgent(MYSQL_57)
             }
           }
           steps{
@@ -1622,6 +1767,44 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,mysql ${MYSQL_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - MS-SQL 2017') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_17)
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,sqlserver ${SQLSERVER_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade old engine from 7.13 - MS-SQL 2019') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_19)
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pold-engine,sqlserver ${SQLSERVER_DB_CONFIG}
                 """
               }
             }
@@ -1649,7 +1832,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 9.6') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+              yaml getMavenAgent() + getPostgresAgent(PG_96)
             }
           }
           steps{
@@ -1668,7 +1851,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 9.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+              yaml getMavenAgent() + getPostgresAgent(PG_94)
             }
           }
           steps{
@@ -1687,7 +1870,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 10.4') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.4')
+              yaml getMavenAgent() + getPostgresAgent(PG_104)
             }
           }
           steps{
@@ -1706,7 +1889,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 10.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.7')
+              yaml getMavenAgent() + getPostgresAgent(PG_107)
             }
           }
           steps{
@@ -1725,7 +1908,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 11.1') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.1')
+              yaml getMavenAgent() + getPostgresAgent(PG_111)
             }
           }
           steps{
@@ -1744,7 +1927,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 11.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_112)
             }
           }
           steps{
@@ -1763,7 +1946,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - PosgreSQL 12.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('12.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_122)
             }
           }
           steps{
@@ -1782,7 +1965,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - MariaDB 10.0') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_100)
             }
           }
           steps{
@@ -1801,7 +1984,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - MariaDB 10.2') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_102)
             }
           }
           steps{
@@ -1820,7 +2003,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - MariaDB 10.3') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_103)
             }
           }
           steps{
@@ -1839,7 +2022,7 @@ pipeline{
         stage('QA: Upgrade database from 7.13 - MySQL 5.7') {
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('5.7.31')
+              yaml getMavenAgent() + getMariaDbAgent(MYSQL_57)
             }
           }
           steps{
@@ -1850,6 +2033,44 @@ pipeline{
                 sh """
                   export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                   cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,mysql ${MYSQL_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MS-SQL 2017') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_17)
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,sqlserver ${SQLSERVER_DB_CONFIG}
+                """
+              }
+            }
+          }
+        }
+        stage('QA: Upgrade database from 7.13 - MS-SQL 2019') {
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_19)
+            }
+          }
+          steps{
+            container("maven"){
+              // Run maven
+              unstash "artifactStash"
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                sh """
+                  export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                  cd qa/test-db-upgrade && mvn -s \$MAVEN_SETTINGS_XML -B -T\$LIMITS_CPU verify -Pupgrade-db,sqlserver ${SQLSERVER_DB_CONFIG}
                 """
               }
             }
@@ -2115,7 +2336,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.6.18')
+              yaml getMavenAgent() + getPostgresAgent(PG_96)
             }
           }
           stages {
@@ -2162,7 +2383,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('9.4.26')
+              yaml getMavenAgent() + getPostgresAgent(PG_94)
             }
           }
           stages {
@@ -2209,7 +2430,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.4')
+              yaml getMavenAgent() + getPostgresAgent(PG_104)
             }
           }
           stages {
@@ -2256,7 +2477,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('10.7')
+              yaml getMavenAgent() + getPostgresAgent(PG_107)
             }
           }
           stages {
@@ -2303,7 +2524,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.1')
+              yaml getMavenAgent() + getPostgresAgent(PG_111)
             }
           }
           stages {
@@ -2350,7 +2571,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('11.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_112)
             }
           }
           stages {
@@ -2397,7 +2618,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getPostgresAgent('12.2')
+              yaml getMavenAgent() + getPostgresAgent(PG_122)
             }
           }
           stages {
@@ -2444,7 +2665,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.0.38')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_100)
             }
           }
           stages {
@@ -2491,7 +2712,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.2.33')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_102)
             }
           }
           stages {
@@ -2538,7 +2759,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMariaDbAgent('10.3.24')
+              yaml getMavenAgent() + getMariaDbAgent(MDB_103)
             }
           }
           stages {
@@ -2585,7 +2806,7 @@ pipeline{
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getMySqlAgent('5.7.31')
+              yaml getMavenAgent() + getMySqlAgent(MYSQL_57)
             }
           }
           stages {
@@ -2611,6 +2832,100 @@ pipeline{
                     sh """
                       export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
                       cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,mysql,cfgAuthorizationCheckRevokesAlways ${MYSQL_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - MS-SQL 2017') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_17)
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver ${SQLSERVER_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver,cfgAuthorizationCheckRevokesAlways ${SQLSERVER_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Webapp - MS-SQL 2019') {
+          when {
+            anyOf {
+              branch 'hackdays-master';
+              allOf {
+                changeRequest();
+                expression {
+                  pullRequest.labels.contains('postgresql')
+                }
+              }
+            }
+          }
+          agent {
+            kubernetes {
+              yaml getMavenAgent() + getSqlServerAgent(MSSQL_19)
+            }
+          }
+          stages {
+            stage('Webapp UNIT tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  unstash "artifactStash"
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver ${SQLSERVER_DB_CONFIG} -Dskip.frontend.build=true -B
+                    """
+                  }
+                }
+              }
+            }
+            stage('Webapp UNIT: Authorizations tests') {
+              steps {
+                container("maven") {
+                  // Run maven
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh """
+                      export MAVEN_OPTS="-Dmaven.repo.local=\$(pwd)/.m2"
+                      cd webapps/ && mvn -s \$MAVEN_SETTINGS_XML test -Pdatabase,sqlserver,cfgAuthorizationCheckRevokesAlways ${SQLSERVER_DB_CONFIG} -Dskip.frontend.build=true -B
                     """
                   }
                 }
@@ -2709,7 +3024,7 @@ pipeline{
         stage('Engine IT: Tomcat tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent(PG_96)
             }
           }
           steps {
@@ -2728,7 +3043,7 @@ pipeline{
         stage('Engine IT: Wildfly tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent(PG_96)
             }
           }
           steps {
@@ -2747,7 +3062,7 @@ pipeline{
         stage('Engine IT: Wildfly XA tests') {
           agent {
             kubernetes {
-              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent('9.6.18')
+              yaml getMavenAgent( 3, '3.6.3-openjdk-8') + getPostgresAgent(PG_96)
             }
           }
           steps {
