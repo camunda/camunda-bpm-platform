@@ -2658,7 +2658,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('mariadb')
                 }
               }
             }
@@ -2705,7 +2705,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('mariadb')
                 }
               }
             }
@@ -2752,7 +2752,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('mariadb')
                 }
               }
             }
@@ -2799,7 +2799,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('mysql')
                 }
               }
             }
@@ -2846,7 +2846,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('sqlserver')
                 }
               }
             }
@@ -2893,7 +2893,7 @@ pipeline{
               allOf {
                 changeRequest();
                 expression {
-                  pullRequest.labels.contains('postgresql')
+                  pullRequest.labels.contains('sqlserver')
                 }
               }
             }
