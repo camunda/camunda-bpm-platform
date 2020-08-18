@@ -10,6 +10,11 @@
   </context-param>
   -->
 
+  <!-- rest bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.engine.rest.impl.web.bootstrap.RestContainerBootstrap</listener-class>
+  </listener>
+
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>

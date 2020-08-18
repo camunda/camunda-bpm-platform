@@ -47,4 +47,16 @@ public class EngineUtil {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }
   }
+
+  public static ProcessEngineProvider getProcessEngineProvider() {
+    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
+    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
+
+    if (iterator.hasNext()) {
+      ProcessEngineProvider provider = iterator.next();
+      return provider;
+    } else {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "No process engine provider found");
+    }
+  }
 }
