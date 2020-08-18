@@ -22,6 +22,14 @@
     <dependencies>
 
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
         <groupId>de.odysseus.juel</groupId>
         <artifactId>juel-api</artifactId>
         <version>${version.juel}</version>

@@ -1,14 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- 
-    This starter cannot be a child of the camunda-parent due to the Spring dependencies defined there in
-    the dependencyManagement section. The starter needs to work with the Spring dependency versions defined
-    in the spring-boot-dependencies artifact which would be overriden by the versions defined in the camunda-parent.
-  -->
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../database</relativePath>
     <version>7.14.0-SNAPSHOT</version>
   </parent>
 
@@ -19,24 +15,8 @@
 
   <packaging>pom</packaging>
 
-  <properties>
-    <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
-    <additionalparam>-Xdoclint:none</additionalparam>
-
-    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <!-- Import dependency management from camunda -->
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
       <dependency>
         <!-- Import dependency management from Spring Boot -->
         <groupId>org.springframework.boot</groupId>
@@ -45,35 +25,10 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.2.4</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.8.1</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
   
   <profiles>
-    <profile>
-      <id>license-header-check</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mycila</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>distro</id>
       <activation>
@@ -168,17 +123,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
-          <configuration>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <trimStackTrace>false</trimStackTrace>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.22.2</version>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <trimStackTrace>false</trimStackTrace>
@@ -206,16 +151,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>1.14</version>
-        <configuration>
-          <acceptPomPackaging>true</acceptPomPackaging>
-          <excludedScopes>test</excludedScopes>
-        </configuration>
       </plugin>
 
     </plugins>

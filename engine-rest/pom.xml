@@ -18,6 +18,18 @@
     <jackson.databind.version>${jackson.version}</jackson.databind.version>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
     <module>engine-rest</module>
     <module>engine-rest-jaxrs2</module>
