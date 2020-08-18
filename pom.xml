@@ -33,7 +33,6 @@
     <version.camunda.spin>1.9.0</version.camunda.spin>
     <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-    <version.spring-boot>2.3.1.RELEASE</version.spring-boot>
     <version.feel-scala>1.11.2</version.feel-scala>
   </properties>
 
@@ -61,7 +60,7 @@
       </activation>
       <modules>
         <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
-          any modules that have a dependency to the webapps. See also the referenced POMs, 
+          any modules that have a dependency to the webapps. See also the referenced POMs,
           they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
@@ -93,6 +92,7 @@
         <module>distro/sql-script</module>
         <module>distro/run</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -105,10 +105,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO); 
+        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO);
           It should activate any module that has a dependency to the webapps -->
         <module>spring-boot-starter</module>
-        
+
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
@@ -134,6 +134,7 @@
 
         <module>distro/sql-script</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -214,6 +215,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -224,6 +226,7 @@
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
       <modules>
+        <module>internal-dependencies</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -249,6 +252,7 @@
 
         <module>distro/webjar</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>

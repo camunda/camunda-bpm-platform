@@ -101,11 +101,19 @@
     
     <!--
       needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
-      BOM must be installed before this module is built
+      BOMs must be installed before this module is built
     -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-core-internal-dependencies</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>
@@ -191,6 +199,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+      <version>${version.spring.framework}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
