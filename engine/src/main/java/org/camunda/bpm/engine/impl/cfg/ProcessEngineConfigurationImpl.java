@@ -2966,6 +2966,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public BpmnParseFactory getBpmnParseFactory() {
+    return bpmnParseFactory;
+  }
+
+  public ProcessEngineConfigurationImpl setBpmnParseFactory(BpmnParseFactory bpmnParseFactory) {
+    this.bpmnParseFactory = bpmnParseFactory;
+    return this;
+  }
+
 
   public List<Deployer> getCustomPreDeployers() {
     return customPreDeployers;
