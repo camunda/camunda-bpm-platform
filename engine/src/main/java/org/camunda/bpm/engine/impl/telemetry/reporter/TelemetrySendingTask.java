@@ -27,6 +27,7 @@ import java.util.TimerTask;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
@@ -67,13 +68,16 @@ public class TelemetrySendingTask extends TimerTask {
   protected void sendData() {
     commandExecutor.execute(commandContext -> {
       // send data only if telemetry is enabled
-      if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
+      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+      if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
         try {
+          resolveDataFromRegistry(processEngineConfiguration);
+
           String telemetryData = JsonUtil.asString(data);
           Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
-                                                                       telemetryEndpoint,
-                                                                       MediaType.APPLICATION_JSON,
-                                                                       telemetryData);
+                                                                        telemetryEndpoint,
+                                                                        MediaType.APPLICATION_JSON,
+                                                                        telemetryData);
           ConnectorRequest<?> request = httpConnector.createRequest();
           request.setRequestParameters(requestParams);
           CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
@@ -98,5 +102,11 @@ public class TelemetrySendingTask extends TimerTask {
     });
   }
 
+  protected void resolveDataFromRegistry(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    if (data.getProduct().getInternals().getApplicationServer() == null &&
+        processEngineConfiguration.getTelemetryRegistry().getApplicationServer() != null) {
+      data.setApplicationServer(processEngineConfiguration.getTelemetryRegistry().getApplicationServer());
+    }
+  }
 
 }

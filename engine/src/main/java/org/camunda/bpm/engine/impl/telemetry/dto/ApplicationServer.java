@@ -16,41 +16,37 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.impl.util.JsonUtil;
+import static org.camunda.bpm.engine.impl.util.ParseUtil.parseServerVendor;
 
-public class Data {
+public class ApplicationServer {
 
-  protected String installation;
-  protected Product product;
+  protected String vendor;
+  protected String version;
 
-  public Data(String installation, Product product) {
-    super();
-    this.installation = installation;
-    this.product = product;
+  public ApplicationServer(String vendor, String version) {
+    this.vendor = vendor;
+    this.version = version;
   }
 
-  public String getInstallation() {
-    return installation;
+  public ApplicationServer(String version) {
+    this.vendor = parseServerVendor(version);
+    this.version = version;
   }
 
-  public void setInstallation(String installation) {
-    this.installation = installation;
+  public String getVendor() {
+    return vendor;
   }
 
-  public Product getProduct() {
-    return product;
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
   }
 
-  public void setProduct(Product product) {
-    this.product = product;
+  public String getVersion() {
+    return version;
   }
 
-  public void setApplicationServer(ApplicationServer applicationServer) {
-    this.product.internals.applicationServer = applicationServer;
+  public void setVersion(String version) {
+    this.version = version;
   }
 
-  @Override
-  public String toString() {
-    return JsonUtil.asString(this);
-  }
 }

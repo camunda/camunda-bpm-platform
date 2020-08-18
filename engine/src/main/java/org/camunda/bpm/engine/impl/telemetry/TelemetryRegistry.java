@@ -14,43 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.dto;
+package org.camunda.bpm.engine.impl.telemetry;
 
-import org.camunda.bpm.engine.impl.util.JsonUtil;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Data {
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 
-  protected String installation;
-  protected Product product;
+public class TelemetryRegistry {
 
-  public Data(String installation, Product product) {
-    super();
-    this.installation = installation;
-    this.product = product;
+  protected Map<String, Object> entries = new HashMap<>();
+  protected ApplicationServer applicationServer;
+
+  public synchronized ApplicationServer getApplicationServer() {
+    return applicationServer;
   }
 
-  public String getInstallation() {
-    return installation;
+  public synchronized void setApplicationServer(ApplicationServer applicationServer) {
+    this.applicationServer = applicationServer;
   }
 
-  public void setInstallation(String installation) {
-    this.installation = installation;
-  }
-
-  public Product getProduct() {
-    return product;
-  }
-
-  public void setProduct(Product product) {
-    this.product = product;
-  }
-
-  public void setApplicationServer(ApplicationServer applicationServer) {
-    this.product.internals.applicationServer = applicationServer;
-  }
-
-  @Override
-  public String toString() {
-    return JsonUtil.asString(this);
+  public synchronized void setApplicationServer(String applicationServerVersion) {
+    this.applicationServer = new ApplicationServer(applicationServerVersion);
   }
 }

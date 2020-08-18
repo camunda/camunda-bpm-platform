@@ -116,4 +116,18 @@ public class ParseUtil {
 
     return new ProcessEngineDetails(version, edition);
   }
+
+  public static String parseServerVendor(String applicationServerInfo) {
+    String serverVendor = null;
+    Pattern pattern = Pattern.compile("[ A-Za-z]+");
+    Matcher matcher = pattern.matcher(applicationServerInfo);
+    if (matcher.find()) {
+      serverVendor = matcher.group(0).trim();
+    }
+    if (serverVendor.contains("WildFly")) {
+      return "JBoss WildFly";
+    }
+    return serverVendor;
+  }
+
 }

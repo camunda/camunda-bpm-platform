@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
@@ -171,6 +172,31 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldSendTelemetryWithApplicationServerInfo() {
+    // given default telemetry data (no application server)
+    managementService.toggleTelemetry(true);
+    // set application server after initialization
+    String applicationServerVersion = "Tomcat 10";
+    configuration.getTelemetryRegistry().setApplicationServer(applicationServerVersion);
+
+    Data expectedData = adjustDataWithProductVersionAndAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo("/pings"))
+            .willReturn(aResponse()
+                        .withBody(requestBody)
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo("/pings"))
+              .withRequestBody(equalToJson(requestBody))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
   public void shouldLogTelemetrySent() {
     // given
@@ -224,9 +250,21 @@ public class TelemetryReporterTest {
 
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
-    Internals internals = new Internals(database);
-    Product product = new Product("Runtime", "7.14", "special", internals);
-    Data data = new Data("b647de4d-e557-455a-a64f-feaecd55f53c", product);
+    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"));
+    Product product = new Product("Runtime", "7.14.0", "special", internals);
+    Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
     return data;
   }
+
+  protected Data adjustDataWithProductVersionAndAppServerInfo(Data telemetryData, String applicationServerVersion) {
+    Data resultData = new Data(telemetryData.getInstallation(), telemetryData.getProduct());
+
+    Product product = resultData.getProduct();
+    product.setVersion("7.14.0");
+    resultData.setProduct(product);
+
+    resultData.setApplicationServer(new ApplicationServer(applicationServerVersion));
+    return resultData;
+  }
+
 }
