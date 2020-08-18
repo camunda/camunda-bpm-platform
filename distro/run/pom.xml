@@ -2,16 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- 
-    This distro cannot be a child of the camunda-parent due to the Spring dependencies defined there in
-    the dependencyManagement section. The distro needs to work with the Spring dependency versions defined
-    in the spring-boot-dependencies artifact which would be overriden by the versions defined in the camunda-parent.
-  -->
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-root</artifactId>
+    <artifactId>camunda-database-settings</artifactId>
     <version>7.14.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
+    <relativePath>../../database</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm.run</groupId>
@@ -19,11 +14,6 @@
   <name>Camunda BPM - Run - Root</name>
   <description>This is the root of Camunda BPM Run</description>
   <packaging>pom</packaging>
-
-  <properties>
-    <!-- keep compatible version to camunda-parent until we can directly inherit from it -->
-    <version.assertj>2.9.1</version.assertj>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -36,20 +26,6 @@
         <type>pom</type>
       </dependency>
 
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${version.assertj}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -60,28 +36,6 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${version.spring-boot}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
-          <configuration>
-            <runOrder>hourly</runOrder>
-            <systemPropertyVariables>
-              <myWorkingDir>${project.build.directory}</myWorkingDir>
-            </systemPropertyVariables>
-            <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <failOnError>false</failOnError>
-            <additionalparam>-Xdoclint:none</additionalparam>
-            <quiet>true</quiet>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
