@@ -193,6 +193,7 @@ public class RuntimeServiceTest {
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
   }
 
+  @Test
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void startProcessInstanceWithBusinessKey() {
@@ -208,7 +209,7 @@ public class RuntimeServiceTest {
     processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "456", CollectionUtil.singletonMap("var", "value"));
     assertNotNull(processInstance);
     assertEquals(2, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals("var", runtimeService.getVariable(processInstance.getId(), "var"));
+    assertEquals("value", runtimeService.getVariable(processInstance.getId(), "var"));
 
     // by id
     processInstance = runtimeService.startProcessInstanceById(processDefinition.getId(), "789");
@@ -219,7 +220,7 @@ public class RuntimeServiceTest {
     processInstance = runtimeService.startProcessInstanceById(processDefinition.getId(), "101123", CollectionUtil.singletonMap("var", "value2"));
     assertNotNull(processInstance);
     assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals("var", runtimeService.getVariable(processInstance.getId(), "var"));
+    assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "var"));
   }
 
   @Deployment(resources={
