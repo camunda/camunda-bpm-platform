@@ -295,11 +295,11 @@ public class CommandLogger extends ProcessEngineLogger {
       "No subscriptions were found during evaluation of the conditional start events."));
   }
 
-
-  public ProcessEngineException exceptionEscalationPropagationFailed(String escalationCode, Throwable cause) {
-    return new ProcessEngineException(exceptionMessage(
-      "044",
-      "Propagation of escalation {} failed. ",
-      escalationCode), cause);
+  public BadUserRequestException exceptionSettingTransientVariablesAsyncNotSupported(String variableName) {
+    return new BadUserRequestException(exceptionMessage(
+        "044",
+        "Setting transient variable '{}' asynchronously is currently not supported.",
+        variableName));
   }
+
 }

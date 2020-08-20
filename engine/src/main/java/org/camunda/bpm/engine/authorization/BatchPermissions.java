@@ -89,14 +89,17 @@ public enum BatchPermissions implements Permission {
   CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND("CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND", 32768),
 
   /** Indicates that CREATE_BATCH_SET_REMOVAL_TIME interactions are permitted */
-  CREATE_BATCH_SET_REMOVAL_TIME("CREATE_BATCH_SET_REMOVAL_TIME", 65536);
+  CREATE_BATCH_SET_REMOVAL_TIME("CREATE_BATCH_SET_REMOVAL_TIME", 65536),
 
-  private static final Resource[] RESOURCES = new Resource[] { Resources.BATCH };
+  /** Indicates that CREATE_BATCH_SET_VARIABLES interactions are permitted */
+  CREATE_BATCH_SET_VARIABLES("CREATE_BATCH_SET_VARIABLES", 131_072);
 
-  private String name;
-  private int id;
+  protected static final Resource[] RESOURCES = new Resource[] { Resources.BATCH };
 
-  private BatchPermissions(String name, int id) {
+  protected String name;
+  protected int id;
+
+  BatchPermissions(String name, int id) {
     this.name = name;
     this.id = id;
   }

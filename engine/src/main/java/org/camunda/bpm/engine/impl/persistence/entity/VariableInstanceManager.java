@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,12 @@ public class VariableInstanceManager extends AbstractManager {
   protected void configureQuery(VariableInstanceQueryImpl query) {
     getAuthorizationManager().configureVariableInstanceQuery(query);
     getTenantManager().configureQuery(query);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByBatchId(String batchId) {
+    Map<String, String> parameters = Collections.singletonMap("batchId", batchId);
+    return getDbEntityManager().selectList("selectVariableInstancesByBatchId", parameters);
   }
 
 }
