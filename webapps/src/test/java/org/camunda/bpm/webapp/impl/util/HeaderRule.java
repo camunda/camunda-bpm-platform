@@ -140,4 +140,12 @@ public class HeaderRule extends ExternalResource {
     }
   }
 
+  public int getResponseCode() {
+    try {
+      return connection.getResponseCode();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 }

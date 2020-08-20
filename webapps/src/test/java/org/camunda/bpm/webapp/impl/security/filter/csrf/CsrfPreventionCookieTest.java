@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter.csrf;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.webapp.impl.util.HeaderRule;
 import org.junit.Rule;
@@ -190,8 +192,8 @@ public class CsrfPreventionCookieTest {
     headerRule.performPostRequest("/api/admin/auth/user/default/login/welcome");
 
     // then
-    assertThat(headerRule.getResponseBody())
-      .matches("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty.");
+    assertThat(headerRule.getResponseCode())
+      .isEqualTo(HttpServletResponse.SC_FORBIDDEN);
   }
 
 }
