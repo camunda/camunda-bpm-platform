@@ -457,7 +457,11 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public ExecutionEntity getExecution() {
-    ensureExecutionInitialized();
+    return getExecution(true);
+  }
+
+  public ExecutionEntity getExecution(boolean validateExistence) {
+    ensureExecutionInitialized(validateExistence);
     return execution;
   }
 
@@ -465,13 +469,16 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     this.execution = execution;
   }
 
-  protected void ensureExecutionInitialized() {
+  protected void ensureExecutionInitialized(boolean validateExistence) {
     if (execution == null) {
       execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
-      EnsureUtil.ensureNotNull(
-          "Cannot find execution with id " + executionId + " for external task " + id,
-          "execution",
-          execution);
+      
+      if (validateExistence) {
+        EnsureUtil.ensureNotNull(
+            "Cannot find execution with id " + executionId + " for external task " + id,
+            "execution",
+            execution);
+      }
     }
   }
 
@@ -596,4 +603,5 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setLastFailureLogId(String lastFailureLogId) {
     this.lastFailureLogId = lastFailureLogId;
   }
+
 }

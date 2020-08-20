@@ -800,5 +800,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         preconditionMessage,
         failedOperation.toString());
   }
+  
+  public void logTaskWithoutExecution(String taskId) {
+	  logDebug("091",
+			  "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
+			  + "It is not returned by the current fetch and lock command.", 
+			  taskId);
+  }
 
 }

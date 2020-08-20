@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.externaltask.LockedExternalTaskImpl;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -74,12 +75,18 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     for (ExternalTaskEntity entity : externalTasks) {
       
       TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
-      entity.lock(workerId, fetchInstruction.getLockDuration());
-
-      LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-          fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
-
-      result.add(resultTask);
+      
+      // retrieve the execution first to detect concurrent modifications @https://jira.camunda.com/browse/CAM-10750
+      ExecutionEntity execution = entity.getExecution(false);
+      
+      if (execution != null) {
+        entity.lock(workerId, fetchInstruction.getLockDuration());
+        LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
+              fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+        result.add(resultTask); 
+      } else {
+        LOG.logTaskWithoutExecution(workerId);
+      }
     }
 
     filterOnOptimisticLockingFailure(commandContext, result);
