@@ -26,11 +26,11 @@ File bugs you found in the code or features you would like to see in the future 
 1. [Signup for our JIRA](https://jira.camunda.com/secure/Signup!default.jspa)
 1. [Search for similar issues](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM), your bug or feature may have already been reported
 1. [Create a new ticket](https://jira.camunda.com/secure/CreateIssue!default.jspa)
-  1. Select the CAM projcet
-  1. Be concise
-  1. Describe the steps to reproduce the problem or the context of the feature request
-  1. Specify your environment (e.g. Camunda version, Camunda modules you use, ...)
-  1. Provide code. For a bug report, create a test that reproduces the problem. For feature requests, create mockup code that shows how the feature might look like. Fork our [unit test Github template](https://github.com/camunda/camunda-engine-unittest) to get started quickly.
+   1. Select the CAM project
+   1. Be concise
+   1. Describe the steps to reproduce the problem or the context of the feature request
+   1. Specify your environment (e.g. Camunda version, Camunda modules you use, ...)
+   1. Provide code. For a bug report, create a test that reproduces the problem. For feature requests, create mockup code that shows how the feature might look like. Fork our [unit test Github template](https://github.com/camunda/camunda-engine-unittest) to get started quickly.
 
 
 ## Write Code
@@ -148,7 +148,7 @@ The scope is the module that is changed by the commit. E.g. `engine` in the case
 
 ## \<subject\>
 
-A brief summary of the change. Use impartive form (e.g. *implement* instead of *implemented*).  The entire subject line shall not exceed 70 characters.
+A brief summary of the change. Use imperative form (e.g. *implement* instead of *implemented*).  The entire subject line shall not exceed 70 characters.
 
 ## \<body\>
 
