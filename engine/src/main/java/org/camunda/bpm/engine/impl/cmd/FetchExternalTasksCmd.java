@@ -16,8 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -29,6 +34,7 @@ import org.camunda.bpm.engine.impl.externaltask.LockedExternalTaskImpl;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -39,93 +45,105 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  */
 public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> {
 
-  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+	 protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected String workerId;
-  protected int maxResults;
-  protected boolean usePriority;
-  protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
-    this(workerId, maxResults, instructions, false);
-  }
+	protected String workerId;
+	protected int maxResults;
+	protected boolean usePriority;
+	protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
-    this.workerId = workerId;
-    this.maxResults = maxResults;
-    this.fetchInstructions = instructions;
-    this.usePriority = usePriority;
-  }
+	public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
+		this(workerId, maxResults, instructions, false);
+	}
 
-  @Override
-  public List<LockedExternalTask> execute(CommandContext commandContext) {
-    validateInput();
+	public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
+		this.workerId = workerId;
+		this.maxResults = maxResults;
+		this.fetchInstructions = instructions;
+		this.usePriority = usePriority;
+	}
 
-    for (TopicFetchInstruction instruction : fetchInstructions.values()) {
-      instruction.ensureVariablesInitialized();
-    }
+	@Override
+	public List<LockedExternalTask> execute(CommandContext commandContext) {
+		validateInput();
 
-    List<ExternalTaskEntity> externalTasks = commandContext
-      .getExternalTaskManager()
-      .selectExternalTasksForTopics(fetchInstructions.values(), maxResults, usePriority);
+		for (TopicFetchInstruction instruction : fetchInstructions.values()) {
+			instruction.ensureVariablesInitialized();
+		}
 
-    final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
+		List<ExternalTaskEntity> externalTasks = commandContext
+				.getExternalTaskManager()
+				.selectExternalTasksForTopics(fetchInstructions.values(), maxResults, usePriority);
 
-    for (ExternalTaskEntity entity : externalTasks) {
-      
-      TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
-      entity.lock(workerId, fetchInstruction.getLockDuration());
+		final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 
-      LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-          fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+		for (ExternalTaskEntity entity : externalTasks) {
 
-      result.add(resultTask);
-    }
+			TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
+			
+			//retrieve latest execution to avoid concurrent modifications to the execution @https://jira.camunda.com/browse/CAM-10750
+			ExecutionEntity execution = commandContext
+					.getExecutionManager()
+					.findExecutionById(entity.getExecutionId());
+			if(null!=execution) {
+				entity.setExecution(execution);
+				entity.lock(workerId, fetchInstruction.getLockDuration());
+			}
+			try{
+				LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
+				          fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+				result.add(resultTask);
+			} catch(NullValueException e) {
+				//catch concurrent workers trying to fetchandLock scenario by handling exception @https://jira.camunda.com/browse/CAM-10750
+				LOG.logTaskAlreadyFetched(workerId, e);
+			}
+		}
 
-    filterOnOptimisticLockingFailure(commandContext, result);
+		filterOnOptimisticLockingFailure(commandContext, result);
 
-    return result;
-  }
+		return result;
+	}
 
-  protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
-    commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
+	protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
+		commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
 
-      public Class<? extends DbEntity> getEntityType() {
-        return ExternalTaskEntity.class;
-      }
+			public Class<? extends DbEntity> getEntityType() {
+				return ExternalTaskEntity.class;
+			}
 
-      public void failedOperation(DbOperation operation) {
-        if (operation instanceof DbEntityOperation) {
-          DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
-          DbEntity dbEntity = dbEntityOperation.getEntity();
+			public void failedOperation(DbOperation operation) {
+				if (operation instanceof DbEntityOperation) {
+					DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
+					DbEntity dbEntity = dbEntityOperation.getEntity();
 
-          boolean failedOperationEntityInList = false;
+					boolean failedOperationEntityInList = false;
 
-          Iterator<LockedExternalTask> it = tasks.iterator();
-          while (it.hasNext()) {
-            LockedExternalTask resultTask = it.next();
-            if (resultTask.getId().equals(dbEntity.getId())) {
-              it.remove();
-              failedOperationEntityInList = true;
-              break;
-            }
-          }
+					Iterator<LockedExternalTask> it = tasks.iterator();
+					while (it.hasNext()) {
+						LockedExternalTask resultTask = it.next();
+						if (resultTask.getId().equals(dbEntity.getId())) {
+							it.remove();
+							failedOperationEntityInList = true;
+							break;
+						}
+					}
 
-          if (!failedOperationEntityInList) {
-            throw LOG.concurrentUpdateDbEntityException(operation);
-          }
-        }
-      }
-    });
-  }
+					if (!failedOperationEntityInList) {
+						throw LOG.concurrentUpdateDbEntityException(operation);
+					}
+				}
+			}
+		});
+	}
 
-  protected void validateInput() {
-    EnsureUtil.ensureNotNull("workerId", workerId);
-    EnsureUtil.ensureGreaterThanOrEqual("maxResults", maxResults, 0);
+	protected void validateInput() {
+		EnsureUtil.ensureNotNull("workerId", workerId);
+		EnsureUtil.ensureGreaterThanOrEqual("maxResults", maxResults, 0);
 
-    for (TopicFetchInstruction instruction : fetchInstructions.values()) {
-      EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
-      EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
-    }
-  }
+		for (TopicFetchInstruction instruction : fetchInstructions.values()) {
+			EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
+			EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
+		}
+	}
 }
