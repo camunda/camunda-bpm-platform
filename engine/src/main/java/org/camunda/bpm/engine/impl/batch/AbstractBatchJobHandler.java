@@ -120,6 +120,9 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       List<String> idsForJob = processIds.subList(0, lastIdIndex);
 
       T jobConfiguration = createJobConfiguration(configuration, idsForJob);
+
+      jobConfiguration.setBatchId(batch.getId());
+
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);

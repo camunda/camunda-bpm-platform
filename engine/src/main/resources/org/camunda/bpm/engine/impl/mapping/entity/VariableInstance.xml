@@ -123,6 +123,10 @@
 
   <!-- VARIABLE INSTANCE SELECT -->
 
+  <select id="selectVariableInstancesByBatchId" parameterType="string" resultMap="variableInstanceResultMap">
+    SELECT * FROM ${prefix}ACT_RU_VARIABLE RES WHERE VAR_SCOPE_ = #{parameter.batchId}
+  </select>
+
 	<select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
 		SELECT
         RES.*,

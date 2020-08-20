@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
@@ -337,6 +339,10 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   public void delete(boolean cascadeToHistory, boolean deleteJobs) {
     CommandContext commandContext = Context.getCommandContext();
 
+    if (Batch.TYPE_SET_VARIABLES.equals(type)) {
+      deleteVariables(commandContext);
+    }
+
     deleteSeedJob();
     deleteMonitorJob();
     if (deleteJobs) {
@@ -366,6 +372,15 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
       commandContext.getHistoricBatchManager().deleteHistoricBatchById(id);
     }
+  }
+
+  protected void deleteVariables(CommandContext commandContext) {
+    VariableInstanceManager variableInstanceManager = commandContext.getVariableInstanceManager();
+
+    List<VariableInstanceEntity> variableInstances =
+        variableInstanceManager.findVariableInstancesByBatchId(id);
+
+    variableInstances.forEach(VariableInstanceEntity::delete);
   }
 
   public void fireHistoricStartEvent() {

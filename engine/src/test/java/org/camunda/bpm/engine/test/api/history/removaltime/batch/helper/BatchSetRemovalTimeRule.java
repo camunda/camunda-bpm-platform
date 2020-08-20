@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.bpmn.async.FailingExecutionListener;
+import org.camunda.bpm.engine.test.util.BatchRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -48,19 +49,13 @@ import org.junit.runner.Description;
 /**
  * @author Tassilo Weidner
  */
-public class BatchSetRemovalTimeRule extends TestWatcher {
-
-  protected ProcessEngineRule engineRule;
-  protected ProcessEngineTestRule engineTestRule;
+public class BatchSetRemovalTimeRule extends BatchRule {
 
   public final Date CURRENT_DATE = new Date(1363608000000L);
   public final Date REMOVAL_TIME = new Date(1363609000000L);
 
-  protected List<String> batchIds = new ArrayList<>();
-
   public BatchSetRemovalTimeRule(ProcessEngineRule engineRule, ProcessEngineTestRule engineTestRule) {
-    this.engineRule = engineRule;
-    this.engineTestRule = engineTestRule;
+    super(engineRule, engineTestRule);
   }
 
   protected void starting(Description description) {
@@ -82,6 +77,8 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   protected void finished(Description description) {
+    super.finished(description);
+
     getProcessEngineConfiguration()
       .setHistoryRemovalTimeProvider(null)
       .setHistoryRemovalTimeStrategy(null)
@@ -105,28 +102,12 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
         .enableFeelLegacyBehavior(false)
         .init();
 
-    ClockUtil.reset();
-
-    clearDatabase();
-
     getProcessEngineConfiguration().setEnableHistoricInstancePermissions(false);
     getProcessEngineConfiguration().setAuthorizationEnabled(false);
-
-    super.finished(description);
   }
 
   public void clearDatabase() {
-    if (!batchIds.isEmpty()) {
-      for (String batchId : batchIds) {
-        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
-          .batchId(batchId)
-          .singleResult();
-
-        if (historicBatch != null) {
-          engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
-        }
-      }
-    }
+    super.clearDatabase();
     clearAuthorization();
   }
 
@@ -318,49 +299,6 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
       return engineRule.getRuntimeService().startProcessInstanceByKey(key, variables).getId();
     }
-  }
-
-  public void syncExec(Batch batch) {
-    syncExec(batch, true);
-  }
-
-  public void syncExec(Batch batch, boolean isClear) {
-    if (isClear) {
-      batchIds.add(batch.getId());
-    }
-
-    executeSeedJobs(batch);
-
-    List<Job> jobs = getExecutionJobs(batch);
-    for (Job job : jobs) {
-      engineRule.getManagementService().executeJob(job.getId());
-    }
-
-    engineRule.getManagementService().executeJob(
-        getJobForDefinition(batch.getMonitorJobDefinitionId()).getId());
-  }
-
-  public void executeSeedJobs(Batch batch) {
-    while (getSeedJob(batch) != null) {
-      engineRule.getManagementService().executeJob(getSeedJob(batch).getId());
-    }
-  }
-
-  public Job getSeedJob(Batch batch) {
-    return getJobForDefinition(batch.getSeedJobDefinitionId());
-  }
-
-  protected Job getJobForDefinition(String definitionId) {
-    return engineRule.getManagementService().createJobQuery()
-    .jobDefinitionId(definitionId)
-    .singleResult();
-  }
-
-  public List<Job> getExecutionJobs(Batch batch) {
-    List<Job> jobs = engineRule.getManagementService().createJobQuery()
-        .jobDefinitionId(batch.getBatchJobDefinitionId())
-        .list();
-    return jobs;
   }
 
   public static Date addDays(Date date, int amount) {

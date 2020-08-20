@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
@@ -1419,6 +1420,110 @@ public interface RuntimeService {
    *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceIds related to the process instances the variables will be set on; cannot
+   *                           be {@code null} when processInstanceQuery and
+   *                           historicProcessInstanceQuery are {@code null}.
+   * @param processInstanceQuery to select process instances; Cannot be {@code null} when
+   *                             processInstanceIds and historicProcessInstanceQuery
+   *                             are {@code null}.
+   * @param historicProcessInstanceQuery to select process instances; Cannot be {@code null} when
+   *                                     processInstanceIds and processInstanceQuery
+   *                                     are {@code null}.
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceIds}, {@code processInstanceQuery} and
+   *   {@code historicProcessInstanceQuery} are {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(List<String> processInstanceIds,
+                          ProcessInstanceQuery processInstanceQuery,
+                          HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                          Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceIds related to the process instances the variables will be set on
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceIds} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(List<String> processInstanceIds, Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceQuery to select process instances
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceQuery} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(ProcessInstanceQuery processInstanceQuery, Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param historicProcessInstanceQuery to select process instances
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code historicProcessInstanceQuery} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery, Map<String, ?> variables);
 
   /**
    * Removes a variable for an execution.

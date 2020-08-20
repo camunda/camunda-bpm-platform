@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.cmd.ResolveIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.batch.variables.SetVariablesToProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
@@ -398,6 +399,48 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
       }
       throw ex;
     }
+  }
+
+  public Batch setVariablesAsync(List<String> processInstanceIds,
+                                 ProcessInstanceQuery processInstanceQuery,
+                                 HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                 Map<String, ?> variables) {
+    return commandExecutor.execute(new SetVariablesToProcessInstancesBatchCmd(
+        processInstanceIds,
+        processInstanceQuery,
+        historicProcessInstanceQuery,
+        variables
+    ));
+  }
+
+  public Batch setVariablesAsync(List<String> processInstanceIds,
+                                 Map<String, ?> variables) {
+    return commandExecutor.execute(new SetVariablesToProcessInstancesBatchCmd(
+        processInstanceIds,
+        null,
+        null,
+        variables
+    ));
+  }
+
+  public Batch setVariablesAsync(ProcessInstanceQuery processInstanceQuery,
+                                 Map<String, ?> variables) {
+    return commandExecutor.execute(new SetVariablesToProcessInstancesBatchCmd(
+        null,
+        processInstanceQuery,
+        null,
+        variables
+    ));
+  }
+
+  public Batch setVariablesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                                 Map<String, ?> variables) {
+    return commandExecutor.execute(new SetVariablesToProcessInstancesBatchCmd(
+        null,
+        null,
+        historicProcessInstanceQuery,
+        variables
+    ));
   }
 
   @Override

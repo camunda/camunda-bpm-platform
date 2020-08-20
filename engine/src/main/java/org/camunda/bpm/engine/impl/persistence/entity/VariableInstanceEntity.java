@@ -74,6 +74,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected Double doubleValue;
   protected String textValue;
   protected String textValue2;
+  protected String variableScopeId;
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.RUNTIME);
 
@@ -490,6 +491,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public String getVariableScopeId() {
+    if (variableScopeId != null) {
+      return variableScopeId;
+    }
+
     if (taskId != null) {
       return taskId;
     }
@@ -499,6 +504,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     return caseExecutionId;
+  }
+
+  public void setVariableScopeId(String variableScopeId) {
+    this.variableScopeId = variableScopeId;
   }
 
   protected VariableScope getVariableScope() {

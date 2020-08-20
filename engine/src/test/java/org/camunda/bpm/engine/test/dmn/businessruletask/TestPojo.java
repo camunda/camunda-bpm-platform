@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class TestPojo implements Serializable {
 
@@ -41,6 +42,20 @@ public class TestPojo implements Serializable {
       "foo='" + foo + '\'' +
       ", bar=" + bar +
       '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TestPojo testPojo = (TestPojo) o;
+    return Objects.equals(foo, testPojo.foo) &&
+        Objects.equals(bar, testPojo.bar);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(foo, bar);
   }
 
 }

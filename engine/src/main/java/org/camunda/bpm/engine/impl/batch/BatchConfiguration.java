@@ -24,6 +24,7 @@ public class BatchConfiguration {
   protected List<String> ids;
   protected DeploymentMappings idMappings;
   protected boolean failIfNotExists;
+  protected String batchId;
 
   public BatchConfiguration(List<String> ids) {
     this(ids, true);
@@ -41,6 +42,12 @@ public class BatchConfiguration {
     this.ids = ids;
     this.idMappings = mappings;
     this.failIfNotExists = failIfNotExists;
+  }
+
+  public BatchConfiguration(List<String> ids, DeploymentMappings mappings, String batchId) {
+    this.ids = ids;
+    this.idMappings = mappings;
+    this.batchId = batchId;
   }
 
   public List<String> getIds() {
@@ -65,6 +72,14 @@ public class BatchConfiguration {
 
   public void setFailIfNotExists(boolean failIfNotExists) {
     this.failIfNotExists = failIfNotExists;
+  }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
   }
 
 }
