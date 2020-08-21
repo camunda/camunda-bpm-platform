@@ -50,7 +50,7 @@ public class ProcessInstanceAssertJobTest extends ProcessAssertTestCase {
     // Then
     assertThat(processInstance).job().isNotNull();
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessInstanceAssert-job.bpmn"
   })
@@ -201,4 +201,15 @@ public class ProcessInstanceAssertJobTest extends ProcessAssertTestCase {
     }, ProcessEngineException.class);
   }
 
+  @Test
+  @Deployment(resources = {"bpmn/ProcessInstanceAssert-jobEventSubprocess.bpmn"})
+  public void testJob_MultipleAsyncAndEventSubprocessTimerStartWithActivityId_Success() {
+    // When
+    ProcessInstance processInstance = runtimeService().startProcessInstanceByKey(
+        "ProcessInstanceAssert-jobEventSubprocess"
+    );
+    // Then
+    assertThat(processInstance).job("ServiceTask_1").isNotNull();
+    assertThat(processInstance).job("StartEvent_2").isNotNull();
+  }
 }
