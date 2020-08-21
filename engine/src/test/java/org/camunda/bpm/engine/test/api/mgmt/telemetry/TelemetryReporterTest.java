@@ -27,13 +27,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
@@ -58,6 +62,7 @@ import com.google.gson.Gson;
 public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
+  private static final String TELEMETRY_ENDPOINT_URL = "/pings";
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule =
@@ -84,6 +89,8 @@ public class TelemetryReporterTest {
   public void init() {
     configuration = engineRule.getProcessEngineConfiguration();
     managementService = configuration.getManagementService();
+
+    configuration.setTelemetryRegistry(new TelemetryRegistry());
   }
 
   @After
@@ -102,7 +109,7 @@ public class TelemetryReporterTest {
     managementService.toggleTelemetry(true);
     Data data = createDataToSend();
     String requestBody = new Gson().toJson(data);
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
             .willReturn(aResponse()
                         .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -116,7 +123,7 @@ public class TelemetryReporterTest {
     telemetryReporter.reportNow();
 
     // then
-    verify(postRequestedFor(urlEqualTo("/pings"))
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_URL))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
@@ -131,7 +138,7 @@ public class TelemetryReporterTest {
         .setInitializeTelemetry(true)
         .setTelemetryData(data)
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
     standaloneProcessEngine = processEngineConfiguration.buildProcessEngine();
@@ -141,7 +148,7 @@ public class TelemetryReporterTest {
   
     // then
     String requestBody = new Gson().toJson(data);
-    verify(postRequestedFor(urlEqualTo("/pings"))
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_URL))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
@@ -152,7 +159,7 @@ public class TelemetryReporterTest {
     managementService.toggleTelemetry(true);
     Data data = createDataToSend();
     String requestBody = new Gson().toJson(data);
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
             .willReturn(aResponse()
                         .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -166,7 +173,7 @@ public class TelemetryReporterTest {
     telemetryReporter.reportNow();
 
     // then
-    verify(postRequestedFor(urlEqualTo("/pings"))
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_URL))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
@@ -182,7 +189,7 @@ public class TelemetryReporterTest {
     Data expectedData = adjustDataWithProductVersionAndAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
 
     String requestBody = new Gson().toJson(expectedData);
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
             .willReturn(aResponse()
                         .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -191,9 +198,37 @@ public class TelemetryReporterTest {
     configuration.getTelemetryReporter().reportNow();
 
     // then
-    verify(postRequestedFor(urlEqualTo("/pings"))
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_URL))
               .withRequestBody(equalToJson(requestBody))
               .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithCommandCounts() {
+    // given default telemetry data and empty telemetry registry
+    managementService.toggleTelemetry(true);
+
+    // execute commands
+    managementService.getHistoryLevel();
+    managementService.getLicenseKey();
+
+    Data expectedData = adjustDataWithCommandCounts(configuration.getTelemetryData());
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
+        .willReturn(aResponse()
+            .withBody(requestBody)
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_URL))
+        .withRequestBody(equalToJson(requestBody))
+        .withHeader("Content-Type",  equalTo("application/json")));
+    assertThat(configuration.getTelemetryRegistry().getCommands().size()).isEqualTo(1);
+    configuration.getTelemetryRegistry().getCommands();
   }
 
   @Test
@@ -201,7 +236,7 @@ public class TelemetryReporterTest {
   public void shouldLogTelemetrySent() {
     // given
     managementService.toggleTelemetry(true);
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
@@ -218,7 +253,7 @@ public class TelemetryReporterTest {
   public void shouldLogUnexpectedResponse() {
     // given
     managementService.toggleTelemetry(true);
-    stubFor(post(urlEqualTo("/pings"))
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_URL))
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_NOT_ACCEPTABLE)));
 
@@ -251,6 +286,8 @@ public class TelemetryReporterTest {
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"));
+    Map<String, Command> commands = getDefaultCommandCounts();
+    internals.setCommands(commands);
     Product product = new Product("Runtime", "7.14.0", "special", internals);
     Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
     return data;
@@ -266,7 +303,28 @@ public class TelemetryReporterTest {
     Internals internals = resultData.getProduct().getInternals();
 
     internals.setApplicationServer(new ApplicationServer(applicationServerVersion));
+    Map<String, Command> commands = getDefaultCommandCounts();
+    internals.setCommands(commands);
+
     return resultData;
   }
 
+  protected Data adjustDataWithCommandCounts(Data telemetryData) {
+    Data resultData = adjustDataWithProductVersionAndAppServerInfo(telemetryData, "Wildfly 10");
+
+
+    Map<String, Command> commands = resultData.getProduct().getInternals().getCommands();
+    commands.put("GetHistoryLevelCmd", new Command(1));
+    commands.put("GetLicenseKeyCmd", new Command(1));
+    resultData.getProduct().getInternals().setCommands(commands);
+
+    return telemetryData;
+  }
+
+  protected Map<String, Command> getDefaultCommandCounts() {
+    Map<String, Command> commands = new HashMap<>();
+    commands.put("TelemetryConfigureCmd", new Command(1));
+    commands.put("IsTelemetryEnabledCmd", new Command(1));
+    return commands;
+  }
 }

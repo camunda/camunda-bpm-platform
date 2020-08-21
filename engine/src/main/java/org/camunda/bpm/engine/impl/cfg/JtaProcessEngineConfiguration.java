@@ -24,12 +24,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
@@ -65,6 +65,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
@@ -75,6 +76,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
@@ -89,6 +91,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if(commandExecutorSchemaOperations == null) {
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
+      commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
       commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
