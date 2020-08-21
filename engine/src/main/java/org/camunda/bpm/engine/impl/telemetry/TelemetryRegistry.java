@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 
 public class TelemetryRegistry {
 
-  protected Map<String, Object> entries = new HashMap<>();
+  protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
 
   public synchronized ApplicationServer getApplicationServer() {
@@ -37,4 +37,23 @@ public class TelemetryRegistry {
   public synchronized void setApplicationServer(String applicationServerVersion) {
     this.applicationServer = new ApplicationServer(applicationServerVersion);
   }
+
+  public Map<String, CommandCounter> getCommands() {
+    return commands;
+  }
+
+  public void markOccurrence(String name) {
+    CommandCounter counter = commands.get(name);
+    if (counter == null) {
+      synchronized (commands) {
+        if (counter == null) {
+          counter = new CommandCounter(name);
+          commands.put(name, counter);
+        }
+      }
+    }
+
+    counter.mark();
+  }
+
 }
