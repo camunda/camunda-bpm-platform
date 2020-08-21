@@ -1,81 +1,166 @@
-# How to contribute
+# How to Contribute
+
+* [Ways to Contribute](#ways-to-contribute)
+* [Build from Source](#build-from-source)
+* [Create a Pull Request](#create-a-pull-request)
+* [Contribution Checklist](#contribution-checklist)
+* [Contributor License Agreement (CLA)](#contributor-license-agreement-cla)
+* [Commit Message Conventions](#commit-message-conventions)
+* [License Headers](#license-headers)
+* [Review Process](#review-process)
+
+# Ways to Contribute
 
 We would love you to contribute to this project. You can do so in various ways.
 
 
-## Contribute your knowledge
+## Contribute your Knowledge
 
-Help others by participating in our [forum](https://forum.camunda.org/).
-
-Before you ask a question, search the forum. The answer may have already been provided.
+Help others by participating in our [forum](https://forum.camunda.org/). Please read the [Forum FAQ](https://forum.camunda.org/faq) before you start.
 
 
-## File bugs or feature requests
+## File Bugs or Feature Requests
 
-[File bugs](https://app.camunda.com/jira/) you found in the code or [features](https://app.camunda.com/jira/) you would like to see in the future in our [issue tracker](https://app.camunda.com/jira/).
+File bugs you found in the code or features you would like to see in the future in our [JIRA project named CAM](https://jira.camunda.com/browse/CAM).
 
-* Register yourself on our [issue tracker](https://app.camunda.com/jira/)
-* Search the list of open issues first, your bug or feature may have already been reported
-* When filing a bug
-  * Be concise
-  * Qualify steps to reproduce a problem
-  * Specify environment you found the bug in (library version etc.)
-  * If possible, attach a test case that reproduces the problem
-
-
-## Contribute code
-
-You can contribute code that fixes bugs and/or implements features.
-
-* [Start with an EasyPick](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM%20AND%20labels%20%3D%20EasyPick%20AND%20status%20%3D%20Open): In our Jira we label issues which we consider small and easy to start on as EasyPicks.
-* Have a look on [what we are working on](https://app.camunda.com/jira/secure/RapidBoard.jspa?rapidView=39) first to check that we do not perform duplicated work
-* Read through our contribution guide lines
-* Implement the feature or bug fix on a [feature branch and submit the result as a pull request](http://lefedt.de/blog/posts/2013/contributing-to-oss-through-pull-requests/)
+1. [Signup for our JIRA](https://jira.camunda.com/secure/Signup!default.jspa)
+1. [Search for similar issues](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM), your bug or feature may have already been reported
+1. [Create a new ticket](https://jira.camunda.com/secure/CreateIssue!default.jspa)
+   1. Select the CAM project
+   1. Be concise
+   1. Describe the steps to reproduce the problem or the context of the feature request
+   1. Specify your environment (e.g. Camunda version, Camunda modules you use, ...)
+   1. Provide code. For a bug report, create a test that reproduces the problem. For feature requests, create mockup code that shows how the feature might look like. Fork our [unit test Github template](https://github.com/camunda/camunda-engine-unittest) to get started quickly.
 
 
-## Write Tests
+## Write Code
 
-Best practices for writing test cases:
+You can contribute code that fixes bugs and/or implements features. Here is how it works:
 
-* write JUnit4-style tests, not JUnit3
-* Project `camunda-engine`: If you need a process engine object, use the JUnit rule `org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule`. It ensures that the process engine object is reused across test cases and that certain integrity checks are performed after every test. For example:
-  ```
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-
-  @Test
-  public void testThings() {
-    ProcessEngine engine = engineRule.getProcessEngine();
-
-    ...
-  }
-  ```
-* Project `camunda-engine`: As an alternative to the above, you can extend extend the `org.camunda.bpm.engine.test.util.PluggableProcessEngineTest` class.
-  The class already provides an instance of the `ProvidedProcessEngineRule`, as well as the `ProcessEngineTestRule` that
-  provides some additional custom assertions and helper methods.
-  * However, if you need to make modifications to the `ProcessEngineConfiguration`, then please use the `ProcessEngineBootstrapRule`
-    as described below. 
-* Project `camunda-engine`: If you need a process engine with custom configuration, use the JUnit rule `org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule` and chain it with `org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule` like so:
-  ```
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
-      // apply configuration options here
-  });
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
-  ```
+1. Select a ticket that you would like to implement. Tickets labelled [EasyPick](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM%20AND%20status%20in%20(Open%2C%20Reopened%2C%20Ready)%20AND%20labels%20in%20(easy-pick%2C%20EasyPick)) are tickets that require little effort and can be good candidates to start. Be aware though that some of them need good knowledge of the surrounding code.
+1. Tell us in the ticket comments or in the [forum](https://forum.camunda.org/c/contributions/14) (select the *Contributions* category) that you want to work on your ticket. This is also the place where you can ask questions.
+1. Check your code changes against our [contribution checklist](#contribution-checklist)
+1. [Create a pull request on Github](). Note that you can already do this earlier if you would like feedback on your work in progress.
 
 
-## Coding styles
+# Build from Source
 
-* tabs as spaces / tab size 2 (all files)
-* If you created a number of commits, [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) your work into a few commits only.
-* Create commit messages that adhere to our commit message style(see below).
+In order to build our codebase from source, add the following to your Maven `settings.xml`.
+
+```xml
+<profiles>
+  <profile>
+    <id>camunda-bpm</id>
+    <repositories>
+      <repository>
+        <id>camunda-bpm-nexus</id>
+        <name>camunda-bpm-nexus</name>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+        <url>https://app.camunda.com/nexus/content/groups/public</url>
+      </repository>
+    </repositories>
+  </profile>
+</profiles>
+<activeProfiles>
+  <activeProfile>camunda-bpm</activeProfile>
+</activeProfiles>
+```
+
+An entire repository can then be built by running `mvn clean install` in the root directory. This will build all sub modules and execute unit tests. Furthermore, you can restrict the build to just the module you are changing by running the same command in the corresponding directory. Check the repository's or module's README for additional module-specific instructions. 
+
+Integration tests (e.g. tests that run in an actual application server) are usually not part of the default Maven profiles. If you think they are relevant to your contribution, please ask us in the ticket, on the forum or in your pull request for how to run them. Smaller contributions usually do not need this.
+
+# Create a Pull Request
+
+In order to show us your code, you can create a pull request on Github. Do this when your contribution is ready for review, or if you have started with your implementation and want some feedback before you continue. It is always easier to help if we can see your work in progress.
+
+A pull request can be submitted as follows: 
+
+1. [Fork the Camunda repository](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) you are contributing to
+1. Commit and push your changes to a branch in your fork
+1. [Submit a Pull Request to the Camunda repository](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork). As the *base* branch (the one that you contribute to), select `master`. This should also be the default in the Github UI.
+
+# Contribution Checklist
+
+Before submitting your pull request for code review, please go through the following checklist:
+
+1. Is your code formatted according to our code style guidelines?
+    * Java: Please check our [Java Code Style Guidelines](https://github.com/camunda/camunda-bpm-dev-docs/blob/master/development/Coding-Style-Java.md). You can also import [our template and settings files](https://github.com/camunda/camunda-bpm-platform/tree/master/settings) into your IDE before you start coding.
+    * Javascript: Your code is automatically formatted whenever you commit.
+1. Is your code covered by unit tests?
+    * Ask us if you are not sure where to write the tests or what kind of tests you should write.
+    * Java: Please follow our [testing best practices](https://github.com/camunda/camunda-bpm-dev-docs/blob/master/development/Testing-Best-Practices-Java.md).
+    * Have a look at other tests in the same module for how it works.
+    * In rare cases, it is not feasible to write an automated test. Please ask us if you think that is the case for your contribution.
+1. Do your commits follow our [commit message conventions](#commit-message-conventions)?
+1. Does your code use the [correct license headers](#license-headers)?
+
+# Contributor License Agreement (CLA)
+
+Before we can merge your contribution you have to sign our [Contributor License Agreement](https://cla-assistant.io/camunda/) (CLA). The CLA contains the terms and conditions under which the contribution is submitted. You need to do this only once for your first pull request. Keep in mind that without a signed CLA we cannot merge your contribution.
+
+# Commit Message Conventions
+
+The messages of all commits must conform to the style:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+Example:
+
+```
+feat(engine): Support BPEL
+
+- implements execution for a really old standard
+- BPEL models are mapped to internal ActivityBehavior classes
+
+related to CAM-1337
+```
+
+Have a look at the [commit history](https://github.com/camunda/camunda-bpm-platform/commits/master) for real-life examples.
 
 
-## License headers
+## \<type\>
 
-Every source file needs to contain the following license header at the top:
+One of the following:
+
+* feat (feature)
+* fix (bug fix)
+* docs (documentation)
+* style (formatting, missing semi colons, …)
+* refactor
+* test (when adding missing tests)
+* chore (maintain)
+ 
+## \<scope\>
+
+The scope is the module that is changed by the commit. E.g. `engine` in the case of https://github.com/camunda/camunda-bpm-platform/tree/master/engine.
+
+## \<subject\>
+
+A brief summary of the change. Use imperative form (e.g. *implement* instead of *implemented*).  The entire subject line shall not exceed 70 characters.
+
+## \<body\>
+
+A list of bullet points giving a high-level overview of the contribution, e.g. which strategy was used for implementing the feature. Use present tense here (e.g. *implements* instead of *implemented*). A line in the body shall not exceed 80 characters. For small changes, the body can be omitted. 
+
+## \<footer\>
+
+Must be `related to <ticket>` where ticket is the ticket number, e.g. CAM-1234. If the change is related to multiple tickets, list them in a comma-separated list such as `related to CAM-1234, CAM-4321`.
+
+# License Headers
+
+Every source file in an open-source repository needs to contain the following license header at  the top, formatted as a code comment:
 
 ```
 Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
@@ -94,131 +179,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-The header can be added manually, it can be set through your IDE's settings so that it is added to new source files automatically, or by running `mvn clean install -Plicense-header-check`. The last option will run a License Header plugin that will go through all the source files and add a license header to the ones that don't have one. It will also re-format an incorrectly formatted license header.
+The header can be added manually (check other files). If you use our [IDE settings](https://github.com/camunda/camunda-bpm-platform/tree/master/settings), it will be generated automatically when you create new `.java` files. You can also add it by running `mvn clean install -Plicense-header-check` in the module that you have changed. This command also re-formats any incorrectly formatted license header.
 
-It should be noted that `Java` source files from a contribution, that do not contain a valid license header, will not be merged with the codebase.
+Contributions that do not contain valid license headers cannot be merged.
 
-## Contributor License Agreement
+# Review Process
 
-In order to merge your contribution you have to sign our [Contributor License Agreement](https://cla-assistant.io/camunda/) (CLA) (which needs to be done only once). The CLA contains the terms and conditions under which the contribution has been submitted. Keep in mind without signed CLA the contribution will not be merged.
+We usually check for new community-submitted pull requests once a week. We will then assign a reviewer from our development team and that person will provide feedback as soon as possible. 
 
-## Commit Message Conventions
+Note that due to other responsibilities (our own implementation tasks, releases), feedback can sometimes be a bit delayed. Especially for larger contributions, it can take a bit until we have the time to assess your code properly.
 
-> This page defines a convention for commit messages for [camundaBPM](http://camunda.org) related projects.
->
-> All commits pushed to the [camunda BPM](https://github.com/camunda) repositories must conform to that convention.
+During review we will provide you with feedback and help to get your contribution merge-ready. However, before requesting a review, please go through our [contribution checklist](#contribution-checklist).
 
-The contents of this page are partly based on the [angular commit messages document](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit?pli=1).
-
-
-### Purpose
-
-The commit message is what is what describes your contribution.
-Its purpose must therefore be to document what a commit contributes to a project.
-
-Its head line __should__ be as meaningful as possible because it is always
-seen along with other commit messages.
-
-Its body __should__ provide information to comprehend the commit for people
-who care.
-
-Its footer __may__ contain references to external artifacts
-(issues it solves, related commits) as well as breaking change notes.
-
-This applies to __all kind of projects__.
-
-
-### Format
-
-#### Short form (only subject line)
-
-    <type>(<scope>): <subject>
-
-#### Long form (with body)
-
-    <type>(<scope>): <subject>
-
-    <BLANK LINE>
-
-    <body>
-
-    <BLANK LINE>
-
-    <footer>
-
-First line cannot be longer than __70 characters__, second line is always blank and other lines should be wrapped at __80 characters__! This makes the message easier to read on github as well as in various git tools.
-
-### Subject Line
-
-The subject line contains succinct description of the change.
-
-#### Allowed <type>
-
- * feat (feature)
- * fix (bug fix)
- * docs (documentation)
- * style (formatting, missing semi colons, …)
- * refactor
- * test (when adding missing tests)
- * chore (maintain)
- * improve (improvement, e.g. enhanced feature)
-
-#### Allowed <scope>
-
-Scope could be anything specifying place of the commit change. For example in the [camunda-modeler project](https://github.com/camunda/camunda-modeler) this could be import, export, property panel, label, id, ...
-
-#### <subject> text
-
- * use imperative, present tense: _change_ not _changed_ nor _changes_ or _changing_
- * do not capitalize first letter
- * do not append dot (.) at the end
-
-### Message Body
-
- * just as in <subject> use imperative, present tense: _change_ not _changed_ nor _changes_ or _changing_
- * include motivation for the change and contrast it with previous behavior
-
-### Message Footer
-
-#### Breaking changes
-
-All breaking changes have to be mentioned in footer with the description of the change, justification and migration notes
-
-    BREAKING CHANGE: Id editing feature temporarily removed
-
-        As a work around, change the id in XML using replace all or friends
-
-#### Referencing issues
-
-Closed bugs / feature requests / issues should be listed on a separate line in the footer prefixed with "Closes" keyword like this:
-
-    Closes #234
-
-or in case of multiple issues:
-
-    Closes #123, #245, #992
-
-### More on good commit Messages
-
- * http://365git.tumblr.com/post/3308646748/writing-git-commit-messages
- * http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-
-### FAQ for Geeks
-
-##### Why to use imperative form in commit messages?
-I.e. why to use _add test for #foo_ versus _added test for #foo_ or _adding test for foo_?
-
-Makes commit logs way more readable. See the work you did during a commit as a work on an issue and the commit as solving that issue. Now write about for what issue the commit is a result rather than what you did or are currently doing.
-
-__Example:__ You write a test for the function #foo. You commit the test. You use the commit message _add test for #foo_. Why? Because that is what the commit solves.
-
-##### How to categorize commits which are direct follow ups to merges?
-Use `chore(merge): <what>`.
-
-##### I want to commit a micro change. What should I do?
-Ask yourself, why it is only a micro change. Use feat = _docs_, _style_ or _chore_ depending on the change of your merge. Please see next question if you consider commiting work in progress.
-
-##### I want to commit work in progress. What should I do?
-Do not do it or do it (except for locally) or do it on a non public branch (ie. non master / develop ...) if you need to share the stuff you do.
-
-When you finished your work, [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) the changes to commits with reasonable commit messages and push them on a public branch.
+Once your code is merged, it will be shipped in the next alpha and minor releases. We usually build alpha releases once a month and minor releases once every six months. If you are curious about the exact next minor release date, check our [release announcements](https://docs.camunda.org/enterprise/announcement/) page.
