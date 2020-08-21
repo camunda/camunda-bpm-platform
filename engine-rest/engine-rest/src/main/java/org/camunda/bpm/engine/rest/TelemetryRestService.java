@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.rest;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -26,9 +28,16 @@ import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface TelemetryRestService {
 
-  String PATH = "/telemetry/configuration";
+  String PATH = "/telemetry";
 
   @POST
+  @Path("/configuration")
   @Consumes(MediaType.APPLICATION_JSON)
   void configureTelemetry(TelemetryConfigurationDto dto);
+
+  @GET
+  @Path("/configuration")
+  @Consumes(MediaType.APPLICATION_JSON)
+  TelemetryConfigurationDto getTelemetryConfiguration();
+
 }
