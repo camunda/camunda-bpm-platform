@@ -45,7 +45,7 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  */
 public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> {
 
-	 protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+	protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
 
 	protected String workerId;
@@ -81,7 +81,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 		for (ExternalTaskEntity entity : externalTasks) {
 
 			TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
-			
+
 			//retrieve latest execution to avoid concurrent modifications to the execution @https://jira.camunda.com/browse/CAM-10750
 			ExecutionEntity execution = commandContext
 					.getExecutionManager()
@@ -92,7 +92,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 			}
 			try{
 				LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-				          fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
+						fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
 				result.add(resultTask);
 			} catch(NullValueException e) {
 				//catch concurrent workers trying to fetchandLock scenario by handling exception @https://jira.camunda.com/browse/CAM-10750
