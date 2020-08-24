@@ -401,12 +401,12 @@
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-jdbc</artifactId>
           <version>${version.tomcat}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-juli</artifactId>
-          <version>${version.tomcat}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.tomcat</groupId>
+              <artifactId>tomcat-juli</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
 
         <dependency>
@@ -520,11 +520,12 @@
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-jdbc</artifactId>
           <version>${version.tomcat}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-juli</artifactId>
-          <version>${version.tomcat}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.tomcat</groupId>
+              <artifactId>tomcat-juli</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
       <build>
@@ -560,7 +561,7 @@
                 </resourceBases>
               </webAppConfig>
               <contextHandlers>
-                <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+                <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
                   <war>${basedir}/target/engine-rest.war</war>
                   <contextPath>/engine-rest</contextPath>
                 </contextHandler>
@@ -672,11 +673,12 @@
           <groupId>org.apache.tomcat</groupId>
           <artifactId>tomcat-jdbc</artifactId>
           <version>${version.tomcat}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-juli</artifactId>
-          <version>${version.tomcat}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.tomcat</groupId>
+              <artifactId>tomcat-juli</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm.identity</groupId>
@@ -703,7 +705,7 @@
                 <defaultsDescriptor>${project.basedir}/src/main/runtime/test/jetty/webdefault.xml</defaultsDescriptor>
               </webAppConfig>
               <contextHandlers>
-                <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+                <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
                   <war>${basedir}/target/engine-rest.war</war>
                   <contextPath>/engine-rest</contextPath>
                 </contextHandler>
