@@ -800,7 +800,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         preconditionMessage,
         failedOperation.toString());
   }
-
+  
   public void logTaskAlreadyFetched(String workerId, Throwable cause) {
 	  logWarn("091",
 			  "Execution Null. External task {}  was already fetched by worker thread {} {}", 
@@ -808,4 +808,5 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 			  cause.getMessage(), 
 			  cause);
   }
+
 }
