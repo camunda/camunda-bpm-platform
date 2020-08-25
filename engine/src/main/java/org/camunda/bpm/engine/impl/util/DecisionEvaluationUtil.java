@@ -31,7 +31,9 @@ import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionResultMapper;
 import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionResultMapper;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Roman Smirnov
@@ -73,7 +75,8 @@ public class DecisionEvaluationUtil {
 
     DmnDecisionResult result = invocation.getInvocationResult();
     if (result != null) {
-      execution.setVariableLocalTransient(DECISION_RESULT_VARIABLE, result);
+      TypedValue typedValue = Variables.untypedValue(result, true);
+      execution.setVariableLocal(DECISION_RESULT_VARIABLE, typedValue);
 
       if (resultVariable != null && decisionResultMapper != null) {
         Object mappedDecisionResult = decisionResultMapper.mapDecisionResult(result);

@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -591,6 +592,31 @@ public class TransientVariableTest {
     // when
     runtimeService.startProcessInstanceByKey("Process", variables);
   }
+  
+
+
+  @Test
+  public void testSwitchNonToTransientLocalVariable() throws URISyntaxException {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(SetTransientLocalVariableDelegate.class)
+      .endEvent()
+      .done();
+
+    testRule.deploy(instance);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", false);
+
+    // expect
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot set transient variable with name var to non-transient variable and vice versa.");
+
+    // when
+    runtimeService.startProcessInstanceByKey("Process", variables);
+  }
 
   /**
    * CAM-9932
@@ -614,6 +640,32 @@ public class TransientVariableTest {
     Object value = runtimeService.getVariable(processInstanceId, "var");
     assertThat(value).isNull();
   }
+  
+
+  
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testTransientLocalVariable() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(SetTransientLocalVariableDelegate.class)
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+    
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+    
+    // then
+    long numHistoricVariables = 
+        engineRule.getHistoryService()
+          .createHistoricVariableInstanceQuery()
+          .count();
+    
+    assertThat(numHistoricVariables).isEqualTo(0);
+  }
 
   public static class ReadTypedTransientVariableDelegate implements JavaDelegate {
 
@@ -633,6 +685,15 @@ public class TransientVariableTest {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
+    }
+  }
+  
+  public static class SetTransientLocalVariableDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      StringValue transientValue = Variables.stringValue("value", true);
+      execution.setVariableLocal("var", transientValue);
     }
   }
 
@@ -677,5 +738,7 @@ public class TransientVariableTest {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, transient2));
     }
   }
+  
+
 
 }

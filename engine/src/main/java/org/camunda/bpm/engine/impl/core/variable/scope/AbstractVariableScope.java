@@ -291,18 +291,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
     if (hasVariableLocal(variableName)) {
-      TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(false);
-
-      if (value.isTransient() != previousTypeValue.isTransient()) {
-        throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
-      }
-
-      if (value.isTransient()) {
-        setVariableLocalTransient(variableName, value, sourceActivityVariableScope);
-      } else {
-        setVariableLocal(variableName, value, sourceActivityVariableScope);
-      }
-
+      setVariableLocal(variableName, value, sourceActivityVariableScope);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
@@ -314,11 +303,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       }
       return;
     }
-    if (value.isTransient()) {
-      setVariableLocalTransient(variableName, value, sourceActivityVariableScope);
-    } else {
-      setVariableLocal(variableName, value, sourceActivityVariableScope);
-    }
+
+    setVariableLocal(variableName, value, sourceActivityVariableScope);
   }
 
   public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
@@ -329,10 +315,17 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
     if (variableStore.containsKey(variableName)) {
       CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
+
+      TypedValue previousValue = existingInstance.getTypedValue(false);
+
+      if (value.isTransient() != previousValue.isTransient()) {
+        throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
+      }
+      
       existingInstance.setValue(value);
       invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityExecution);
     }
-    else if (variableStore.isRemoved(variableName)) {
+    else if (!value.isTransient() && variableStore.isRemoved(variableName)) {
 
       CoreVariableInstance existingInstance = variableStore.getRemovedVariable(variableName);
 
@@ -344,7 +337,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       dbEntityManager.undoDelete((VariableInstanceEntity) existingInstance);
     }
     else {
-      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);
+      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, value.isTransient());
       getVariableStore().addVariable(variableValue);
       invokeVariableLifecycleListenersCreate(variableValue, sourceActivityExecution);
     }
@@ -387,35 +380,6 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     TypedValue typedValue = Variables.untypedValue(value);
     setVariableLocal(variableName, typedValue, getSourceActivityVariableScope());
 
-  }
-
-  /**
-   * Sets a variable in the local scope. In contrast to
-   * {@link #setVariableLocal(String, Object)}, the variable is transient that
-   * means it will not be stored in the data base. For example, a transient
-   * variable can be used for a result variable that is only available for
-   * output mapping.
-   */
-  public void setVariableLocalTransient(String variableName, Object value) {
-    TypedValue typedValue = Variables.untypedValue(value, true);
-
-    VariableUtil.checkJavaSerialization(variableName, typedValue);
-
-    CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
-    getVariableStore().addVariable(coreVariableInstance);
-  }
-
-  public void setVariableLocalTransient(String variableName, Object value, AbstractVariableScope sourceActivityVariableScope) {
-
-    VariableStore<CoreVariableInstance> variableStore = getVariableStore();
-    if (variableStore.containsKey(variableName)) {
-      CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
-      existingInstance.setValue((TypedValue) value);
-      invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityVariableScope);
-    } else {
-      setVariableLocalTransient(variableName, value);
-      invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
-    }
   }
 
   public void removeVariable(String variableName) {
