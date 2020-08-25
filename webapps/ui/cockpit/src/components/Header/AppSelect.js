@@ -47,9 +47,16 @@ export default function AppSelect({ user }) {
             <a href={`../../admin/${pathUtil("engine")}/`}>Admin</a>
           </Dropdown.Option>
         ) : null}
+
         {authorizedApps.includes("tasklist") ? (
           <Dropdown.Option>
             <a href={`../../tasklist/${pathUtil("engine")}/`}>Tasklist</a>
+          </Dropdown.Option>
+        ) : null}
+
+        {!user ? (
+          <Dropdown.Option>
+            <a href={`../../welcome/${pathUtil("engine")}/`}>Welcome</a>
           </Dropdown.Option>
         ) : null}
       </Dropdown>
