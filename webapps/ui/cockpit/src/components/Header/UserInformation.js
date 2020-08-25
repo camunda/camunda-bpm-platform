@@ -54,7 +54,7 @@ function UserInformation({ user, history }) {
         position="right"
       >
         <Dropdown.Option>
-          <a href={`../../welcome/${pathUtil("engine")}`}>
+          <a href={`../../welcome/${pathUtil("engine")}/`}>
             {translate("MY_PROFILE")}
           </a>
         </Dropdown.Option>
