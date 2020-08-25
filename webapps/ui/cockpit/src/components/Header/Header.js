@@ -34,10 +34,12 @@ import Navigation from "./Navigation";
 function Header({ user }) {
   return (
     <div className="Header">
-      <Link to="/" className="app-banner">
-        <Logo className="logo" />
-        {translate("APP_VENDOR")} Cockpit
-      </Link>
+      {user ? (
+        <Link to="/" className="app-banner">
+          <Logo className="logo" />
+          {translate("APP_VENDOR")} Cockpit
+        </Link>
+      ) : null}
 
       {user && <Navigation />}
 
