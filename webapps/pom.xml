@@ -54,6 +54,13 @@
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-rest-core</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -176,12 +183,14 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+      <version>${version.spring.framework}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
+      <version>${version.spring.framework}</version>
       <scope>test</scope>
     </dependency>
 
