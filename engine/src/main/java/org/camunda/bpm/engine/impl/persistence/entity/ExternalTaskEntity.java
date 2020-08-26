@@ -596,4 +596,15 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setLastFailureLogId(String lastFailureLogId) {
     this.lastFailureLogId = lastFailureLogId;
   }
+  
+  /**
+   * Added as part of @https://jira.camunda.com/browse/CAM-10750 to pull latest execution by id 
+   * @param execId
+   * @return execution
+   */
+  public ExecutionEntity getLatestExecutionById(String execId) {
+	  execution =  Context.getCommandContext().getExecutionManager().findExecutionById(execId);
+	  return execution;
+  }
+
 }

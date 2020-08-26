@@ -801,12 +801,10 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         failedOperation.toString());
   }
   
-  public void logTaskAlreadyFetched(String workerId, Throwable cause) {
-	  logWarn("091",
+  public void logTaskAlreadyFetched(String workerId) {
+	  logDebug("091",
 			  "Execution Null. External task {}  was already fetched by worker thread {} {}", 
-			  workerId, 
-			  cause.getMessage(), 
-			  cause);
+			  workerId);
   }
 
 }

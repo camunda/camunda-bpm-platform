@@ -77,23 +77,17 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       
       TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
       //retrieve latest execution to avoid concurrent modifications to the execution @https://jira.camunda.com/browse/CAM-10750
-      ExecutionEntity execution = commandContext
-    		  .getExecutionManager()
-    		  .findExecutionById(entity.getExecutionId());
-      if(null!=execution){
+      ExecutionEntity execution = entity.getLatestExecutionById(entity.getExecutionId());
+      if(null!=execution) {
     	  entity.setExecution(execution);
     	  entity.lock(workerId, fetchInstruction.getLockDuration());
-      }
-      
-      try {
           LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
-                  fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
-
+        			  fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
           result.add(resultTask); 
-      } catch(NullValueException e) {
-    	  //catch concurrent workers trying to fetchandLock scenario by handling exception @https://jira.camunda.com/browse/CAM-10750
-    	  LOG.logTaskAlreadyFetched(workerId, e);
-      }
+    	} else {
+    		LOG.logTaskAlreadyFetched(workerId);
+    	}
+
     }
 
     filterOnOptimisticLockingFailure(commandContext, result);
