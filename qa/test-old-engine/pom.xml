@@ -102,7 +102,14 @@
             <scope>import</scope>
             <type>pom</type>
           </dependency>
-         </dependencies>
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>${version.spring.framework}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
       </dependencyManagement>
 
       <dependencies>
@@ -127,7 +134,6 @@
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-test</artifactId>
-          <version>${version.spring.framework}</version>
           <scope>test</scope>
         </dependency>
 
