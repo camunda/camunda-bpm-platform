@@ -832,6 +832,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
 
+  protected String historyCleanupJobLogTimeToLive;
+
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
 
   protected HistoryRemovalTimeProvider historyRemovalTimeProvider;
@@ -1036,6 +1038,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
+
+    initHistoryCleanupJobLogTimeToLive();
   }
 
   protected void initHistoryCleanupStrategy() {
@@ -1162,6 +1166,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       historyCleanupBatchWindowStartTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(historyCleanupBatchWindowStartTime);
     } catch (ParseException e) {
       throw LOG.invalidPropertyValue("historyCleanupBatchWindowStartTime", historyCleanupBatchWindowStartTime);
+    }
+  }
+
+  protected void initHistoryCleanupJobLogTimeToLive() {
+    try {
+      ParseUtil.parseHistoryTimeToLive(historyCleanupJobLogTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("historyCleanupJobLogTimeToLive", historyCleanupJobLogTimeToLive, e);
     }
   }
 
@@ -4517,6 +4529,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.parsedBatchOperationsForHistoryCleanup = parsedBatchOperationsForHistoryCleanup;
   }
 
+  public String getHistoryCleanupJobLogTimeToLive() {
+    return historyCleanupJobLogTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupJobLogTimeToLive(String historyCleanupJobLogTimeToLive) {
+    this.historyCleanupJobLogTimeToLive = historyCleanupJobLogTimeToLive;
+    return this;
+  }
+
   public BatchWindowManager getBatchWindowManager() {
     return batchWindowManager;
   }
@@ -4740,5 +4761,4 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.telemetryData = telemetryData;
     return this;
   }
-
 }

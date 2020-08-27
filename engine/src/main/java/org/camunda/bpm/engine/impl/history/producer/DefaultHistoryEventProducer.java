@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
@@ -53,6 +54,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -69,6 +71,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ResourceTypes;
@@ -1098,6 +1101,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
     evt.setHostname(hostName);
 
+    if (jobEntity.getJobHandlerType().equals(HistoryCleanupJobHandler.TYPE)) {
+      String timeToLive = Context.getProcessEngineConfiguration().getHistoryCleanupJobLogTimeToLive();
+      if(timeToLive != null) {
+        Integer timeToLiveDays = ParseUtil.parseHistoryTimeToLive(timeToLive);
+        Date removalTime = DefaultHistoryRemovalTimeProvider.determineRemovalTime(ClockUtil.getCurrentTime(), timeToLiveDays);
+        evt.setRemovalTime(removalTime);
+      }
+    }
+
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {
       evt.setJobDefinitionId(jobDefinition.getId());
@@ -1111,7 +1123,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
           evt.setRemovalTime(historicBatch.getRemovalTime());
         }
       }
-
     }
     else {
       // in case of async signal there does not exist a job definition
@@ -1326,7 +1337,4 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
-
-
-
 }
