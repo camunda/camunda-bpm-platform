@@ -1101,7 +1101,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
     evt.setHostname(hostName);
 
-    if (jobEntity.getJobHandlerType().equals(HistoryCleanupJobHandler.TYPE)) {
+    if (jobEntity.getJobHandlerType() != null && jobEntity.getJobHandlerType().equals(HistoryCleanupJobHandler.TYPE)) {
       String timeToLive = Context.getProcessEngineConfiguration().getHistoryCleanupJobLogTimeToLive();
       if(timeToLive != null) {
         Integer timeToLiveDays = ParseUtil.parseHistoryTimeToLive(timeToLive);
