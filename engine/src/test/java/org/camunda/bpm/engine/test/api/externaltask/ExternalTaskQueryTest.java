@@ -50,8 +50,11 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -665,6 +668,25 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Ignore("https://jira.camunda.com/browse/CAM-12333")
+  @Test
+  public void shouldCheckPresenceOfVersionTag() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .camundaVersionTag("1.2.3.4")
+        .startEvent()
+        .serviceTask()
+          .camundaExternalTask("my-topic")
+        .endEvent()
+        .done();
+
+    testRule.deploy(process);
+
+    startInstancesByKey("process", 1);
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertThat(task.getProcessDefinitionVersionTag()).isEqualTo("1.2.3.4");
+  }
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<>();
