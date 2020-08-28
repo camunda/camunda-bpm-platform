@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.cmd.batch.variables;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -35,7 +34,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.Variables;
@@ -109,7 +107,7 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
     propChanges.add(new PropertyChange("async", null, true));
 
     commandContext.getOperationLogManager()
-        .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLES_BATCH, propChanges);
+        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLES, propChanges);
   }
 
   protected void setVariable(String batchId, String variableName, Object variableValue) {

@@ -116,7 +116,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
   public static String OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES = "SetExternalTaskRetries";
   public static String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
-  String OPERATION_TYPE_SET_VARIABLES_BATCH = "SetVariablesBatch";
+  String OPERATION_TYPE_SET_VARIABLES = "SetVariables";
 
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
