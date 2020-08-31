@@ -263,7 +263,9 @@ public class TelemetryReporterTest {
     product.setVersion("7.14.0");
     resultData.setProduct(product);
 
-    resultData.setApplicationServer(new ApplicationServer(applicationServerVersion));
+    Internals internals = resultData.getProduct().getInternals();
+
+    internals.setApplicationServer(new ApplicationServer(applicationServerVersion));
     return resultData;
   }
 

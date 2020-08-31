@@ -16,33 +16,17 @@
  */
 package org.camunda.bpm.engine.rest.impl.web.bootstrap;
 
-import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
-import static org.camunda.bpm.engine.rest.util.EngineUtil.lookupProcessEngine;
-
-import java.util.Set;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 
 public class RestContainerBootstrap implements ServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent sce) {
-    String serverInfo = sce.getServletContext().getServerInfo();
-    if (serverInfo != null && !serverInfo.isEmpty() ) {
-      Set<String> processEngineNames = getProcessEngineProvider().getProcessEngineNames();
-      for (String engineName : processEngineNames) {
-        ProcessEngine processEngine = lookupProcessEngine(engineName);
-        ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
-        TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
-        if (telemetryRegistry != null && telemetryRegistry.getApplicationServer() == null) {
-            telemetryRegistry.setApplicationServer(serverInfo);
-        }
-      }
-    }
-}
+    WebApplicationUtil.setApplicationServer(sce.getServletContext().getServerInfo());
+  }
 
   @Override
   public void contextDestroyed(ServletContextEvent sce) {

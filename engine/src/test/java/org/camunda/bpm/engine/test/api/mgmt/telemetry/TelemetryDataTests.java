@@ -23,12 +23,18 @@ import org.junit.Test;
 
 public class TelemetryDataTests {
 
-
   @Test
   public void shouldValidateWildFlyVendor() {
     // given
     ApplicationServer server = new ApplicationServer("WildFly Full 19.0.0.Final (WildFly Core 11.0.0.Final) - 2.0.30.Final");
-    assertThat(server.getVendor()).isEqualTo("JBoss WildFly");
+    assertThat(server.getVendor()).isEqualTo("WildFly");
+  }
+
+  @Test
+  public void shouldValidateJbossVendor() {
+    // given
+    ApplicationServer server = new ApplicationServer("JBoss EAP 7.2.0.GA (WildFly Core 6.0.11.Final-redhat-00001) - 2.0.15.Final-redhat-00001");
+    assertThat(server.getVendor()).isEqualTo("JBoss EAP");
   }
 
   @Test
