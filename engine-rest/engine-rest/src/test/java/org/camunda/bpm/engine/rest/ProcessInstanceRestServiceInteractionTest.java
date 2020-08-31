@@ -3704,8 +3704,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
 
+  /**
+   * Thrown when java serialization format is prohibited and java serialized variable is set 
+   * or null value is given.
+   */
   @Test
-  public void shouldThrowExceptionWhenSetVariablesAsync_JavaSerializationFormatProhibited() {
+  public void shouldTransformProcessEngineExceptionToInvalidRequestException() {
     // given
     doThrow(new ProcessEngineException("message"))
         .when(runtimeServiceMock).setVariablesAsync(any(), any(), any(), any());
