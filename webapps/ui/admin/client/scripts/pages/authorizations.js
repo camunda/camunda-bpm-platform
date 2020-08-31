@@ -166,7 +166,8 @@ module.exports = [
               'CREATE_BATCH_SET_JOB_RETRIES',
               'CREATE_BATCH_SET_REMOVAL_TIME',
               'CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES',
-              'CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND'
+              'CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND',
+              'CREATE_BATCH_SET_VARIABLES'
             ],
             14: ['READ'],
             17: ['READ', 'DELETE', 'UPDATE'],
