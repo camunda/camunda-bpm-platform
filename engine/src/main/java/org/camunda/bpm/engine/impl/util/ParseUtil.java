@@ -119,13 +119,13 @@ public class ParseUtil {
 
   public static String parseServerVendor(String applicationServerInfo) {
     String serverVendor = null;
-    Pattern pattern = Pattern.compile("[ A-Za-z]+");
+    Pattern pattern = Pattern.compile("[\\sA-Za-z]+");
     Matcher matcher = pattern.matcher(applicationServerInfo);
     if (matcher.find()) {
       serverVendor = matcher.group(0).trim();
     }
     if (serverVendor.contains("WildFly")) {
-      return "JBoss WildFly";
+      return "WildFly";
     }
     return serverVendor;
   }

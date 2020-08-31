@@ -31,20 +31,14 @@ public class RestContainerBootstrap implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent sce) {
     String serverInfo = sce.getServletContext().getServerInfo();
-    if (serverInfo != null && !sce.getServletContext().getServerInfo().isEmpty() ) {
+    if (serverInfo != null && !serverInfo.isEmpty() ) {
       Set<String> processEngineNames = getProcessEngineProvider().getProcessEngineNames();
       for (String engineName : processEngineNames) {
         ProcessEngine processEngine = lookupProcessEngine(engineName);
-        try {
-          if (processEngine.getProcessEngineConfiguration().getTelemetryRegistry() != null &&
-              processEngine.getProcessEngineConfiguration().getTelemetryRegistry().getApplicationServer() == null) {
-
-            processEngine.getProcessEngineConfiguration()
-                .getTelemetryRegistry()
-                .setApplicationServer(serverInfo);
-          }
-        } catch (Exception e) {
-          // do nothing
+        ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
+        TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
+        if (telemetryRegistry != null && telemetryRegistry.getApplicationServer() == null) {
+            telemetryRegistry.setApplicationServer(serverInfo);
         }
       }
     }

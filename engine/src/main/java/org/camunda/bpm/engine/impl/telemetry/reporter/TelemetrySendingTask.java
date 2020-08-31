@@ -103,9 +103,10 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected void resolveDataFromRegistry(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (data.getProduct().getInternals().getApplicationServer() == null &&
-        processEngineConfiguration.getTelemetryRegistry().getApplicationServer() != null) {
-      data.setApplicationServer(processEngineConfiguration.getTelemetryRegistry().getApplicationServer());
+    Internals internals = data.getProduct().getInternals();
+    ApplicationServer applicationServer = processEngineConfiguration.getTelemetryRegistry().getApplicationServer();
+    if (internals.getApplicationServer() == null && applicationServer != null) {
+      internals.setApplicationServer(applicationServer);
     }
   }
 
