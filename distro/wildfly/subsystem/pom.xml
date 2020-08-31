@@ -42,6 +42,7 @@
       <version>${version.wildfly}</version>
       <scope>provided</scope>
       <exclusions>
+        <!-- we need to exclude picketbox, because it uses a version only available in an early access repository -->
         <exclusion>
           <groupId>org.picketbox</groupId>
           <artifactId>picketbox</artifactId>
@@ -55,6 +56,7 @@
       <version>${version.wildfly}</version>
       <scope>provided</scope>
       <exclusions>
+      <!-- we need to exclude picketbox, because it uses a version only available in an early access repository -->
         <exclusion>
           <groupId>org.picketbox</groupId>
           <artifactId>picketbox</artifactId>
