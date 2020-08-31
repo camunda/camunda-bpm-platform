@@ -647,9 +647,9 @@ public class SetVariablesBatchTest {
         .extracting("property", "orgValue", "newValue", "operationType",
             "entityType", "category", "userId")
         .containsExactlyInAnyOrder(
-            tuple("nrOfInstances", null, "1", "SetVariablesBatch", "Batch", "Operator", "demo"),
-            tuple("nrOfVariables", null, "1", "SetVariablesBatch", "Batch", "Operator", "demo"),
-            tuple("async", null, "true", "SetVariablesBatch", "Batch", "Operator", "demo")
+            tuple("nrOfInstances", null, "1", "SetVariables", "ProcessInstance", "Operator", "demo"),
+            tuple("nrOfVariables", null, "1", "SetVariables", "ProcessInstance", "Operator", "demo"),
+            tuple("async", null, "true", "SetVariables", "ProcessInstance", "Operator", "demo")
         );
 
     // clear
