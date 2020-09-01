@@ -15,18 +15,5 @@
  * limitations under the License.
  */
 
-import React from "react";
-import { Link } from "react-router-dom";
-import translate from "./translation";
-
-export default function(id, label, priority, path) {
-  return {
-    id: "cockpit." + id,
-    pluginPoint: "cockpit.navigation",
-    priority: priority,
-    render: () => <Link to={"/" + id}>{translate(label)}</Link>,
-    properties: {
-      path: path || id
-    }
-  };
-}
+export { default } from "./PluginPoint";
+export { default as addApiAttributes } from "./addApiAttributes";

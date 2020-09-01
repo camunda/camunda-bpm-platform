@@ -23,7 +23,12 @@ export const processes = navFactory(
   100,
   /(process|migration)/
 );
-export const decisions = navFactory("decisions", "COCKPIT_DECISIONS", 90, "decision");
+export const decisions = navFactory(
+  "decisions",
+  "COCKPIT_DECISIONS",
+  90,
+  "decision"
+);
 export const tasks = navFactory("tasks", "COCKPIT_HUMAN_TASKS", 80);
 export const repository = navFactory("repository", "COCKPIT_DEPLOYMENTS", -5);
 export const batch = navFactory("batch", "COCKPIT_BATCHES", -6, /batch(?!\/)/);

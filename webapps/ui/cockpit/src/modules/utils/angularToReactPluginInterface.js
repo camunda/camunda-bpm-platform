@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-import { getCSRFToken } from "utils/request";
-
 export default function(pluginPoint, scope) {
   let result = {};
 
@@ -106,8 +104,6 @@ export default function(pluginPoint, scope) {
       result = {};
       break;
   }
-
-  result.CSRFToken = getCSRFToken();
 
   return result;
 }

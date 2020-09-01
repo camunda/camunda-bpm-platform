@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-import React from "react";
-import { Link } from "react-router-dom";
-import translate from "./translation";
+import { getCSRFToken } from "utils/request";
 
-export default function(id, label, priority, path) {
+export default function(params) {
+  const base = document.querySelector("base");
+  const engine = window.location.href.replace(/.*cockpit\/([^/]*).*/, "$1");
+
   return {
-    id: "cockpit." + id,
-    pluginPoint: "cockpit.navigation",
-    priority: priority,
-    render: () => <Link to={"/" + id}>{translate(label)}</Link>,
-    properties: {
-      path: path || id
-    }
+    api: {
+      adminApi: base.getAttribute("admin-api").slice(0, -1),
+      baseApi: base.getAttribute("engine-api").slice(0, -1),
+      cockpitApi: base.getAttribute("cockpit-api").slice(0, -1),
+      engineApi: base.getAttribute("engine-api") + "engine/" + engine,
+      engine,
+      CSRFToken: getCSRFToken()
+    },
+    ...params
   };
 }

@@ -24,14 +24,16 @@ import translate from "utils/translation";
 
 import "./Navigation.scss";
 
-function topLevelItems({ location, path, children }) {
+function topLevelItems({ location, properties, children }) {
+  const path = properties.path;
   return (
     <div className={path && location.pathname.match(path) ? "active" : null}>
       {children}
     </div>
   );
 }
-function additionalItems({ location, path, children }) {
+function additionalItems({ location, properties, children }) {
+  const path = properties.path;
   return (
     <Dropdown.Option
       className={path && location.pathname.match(path) ? "active" : null}

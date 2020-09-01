@@ -121,8 +121,8 @@ function App() {
             <Route>
               <PluginPoint
                 location="cockpit.route"
-                wrapPlugins={({ children, path }) => (
-                  <Route exact path={path}>
+                wrapPlugins={({ children, properties }) => (
+                  <Route exact path={properties.path}>
                     {children}
                   </Route>
                 )}

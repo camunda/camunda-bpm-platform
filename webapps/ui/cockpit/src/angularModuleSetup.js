@@ -29,6 +29,7 @@ import $ from "jquery";
 
 import dataDepend from "angular-data-depend/src/dataDepend";
 import { getPlugins, getConfig, getLocale } from "utils/config";
+import { addApiAttributes } from "utils/PluginPoint";
 
 export default function setup(module) {
   const config = getConfig();
@@ -58,7 +59,7 @@ export default function setup(module) {
       ({ getViewer }, scope) => {
         plugin.render(
           getViewer(),
-          getPassthroughData(plugin.pluginPoint, scope),
+          addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
           scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
         );
         scope.$on("$destroy", plugin.unmount);
@@ -72,7 +73,7 @@ export default function setup(module) {
             const isolatedContainer = document.createElement("div");
             plugin.render(
               isolatedContainer,
-              getPassthroughData(plugin.pluginPoint, scope),
+              addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
               scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
             );
 
@@ -87,6 +88,7 @@ export default function setup(module) {
       "ViewsProvider",
       function(ViewsProvider) {
         ViewsProvider.registerDefaultView(plugin.pluginPoint, {
+          ...plugin.properties, // For backwards-compatibility with 'label' property
           ...plugin,
           template: `<div plugin-bridge${pluginDirectiveUID} />`
         });
