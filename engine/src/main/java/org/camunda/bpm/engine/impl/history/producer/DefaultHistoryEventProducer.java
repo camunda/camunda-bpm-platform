@@ -854,7 +854,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setId(idGenerator.getNextId());
     historicFormPropertyEntity.setEventType(HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName());
     historicFormPropertyEntity.setTimestamp(ClockUtil.getCurrentTime());
-    historicFormPropertyEntity.setActivityInstanceId(execution.getActivityInstanceId());
     historicFormPropertyEntity.setExecutionId(execution.getId());
     historicFormPropertyEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
     historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
@@ -876,6 +875,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize sequence counter
     initSequenceCounter(execution, historicFormPropertyEntity);
+    
+    if (execution.isProcessInstanceStarting()) {
+      // instantiate activity instance id as process instance id when starting a process instance
+      // via a form
+      historicFormPropertyEntity.setActivityInstanceId(execution.getProcessInstanceId());
+    } else {
+      historicFormPropertyEntity.setActivityInstanceId(execution.getActivityInstanceId());
+    }
 
     return historicFormPropertyEntity;
   }
