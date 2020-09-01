@@ -118,15 +118,23 @@ public class ParseUtil {
   }
 
   public static String parseServerVendor(String applicationServerInfo) {
-    String serverVendor = null;
+    String serverVendor = "";
+
     Pattern pattern = Pattern.compile("[\\sA-Za-z]+");
     Matcher matcher = pattern.matcher(applicationServerInfo);
     if (matcher.find()) {
-      serverVendor = matcher.group(0).trim();
+      try {
+        serverVendor = matcher.group();
+      } catch (IllegalStateException ignored) {
+      }
+
+      serverVendor = serverVendor.trim();
+
+      if (serverVendor.contains("WildFly")) {
+        return "WildFly";
+      }
     }
-    if (serverVendor.contains("WildFly")) {
-      return "WildFly";
-    }
+
     return serverVendor;
   }
 
