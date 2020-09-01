@@ -1352,7 +1352,15 @@ public interface ManagementService {
   void toggleTelemetry(boolean enabled);
 
   /**
-   * Checks if sending telemetry data to Camunda is enabled/disabled
+   * Checks how sending telemetry data to Camunda is configured
+   * @return
+   *   <ul>
+   *     <li><code>null</code> if the configuration is not defined so far,
+   *     treated as <code>false</code> and no data is send,</li>
+   *     <li><code>true</code> if the telemetry sending is enabled, and</li>
+   *     <li><code>false</code> if the telemetry is disabled explicitly.</li>
+   *   </ul>
    */
-  boolean isTelemetryEnabled();
+  Boolean isTelemetryEnabled();
+
 }

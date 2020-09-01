@@ -508,7 +508,8 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new TelemetryConfigureCmd(enabled));
   }
 
-  public boolean isTelemetryEnabled() {
+  public Boolean isTelemetryEnabled() {
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
   }
+
 }

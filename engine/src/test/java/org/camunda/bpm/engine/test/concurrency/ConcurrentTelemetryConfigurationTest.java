@@ -42,7 +42,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
   @Before
   public void setUp() {
-    TestHelper.deleteInstallationId(processEngineConfiguration);
+    TestHelper.deleteTelemetryProperty(processEngineConfiguration);
   }
 
   @Test

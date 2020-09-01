@@ -34,10 +34,14 @@ public class IsTelemetryEnabledCmd implements Command<Boolean> {
 
     PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
     if (telemetryProperty != null) {
-      return Boolean.parseBoolean(telemetryProperty.getValue());
+      if (telemetryProperty.getValue().toLowerCase().equals("null")) {
+        return null;
+      } else {
+        return Boolean.parseBoolean(telemetryProperty.getValue());
+      }
     } else {
       LOG.databaseTelemetryPropertyMissingInfo();
-      return false;
+      return null;
     }
   }
 

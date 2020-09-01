@@ -29,63 +29,85 @@ import org.junit.Test;
 
 public class TelemetryConfigurationTest {
 
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
+
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ProcessEngineConfigurationImpl inMemoryConfiguration;
 
   @After
   public void reset() {
-    ProcessEngineImpl processEngineImpl = processEngineConfiguration.getProcessEngine();
-    processEngineImpl.close();
-    processEngineImpl = null;
+    if (inMemoryConfiguration != null) {
+    inMemoryConfiguration.getManagementService().toggleTelemetry(false);
+      ProcessEngineImpl processEngineImpl = inMemoryConfiguration.getProcessEngine();
+      processEngineImpl.close();
+      processEngineImpl = null;
+    }
   }
 
   @Test
-  public void shouldHaveDisabledTelemetryByDefault() {
+  public void shouldStartEngineTelemetryDisabled() {
     // given
-    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    processEngineConfiguration
-                              .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setInitializeTelemetry(false);
 
     // when
-    processEngineConfiguration.buildProcessEngine();
+    inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isInitializeTelemetry()).isFalse();
-    assertThat(processEngineConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
+    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
+    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
   }
 
   @Test
   public void shouldStartEngineWithTelemetryEnabled() {
     // given
-    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    processEngineConfiguration
-                              .setInitializeTelemetry(true)
-                              .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+        .setInitializeTelemetry(true);
 
     // when
-    processEngineConfiguration.buildProcessEngine();
+    inMemoryConfiguration.buildProcessEngine();
 
     // then
-    assertThat(processEngineConfiguration.isInitializeTelemetry()).isTrue();
-    assertThat(processEngineConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
+    assertThat(inMemoryConfiguration.isInitializeTelemetry()).isTrue();
+    assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
   }
 
   @Test
   public void shouldStartEngineWithChangedTelemetryEndpoint() {
     // given
-    String telemetryEndpoint = "http://localhost:8081/pings";
-    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    processEngineConfiguration
-        .setTelemetryEndpoint(telemetryEndpoint)
-        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
   
     // when
-    processEngineConfiguration.buildProcessEngine();
+    inMemoryConfiguration.buildProcessEngine();
   
     // then
-    assertThat(processEngineConfiguration.getTelemetryEndpoint()).isEqualTo(telemetryEndpoint);
+    assertThat(inMemoryConfiguration.getTelemetryEndpoint()).isEqualTo(TELEMETRY_ENDPOINT);
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.persistence"}, level = "DEBUG")
+  public void shouldLogDefaultTelemetryValue() {
+    // given
+    Boolean telemetryInitializedValue = null;
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+
+    // when
+    inMemoryConfiguration.buildProcessEngine();
+
+    // then
+    assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitializedValue).size()).isOne();
   }
 
   @Test
@@ -93,13 +115,13 @@ public class TelemetryConfigurationTest {
   public void shouldLogTelemetryPersistenceLog() {
     // given
     boolean telemetryInitialized = true;
-    processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
-    processEngineConfiguration
-                              .setInitializeTelemetry(telemetryInitialized)
-                              .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
- 
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setInitializeTelemetry(telemetryInitialized)
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+
     // when
-    processEngineConfiguration.buildProcessEngine();
+    inMemoryConfiguration.buildProcessEngine();
 
     // then
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
