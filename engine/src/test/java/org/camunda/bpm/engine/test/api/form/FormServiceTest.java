@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.variable.Variables.booleanValue;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
@@ -46,10 +47,14 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
@@ -64,10 +69,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -135,6 +142,8 @@ public class FormServiceTest {
   public void tearDown() throws Exception {
     identityService.deleteGroup("management");
     identityService.deleteUser("fozzie");
+
+    VariablesRecordingListener.reset();
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
@@ -650,6 +659,105 @@ public class FormServiceTest {
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
     assertEquals("Mike", variables.get("speaker"));
     assertEquals(45L, variables.get("duration"));
+  }
+
+  @Test
+  public void testSubmitStartFormWithExecutionListenerOnStartEvent() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess()
+      .startEvent()
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, VariablesRecordingListener.class)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, VariablesRecordingListener.class)
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    VariableMap formData = Variables.createVariables().putValue("foo", "bar");
+
+    // when
+    formService.submitStartForm(procDef.getId(), formData);
+
+    // then
+    List<VariableMap> variableEvents = VariablesRecordingListener.getVariableEvents();
+    assertThat(variableEvents).hasSize(2);
+    assertThat(variableEvents.get(0)).containsExactly(entry("foo", "bar"));
+    assertThat(variableEvents.get(1)).containsExactly(entry("foo", "bar"));
+  }
+
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testSubmitStartFormWithAsyncStartEvent() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess()
+      .startEvent().camundaAsyncBefore()
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    VariableMap formData = Variables.createVariables().putValue("foo", "bar");
+
+    // when
+    ProcessInstance processInstance = formService.submitStartForm(procDef.getId(), formData);
+
+    // then
+    VariableMap runtimeVariables = runtimeService.getVariablesTyped(processInstance.getId());
+    assertThat(runtimeVariables).containsExactly(entry("foo", "bar"));
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertThat(historicVariable).isNotNull();
+    assertThat(historicVariable.getName()).isEqualTo("foo");
+    assertThat(historicVariable.getValue()).isEqualTo("bar");
+  }
+
+
+  @Test
+  public void testSubmitStartFormWithAsyncStartEventExecuteJob() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess()
+      .startEvent().camundaAsyncBefore()
+      .userTask()
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    VariableMap formData = Variables.createVariables().putValue("foo", "bar");
+    ProcessInstance processInstance = formService.submitStartForm(procDef.getId(), formData);
+
+    ManagementService managementService = engineRule.getManagementService();
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when
+    managementService.executeJob(job.getId());
+
+    // then the job can be executed successfully (e.g. we don't try to insert the variables a second time)
+    // and
+    VariableMap runtimeVariables = runtimeService.getVariablesTyped(processInstance.getId());
+    assertThat(runtimeVariables).containsExactly(entry("foo", "bar"));
+  }
+
+  public static class VariablesRecordingListener implements ExecutionListener {
+
+    private static List<VariableMap> variableEvents = new ArrayList<VariableMap>();
+
+    public static void reset() {
+      variableEvents.clear();
+    }
+
+    public static List<VariableMap> getVariableEvents() {
+      return variableEvents;
+    }
+
+    @Override
+    public void notify(DelegateExecution execution) throws Exception {
+      variableEvents.add(execution.getVariablesTyped());
+    }
   }
 
   @Test

@@ -493,10 +493,7 @@ public class FullHistoryTest {
     assertEquals(processInstance.getId(), historicProperty1.getProcessInstanceId());
     assertNull(historicProperty1.getTaskId());
 
-    assertNotNull(historicProperty1.getActivityInstanceId());
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityInstanceId(historicProperty1.getActivityInstanceId()).singleResult();
-    assertNotNull(historicActivityInstance);
-    assertEquals("start", historicActivityInstance.getActivityId());
+    assertEquals(processInstance.getId(), historicProperty1.getActivityInstanceId());
 
     HistoricFormProperty historicProperty2 = (HistoricFormProperty) props.get(1);
     assertEquals("formProp2", historicProperty2.getPropertyId());
@@ -505,10 +502,7 @@ public class FullHistoryTest {
     assertEquals(processInstance.getId(), historicProperty2.getProcessInstanceId());
     assertNull(historicProperty2.getTaskId());
 
-    assertNotNull(historicProperty2.getActivityInstanceId());
-    historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityInstanceId(historicProperty2.getActivityInstanceId()).singleResult();
-    assertNotNull(historicActivityInstance);
-    assertEquals("start", historicActivityInstance.getActivityId());
+    assertEquals(processInstance.getId(), historicProperty2.getActivityInstanceId());
 
     HistoricFormProperty historicProperty3 = (HistoricFormProperty) props.get(2);
     assertEquals("formProp3", historicProperty3.getPropertyId());
@@ -516,7 +510,7 @@ public class FullHistoryTest {
     assertEquals(startedDate, historicProperty3.getTime());
     assertEquals(processInstance.getId(), historicProperty3.getProcessInstanceId());
     String activityInstanceId = historicProperty3.getActivityInstanceId();
-    historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityInstanceId(activityInstanceId).singleResult();
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityInstanceId(activityInstanceId).singleResult();
     assertNotNull(historicActivityInstance);
     assertEquals(taskActivityId, historicActivityInstance.getActivityId());
     assertNotNull(historicProperty3.getTaskId());
