@@ -20,6 +20,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 import org.camunda.bpm.tasklist.Tasklist;
 import org.camunda.bpm.tasklist.impl.DefaultTasklistRuntimeDelegate;
 
@@ -36,6 +37,9 @@ public class TasklistContainerBootstrap implements ServletContextListener {
 
     environment = createTasklistEnvironment();
     environment.setup();
+
+    WebApplicationUtil.setApplicationServer(sce.getServletContext().getServerInfo());
+
   }
 
   @Override

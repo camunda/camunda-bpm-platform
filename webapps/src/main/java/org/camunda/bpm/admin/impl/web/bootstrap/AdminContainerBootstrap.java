@@ -22,6 +22,7 @@ import javax.servlet.ServletContextListener;
 import org.camunda.bpm.admin.Admin;
 import org.camunda.bpm.admin.impl.DefaultAdminRuntimeDelegate;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 
 /**
  * @author Daniel Meyer
@@ -36,6 +37,9 @@ public class AdminContainerBootstrap implements ServletContextListener {
 
     environment = createAdminEnvironment();
     environment.setup();
+
+    WebApplicationUtil.setApplicationServer(sce.getServletContext().getServerInfo());
+
   }
 
   @Override
