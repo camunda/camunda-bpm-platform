@@ -39,10 +39,12 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
@@ -51,6 +53,7 @@ import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
@@ -58,6 +61,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
@@ -128,6 +132,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_SUSPENDED_ASYNC_URL = PROCESS_INSTANCE_URL + "/suspended-async";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
   protected static final String PROCESS_INSTANCE_MODIFICATION_ASYNC_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification-async";
+  protected static final String PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL =
+      PROCESS_INSTANCE_URL + "/variables-async";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -3632,6 +3638,258 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
     verify(mockModificationBuilder).cancellationSourceExternal(true);
+  }
+
+  @Test
+  public void shouldSetVariablesAsync() {
+    // given
+    Batch batchMock = createMockBatch();
+    when(runtimeServiceMock.setVariablesAsync(any(), any(), any(), any()))
+        .thenReturn(batchMock);
+
+    SetVariablesAsyncDto body = new SetVariablesAsyncDto();
+
+    VariableValueDto variableValueDto = new VariableValueDto();
+    variableValueDto.setValue("bar");
+
+    body.setVariables(Collections.singletonMap("foo", variableValueDto));
+
+    // when
+    Response response = given()
+          .contentType(ContentType.JSON)
+          .body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+
+    // then
+    ArgumentCaptor<Map> captor = ArgumentCaptor.forClass(Map.class);
+    verify(runtimeServiceMock).setVariablesAsync(
+        eq(null),
+        eq(null),
+        eq(null),
+        captor.capture()
+    );
+
+    Assertions.assertThat(captor.getValue().get("foo")).isEqualTo("bar");
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenSetVariablesAsync_UnsupportedType() {
+    // given
+    Batch batchMock = createMockBatch();
+    when(runtimeServiceMock.setVariablesAsync(any(), any(), any(), any()))
+        .thenReturn(batchMock);
+
+    SetVariablesAsyncDto body = new SetVariablesAsyncDto();
+
+    VariableValueDto variableValueDto = new VariableValueDto();
+    variableValueDto.setValue("bar");
+    variableValueDto.setType("unknown");
+
+    body.setVariables(Collections.singletonMap("foo", variableValueDto));
+
+    // when + then
+    given()
+          .contentType(ContentType.JSON)
+          .body(body)
+        .then().expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+          .body(containsString("{\"type\":\"InvalidRequestException\"," +
+              "\"message\":\"Cannot set variables: Unsupported value type 'unknown'\"}"))
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+  }
+
+  /**
+   * Thrown when java serialization format is prohibited and java serialized variable is set 
+   * or null value is given.
+   */
+  @Test
+  public void shouldTransformProcessEngineExceptionToInvalidRequestException() {
+    // given
+    doThrow(new ProcessEngineException("message"))
+        .when(runtimeServiceMock).setVariablesAsync(any(), any(), any(), any());
+
+    // when + then
+    given()
+          .contentType(ContentType.JSON)
+          .body("{}")
+        .then().expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+          .body(containsString("{\"type\":\"InvalidRequestException\"," +
+              "\"message\":\"message\"}"))
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenSetVariablesAsync_AuthorizationException() {
+    // given
+    doThrow(new AuthorizationException("message"))
+        .when(runtimeServiceMock).setVariablesAsync(any(), any(), any(), any());
+
+    // when + then
+    given()
+          .contentType(ContentType.JSON)
+          .body("{}")
+        .then().expect()
+          .statusCode(Status.FORBIDDEN.getStatusCode())
+          .body(containsString("{\"type\":\"AuthorizationException\""))
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenSetVariablesAsync_NullValueException() {
+    // given
+    doThrow(new NullValueException("message"))
+        .when(runtimeServiceMock).setVariablesAsync(any(), any(), any(), any());
+
+    // when + then
+    given()
+          .contentType(ContentType.JSON)
+          .body("{}")
+        .then().expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+          .body(containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenSetVariablesAsync_BadUserRequestException() {
+    // given
+    doThrow(new BadUserRequestException("message"))
+        .when(runtimeServiceMock).setVariablesAsync(any(), any(), any(), any());
+
+    // when + then
+    given()
+          .contentType(ContentType.JSON)
+          .body("{}")
+        .then().expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+          .body(containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldSetVariablesAsync_RuntimeQuery() {
+    // given
+    Batch batchMock = createMockBatch();
+    when(runtimeServiceMock.setVariablesAsync(any(), any(), any(), any()))
+        .thenReturn(batchMock);
+
+    ProcessInstanceQuery mockedProcessInstanceQuery = mock(ProcessInstanceQuery.class);
+    when(runtimeServiceMock.createProcessInstanceQuery())
+        .thenReturn(mockedProcessInstanceQuery);
+
+    SetVariablesAsyncDto body = new SetVariablesAsyncDto();
+
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setProcessDefinitionId("foo");
+    body.setProcessInstanceQuery(processInstanceQueryDto);
+
+    // when
+    Response response = given()
+          .contentType(ContentType.JSON)
+          .body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+
+    // then
+
+    verify(mockedProcessInstanceQuery)
+        .processDefinitionId("foo");
+
+    verify(runtimeServiceMock).setVariablesAsync(
+        eq(null),
+        eq(mockedProcessInstanceQuery),
+        eq(null),
+        eq(null)
+    );
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldSetVariablesAsync_HistoryQuery() {
+    // given
+    Batch batchMock = createMockBatch();
+    when(runtimeServiceMock.setVariablesAsync(any(), any(), any(), any()))
+        .thenReturn(batchMock);
+
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery =
+        mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery())
+        .thenReturn(mockedHistoricProcessInstanceQuery);
+
+    SetVariablesAsyncDto body = new SetVariablesAsyncDto();
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto =
+        new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessDefinitionId("foo");
+    body.setHistoricProcessInstanceQuery(historicProcessInstanceQueryDto);
+
+    // when
+    Response response = given()
+          .contentType(ContentType.JSON)
+          .body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+
+    // then
+    verify(mockedHistoricProcessInstanceQuery)
+        .processDefinitionId("foo");
+
+    verify(runtimeServiceMock).setVariablesAsync(
+        eq(null),
+        eq(null),
+        eq(mockedHistoricProcessInstanceQuery),
+        eq(null)
+    );
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldSetVariablesAsync_ByIds() {
+    // given
+    Batch batchMock = createMockBatch();
+    when(runtimeServiceMock.setVariablesAsync(any(), any(), any(), any()))
+        .thenReturn(batchMock);
+
+    SetVariablesAsyncDto body = new SetVariablesAsyncDto();
+
+    List<String> processInstanceIds = Arrays.asList("foo", "bar");
+    body.setProcessInstanceIds(processInstanceIds);
+
+    // when
+    Response response = given()
+          .contentType(ContentType.JSON)
+          .body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
+
+    // then
+    verify(runtimeServiceMock).setVariablesAsync(
+        eq(processInstanceIds),
+        eq(null),
+        eq(null),
+        eq(null)
+    );
+
+    verifyBatchJson(response.asString());
   }
 
   @SuppressWarnings("unchecked")

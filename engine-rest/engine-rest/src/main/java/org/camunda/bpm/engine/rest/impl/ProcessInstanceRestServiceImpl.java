@@ -18,20 +18,26 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -40,13 +46,16 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateAsy
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
     ProcessInstanceRestService {
@@ -228,4 +237,50 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
+
+  @Override
+  public BatchDto setVariablesAsync(SetVariablesAsyncDto setVariablesAsyncDto) {
+    Map<String, VariableValueDto> variables = setVariablesAsyncDto.getVariables();
+
+    VariableMap variableMap = null;
+    try {
+      variableMap = VariableValueDto.toMap(variables, processEngine, objectMapper);
+
+    } catch (RestException e) {
+      String errorMessage = String.format("Cannot set variables: %s", e.getMessage());
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
+    }
+
+    List<String> ids = setVariablesAsyncDto.getProcessInstanceIds();
+    ProcessInstanceQuery runtimeQuery = toQuery(setVariablesAsyncDto.getProcessInstanceQuery());
+    HistoricProcessInstanceQuery historyQuery = toQuery(setVariablesAsyncDto.getHistoricProcessInstanceQuery());
+
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+
+    Batch batch = null;
+    try {
+      batch = runtimeService.setVariablesAsync(ids, runtimeQuery, historyQuery, variableMap);
+
+    } catch (BadUserRequestException | AuthorizationException e) {
+      throw e;
+
+    } catch (ProcessEngineException e) {
+      // 1) the java serialization format is prohibited
+      // 2) null value is given
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+
+    }
+
+    return BatchDto.fromBatch(batch);
+  }
+
+  protected <T extends Query, R extends AbstractQueryDto> T toQuery(R query) {
+    if (query == null) {
+      return null;
+    }
+
+    return (T) query.toQuery(processEngine);
+  }
+
 }
