@@ -14,39 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.dto;
+package org.camunda.bpm.engine.rest.impl.web.bootstrap;
 
-import org.camunda.bpm.engine.impl.util.JsonUtil;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
-public class Data {
+import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 
-  protected String installation;
-  protected Product product;
+public class RestContainerBootstrap implements ServletContextListener {
 
-  public Data(String installation, Product product) {
-    super();
-    this.installation = installation;
-    this.product = product;
-  }
-
-  public String getInstallation() {
-    return installation;
-  }
-
-  public void setInstallation(String installation) {
-    this.installation = installation;
-  }
-
-  public Product getProduct() {
-    return product;
-  }
-
-  public void setProduct(Product product) {
-    this.product = product;
+  @Override
+  public void contextInitialized(ServletContextEvent sce) {
+    WebApplicationUtil.setApplicationServer(sce.getServletContext().getServerInfo());
   }
 
   @Override
-  public String toString() {
-    return JsonUtil.asString(this);
+  public void contextDestroyed(ServletContextEvent sce) {
+    // do nothing
   }
+
 }

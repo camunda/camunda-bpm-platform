@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
+
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -28,7 +28,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
@@ -63,10 +62,10 @@ import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.impl.optimize.OptimizeRestService;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+
 
 @Path(NamedProcessEngineRestServiceImpl.PATH)
 public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRestServiceImpl {
@@ -293,18 +292,6 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Override
   protected URI getRelativeEngineUri(String engineName) {
     return UriBuilder.fromResource(NamedProcessEngineRestServiceImpl.class).path("{name}").build(engineName);
-  }
-
-  protected ProcessEngineProvider getProcessEngineProvider() {
-    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
-    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
-
-    if (iterator.hasNext()) {
-      ProcessEngineProvider provider = iterator.next();
-      return provider;
-    } else {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, "No process engine provider found");
-    }
   }
 
 }

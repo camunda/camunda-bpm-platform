@@ -16,13 +16,20 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Internals {
 
-  protected Database database;
+  public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
 
-  public Internals(Database database) {
+  protected Database database;
+  @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
+  protected ApplicationServer applicationServer;
+
+  public Internals(Database database, ApplicationServer server) {
     super();
     this.database = database;
+    this.applicationServer = server;
   }
 
   public Database getDatabase() {
@@ -31,6 +38,14 @@ public class Internals {
 
   public void setDatabase(Database database) {
     this.database = database;
+  }
+
+  public ApplicationServer getApplicationServer() {
+    return applicationServer;
+  }
+
+  public void setApplicationServer(ApplicationServer applicationServer) {
+    this.applicationServer = applicationServer;
   }
 
 }
