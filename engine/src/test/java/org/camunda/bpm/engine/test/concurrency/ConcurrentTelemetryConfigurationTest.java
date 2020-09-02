@@ -72,7 +72,7 @@ public class ConcurrentTelemetryConfigurationTest extends ConcurrencyTestCase {
 
     assertNull(thread1.exception);
     assertNull(thread2.exception);
-    assertThat(managementService.isTelemetryEnabled()).isFalse();
+    assertThat(managementService.isTelemetryEnabled()).isNull();
   }
 
   protected static class ControllableUpdateTelemetrySetupCommand extends ControllableCommand<Void> {
