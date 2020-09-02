@@ -31,14 +31,6 @@ import java.util.Date;
  */
 public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProvider {
 
-  public static Date determineRemovalTime(Date initTime, Integer timeToLive) {
-    Calendar removalTime = Calendar.getInstance();
-    removalTime.setTime(initTime);
-    removalTime.add(Calendar.DATE, timeToLive);
-    
-    return removalTime.getTime();
-  }
-
   public Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance, ProcessDefinition processDefinition) {
 
     Integer historyTimeToLive = processDefinition.getHistoryTimeToLive();
@@ -112,4 +104,13 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
   protected boolean isProcessInstanceEnded(HistoricProcessInstanceEventEntity historicProcessInstance) {
     return historicProcessInstance.getEndTime() != null;
   }
+
+  public static Date determineRemovalTime(Date initTime, Integer timeToLive) {
+    Calendar removalTime = Calendar.getInstance();
+    removalTime.setTime(initTime);
+    removalTime.add(Calendar.DATE, timeToLive);
+    
+    return removalTime.getTime();
+  }
+
 }

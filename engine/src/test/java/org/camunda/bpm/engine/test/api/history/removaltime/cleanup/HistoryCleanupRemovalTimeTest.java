@@ -206,6 +206,8 @@ public class HistoryCleanupRemovalTimeTest {
 
       engineConfiguration.setAuthorizationEnabled(false);
       engineConfiguration.setEnableHistoricInstancePermissions(false);
+
+      engineConfiguration.setHistoryCleanupJobLogTimeToLive(null);
     }
 
     ClockUtil.reset();

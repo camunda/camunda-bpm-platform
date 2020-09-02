@@ -832,6 +832,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
 
+  /**
+   * Time to live for historic job log entries written by history cleanup jobs.
+   * Must be an ISO-8601 conform String specifying only a number of days. Only
+   * works in conjunction with removal-time-based cleanup strategy.
+   */
   protected String historyCleanupJobLogTimeToLive;
 
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
