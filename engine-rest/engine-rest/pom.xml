@@ -186,7 +186,7 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <!-- override version -->
-      <version>1.11</version>
+      <version>1.15</version>
       <scope>test</scope>
     </dependency>
 
