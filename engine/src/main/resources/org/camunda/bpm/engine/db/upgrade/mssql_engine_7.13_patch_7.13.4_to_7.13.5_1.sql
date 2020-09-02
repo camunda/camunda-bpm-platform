@@ -16,7 +16,7 @@
 --
 
 insert into ACT_GE_SCHEMA_LOG
-values ('201', CURRENT_TIMESTAMP, '7.13.5');
+values ('201', CURRENT_TIMESTAMP, '7.13.5_1');
 
 -- https://jira.camunda.com/browse/CAM-4441
 create index ACT_IDX_TASK_OWNER on ACT_RU_TASK(OWNER_);
