@@ -26,3 +26,7 @@ values ('telemetry.lock', '0', 1);
 -- insert telemetry.lock in property table - https://jira.camunda.com/browse/CAM-12031  --
 insert into ACT_GE_PROPERTY
 values ('installationId.lock', '0', 1);
+
+-- quick sorting of incidents - https://jira.camunda.com/browse/CAM-12383
+create index ACT_IDX_HI_INCIDENT_CREATE_TIME on ACT_HI_INCIDENT(CREATE_TIME_);
+create index ACT_IDX_HI_INCIDENT_END_TIME on ACT_HI_INCIDENT(END_TIME_);
