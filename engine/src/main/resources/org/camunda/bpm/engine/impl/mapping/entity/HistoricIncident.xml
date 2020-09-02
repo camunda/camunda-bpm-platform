@@ -426,4 +426,45 @@
       and HI.JOB_DEF_ID_ is not null
   </sql>
 
+  <select id="selectCompletedHistoricIncidentsPage" resultMap="historicIncidentResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_INCIDENT RES
+
+    <where>
+      <if test="parameter.finishedAfter != null">
+        and RES.END_TIME_ &gt; #{parameter.finishedAfter}
+      </if>
+      <if test="parameter.finishedAt != null">
+        and RES.END_TIME_ = #{parameter.finishedAt}
+      </if>
+      <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+        and RES.END_TIME_ is not null
+      </if>
+    </where>
+
+    ORDER BY RES.END_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
+  <select id="selectOpenHistoricIncidentsPage" resultMap="historicIncidentResultMap" parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+    ${optimizeLimitBeforeWithoutOffset}
+      select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_INCIDENT RES
+
+    <where>
+      <if test="parameter.createdAfter != null">
+        and RES.CREATE_TIME_ &gt; #{parameter.createdAfter}
+      </if>
+      <if test="parameter.createdAt != null">
+        and RES.CREATE_TIME_ = #{parameter.createdAt}
+      </if>
+      and RES.END_TIME_ is null
+    </where>
+
+    ORDER BY RES.CREATE_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
 </mapper>

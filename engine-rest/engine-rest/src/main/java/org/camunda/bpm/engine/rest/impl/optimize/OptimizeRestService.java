@@ -19,14 +19,17 @@ package org.camunda.bpm.engine.rest.impl.optimize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
@@ -49,7 +52,7 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
   public static final String PATH = "/optimize";
 
-  private DateConverter dateConverter;
+  private final DateConverter dateConverter;
 
   public OptimizeRestService(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
@@ -263,6 +266,50 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     for (HistoricVariableUpdate instance : historicVariableUpdates) {
       OptimizeHistoricVariableUpdateDto dto =
         OptimizeHistoricVariableUpdateDto.fromHistoricVariableUpdate(instance);
+      result.add(dto);
+    }
+    return result;
+  }
+
+  @GET
+  @Path("/incident/completed")
+  public List<HistoricIncidentDto> getCompletedHistoricIncidents(@QueryParam("finishedAfter") String finishedAfterAsString,
+                                                                 @QueryParam("finishedAt") String finishedAtAsString,
+                                                                 @QueryParam("maxResults") int maxResults) {
+    Date finishedAfter = dateConverter.convertQueryParameterToType(finishedAfterAsString);
+    Date finishedAt = dateConverter.convertQueryParameterToType(finishedAtAsString);
+    maxResults = ensureValidMaxResults(maxResults);
+
+    ProcessEngineConfigurationImpl config =
+      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    List<HistoricIncidentEntity> historicIncidents =
+      config.getOptimizeService().getCompletedHistoricIncidents(finishedAfter, finishedAt, maxResults);
+
+    List<HistoricIncidentDto> result = new ArrayList<>();
+    for (HistoricIncident instance : historicIncidents) {
+      HistoricIncidentDto dto = HistoricIncidentDto.fromHistoricIncident(instance);
+      result.add(dto);
+    }
+    return result;
+  }
+
+  @GET
+  @Path("/incident/open")
+  public List<HistoricIncidentDto> getOpenHistoricIncidents(@QueryParam("createdAfter") String createdAfterAsString,
+                                                            @QueryParam("createdAt") String createdAtAsString,
+                                                            @QueryParam("maxResults") int maxResults) {
+    Date createdAfter = dateConverter.convertQueryParameterToType(createdAfterAsString);
+    Date createdAt = dateConverter.convertQueryParameterToType(createdAtAsString);
+    maxResults = ensureValidMaxResults(maxResults);
+
+    ProcessEngineConfigurationImpl config =
+      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    List<HistoricIncidentEntity> historicIncidents =
+      config.getOptimizeService().getOpenHistoricIncidents(createdAfter, createdAt, maxResults);
+
+    List<HistoricIncidentDto> result = new ArrayList<>();
+    for (HistoricIncident instance : historicIncidents) {
+      HistoricIncidentDto dto = HistoricIncidentDto.fromHistoricIncident(instance);
       result.add(dto);
     }
     return result;
