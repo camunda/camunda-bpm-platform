@@ -70,8 +70,10 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -483,8 +485,16 @@ public class RuntimeServiceTest {
 
   /**
    * CAM-8005 - StackOverflowError must not happen.
+   *
+   * CAM-12239 - Test is flaky on CRDB since the INSERT and DELETE SQL statements
+   * of the Process Instance Executions and Tasks are executed much slower than expected.
+   * Under some conditions, the CRDB-range lease expires, this leads to a transaction
+   * time-out and CRDB throws an
+   * TransactionRetryWithProtoRefreshError: TransactionAbortedError(ABORT_REASON_ABORT_SPAN) error.
+   * Note: debug at CommandContextInterceptor -> context.close()
    */
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testDeleteProcessInstancesManyParallelSubprocesses() {
     final BpmnModelInstance multiInstanceWithSubprocess =
       Bpmn.createExecutableProcess("multiInstanceWithSubprocess")
