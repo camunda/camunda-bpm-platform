@@ -24,7 +24,6 @@ public class TelemetryConfigurationDto {
   }
 
   public TelemetryConfigurationDto(Boolean enableTelemetry) {
-    super();
     this.enableTelemetry = enableTelemetry;
   }
 

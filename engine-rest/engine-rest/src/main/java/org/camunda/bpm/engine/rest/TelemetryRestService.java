@@ -37,7 +37,7 @@ public interface TelemetryRestService {
 
   @GET
   @Path("/configuration")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   TelemetryConfigurationDto getTelemetryConfiguration();
 
 }
