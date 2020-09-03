@@ -1356,7 +1356,7 @@ public interface ManagementService {
    * @return
    *   <ul>
    *     <li><code>null</code> if the configuration is not defined so far,
-   *     treated as <code>false</code> and no data is send,</li>
+   *     treated as <code>false</code> and no data is sent,</li>
    *     <li><code>true</code> if the telemetry sending is enabled, and</li>
    *     <li><code>false</code> if the telemetry is disabled explicitly.</li>
    *   </ul>
