@@ -41,13 +41,32 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String TELEMETRY_URL = TEST_RESOURCE_ROOT_PATH +  TelemetryRestService.PATH;
+  protected static final String TELEMETRY_CONFIG_URL = TELEMETRY_URL + "/configuration";
 
   protected ManagementService managementServiceMock;
+
 
   @Before
   public void setupMocks() {
     managementServiceMock = mock(ManagementService.class);
     when(processEngine.getManagementService()).thenReturn(managementServiceMock);
+  }
+  
+  @Test
+  public void shouldDisableTelemetry() {
+    Map<String, Object> requestBody = new HashMap<String, Object>();
+    requestBody.put("enableTelemetry", false);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(requestBody)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+    .post(TELEMETRY_CONFIG_URL);
+    
+    verify(managementServiceMock).toggleTelemetry(false);
   }
 
   @Test
@@ -62,13 +81,13 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .post(TELEMETRY_URL);
+      .post(TELEMETRY_CONFIG_URL);
 
     verify(managementServiceMock).toggleTelemetry(true);
   }
 
   @Test
-  public void shouldThrowAuthorizationException() {
+  public void shouldThrowAuthorizationExceptionOnEnablingTelemetry() {
     String message = "Required admin authenticated group or user.";
     doThrow(new AuthorizationException(message)).when(managementServiceMock).toggleTelemetry(anyBoolean());
 
@@ -85,7 +104,74 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .body("type", equalTo(AuthorizationException.class.getSimpleName()))
         .body("message", equalTo(message))
     .when()
-      .post(TELEMETRY_URL);
+      .post(TELEMETRY_CONFIG_URL);
   }
-  
+
+  @Test
+  public void shouldFetchEnabledTelemetryConfiguration() {
+    when(managementServiceMock.isTelemetryEnabled()).thenReturn(true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("enableTelemetry", equalTo(true))
+    .when()
+      .get(TELEMETRY_CONFIG_URL);
+
+    verify(managementServiceMock).isTelemetryEnabled();
+  }
+
+  @Test
+  public void shouldFetchDisabledTelemetryConfiguration() {
+    when(managementServiceMock.isTelemetryEnabled()).thenReturn(false);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("enableTelemetry", equalTo(false))
+    .when()
+      .get(TELEMETRY_CONFIG_URL);
+
+    verify(managementServiceMock).isTelemetryEnabled();
+  }
+
+  @Test
+  public void shouldFetchEmptyTelemetryConfiguration() {
+    when(managementServiceMock.isTelemetryEnabled()).thenReturn(null);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("enableTelemetry", equalTo(null))
+    .when()
+      .get(TELEMETRY_CONFIG_URL);
+
+    verify(managementServiceMock).isTelemetryEnabled();
+  }
+
+  @Test
+  public void shouldThrowAuthorizationExceptionOnFetchingTelemetryConfig() {
+    String message = "Required admin authenticated group or user.";
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).isTelemetryEnabled();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .get(TELEMETRY_CONFIG_URL);
+
+    verify(managementServiceMock).isTelemetryEnabled();
+  }
+
 }

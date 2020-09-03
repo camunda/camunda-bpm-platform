@@ -36,4 +36,11 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
     managementService.toggleTelemetry(enableTelemetry);
   }
 
+  @Override
+  public TelemetryConfigurationDto getTelemetryConfiguration() {
+    ManagementService managementService = processEngine.getManagementService();
+
+    Boolean telemetryEnabled = managementService.isTelemetryEnabled();
+    return new TelemetryConfigurationDto(telemetryEnabled);
+  }
 }
