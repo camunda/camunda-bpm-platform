@@ -41,6 +41,13 @@
       <artifactId>wildfly-web-common</artifactId>
       <version>${version.wildfly}</version>
       <scope>provided</scope>
+      <exclusions>
+        <!-- we need to exclude picketbox, because it uses a version only available in an early access repository -->
+        <exclusion>
+          <groupId>org.picketbox</groupId>
+          <artifactId>picketbox</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -48,6 +55,17 @@
       <artifactId>wildfly-ejb3</artifactId>
       <version>${version.wildfly}</version>
       <scope>provided</scope>
+      <exclusions>
+      <!-- we need to exclude picketbox, because it uses a version only available in an early access repository -->
+        <exclusion>
+          <groupId>org.picketbox</groupId>
+          <artifactId>picketbox</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.picketbox</groupId>
+          <artifactId>picketbox-infinispan</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
