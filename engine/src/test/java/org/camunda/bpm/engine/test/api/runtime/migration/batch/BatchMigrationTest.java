@@ -398,7 +398,7 @@ public class BatchMigrationTest {
 
       // extend waiting time for CRDB since it takes longer to process all the jobs there
       // see CAM-12239 for more details
-      long maxMillisToWait = testRule.isOptimisticLockingExceptionSuppressible()? 10000L : 20000L;
+      long maxMillisToWait = testRule.isOptimisticLockingExceptionSuppressible()? 10000L : 30000L;
       testRule.waitForJobExecutorToProcessAllJobs(maxMillisToWait);
 
       // then all process instances where migrated
