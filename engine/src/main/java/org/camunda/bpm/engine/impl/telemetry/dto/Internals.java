@@ -30,6 +30,8 @@ public class Internals {
   protected ApplicationServer applicationServer;
   protected Map<String, Command> commands;
 
+  protected Map<String, Metric> metrics;
+
   public Internals(Database database, ApplicationServer server) {
     super();
     this.database = database;
@@ -59,6 +61,14 @@ public class Internals {
 
   public void setCommands(Map<String, Command> commands) {
     this.commands = commands;
+  }
+
+  public Map<String, Metric> getMetrics() {
+    return metrics;
+  }
+
+  public void setMetrics(Map<String, Metric> metrics) {
+    this.metrics = metrics;
   }
 
 }

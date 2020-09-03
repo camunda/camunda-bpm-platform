@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Nikola Koevski
@@ -203,6 +204,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         processEngineConfiguration.getTelemetryReporter() != null &&
         processEngineConfiguration.getTelemetryReporter().getHttpConnector() != null) {
       processEngineConfiguration.getTelemetryReporter().start();
+      // set start report time
+      processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
     }
   }
 }

@@ -17,12 +17,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 public class TelemetryConfigureCmd implements Command<Void> {
 
@@ -50,9 +52,12 @@ public class TelemetryConfigureCmd implements Command<Void> {
       commandContext.getPropertyManager().insert(telemetryProperty);
     }
 
-    TelemetryReporter telemetryReporter = commandContext.getProcessEngineConfiguration().getTelemetryReporter();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
     if (telemetryEnabled) {
       telemetryReporter.start();
+      // set start report time
+      processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
     } else {
       telemetryReporter.stop();
     }

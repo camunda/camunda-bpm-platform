@@ -14,6 +14,9 @@
 
   <logger name="org.springframework" level="info" />
 
+  <!-- wiremock logger -->
+  <logger name="org.mortbay.log" level="info" />
+
   <logger name="org.camunda" level="info" />
 
   <logger name="org.camunda.bpm.engine.test" level="debug" />
