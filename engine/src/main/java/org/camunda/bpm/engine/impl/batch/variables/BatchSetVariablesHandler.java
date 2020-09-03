@@ -57,7 +57,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
     Map<String, Object> variables = variableInstances.stream()
         .collect(Collectors.toMap(VariableInstanceEntity::getName,
-            VariableInstanceEntity::getTypedValue));
+            VariableInstanceEntity::getTypedValueWithImplicitUpdatesSkipped));
 
     List<String> processInstanceIds = batchConfiguration.getIds();
 
