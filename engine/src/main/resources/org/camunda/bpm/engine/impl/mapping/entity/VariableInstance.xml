@@ -35,6 +35,7 @@
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
+      BATCH_ID_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -56,6 +57,7 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
+      #{batchId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -107,6 +109,7 @@
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
       <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+      <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR" />
       <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
       <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
@@ -399,6 +402,15 @@
             <if test="taskIds != null &amp;&amp; taskIds.length > 0">
               and RES.TASK_ID_ in
               <foreach item="item" index="index" collection="taskIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
+            <!-- batchIds -->
+            <if test="batchIds != null &amp;&amp; batchIds.length > 0">
+              and RES.BATCH_ID_ in
+              <foreach item="item" index="index" collection="batchIds"
                        open="(" separator="," close=")">
                 #{item}
               </foreach>

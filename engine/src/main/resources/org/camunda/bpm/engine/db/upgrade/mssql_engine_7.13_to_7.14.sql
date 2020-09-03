@@ -25,3 +25,12 @@ values ('telemetry.lock', '0', 1);
 -- insert telemetry.lock in property table - https://jira.camunda.com/browse/CAM-12031  --
 insert into ACT_GE_PROPERTY
 values ('installationId.lock', '0', 1);
+
+-- https://jira.camunda.com/browse/CAM-12304
+ALTER TABLE ACT_RU_VARIABLE
+  ADD BATCH_ID_ nvarchar(64);
+CREATE INDEX ACT_IDX_BATCH_ID ON ACT_RU_VARIABLE(BATCH_ID_);
+ALTER TABLE ACT_RU_VARIABLE
+    ADD CONSTRAINT ACT_FK_VAR_BATCH
+    FOREIGN KEY (BATCH_ID_)
+    REFERENCES ACT_RU_BATCH (ID_);

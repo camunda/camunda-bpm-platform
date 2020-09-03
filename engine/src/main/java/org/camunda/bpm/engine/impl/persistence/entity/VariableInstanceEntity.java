@@ -65,6 +65,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected String processInstanceId;
   protected String executionId;
   protected String taskId;
+  protected String batchId;
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String activityInstanceId;
@@ -450,6 +451,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
   }
 
   public void setTask(TaskEntity task) {

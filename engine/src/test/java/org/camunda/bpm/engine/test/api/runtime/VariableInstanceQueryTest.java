@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -43,6 +49,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -2761,5 +2768,111 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTest {
     assertEquals(processInstance.getProcessDefinitionId(), variable.getProcessDefinitionId());
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void shouldGetBatchId() {
+    // given
+    String processInstanceId =
+        runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    List<String> processInstances = Collections.singletonList(processInstanceId);
+
+    VariableMap variables = Variables.putValue("foo", "bar");
+
+    Batch batch = runtimeService.setVariablesAsync(processInstances, variables);
+
+    // when
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+
+    // then
+    assertThat(variableInstance.getBatchId()).isEqualTo(batch.getId());
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryForBatchId() {
+    // given
+    VariableMap variables = Variables.putValue("foo", "bar");
+
+    String processInstanceId =
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", variables).getId();
+
+    List<String> processInstances = Collections.singletonList(processInstanceId);
+
+    Batch batch = runtimeService.setVariablesAsync(processInstances, variables);
+
+    VariableInstanceQuery variableInstanceQuery = runtimeService.createVariableInstanceQuery();
+
+    // assume
+    assertThat(variableInstanceQuery.list())
+        .extracting("name", "value", "batchId")
+        .containsExactlyInAnyOrder(
+            tuple("foo", "bar", batch.getId()),
+            tuple("foo", "bar", null)
+        );
+
+    // when
+    variableInstanceQuery = variableInstanceQuery.batchIdIn(batch.getId());
+
+    // then
+    assertThat(variableInstanceQuery.list())
+        .extracting("name", "value", "batchId")
+        .containsExactly(
+            tuple("foo", "bar", batch.getId())
+        );
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryForBatchIds() {
+    // given
+    VariableMap variables = Variables.putValue("foo", "bar");
+
+    String processInstanceId =
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", variables).getId();
+
+    List<String> processInstances = Collections.singletonList(processInstanceId);
+
+    Batch batchOne = runtimeService.setVariablesAsync(processInstances, variables);
+    Batch batchTwo = runtimeService.setVariablesAsync(processInstances, variables);
+    Batch batchThree = runtimeService.setVariablesAsync(processInstances, variables);
+
+    VariableInstanceQuery variableInstanceQuery = runtimeService.createVariableInstanceQuery();
+
+    // assume
+    assertThat(variableInstanceQuery.list())
+        .extracting("name", "value", "batchId")
+        .containsExactlyInAnyOrder(
+            tuple("foo", "bar", batchOne.getId()),
+            tuple("foo", "bar", batchTwo.getId()),
+            tuple("foo", "bar", batchThree.getId()),
+            tuple("foo", "bar", null)
+        );
+
+    // when
+    variableInstanceQuery = variableInstanceQuery.batchIdIn(
+        batchOne.getId(),
+        batchTwo.getId()
+    );
+
+    // then
+    assertThat(variableInstanceQuery.list())
+        .extracting("name", "value", "batchId")
+        .containsExactlyInAnyOrder(
+            tuple("foo", "bar", batchOne.getId()),
+            tuple("foo", "bar", batchTwo.getId())
+        );
+
+    // clear
+    managementService.deleteBatch(batchOne.getId(), true);
+    managementService.deleteBatch(batchTwo.getId(), true);
+    managementService.deleteBatch(batchThree.getId(), true);
+  }
 
 }

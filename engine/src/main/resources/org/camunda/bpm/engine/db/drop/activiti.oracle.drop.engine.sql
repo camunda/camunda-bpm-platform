@@ -137,6 +137,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop CONSTRAINT ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_FK_VAR_BATCH;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -183,6 +186,8 @@ drop index ACT_IDX_PROCDEF_VER_TAG;
 
 drop index ACT_IDX_AUTH_ROOT_PI;
 drop index ACT_IDX_AUTH_RM_TIME;
+
+drop index ACT_IDX_BATCH_ID;
 
 drop table  ACT_GE_PROPERTY;
 drop table  ACT_GE_BYTEARRAY;

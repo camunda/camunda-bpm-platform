@@ -32,9 +32,10 @@ public class VariableInstanceDto extends VariableValueDto {
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String taskId;
+  protected String batchId;
   protected String activityInstanceId;
   protected String errorMessage;
-  private String tenantId;
+  protected String tenantId;
 
   public VariableInstanceDto() { }
 
@@ -86,6 +87,14 @@ public class VariableInstanceDto extends VariableValueDto {
     this.taskId = taskId;
   }
 
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
+
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
@@ -127,6 +136,7 @@ public class VariableInstanceDto extends VariableValueDto {
     dto.caseInstanceId = variableInstance.getCaseInstanceId();
 
     dto.taskId = variableInstance.getTaskId();
+    dto.batchId = variableInstance.getBatchId();
     dto.activityInstanceId = variableInstance.getActivityInstanceId();
 
     dto.tenantId = variableInstance.getTenantId();
