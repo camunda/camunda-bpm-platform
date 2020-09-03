@@ -894,7 +894,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Subsequent changes can be done only via the
    * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
    */
-  protected boolean initializeTelemetry = false;
+  protected Boolean initializeTelemetry = null;
   /** The endpoint which telemetry is sent to */
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
   protected TelemetryReporter telemetryReporter;
@@ -4732,11 +4732,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isInitializeTelemetry() {
+  public Boolean isInitializeTelemetry() {
     return initializeTelemetry;
   }
 
-  public ProcessEngineConfigurationImpl setInitializeTelemetry(boolean telemetryInitialized) {
+  public ProcessEngineConfigurationImpl setInitializeTelemetry(Boolean telemetryInitialized) {
     this.initializeTelemetry = telemetryInitialized;
     return this;
   }

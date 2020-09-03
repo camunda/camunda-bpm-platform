@@ -132,8 +132,13 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createTelemetryProperty(CommandContext commandContext) {
-    boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
-    PropertyEntity property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
+    Boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
+    PropertyEntity property = null;
+    if (telemetryEnabled != null) {
+      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
+    } else {
+      property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, "null");
+    }
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
   }
@@ -194,7 +199,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   protected void startTelemetryReporter(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     // start telemetry reporter only if the telemetry is enabled
-    if (processEngineConfiguration.getManagementService().isTelemetryEnabled() &&
+    if (Boolean.TRUE.equals(processEngineConfiguration.getManagementService().isTelemetryEnabled()) &&
         processEngineConfiguration.getTelemetryReporter() != null &&
         processEngineConfiguration.getTelemetryReporter().getHttpConnector() != null) {
       processEngineConfiguration.getTelemetryReporter().start();
