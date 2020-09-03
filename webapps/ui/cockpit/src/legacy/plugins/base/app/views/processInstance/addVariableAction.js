@@ -34,6 +34,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           var dialog = $modal.open({
             scope: $scope,
             resolve: {
+              operation: false,
               instance: function() {
                 return $scope.processInstance;
               },
@@ -43,7 +44,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             },
             controller: addTemplate.controller,
             template: addTemplate.template,
-            appendTo: angular.element('.angular-app')
+            appendTo: angular.element(".angular-app")
           });
 
           dialog.result

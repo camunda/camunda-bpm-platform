@@ -29,6 +29,7 @@ var Controller = [
   "fixDate",
   "$translate",
   "camAPI",
+  "operation",
   function(
     $modalInstance,
     $scope,
@@ -38,9 +39,11 @@ var Controller = [
     isProcessInstance,
     fixDate,
     $translate,
-    camAPI
+    camAPI,
+    operation
   ) {
     $scope.isProcessInstance = isProcessInstance;
+    $scope.isBatchOperation = !!operation;
 
     $scope.variableTypes = [
       "String",
@@ -97,35 +100,56 @@ var Controller = [
 
       var data = angular.extend({}, newVariable);
 
-      if (data.type === "Date") {
-        data.value = fixDate(data.value);
-      }
-
-      var instanceAPI = isProcessInstance ? processInstance : caseInstance;
-      instanceAPI
-        .setVariable(instance.id, data)
-        .then(function() {
-          $scope.status = SUCCESS;
-
-          Notifications.addMessage({
-            status: $translate.instant("VARIABLE_ADD_MESSAGE_STATUS_FINISHED"),
-            message: $translate.instant("VARIABLE_ADD_MESSAGE_MESSAGE_ADD", {
-              name: data.name
-            }),
-            exclusive: true
-          });
-        })
-        .catch(function(data) {
-          $scope.status = FAIL;
-
-          Notifications.addError({
-            status: $translate.instant("VARIABLE_ADD_MESSAGE_STATUS_FINISHED"),
-            message: $translate.instant("VARIABLE_ADD_MESSAGE_MESSAGE_ERROR", {
-              message: data.message
-            }),
-            exclusive: true
-          });
+      if (operation.variables) {
+        operation.variables = operation.variables.filter(variable => {
+          return data.name !== variable.variable.name;
         });
+
+        operation.variables.push({
+          variable: data,
+          valid: true,
+          changed: false
+        });
+
+        $scope.status = SUCCESS;
+      } else {
+        if (data.type === "Date") {
+          data.value = fixDate(data.value);
+        }
+
+        var instanceAPI = isProcessInstance ? processInstance : caseInstance;
+        instanceAPI
+          .setVariable(instance.id, data)
+          .then(function() {
+            $scope.status = SUCCESS;
+
+            Notifications.addMessage({
+              status: $translate.instant(
+                "VARIABLE_ADD_MESSAGE_STATUS_FINISHED"
+              ),
+              message: $translate.instant("VARIABLE_ADD_MESSAGE_MESSAGE_ADD", {
+                name: data.name
+              }),
+              exclusive: true
+            });
+          })
+          .catch(function(data) {
+            $scope.status = FAIL;
+
+            Notifications.addError({
+              status: $translate.instant(
+                "VARIABLE_ADD_MESSAGE_STATUS_FINISHED"
+              ),
+              message: $translate.instant(
+                "VARIABLE_ADD_MESSAGE_MESSAGE_ERROR",
+                {
+                  message: data.message
+                }
+              ),
+              exclusive: true
+            });
+          });
+      }
     };
   }
 ];

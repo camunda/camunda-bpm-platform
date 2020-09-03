@@ -17,7 +17,11 @@
 
 module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->
 <div class="modal-header">
-  <h3>{{ isProcessInstance ? 'VARIABLE_ADD_MODAL_TITLE_PROCESS' : 'VARIABLE_ADD_MODAL_TITLE_CASE' | translate }}</h3>
+  <h3>
+    {{ isProcessInstance && !isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_PROCESS' : '' | translate }}
+    {{ isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_BATCH' : '' | translate }}
+    {{ !isProcessInstance && !isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_CASE' : '' | translate }}
+  </h3>
 </div>
 
 <div class="modal-body add-variable-dialog">
