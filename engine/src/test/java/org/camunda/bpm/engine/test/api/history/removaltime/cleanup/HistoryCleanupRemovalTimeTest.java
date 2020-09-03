@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.history.removaltime.cleanup;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.apache.commons.lang3.time.DateUtils.addMinutes;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
@@ -35,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
@@ -180,6 +182,7 @@ public class HistoryCleanupRemovalTimeTest {
       clearJobLog(jobId);
       clearJob(jobId);
     }
+
   }
 
   @AfterClass
@@ -203,6 +206,8 @@ public class HistoryCleanupRemovalTimeTest {
 
       engineConfiguration.setAuthorizationEnabled(false);
       engineConfiguration.setEnableHistoricInstancePermissions(false);
+
+      engineConfiguration.setHistoryCleanupJobLogTimeToLive(null);
     }
 
     ClockUtil.reset();
@@ -876,6 +881,43 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(jobLogs.size(), is(0));
+  }
+
+  @Test
+  public void shouldCleanupHistoryCleanupJobsFromHistoricJobLog() {
+    // given
+    engineConfiguration.setHistoryCleanupJobLogTimeToLive("P5D");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    runHistoryCleanup();
+    List<String> initialHistoryCleanupJobLog = historyService.createHistoricJobLogQuery().list().stream().map(HistoricJobLog::getId).collect(Collectors.toList());
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+    runHistoryCleanup();
+
+    // then
+    List<HistoricJobLog> finalJobLog = historyService.createHistoricJobLogQuery().list();
+    assertThat(finalJobLog).hasSize(1);
+    assertThat(finalJobLog).extracting("id").doesNotContainAnyElementsOf(initialHistoryCleanupJobLog);
+  }
+
+  @Test
+  public void shouldNotCleanupHistoryCleanupJobsFromHistoricJobLog() {
+    // given
+    engineConfiguration.setHistoryCleanupJobLogTimeToLive(null);
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    runHistoryCleanup();
+    List<String> initialHistoryCleanupJobLog = historyService.createHistoricJobLogQuery().list().stream().map(HistoricJobLog::getId).collect(Collectors.toList());
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+    runHistoryCleanup();
+    
+    // then
+    List<HistoricJobLog> finalJobLog = historyService.createHistoricJobLogQuery().list();
+    assertThat(finalJobLog).hasSize(3);
+    assertThat(finalJobLog).extracting("id").containsAll(initialHistoryCleanupJobLog);
   }
 
   @Test

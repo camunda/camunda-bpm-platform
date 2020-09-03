@@ -105,11 +105,11 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
     return historicProcessInstance.getEndTime() != null;
   }
 
-  protected Date determineRemovalTime(Date initTime, Integer timeToLive) {
+  public static Date determineRemovalTime(Date initTime, Integer timeToLive) {
     Calendar removalTime = Calendar.getInstance();
     removalTime.setTime(initTime);
     removalTime.add(Calendar.DATE, timeToLive);
-
+    
     return removalTime.getTime();
   }
 
