@@ -419,6 +419,25 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     taskService.deleteTask("newTask",true);
   }
 
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskInvolvedUserAsOwner() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.setOwner(taskId, "user");
+
+    // when
+    List<HistoricTaskInstance> historicTasks =
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("user").list();
+
+    // query test
+    assertThat(historicTasks).hasSize(1);
+  }
+
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -692,7 +711,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
   private HistoricTaskInstanceQuery queryValueIgnoreCase() {
     return historyService.createHistoricTaskInstanceQuery().matchVariableValuesIgnoreCase();
   }
-  
+
   private HistoricTaskInstanceQuery queryNameValueIgnoreCase() {
     return historyService.createHistoricTaskInstanceQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase();
   }

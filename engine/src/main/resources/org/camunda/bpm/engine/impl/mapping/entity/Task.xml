@@ -265,7 +265,10 @@
     </foreach>
 
     <if test="I_JOIN">
-      ${JOIN_TYPE} ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
+      <!-- Identity links are always left-joined, because the involvedUser criterion
+        either requires an identity link or a not-null assignee or owner field (i.e.
+        it can be fulfilled without an identity link) -->
+      left join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="D_JOIN">
       ${JOIN_TYPE} ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
@@ -597,7 +600,7 @@
             </if>
 
             <if test="query.involvedUser != null">
-              ${queryType} I.USER_ID_ = #{query.involvedUser}
+              ${queryType} (I.USER_ID_ = #{query.involvedUser} or RES.ASSIGNEE_ = #{query.involvedUser} or RES.OWNER_ = #{query.involvedUser})
             </if>
 
 
