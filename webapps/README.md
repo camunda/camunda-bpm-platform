@@ -34,11 +34,11 @@ See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#
 
 ## Libraries
 
-### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-sdk-js)
+### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-webapp/tree/master/camunda-bpm-sdk-js)
 
 Has tools to work with the REST API and forms (included transitively via camunda-commons-ui).
 
-### [camunda-commons-ui](https://github.com/camunda/camunda-commons-ui)
+### [camunda-commons-ui](https://github.com/camunda/camunda-bpm-webapp/tree/master/camunda-commons-ui)
 
 Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules.
 
@@ -48,6 +48,8 @@ Contains the translation files for all application texts in different languages.
 
 
 ## Development
+
+**Please note that with Camunda 7.14.0 we moved Cockpit to a separate build step. Check out the development build and prerequisites in the [Cockpit directory](https://github.com/camunda/camunda-bpm-webapp/tree/master/ui/cockpit).** 
 
 ### Prerequisite
 
@@ -78,21 +80,9 @@ mvn jetty:run -Pdevelop
 ```
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080). To login as admin user, use `jonny1` as username and password.
 
-You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
+You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:admin`
 
 If you are only changing Javascript files, you can set the environment variable `FAST_BUILD` to 1 to further improve compile times.
-
-If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects via npm:
-
-```sh
-# cd <path to your workspace>
-git clone git@github.com:camunda/camunda-commons-ui.git
-cd camunda-commons-ui
-npm install
-npm link
-cd ../camunda-bpm-webapp
-npm link camunda-commons-ui
-```
 
 #### Testing
 

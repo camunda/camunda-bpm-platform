@@ -957,6 +957,12 @@
                       <arg value="npm" />
                       <arg value="install" />
                     </exec>
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="build" />
+                      <arg value="--color=false" />
+                    </exec>
                     <exec dir="./ui/cockpit" executable="cmd" failonerror="true">
                       <arg value="/c" />
                       <arg value="npm" />
@@ -968,19 +974,13 @@
                       <arg value="run" />
                       <arg value="build" />
                     </exec>
-                    <exec dir="${frontend.react.path}" executable="npm" failonerror="true">
-                      <arg value="install" />
-                    </exec>
-                    <exec dir="${frontend.react.path}" executable="npm" failonerror="true">
-                      <arg value="run" />
-                      <arg value="buildCE" />
-                    </exec>
-                    <exec executable="node" failonerror="true">
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="node" />
                       <arg value=".\scripts\removeAndCopy.js" />
                       <arg value="${frontend.react.path}\build\" />
                       <arg value="${project.build.directory}\webapp\app\cockpit\" />
                     </exec>
-
                   </target>
                 </configuration>
               </execution>

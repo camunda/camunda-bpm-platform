@@ -40,14 +40,14 @@
   "scripts": {
     "start": "react-scripts start",
     "styles": "lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles.less public/styles/styles.css && lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles-components.less public/styles/styles-components.css",
-    "translations": "mkdir -p public/locales; cp node_modules/camunda-webapp-translations/cockpit/en.json public/locales/en.json",
+    "translations": "node scripts/translations",
     "build": "react-scripts build",
-    "buildCE": "node scripts/linkCommunity; npm run build",
-    "buildEE": "node scripts/linkEnterprise; npm run build",
+    "buildCE": "node scripts/linkCommunity && npm run build",
+    "buildEE": "node scripts/linkEnterprise && npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "postinstall": "node wireModules; node scripts/linkCommunity; npm run translations; npm run styles",
-    "prebuild": "npm run styles; node scripts/prebuild",
+    "postinstall": "node wireModules && node scripts/linkCommunity && npm run translations && npm run styles",
+    "prebuild": "npm run styles && node scripts/prebuild",
     "postbuild": "node scripts/postbuild"
   },
   "eslintConfig": {
