@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +24,14 @@ import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 
 public class TelemetryRegistry {
 
+  public static final String ROOT_PROCESS_INSTANCES = "root-process-instances";
+  public static final String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
+  public static final String FLOW_NODE_INSTANCES = "flow-node-instances";
+  public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
+
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
+  protected Date startReportTime;
 
   public synchronized ApplicationServer getApplicationServer() {
     return applicationServer;
@@ -40,6 +47,14 @@ public class TelemetryRegistry {
 
   public Map<String, CommandCounter> getCommands() {
     return commands;
+  }
+
+  public Date getStartReportTime() {
+    return startReportTime;
+  }
+
+  public void setStartReportTime(Date lastReport) {
+    this.startReportTime = lastReport;
   }
 
   public void markOccurrence(String name) {

@@ -16,27 +16,39 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
+import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.EXECUTED_DECISION_INSTANCES;
+import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.FLOW_NODE_INSTANCES;
+import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.ROOT_PROCESS_INSTANCES;
+import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
+import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -76,7 +88,7 @@ public class TelemetrySendingTask extends TimerTask {
       ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
         try {
-          resolveDataFromRegistry(processEngineConfiguration);
+          resolveData(processEngineConfiguration);
 
           String telemetryData = JsonUtil.asString(data);
           Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -95,6 +107,8 @@ public class TelemetrySendingTask extends TimerTask {
               LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
             } else {
               LOG.telemetryDataSent(telemetryData);
+              // reset report time
+              processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
             }
           }
         } catch (Exception e) {
@@ -107,7 +121,7 @@ public class TelemetrySendingTask extends TimerTask {
     });
   }
 
-  protected void resolveDataFromRegistry(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected void resolveData(ProcessEngineConfigurationImpl processEngineConfiguration) {
     Internals internals = data.getProduct().getInternals();
     ApplicationServer applicationServer = processEngineConfiguration.getTelemetryRegistry().getApplicationServer();
     if (internals.getApplicationServer() == null && applicationServer != null) {
@@ -116,6 +130,9 @@ public class TelemetrySendingTask extends TimerTask {
 
     Map<String, Command> commands = fetchAndResetCommandCounts(processEngineConfiguration);
     internals.setCommands(commands);
+
+    Map<String, Metric> metrics = calculateMetrics(processEngineConfiguration);
+    internals.setMetrics(metrics);
   }
 
   protected Map<String, Command> fetchAndResetCommandCounts(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -131,6 +148,54 @@ public class TelemetrySendingTask extends TimerTask {
     copiedCounts.forEach((k, v) -> commandsToReport.put(k, new Command(v.get())));
 
     return commandsToReport;
+  }
+
+  protected Map<String, Metric> calculateMetrics(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    Date startReportTime = telemetryRegistry.getStartReportTime();
+    Date currentTime = ClockUtil.getCurrentTime();
+    Map<String, Metric> metrics = new HashMap<>();
+
+    long sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.ROOT_PROCESS_INSTANCE_START);
+    metrics.put(ROOT_PROCESS_INSTANCES, new Metric(sum));
+
+    sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.EXECUTED_DECISION_INSTANCES);
+    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
+
+    sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.ACTIVTY_INSTANCE_START);
+    metrics.put(FLOW_NODE_INSTANCES, new Metric(sum));
+
+    sum = calculateUniqueUserCount(processEngineConfiguration, startReportTime, currentTime);
+    metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
+
+    return metrics;
+  }
+
+  protected long calculateMetricCount(ProcessEngineConfigurationImpl processEngineConfiguration,
+                                      Date startReportTime,
+                                      Date currentTime,
+                                      String metricName) {
+    return processEngineConfiguration.getManagementService().createMetricsQuery()
+        .name(metricName)
+        .startDate(startReportTime)
+        .endDate(currentTime)
+        .sum();
+  }
+
+  protected long calculateUniqueUserCount(ProcessEngineConfigurationImpl processEngineConfiguration,
+                                          Date startReportTime,
+                                          Date currentTime) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      return 0;
+    } else {
+      List<HistoricTaskInstance> historicTaskInstances = processEngineConfiguration.getHistoryService()
+          .createHistoricTaskInstanceQuery()
+          .startedAfter(startReportTime)
+          .startedBefore(currentTime)
+          .taskAssigned()
+          .list();
+      return historicTaskInstances.stream().map(HistoricTaskInstance::getAssignee).distinct().count();
+    }
   }
 
 }
