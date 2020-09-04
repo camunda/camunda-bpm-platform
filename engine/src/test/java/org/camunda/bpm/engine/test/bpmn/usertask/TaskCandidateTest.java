@@ -214,6 +214,44 @@ public class TaskCandidateTest extends PluggableProcessEngineTest {
     assertThat(tasks).hasSize(1);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testInvolvedUserQueryForAssignee() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setAssignee(task.getId(), KERMIT);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+        .taskInvolvedUser(KERMIT)
+        .list();
+
+    // then
+    assertThat(tasks).hasSize(1);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testInvolvedUserQueryForOwner() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setOwner(task.getId(), KERMIT);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+        .taskInvolvedUser(KERMIT)
+        .list();
+
+    // then
+    assertThat(tasks).hasSize(1);
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/usertask/groupTest.bpmn")
   @Test
   public void testInvolvedUserQueryOr() {

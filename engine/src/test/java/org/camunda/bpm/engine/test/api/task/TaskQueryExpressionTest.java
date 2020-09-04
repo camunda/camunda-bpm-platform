@@ -145,11 +145,11 @@ public class TaskQueryExpressionTest {
 
   @Test
   public void testQueryByInvolvedUserExpression() {
-    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 2);
+    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 3);
     assertCount(taskQuery().taskInvolvedUserExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
-    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 2);
+    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 3);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 0);
