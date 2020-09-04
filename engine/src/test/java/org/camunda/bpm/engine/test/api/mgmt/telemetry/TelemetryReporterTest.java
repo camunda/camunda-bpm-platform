@@ -190,10 +190,10 @@ public class TelemetryReporterTest {
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
     standaloneProcessEngine = processEngineConfiguration.buildProcessEngine();
-  
+
     // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
-  
+
     // then
     String requestBody = new Gson().toJson(data);
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -278,10 +278,15 @@ public class TelemetryReporterTest {
   public void shouldSendTelemetryWithRooProcessInstanceMetrics() {
     // given
     managementService.toggleTelemetry(true);
+
+    ClockUtil.setCurrentTime(addHour(new Date()));
+
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
+
+    ClockUtil.setCurrentTime(addHour(new Date()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
 
@@ -312,12 +317,18 @@ public class TelemetryReporterTest {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
+
     ClockUtil.setCurrentTime(addHour(new Date()));
+
     managementService.toggleTelemetry(true);
+
+    ClockUtil.setCurrentTime(addHour(new Date()));
+
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
+
     ClockUtil.setCurrentTime(addHour(new Date()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
@@ -405,11 +416,16 @@ public class TelemetryReporterTest {
   public void shouldSendTelemetryWithTaskWorkersMetrics() {
     // given
     managementService.toggleTelemetry(true);
+
+    ClockUtil.setCurrentTime(addHour(new Date()));
+
     for (int i = 0; i < 3; i++) {
       String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
       String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
       taskService.setAssignee(taskId, "user" + i);
     }
+
+    ClockUtil.setCurrentTime(addHour(new Date()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 3);
 
