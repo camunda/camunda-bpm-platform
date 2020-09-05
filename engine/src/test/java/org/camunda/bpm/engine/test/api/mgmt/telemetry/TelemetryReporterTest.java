@@ -279,14 +279,14 @@ public class TelemetryReporterTest {
     // given
     managementService.toggleTelemetry(true);
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
 
@@ -307,7 +307,6 @@ public class TelemetryReporterTest {
     assertThat(metrics.get(ROOT_PROCESS_INSTANCES).getCount()).isEqualTo(3);
   }
 
-
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldSendTelemetryOnceWithRooProcessInstanceMetrics() {
@@ -318,18 +317,18 @@ public class TelemetryReporterTest {
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     managementService.toggleTelemetry(true);
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
 
@@ -361,6 +360,7 @@ public class TelemetryReporterTest {
       runtimeService.startProcessInstanceByKey("testProcess");
     }
 
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 2, 2, 4, 0);
 
     String requestBody = new Gson().toJson(expectedData);
@@ -391,6 +391,7 @@ public class TelemetryReporterTest {
       taskService.complete(taskId);
     }
 
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 4, 0, 12, 0);
 
     String requestBody = new Gson().toJson(expectedData);
@@ -417,7 +418,7 @@ public class TelemetryReporterTest {
     // given
     managementService.toggleTelemetry(true);
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     for (int i = 0; i < 3; i++) {
       String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -425,7 +426,7 @@ public class TelemetryReporterTest {
       taskService.setAssignee(taskId, "user" + i);
     }
 
-    ClockUtil.setCurrentTime(addHour(new Date()));
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
     Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 3);
 
