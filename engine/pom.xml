@@ -823,6 +823,7 @@
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
                 <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
+                <exclude>**/TelemetryTaskWorkerMetricsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
