@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -73,6 +74,7 @@ public class TelemetryTaskWorkerMetricsTest {
       new ProcessEngineBootstrapRule(configuration ->
       configuration.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
                    .setJdbcUrl("jdbc:h2:mem:TelemetryTaskWorkerMetricsTest")
+                   .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
                    .setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE));
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
