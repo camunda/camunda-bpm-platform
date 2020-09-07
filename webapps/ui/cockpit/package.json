@@ -34,20 +34,19 @@
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-router-dom": "5.1.2",
-    "react-scripts": "3.4.0",
     "superagent": "5.2.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "rescripts start",
     "styles": "lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles.less public/styles/styles.css && lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles-components.less public/styles/styles-components.css",
     "translations": "node scripts/translations",
-    "build": "react-scripts build",
+    "build": "rescripts build",
     "buildCE": "node scripts/linkCommunity && npm run build",
     "buildEE": "node scripts/linkEnterprise && npm run build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "test": "rescripts test",
+    "eject": "rescripts eject",
     "postinstall": "node wireModules && node scripts/linkCommunity && npm run translations && npm run styles",
-    "prebuild": "npm run styles && node scripts/prebuild",
+    "prebuild": "npm run styles && node scripts/licenseCheck && node scripts/prebuild",
     "postbuild": "node scripts/postbuild"
   },
   "eslintConfig": {
@@ -66,15 +65,19 @@
     ]
   },
   "devDependencies": {
+    "@rescripts/cli": "0.0.14",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-camunda-licensed": "0.4.3",
     "eslint-plugin-prettier": "3.1.2",
     "http-proxy-middleware": "0.20.0",
     "husky": "3.1.0",
     "less": "3.10.3",
+    "license-checker": "25.0.1",
+    "license-webpack-plugin": "2.3.0",
     "lint-staged": "10.0.7",
     "node-sass": "4.13.1",
-    "prettier": "1.19.1"
+    "prettier": "1.19.1",
+    "react-scripts": "3.4.0"
   },
   "husky": {
     "hooks": {

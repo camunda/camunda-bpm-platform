@@ -17,55 +17,119 @@
 
 var checker = require('license-checker');
 
-const ALLOWED_LICENSES = [
-  'MIT',
-  'MIT*',
-  'ISC',
-  'BSD',
-  'BSD-3-Clause',
+const PRODUCTION_LICENSES = [
+  '0BSD',
+  'Apache 2.0',
   'Apache-2.0',
-  'Apache-2.0 WITH LLVM-exception'
+  'Apache-2.0 WITH LLVM-exception',
+  'BSD',
+  'BSD-2-Clause',
+  'BSD-3-Clause',
+  'CC0-1.0',
+  'ISC',
+  'MIT',
+  'WTFPL'
 ];
 
-module.exports = function(grunt) {
-  grunt.registerTask('license-check', function() {
-    var done = this.async();
+const DEV_LICENSES = [
+  'CC-BY-3.0',
+  'CC-BY-4.0',
+  'ODC-By-1.0',
+  'Unlicense',
+  'Zlib'
+];
 
-    checker.init(
-      {
-        start: '.',
-        production: true,
-        excludePrivatePackages: true
-      },
-      function(err, packages) {
-        if (err) {
-          throw err;
-        } else {
-          const entries = Object.entries(packages);
-          let licenseWarning = '';
+const ALLOWED_PACKAGES = [
+  'axe-core@3.5.5', // uses MPL-2.0, permitted as of https://jira.camunda.com/browse/OB-8
+  'desired-capabilities@0.1.0', // uses the CC0, but has wrong license field
+  'jsonify@0.0.0', // uses the unlicense, but has wrong license field
+  'map-stream@0.1.0', // uses the MIT, but has wrong license field
+  'stackframe@0.3.1' // uses the MIT, but has wrong license field
+];
 
-          for (const [package, info] of entries) {
-            const licenses =
-              typeof info.licenses === 'object'
-                ? info.licenses
-                : [info.licenses];
+const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
+  function(err, packages) {
+    if (err) {
+      throw err;
+    } else {
+      const entries = Object.entries(packages);
+      let licenseWarning = '';
 
-            licenses.forEach(license => {
-              if (!ALLOWED_LICENSES.includes(license)) {
-                licenseWarning += `${package} uses ${license}\n`;
-              }
-            });
-          }
+      for (const [id, info] of entries) {
+        if (ALLOWED_PACKAGES.includes(id)) {
+          continue;
+        }
 
-          if (licenseWarning) {
-            grunt.warn(
-              `These Packages use unknown licenses:\n${licenseWarning}`
-            );
+        let licenses = info.licenses;
+        let hasMultipleLicenses = false;
+
+        if (typeof licenses === 'string') {
+          licenses = licenses.replace(/\(|\)|\*/g, '');
+          if (licenses.includes('AND')) {
+            licenses = licenses.split(' AND ');
+            hasMultipleLicenses = true;
+          } else {
+            licenses = licenses.split(' OR ');
           }
         }
 
-        done();
+        licenses = typeof licenses === 'object' ? licenses : [licenses];
+
+        let approved = hasMultipleLicenses
+          ? licenses.every(license => ALLOWED_LICENSES.includes(license))
+          : licenses.some(license => ALLOWED_LICENSES.includes(license));
+
+        if (!approved) {
+          licenseWarning += `${id} uses ${licenses.join(' OR ')}\n`;
+        }
       }
-    );
+
+      if (licenseWarning) {
+        reject(licenseWarning);
+      } else {
+        resolve();
+      }
+    }
+  };
+
+module.exports = function(grunt) {
+  grunt.registerTask('license-check', function() {
+    const done = this.async();
+
+    const licenseChecks = [
+      new Promise((resolve, reject) => {
+        checker.init(
+          {
+            start: '.',
+            production: true,
+            excludePrivatePackages: true
+          },
+          parseResults(PRODUCTION_LICENSES, resolve, reject)
+        );
+      }),
+      new Promise((resolve, reject) => {
+        checker.init(
+          {
+            start: '.',
+            development: true,
+            excludePrivatePackages: true
+          },
+          parseResults(
+            [...PRODUCTION_LICENSES, ...DEV_LICENSES],
+            resolve,
+            reject
+          )
+        );
+      })
+    ];
+
+    Promise.all(licenseChecks)
+      .then(() => {
+        done();
+      })
+      .catch(err => {
+        console.error(err);
+        done(false);
+      });
   });
 };
