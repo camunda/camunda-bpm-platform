@@ -17,21 +17,12 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.exception.NotAllowedException;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -83,12 +74,6 @@ public class StandaloneTasksDisabledTest {
   }
 
   @Test
-  public void missingTests() {
-    fail("standaloneTasksEnabled default value is true");
-    fail("adapt testTaskQueryAuthorization");
-  }
-
-  @Test
   public void shouldNotCreateStandaloneTask() {
     // given
     Task task = taskService.newTask();
@@ -135,46 +120,5 @@ public class StandaloneTasksDisabledTest {
     // then
     Task updatedTask = taskService.createTaskQuery().singleResult();
     assertThat(updatedTask.getAssignee()).isEqualTo("newAssignee");
-  }
-
-  @Test
-  public void testTaskQueryAuthorization() {
-    // given
-    engineTestRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
-    engineTestRule.deploy("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml");
-
-    // a process instance task with read authorization
-    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task processInstanceTask = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
-
-    Authorization processInstanceAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    processInstanceAuthorization.setResource(Resources.PROCESS_DEFINITION);
-    processInstanceAuthorization.setResourceId("oneTaskProcess");
-    processInstanceAuthorization.addPermission(ProcessDefinitionPermissions.READ_TASK);
-    processInstanceAuthorization.setUserId("user");
-    authorizationService.saveAuthorization(processInstanceAuthorization);
-
-    // a standalone task with read authorization
-    Task standaloneTask = taskService.newTask();
-    taskService.saveTask(standaloneTask);
-
-    Authorization standaloneTaskAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    standaloneTaskAuthorization.setResource(Resources.TASK);
-    standaloneTaskAuthorization.setResourceId(standaloneTask.getId());
-    standaloneTaskAuthorization.addPermission(TaskPermissions.READ);
-    standaloneTaskAuthorization.setUserId("user");
-    authorizationService.saveAuthorization(standaloneTaskAuthorization);
-
-    // a third task for which we have no authorization
-    runtimeService.startProcessInstanceByKey("twoTasksProcess");
-
-    identityService.setAuthenticatedUserId("user");
-    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
-
-    // when
-    List<Task> tasks = taskService.createTaskQuery().list();
-
-    // then
-    assertThat(tasks).extracting("id").containsExactlyInAnyOrder(standaloneTask.getId(), processInstanceTask.getId());
   }
 }
