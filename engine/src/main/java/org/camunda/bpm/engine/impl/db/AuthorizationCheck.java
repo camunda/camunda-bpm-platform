@@ -43,7 +43,7 @@ public class AuthorizationCheck implements Serializable {
    * If true authorization check is performed.
    */
   protected boolean shouldPerformAuthorizatioCheck = false;
-  
+
   /**
    * Indicates if the revoke authorization checks are enabled or not.
    * The authorization checks without checking revoke permissions are much more faster.
@@ -64,6 +64,8 @@ public class AuthorizationCheck implements Serializable {
 
   protected boolean historicInstancePermissionsEnabled = false;
 
+  protected boolean useLeftJoin = true;
+
   public AuthorizationCheck() {
   }
 
@@ -71,9 +73,9 @@ public class AuthorizationCheck implements Serializable {
     this.authUserId = authUserId;
     this.authGroupIds = authGroupIds;
     this.permissionChecks = permissionCheck;
-    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;
   }
-  
+
   // getters / setters /////////////////////////////////////////
 
   public boolean isAuthorizationCheckEnabled() {
@@ -146,7 +148,7 @@ public class AuthorizationCheck implements Serializable {
   public void setPermissionChecks(CompositePermissionCheck permissionChecks) {
     this.permissionChecks = permissionChecks;
   }
-  
+
   public boolean isRevokeAuthorizationCheckEnabled() {
     return isRevokeAuthorizationCheckEnabled;
   }
@@ -166,4 +168,11 @@ public class AuthorizationCheck implements Serializable {
     return historicInstancePermissionsEnabled;
   }
 
+  public boolean isUseLeftJoin() {
+    return useLeftJoin;
+  }
+
+  public void setUseLeftJoin(boolean useLeftJoin) {
+    this.useLeftJoin = useLeftJoin;
+  }
 }

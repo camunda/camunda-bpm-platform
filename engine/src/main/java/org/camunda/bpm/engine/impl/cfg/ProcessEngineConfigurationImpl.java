@@ -366,10 +366,14 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -562,7 +566,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
 
+  /**
+   * When set to false, the following behavior changes:
+   * <ul>
+   * <li>The automated schema maintenance (creating and dropping tables, see property <code>databaseSchemaUpdate</code>)
+   *   does not cover the tables required for CMMN execution.</li>
+   * <li>CMMN resources are not deployed as {@link CaseDefinition} to the engine.</li>
+   * <li>Tasks from CMMN cases are not returned by the {@link TaskQuery}.</li>
+   * </ul>
+   */
   protected boolean cmmnEnabled = true;
+
+    /**
+   * When set to false, the following behavior changes:
+   * <ul>
+   * <li>The automated schema maintenance (creating and dropping tables, see property <code>databaseSchemaUpdate</code>)
+   *   does not cover the tables required for DMN execution.</li>
+   * <li>DMN resources are not deployed as {@link DecisionDefinition} or
+   *   {@link DecisionRequirementsDefinition} to the engine.</li>
+   * </ul>
+   */
   protected boolean dmnEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;

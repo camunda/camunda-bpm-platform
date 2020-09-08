@@ -414,6 +414,7 @@
   <sql id="selectActivityStatisticsSql">
     <bind name="authUserId" value="authCheck.authUserId" />
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
     <bind name="disjunctive" value="#{true}" />
     <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
 
@@ -458,6 +459,7 @@
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
     <bind name="authUserId" value="authCheck.authUserId" />
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
     <bind name="disjunctive" value="#{true}" />
     <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
 
