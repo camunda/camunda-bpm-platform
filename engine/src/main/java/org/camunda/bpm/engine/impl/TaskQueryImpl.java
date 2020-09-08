@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -2278,6 +2279,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     ensureNotNull("Task nameNotLike", nameNotLike);
     this.nameNotLike = nameNotLike;
     return this;
+  }
+
+  /**
+   * @return true if the query is not supposed to find CMMN or standalone tasks
+   */
+  public boolean isQueryForProcessTasksOnly() {
+    ProcessEngineConfigurationImpl engineConfiguration = Context.getProcessEngineConfiguration();
+
+    return !engineConfiguration.isCmmnEnabled() && !engineConfiguration.isStandaloneTasksEnabled();
   }
 
   @Override
