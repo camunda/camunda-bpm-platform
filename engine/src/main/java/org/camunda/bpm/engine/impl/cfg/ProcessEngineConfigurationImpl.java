@@ -4736,7 +4736,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return initializeTelemetry;
   }
 
-  public ProcessEngineConfigurationImpl setInitializeTelemetry(Boolean telemetryInitialized) {
+  public ProcessEngineConfigurationImpl setInitializeTelemetry(boolean telemetryInitialized) {
     this.initializeTelemetry = telemetryInitialized;
     return this;
   }
