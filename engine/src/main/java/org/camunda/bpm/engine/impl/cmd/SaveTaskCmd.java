@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.TaskState;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 
@@ -46,6 +48,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
 	public Void execute(CommandContext commandContext) {
     ensureNotNull("task", task);
+    validateStandaloneTask(task, commandContext);
 
     String operation;
     if (task.getRevision() == 0) {
@@ -77,6 +80,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
     return null;
   }
+
+	protected void validateStandaloneTask(TaskEntity task, CommandContext commandContext) {
+	  boolean standaloneTasksEnabled = commandContext.getProcessEngineConfiguration().isStandaloneTasksEnabled();
+	  if (!standaloneTasksEnabled && task.isStandaloneTask()) {
+      throw new NotAllowedException("Cannot save standalone task. They are disabled in the process engine configuration.");
+	  }
+	}
 
   protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {

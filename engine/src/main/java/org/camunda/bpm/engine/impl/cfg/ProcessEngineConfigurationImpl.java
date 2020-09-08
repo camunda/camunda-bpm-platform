@@ -587,6 +587,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * </ul>
    */
   protected boolean dmnEnabled = true;
+  /**
+   * When set to <code>false</code>, the following behavior changes:
+   * <ul>
+   *   <li>Standalone tasks can no longer be created via API.</li>
+   *   <li>Standalone tasks are not returned by the TaskQuery.</li>
+   * </ul>
+   */
+  protected boolean standaloneTasksEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
 
@@ -3936,6 +3944,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setDmnEnabled(boolean dmnEnabled) {
     this.dmnEnabled = dmnEnabled;
+  }
+
+  public boolean isStandaloneTasksEnabled() {
+    return standaloneTasksEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setStandaloneTasksEnabled(boolean standaloneTasksEnabled) {
+    this.standaloneTasksEnabled = standaloneTasksEnabled;
+    return this;
   }
 
   public ScriptFactory getScriptFactory() {

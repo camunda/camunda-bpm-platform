@@ -1380,6 +1380,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return processInstanceId;
   }
 
+  public boolean isStandaloneTask() {
+    return executionId == null && caseExecutionId == null;
+  }
+
   public ProcessDefinitionEntity getProcessDefinition() {
     if (processDefinitionId != null) {
       return Context
