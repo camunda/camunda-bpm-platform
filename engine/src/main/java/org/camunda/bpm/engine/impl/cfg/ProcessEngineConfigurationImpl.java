@@ -587,6 +587,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * </ul>
    */
   protected boolean dmnEnabled = true;
+  protected boolean standaloneTasksEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
 
@@ -3936,6 +3937,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setDmnEnabled(boolean dmnEnabled) {
     this.dmnEnabled = dmnEnabled;
+  }
+
+  public boolean isStandaloneTasksEnabled() {
+    return standaloneTasksEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setStandaloneTasksEnabled(boolean standaloneTasksEnabled) {
+    this.standaloneTasksEnabled = standaloneTasksEnabled;
+    return this;
   }
 
   public ScriptFactory getScriptFactory() {
