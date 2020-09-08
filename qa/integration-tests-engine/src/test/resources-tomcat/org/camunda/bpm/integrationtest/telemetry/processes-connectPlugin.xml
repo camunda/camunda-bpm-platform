@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="engine-connect-1">
+    <job-acquisition>default</job-acquisition>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
+    <datasource>java:comp/env/ProcessEngineDataSource</datasource>
+    <properties>
+      <property name="history">full</property>
+      <property name="telemetryEndpoint">http://localhost:18090/pings</property>
+      <property name="initializeTelemetry">true</property>
+    </properties>
+    <plugins>
+      <plugin>
+        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
+  </process-engine>
+  <process-archive name="paConnectPlugin">
+    <process-engine>engine-connect-1</process-engine>
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+    </properties>
+  </process-archive>
+
+</process-application>
