@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -123,4 +127,84 @@ public class StandaloneTasksAndCmmnDisabledTest {
     // then
     assertThat(tasks).extracting("id").containsExactlyInAnyOrder(instance1Task.getId(), instance2Task.getId());
   }
+
+  /**
+   * CAM-12410 implements a single join for the process definition query filters
+   * and the authorization check. This test assures that the query works when
+   * both are used.
+   */
+  @Test
+  public void testTaskQueryAuthorizationWithProcessDefinitionFilter() {
+    // given
+    engineTestRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
+    engineTestRule.deploy("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml");
+
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task instance1Task = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+
+    Authorization oneTaskAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    oneTaskAuthorization.setResource(Resources.PROCESS_DEFINITION);
+    oneTaskAuthorization.setResourceId("oneTaskProcess");
+    oneTaskAuthorization.addPermission(ProcessDefinitionPermissions.READ_TASK);
+    oneTaskAuthorization.setUserId("user");
+    authorizationService.saveAuthorization(oneTaskAuthorization);
+
+    runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+    identityService.setAuthenticatedUserId("user");
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").list();
+
+    // then
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getId()).isEqualTo(instance1Task.getId());
+  }
+
+  @Test
+  public void testTaskQueryAuthorizationWithProcessDefinitionFilterInOrQuery() {
+    // given
+    engineTestRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
+    engineTestRule.deploy("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml");
+
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task instance1Task = taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult();
+
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+    Task instance2Task = taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult();
+    runtimeService.setVariable(instance2.getId(), "markerVar", "markerValue");
+
+    ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+    taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult();
+
+    Authorization oneTaskAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    oneTaskAuthorization.setResource(Resources.PROCESS_DEFINITION);
+    oneTaskAuthorization.setResourceId("oneTaskProcess");
+    oneTaskAuthorization.addPermission(ProcessDefinitionPermissions.READ_TASK);
+    oneTaskAuthorization.setUserId("user");
+    authorizationService.saveAuthorization(oneTaskAuthorization);
+
+    Authorization twoTasksAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    twoTasksAuthorization.setResource(Resources.PROCESS_DEFINITION);
+    twoTasksAuthorization.setResourceId("twoTasksProcess");
+    twoTasksAuthorization.addPermission(ProcessDefinitionPermissions.READ_TASK);
+    twoTasksAuthorization.setUserId("user");
+    authorizationService.saveAuthorization(twoTasksAuthorization);
+
+    identityService.setAuthenticatedUserId("user");
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+        .or()
+          .processDefinitionKey("oneTaskProcess")
+          .processVariableValueEquals("markerVar", "markerValue")
+        .endOr()
+        .list();
+
+    // then
+    assertThat(tasks).extracting("id").containsExactlyInAnyOrder(instance1Task.getId(), instance2Task.getId());
+  }
+
 }

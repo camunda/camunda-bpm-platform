@@ -245,8 +245,14 @@
       <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
         <bind name="I_JOIN" value="true" />
       </if>
-      <if test="query != null &amp;&amp; (query.processDefinitionKey != null || query.processDefinitionName != null || query.processDefinitionNameLike != null ||
-              (query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0))">
+      <!-- the process definition table is joined if
+      1. a process-definition-related filter is used
+      2. authorization check is enabled (as permissions are defined per process definition) -->
+      <if test="query != null &amp;&amp; 
+        (query.processDefinitionKey != null || query.processDefinitionName != null || 
+        query.processDefinitionNameLike != null ||              
+        (query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0)) ||
+        authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <bind name="D_JOIN" value="true" />
       </if>
       <if test="query != null &amp;&amp; (query.processInstanceBusinessKey != null || query.processInstanceBusinessKeyLike != null ||
@@ -271,7 +277,20 @@
       left join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="D_JOIN">
-      ${JOIN_TYPE} ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+      <choose>
+        <!-- if we do not query for cmmn or standalone tasks, then an inner join is
+          always correct, regardless if it is an 'and' or 'or' query. Every task
+          references a process definition then. -->
+        <when test="queryForProcessTasksOnly">inner join</when>
+        <!-- If authorizations are enabled and we query for case tasks, it must always be a left join -->
+        <when test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+          left join
+        </when>
+        <otherwise>
+          ${JOIN_TYPE}
+        </otherwise>
+      </choose>
+      ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
     <if test="E_JOIN">
       ${JOIN_TYPE} ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
@@ -287,15 +306,9 @@
     </if>
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-      <choose>
-        <when test="queryForProcessTasksOnly">inner join</when>
-        <otherwise>left join</otherwise>
-      </choose>
-      ${prefix}ACT_RE_PROCDEF PROCDEF
-      on RES.PROC_DEF_ID_ = PROCDEF.ID_           
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, D.KEY_, '*'))      
       </if>
     </if>
     

@@ -603,7 +603,7 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
               .atomicCheck(TASK, "RES.ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK)
+              .atomicCheck(PROCESS_DEFINITION, "D.KEY_", READ_TASK)
               .build();
         addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
