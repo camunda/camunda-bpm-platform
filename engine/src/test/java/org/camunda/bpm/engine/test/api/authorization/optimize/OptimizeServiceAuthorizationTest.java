@@ -328,14 +328,11 @@ public class OptimizeServiceAuthorizationTest {
       .variables(Variables.createVariables().putValue("input1", "a")).evaluate();
 
     // create completed incident data
-    final ProcessInstance failingProcessInstance = runtimeService.startProcessInstanceByKey(FAILING_PROCESS);
-    testRule.executeAvailableJobs();
-    runtimeService.setVariable(failingProcessInstance.getId(), "fail", false);
-    String jobId = managementService.createJobQuery().singleResult().getId();
-    managementService.setJobRetries(jobId, 1);
-    // create open incident
     runtimeService.startProcessInstanceByKey(FAILING_PROCESS);
-    testRule.executeAvailableJobs();
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.setJobRetries(jobId, 0); // creates incident
+    managementService.setJobRetries(jobId, 1); // resolves incident
+    managementService.setJobRetries(jobId, 0); // creates second incident
 
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
   }

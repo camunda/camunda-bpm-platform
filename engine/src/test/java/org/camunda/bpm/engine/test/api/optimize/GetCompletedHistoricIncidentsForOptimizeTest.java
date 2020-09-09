@@ -16,14 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.optimize;
 
-import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
@@ -71,9 +66,7 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testHelper);
 
   private OptimizeService optimizeService;
-  private IdentityService identityService;
   private RuntimeService runtimeService;
-  private AuthorizationService authorizationService;
   private ManagementService managementService;
 
   @Before
@@ -81,23 +74,12 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
     ProcessEngineConfigurationImpl config =
       engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
-    identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
-    authorizationService = engineRule.getAuthorizationService();
     managementService = engineRule.getManagementService();
   }
 
   @After
   public void cleanUp() {
-    for (User user : identityService.createUserQuery().list()) {
-      identityService.deleteUser(user.getId());
-    }
-    for (Group group : identityService.createGroupQuery().list()) {
-      identityService.deleteGroup(group.getId());
-    }
-    for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
-      authorizationService.deleteAuthorization(authorization.getId());
-    }
     ClockUtil.reset();
   }
 
@@ -107,6 +89,7 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
     testHelper.deploy(FAILING_SERVICE_TASK_MODEL);
     final ProcessInstance processInstance = startProcessInstanceAndFailWithIncident();
     retryAndSucceed(processInstance);
+    startProcessInstanceAndFailWithIncident();
 
     // when
     List<HistoricIncidentEntity> completedIncidents =
@@ -136,6 +119,7 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
 
     // then
     assertThat(completedIncidents.size(), is(1));
+    assertThat(completedIncidents.get(0).getProcessInstanceId(), is(processInstance2.getId()));
   }
 
   @Test
@@ -207,10 +191,12 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
     ClockUtil.setCurrentTime(nowPlus1Second);
     ProcessInstance processInstance1 = startProcessInstanceAndFailWithIncident();
     retryAndSucceed(processInstance1);
+
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     final ProcessInstance processInstance2 = startProcessInstanceAndFailWithIncident();
     retryAndSucceed(processInstance2);
+
     Date nowPlus4Seconds = new Date(nowPlus2Seconds.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus4Seconds);
     final ProcessInstance processInstance3 = startProcessInstanceAndFailWithIncident();
@@ -227,30 +213,8 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
     assertThat(completedIncidents.get(2).getProcessInstanceId(), is(processInstance3.getId()));
   }
 
-  @Test
-  public void fetchOnlyCompletedIncidents() {
-    // given
-    testHelper.deploy(FAILING_SERVICE_TASK_MODEL);
-    final ProcessInstance processInstance = startProcessInstanceAndFailWithIncident();
-    retryAndSucceed(processInstance);
-    startProcessInstanceAndFailWithIncident();
-
-    // when
-    List<HistoricIncidentEntity> completedIncidents =
-      optimizeService.getCompletedHistoricIncidents(pastDate(), null, 10);
-
-    // then
-    assertThat(completedIncidents.size(), is(1));
-    assertThat(completedIncidents.get(0).getProcessInstanceId(), is(processInstance.getId()));
-  }
-
   private Date pastDate() {
     return new Date(2L);
-  }
-
-  protected void createUser(String userId) {
-    User user = identityService.newUser(userId);
-    identityService.saveUser(user);
   }
 
   private void assertThatInstanceHasAllImportantInformation(HistoricIncidentEntity historicIncidentEntity) {
@@ -265,13 +229,14 @@ public class GetCompletedHistoricIncidentsForOptimizeTest {
 
   private void retryAndSucceed(final ProcessInstance processInstance) {
     runtimeService.setVariable(processInstance.getId(), "fail", false);
-    String jobId = managementService.createJobQuery().singleResult().getId();
+    String jobId = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId();
     managementService.setJobRetries(jobId, 1);
   }
 
   private ProcessInstance startProcessInstanceAndFailWithIncident() {
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
-    testHelper.executeAvailableJobs();
+    String jobId = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    managementService.setJobRetries(jobId, 0); // creates incident
     return processInstance;
   }
 

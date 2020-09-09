@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 
 public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestServiceTest {
 
-  public static final String OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH =
+  private static final String OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH =
     TEST_RESOURCE_ROOT_PATH + "/optimize/incident/open";
 
   protected OptimizeService mockedOptimizeService;
@@ -71,7 +71,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
     .when()
-      .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+      .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     verify(mockedOptimizeService).getOpenHistoricIncidents(null, null, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
@@ -87,7 +87,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
     .when()
-      .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+      .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     verify(mockedOptimizeService).getOpenHistoricIncidents(now, null, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
@@ -103,7 +103,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
     .when()
-      .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+      .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     verify(mockedOptimizeService).getOpenHistoricIncidents(null, now, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
@@ -118,7 +118,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
     .when()
-      .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+      .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     verify(mockedOptimizeService).getOpenHistoricIncidents(null, null, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
@@ -136,7 +136,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
     .when()
-      .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+      .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     verify(mockedOptimizeService).getOpenHistoricIncidents(now, now, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
@@ -155,7 +155,7 @@ public class OptimizeOpenHistoricIncidentRestServiceTest extends AbstractRestSer
           .statusCode(Status.OK.getStatusCode())
           .contentType(MediaType.APPLICATION_JSON)
       .when()
-        .get(OPTIMIZE_COMPLETED_HISTORIC_INCIDENT_PATH);
+        .get(OPTIMIZE_OPEN_HISTORIC_INCIDENT_PATH);
 
     String content = response.asString();
     String processInstanceId = from(content).getString("[0].processInstanceId");
