@@ -638,7 +638,7 @@
 
   <select id="selectUniqueTaskWorkerCount" parameterType="java.util.Map" resultType="long">
     ${countDistinctBeforeStart} RES.ASSIGNEE_ ${countDistinctBeforeEnd}
-    from ACT_HI_TASKINST RES
+    from ${prefix}ACT_HI_TASKINST RES
     where RES.START_TIME_ 
     between #{startTime, jdbcType=TIMESTAMP} and #{endTime, jdbcType=TIMESTAMP}
     and RES.ASSIGNEE_ is not null
