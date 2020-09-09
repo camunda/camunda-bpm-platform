@@ -16,8 +16,11 @@
  */
 package org.camunda.bpm.container.impl.jboss.config;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 
 /**
  *
@@ -36,6 +39,13 @@ public class ManagedJtaProcessEngineConfiguration extends JtaProcessEngineConfig
     if (idGenerator == null) {
       idGenerator = new StrongUuidGenerator();
     }
+  }
+
+  @Override
+  protected void initTelemetryData() {
+    super.initTelemetryData();
+    Map<String, Object> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    camundaIntegration.put(CamundaIntegration.WILDFLY_SUBSYSTEM, true);
   }
 
 }
