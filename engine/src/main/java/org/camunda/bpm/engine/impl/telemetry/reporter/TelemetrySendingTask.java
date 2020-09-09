@@ -25,18 +25,18 @@ import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_S
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 
 import java.net.HttpURLConnection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
@@ -88,7 +88,7 @@ public class TelemetrySendingTask extends TimerTask {
       ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
         try {
-          resolveData(processEngineConfiguration);
+          resolveData(commandContext);
 
           String telemetryData = JsonUtil.asString(data);
           Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -121,7 +121,8 @@ public class TelemetrySendingTask extends TimerTask {
     });
   }
 
-  protected void resolveData(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected void resolveData(CommandContext commandContext) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     Internals internals = data.getProduct().getInternals();
     ApplicationServer applicationServer = processEngineConfiguration.getTelemetryRegistry().getApplicationServer();
     if (internals.getApplicationServer() == null && applicationServer != null) {
@@ -131,7 +132,7 @@ public class TelemetrySendingTask extends TimerTask {
     Map<String, Command> commands = fetchAndResetCommandCounts(processEngineConfiguration);
     internals.setCommands(commands);
 
-    Map<String, Metric> metrics = calculateMetrics(processEngineConfiguration);
+    Map<String, Metric> metrics = calculateMetrics(commandContext);
     internals.setMetrics(metrics);
   }
 
@@ -150,7 +151,8 @@ public class TelemetrySendingTask extends TimerTask {
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected Map<String, Metric> calculateMetrics(CommandContext commandContext) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
     Date startReportTime = telemetryRegistry.getStartReportTime();
     Date currentTime = ClockUtil.getCurrentTime();
@@ -165,7 +167,7 @@ public class TelemetrySendingTask extends TimerTask {
     sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.ACTIVTY_INSTANCE_START);
     metrics.put(FLOW_NODE_INSTANCES, new Metric(sum));
 
-    sum = calculateUniqueUserCount(processEngineConfiguration, startReportTime, currentTime);
+    sum = calculateUniqueUserCount(commandContext, startReportTime, currentTime);
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
 
     return metrics;
@@ -182,20 +184,25 @@ public class TelemetrySendingTask extends TimerTask {
         .sum();
   }
 
-  protected long calculateUniqueUserCount(ProcessEngineConfigurationImpl processEngineConfiguration,
+  protected long calculateUniqueUserCount(CommandContext commandContext,
                                           Date startReportTime,
                                           Date currentTime) {
-    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (commandContext.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       return 0;
     } else {
-      List<HistoricTaskInstance> historicTaskInstances = processEngineConfiguration.getHistoryService()
-          .createHistoricTaskInstanceQuery()
-          .startedAfter(startReportTime)
-          .startedBefore(currentTime)
-          .taskAssigned()
-          .list();
-      return historicTaskInstances.stream().map(HistoricTaskInstance::getAssignee).distinct().count();
+      Date previousDay = previousDay(currentTime);
+      long workerCount = commandContext.getHistoricTaskInstanceManager()
+          .findUniqueTaskWorkerCount(previousDay, currentTime);
+      return workerCount;
     }
+  }
+
+  protected Date previousDay(Date date) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.DAY_OF_YEAR, -1);
+    Date result = calendar.getTime();
+    return result;
   }
 
 }

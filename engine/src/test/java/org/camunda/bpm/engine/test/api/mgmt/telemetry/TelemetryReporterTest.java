@@ -29,8 +29,6 @@ import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.EXECUTED_D
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.FLOW_NODE_INSTANCES;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.ROOT_PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
-import static org.junit.Assert.fail;
-
 import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.Collection;
@@ -47,7 +45,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
@@ -250,13 +247,7 @@ public class TelemetryReporterTest {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody))
         .withHeader("Content-Type",  equalTo("application/json")));
-    if (configuration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
-      assertThat(configuration.getTelemetryRegistry().getCommands().size()).isEqualTo(3);
-    } else if (configuration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_NONE.getId()) {
-      assertThat(configuration.getTelemetryRegistry().getCommands().size()).isEqualTo(2);
-    } else {
-      fail("Unexpected history level.");
-    }
+    assertThat(configuration.getTelemetryRegistry().getCommands().size()).isEqualTo(2);
   }
 
   @Test
@@ -596,7 +587,6 @@ public class TelemetryReporterTest {
 
     return result;
   }
-
 
   protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {
     Map<String, Metric> metrics = new HashMap<>();
