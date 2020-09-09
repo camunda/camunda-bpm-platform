@@ -21,7 +21,6 @@ public class Command {
   protected long count;
 
   public Command(long count) {
-    super();
     this.count = count;
   }
 

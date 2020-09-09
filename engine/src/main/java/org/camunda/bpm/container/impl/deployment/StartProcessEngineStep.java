@@ -112,6 +112,8 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
       configurationImpl.setJobExecutor(jobExecutor);
     }
 
+    additionalConfiguration(configuration);
+
     // start the process engine inside the container.
     JmxManagedProcessEngine managedProcessEngineService = createProcessEngineControllerInstance(configuration);
     serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
@@ -181,7 +183,11 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
   /**
    * Add additional plugins that are not declared in the process engine xml.
    */
-  public void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
+  protected void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
+    // do nothing
+  }
+
+  protected void additionalConfiguration(ProcessEngineConfigurationImpl configuration) {
     // do nothing
   }
 
