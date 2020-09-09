@@ -17,12 +17,15 @@
 package org.camunda.bpm.container.impl.ejb.deployment;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.container.impl.deployment.StartProcessEngineStep;
 import org.camunda.bpm.container.impl.ejb.plugin.EjbConnectProcessEnginePlugin;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 
 /**
  * Adds an additional plugin to load the connectors in case they are not loaded so far,
@@ -37,7 +40,7 @@ public class EjbStartProcessEngineStep extends StartProcessEngineStep {
   }
 
   @Override
-  public void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
+  protected void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
     boolean isConnectPluginAdded = false;
     List<ProcessEnginePlugin> processEnginePlugins = configuration.getProcessEnginePlugins();
     for (ProcessEnginePlugin processEnginePlugin : processEnginePlugins) {
@@ -51,5 +54,11 @@ public class EjbStartProcessEngineStep extends StartProcessEngineStep {
       // the plugin will initialize the connectors with the current class loader
       processEnginePlugins.add(new EjbConnectProcessEnginePlugin());
     }
+  }
+
+  protected void additionalConfiguration(ProcessEngineConfigurationImpl configuration) {
+    Data telemetryData = configuration.getTelemetryData();
+    Map<String, Object> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    camundaIntegration.put(CamundaIntegration.CAMUNDA_EJB_SERVICE, true);
   }
 }

@@ -18,20 +18,22 @@ package org.camunda.bpm.run;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngineConfiguration {
 
-  
+
   @Inject
   private Environment env;
-  
+
   public CamundaBpmRunProcessEngineConfiguration() {
     setDeployChangedOnly(true);
   }
@@ -51,5 +53,12 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
     } catch (IOException e) {
       throw new ProcessEngineException("Failed to locate resource " + resource.getFilename(), e);
     }
+  }
+
+  @Override
+  protected void initTelemetryData() {
+    super.initTelemetryData();
+    Map<String, Object> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    camundaIntegration.put(CamundaIntegration.CAMUNDA_BPM_RUN, true);
   }
 }
