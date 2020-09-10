@@ -39,12 +39,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -104,6 +107,7 @@ public class TelemetryReporterTest {
   protected ManagementService managementService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected IdentityService identityService;
 
   @Before
   public void init() {
@@ -111,6 +115,7 @@ public class TelemetryReporterTest {
     managementService = configuration.getManagementService();
     runtimeService = configuration.getRuntimeService();
     taskService = configuration.getTaskService();
+    identityService = configuration.getIdentityService();
 
     DefaultDmnEngineConfiguration dmnEngineConfiguration = configuration
         .getDmnEngineConfiguration();
@@ -126,6 +131,7 @@ public class TelemetryReporterTest {
 
   @After
   public void tearDown() {
+    identityService.clearAuthentication();
     ClockUtil.resetClock();
     managementService.toggleTelemetry(false);
 
@@ -523,6 +529,24 @@ public class TelemetryReporterTest {
     assertThat(loggingRule.getFilteredLog("'java.lang.NullPointerException' exception occurred while sending telemetry data").size()).isOne();
   }
 
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldRecordUserOperationLog() {
+    // given
+    configuration.getIdentityService().setAuthenticatedUserId("admin");
+
+    // when
+    managementService.toggleTelemetry(true);
+
+    // then
+    UserOperationLogEntry entry = configuration.getHistoryService().createUserOperationLogQuery().singleResult();
+    assertThat(entry.getEntityType()).isEqualTo(EntityTypes.PROPERTY);
+    assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_ADMIN);
+    assertThat(entry.getOperationType()).isEqualTo( UserOperationLogEntry.OPERATION_TYPE_UPDATE);
+    assertThat(entry.getProperty()).isEqualTo("name");
+    assertThat(entry.getOrgValue()).isNull();
+    assertThat(entry.getNewValue()).isEqualTo("camunda.telemetry.enabled");
+  }
 
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");

@@ -44,13 +44,10 @@ public class TelemetryConfigureCmd implements Command<Void> {
     authorizationManager.checkCamundaAdmin();
 
     PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY);
-    if (telemetryProperty != null) {
-      telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
-    } else {
+    if (telemetryProperty == null) {
       LOG.databaseTelemetryPropertyMissingInfo(telemetryEnabled);
-      telemetryProperty = new PropertyEntity(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled));
-      commandContext.getPropertyManager().insert(telemetryProperty);
     }
+    new SetPropertyCmd(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled)).execute(commandContext);
 
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
