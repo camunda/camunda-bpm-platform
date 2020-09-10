@@ -17,8 +17,7 @@
 
 var angular = require("../../../camunda-bpm-sdk-js/vendor/angular"),
   uriFilter = require("./uriFilter"),
-  uriProvider = require("./uriProvider"),
-  notifications = require("./notifications");
+  uriProvider = require("./uriProvider");
 
 /**
  * @module cam.commons.util
@@ -31,5 +30,4 @@ var angular = require("../../../camunda-bpm-sdk-js/vendor/angular"),
 module.exports = angular
   .module("cam.commons.util", [])
   .filter("uri", uriFilter)
-  .provider("Uri", uriProvider)
-  .service("Notifications", notifications);
+  .provider("Uri", uriProvider);

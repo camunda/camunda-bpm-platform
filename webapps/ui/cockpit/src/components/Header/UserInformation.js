@@ -26,6 +26,7 @@ import { Dropdown } from "components";
 
 import "./UserInformation.scss";
 import SmallScreenSwitch from "./SmallScreenSwitch";
+import { addMessage } from "utils/notifications";
 
 function UserInformation({ user, history }) {
   const profile = user.profile;
@@ -33,6 +34,37 @@ function UserInformation({ user, history }) {
   function logout() {
     post("%ADMIN_API%/auth/user/%ENGINE%/logout").then(() => {
       history.push("/login");
+      var getDayContext = function() {
+        var now = new Date();
+        if (now.getDay() >= 5) {
+          return "AUTH_DAY_CONTEXT_WEEKEND";
+        } else {
+          var hour = now.getHours();
+          switch (true) {
+            case hour >= 4 && hour < 7:
+              return "AUTH_DAY_CONTEXT_MORNING";
+            case hour >= 7 && hour < 12:
+              return "AUTH_DAY_CONTEXT_DAY";
+            case hour >= 12 && hour < 17:
+              return "AUTH_DAY_CONTEXT_AFTERNOON";
+            case hour >= 17 && hour < 22:
+              return "AUTH_DAY_CONTEXT_EVENING";
+            case hour >= 22 || hour < 4:
+              return "AUTH_DAY_CONTEXT_NIGHT";
+            default:
+              // should never get here, but just to be sure
+              return "AUTH_DAY_CONTEXT_DAY";
+          }
+        }
+      };
+
+      addMessage({
+        status: translate("AUTH_LOGOUT_SUCCESSFUL"),
+        message: translate("AUTH_LOGOUT_THANKS", {
+          dayContext: translate(getDayContext())
+        }),
+        exclusive: true
+      });
     });
   }
 

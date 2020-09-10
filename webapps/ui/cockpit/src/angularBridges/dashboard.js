@@ -28,7 +28,6 @@ export default function() {
   const node = document.createElement("div");
   node.innerHTML = `
   <div class="CockpitDashboard" cam-cockpit-dashboard></div>
-  <div notifications-panel class="page-notifications"></div>
   `;
 
   return { node, module: ngModule };

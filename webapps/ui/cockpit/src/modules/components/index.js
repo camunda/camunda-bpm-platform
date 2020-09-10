@@ -19,5 +19,6 @@ export { Dropdown } from "./Dropdown";
 export { EnterpriseComponent } from "./EnterpriseComponent";
 export { LinkButton } from "./LinkButton";
 export { LoadingIndicator } from "./LoadingIndicator";
+export { Notifications } from "./Notifications";
 export { StateCircle } from "./StateCircle";
 export { Table } from "./Table";

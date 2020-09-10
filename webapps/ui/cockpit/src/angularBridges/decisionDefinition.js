@@ -26,7 +26,6 @@ export default function() {
       ng-cloak
       class="breadcrumbs-panel"></div>
   <div ng-view></div>
-  <div notifications-panel class="page-notifications"></div>
   `;
   node.className = "ctn-main";
 

@@ -21,7 +21,7 @@ import { HashRouter, Switch, Route, Redirect } from "react-router-dom";
 import AngularApp from "./AngularApp";
 
 import { Footer, Header } from "./components";
-import { LoadingIndicator } from "components";
+import { LoadingIndicator, Notifications } from "components";
 
 import RedirectToLoginIfUnauthenticated from "./RedirectToLoginIfUnauthenticated";
 
@@ -129,6 +129,7 @@ function App() {
               />
             </Route>
           </Switch>
+          <Notifications className="page-notifications" />
           <Footer />
         </div>
       </UserProvider>

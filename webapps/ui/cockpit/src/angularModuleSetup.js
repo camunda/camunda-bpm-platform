@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import angular from "angular";
+
 import camCommonsModule from "./legacy/camunda-commons-ui/lib";
 import pluginsModule from "./legacy/plugins";
 import services from "./legacy/client/scripts/services/main";
@@ -30,6 +32,7 @@ import $ from "jquery";
 import dataDepend from "angular-data-depend/src/dataDepend";
 import { getPlugins, getConfig, getLocale } from "utils/config";
 import { addApiAttributes } from "utils/PluginPoint";
+import * as notifications from "utils/notifications";
 
 export default function setup(module) {
   const config = getConfig();
@@ -46,6 +49,11 @@ export default function setup(module) {
     directives.name,
     eePlugins.name
   );
+
+  angular.module("cam.commons.util").service("Notifications", function() {
+    // Needs to be a 'real' function due to arrow functions not binding 'this' or 'super'
+    return notifications;
+  });
 
   plugins.forEach(plugin => {
     const pluginDirectiveUID = Math.random()

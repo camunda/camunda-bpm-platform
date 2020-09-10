@@ -15,23 +15,4 @@
  * limitations under the License.
  */
 
-import angular from "angular";
-import module from "../legacy/client/scripts/pages/processInstance";
-
-export default function() {
-  var ngModule = angular.module("cam.cockpit.runtime.processInstance", [
-    module.name
-  ]);
-
-  const node = document.createElement("div");
-  node.innerHTML = `  <div
-  cam-breadcrumbs-panel
-  divider="&raquo;"
-  ng-cloak
-  class="breadcrumbs-panel"></div>
-  <div ng-view></div>
-  `;
-  node.className = "ctn-main";
-
-  return { node, module: ngModule };
-}
+export { default as Notifications } from "./Notifications";
