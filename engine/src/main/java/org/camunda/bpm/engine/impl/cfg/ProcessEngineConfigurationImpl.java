@@ -339,6 +339,7 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
+import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -2635,7 +2636,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initTelemetryData() {
     Database database = new Database(databaseVendor, databaseVersion);
 
-    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer());
+    Jdk jdk = ParseUtil.parseJdkDetails();
+
+    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), jdk);
 
     ProcessEngineDetails engineInfo = ParseUtil
         .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion(), true);

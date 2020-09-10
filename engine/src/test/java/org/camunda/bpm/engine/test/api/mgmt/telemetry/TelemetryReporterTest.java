@@ -55,10 +55,12 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
+import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -440,6 +442,19 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldAddJdkInfoToTelemetryData() {
+    // given
+    Data telemetryData = configuration.getTelemetryData();
+
+    // then
+    Jdk jdkInfo = telemetryData.getProduct().getInternals().getJdk();
+    assertThat(jdkInfo).isNotNull();
+    Jdk expectedJdkInfo = ParseUtil.parseJdkDetails();
+    assertThat(jdkInfo.getVersion()).isEqualTo(expectedJdkInfo.getVersion());
+    assertThat(jdkInfo.getVendor()).isEqualTo(expectedJdkInfo.getVendor());
+  }
+
+  @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
   public void shouldLogTelemetrySent() {
     // given
@@ -625,7 +640,8 @@ public class TelemetryReporterTest {
 
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
-    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"));
+    Jdk jdk = ParseUtil.parseJdkDetails();
+    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), jdk);
 
     Map<String, Command> commands = getDefaultCommandCounts();
     internals.setCommands(commands);
