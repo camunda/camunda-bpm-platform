@@ -60,6 +60,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
@@ -143,13 +144,14 @@ public class TelemetryTaskWorkerMetricsTest {
     new TelemetryReporter(configuration.getCommandExecutorSchemaOperations(),
                           TELEMETRY_ENDPOINT,
                           0,
+                          1000,
                           data,
                           configuration.getTelemetryHttpConnector(),
                           configuration.getTelemetryRegistry()).reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
     Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
     assertThat(metrics.get(UNIQUE_TASK_WORKERS).getCount()).isEqualTo(0);

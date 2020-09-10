@@ -30,8 +30,7 @@ public class TelemetryReporter {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
-  // send report every 24 hours
-  protected long reportingIntervalInSeconds = 24 * 60 * 60;
+  protected long reportingIntervalInSeconds;
   /**
    * Report after 5 minutes the first time so that we get an initial ping
    * quickly. 5 minutes delay so that other modules (e.g. those collecting the app
@@ -54,12 +53,14 @@ public class TelemetryReporter {
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            int telemetryRequestRetries,
+                           long telemetryReportingPeriod,
                            Data data,
                            Connector<? extends ConnectorRequest<?>> httpConnector,
                            TelemetryRegistry telemetryRegistry) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
+    this.reportingIntervalInSeconds = telemetryReportingPeriod;
     this.data = data;
     this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
