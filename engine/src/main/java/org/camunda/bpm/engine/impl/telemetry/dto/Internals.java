@@ -32,11 +32,20 @@ public class Internals {
 
   protected Map<String, Metric> metrics;
 
+  public Internals() {
+    this(null, null);
+  }
+
   public Internals(Database database, ApplicationServer server) {
-    super();
     this.database = database;
     this.applicationServer = server;
     this.commands = new HashMap<>();
+  }
+
+  public Internals(Internals internals) {
+    this(internals.database, internals.applicationServer);
+    this.commands = internals.getCommands();
+    this.metrics = internals.getMetrics();
   }
 
   public Database getDatabase() {
@@ -69,6 +78,11 @@ public class Internals {
 
   public void setMetrics(Map<String, Metric> metrics) {
     this.metrics = metrics;
+  }
+
+  public void mergeDynamicData(Internals other) {
+    this.commands = other.commands;
+    this.metrics = other.metrics;
   }
 
 }

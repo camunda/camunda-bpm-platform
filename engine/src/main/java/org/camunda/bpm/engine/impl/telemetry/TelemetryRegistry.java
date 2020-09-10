@@ -58,6 +58,10 @@ public class TelemetryRegistry {
   }
 
   public void markOccurrence(String name) {
+    markOccurrence(name, 1);
+  }
+
+  public void markOccurrence(String name, long times) {
     CommandCounter counter = commands.get(name);
     if (counter == null) {
       synchronized (commands) {
@@ -68,7 +72,11 @@ public class TelemetryRegistry {
       }
     }
 
-    counter.mark();
+    counter.mark(times);
+  }
+
+  public void clear() {
+    commands.clear();
   }
 
 }

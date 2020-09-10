@@ -40,6 +40,13 @@ public class CommandCounter {
     count.incrementAndGet();
   }
 
+  public void mark(long times) {
+    count.addAndGet(times);
+  }
+
+  public long getAndClear() {
+    return count.getAndSet(0);
+  }
 
   public long get() {
     return count.get();

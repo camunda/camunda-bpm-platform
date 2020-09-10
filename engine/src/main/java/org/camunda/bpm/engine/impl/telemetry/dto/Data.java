@@ -24,9 +24,12 @@ public class Data {
   protected Product product;
 
   public Data(String installation, Product product) {
-    super();
     this.installation = installation;
     this.product = product;
+  }
+
+  public Data(Data other) {
+    this(other.installation, new Product(other.product));
   }
 
   public String getInstallation() {
@@ -43,6 +46,10 @@ public class Data {
 
   public void setProduct(Product product) {
     this.product = product;
+  }
+
+  public void mergeInternals(Internals other) {
+    product.getInternals().mergeDynamicData(other);
   }
 
   @Override

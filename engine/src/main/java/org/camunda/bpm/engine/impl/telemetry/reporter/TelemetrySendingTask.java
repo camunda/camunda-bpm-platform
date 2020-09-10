@@ -33,8 +33,9 @@ import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -59,125 +60,192 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
-  protected Data data;
+  protected Data staticData;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
+  protected int telemetryRequestRetries;
+  protected TelemetryRegistry telemetryRegistry;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
+                              int telemetryRequestRetries,
                               Data data,
-                              Connector<? extends ConnectorRequest<?>> httpConnector) {
+                              Connector<? extends ConnectorRequest<?>> httpConnector,
+                              TelemetryRegistry telemetryRegistry) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
-    this.data = data;
+    this.telemetryRequestRetries = telemetryRequestRetries;
+    this.staticData = data;
     this.httpConnector = httpConnector;
+    this.telemetryRegistry = telemetryRegistry;
   }
 
   @Override
   public void run() {
     LOG.startTelemetrySendingTask();
-    try {
-      sendData();
-    } catch (Exception e) {
-      LOG.exceptionWhileSendingTelemetryData(e);
+
+    if (!isTelemetryEnabled()) {
+      LOG.telemetryDisabled();
+      return;
     }
-  }
 
-  protected void sendData() {
-    commandExecutor.execute(commandContext -> {
-      // send data only if telemetry is enabled
-      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-      if (processEngineConfiguration.getManagementService().isTelemetryEnabled()) {
+    int triesLeft = telemetryRequestRetries + 1;
+    boolean requestSuccessful = false;
+    do {
+      try {
+        triesLeft--;
+
+        updateStaticData();
+        Internals dynamicData = resolveDynamicData();
+        Data mergedData = new Data(staticData);
+        mergedData.mergeInternals(dynamicData);
+
         try {
-          resolveData(commandContext);
-
-          String telemetryData = JsonUtil.asString(data);
-          Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
-                                                                        telemetryEndpoint,
-                                                                        MediaType.APPLICATION_JSON,
-                                                                        telemetryData);
-          ConnectorRequest<?> request = httpConnector.createRequest();
-          request.setRequestParameters(requestParams);
-          CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
-
-          if (response == null) {
-            LOG.unexpectedResponseWhileSendingTelemetryData();
-          } else {
-            int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
-            if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
-              LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
-            } else {
-              LOG.telemetryDataSent(telemetryData);
-              // reset report time
-              processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
-            }
-          }
+          sendData(mergedData);
         } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e);
+          // so that we send it again the next time
+          restoreDynamicData(dynamicData);
+          throw e;
         }
-      } else {
-        LOG.telemetryDisabled();
+
+        // reset report time
+        telemetryRegistry.setStartReportTime(ClockUtil.getCurrentTime());
+
+        requestSuccessful = true;
+      } catch (Exception e) {
+        LOG.exceptionWhileSendingTelemetryData(e);
       }
-      return null;
-    });
+    } while (!requestSuccessful && triesLeft > 0);
   }
 
-  protected void resolveData(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    Internals internals = data.getProduct().getInternals();
-    ApplicationServer applicationServer = processEngineConfiguration.getTelemetryRegistry().getApplicationServer();
-    if (internals.getApplicationServer() == null && applicationServer != null) {
+  protected void updateStaticData() {
+    Internals internals = staticData.getProduct().getInternals();
+
+    if (internals.getApplicationServer() == null) {
+      ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
     }
-
-    Map<String, Command> commands = fetchAndResetCommandCounts(processEngineConfiguration);
-    internals.setCommands(commands);
-
-    Map<String, Metric> metrics = calculateMetrics(commandContext);
-    internals.setMetrics(metrics);
   }
 
-  protected Map<String, Command> fetchAndResetCommandCounts(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    Map<String, Command> commandsToReport = new HashMap<>();
-    Map<String, CommandCounter> originalCounts = processEngineConfiguration.getTelemetryRegistry().getCommands();
-    Map<String, CommandCounter> copiedCounts;
-    synchronized (originalCounts) {
-      // make a copy and empty the origin
-      copiedCounts = new HashMap<>(originalCounts);
-      originalCounts.clear();
-    }
+  protected boolean isTelemetryEnabled() {
+    return commandExecutor.execute(new IsTelemetryEnabledCmd());
+  }
 
-    copiedCounts.forEach((k, v) -> commandsToReport.put(k, new Command(v.get())));
+  protected void sendData(Data dataToSend) {
+
+      String telemetryData = JsonUtil.asString(dataToSend);
+      Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
+          telemetryEndpoint,
+          MediaType.APPLICATION_JSON,
+          telemetryData);
+
+      ConnectorRequest<?> request = httpConnector.createRequest();
+      request.setRequestParameters(requestParams);
+
+      LOG.sendingTelemetryData(telemetryData);
+      CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
+
+      if (response == null) {
+        LOG.unexpectedResponseWhileSendingTelemetryData();
+      } else {
+        int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
+
+        if (isSuccessStatusCode(responseCode)) {
+          if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
+            LOG.unexpectedResponseSuccessCode(responseCode);
+          }
+
+          LOG.telemetrySentSuccessfully();
+
+        } else {
+          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
+        }
+      }
+  }
+
+  /**
+   * @return true if status code is 2xx
+   */
+  protected boolean isSuccessStatusCode(int statusCode) {
+    return (statusCode / 100) == 2;
+  }
+
+  protected void clearDynamicData() {
+    Internals internals = staticData.getProduct().getInternals();
+
+    internals.setApplicationServer(null);
+    internals.setCommands(null);
+    internals.setMetrics(null);
+  }
+
+  protected void restoreDynamicData(Internals internals) {
+    Map<String, Command> commands = internals.getCommands();
+
+    for (Map.Entry<String, Command> entry : commands.entrySet()) {
+      telemetryRegistry.markOccurrence(entry.getKey(), entry.getValue().getCount());
+    }
+  }
+
+  protected Internals resolveDynamicData() {
+    Internals result = new Internals();
+
+    Map<String, Metric> metrics = calculateMetrics();
+    result.setMetrics(metrics);
+
+    // command counts are modified after the metrics are retrieved, because
+    // metric retrieval can fail and resetting the command count is a side effect
+    // that we would otherwise have to undo
+    Map<String, Command> commands = fetchAndResetCommandCounts();
+    result.setCommands(commands);
+
+    return result;
+  }
+
+  protected Map<String, Command> fetchAndResetCommandCounts() {
+    Map<String, Command> commandsToReport = new HashMap<>();
+    Map<String, CommandCounter> originalCounts = telemetryRegistry.getCommands();
+
+    synchronized (originalCounts) {
+
+      for (Map.Entry<String, CommandCounter> counter : originalCounts.entrySet()) {
+        long occurrences = counter.getValue().getAndClear();
+        commandsToReport.put(counter.getKey(), new Command(occurrences));
+      }
+    }
 
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+  protected Map<String, Metric> calculateMetrics() {
+
     Date startReportTime = telemetryRegistry.getStartReportTime();
     Date currentTime = ClockUtil.getCurrentTime();
-    Map<String, Metric> metrics = new HashMap<>();
 
-    long sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.ROOT_PROCESS_INSTANCE_START);
-    metrics.put(ROOT_PROCESS_INSTANCES, new Metric(sum));
+    return commandExecutor.execute(c -> {
+      ManagementService managementService = c.getProcessEngineConfiguration().getManagementService();
 
-    sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.EXECUTED_DECISION_INSTANCES);
-    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
+      Map<String, Metric> metrics = new HashMap<>();
 
-    sum = calculateMetricCount(processEngineConfiguration, startReportTime, currentTime, Metrics.ACTIVTY_INSTANCE_START);
-    metrics.put(FLOW_NODE_INSTANCES, new Metric(sum));
+      long sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.ROOT_PROCESS_INSTANCE_START);
+      metrics.put(ROOT_PROCESS_INSTANCES, new Metric(sum));
 
-    sum = calculateUniqueUserCount(commandContext, startReportTime, currentTime);
-    metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
+      sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.EXECUTED_DECISION_INSTANCES);
+      metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
 
-    return metrics;
+      sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.ACTIVTY_INSTANCE_START);
+      metrics.put(FLOW_NODE_INSTANCES, new Metric(sum));
+
+      sum = calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), startReportTime, currentTime);
+      metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
+
+      return metrics;
+    });
   }
 
-  protected long calculateMetricCount(ProcessEngineConfigurationImpl processEngineConfiguration,
+  protected long calculateMetricCount(ManagementService managementService,
                                       Date startReportTime,
                                       Date currentTime,
                                       String metricName) {
-    return processEngineConfiguration.getManagementService().createMetricsQuery()
+    return managementService.createMetricsQuery()
         .name(metricName)
         .startDate(startReportTime)
         .endDate(currentTime)
@@ -185,9 +253,10 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected long calculateUniqueUserCount(CommandContext commandContext,
+                                          HistoryLevel historyLevel,
                                           Date startReportTime,
                                           Date currentTime) {
-    if (commandContext.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       return 0;
     } else {
       Date previousDay = previousDay(currentTime);
