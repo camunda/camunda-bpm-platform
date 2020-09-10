@@ -216,6 +216,7 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ NVARCHAR2(64),
     CASE_INST_ID_ NVARCHAR2(64),
     TASK_ID_ NVARCHAR2(64),
+    BATCH_ID_ NVARCHAR2(64),
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
     LONG_ NUMBER(19,0),
@@ -539,6 +540,12 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_ID ON ACT_RU_VARIABLE(BATCH_ID_);
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BATCH
+    foreign key (BATCH_ID_)
+    references ACT_RU_BATCH (ID_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);

@@ -124,6 +124,7 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
         VariableInstanceEntity.createAndInsert(variableName, variableTypedValue);
 
     variableInstance.setVariableScopeId(batchId);
+    variableInstance.setBatchId(batchId);
   }
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {

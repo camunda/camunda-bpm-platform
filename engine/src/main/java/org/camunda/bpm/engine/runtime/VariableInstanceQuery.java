@@ -58,6 +58,9 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /** Only select variable instances which have one of the task ids. **/
   VariableInstanceQuery taskIdIn(String... taskIds);
 
+  /** Only select variable instances which are related to one of the given batch ids. **/
+  VariableInstanceQuery batchIdIn(String... batchIds);
+
   /** Only select variables instances which have on of the variable scope ids. **/
   VariableInstanceQuery variableScopeIdIn(String... variableScopeIds);
 

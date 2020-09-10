@@ -113,8 +113,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -143,8 +143,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -176,10 +176,10 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
+        .extracting("processInstanceId", "name", "value", "batchId")
           .containsExactlyInAnyOrder(
-              tuple(null, "foo", "bar"),
-              tuple(null, "bar", "foo")
+              tuple(null, "foo", "bar", batch.getId()),
+              tuple(null, "bar", "foo", batch.getId())
           );
 
     // when
@@ -214,8 +214,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-        .containsExactly(tuple(null, "foo", pojo));
+        .extracting("processInstanceId", "name", "value", "batchId")
+        .containsExactly(tuple(null, "foo", pojo, batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -247,11 +247,11 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
+        .extracting("processInstanceId", "name", "value", "batchId")
           .containsExactlyInAnyOrder(
-              tuple(null, "variableOne", "string"),
-              tuple(null, "variableTwo", 42),
-              tuple(null, "variableThree", (short) 3)
+              tuple(null, "variableOne", "string", batch.getId()),
+              tuple(null, "variableTwo", 42, batch.getId()),
+              tuple(null, "variableThree", (short) 3, batch.getId())
           );
 
     // when
@@ -289,10 +289,10 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
+        .extracting("processInstanceId", "name", "value", "batchId")
           .containsExactlyInAnyOrder(
-              tuple(null, "foo", "bar"),
-              tuple(null, "bar", "foo")
+              tuple(null, "foo", "bar", batch.getId()),
+              tuple(null, "bar", "foo", batch.getId())
           );
 
     // when
@@ -323,8 +323,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -363,8 +363,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -393,8 +393,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);
@@ -424,8 +424,8 @@ public class SetVariablesBatchTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.list())
-        .extracting("processInstanceId", "name", "value")
-          .containsExactly(tuple(null, "foo", "bar"));
+        .extracting("processInstanceId", "name", "value", "batchId")
+          .containsExactly(tuple(null, "foo", "bar", batch.getId()));
 
     // when
     rule.syncExec(batch);

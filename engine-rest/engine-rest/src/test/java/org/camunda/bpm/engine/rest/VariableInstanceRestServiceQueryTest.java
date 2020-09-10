@@ -319,6 +319,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
           .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
           .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
           .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].batchId", equalTo(mockInstanceBuilder.getBatchId()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
           .body("[0].tenantId", equalTo(mockInstanceBuilder.getTenantId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
@@ -361,6 +362,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
           .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
           .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
           .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
+          .body("[0].batchId", equalTo(mockInstanceBuilder.getBatchId()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
           .body("[0].tenantId", equalTo(mockInstanceBuilder.getTenantId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
@@ -395,6 +397,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     queryParameters.put("caseExecutionIdIn", "aCaseExecutionId");
     queryParameters.put("caseInstanceIdIn", "aCaseInstanceId");
     queryParameters.put("taskIdIn", "aTaskId");
+    queryParameters.put("batchIdIn", "aBatchId");
     queryParameters.put("variableScopeIdIn", "aVariableScopeId");
     queryParameters.put("activityInstanceIdIn", "anActivityInstanceId");
     queryParameters.put("tenantIdIn", "anTenantId");
@@ -410,6 +413,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     verify(mockedQuery).caseInstanceIdIn(queryParameters.get("caseInstanceIdIn"));
     verify(mockedQuery).caseExecutionIdIn(queryParameters.get("caseExecutionIdIn"));
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
+    verify(mockedQuery).batchIdIn(queryParameters.get("batchIdIn"));
     verify(mockedQuery).variableScopeIdIn(queryParameters.get("variableScopeIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
     verify(mockedQuery).tenantIdIn(queryParameters.get("tenantIdIn"));
@@ -429,6 +433,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     String aProcessInstanceId = "aProcessInstanceId";
     String anExecutionId = "anExecutionId";
     String aTaskId = "aTaskId";
+    String aBatchId = "aBatchId";
     String aVariableScopeId = "aVariableScopeId";
     String anActivityInstanceId = "anActivityInstanceId";
     String aCaseInstanceId = "aCaseInstanceId";
@@ -460,6 +465,10 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     taskIdIn.add(aTaskId);
     queryParameters.put("taskIdIn", taskIdIn);
 
+    List<String> batchIdIn = new ArrayList<>();
+    batchIdIn.add(aBatchId);
+    queryParameters.put("batchIdIn", batchIdIn);
+
     List<String> variableScopeIdIn = new ArrayList<String>();
     variableScopeIdIn.add(aVariableScopeId);
     queryParameters.put("variableScopeIdIn", variableScopeIdIn);
@@ -481,6 +490,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     verify(mockedQuery).processInstanceIdIn(aProcessInstanceId);
     verify(mockedQuery).executionIdIn(anExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId);
+    verify(mockedQuery).batchIdIn(aBatchId);
     verify(mockedQuery).variableScopeIdIn(aVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId);
     verify(mockedQuery).tenantIdIn(aTenantId);

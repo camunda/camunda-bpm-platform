@@ -216,6 +216,7 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
@@ -543,6 +544,12 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_ID ON ACT_RU_VARIABLE(BATCH_ID_);
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BATCH
+    foreign key (BATCH_ID_)
+    references ACT_RU_BATCH (ID_);
 
 -- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
 create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);
