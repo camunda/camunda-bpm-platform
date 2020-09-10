@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
 
 public class ParseUtil {
 
@@ -136,6 +137,17 @@ public class ParseUtil {
     }
 
     return serverVendor;
+  }
+
+  public static Jdk parseJdkDetails() {
+    String jdkVendor = System.getProperty("java.vm.vendor");
+    if (jdkVendor != null && jdkVendor.contains("Oracle")
+        && System.getProperty("java.vm.name").contains("OpenJDK")) {
+      jdkVendor = "OpenJDK";
+    }
+    String jdkVersion = System.getProperty("java.version");
+    Jdk jdk = new Jdk(jdkVersion, jdkVendor);
+    return jdk;
   }
 
 }

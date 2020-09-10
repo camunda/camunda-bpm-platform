@@ -32,18 +32,21 @@ public class Internals {
 
   protected Map<String, Metric> metrics;
 
+  protected Jdk jdk;
+
   public Internals() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  public Internals(Database database, ApplicationServer server) {
+  public Internals(Database database, ApplicationServer server, Jdk jdk) {
     this.database = database;
     this.applicationServer = server;
     this.commands = new HashMap<>();
+    this.jdk = jdk;
   }
 
   public Internals(Internals internals) {
-    this(internals.database, internals.applicationServer);
+    this(internals.database, internals.applicationServer, internals.jdk);
     this.commands = internals.getCommands();
     this.metrics = internals.getMetrics();
   }
@@ -83,6 +86,14 @@ public class Internals {
   public void mergeDynamicData(Internals other) {
     this.commands = other.commands;
     this.metrics = other.metrics;
+  }
+
+  public Jdk getJdk() {
+    return jdk;
+  }
+
+  public void setJdk(Jdk jdk) {
+    this.jdk = jdk;
   }
 
 }
