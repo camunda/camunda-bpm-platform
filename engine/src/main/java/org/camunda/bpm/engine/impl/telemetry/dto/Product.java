@@ -31,6 +31,10 @@ public class Product {
     this.internals = internals;
   }
 
+  public Product(Product other) {
+    this(other.name, other.version, other.edition, new Internals(other.internals));
+  }
+
   public String getName() {
     return name;
   }

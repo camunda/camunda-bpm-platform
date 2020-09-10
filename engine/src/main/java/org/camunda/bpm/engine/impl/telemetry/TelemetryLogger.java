@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 public class TelemetryLogger extends ProcessEngineLogger {
@@ -26,59 +27,75 @@ public class TelemetryLogger extends ProcessEngineLogger {
   }
 
   public void exceptionWhileSendingTelemetryData(Exception e) {
-    logDebug(
-        "002", "'{}' exception occurred while sending telemetry data with message: {}", 
-        e.getClass().getCanonicalName(),
+    logWarn("002",
+        "Could not send telemetry data. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
+        e.getClass().getSimpleName(),
         e.getMessage());
+    logDebug(
+        "003", "{} occurred while sending telemetry data.",
+        e.getClass().getCanonicalName(),
+        e);
   }
 
-  public void unexpectedResponseWhileSendingTelemetryData(int responseCode) {
-    logDebug(
-        "003", "Unexpected response while sending telemetry data. Status code: {}", responseCode);
+  public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode) {
+    return new ProcessEngineException(
+      exceptionMessage("013", "Unexpected response code {} when sending telemetry data", responseCode));
   }
 
   public void unexpectedResponseWhileSendingTelemetryData() {
     logDebug(
-        "004", "Unexpected 'null' response while sending telemetry data.");
+        "005", "Unexpected 'null' response while sending telemetry data.");
   }
 
-  public void telemetryDataSent(String data) {
+  public void sendingTelemetryData(String data) {
     logDebug(
-        "005", "Telemetry data sent: {}", data);
+        "006", "Sending telemetry data: {}", data);
   }
 
   public void databaseTelemetryPropertyMissingInfo(boolean telemetryEnabled) {
     logInfo(
-        "006",
+        "007",
         "`camunda.telemetry.enabled` property is missing in the database, creating the property with value: {}",
         Boolean.toString(telemetryEnabled));
   }
 
   public void databaseTelemetryPropertyMissingInfo() {
     logInfo(
-        "007",
+        "008",
         "`camunda.telemetry.enabled` property is missing in the database");
   }
 
   public void telemetryDisabled() {
     logDebug(
-        "008", "Sending telemetry is disabled.");
+        "009", "Sending telemetry is disabled.");
   }
 
   public void schedulingTaskFails(String message) {
     logDebug(
-        "009", "An exception occured during scheduling telemetry task: {}", message);
+        "010", "An exception occured during scheduling telemetry task: {}", message);
   }
 
   public void unableToConfigureHttpConnectorWarning() {
     logWarn(
-        "010","The http connector used to send telemetry is `null`, telemetry data will not be sent.");
+        "011","The http connector used to send telemetry is `null`, telemetry data will not be sent.");
   }
 
   public void unexpectedExceptionDuringHttpConnectorConfiguration(Exception e) {
     logDebug(
-        "011", "'{}' exception occurred while configuring http connector with message: {}", 
+        "012", "'{}' exception occurred while configuring http connector with message: {}",
         e.getClass().getCanonicalName(),
         e.getMessage());
+  }
+
+
+  public void unexpectedResponseSuccessCode(int statusCode) {
+    logDebug(
+        "015", "Telemetry request was sent, but received an unexpected response success code: {}", statusCode);
+  }
+
+
+  public void telemetrySentSuccessfully() {
+    logDebug(
+        "016", "Telemetry request was successful.");
   }
 }

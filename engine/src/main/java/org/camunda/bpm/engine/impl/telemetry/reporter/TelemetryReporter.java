@@ -21,6 +21,7 @@ import java.util.Timer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -37,27 +38,35 @@ public class TelemetryReporter {
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
+  protected int telemetryRequestRetries;
   protected Data data;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
+  protected TelemetryRegistry telemetryRegistry;
 
   protected boolean stopped;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
+                           int telemetryRequestRetries,
                            Data data,
-                           Connector<? extends ConnectorRequest<?>> httpConnector) {
+                           Connector<? extends ConnectorRequest<?>> httpConnector,
+                           TelemetryRegistry telemetryRegistry) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
+    this.telemetryRequestRetries = telemetryRequestRetries;
     this.data = data;
     this.httpConnector = httpConnector;
+    this.telemetryRegistry = telemetryRegistry;
     initTelemetrySendingTask();
   }
 
   protected void initTelemetrySendingTask() {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
+                                                    telemetryRequestRetries,
                                                     data,
-                                                    httpConnector);
+                                                    httpConnector,
+                                                    telemetryRegistry);
   }
 
   public synchronized void start() {

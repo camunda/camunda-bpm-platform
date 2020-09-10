@@ -141,8 +141,10 @@ public class TelemetryTaskWorkerMetricsTest {
     // when
     new TelemetryReporter(configuration.getCommandExecutorSchemaOperations(),
                           TELEMETRY_ENDPOINT,
+                          0,
                           data,
-                          configuration.getTelemetryHttpConnector()).reportNow();
+                          configuration.getTelemetryHttpConnector(),
+                          configuration.getTelemetryRegistry()).reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))

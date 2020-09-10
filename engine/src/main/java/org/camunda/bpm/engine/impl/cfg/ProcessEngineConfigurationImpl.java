@@ -897,6 +897,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Boolean initializeTelemetry = null;
   /** The endpoint which telemetry is sent to */
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
+  /** The number of times the telemetry request is retried in case it fails **/
+  protected int telemetryRequestRetries = 2;
   protected TelemetryReporter telemetryReporter;
   /** http client used for sending telemetry */
   protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
@@ -2619,8 +2621,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (telemetryReporter == null) {
         telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
                                                   telemetryEndpoint,
+                                                  telemetryRequestRetries,
                                                   telemetryData,
-                                                  telemetryHttpConnector);
+                                                  telemetryHttpConnector,
+                                                  telemetryRegistry);
       }
     }
   }
@@ -4747,6 +4751,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setTelemetryEndpoint(String telemetryEndpoint) {
     this.telemetryEndpoint = telemetryEndpoint;
+    return this;
+  }
+
+  public int getTelemetryRequestRetries() {
+    return telemetryRequestRetries;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryRequestRetries(int telemetryRequestRetries) {
+    this.telemetryRequestRetries = telemetryRequestRetries;
     return this;
   }
 
