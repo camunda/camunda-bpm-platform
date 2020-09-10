@@ -55,8 +55,6 @@ public class CamundaBpmRestInitializer implements ServletContextInitializer {
   public void onStartup(ServletContext servletContext) throws ServletException {
     this.servletContext = servletContext;
 
-    servletContext.addListener(new RestContainerBootstrap());
-
     String restApiPathPattern = applicationPath.getUrlMapping();
 
     registerFilter("EmptyBodyFilter", EmptyBodyFilter.class, restApiPathPattern);

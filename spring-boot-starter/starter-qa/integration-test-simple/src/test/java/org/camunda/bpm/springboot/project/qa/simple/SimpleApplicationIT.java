@@ -18,7 +18,10 @@ package org.camunda.bpm.springboot.project.qa.simple;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +36,27 @@ public class SimpleApplicationIT {
   @Autowired
   RuntimeService runtimeService;
 
+  @Autowired
+  ProcessEngine processEngine;
+
   @Test
   public void shouldStartApplicationSuccessfully() {
     // then no exception due to missing classes is thrown
     assertThat(runtimeService).isNotNull();
+  }
+
+  /**
+   * Verifies that a Spring Boot project without spring-boot-starter-web and
+   * spring-boot-starter-jersey (i.e. without servlet API) still works correctly.
+   */
+  @Test
+  public void shouldNotDetermineApplicationServer() {
+
+    TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
+
+    // then
+    ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
+    assertThat(applicationServer).isNull();
   }
 
 }

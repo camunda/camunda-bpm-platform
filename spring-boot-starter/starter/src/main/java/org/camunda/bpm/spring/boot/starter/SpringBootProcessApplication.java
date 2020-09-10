@@ -93,8 +93,6 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
       setBeanName(CamundaBpmProperties.getUniqueName(CamundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
     }
 
-    resolveApplicationServerInfo();
-
     String processEngineName = processEngine.getName();
     setDefaultDeployToEngineName(processEngineName);
 
@@ -118,19 +116,6 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
   @PreUndeploy
   public void onPreUndeploy(ProcessEngine processEngine) {
     eventPublisher.publishEvent(new PreUndeployEvent(processEngine));
-  }
-
-  protected void resolveApplicationServerInfo() {
-    ServletContext servletContext = null;
-    try {
-      servletContext = (ServletContext) applicationContext.getBean("servletContext");
-    } catch (Exception e) {
-    }
-    if (servletContext != null && servletContext.getServerInfo() != null
-        && processEngine.getProcessEngineConfiguration().getTelemetryRegistry() != null) {
-      processEngine.getProcessEngineConfiguration().getTelemetryRegistry()
-          .setApplicationServer(servletContext.getServerInfo());
-    }
   }
 
   @ConditionalOnWebApplication

@@ -36,8 +36,6 @@ import org.camunda.bpm.spring.boot.starter.configuration.CamundaMetricsConfigura
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.condition.NeedsHistoryAutoConfigurationCondition;
 import org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateAdminUserConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateFilterConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultAuthorizationConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDatasourceConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDeploymentConfiguration;
@@ -50,6 +48,8 @@ import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJpaConfigur
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultMetricsConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.GenericPropertiesConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateAdminUserConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateFilterConfiguration;
 import org.camunda.bpm.spring.boot.starter.event.EventPublisherPlugin;
 import org.camunda.bpm.spring.boot.starter.jdbc.HistoryLevelDeterminator;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
@@ -182,5 +182,4 @@ public class CamundaBpmConfiguration {
   public EventPublisherPlugin eventPublisherPlugin(CamundaBpmProperties properties, ApplicationEventPublisher publisher) {
     return new EventPublisherPlugin(properties.getEventing(), publisher);
   }
-
 }
