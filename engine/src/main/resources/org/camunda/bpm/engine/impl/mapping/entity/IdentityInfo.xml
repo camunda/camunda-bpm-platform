@@ -127,8 +127,8 @@
   
   <select id="selectIdentityInfoKeysByUserIdAndType" parameterType="map" resultType="string">
     select KEY_ from ${prefix}ACT_ID_INFO 
-    where USER_ID_ = #{userId,jdbcType=VARCHAR}
-      and TYPE_ =  #{type,jdbcType=VARCHAR}
+    where USER_ID_ = #{parameter.userId,jdbcType=VARCHAR}
+      and TYPE_ =  #{parameter.type,jdbcType=VARCHAR}
       and PARENT_ID_ is null
   </select>
   

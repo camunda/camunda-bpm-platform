@@ -36,8 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -76,45 +79,47 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory
-      .getSqlSessionFactory()
-      .openSession();
+    SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
+    this.sqlSession = ExceptionUtil.doWithExceptionWrapper(sqlSessionFactory::openSession);
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory
-      .getSqlSessionFactory()
-      .openSession(connection);
+    SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
+    this.sqlSession = ExceptionUtil.doWithExceptionWrapper(() -> sqlSessionFactory.openSession(connection));
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
   }
 
   // select ////////////////////////////////////////////
 
-  public List<?> selectList(String statement, Object parameter){
+  public List<?> selectList(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
-    List<Object> resultList = sqlSession.selectList(statement, parameter);
+    List<Object> resultList = executeSelectList(statement, parameter);
     for (Object object : resultList) {
       fireEntityLoaded(object);
     }
     return resultList;
   }
 
+  public List<Object> executeSelectList(String statement, Object parameter) {
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectList(statement, parameter));
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> T selectById(Class<T> type, String id) {
     String selectStatement = dbSqlSessionFactory.getSelectStatement(type);
-    selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
+    String mappedSelectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
     ensureNotNull("no select statement for " + type + " in the ibatis mapping files", "selectStatement", selectStatement);
 
-    Object result = sqlSession.selectOne(selectStatement, id);
+    Object result = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(mappedSelectStatement, id));
     fireEntityLoaded(result);
     return (T) result;
   }
 
   public Object selectOne(String statement, Object parameter) {
-    statement = dbSqlSessionFactory.mapStatement(statement);
-    Object result = sqlSession.selectOne(statement, parameter);
+    String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
+    Object result = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(mappedStatement, parameter));
     fireEntityLoaded(result);
     return result;
   }
@@ -133,7 +138,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected abstract void executeSelectForUpdate(String statement, Object parameter);
 
-  protected void entityUpdatePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityUpdatePerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     if (failure != null) {
       operation.setRowsAffected(0);
       operation.setFailure(failure);
@@ -162,17 +169,23 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected void bulkUpdatePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkUpdatePerformed(DbBulkOperation operation,
+                                     int rowsAffected,
+                                     Exception failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
-  protected void bulkDeletePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkDeletePerformed(DbBulkOperation operation,
+                                     int rowsAffected,
+                                     Exception failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
-  protected void bulkOperationPerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkOperationPerformed(DbBulkOperation operation,
+                                        int rowsAffected,
+                                        Exception failure) {
 
     if (failure != null) {
       operation.setFailure(failure);
@@ -183,7 +196,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected void entityDeletePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityDeletePerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     
     if (failure != null) {
       operation.setRowsAffected(0);
@@ -214,7 +229,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected boolean isConcurrentModificationException(DbOperation failedOperation, Throwable cause) {
+  protected boolean isConcurrentModificationException(DbOperation failedOperation,
+                                                      Exception cause) {
 
     boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
     boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
@@ -261,10 +277,17 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void executeInsertEntity(String insertStatement, Object parameter) {
     LOG.executeDatabaseOperation("INSERT", parameter);
-    sqlSession.insert(insertStatement, parameter);
+    try {
+      sqlSession.insert(insertStatement, parameter);
+    } catch (Exception e) {
+      // exception is wrapped later
+      throw e;
+    }
   }
 
-  protected void entityInsertPerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityInsertPerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     DbEntity entity = operation.getEntity();
 
     if (failure != null) {
@@ -291,27 +314,49 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected int executeDelete(String deleteStatement, Object parameter) {
     // map the statement
-    deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-    return sqlSession.delete(deleteStatement, parameter);
+    String mappedDeleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
+    try {
+      return sqlSession.delete(mappedDeleteStatement, parameter);
+    } catch (Exception e) {
+      // Exception is wrapped later
+      throw e;
+    }
   }
 
   // update ////////////////////////////////////////
 
   public int executeUpdate(String updateStatement, Object parameter) {
-    updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-    return sqlSession.update(updateStatement, parameter);
+    String mappedUpdateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
+    try {
+      return sqlSession.update(mappedUpdateStatement, parameter);
+    } catch (Exception e) {
+      // Exception is wrapped later
+      throw e;
+    }
+  }
+
+  public int update(String updateStatement, Object parameter) {
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.update(updateStatement, parameter));
   }
 
   @Override
   public int executeNonEmptyUpdateStmt(String updateStmt, Object parameter) {
-    updateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
+    String mappedUpdateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
 
     //if mapped statement is empty, which can happens for some databases, we have no need to execute it
-    MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(updateStmt);
-    if (mappedStatement.getBoundSql(parameter).getSql().isEmpty())
-      return 0;
+    boolean isMappedStmtEmpty = ExceptionUtil.doWithExceptionWrapper(() -> {
+      Configuration configuration = sqlSession.getConfiguration();
+      MappedStatement mappedStatement = configuration.getMappedStatement(mappedUpdateStmt);
+      BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+      String sql = boundSql.getSql();
+      return sql.isEmpty();
+    });
 
-    return sqlSession.update(updateStmt, parameter);
+    if (isMappedStmtEmpty) {
+      return 0;
+    }
+
+    return update(mappedUpdateStmt, parameter);
   }
 
   // flush ////////////////////////////////////////////////////////////////////
@@ -320,23 +365,39 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   public void flushOperations() {
-    flushBatchOperations();
+    ExceptionUtil.doWithExceptionWrapper(this::flushBatchOperations);
   }
 
   public List<BatchResult> flushBatchOperations() {
-    return sqlSession.flushStatements();
+    try {
+      return sqlSession.flushStatements();
+
+    } catch (RuntimeException ex) {
+      // exception is wrapped later
+      throw ex;
+
+    }
   }
 
   public void close() {
-    sqlSession.close();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.close();
+      return null;
+    });
   }
 
   public void commit() {
-    sqlSession.commit();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.commit();
+      return null;
+    });
   }
 
   public void rollback() {
-    sqlSession.rollback();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.rollback();
+      return null;
+    });
   }
 
   // schema operations ////////////////////////////////////////////////////////
@@ -385,7 +446,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   @Override
   protected String getDbVersion() {
     String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
-    return (String) sqlSession.selectOne(selectSchemaVersionStatement);
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(selectSchemaVersionStatement));
   }
 
   @Override
@@ -502,7 +563,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     tableName = prependDatabaseTablePrefix(tableName);
     Connection connection = null;
     try {
-      connection = sqlSession.getConnection();
+      connection = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.getConnection());
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       ResultSet tables = null;
 
@@ -674,7 +735,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     String sqlStatement = null;
     String exceptionSqlStatement = null;
     try {
-      Connection connection = sqlSession.getConnection();
+      Connection connection = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.getConnection());
       Exception exception = null;
       byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
       String ddlStatements = new String(bytes);
@@ -692,8 +753,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
           if (line.endsWith(";")) {
             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length()-1));
-            Statement jdbcStatement = connection.createStatement();
             try {
+              Statement jdbcStatement = connection.createStatement();
               // no logging needed as the connection will log it
               logLines.add(sqlStatement);
               jdbcStatement.execute(sqlStatement);
@@ -743,21 +804,22 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected boolean isMissingTablesException(Exception e) {
-    String exceptionMessage = e.getMessage();
-    if(e.getMessage() != null) {
-      // Matches message returned from H2
-      if ((exceptionMessage.indexOf("Table") != -1) && (exceptionMessage.indexOf("not found") != -1)) {
-        return true;
-      }
+    Throwable cause = e.getCause();
+    if (cause != null) {
+      String exceptionMessage = cause.getMessage();
+      if(cause.getMessage() != null) {
+        // Matches message returned from H2
+        if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
+          return true;
+        }
 
-      // Message returned from MySQL and Oracle
-      if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
-        return true;
-      }
+        // Message returned from MySQL and Oracle
+        if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
+          return true;
+        }
 
-      // Message returned from Postgres
-      if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
-        return true;
+        // Message returned from Postgres
+        return (exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"));
       }
     }
     return false;
