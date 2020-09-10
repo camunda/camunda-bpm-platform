@@ -179,6 +179,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
       .body("executionId", equalTo(builder.getExecutionId()))
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
       .body("batchId", equalTo(builder.getBatchId()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("tenantId", equalTo(builder.getTenantId()))
