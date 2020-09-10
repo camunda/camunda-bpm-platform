@@ -64,12 +64,12 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     if (Context.getProcessEngineConfiguration().getManagementService().getTableMetaData("ACT_RU_JOB") != null) {
       // CAM-9671: avoid transaction rollback due to the OLE being caught in CommandContext#close
       commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
-        
+
         @Override
         public Class<? extends DbEntity> getEntityType() {
           return EverLivingJobEntity.class;
         }
-        
+
         @Override
         public void failedOperation(DbOperation operation) {
           // nothing do to, reconfiguration will be handled later on
@@ -203,9 +203,14 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     if (Boolean.TRUE.equals(processEngineConfiguration.getManagementService().isTelemetryEnabled()) &&
         processEngineConfiguration.getTelemetryReporter() != null &&
         processEngineConfiguration.getTelemetryReporter().getHttpConnector() != null) {
-      processEngineConfiguration.getTelemetryReporter().start();
-      // set start report time
-      processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
+
+      try {
+        processEngineConfiguration.getTelemetryReporter().start();
+        // set start report time
+        processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
+      } catch (Exception e) {
+        ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
+      }
     }
   }
 }

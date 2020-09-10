@@ -32,6 +32,12 @@ public class TelemetryReporter {
 
   // send report every 24 hours
   protected long reportingIntervalInSeconds = 24 * 60 * 60;
+  /**
+   * Report after 5 minutes the first time so that we get an initial ping
+   * quickly. 5 minutes delay so that other modules (e.g. those collecting the app
+   * server name) can contribute their data.
+   */
+  protected long initialReportingDelayInSeconds = 5 * 60;
 
   protected TelemetrySendingTask telemetrySendingTask;
   protected Timer timer;
@@ -77,11 +83,12 @@ public class TelemetryReporter {
     if (timer == null) { // initialize timer if only the the timer is not scheduled yet
       timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
       long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
+      long initialReportingDelay = initialReportingDelayInSeconds * 1000;
 
       try {
-        timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+        timer.scheduleAtFixedRate(telemetrySendingTask, initialReportingDelay, reportingIntervalInMillis);
       } catch (Exception e) {
-        LOG.schedulingTaskFails(e.getMessage());
+        throw LOG.schedulingTaskFails(e);
       }
     }
   }
