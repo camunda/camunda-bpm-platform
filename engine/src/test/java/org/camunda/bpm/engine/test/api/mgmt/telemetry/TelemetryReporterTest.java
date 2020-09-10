@@ -172,6 +172,7 @@ public class TelemetryReporterTest {
     TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 TELEMETRY_ENDPOINT,
                                                                 0,
+                                                                1000,
                                                                 data,
                                                                 configuration.getTelemetryHttpConnector(),
                                                                 configuration.getTelemetryRegistry());
@@ -504,6 +505,7 @@ public class TelemetryReporterTest {
     TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 TELEMETRY_ENDPOINT,
                                                                 0,
+                                                                1000,
                                                                 data,
                                                                 null,
                                                                 configuration.getTelemetryRegistry());

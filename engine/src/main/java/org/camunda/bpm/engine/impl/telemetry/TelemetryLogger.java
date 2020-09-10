@@ -39,7 +39,7 @@ public class TelemetryLogger extends ProcessEngineLogger {
 
   public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode) {
     return new ProcessEngineException(
-      exceptionMessage("013", "Unexpected response code {} when sending telemetry data", responseCode));
+      exceptionMessage("004", "Unexpected response code {} when sending telemetry data", responseCode));
   }
 
   public void unexpectedResponseWhileSendingTelemetryData() {

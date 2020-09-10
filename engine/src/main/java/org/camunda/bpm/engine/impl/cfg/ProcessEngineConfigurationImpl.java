@@ -902,6 +902,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected TelemetryReporter telemetryReporter;
   /** http client used for sending telemetry */
   protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
+  /** default: once every 24 hours */
+  protected long telemetryReportingPeriod = 24 * 60 * 60;
   protected Data telemetryData;
 
 
@@ -2622,6 +2624,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
                                                   telemetryEndpoint,
                                                   telemetryRequestRetries,
+                                                  telemetryReportingPeriod,
                                                   telemetryData,
                                                   telemetryHttpConnector,
                                                   telemetryRegistry);
@@ -4760,6 +4763,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setTelemetryRequestRetries(int telemetryRequestRetries) {
     this.telemetryRequestRetries = telemetryRequestRetries;
+    return this;
+  }
+
+  public long getTelemetryReportingPeriod() {
+    return telemetryReportingPeriod;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryReportingPeriod(long telemetryReportingPeriod) {
+    this.telemetryReportingPeriod = telemetryReportingPeriod;
     return this;
   }
 
