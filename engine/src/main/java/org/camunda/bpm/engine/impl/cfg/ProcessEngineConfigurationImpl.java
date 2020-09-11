@@ -2264,15 +2264,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
     metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
-    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
+    metricsRegistry.createDbMeter(Metrics.ACTIVTY_INSTANCE_END);
 
-    metricsRegistry.createMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_SUCCESS);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_FAILURE);
-    metricsRegistry.createMeter(Metrics.JOB_SUCCESSFUL);
-    metricsRegistry.createMeter(Metrics.JOB_FAILED);
-    metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
-    metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_SUCCESS);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_FAILURE);
+    metricsRegistry.createDbMeter(Metrics.JOB_SUCCESSFUL);
+    metricsRegistry.createDbMeter(Metrics.JOB_FAILED);
+    metricsRegistry.createDbMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
+    metricsRegistry.createDbMeter(Metrics.JOB_EXECUTION_REJECTED);
 
     metricsRegistry.createMeter(Metrics.ROOT_PROCESS_INSTANCE_START);
 
@@ -2663,7 +2663,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                                                   telemetryReportingPeriod,
                                                   telemetryData,
                                                   telemetryHttpConnector,
-                                                  telemetryRegistry);
+                                                  telemetryRegistry,
+                                                  metricsRegistry);
       }
     }
   }

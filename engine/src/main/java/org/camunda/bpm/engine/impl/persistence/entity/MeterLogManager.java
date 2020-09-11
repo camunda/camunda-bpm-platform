@@ -54,7 +54,7 @@ public class MeterLogManager extends AbstractManager {
       // add current unlogged count
       Meter meter = Context.getProcessEngineConfiguration()
         .getMetricsRegistry()
-        .getMeterByName(query.getName());
+        .getDbMeterByName(query.getName());
       if(meter != null) {
         result += meter.get();
       }
@@ -69,7 +69,7 @@ public class MeterLogManager extends AbstractManager {
 
     String reporterId = Context.getProcessEngineConfiguration().getDbMetricsReporter().getMetricsCollectionTask().getReporter();
     if (!intervalResult.isEmpty() && isEndTimeAfterLastReportInterval(query) && reporterId != null) {
-      Map<String, Meter> metrics = Context.getProcessEngineConfiguration().getMetricsRegistry().getMeters();
+      Map<String, Meter> metrics = Context.getProcessEngineConfiguration().getMetricsRegistry().getDbMeters();
       String queryName = query.getName();
       //we have to add all unlogged metrics to last interval
       if (queryName != null) {

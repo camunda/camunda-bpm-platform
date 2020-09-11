@@ -91,7 +91,7 @@ public class GenerateMetricsTask implements Runnable {
     //set up
     long startTime = START_TIME.get();
     MetricsRegistry metricsRegistry = processEngineConfiguration.getMetricsRegistry();
-    Set<String> metricNames = metricsRegistry.getMeters().keySet();
+    Set<String> metricNames = metricsRegistry.getDbMeters().keySet();
 
     //generate metric
     for (int i = 0; i < ITERATION_PER_EXECUTION; i++) {

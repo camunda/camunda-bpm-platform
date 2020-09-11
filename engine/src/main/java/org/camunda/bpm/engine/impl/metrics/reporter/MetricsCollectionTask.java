@@ -65,7 +65,7 @@ public class MetricsCollectionTask extends TimerTask {
   protected void collectMetrics() {
 
     final List<MeterLogEntity> logs = new ArrayList<MeterLogEntity>();
-    for (Meter meter : metricsRegistry.getMeters().values()) {
+    for (Meter meter : metricsRegistry.getDbMeters().values()) {
       logs.add(new MeterLogEntity(meter.getName(),
           reporterId,
           meter.getAndClear(),
