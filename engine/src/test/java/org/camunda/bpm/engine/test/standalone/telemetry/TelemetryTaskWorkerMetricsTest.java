@@ -135,9 +135,8 @@ public class TelemetryTaskWorkerMetricsTest {
 
     String requestBody = new Gson().toJson(data);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     new TelemetryReporter(configuration.getCommandExecutorSchemaOperations(),
