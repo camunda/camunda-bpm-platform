@@ -121,7 +121,6 @@ public class DetermineHistoryLevelCmdTest {
 
   @After
   public void after() {
-    TestHelper.dropSchema(processEngineImpl.getProcessEngineConfiguration());
     processEngineImpl.close();
     processEngineImpl = null;
   }

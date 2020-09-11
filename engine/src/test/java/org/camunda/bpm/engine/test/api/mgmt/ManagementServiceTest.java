@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -61,6 +62,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,6 +74,15 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class ManagementServiceTest extends PluggableProcessEngineTest {
+
+  protected boolean tearDownTelemetry;
+
+  @After
+  public void tearDown() {
+    if (tearDownTelemetry) {
+      managementService.toggleTelemetry(false);
+    }
+  }
 
   @Test
   public void testGetMetaDataForUnexistingTable() {
@@ -876,6 +887,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testTelemetryEnabled() {
     // given default configuration
+    tearDownTelemetry = true;
 
     // when
     managementService.toggleTelemetry(true);
@@ -883,13 +895,16 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     // then
     assertThat(managementService.isTelemetryEnabled()).isTrue();
 
-    // cleanup
-    managementService.toggleTelemetry(false);
+    // and the telemetry reporter is still scheduled
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   @Test
   public void testTelemetryDisabled() {
     // given
+    tearDownTelemetry = true;
+
     managementService.toggleTelemetry(true);
 
     // when
@@ -897,6 +912,10 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();
+
+    // and the telemetry reporter is still scheduled
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {

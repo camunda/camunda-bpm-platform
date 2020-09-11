@@ -126,7 +126,8 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected boolean isTelemetryEnabled() {
-    return commandExecutor.execute(new IsTelemetryEnabledCmd());
+    Boolean telemetryEnabled = commandExecutor.execute(new IsTelemetryEnabledCmd());
+    return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
   protected void sendData(Data dataToSend) {

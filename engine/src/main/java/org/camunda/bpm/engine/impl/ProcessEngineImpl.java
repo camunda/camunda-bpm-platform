@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.CompositeCondition;
 
 /**
@@ -161,8 +162,9 @@ public class ProcessEngineImpl implements ProcessEngine {
       processEngineConfiguration.getDbMetricsReporter().stop();
     }
 
-    if (processEngineConfiguration.getTelemetryReporter() != null) {
-      processEngineConfiguration.getTelemetryReporter().stop();
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+    if (telemetryReporter != null) {
+      telemetryReporter.stop();
     }
 
     if ((jobExecutor != null)) {

@@ -78,13 +78,12 @@ public class TelemetryRegistryCounterTest {
     // then
     TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
-    assertThat(entries.size()).isEqualTo(6);
+    assertThat(entries.size()).isEqualTo(5);
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
-        "SchemaOperationsProcessEngineBuild", 
-        "HistoryLevelSetupCommand", 
+        "SchemaOperationsProcessEngineBuild",
+        "HistoryLevelSetupCommand",
         "GetTableMetaDataCmd",
-        "HistoryCleanupCmd", 
-        "IsTelemetryEnabledCmd",
+        "HistoryCleanupCmd",
         "BootstrapEngineCommand");
     for (String commandName : entries.keySet()) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);

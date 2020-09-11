@@ -60,6 +60,8 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
+    // the telemetry reporter is always scheduled
+    assertThat(inMemoryConfiguration.getTelemetryReporter().isScheduled()).isTrue();
   }
 
   @Test
@@ -86,10 +88,10 @@ public class TelemetryConfigurationTest {
     inMemoryConfiguration
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
         .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
-  
+
     // when
     inMemoryConfiguration.buildProcessEngine();
-  
+
     // then
     assertThat(inMemoryConfiguration.getTelemetryEndpoint()).isEqualTo(TELEMETRY_ENDPOINT);
   }

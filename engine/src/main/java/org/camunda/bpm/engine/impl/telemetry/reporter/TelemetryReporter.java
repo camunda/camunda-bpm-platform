@@ -89,18 +89,31 @@ public class TelemetryReporter {
       try {
         timer.scheduleAtFixedRate(telemetrySendingTask, initialReportingDelay, reportingIntervalInMillis);
       } catch (Exception e) {
+        timer = null;
         throw LOG.schedulingTaskFails(e);
       }
     }
   }
 
+  public synchronized void reschedule() {
+    stop(false);
+    start();
+  }
+
   public synchronized void stop() {
+    stop(true);
+  }
+
+  public synchronized void stop(boolean report) {
     if (timer != null) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      // collect and send manually for the last time
-      reportNow();
+
+      if (report) {
+        // collect and send manually for the last time
+        reportNow();
+      }
     }
     stopped = true;
   }
@@ -109,6 +122,10 @@ public class TelemetryReporter {
     if (telemetrySendingTask != null) {
       telemetrySendingTask.run();
     }
+  }
+
+  public boolean isScheduled() {
+    return timer != null;
   }
 
   public long getReportingIntervalInSeconds() {
