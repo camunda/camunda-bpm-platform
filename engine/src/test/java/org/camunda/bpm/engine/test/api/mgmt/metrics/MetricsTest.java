@@ -58,7 +58,7 @@ public class MetricsTest {
   protected static ManagementService managementService;
 
   protected static void clearMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }

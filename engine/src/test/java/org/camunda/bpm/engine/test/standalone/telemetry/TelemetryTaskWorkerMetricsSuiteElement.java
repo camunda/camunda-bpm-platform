@@ -117,7 +117,7 @@ public class TelemetryTaskWorkerMetricsSuiteElement {
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = configuration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = configuration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
@@ -150,7 +150,8 @@ public class TelemetryTaskWorkerMetricsSuiteElement {
                           1000,
                           data,
                           configuration.getTelemetryHttpConnector(),
-                          configuration.getTelemetryRegistry()).reportNow();
+                          configuration.getTelemetryRegistry(),
+                          configuration.getMetricsRegistry()).reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))

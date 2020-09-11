@@ -28,7 +28,9 @@ import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
@@ -39,6 +41,8 @@ import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -49,6 +53,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -56,6 +61,13 @@ import org.camunda.connect.spi.ConnectorRequest;
 public class TelemetrySendingTask extends TimerTask {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
+
+  static {
+    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
+    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
+  }
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
@@ -63,19 +75,22 @@ public class TelemetrySendingTask extends TimerTask {
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
+  protected MetricsRegistry metricsRegistry;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               int telemetryRequestRetries,
                               Data data,
                               Connector<? extends ConnectorRequest<?>> httpConnector,
-                              TelemetryRegistry telemetryRegistry) {
+                              TelemetryRegistry telemetryRegistry,
+                              MetricsRegistry metricsRegistry) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
     this.staticData = data;
     this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
+    this.metricsRegistry = metricsRegistry;
   }
 
   @Override
@@ -105,9 +120,6 @@ public class TelemetrySendingTask extends TimerTask {
           restoreDynamicData(dynamicData);
           throw e;
         }
-
-        // reset report time
-        telemetryRegistry.setStartReportTime(ClockUtil.getCurrentTime());
 
         requestSuccessful = true;
       } catch (Exception e) {
@@ -188,6 +200,13 @@ public class TelemetrySendingTask extends TimerTask {
     for (Map.Entry<String, Command> entry : commands.entrySet()) {
       telemetryRegistry.markOccurrence(entry.getKey(), entry.getValue().getCount());
     }
+
+    Map<String, Metric> metrics = internals.getMetrics();
+
+    for (String metricToReport : METRICS_TO_REPORT) {
+      Metric metricValue = metrics.get(metricToReport);
+      metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
+    }
   }
 
   protected Internals resolveDynamicData() {
@@ -222,28 +241,23 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected Map<String, Metric> calculateMetrics() {
 
-    Date startReportTime = telemetryRegistry.getStartReportTime();
     Date currentTime = ClockUtil.getCurrentTime();
 
-    return commandExecutor.execute(c -> {
-      ManagementService managementService = c.getProcessEngineConfiguration().getManagementService();
+    Map<String, Metric> metrics = new HashMap<>();
 
-      Map<String, Metric> metrics = new HashMap<>();
+    Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-      long sum = calculateMetricCount(managementService, startReportTime, currentTime, ROOT_PROCESS_INSTANCE_START);
-      metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(sum));
+    for (String metricToReport : METRICS_TO_REPORT) {
+      long value = telemetryMeters.get(metricToReport).getAndClear();
+      metrics.put(metricToReport, new Metric(value));
+    }
 
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, EXECUTED_DECISION_INSTANCES);
-      metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
-
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, ACTIVTY_INSTANCE_START);
-      metrics.put(ACTIVTY_INSTANCE_START, new Metric(sum));
-
-      sum = calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), startReportTime, currentTime);
-      metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
-
-      return metrics;
+    Long taskWorkers = commandExecutor.execute(c -> {
+      return calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), currentTime);
     });
+    metrics.put(UNIQUE_TASK_WORKERS, new Metric(taskWorkers));
+
+    return metrics;
   }
 
   protected long calculateMetricCount(ManagementService managementService,
@@ -259,7 +273,6 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected long calculateUniqueUserCount(CommandContext commandContext,
                                           HistoryLevel historyLevel,
-                                          Date startReportTime,
                                           Date currentTime) {
     if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       return 0;
