@@ -162,7 +162,6 @@ public class TelemetryReporterTest {
     String requestBody = new Gson().toJson(data);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
-                        .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
@@ -190,8 +189,8 @@ public class TelemetryReporterTest {
         .setTelemetryData(data)
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-                    .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
     standaloneProcessEngine = processEngineConfiguration.buildProcessEngine();
 
     // when
@@ -217,7 +216,6 @@ public class TelemetryReporterTest {
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
-                        .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
@@ -242,9 +240,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -289,9 +286,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -331,9 +327,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -362,9 +357,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -393,9 +387,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -429,9 +422,8 @@ public class TelemetryReporterTest {
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .willReturn(aResponse()
-            .withBody(requestBody)
-            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -502,10 +494,8 @@ public class TelemetryReporterTest {
     // given
     managementService.toggleTelemetry(true);
     Data data = createDataToSend();
-    String requestBody = new Gson().toJson(data);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
-                        .withBody(requestBody)
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
     TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
