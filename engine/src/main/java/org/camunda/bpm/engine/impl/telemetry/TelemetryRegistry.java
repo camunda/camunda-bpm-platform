@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 public class TelemetryRegistry {
 
@@ -28,7 +29,7 @@ public class TelemetryRegistry {
 
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
-  protected Date startReportTime;
+  protected Date startReportTime = ClockUtil.getCurrentTime();
   protected String camundaIntegration;
 
   public synchronized ApplicationServer getApplicationServer() {

@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -199,13 +200,15 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
   protected void startTelemetryReporter(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    // start telemetry reporter only if the telemetry is enabled
-    if (Boolean.TRUE.equals(processEngineConfiguration.getManagementService().isTelemetryEnabled()) &&
-        processEngineConfiguration.getTelemetryReporter() != null &&
-        processEngineConfiguration.getTelemetryReporter().getHttpConnector() != null) {
 
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+
+    // Always start telemetry reporter, regardless of engine configuration.
+    // If telemetry is disabled, the reporter simply does nothing when it runs.
+    // That way, the reporter will detect if telemetry was activated via a different process engine.
+    if (telemetryReporter != null) {
       try {
-        processEngineConfiguration.getTelemetryReporter().start();
+        telemetryReporter.start();
         // set start report time
         processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
       } catch (Exception e) {

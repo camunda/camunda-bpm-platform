@@ -48,8 +48,6 @@ public class TelemetryReporter {
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected TelemetryRegistry telemetryRegistry;
 
-  protected boolean stopped;
-
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
                            int telemetryRequestRetries,
@@ -77,11 +75,9 @@ public class TelemetryReporter {
   }
 
   public synchronized void start() {
-    if (stopped) {
-      // if the reporter was already stopped another task should be scheduled
+    if (!isScheduled()) { // initialize timer if only the the timer is not scheduled yet
       initTelemetrySendingTask();
-    }
-    if (timer == null) { // initialize timer if only the the timer is not scheduled yet
+
       timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
       long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
       long initialReportingDelay = initialReportingDelayInSeconds * 1000;
@@ -89,26 +85,42 @@ public class TelemetryReporter {
       try {
         timer.scheduleAtFixedRate(telemetrySendingTask, initialReportingDelay, reportingIntervalInMillis);
       } catch (Exception e) {
+        timer = null;
         throw LOG.schedulingTaskFails(e);
       }
     }
   }
 
+  public synchronized void reschedule() {
+    stop(false);
+    start();
+  }
+
   public synchronized void stop() {
-    if (timer != null) {
+    stop(true);
+  }
+
+  public synchronized void stop(boolean report) {
+    if (isScheduled()) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      // collect and send manually for the last time
-      reportNow();
+
+      if (report) {
+        // collect and send manually for the last time
+        reportNow();
+      }
     }
-    stopped = true;
   }
 
   public void reportNow() {
     if (telemetrySendingTask != null) {
       telemetrySendingTask.run();
     }
+  }
+
+  public boolean isScheduled() {
+    return timer != null;
   }
 
   public long getReportingIntervalInSeconds() {

@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -43,23 +42,30 @@ public class TelemetryConfigureCmd implements Command<Void> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
 
-    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY);
-    if (telemetryProperty == null) {
-      LOG.databaseTelemetryPropertyMissingInfo(telemetryEnabled);
-    }
+
+    commandContext.runWithoutAuthorization(() -> {
+      toggleTelemetry(commandContext);
+      return null;
+    });
+
+
+    return null;
+  }
+
+  protected void toggleTelemetry(CommandContext commandContext) {
+
+    Boolean currentValue = new IsTelemetryEnabledCmd().execute(commandContext);
+
     new SetPropertyCmd(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled)).execute(commandContext);
 
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    if (telemetryEnabled) {
-      telemetryReporter.start();
+
+    if (currentValue != null && !currentValue.booleanValue() && telemetryEnabled) {
+      telemetryReporter.reschedule();
       // set start report time
       processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
-    } else {
-      telemetryReporter.stop();
     }
-
-    return null;
   }
 
 }

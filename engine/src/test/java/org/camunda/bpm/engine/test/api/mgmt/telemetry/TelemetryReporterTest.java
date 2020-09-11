@@ -492,6 +492,19 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldNotSendTelemetryWhenDisabled() {
+    // given
+    managementService.toggleTelemetry(false);
+    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
+
+    // when
+    telemetryReporter.reportNow();
+
+    // then
+    verify(0, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+  }
+
+  @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
   public void shouldLogTelemetryDisabled() {
     // given default configuration
