@@ -61,7 +61,7 @@ function App() {
   }, []);
 
   if (isLoading) {
-    return <LoadingIndicator />;
+    return <LoadingIndicator fullscreen={true} />;
   }
 
   return (

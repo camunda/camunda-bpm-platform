@@ -35,7 +35,7 @@ export default function EnterpriseComponent({ children }) {
   }, []);
 
   if (hasLicense === null) {
-    return <LoadingIndicator />;
+    return <LoadingIndicator fullscreen={true} />;
   }
   if (hasLicense) {
     return children;

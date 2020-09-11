@@ -18,10 +18,16 @@
 import React from "react";
 
 import "./LoadingIndicator.scss";
+import classNames from "classnames";
 
-export default function LoadingIndicator() {
+export default function LoadingIndicator({ fullscreen }) {
   return (
-    <div className="LoadingIndicator">
+    <div
+      className={classNames(
+        "LoadingIndicator",
+        fullscreen ? "fullscreen" : null
+      )}
+    >
       <span className="spinner spinner-big" />
     </div>
   );
