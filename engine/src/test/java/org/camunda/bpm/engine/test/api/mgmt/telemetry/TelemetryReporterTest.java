@@ -25,10 +25,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.EXECUTED_DECISION_INSTANCES;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.FLOW_NODE_INSTANCES;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.ROOT_PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
+import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.net.HttpURLConnection;
 import java.util.Calendar;
@@ -300,7 +300,7 @@ public class TelemetryReporterTest {
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
     Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCES).getCount()).isEqualTo(3);
+    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -341,7 +341,7 @@ public class TelemetryReporterTest {
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
     Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCES).getCount()).isEqualTo(3);
+    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -401,7 +401,7 @@ public class TelemetryReporterTest {
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
     Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(FLOW_NODE_INSTANCES).getCount()).isEqualTo(12);
+    assertThat(metrics.get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(12);
   }
 
   @Test
@@ -698,9 +698,9 @@ public class TelemetryReporterTest {
 
   protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {
     Map<String, Metric> metrics = new HashMap<>();
-    metrics.put(ROOT_PROCESS_INSTANCES, new Metric(processCount));
+    metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(processCount));
     metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionCount));
-    metrics.put(FLOW_NODE_INSTANCES, new Metric(flowNodeCount));
+    metrics.put(ACTIVTY_INSTANCE_START, new Metric(flowNodeCount));
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(workerCount));
     return metrics;
   }

@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.EXECUTED_DECISION_INSTANCES;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.FLOW_NODE_INSTANCES;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.ROOT_PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
+import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.net.HttpURLConnection;
 import java.util.Calendar;
@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -225,14 +224,14 @@ public class TelemetrySendingTask extends TimerTask {
 
       Map<String, Metric> metrics = new HashMap<>();
 
-      long sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.ROOT_PROCESS_INSTANCE_START);
-      metrics.put(ROOT_PROCESS_INSTANCES, new Metric(sum));
+      long sum = calculateMetricCount(managementService, startReportTime, currentTime, ROOT_PROCESS_INSTANCE_START);
+      metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(sum));
 
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.EXECUTED_DECISION_INSTANCES);
+      sum = calculateMetricCount(managementService, startReportTime, currentTime, EXECUTED_DECISION_INSTANCES);
       metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
 
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, Metrics.ACTIVTY_INSTANCE_START);
-      metrics.put(FLOW_NODE_INSTANCES, new Metric(sum));
+      sum = calculateMetricCount(managementService, startReportTime, currentTime, ACTIVTY_INSTANCE_START);
+      metrics.put(ACTIVTY_INSTANCE_START, new Metric(sum));
 
       sum = calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), startReportTime, currentTime);
       metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
