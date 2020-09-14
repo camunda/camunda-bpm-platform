@@ -24,9 +24,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 
 public class TelemetryRegistry {
 
-  public static final String ROOT_PROCESS_INSTANCES = "root-process-instances";
-  public static final String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
-  public static final String FLOW_NODE_INSTANCES = "flow-node-instances";
   public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
 
   protected Map<String, CommandCounter> commands = new HashMap<>();
