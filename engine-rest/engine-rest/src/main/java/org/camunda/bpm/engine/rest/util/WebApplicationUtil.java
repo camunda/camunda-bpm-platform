@@ -17,21 +17,23 @@
 package org.camunda.bpm.engine.rest.util;
 
 import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
-import static org.camunda.bpm.engine.rest.util.EngineUtil.lookupProcessEngine;
 
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class WebApplicationUtil {
 
   public static void setApplicationServer(String serverInfo) {
     if (serverInfo != null && !serverInfo.isEmpty() ) {
-      Set<String> processEngineNames = getProcessEngineProvider().getProcessEngineNames();
+      ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
+      Set<String> processEngineNames = processEngineProvider.getProcessEngineNames();
+
       for (String engineName : processEngineNames) {
-        ProcessEngine processEngine = lookupProcessEngine(engineName);
+        ProcessEngine processEngine = processEngineProvider.getProcessEngine(engineName);
         ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
         TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
         if (telemetryRegistry != null && telemetryRegistry.getApplicationServer() == null) {

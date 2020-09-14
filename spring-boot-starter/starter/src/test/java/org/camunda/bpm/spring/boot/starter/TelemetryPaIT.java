@@ -14,49 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.springboot.project.qa.simple;
+package org.camunda.bpm.spring.boot.starter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.spring.boot.starter.test.pa.TestProcessApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { Application.class },
-                webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class SimpleApplicationIT {
-
-  @Autowired
-  RuntimeService runtimeService;
-
-  @Autowired
-  ProcessEngine processEngine;
+@SpringBootTest(
+  classes = {TestProcessApplication.class},
+  webEnvironment = WebEnvironment.RANDOM_PORT
+)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class TelemetryPaIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
-  public void shouldStartApplicationSuccessfully() {
-    // then no exception due to missing classes is thrown
-    assertThat(runtimeService).isNotNull();
-  }
-
-  /**
-   * Verifies that a Spring Boot project without spring-boot-starter-web and
-   * spring-boot-starter-jersey (i.e. without servlet API) still works correctly.
-   */
-  @Test
-  public void shouldNotDetermineApplicationServer() {
-
+  public void shouldSubmitApplicationServerData() {
     TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
 
     // then
     ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
-    assertThat(applicationServer).isNull();
+    assertThat(applicationServer).isNotNull();
+    assertThat(applicationServer.getVendor()).isEqualTo("Apache Tomcat");
+    assertThat(applicationServer.getVersion()).isNotNull();
   }
-
 }
