@@ -29,6 +29,7 @@ public class TelemetryRegistry {
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
   protected Date startReportTime;
+  protected String camundaIntegration;
 
   public synchronized ApplicationServer getApplicationServer() {
     return applicationServer;
@@ -52,6 +53,14 @@ public class TelemetryRegistry {
 
   public void setStartReportTime(Date lastReport) {
     this.startReportTime = lastReport;
+  }
+
+  public String getCamundaIntegration() {
+    return camundaIntegration;
+  }
+
+  public void setCamundaIntegration(String camundaIntegration) {
+    this.camundaIntegration = camundaIntegration;
   }
 
   public void markOccurrence(String name) {
