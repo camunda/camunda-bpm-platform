@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.mgmt.telemetry.TelemetrySuiteTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -65,7 +66,10 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 
-public class TelemetryTaskWorkerMetricsTest {
+/**
+ * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
+ */
+public class TelemetryTaskWorkerMetricsSuiteElement {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";

@@ -80,7 +80,10 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 
-public class TelemetryReporterTest {
+/**
+ * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
+ */
+public class TelemetryReporterSuiteElement {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
