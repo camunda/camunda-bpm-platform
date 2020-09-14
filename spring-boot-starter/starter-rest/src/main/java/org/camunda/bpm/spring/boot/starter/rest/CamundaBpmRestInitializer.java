@@ -18,7 +18,6 @@ package org.camunda.bpm.spring.boot.starter.rest;
 
 import org.camunda.bpm.engine.rest.filter.CacheControlFilter;
 import org.camunda.bpm.engine.rest.filter.EmptyBodyFilter;
-import org.camunda.bpm.engine.rest.impl.web.bootstrap.RestContainerBootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.servlet.JerseyApplicationPath;
