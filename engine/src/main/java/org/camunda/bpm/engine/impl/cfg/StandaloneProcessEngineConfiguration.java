@@ -36,31 +36,25 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
 
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
-    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
-
+    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
+    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
-
     return defaultCommandInterceptorsTxRequired;
   }
 
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
-    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
-
+    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
+    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this, true));
-
     return defaultCommandInterceptorsTxRequired;
   }
 
