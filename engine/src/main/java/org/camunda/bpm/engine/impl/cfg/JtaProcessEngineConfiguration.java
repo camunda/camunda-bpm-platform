@@ -68,11 +68,13 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
 
+    // CRDB interceptor is added before the JtaTransactionInterceptor,
+    // so that a Java EE managed TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
 
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
 
@@ -85,11 +87,13 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
 
+    // CRDB interceptor is added before the JtaTransactionInterceptor,
+    // so that a Java EE managed TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
 
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
 

@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
-import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 
@@ -25,22 +24,19 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
  * A CockroachDB-specific Command interceptor to catch optimistic locking
  * errors (classified as a {@link CrdbTransactionRetryException}). The
  * interceptor then retries the Command multiple times, according to the
- * retries set by the {@link org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl#commandRetries} property.
+ * retries set by the {@link org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl}
+ * commandRetries property.
  */
 public class CrdbTransactionRetryInterceptor extends CommandInterceptor {
 
   private static final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
-  // TODO: how to address this in the managed tx case? should not make a retry
-  //   if the tx is externally managed, but ideally we do make a retry if the
-  //   tx is begun when the Camunda command starts
-  
   protected int retries;
-  
+
   public CrdbTransactionRetryInterceptor(int retries) {
     this.retries = retries;
   }
-  
+
   @Override
   public <T> T execute(Command<T> command) {
     int remainingTries = retries + 1;
@@ -50,7 +46,7 @@ public class CrdbTransactionRetryInterceptor extends CommandInterceptor {
         return next.execute(command);
       } catch (CrdbTransactionRetryException e) {
         remainingTries--;
-        if (!command.isRetryable() || remainingTries == 0) {
+        if (!isRetryable(command) || remainingTries == 0) {
           throw e;
         } else {
           LOG.crdbTransactionRetryAttempt(e);
@@ -59,5 +55,9 @@ public class CrdbTransactionRetryInterceptor extends CommandInterceptor {
     }
 
     return null;
+  }
+
+  protected boolean isRetryable(Command<?> command) {
+    return command.isRetryable();
   }
 }

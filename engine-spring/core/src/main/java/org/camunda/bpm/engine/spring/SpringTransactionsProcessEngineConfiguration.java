@@ -17,11 +17,13 @@
 package org.camunda.bpm.engine.spring;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipInputStream;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -31,7 +33,6 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
@@ -77,17 +78,13 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    
-    // TODO: need to catch CRDB exception on commit and warp in OLE if necessary (same for JTA)
-    defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED));
 
-    // TODO: make this work for cases in which TX integration is used, but the TX Is not user-managed (same for JTA)
-    // this requires:
-    //   - move this interceptor in front of the Spring TX interceptor
-    //   - catch CRDB exceptions on commit in TX interceptor and wrap in OLE (see above)
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+    // CRDB interceptor is added before the SpringTransactionInterceptor,
+    // so that a Spring TX may be rolled back before retrying.
+    if (crdbIntegrationProvider.registerCrdbRetryInterceptor(this)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED));
 
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this);
     defaultCommandInterceptorsTxRequired.add(commandContextInterceptor);
@@ -100,11 +97,13 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRES_NEW));
 
-    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+    // CRDB interceptor is added before the SpringTransactionInterceptor,
+    // so that a Spring TX may be rolled back before retrying.
+    if (crdbIntegrationProvider.registerCrdbRetryInterceptor(this)) {
       defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequiresNew.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRES_NEW));
 
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this, true);
     defaultCommandInterceptorsTxRequiresNew.add(commandContextInterceptor);
