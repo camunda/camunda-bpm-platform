@@ -26,7 +26,7 @@
     <jackson.version>2.10.0</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
     <commons.version>1.9.0</commons.version>
-    <spin.version.old>1.9.0</spin.version.old>
+    <spin.version.old>1.10.0</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <powermock.version>1.5.6</powermock.version>
