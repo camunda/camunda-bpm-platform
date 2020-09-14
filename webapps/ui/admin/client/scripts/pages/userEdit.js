@@ -156,18 +156,20 @@ module.exports = [
               $scope.profile = angular.copy(res);
               $scope.profileCopy = angular.copy(res);
 
+              var userFullName = [$scope.user.firstName, $scope.user.lastName]
+                .filter(function(v) {
+                  return !!v;
+                })
+                .join(' ');
+
               page.titleSet(
-                $translate.instant('USERS_EDIT_USER', {user: $scope.user})
+                $translate.instant('USERS_EDIT_USER', {user: userFullName})
               );
 
               refreshBreadcrumbs();
 
               page.breadcrumbsAdd({
-                label: [$scope.user.firstName, $scope.user.lastName]
-                  .filter(function(v) {
-                    return !!v;
-                  })
-                  .join(' '),
+                label: userFullName,
                 href: '#/users/' + $scope.user.id
               });
             });
