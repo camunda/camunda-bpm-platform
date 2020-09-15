@@ -2642,7 +2642,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     String camundaIntegration = telemetryRegistry.getCamundaIntegration();
     if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
-      internals.getCamundaIntegration().put(camundaIntegration, true);
+      internals.getCamundaIntegration().add(camundaIntegration);
     }
 
     ProcessEngineDetails engineInfo = ParseUtil

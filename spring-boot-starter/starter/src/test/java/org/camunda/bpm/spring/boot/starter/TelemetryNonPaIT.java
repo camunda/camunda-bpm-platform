@@ -18,8 +18,13 @@ package org.camunda.bpm.spring.boot.starter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
+
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,4 +49,17 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
     assertThat(applicationServer.getVendor()).isEqualTo("Apache Tomcat");
     assertThat(applicationServer.getVersion()).isNotNull();
   }
+
+  @Test
+  public void shouldAddCamundaIntegration() {
+    // given default configuration
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+
+    // then
+    Data telemetryData = processEngineConfiguration.getTelemetryData();
+    Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    assertThat(camundaIntegration.size()).isOne();
+    assertThat(camundaIntegration).containsExactly(CamundaIntegration.SPRING_BOOT_STARTER);
+  }
+
 }

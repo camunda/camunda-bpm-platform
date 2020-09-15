@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.telemetry;
 
-import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,8 +34,8 @@ public class CamundaIntegrationDeterminator implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
-    Map<String, Object> camundaIntegration = configuration.getTelemetryData().getProduct().getInternals().getCamundaIntegration();
-    camundaIntegration.put(CamundaIntegration.SPRING_BOOT_STARTER, true);
+    Set<String> camundaIntegration = configuration.getTelemetryData().getProduct().getInternals().getCamundaIntegration();
+    camundaIntegration.add(CamundaIntegration.SPRING_BOOT_STARTER);
   }
 
 }
