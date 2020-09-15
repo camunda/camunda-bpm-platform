@@ -18,7 +18,7 @@ package org.camunda.bpm.run.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -46,9 +46,9 @@ public class TelemetryDataTest {
 
     // then
     Data telemetryData = processEngineConfiguration.getTelemetryData();
-    Map<String, Object> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
     assertThat(camundaIntegration.size()).isEqualTo(2);
-    assertThat((boolean) camundaIntegration.get(CamundaIntegration.CAMUNDA_BPM_RUN)).isTrue();
-    assertThat((boolean) camundaIntegration.get(CamundaIntegration.SPRING_BOOT_STARTER)).isTrue();
+    assertThat(camundaIntegration)
+      .containsExactlyInAnyOrder(CamundaIntegration.CAMUNDA_BPM_RUN, CamundaIntegration.SPRING_BOOT_STARTER);
   }
 }
