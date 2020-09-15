@@ -900,6 +900,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** The number of times the telemetry request is retried in case it fails **/
   protected int telemetryRequestRetries = 2;
   protected TelemetryReporter telemetryReporter;
+  /** Determines if the telemetry reporter thread runs. For telemetry to be sent,
+   * this flag must be set to <code>true</code> and telemetry must be enabled via API
+   * (see {@link ManagementService#toggleTelemetry(boolean)}. */
+  protected boolean isTelemetryReporterActivate = true;
   /** http client used for sending telemetry */
   protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
   /** default: once every 24 hours */
@@ -4781,6 +4785,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setTelemetryReporter(TelemetryReporter telemetryReporter) {
     this.telemetryReporter = telemetryReporter;
+    return this;
+  }
+
+  public boolean isTelemetryReporterActivate() {
+    return isTelemetryReporterActivate;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryReporterActivate(boolean isTelemetryReporterActivate) {
+    this.isTelemetryReporterActivate = isTelemetryReporterActivate;
     return this;
   }
 

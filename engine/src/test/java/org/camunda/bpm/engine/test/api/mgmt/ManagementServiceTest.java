@@ -50,7 +50,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -894,10 +893,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isTrue();
-
-    // and the telemetry reporter is still scheduled
-    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   @Test
@@ -912,10 +907,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();
-
-    // and the telemetry reporter is still scheduled
-    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
-    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {

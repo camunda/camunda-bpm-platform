@@ -202,11 +202,14 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+    boolean telemetryReporterActivate = processEngineConfiguration.isTelemetryReporterActivate();
 
-    // Always start telemetry reporter, regardless of engine configuration.
-    // If telemetry is disabled, the reporter simply does nothing when it runs.
-    // That way, the reporter will detect if telemetry was activated via a different process engine.
-    if (telemetryReporter != null) {
+    // Start telemetry if the reporter is generally activated via the engine configuration.
+    // Note that there are two conditions for telemetry to be sent: The reporter runs and
+    // telemetry is enabled via API. If the latter is not the case, the reporter will do nothing.
+    // However, it is important that it is always running so that it will detect if telemetry
+    // was enabled by another engine in the cluster.
+    if (telemetryReporter != null && telemetryReporterActivate) {
       try {
         telemetryReporter.start();
         // set start report time

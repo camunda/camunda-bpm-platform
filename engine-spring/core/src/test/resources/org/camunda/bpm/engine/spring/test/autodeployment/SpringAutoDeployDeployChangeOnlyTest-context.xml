@@ -26,6 +26,7 @@
     <property name="jobExecutorActivate" value="false" />
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
     <property name="deployChangedOnly" value="true" />
     <!-- resources are dynamically looked up by engine configuration -->
   </bean>
