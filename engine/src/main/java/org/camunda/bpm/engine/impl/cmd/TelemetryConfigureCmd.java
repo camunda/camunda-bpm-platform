@@ -59,9 +59,11 @@ public class TelemetryConfigureCmd implements Command<Void> {
     new SetPropertyCmd(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled)).execute(commandContext);
 
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+
+    boolean isReportedActivated = processEngineConfiguration.isTelemetryReporterActivate();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
 
-    if (currentValue != null && !currentValue.booleanValue() && telemetryEnabled) {
+    if (isReportedActivated && currentValue != null && !currentValue.booleanValue() && telemetryEnabled) {
       telemetryReporter.reschedule();
       // set start report time
       processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());

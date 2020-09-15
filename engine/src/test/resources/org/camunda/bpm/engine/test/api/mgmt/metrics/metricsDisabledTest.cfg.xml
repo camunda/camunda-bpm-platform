@@ -20,6 +20,7 @@
     <property name="jobExecutorActivate" value="false" />
 
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
     <property name="metricsEnabled" value="false" />
 
   </bean>

@@ -60,7 +60,9 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
+
     // the telemetry reporter is always scheduled
+    assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
     assertThat(inMemoryConfiguration.getTelemetryReporter().isScheduled()).isTrue();
   }
 

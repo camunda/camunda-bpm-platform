@@ -28,6 +28,7 @@
         <property name="jobExecutorActivate" value="false"/>
         <!-- turn off metrics reporter -->
         <property name="dbMetricsReporterActivate" value="false" />
+        <property name="telemetryReporterActivate" value="false" />
     </bean>
 
     <!-- using ManagedProcessEngineFactoryBean allows registering the ProcessEngine with the BpmPlatform -->

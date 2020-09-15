@@ -14,7 +14,8 @@
 		<property name="enableExpressionsInAdhocQueries" value="true" />
 
         <!-- turn off metrics reporter -->
-        <property name="dbMetricsReporterActivate" value="false" />
+    <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
 
 		<property name="customPostBPMNParseListeners">
 			<list>

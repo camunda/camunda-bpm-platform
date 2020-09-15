@@ -93,7 +93,9 @@ public class TelemetryReporterSuiteElement {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule =
       new ProcessEngineBootstrapRule(configuration ->
-          configuration.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+          configuration
+            .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+            .setTelemetryReporterActivate(true)
             );
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
@@ -521,6 +523,16 @@ public class TelemetryReporterSuiteElement {
     // it might have two logs:
     // first during process engine start
     // second during #reportNow call
+  }
+
+  @Test
+  public void shouldKeepReporterRunningAfterTelemetryIsDisabled() {
+    // when
+    managementService.toggleTelemetry(false);
+
+    // then
+    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
+    assertThat(telemetryReporter.isScheduled()).isTrue();
   }
 
   @Test

@@ -26,6 +26,7 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
