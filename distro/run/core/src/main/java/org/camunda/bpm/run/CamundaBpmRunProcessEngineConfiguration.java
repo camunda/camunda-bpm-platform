@@ -18,7 +18,7 @@ package org.camunda.bpm.run;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -58,7 +58,7 @@ public class CamundaBpmRunProcessEngineConfiguration extends SpringProcessEngine
   @Override
   protected void initTelemetryData() {
     super.initTelemetryData();
-    Map<String, Object> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
-    camundaIntegration.put(CamundaIntegration.CAMUNDA_BPM_RUN, true);
+    Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
+    camundaIntegration.add(CamundaIntegration.CAMUNDA_BPM_RUN);
   }
 }
