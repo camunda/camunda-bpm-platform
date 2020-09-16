@@ -858,7 +858,7 @@
           and (
           <!-- Task query does not use left join if cmmn is disabled, 
             so we don't need to account for case tasks in this case. -->
-          <if test="authCheck.useLeftJoin" >
+          <if test="applyAuthorizationCheckForCaseInstances" >
             (RES.CASE_EXECUTION_ID_ IS NOT NULL)
             OR
           </if>

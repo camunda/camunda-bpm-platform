@@ -656,6 +656,9 @@
         )
       </foreach>
       
+      <!-- Task query does not use left join if cmmn is disabled, 
+        so we don't need to account for case tasks in this case. -->
+      <bind name="applyAuthorizationCheckForCaseInstances" value="authCheck.useLeftJoin" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
  

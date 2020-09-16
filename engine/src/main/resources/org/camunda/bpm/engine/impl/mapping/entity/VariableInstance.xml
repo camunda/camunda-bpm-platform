@@ -462,6 +462,7 @@
               </if>
             </foreach>
 
+            <bind name="applyAuthorizationCheckForCaseInstances" value="true" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
