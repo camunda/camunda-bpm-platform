@@ -2665,7 +2665,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     Jdk jdk = ParseUtil.parseJdkDetails();
 
-    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), jdk);
+    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
 
     String camundaIntegration = telemetryRegistry.getCamundaIntegration();
     if (camundaIntegration != null && !camundaIntegration.isEmpty()) {

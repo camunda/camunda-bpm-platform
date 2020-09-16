@@ -31,6 +31,7 @@ public class Internals {
   protected Database database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
   protected ApplicationServer applicationServer;
+  protected LicenseKeyData licenseKey;
   protected Map<String, Command> commands;
   @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)
   protected Set<String> camundaIntegration;
@@ -40,21 +41,22 @@ public class Internals {
   protected Jdk jdk;
 
   public Internals() {
-    this(null, null, null);
+    this(null, null, null, null);
   }
 
-  public Internals(Database database, ApplicationServer server, Jdk jdk) {
+  public Internals(Database database, ApplicationServer server, LicenseKeyData licenseKey, Jdk jdk) {
     this.database = database;
     this.applicationServer = server;
+    this.licenseKey = licenseKey;
     this.commands = new HashMap<>();
     this.jdk = jdk;
     this.camundaIntegration = new HashSet<>();
   }
 
   public Internals(Internals internals) {
-    this(internals.database, internals.applicationServer, internals.jdk);
-    this.commands = internals.getCommands();
-    this.metrics = internals.getMetrics();
+    this(internals.database, internals.applicationServer, internals.licenseKey, internals.jdk);
+    this.commands = new HashMap<>(internals.getCommands());
+    this.metrics = internals.metrics == null ? null : new HashMap<>(internals.getMetrics());
   }
 
   public Database getDatabase() {
@@ -108,6 +110,14 @@ public class Internals {
 
   public void setCamundaIntegration(Set<String> camundaIntegration) {
     this.camundaIntegration = camundaIntegration;
+  }
+
+  public LicenseKeyData getLicenseKey() {
+    return licenseKey;
+  }
+
+  public void setLicenseKey(LicenseKeyData licenseKey) {
+    this.licenseKey = licenseKey;
   }
 
 }

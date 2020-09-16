@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 public class TelemetryRegistry {
@@ -30,6 +31,7 @@ public class TelemetryRegistry {
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
   protected Date startReportTime = ClockUtil.getCurrentTime();
+  protected LicenseKeyData licenseKey;
   protected String camundaIntegration;
 
   public synchronized ApplicationServer getApplicationServer() {
@@ -64,6 +66,14 @@ public class TelemetryRegistry {
     this.camundaIntegration = camundaIntegration;
   }
 
+  public LicenseKeyData getLicenseKey() {
+    return licenseKey;
+  }
+
+  public void setLicenseKey(LicenseKeyData licenseKey) {
+    this.licenseKey = licenseKey;
+  }
+
   public void markOccurrence(String name) {
     markOccurrence(name, 1);
   }
@@ -84,6 +94,8 @@ public class TelemetryRegistry {
 
   public void clear() {
     commands.clear();
+    licenseKey = null;
+    applicationServer = null;
   }
 
 }
