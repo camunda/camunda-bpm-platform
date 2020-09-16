@@ -47,7 +47,6 @@ public class TelemetryDataTest {
     // then
     Data telemetryData = processEngineConfiguration.getTelemetryData();
     Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
-    assertThat(camundaIntegration.size()).isEqualTo(2);
     assertThat(camundaIntegration)
       .containsExactlyInAnyOrder(CamundaIntegration.CAMUNDA_BPM_RUN, CamundaIntegration.SPRING_BOOT_STARTER);
   }
