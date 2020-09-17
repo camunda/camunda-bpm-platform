@@ -17,6 +17,7 @@
 package org.camunda.bpm.container.impl.ejb.deployment;
 
 import java.util.List;
+
 import org.camunda.bpm.container.impl.deployment.StartProcessEngineStep;
 import org.camunda.bpm.container.impl.ejb.plugin.EjbConnectProcessEnginePlugin;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
@@ -26,8 +27,7 @@ import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 
 /**
- * Adds an additional plugin to load the connectors in case they are not loaded so far,
- * e.g. the connect plugin is not present
+ * Adds an additional configuration before the engine is built
  */
 public class EjbStartProcessEngineStep extends StartProcessEngineStep {
 
