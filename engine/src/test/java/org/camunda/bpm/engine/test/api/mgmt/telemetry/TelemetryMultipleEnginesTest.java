@@ -59,7 +59,7 @@ import com.google.gson.Gson;
  *
  * Note: This test assumes that the default engine is configured against the wiremock endpoint on port 8081.
  */
-public class TelemetryMultipleEnginesSuiteElement {
+public class TelemetryMultipleEnginesTest {
 
   protected static final String TELEMETRY_ENDPOINT_PATH = "/pings";
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081" + TELEMETRY_ENDPOINT_PATH;
@@ -165,9 +165,9 @@ public class TelemetryMultipleEnginesSuiteElement {
       int expectedTaskWorkers) {
     Internals internals = data.getProduct().getInternals();
 
-    assertMetric(internals, "root-process-instances", expectedRootInstances);
-    assertMetric(internals, "executed-decision-instances", expectedDecisionInstances);
-    assertMetric(internals, "flow-node-instances", expectedFlowNodeInstances);
+    assertMetric(internals, Metrics.ROOT_PROCESS_INSTANCE_START, expectedRootInstances);
+    assertMetric(internals, Metrics.EXECUTED_DECISION_INSTANCES, expectedDecisionInstances);
+    assertMetric(internals, Metrics.ACTIVTY_INSTANCE_START, expectedFlowNodeInstances);
     assertMetric(internals, "unique-task-workers", expectedTaskWorkers);
   }
 

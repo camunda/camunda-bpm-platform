@@ -86,9 +86,9 @@ import com.google.gson.Gson;
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
-public class TelemetryReporterSuiteElement {
+public class TelemetryReporterTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
 
   @ClassRule
@@ -108,7 +108,7 @@ public class TelemetryReporterSuiteElement {
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   @ClassRule
-  public static WireMockRule wireMockRule = new WireMockRule(8081);
+  public static WireMockRule wireMockRule = new WireMockRule(8084);
 
   protected ProcessEngine standaloneProcessEngine;
   protected ProcessEngineConfigurationImpl configuration;
