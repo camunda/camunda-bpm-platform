@@ -49,7 +49,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -444,7 +443,7 @@ public class SuppressSqlExceptionsTest {
   protected void failForSqlStatement(String statement) {
     Map<String, String> statementMappings = engineConfig.getDbSqlSessionFactory()
         .getStatementMappings();
-    statementMappings.put(statement, "");
+    statementMappings.put(statement, "does-not-exist");
   }
 
   protected String generateString(int size) {
