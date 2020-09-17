@@ -29,7 +29,7 @@ module.exports = {
     files: [{
       expand: true,
       cwd: 'ui/cockpit/',
-      src: ['plugin.js'],
+      src: ['plugin.js', 'plugin.css'],
       dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app'
     }]
   }

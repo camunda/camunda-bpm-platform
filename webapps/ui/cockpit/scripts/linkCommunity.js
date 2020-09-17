@@ -24,8 +24,10 @@ try {
   fs.unlinkSync(srcDirectory + "/enterprise");
 } catch {}
 
-fs.symlinkSync(
-  srcDirectory + "/enterprise_stubs",
-  srcDirectory + "/enterprise",
-  "dir"
-);
+try {
+  fs.symlinkSync(
+    srcDirectory + "/enterprise_stubs",
+    srcDirectory + "/enterprise",
+    "dir"
+  );
+} catch {}

@@ -1026,7 +1026,7 @@
                     </exec>
                     <exec dir="${frontend.react.path}" executable="npm" failonerror="true">
                       <arg value="run" />
-                      <arg value="buildCE" />
+                      <arg value="build" />
                     </exec>
                     <exec executable="node" failonerror="true">
                       <arg value="./scripts/removeAndCopy.js" />

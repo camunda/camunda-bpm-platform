@@ -41,8 +41,6 @@
     "styles": "lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles.less public/styles/styles.css && lessc --include-path=src/legacy/camunda-commons-ui/lib/widgets:src/legacy/camunda-commons-ui/resources/less:src/legacy/camunda-commons-ui/resources/css:src/legacy/common/styles:src/legacy/client/scripts src/legacy/client/styles/styles-components.less public/styles/styles-components.css",
     "translations": "node scripts/translations",
     "build": "rescripts build",
-    "buildCE": "node scripts/linkCommunity && npm run build",
-    "buildEE": "node scripts/linkEnterprise && npm run build",
     "test": "rescripts test",
     "eject": "rescripts eject",
     "postinstall": "node wireModules && node scripts/linkCommunity && npm run translations && npm run styles",

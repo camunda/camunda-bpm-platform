@@ -14,22 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-const fs = require("fs");
-const path = require("path");
-
-const srcDirectory = path.resolve(__dirname, "../src");
-
-try {
-  fs.unlinkSync(srcDirectory + "/enterprise");
-} catch {}
-
-try {
-  fs.symlinkSync(
-    srcDirectory + "/enterprise_modules",
-    srcDirectory + "/enterprise",
-    "dir"
-  );
-} catch {
-  console.log("Could not link Enterprise modules.");
-}
