@@ -685,11 +685,16 @@
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
     <bind name="atomicChecks" value="authCheck.permissionChecks.atomicChecks" />
     <bind name="disjunctive" value="authCheck.permissionChecks.disjunctive" />
+    <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
   </sql>
 
   <sql id="authCheckJoinWithoutOnClauseWithBinding">
-    left JOIN (
+    <choose>
+      <when test="useLeftJoin != null &amp;&amp; useLeftJoin == true">left join</when>
+      <otherwise>inner join</otherwise>
+    </choose>
+    (
     SELECT A.*
     FROM ${prefix}ACT_RU_AUTHORIZATION A
     WHERE A.TYPE_ &lt; 2     
@@ -851,9 +856,13 @@
         </when>
         <otherwise>
           and (
-          (RES.CASE_EXECUTION_ID_ IS NOT NULL)
-          OR
-          (AUTH.RESOURCE_ID_ IS NOT NULL)
+          <!-- Task query does not use left join if cmmn is disabled, 
+            so we don't need to account for case tasks in this case. -->
+          <if test="applyAuthorizationCheckForCaseInstances" >
+            (RES.CASE_EXECUTION_ID_ IS NOT NULL)
+            OR
+          </if>
+            (AUTH.RESOURCE_ID_ IS NOT NULL)
             <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">

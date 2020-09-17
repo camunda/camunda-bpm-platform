@@ -146,7 +146,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected SuspensionState suspensionState;
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
-  
+
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
 
@@ -698,7 +698,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, true, false);
     return this;
   }
-  
+
   @Override
   public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, true, false);
@@ -734,7 +734,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
-  
+
   @Override
   public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
@@ -1081,7 +1081,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         .createGroupQuery()
         .groupMember(candidateUser)
         .list();
-    
+
     List<String> groupIds = new ArrayList<>();
     for (Group group : groups) {
       groupIds.add(group.getId());
@@ -1122,7 +1122,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       }
     }
   }
-  
+
   public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     ensureNotNull("name", name);
 
@@ -1368,6 +1368,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return Collections.emptyList();
     }
 
+    decideAuthorizationJoinType(commandContext);
+
     List<Task> taskList = commandContext
       .getTaskManager()
       .findTasksByQueryCriteria(this);
@@ -1394,9 +1396,17 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     if (getCandidateGroup() != null && getCandidateGroupsInternal() != null && getCandidateGroups().isEmpty()) {
       return 0;
     }
+
+    decideAuthorizationJoinType(commandContext);
+
     return commandContext
       .getTaskManager()
       .findTaskCountByQueryCriteria(this);
+  }
+
+  protected void decideAuthorizationJoinType(CommandContext commandContext) {
+    boolean cmmnEnabled = commandContext.getProcessEngineConfiguration().isCmmnEnabled();
+    authCheck.setUseLeftJoin(cmmnEnabled);
   }
 
   protected void resetCachedCandidateGroups() {
