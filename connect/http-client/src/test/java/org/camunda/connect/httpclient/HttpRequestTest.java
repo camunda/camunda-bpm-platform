@@ -160,4 +160,35 @@ public class HttpRequestTest {
       .containsEntry("number", 42);
   }
 
+  @Test
+  public void setConfigOption() {
+    Object value = new Object();
+    HttpRequest request = connector.createRequest()
+        .configOption("object-field", value)
+        .configOption("int-field", 15)
+        .configOption("long-field", 15l)
+        .configOption("boolean-field", true)
+        .configOption("string-field", "string-value");
+
+    assertThat(request.getConfigOption("object-field")).isEqualTo(value);
+    assertThat(request.getConfigOption("int-field")).isEqualTo(15);
+    assertThat(request.getConfigOption("long-field")).isEqualTo(15l);
+    assertThat(request.getConfigOption("boolean-field")).isEqualTo(true);
+    assertThat(request.getConfigOption("string-field")).isEqualTo("string-value");
+  }
+
+  @Test
+  public void shouldIgnoreConfigWithNullOrEmptyNameOrNullValue() {
+      HttpRequest request = connector.createRequest();
+
+      request.configOption(null, "test");
+      assertThat(request.getConfigOptions()).isNull();
+
+      request.configOption("", "test");
+      assertThat(request.getConfigOptions()).isNull();
+
+      request.configOption("test", null);
+      assertThat(request.getConfigOptions()).isNull();
+  }
+
 }

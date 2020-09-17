@@ -29,6 +29,8 @@ public interface HttpBaseRequest<Q extends HttpBaseRequest<?, ?>, R extends Conn
   String PARAM_NAME_REQUEST_PAYLOAD = "payload";
   String HEADER_CONTENT_TYPE = "Content-Type";
 
+  String PARAM_NAME_REQUEST_CONFIG = "request-config";
+
   /**
    * Set the url of this request.
    *
@@ -99,4 +101,23 @@ public interface HttpBaseRequest<Q extends HttpBaseRequest<?, ?>, R extends Conn
    * @return the method of this request or null if not set
    */
   String getMethod();
+
+  /**
+   * @return the HTTP configuration options of this request or null if non set
+   */
+  Map<String, Object> getConfigOptions();
+
+  /**
+   * @return the HTTP configuration option value of this request or null if non set
+   */
+  Object getConfigOption(String field);
+
+  /**
+   * Set a HTTP request configuration option for this request.
+   *
+   * @param field HTTP request configuration name
+   * @param value HTTP request configuration value
+   * @return this request
+   */
+  Q configOption(String field, Object value);
 }

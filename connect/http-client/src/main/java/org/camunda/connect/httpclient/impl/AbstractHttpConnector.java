@@ -20,6 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -36,6 +38,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.connect.httpclient.HttpBaseRequest;
 import org.camunda.connect.httpclient.HttpResponse;
+import org.camunda.connect.httpclient.impl.util.ParseUtil;
 import org.camunda.connect.impl.AbstractConnector;
 
 public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R extends HttpResponse> extends AbstractConnector<Q, R> {
@@ -90,6 +93,8 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
    */
   protected <T extends HttpRequestBase> T createHttpRequest(Q request) {
     T httpRequest = createHttpRequestBase(request);
+
+    applyConfig(httpRequest, request.getConfigOptions());
 
     applyHeaders(httpRequest, request.getHeaders());
 
@@ -154,5 +159,15 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   protected <T extends HttpRequestBase> boolean httpMethodSupportsPayload(T httpRequest) {
     return httpRequest instanceof HttpEntityEnclosingRequestBase;
   }
+
+  protected <T extends HttpRequestBase> void applyConfig(T httpRequest, Map<String, Object> configOptions) {
+    Builder configBuilder = RequestConfig.custom();
+    if (configOptions != null && !configOptions.isEmpty()) {
+      ParseUtil.parseConfigOptions(configOptions, configBuilder);
+    }
+    RequestConfig requestConfig = configBuilder.build();
+    httpRequest.setConfig(requestConfig);
+  }
+
 
 }

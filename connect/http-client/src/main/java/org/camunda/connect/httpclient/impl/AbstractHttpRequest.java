@@ -142,4 +142,33 @@ public class AbstractHttpRequest<Q extends HttpBaseRequest<?, ?>, R extends Http
     return method(HttpTrace.METHOD_NAME);
   }
 
+
+  public Map<String, Object> getConfigOptions() {
+    return getRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_CONFIG);
+  }
+
+  public Object getConfigOption(String field) {
+    Map<String, Object> config = getConfigOptions();
+    if (config != null) {
+      return config.get(field);
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Q configOption(String field, Object value) {
+    if (field == null || field.isEmpty() || value == null) {
+      LOG.ignoreConfig(field, value);
+    } else {
+      Map<String, Object> config = getConfigOptions();
+
+      if (config == null) {
+        config = new HashMap<String, Object>();
+        setRequestParameter(HttpBaseRequest.PARAM_NAME_REQUEST_CONFIG, config);
+      }
+      config.put(field, value);
+    }
+
+    return (Q) this;
+  }
 }

@@ -51,4 +51,12 @@ public class HttpConnectorLogger extends ConnectLogger {
     return new ConnectorRequestException(exceptionMessage("007", "Unable to execute HTTP request"), cause);
   }
 
+  public ConnectorRequestException invalidConfigurationOption(String optionName, Exception cause) {
+    return new ConnectorRequestException(exceptionMessage("008", "Invalid value for request configuration option: {}", optionName), cause);
+  }
+
+  public void ignoreConfig(String field, Object value) {
+    logInfo("009", "Ignoring request configuration option with name '{}' and value '{}'", field, value);
+  }
+
 }
