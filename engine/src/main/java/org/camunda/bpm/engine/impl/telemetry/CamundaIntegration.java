@@ -14,32 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.dto;
+package org.camunda.bpm.engine.impl.telemetry;
 
-public class Database {
+public class CamundaIntegration {
 
-  protected String vendor;
-  protected String version;
-
-  public Database(String vendor, String version) {
-    this.vendor = vendor;
-    this.version = version;
-  }
-
-  public String getVendor() {
-    return vendor;
-  }
-
-  public void setVendor(String vendor) {
-    this.vendor = vendor;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
-  }
+  public static final String SPRING_BOOT_STARTER = "spring-boot-starter";
+  public static final String CAMUNDA_BPM_RUN = "camunda-bpm-run";
+  public static final String WILDFLY_SUBSYSTEM = "wildfly-sybsystem";
+  public static final String JBOSS_SUBSYSTEM = "jboss-sybsystem";
+  public static final String CAMUNDA_EJB_SERVICE = "camunda-ejb-service";
 
 }

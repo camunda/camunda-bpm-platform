@@ -23,10 +23,11 @@ import org.camunda.bpm.container.impl.ejb.plugin.EjbConnectProcessEnginePlugin;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 
 /**
- * Adds an additional plugin to load the connectors in case they are not loaded so far,
- * e.g. the connect plugin is not present
+ * Adds an additional configuration before the engine is built
  */
 public class EjbStartProcessEngineStep extends StartProcessEngineStep {
 
@@ -37,7 +38,7 @@ public class EjbStartProcessEngineStep extends StartProcessEngineStep {
   }
 
   @Override
-  public void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
+  protected void addAdditionalPlugins(ProcessEngineConfigurationImpl configuration) {
     boolean isConnectPluginAdded = false;
     List<ProcessEnginePlugin> processEnginePlugins = configuration.getProcessEnginePlugins();
     for (ProcessEnginePlugin processEnginePlugin : processEnginePlugins) {
@@ -51,5 +52,11 @@ public class EjbStartProcessEngineStep extends StartProcessEngineStep {
       // the plugin will initialize the connectors with the current class loader
       processEnginePlugins.add(new EjbConnectProcessEnginePlugin());
     }
+  }
+
+  protected void additionalConfiguration(ProcessEngineConfigurationImpl configuration) {
+    TelemetryRegistry telemetryRegistry = new TelemetryRegistry();
+    telemetryRegistry.setCamundaIntegration(CamundaIntegration.CAMUNDA_EJB_SERVICE);
+    configuration.setTelemetryRegistry(telemetryRegistry);
   }
 }

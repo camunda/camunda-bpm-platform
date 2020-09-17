@@ -14,52 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter;
+package org.camunda.bpm.run.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
+import org.camunda.bpm.run.CamundaBpmRun;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-  classes = {TestApplication.class},
-  webEnvironment = WebEnvironment.RANDOM_PORT
-)
-public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
+@SpringBootTest(classes = { CamundaBpmRun.class })
+public class TelemetryDataTest {
 
-  @Test
-  public void shouldSubmitApplicationServerData() {
-    TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
-
-    // then
-    ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
-    assertThat(applicationServer).isNotNull();
-    assertThat(applicationServer.getVendor()).isEqualTo("Apache Tomcat");
-    assertThat(applicationServer.getVersion()).isNotNull();
-  }
+  @Autowired
+  ProcessEngine engine;
 
   @Test
   public void shouldAddCamundaIntegration() {
-    // given default configuration
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    // given
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
 
     // then
     Data telemetryData = processEngineConfiguration.getTelemetryData();
     Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
-    assertThat(camundaIntegration.size()).isOne();
-    assertThat(camundaIntegration).containsExactly(CamundaIntegration.SPRING_BOOT_STARTER);
+    assertThat(camundaIntegration)
+      .containsExactlyInAnyOrder(CamundaIntegration.CAMUNDA_BPM_RUN, CamundaIntegration.SPRING_BOOT_STARTER);
   }
-
 }

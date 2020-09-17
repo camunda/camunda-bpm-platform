@@ -2640,6 +2640,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), jdk);
 
+    String camundaIntegration = telemetryRegistry.getCamundaIntegration();
+    if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
+      internals.getCamundaIntegration().add(camundaIntegration);
+    }
+
     ProcessEngineDetails engineInfo = ParseUtil
         .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion(), true);
 

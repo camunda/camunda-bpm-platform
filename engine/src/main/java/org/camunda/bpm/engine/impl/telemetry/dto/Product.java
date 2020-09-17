@@ -24,7 +24,6 @@ public class Product {
   protected Internals internals;
 
   public Product(String name, String version, String edition, Internals internals) {
-    super();
     this.name = name;
     this.version = version;
     this.edition = edition;

@@ -17,18 +17,23 @@
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
 
 public class Internals {
 
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
+  public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
 
   protected Database database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
   protected ApplicationServer applicationServer;
   protected Map<String, Command> commands;
+  @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)
+  protected Set<String> camundaIntegration;
 
   protected Map<String, Metric> metrics;
 
@@ -43,6 +48,7 @@ public class Internals {
     this.applicationServer = server;
     this.commands = new HashMap<>();
     this.jdk = jdk;
+    this.camundaIntegration = new HashSet<>();
   }
 
   public Internals(Internals internals) {
@@ -94,6 +100,14 @@ public class Internals {
 
   public void setJdk(Jdk jdk) {
     this.jdk = jdk;
+  }
+
+  public Set<String> getCamundaIntegration() {
+    return camundaIntegration;
+  }
+
+  public void setCamundaIntegration(Set<String> camundaIntegration) {
+    this.camundaIntegration = camundaIntegration;
   }
 
 }
