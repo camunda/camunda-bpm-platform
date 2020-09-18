@@ -27,10 +27,12 @@ public class Internals {
 
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
+  public static final String SERIALIZED_LICENSE_KEY = "license-key";
 
   protected Database database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
   protected ApplicationServer applicationServer;
+  @SerializedName(value = SERIALIZED_LICENSE_KEY)
   protected LicenseKeyData licenseKey;
   protected Map<String, Command> commands;
   @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)

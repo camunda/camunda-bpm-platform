@@ -18,11 +18,18 @@ package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public class LicenseKeyData {
+
+  public static final String SERIALIZED_VALID_UNTIL = "valid-until";
+  public static final String SERIALIZED_IS_UNLIMITED = "unlimited";
 
   protected String customer;
   protected String type;
+  @SerializedName(value = SERIALIZED_VALID_UNTIL)
   protected String validUntil;
+  @SerializedName(value = SERIALIZED_IS_UNLIMITED)
   protected Boolean isUnlimited;
   protected Map<String, String> features;
   protected String raw;
