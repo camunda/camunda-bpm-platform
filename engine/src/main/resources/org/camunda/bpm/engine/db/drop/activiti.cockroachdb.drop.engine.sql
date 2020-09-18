@@ -93,6 +93,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop CONSTRAINT ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_FK_VAR_BATCH;
+
 -- unique constraints must be dropped as indexes in CRDB
 -- cascade must be used to drop these types of constraints
 drop index ACT_UNIQ_AUTH_GROUP cascade;
@@ -183,6 +186,8 @@ drop index ACT_IDX_PROCDEF_VER_TAG;
 
 drop index ACT_IDX_AUTH_ROOT_PI;
 drop index ACT_IDX_AUTH_RM_TIME;
+
+drop index ACT_IDX_BATCH_ID;
 
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;

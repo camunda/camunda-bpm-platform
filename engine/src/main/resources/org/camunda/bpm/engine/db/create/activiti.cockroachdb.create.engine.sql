@@ -216,6 +216,7 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,
@@ -340,6 +341,7 @@ create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
+create index ACT_IDX_TASK_OWNER on ACT_RU_TASK(OWNER_);
 create index ACT_IDX_TASK_TENANT_ID on ACT_RU_TASK(TENANT_ID_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
@@ -526,6 +528,12 @@ alter table ACT_RU_EXT_TASK
     add constraint ACT_FK_EXT_TASK_ERROR_DETAILS
     foreign key (ERROR_DETAILS_ID_)
     references ACT_GE_BYTEARRAY (ID_);
+
+create index ACT_IDX_BATCH_ID ON ACT_RU_VARIABLE(BATCH_ID_);
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BATCH
+    foreign key (BATCH_ID_)
+    references ACT_RU_BATCH (ID_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);
