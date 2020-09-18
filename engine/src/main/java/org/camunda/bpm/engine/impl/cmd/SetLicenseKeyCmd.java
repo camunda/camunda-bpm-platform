@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.LicenseKeyUtil.addToTelemetry;
+
 import java.nio.charset.StandardCharsets;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
@@ -59,18 +59,8 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME).execute(commandContext);
 
     // add raw license to telemetry data if not there already
-    addToTelemetry(licenseKey, commandContext);
+    addToTelemetry(licenseKey, commandContext.getProcessEngineConfiguration().getTelemetryRegistry());
 
     return null;
-  }
-
-  protected void addToTelemetry(String licenseKey, CommandContext context) {
-    TelemetryRegistry telemetryRegistry = context.getProcessEngineConfiguration().getTelemetryRegistry();
-    LicenseKeyData currentLicenseData = telemetryRegistry.getLicenseKey();
-    // only report license body without signature, if present
-    String newLicenseData = licenseKey.contains(";") ? licenseKey.split(";", 2)[1] : licenseKey;
-    if (currentLicenseData == null || !newLicenseData.equals(currentLicenseData.getRaw())) {
-      telemetryRegistry.setLicenseKey(new LicenseKeyData(null, null, null, null, null, newLicenseData));
-    }
   }
 }
