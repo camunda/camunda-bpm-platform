@@ -25,9 +25,14 @@ public class ConnectUtil {
   public static final String PARAM_NAME_REQUEST_URL = "url";
   public static final String PARAM_NAME_REQUEST_METHOD = "method";
   public static final String PARAM_NAME_REQUEST_PAYLOAD = "payload";
+  public static final String PARAM_NAME_REQUEST_CONFIG = "request-config";
 
   // request methods
   public static final String METHOD_NAME_POST = "POST";
+
+  // config options
+  public static final String CONFIG_NAME_CONNECTION_TIMEOUT = "connection-timeout";
+  public static final String CONFIG_NAME_SOCKET_TIMEOUT = "socket-timeout";
 
   // response
   public static final String PARAM_NAME_RESPONSE_STATUS_CODE = "statusCode";
@@ -54,4 +59,14 @@ public class ConnectUtil {
     return requestParams;
   }
 
+  public static Map<String, Object> addRequestTimeoutConfiguration(Map<String, Object> requestParams,
+                                                           int timeout) {
+    Map<String, Object> config = new HashMap<>();
+    config.put(CONFIG_NAME_CONNECTION_TIMEOUT, timeout);
+    config.put(CONFIG_NAME_SOCKET_TIMEOUT, timeout);
+
+    requestParams.put(PARAM_NAME_REQUEST_CONFIG, config);
+
+    return requestParams;
+  }
 }

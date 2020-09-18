@@ -29,9 +29,12 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
 public class TelemetryConfigurationTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
@@ -161,6 +164,42 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
     assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitialized).size()).isOne();
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "INFO")
+  public void shouldThrowAnConnectorException() {
+    // given
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setInitializeTelemetry(true)
+        .setTelemetryRequestRetries(0)
+        .setTelemetryRequestTimeout(1)
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
+    inMemoryConfiguration.buildProcessEngine();
+
+    // when
+    inMemoryConfiguration.getTelemetryReporter().reportNow();
+
+    // then
+    assertThat(loggingRule
+        .getFilteredLog("Could not send telemetry data. Reason: "
+            + "ConnectorRequestException with message 'HTCL-02007 Unable to execute HTTP request'")
+        .size())
+        .isOne();
+    assertThat(loggingRule
+        .getFilteredLog("Could not send telemetry data. Reason: "
+            + "ConnectorRequestException occurred while sending telemetry data.")
+        .size())
+        .isOne();
+    ILoggingEvent debugLog = loggingRule
+        .getFilteredLog("ConnectorRequestException occurred while sending telemetry data.").get(0);
+    assertThat(debugLog.getLevel()).isEqualTo(Level.DEBUG);
+    // the root cause it timeout exception
+    assertThat(debugLog
+        .getThrowableProxy().getCause().getClassName())
+    .contains("TimeoutException");
   }
 
 }
