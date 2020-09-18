@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -33,6 +34,10 @@ import org.camunda.bpm.engine.repository.ResourceType;
  * @author Askar Akhmerov
  */
 public class ExceptionUtil {
+
+  public static final String PERSISTENCE_EXCEPTION_MESSAGE = "An exception occurred in the " +
+      "persistence layer. Please check the server logs for a detailed message and the entire " +
+      "exception stack trace.";
 
   public static String getExceptionStacktrace(Throwable exception) {
     StringWriter stringWriter = new StringWriter();
@@ -212,4 +217,32 @@ public class ExceptionUtil {
 
     return message;
   }
+
+  /**
+   * Pass logic, which directly calls MyBatis API. In case a MyBatis exception is thrown, it is
+   * wrapped into a {@link ProcessEngineException} and never propagated directly to an Engine API
+   * call. In some cases, the top-level exception and its message are shown as a response body in
+   * the REST API. Wrapping all MyBatis API calls in our codebase makes sure that the top-level
+   * exception is always a {@link ProcessEngineException} with a generic message. Like this, SQL
+   * details are never disclosed to potential attackers.
+   *
+   * @param supplier which calls MyBatis API
+   * @param <T> is the type of the return value
+   * @return the value returned by the supplier
+   * @throws ProcessEngineException which wraps the actual exception
+   */
+  public static <T> T doWithExceptionWrapper(Supplier<T> supplier) {
+    try {
+      return supplier.get();
+
+    } catch (Exception ex) {
+      throw wrapPersistenceException(ex);
+
+    }
+  }
+
+  public static ProcessEngineException wrapPersistenceException(Exception ex) {
+    return new ProcessEngineException(PERSISTENCE_EXCEPTION_MESSAGE, ex);
+  }
+
 }

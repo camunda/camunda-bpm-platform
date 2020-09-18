@@ -149,8 +149,6 @@ public class CommandInvocationContext {
     if (throwable != null) {
       if (throwable instanceof Error) {
         throw (Error) throwable;
-      } else if (throwable instanceof PersistenceException) {
-        throw new ProcessEngineException("Process engine persistence exception", throwable);
       } else if (throwable instanceof RuntimeException) {
         throw (RuntimeException) throwable;
       } else {

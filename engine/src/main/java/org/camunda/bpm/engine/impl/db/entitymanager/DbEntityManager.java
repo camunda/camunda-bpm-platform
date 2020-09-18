@@ -330,7 +330,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
   }
 
-  protected void flushDbOperations(List<DbOperation> operationsToFlush, List<DbOperation> allOperations) {
+  protected void flushDbOperations(List<DbOperation> operationsToFlush,
+                                   List<DbOperation> allOperations) {
 
     // execute the flush
     while (!operationsToFlush.isEmpty()) {
@@ -338,7 +339,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         flushResult = persistenceSession.executeDbOperations(operationsToFlush);
       } catch (Exception e) {
-        throw LOG.flushDbOperationsException(allOperations, e);
+        // Top level persistence exception
+        throw LOG.flushDbOperationUnexpectedException(allOperations, e);
+
       }
 
       List<DbOperation> failedOperations = flushResult.getFailedOperations();
@@ -352,7 +355,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
           handleConcurrentModification(failedOperation);
         }
         else if (failureState == State.FAILED_ERROR) {
-          throw LOG.flushDbOperationException(allOperations, failedOperation, failedOperation.getFailure());
+          // Top level persistence exception
+          Exception failure = failedOperation.getFailure();
+          throw LOG.flushDbOperationException(allOperations, failedOperation, failure);
+
         } else {
           // This branch should never be reached and the exception thus indicates a bug
           throw new ProcessEngineException("Entity session returned a failed operation not "

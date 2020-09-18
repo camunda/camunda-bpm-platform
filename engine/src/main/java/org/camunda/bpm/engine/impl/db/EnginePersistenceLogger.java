@@ -16,12 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -115,19 +113,22 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
-  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
-      Throwable cause) {
+  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush,
+                                                          DbOperation failedOperation,
+                                                          Throwable e) {
 
-    String message = ExceptionUtil.collectExceptionMessages(cause);
+    String message = ExceptionUtil.collectExceptionMessages(e);
+
     String exceptionMessage = exceptionMessage(
-      "004",
-      "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
-      operation.toString(),
-      message,
-      buildStringFromList(operationsToFlush)
+        "004",
+        "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
+        failedOperation,
+        message,
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, e);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public OptimisticLockingException concurrentUpdateDbEntityException(DbOperation operation) {
@@ -440,8 +441,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException retrieveMetadataException(Throwable cause) {
-    return new ProcessEngineException(
-      exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage()), cause);
+    String exceptionMessage = exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage());
+    ProcessEngineException exception = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(exception);
   }
 
   public ProcessEngineException invokeTaskListenerException(Throwable cause) {
@@ -651,31 +653,17 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "081", "No startup lock property found in database");
   }
 
-  public void printBatchResults(List<BatchResult> results) {
-    if (results.size() > 0) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Batch summary:\n");
-      for (int i = 0; i < results.size(); i++) {
-        BatchResult result = results.get(i);
-        sb.append("Result ").append(i).append(":\t");
-        sb.append(result.getSql().replaceAll("\n", "").replaceAll("\\s+", " ")).append("\t");
-        sb.append("Update counts: ").append(Arrays.toString(result.getUpdateCounts())).append("\n");
-      }
-      logDebug("082", sb.toString());
-    }
-  }
-
-  public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
-    Throwable cause) {
-
-    String message = ExceptionUtil.collectExceptionMessages(cause);
+  public ProcessEngineException flushDbOperationUnexpectedException(List<DbOperation> operationsToFlush,
+                                                                    Throwable cause) {
     String exceptionMessage = exceptionMessage(
       "083",
-      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
-      buildStringFromList(operationsToFlush)
+      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}",
+        ExceptionUtil.collectExceptionMessages(cause),
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public ProcessEngineException wrongBatchResultsSizeException(List<DbOperation> operationsToFlush) {

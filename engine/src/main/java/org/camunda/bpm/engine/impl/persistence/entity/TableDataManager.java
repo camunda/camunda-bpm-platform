@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
@@ -196,18 +195,17 @@ public class TableDataManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery) {
 
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession()
-      .selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbEntityManager().selectList("selectTableData", tablePageQuery);
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));
     tablePage.setRows(tableData);
-    tablePage.setFirstResult(firstResult);
+    tablePage.setFirstResult(tablePageQuery.getFirstResult());
 
     return tablePage;
   }
