@@ -18,9 +18,6 @@ package org.camunda.bpm.engine.rest.util;
 
 import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -31,22 +28,24 @@ public class WebApplicationUtil {
 
   public static void setApplicationServer(String serverInfo) {
     if (serverInfo != null && !serverInfo.isEmpty() ) {
-      addToTelemetryRegistry(t -> t.setApplicationServer(serverInfo), t -> t.getApplicationServer() == null);
+      ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
+      for (String engineName : processEngineProvider.getProcessEngineNames()) {
+        TelemetryRegistry telemetryRegistry = getTelemetryRegistry(processEngineProvider, engineName);
+        if (telemetryRegistry != null && telemetryRegistry.getApplicationServer() == null) {
+            telemetryRegistry.setApplicationServer(serverInfo);
+        }
+      }
     }
   }
 
   public static void setLicenseKey(LicenseKeyData licenseKeyData) {
     if (licenseKeyData != null) {
-      addToTelemetryRegistry(t -> t.setLicenseKey(licenseKeyData), t -> true);
-    }
-  }
-
-  protected static void addToTelemetryRegistry(Consumer<TelemetryRegistry> addTelemetryData, Function<TelemetryRegistry, Boolean> addTelemetryDataFilter) {
-    ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
-    for (String engineName : processEngineProvider.getProcessEngineNames()) {
-      TelemetryRegistry telemetryRegistry = getTelemetryRegistry(processEngineProvider, engineName);
-      if (telemetryRegistry != null && addTelemetryDataFilter.apply(telemetryRegistry)) {
-          addTelemetryData.accept(telemetryRegistry);
+      ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
+      for (String engineName : processEngineProvider.getProcessEngineNames()) {
+        TelemetryRegistry telemetryRegistry = getTelemetryRegistry(processEngineProvider, engineName);
+        if (telemetryRegistry != null) {
+            telemetryRegistry.setLicenseKey(licenseKeyData);;
+        }
       }
     }
   }
