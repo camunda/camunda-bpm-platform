@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -333,20 +334,31 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-
-    thrown.expect(ProcessEngineException.class);
-
-    identityService.createMembership(johndoe.getId(), "unexistinggroup");
+    try {
+      identityService.createMembership(johndoe.getId(), "unexistinggroup");
+      fail("NullValueException is expected");
+    } catch(Exception ex) {
+      if(!(ex instanceof NullValueException)) {
+        fail("NullValueException is expected  but other exception was received: " + ex);
+      }
+      assertEquals("No group found with id 'unexistinggroup'.: group is null", ex.getMessage());
+    }
   }
 
   @Test
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
+    try {
+      identityService.createMembership("unexistinguser", sales.getId());
+      fail("NullValueException is expected");
+    } catch(Exception ex) {
+      if(!(ex instanceof NullValueException)) {
+        fail("NullValueException is expected  but other exception was received: " + ex);
+      }
+      assertEquals("No user found with id 'unexistinguser'.: user is null", ex.getMessage());
+    }
 
-    thrown.expect(ProcessEngineException.class);
-
-    identityService.createMembership("unexistinguser", sales.getId());
   }
 
   @Test
