@@ -29,7 +29,7 @@
   <select id="selectTableData" parameterType="org.camunda.bpm.engine.impl.TablePageQueryImpl" resultType="map">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select *
+    select RES.*
     ${limitBetween}
     from ${tableName} RES
     ${orderBy}
