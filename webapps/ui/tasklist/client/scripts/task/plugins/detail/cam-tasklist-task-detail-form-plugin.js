@@ -85,9 +85,12 @@ var Controller = [
       'task',
       'isAssignee',
       function(task, isAssignee) {
-        $scope.options = angular.copy(DEFAULT_OPTIONS);
-
         if (task && task.id) {
+          if (task.id !== $scope.task.id) {
+            // Only reset options when the task changed, not on assignment
+            $scope.options = angular.copy(DEFAULT_OPTIONS);
+          }
+
           $scope.params = {
             taskId: task.id,
             caseDefinitionId: task.caseDefinitionId,
