@@ -587,6 +587,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * </ul>
    */
   protected boolean dmnEnabled = true;
+  /**
+   * When set to <code>false</code>, the following behavior changes:
+   * <ul>
+   *   <li>Standalone tasks can no longer be created via API.</li>
+   *   <li>Standalone tasks are not returned by the TaskQuery.</li>
+   * </ul>
+   */
   protected boolean standaloneTasksEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
