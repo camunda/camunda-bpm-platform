@@ -34,8 +34,6 @@ import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class TelemetryConfigurationTest {
 
@@ -180,8 +178,8 @@ public class TelemetryConfigurationTest {
 //  wireMockServer.start();
 
   @Test
-  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
-  public void shouldThrowAnTimeoutException() {
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "INFO")
+  public void shouldThrowAnException() {
     // given
     wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().port(8085));
     wireMockServer.start();
@@ -205,13 +203,6 @@ public class TelemetryConfigurationTest {
             + "ConnectorRequestException with message 'HTCL-02007 Unable to execute HTTP request'")
         .size())
         .isOne();
-    ILoggingEvent debugLog = loggingRule
-        .getFilteredLog("ConnectorRequestException occurred while sending telemetry data.").get(0);
-    assertThat(debugLog.getLevel()).isEqualTo(Level.DEBUG);
-    // the root cause it timeout exception
-    assertThat(debugLog
-        .getThrowableProxy().getCause().getClassName())
-    .contains("TimeoutException");
   }
 
 }
