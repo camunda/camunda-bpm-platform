@@ -123,6 +123,10 @@ public class TelemetrySendingTask extends TimerTask {
       ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
     }
+
+    // license key data is fed from the outside to the registry but needs to be constantly updated
+    internals.setLicenseKey(telemetryRegistry.getLicenseKey());
+
   }
 
   protected boolean isTelemetryEnabled() {
@@ -175,6 +179,7 @@ public class TelemetrySendingTask extends TimerTask {
     internals.setApplicationServer(null);
     internals.setCommands(null);
     internals.setMetrics(null);
+    internals.setLicenseKey(null);
   }
 
   protected void restoreDynamicData(Internals internals) {

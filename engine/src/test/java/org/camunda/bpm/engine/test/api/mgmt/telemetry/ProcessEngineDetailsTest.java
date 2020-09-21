@@ -21,35 +21,10 @@ import static org.camunda.bpm.engine.impl.util.ParseUtil.parseProcessEngineVersi
 import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_COMMUNITY;
 import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_ENTERPRISE;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 
 public class ProcessEngineDetailsTest {
-
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  ProcessEngineConfigurationImpl configuration;
-
-  @Before
-  public void init() {
-    configuration = engineRule.getProcessEngineConfiguration();
-  }
-
-  @After
-  public void tearDown() {
-  }
 
   // process engine version and edition ////////////////////////////////////////////////////////////
 

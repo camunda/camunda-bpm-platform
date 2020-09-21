@@ -29,10 +29,10 @@ import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TAS
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
-
 import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
@@ -116,6 +117,8 @@ public class TelemetryReporterSuiteElement {
   protected TaskService taskService;
   protected IdentityService identityService;
 
+  protected Data defaultTelemetryData;
+
   @Before
   public void init() {
     configuration = engineRule.getProcessEngineConfiguration();
@@ -132,8 +135,10 @@ public class TelemetryReporterSuiteElement {
 
     clearMetrics();
 
-    // clean up the recorded commands
+    // clean up the registry data
     configuration.getTelemetryRegistry().clear();
+
+    defaultTelemetryData = new Data(configuration.getTelemetryData());
   }
 
   @After
@@ -156,6 +161,8 @@ public class TelemetryReporterSuiteElement {
         .init();
 
     WireMock.resetAllRequests();
+
+    configuration.setTelemetryData(defaultTelemetryData);
   }
 
   protected void clearMetrics() {
@@ -222,7 +229,31 @@ public class TelemetryReporterSuiteElement {
     String applicationServerVersion = "Tomcat 10";
     configuration.getTelemetryRegistry().setApplicationServer(applicationServerVersion);
 
-    Data expectedData = adjustDataWithProductVersionAndAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
+    Data expectedData = adjustDataWithAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithLicenseInfo() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization
+    LicenseKeyData licenseKey = new LicenseKeyData("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    Data expectedData = adjustDataWithLicenseInfo(configuration.getTelemetryData(), licenseKey);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -236,6 +267,65 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
               .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
               .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithOverriddenLicenseInfo() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization
+    LicenseKeyData licenseKey = new LicenseKeyData("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+    // report once
+    configuration.getTelemetryReporter().reportNow();
+    configuration.getTelemetryRegistry().getCommands().clear();
+
+    // change license key
+    licenseKey = new LicenseKeyData("customer b", "UNIFIED", "2029-08-01", false, Collections.singletonMap("cawemo", "true"), "new raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    Data expectedData = adjustDataWithLicenseInfo(configuration.getTelemetryData(), licenseKey);
+
+    String requestBody = new Gson().toJson(expectedData);
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithRawLicenseInfoOnly() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization via management service
+    String licenseKeyRaw = "raw license";
+    managementService.setLicenseKey(licenseKeyRaw);
+
+    Data expectedData = adjustDataWithRawLicenseInfo(configuration.getTelemetryData(), licenseKeyRaw);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+
+    // cleanup
+    managementService.deleteLicenseKey();
   }
 
   @Test
@@ -306,8 +396,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -347,8 +435,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -377,8 +463,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(EXECUTED_DECISION_INSTANCES).getCount()).isEqualTo(2);
   }
 
   @Test
@@ -407,8 +491,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(12);
   }
 
   @Test
@@ -442,8 +524,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(UNIQUE_TASK_WORKERS).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -669,7 +749,7 @@ public class TelemetryReporterSuiteElement {
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Jdk jdk = ParseUtil.parseJdkDetails();
-    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), jdk);
+    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), null, jdk);
 
     Map<String, Command> commands = getDefaultCommandCounts();
     internals.setCommands(commands);
@@ -682,12 +762,8 @@ public class TelemetryReporterSuiteElement {
     return data;
   }
 
-  protected Data adjustDataWithProductVersionAndAppServerInfo(Data telemetryData, String applicationServerVersion) {
-    Data result = new Data(telemetryData.getInstallation(), telemetryData.getProduct());
-
-    Product product = result.getProduct();
-    product.setVersion("7.14.0");
-    result.setProduct(product);
+  protected Data adjustDataWithAppServerInfo(Data telemetryData, String applicationServerVersion) {
+    Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
 
@@ -702,12 +778,30 @@ public class TelemetryReporterSuiteElement {
   }
 
   protected Data adjustDataWithCommandCounts(Data telemetryData) {
-    Data result = adjustDataWithProductVersionAndAppServerInfo(telemetryData, "Wildfly 10");
+    Data result = initData(telemetryData);
 
     Map<String, Command> commands = result.getProduct().getInternals().getCommands();
     commands.put("GetHistoryLevelCmd", new Command(1));
     commands.put("GetLicenseKeyCmd", new Command(1));
     result.getProduct().getInternals().setCommands(commands);
+
+    return result;
+  }
+
+  protected Data adjustDataWithLicenseInfo(Data telemetryData, LicenseKeyData licenseKeyData) {
+    Data result = initData(telemetryData);
+
+    Internals internals = result.getProduct().getInternals();
+    internals.setLicenseKey(licenseKeyData);
+
+    return result;
+  }
+
+  protected Data adjustDataWithRawLicenseInfo(Data telemetryData, String licenseKeyRaw) {
+    Data result = initData(telemetryData);
+
+    Internals internals = result.getProduct().getInternals();
+    internals.setLicenseKey(new LicenseKeyData(null, null, null, null, null, licenseKeyRaw));
 
     return result;
   }
@@ -724,7 +818,7 @@ public class TelemetryReporterSuiteElement {
   }
 
   protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionCount, long flowNodeCount, long workerCount) {
-    Data result = adjustDataWithProductVersionAndAppServerInfo(telemetryData, "JBoss EAP 7.2.0.GA");
+    Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
     Map<String, Metric> metrics = assembleMetrics(processCount, decisionCount, flowNodeCount, workerCount);
@@ -738,6 +832,10 @@ public class TelemetryReporterSuiteElement {
     internals.setCommands(commands);
 
     return result;
+  }
+
+  protected Data initData(Data telemetryData) {
+    return new Data(telemetryData.getInstallation(), new Product(telemetryData.getProduct()));
   }
 
   protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {

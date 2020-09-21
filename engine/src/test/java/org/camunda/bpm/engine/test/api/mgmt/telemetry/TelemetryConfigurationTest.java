@@ -17,10 +17,12 @@
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
@@ -39,10 +41,10 @@ public class TelemetryConfigurationTest {
   @After
   public void reset() {
     if (inMemoryConfiguration != null) {
-    inMemoryConfiguration.getManagementService().toggleTelemetry(false);
-      ProcessEngineImpl processEngineImpl = inMemoryConfiguration.getProcessEngine();
-      processEngineImpl.close();
-      processEngineImpl = null;
+      inMemoryConfiguration.getManagementService().toggleTelemetry(false);
+        ProcessEngineImpl processEngineImpl = inMemoryConfiguration.getProcessEngine();
+        processEngineImpl.close();
+        processEngineImpl = null;
     }
   }
 
@@ -96,6 +98,35 @@ public class TelemetryConfigurationTest {
 
     // then
     assertThat(inMemoryConfiguration.getTelemetryEndpoint()).isEqualTo(TELEMETRY_ENDPOINT);
+  }
+
+  @Test
+  public void shouldStartEngineWithTelemetryEnabledAndLicenseKeyAlreadyPresent() {
+    // given license key persisted
+    String testLicenseKey = "signature=;my company;unlimited";
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda-test" + getClass().getSimpleName())
+        // keep data alive at process engine close
+        .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE)
+        .setInitializeTelemetry(false)
+        .setDbMetricsReporterActivate(false);
+    ProcessEngine processEngine = inMemoryConfiguration.buildProcessEngine();
+    processEngine.getManagementService().setLicenseKey(testLicenseKey);
+    processEngine.close();
+
+    // when an engine with telemetry is started
+    inMemoryConfiguration
+        .setInitializeTelemetry(true)
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
+    inMemoryConfiguration.buildProcessEngine();
+
+    // then the license key is picked up
+    assertThat(inMemoryConfiguration.getTelemetryRegistry().getLicenseKey())
+        .isEqualToComparingFieldByField(new LicenseKeyData(null, null, null, null, null, "my company;unlimited"));
+
+    // force clean up
+    inMemoryConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
   }
 
   @Test
