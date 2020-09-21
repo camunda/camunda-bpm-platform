@@ -44,6 +44,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -171,6 +172,7 @@ public class SuppressSqlExceptionsTest {
         .isInstanceOf(PersistenceException.class);
   }
 
+  @Ignore("https://jira.camunda.com/browse/CAM-12466")
   @Test
   public void shouldThrowExceptionOnInsert_ColumnSizeExceeded() {
     // given
