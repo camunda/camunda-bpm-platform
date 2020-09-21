@@ -67,7 +67,11 @@ export default function Notifications({ className }) {
               ×
             </button>
             <strong className="status">{notification.status}:</strong>
-            <span className="message">{notification.message}</span>
+            <span
+              className="message"
+              // The Notification service returns escaped strings or trusted html
+              dangerouslySetInnerHTML={{ __html: notification.message }}
+            />
           </div>
         ))}
       </div>
