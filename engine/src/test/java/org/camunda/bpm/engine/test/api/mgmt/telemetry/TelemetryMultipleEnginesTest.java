@@ -68,10 +68,7 @@ public class TelemetryMultipleEnginesTest {
   public static WireMockRule wireMockRule = new WireMockRule(8081);
 
   @ClassRule
-  public static ProcessEngineBootstrapRule secondEngineRule =
-      new ProcessEngineBootstrapRule(configuration ->
-          configuration.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-            );
+  public static ProcessEngineBootstrapRule secondEngineRule = new ProcessEngineBootstrapRule();
 
   protected ProcessEngineRule defaultEngineRule = new ProvidedProcessEngineRule();
 
@@ -201,13 +198,19 @@ public class TelemetryMultipleEnginesTest {
   }
 
   protected void clearMetrics() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) defaultEngine.getProcessEngineConfiguration();
+    clearMetrics(defaultEngine);
+    clearMetrics(secondEngine);
+  }
+
+  protected void clearMetrics(ProcessEngine engine) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
     MetricsRegistry metricsRegistry = processEngineConfiguration.getMetricsRegistry();
 
     Collection<Meter> meters = metricsRegistry.getTelemetryMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
-    defaultEngine.getManagementService().deleteMetrics(null);
+
+    engine.getManagementService().deleteMetrics(null);
   }
 }
