@@ -142,7 +142,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
 
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
-    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), ParseUtil.parseJdkDetails());
+    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), null, ParseUtil.parseJdkDetails());
 
     Map<String, Command> commands = configuration.getTelemetryData().getProduct().getInternals().getCommands();
     internals.setCommands(commands);
