@@ -22,6 +22,7 @@
 'use strict';
 
 var angular = require('../../camunda-bpm-sdk-js/vendor/angular'),
+  analytics = require('./analytics/index'),
   auth = require('./auth/index'),
   util = require('./util/index'),
   pages = require('./pages/index'),
@@ -40,6 +41,7 @@ require('angular-animate');
 
 module.exports = angular.module('cam.commons', [
   auth.name,
+  analytics.name,
   util.name,
   pages.name,
   plugin.name,
