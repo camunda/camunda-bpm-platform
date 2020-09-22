@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.*;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
@@ -53,7 +53,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -76,6 +75,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
+  protected int telemetryRequestTimeout;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
@@ -83,7 +83,8 @@ public class TelemetrySendingTask extends TimerTask {
                               Data data,
                               Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
-                              MetricsRegistry metricsRegistry) {
+                              MetricsRegistry metricsRegistry,
+                              int telemetryRequestTimeout) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
@@ -91,6 +92,7 @@ public class TelemetrySendingTask extends TimerTask {
     this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
   }
 
   @Override
@@ -153,9 +155,11 @@ public class TelemetrySendingTask extends TimerTask {
           telemetryEndpoint,
           MediaType.APPLICATION_JSON,
           telemetryData);
+      requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
 
       ConnectorRequest<?> request = httpConnector.createRequest();
       request.setRequestParameters(requestParams);
+
 
       LOG.sendingTelemetryData(telemetryData);
       CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();

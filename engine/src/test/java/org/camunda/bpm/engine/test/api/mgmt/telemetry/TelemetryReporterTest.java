@@ -190,7 +190,8 @@ public class TelemetryReporterTest {
                                                                 data,
                                                                 configuration.getTelemetryHttpConnector(),
                                                                 configuration.getTelemetryRegistry(),
-                                                                configuration.getMetricsRegistry());
+                                                                configuration.getMetricsRegistry(),
+                                                                configuration.getTelemetryRequestTimeout());
 
     // when
     telemetryReporter.reportNow();
@@ -648,7 +649,8 @@ public class TelemetryReporterTest {
                                                                 data,
                                                                 null,
                                                                 configuration.getTelemetryRegistry(),
-                                                                configuration.getMetricsRegistry());
+                                                                configuration.getMetricsRegistry(),
+                                                                configuration.getTelemetryRequestTimeout());
 
     // when
     telemetryReporter.reportNow();

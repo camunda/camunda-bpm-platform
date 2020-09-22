@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -29,14 +32,19 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+
 public class TelemetryConfigurationTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8082/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8085/pings";
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   protected ProcessEngineConfigurationImpl inMemoryConfiguration;
+
+  WireMockServer wireMockServer;
 
   @After
   public void reset() {
@@ -45,6 +53,10 @@ public class TelemetryConfigurationTest {
         ProcessEngineImpl processEngineImpl = inMemoryConfiguration.getProcessEngine();
         processEngineImpl.close();
         processEngineImpl = null;
+    }
+
+    if (wireMockServer != null) {
+      wireMockServer.stop();
     }
   }
 
@@ -161,6 +173,34 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
     assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitialized).size()).isOne();
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "INFO")
+  public void shouldThrowAnException() {
+    // given
+    wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().port(8085));
+    wireMockServer.start();
+    inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setInitializeTelemetry(true)
+        .setTelemetryRequestRetries(0)
+        .setTelemetryRequestTimeout(1)
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT);
+    inMemoryConfiguration.buildProcessEngine();
+    wireMockServer.stubFor(post(urlEqualTo("/pings"))
+        .willReturn(aResponse().withStatus(202)));
+
+    // when
+    inMemoryConfiguration.getTelemetryReporter().reportNow();
+
+    // then
+    assertThat(loggingRule
+        .getFilteredLog("Could not send telemetry data. Reason: "
+            + "ConnectorRequestException with message 'HTCL-02007 Unable to execute HTTP request'")
+        .size())
+        .isOne();
   }
 
 }
