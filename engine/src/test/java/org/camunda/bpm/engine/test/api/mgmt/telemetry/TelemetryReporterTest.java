@@ -98,7 +98,7 @@ public class TelemetryReporterTest {
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
 
-  public static final String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
+  public static String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
   public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
 
 
@@ -111,7 +111,7 @@ public class TelemetryReporterTest {
             );
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  protected final ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -469,7 +469,7 @@ public class TelemetryReporterTest {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionOkay.dmn11.xml" })
-  public void shouldSendTelemetryWithExecutedDecisionInstancesMetrics() {
+  public void shouldSendTelemetryWithExecutedDecisionInstanceMetrics() {
     // given
     managementService.toggleTelemetry(true);
     for (int i = 0; i < 2; i++) {
@@ -496,7 +496,7 @@ public class TelemetryReporterTest {
   @Test
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml" })
-  public void shouldSendTelemetryWithExecutedDecisionElementsMetrics() {
+  public void shouldSendTelemetryWithExecutedDecisionElementMetrics() {
     // given
     BpmnModelInstance modelInstance = createProcessWithBusinessRuleTask("testProcess", "decision");
 
@@ -876,11 +876,11 @@ public class TelemetryReporterTest {
     return assembleMetrics(0, 0, 0, 0, 0);
   }
 
-  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionElementsCount, long decisionInstancesCount, long flowNodeCount, long workerCount) {
+  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionElementsCount, long decisionInstancesCount, long activityInstanceCount, long workerCount) {
     Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
-    Map<String, Metric> metrics = assembleMetrics(processCount, decisionElementsCount, decisionInstancesCount, flowNodeCount, workerCount);
+    Map<String, Metric> metrics = assembleMetrics(processCount, decisionElementsCount, decisionInstancesCount, activityInstanceCount, workerCount);
     internals.setMetrics(metrics);
 
     // to clean up the recorded commands
