@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
-import static org.camunda.bpm.engine.impl.util.ConnectUtil.*;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
@@ -54,6 +55,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -103,8 +105,11 @@ public class TelemetrySendingTask extends TimerTask {
 
     if (!isTelemetryEnabled()) {
       LOG.telemetryDisabled();
+      updateTelemetryFlag(false);
       return;
     }
+
+    updateTelemetryFlag(true);
 
     int triesLeft = telemetryRequestRetries + 1;
     boolean requestSuccessful = false;
@@ -162,7 +167,6 @@ public class TelemetrySendingTask extends TimerTask {
       ConnectorRequest<?> request = httpConnector.createRequest();
       request.setRequestParameters(requestParams);
 
-
       LOG.sendingTelemetryData(telemetryData);
       CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
 
@@ -207,11 +211,13 @@ public class TelemetrySendingTask extends TimerTask {
       telemetryRegistry.markOccurrence(entry.getKey(), entry.getValue().getCount());
     }
 
-    Map<String, Metric> metrics = internals.getMetrics();
+    if (metricsRegistry != null) {
+      Map<String, Metric> metrics = internals.getMetrics();
 
-    for (String metricToReport : METRICS_TO_REPORT) {
-      Metric metricValue = metrics.get(metricToReport);
-      metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
+      for (String metricToReport : METRICS_TO_REPORT) {
+        Metric metricValue = metrics.get(metricToReport);
+        metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
+      }
     }
   }
 
@@ -251,11 +257,13 @@ public class TelemetrySendingTask extends TimerTask {
 
     Map<String, Metric> metrics = new HashMap<>();
 
-    Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
+    if (metricsRegistry != null) {
+      Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-    for (String metricToReport : METRICS_TO_REPORT) {
-      long value = telemetryMeters.get(metricToReport).getAndClear();
-      metrics.put(metricToReport, new Metric(value));
+      for (String metricToReport : METRICS_TO_REPORT) {
+        long value = telemetryMeters.get(metricToReport).getAndClear();
+        metrics.put(metricToReport, new Metric(value));
+      }
     }
 
     Long taskWorkers = commandExecutor.execute(c -> {
@@ -296,6 +304,10 @@ public class TelemetrySendingTask extends TimerTask {
     calendar.add(Calendar.DAY_OF_YEAR, -1);
     Date result = calendar.getTime();
     return result;
+  }
+
+  protected void updateTelemetryFlag(boolean enabled) {
+    TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
   }
 
 }

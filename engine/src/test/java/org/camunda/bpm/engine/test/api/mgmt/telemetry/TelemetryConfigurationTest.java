@@ -37,7 +37,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 public class TelemetryConfigurationTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8085/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8086/pings";
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
@@ -61,7 +61,7 @@ public class TelemetryConfigurationTest {
   }
 
   @Test
-  public void shouldStartEngineTelemetryDisabled() {
+  public void shouldStartEngineWithTelemetryDisabled() {
     // given
     inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
     inMemoryConfiguration
@@ -74,6 +74,7 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
+    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
@@ -95,6 +96,7 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isTrue();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
+    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isTrue();
   }
 
   @Test

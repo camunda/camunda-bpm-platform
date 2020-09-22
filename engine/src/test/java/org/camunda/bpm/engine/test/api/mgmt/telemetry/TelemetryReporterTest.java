@@ -428,45 +428,6 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void shouldSendTelemetryOnceWithRooProcessInstanceMetrics() {
-    // given
-    managementService.toggleTelemetry(false);
-    for (int i = 0; i < 3; i++) {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    }
-    configuration.getDbMetricsReporter().reportNow();
-
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
-    managementService.toggleTelemetry(true);
-
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
-    for (int i = 0; i < 3; i++) {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    }
-    configuration.getDbMetricsReporter().reportNow();
-
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 6, 0, 0, 12, 0);
-
-    String requestBody = new Gson().toJson(expectedData);
-    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-            .willReturn(aResponse()
-                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
-
-    // when
-    configuration.getTelemetryReporter().reportNow();
-
-    // then
-    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
-        .withHeader("Content-Type",  equalTo("application/json")));
-  }
-
-  @Test
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionOkay.dmn11.xml" })
@@ -658,10 +619,7 @@ public class TelemetryReporterTest {
     configuration.getTelemetryReporter().reportNow();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Sending telemetry is disabled").size()).isPositive();
-    // it might have two logs:
-    // first during process engine start
-    // second during #reportNow call
+    assertThat(loggingRule.getFilteredLog("Sending telemetry is disabled").size()).isOne();
   }
 
   @Test
@@ -805,6 +763,30 @@ public class TelemetryReporterTest {
         urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(expectedRequestBody, JSONCompareMode.LENIENT))
         );
+  }
+
+
+  @Test
+  public void shouldSendTelemetryWhenDbMetricsDisabled() {
+    // given
+    boolean telemetryInitialized = true;
+    StandaloneInMemProcessEngineConfiguration inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setInitializeTelemetry(telemetryInitialized)
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+        .setMetricsEnabled(false)
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    standaloneProcessEngine = inMemoryConfiguration.buildProcessEngine();
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse().withStatus(HttpURLConnection.HTTP_NO_CONTENT)));
+
+    // when
+    inMemoryConfiguration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withHeader("Content-Type",  equalTo("application/json")));
   }
 
   protected Data createDataToSend() {
