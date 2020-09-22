@@ -35,7 +35,7 @@ public class CommandCounterInterceptor extends CommandInterceptor {
       return next.execute(command);
     } finally {
       TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
-      if (telemetryRegistry != null) {
+      if (telemetryRegistry != null && telemetryRegistry.isCollectingTelemetryDataEnabled()) {
         telemetryRegistry.markOccurrence(ClassNameUtil.getClassNameWithoutPackage(command));
       }
     }

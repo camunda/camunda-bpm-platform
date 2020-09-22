@@ -20,12 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.task.Task;
@@ -38,7 +40,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class TelemetryRegistryCounterTest {
+public class TelemetryDynamicDataTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -48,6 +50,7 @@ public class TelemetryRegistryCounterTest {
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected ManagementService managementService;
 
   protected ProcessEngine processEngineInMem;
 
@@ -56,16 +59,36 @@ public class TelemetryRegistryCounterTest {
     configuration = engineRule.getProcessEngineConfiguration();
     runtimeService = configuration.getRuntimeService();
     taskService = configuration.getTaskService();
+    managementService = configuration.getManagementService();
+    clearMetrics();
   }
+
 
   @After
   public void tearDown() {
+    clearMetrics();
     configuration.setTelemetryRegistry(new TelemetryRegistry());
+    managementService.toggleTelemetry(false);
 
     if (processEngineInMem != null) {
+      ((ProcessEngineConfigurationImpl) processEngineInMem.getProcessEngineConfiguration()).getManagementService()
+          .toggleTelemetry(false);
       ProcessEngines.unregister(processEngineInMem);
       processEngineInMem.close();
     }
+  }
+
+  public void clearMetrics() {
+    configuration.getTelemetryRegistry().clear();
+    clearMetrics(configuration.getMetricsRegistry().getDbMeters());
+    clearMetrics(configuration.getMetricsRegistry().getTelemetryMeters());
+  }
+
+  protected void clearMetrics(Map<String, Meter> meters) {
+    for (Meter meter : meters.values()) {
+      meter.getAndClear();
+    }
+    managementService.deleteMetrics(null);
   }
 
   @Test
@@ -73,17 +96,14 @@ public class TelemetryRegistryCounterTest {
     // when
     processEngineInMem =  new StandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
+        .setInitializeTelemetry(true)
         .buildProcessEngine();
 
     // then
     TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
-    assertThat(entries.size()).isEqualTo(6);
+    assertThat(entries.size()).isEqualTo(2);
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
-        "SchemaOperationsProcessEngineBuild",
-        "HistoryLevelSetupCommand",
-        "GetTableMetaDataCmd",
-        "HistoryCleanupCmd",
         "BootstrapEngineCommand",
         "GetLicenseKeyCmd");
     for (String commandName : entries.keySet()) {
@@ -95,6 +115,7 @@ public class TelemetryRegistryCounterTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldCountAfterCleaning() {
     // given
+    managementService.toggleTelemetry(true);
     clearCommandCounts();
     Map<String, CommandCounter> entries = configuration.getTelemetryRegistry().getCommands();
 
@@ -116,10 +137,52 @@ public class TelemetryRegistryCounterTest {
     }
   }
 
+  @Test
+  public void shouldCollectCommandsDataOnlyWhenTelemetryEnabled() {
+    // given default telemetry data and empty telemetry registry
+
+    // execute commands
+    managementService.getHistoryLevel();
+    managementService.getLicenseKey();
+    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    assertThat(commands.size()).isZero();
+
+    // when
+    managementService.toggleTelemetry(true);
+    // execute commands
+    managementService.getHistoryLevel();
+    managementService.getLicenseKey();
+
+    // when
+    assertThat(commands.size()).isEqualTo(3);
+    String [] expectedExcutedCommands = {"GetLicenseKeyCmd","GetHistoryLevelCmd","TelemetryConfigureCmd"};
+    assertThat(commands.keySet()).isSubsetOf(expectedExcutedCommands);
+  }
+
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void shouldNotCollectMetricsDataWhenTelemetryDisabled() {
+    // given
+    managementService.toggleTelemetry(false);
+    for (int i = 0; i < 3; i++) {
+      runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    }
+
+    // when
+    configuration.getDbMetricsReporter().reportNow();
+
+    // then
+    Map<String, Meter> telemetryMeters = configuration.getMetricsRegistry().getTelemetryMeters();
+    for (String meter : telemetryMeters.keySet()) {
+      assertThat(telemetryMeters.get(meter).get()).isZero();
+    }
+
+  }
+
+
   protected void clearCommandCounts() {
-    TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
-    Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
-    entries.clear();
+    configuration.getTelemetryRegistry().clear();
   }
 
 }

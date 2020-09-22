@@ -106,7 +106,6 @@ public class TelemetryMultipleEnginesTest {
     // the second engine reports its metrics
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withHeader("Content-Type",  equalTo("application/json")));
-
   }
 
   @Test
@@ -143,6 +142,25 @@ public class TelemetryMultipleEnginesTest {
     LoggedRequest secondRequest = requests.get(1);
     Data secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), Data.class);
     assertReportedMetrics(secondRequestBody, 1, 0, 0, 0);
+  }
+
+  @Test
+  public void shouldUpdateTelemetryFlagDuringReporting() {
+    // given
+    defaultEngine.getManagementService().toggleTelemetry(true);
+
+    // when
+    secondTelemetryReporter.reportNow();
+
+    // then
+    assertThat(defaultEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
+        .isTrue();
+    assertThat(secondEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
+        .isTrue();
+    assertThat(((ProcessEngineConfigurationImpl) defaultEngine.getProcessEngineConfiguration()).getMetricsRegistry()
+        .isCollectingTelemetryMetrics()).isTrue();
+    assertThat(((ProcessEngineConfigurationImpl) secondEngine.getProcessEngineConfiguration()).getMetricsRegistry()
+        .isCollectingTelemetryMetrics()).isTrue();
   }
 
   private TelemetryReporter getTelemetryReporter(ProcessEngine engine) {
