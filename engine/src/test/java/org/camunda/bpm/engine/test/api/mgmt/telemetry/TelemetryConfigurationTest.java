@@ -37,7 +37,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 public class TelemetryConfigurationTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8085/pings";
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
@@ -174,8 +174,6 @@ public class TelemetryConfigurationTest {
     assertThat(loggingRule.getFilteredLog("No telemetry property found in the database").size()).isOne();
     assertThat(loggingRule.getFilteredLog("Creating the telemetry property in database with the value: " + telemetryInitialized).size()).isOne();
   }
-  //WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(8089)); //No-args constructor will start on port 8080, no HTTPS
-//  wireMockServer.start();
 
   @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "INFO")
