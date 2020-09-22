@@ -129,7 +129,8 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
                                                                 configuration.getTelemetryReportingPeriod(),
                                                                 data,
                                                                 configuration.getTelemetryHttpConnector(),
-                                                                configuration.getTelemetryRegistry());
+                                                                configuration.getTelemetryRegistry(),
+                                                                configuration.getMetricsRegistry());
 
     // when
     telemetryReporter.reportNow();
