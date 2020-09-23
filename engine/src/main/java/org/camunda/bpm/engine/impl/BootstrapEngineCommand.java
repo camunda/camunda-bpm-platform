@@ -116,6 +116,8 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         createTelemetryProperty(commandContext);
       }
 
+      // enable collecting dynamic data in case telemetry is initialized with true
+      // or already enabled
       if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
           || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
         TelemetryUtil.updateCollectingTelemetryDataEnabled(processEngineConfiguration.getTelemetryRegistry(),
