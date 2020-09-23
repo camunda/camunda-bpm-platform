@@ -30,6 +30,7 @@ public class TelemetryRegistry {
   protected ApplicationServer applicationServer;
   protected LicenseKeyData licenseKey;
   protected String camundaIntegration;
+  protected boolean isCollectingTelemetryDataEnabled = false;
 
   public synchronized ApplicationServer getApplicationServer() {
     return applicationServer;
@@ -61,6 +62,14 @@ public class TelemetryRegistry {
 
   public void setLicenseKey(LicenseKeyData licenseKey) {
     this.licenseKey = licenseKey;
+  }
+
+  public boolean isCollectingTelemetryDataEnabled() {
+    return isCollectingTelemetryDataEnabled;
+  }
+
+  public void setCollectingTelemetryDataEnabled(boolean isTelemetryEnabled) {
+    this.isCollectingTelemetryDataEnabled = isTelemetryEnabled;
   }
 
   public void markOccurrence(String name) {

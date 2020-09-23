@@ -28,6 +28,8 @@ public class MetricsRegistry {
   protected Map<String, Meter> dbMeters = new HashMap<String, Meter>();
   protected Map<String, Meter> telemetryMeters = new HashMap<String, Meter>();
 
+  protected boolean isCollectingTelemetryMetrics = false;
+
   public Meter getDbMeterByName(String name) {
     return dbMeters.get(name);
   }
@@ -40,13 +42,23 @@ public class MetricsRegistry {
     return telemetryMeters;
   }
 
+  public boolean isCollectingTelemetryMetrics() {
+    return isCollectingTelemetryMetrics;
+  }
+
+  public void setCollectingTelemetryMetrics(boolean isCollectingTelemetryMetrics) {
+    this.isCollectingTelemetryMetrics = isCollectingTelemetryMetrics;
+  }
+
   public void markOccurrence(String name) {
     markOccurrence(name, 1);
   }
 
   public void markOccurrence(String name, long times) {
     markOccurrence(dbMeters, name, times);
-    markOccurrence(telemetryMeters, name, times);
+    if (isCollectingTelemetryMetrics) {
+      markOccurrence(telemetryMeters, name, times);
+    }
   }
 
   public void markTelemetryOccurrence(String name, long times) {

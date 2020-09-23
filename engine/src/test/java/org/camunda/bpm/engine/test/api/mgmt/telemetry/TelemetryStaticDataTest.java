@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.junit.Test;
 
-public class TelemetryDataTest {
+public class TelemetryStaticDataTest {
 
   @Test
   public void shouldValidateWildFlyVendor() {

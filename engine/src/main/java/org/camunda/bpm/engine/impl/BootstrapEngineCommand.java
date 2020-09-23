@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 /**
  * @author Nikola Koevski
@@ -109,9 +110,19 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
       commandContext.getPropertyManager().acquireExclusiveLockForTelemetry();
       PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
 
+      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (databaseTelemetryProperty == null) {
         LOG.noTelemetryPropertyFound();
         createTelemetryProperty(commandContext);
+      }
+
+      // enable collecting dynamic data in case telemetry is initialized with true
+      // or already enabled
+      if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
+          || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
+        TelemetryUtil.updateCollectingTelemetryDataEnabled(processEngineConfiguration.getTelemetryRegistry(),
+                                                           processEngineConfiguration.getMetricsRegistry(),
+                                                           true);
       }
 
     } catch (Exception e) {
@@ -136,7 +147,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createTelemetryProperty(CommandContext commandContext) {
-    Boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
+    Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = null;
     if (telemetryEnabled != null) {
       property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
@@ -200,11 +211,12 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
     // set installationId in the telemetry data
     telemetryData.setInstallation(installationId);
+
     // set the persisted license key in the telemetry data and registry
-    String licenseKey = commandContext.getProcessEngineConfiguration().getManagementService().getLicenseKey();
+    String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
     if (licenseKey != null) {
       LicenseKeyData licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
-      commandContext.getProcessEngineConfiguration().getTelemetryRegistry().setLicenseKey(licenseKeyData);
+      processEngineConfiguration.getTelemetryRegistry().setLicenseKey(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }
   }
