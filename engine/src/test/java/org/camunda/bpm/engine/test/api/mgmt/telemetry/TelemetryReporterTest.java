@@ -27,6 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 import java.net.HttpURLConnection;
@@ -66,8 +67,14 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
@@ -91,6 +98,10 @@ public class TelemetryReporterTest {
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
 
+  public static String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
+  public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
+
+
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule =
       new ProcessEngineBootstrapRule(configuration ->
@@ -100,9 +111,10 @@ public class TelemetryReporterTest {
             );
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
@@ -370,7 +382,7 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 0, 6, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -397,7 +409,7 @@ public class TelemetryReporterTest {
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 0, 0, 0, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 0, 0, 0, 0, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -438,7 +450,7 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 6, 0, 12, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 6, 0, 0, 12, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -466,7 +478,37 @@ public class TelemetryReporterTest {
     }
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 2, 2, 4, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 2, 2, 2, 4, 0);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml" })
+  public void shouldSendTelemetryWithExecutedDecisionElementMetrics() {
+    // given
+    BpmnModelInstance modelInstance = createProcessWithBusinessRuleTask("testProcess", "decision");
+
+    testRule.deploy(configuration.getRepositoryService().createDeployment()
+        .addModelInstance("process.bpmn", modelInstance)
+        .addClasspathResource(DMN_FILE));
+    managementService.toggleTelemetry(true);
+    runtimeService.startProcessInstanceByKey("testProcess", VARIABLES);
+
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 1, 16, 1, 3, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -484,7 +526,7 @@ public class TelemetryReporterTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void shouldSendTelemetryWithFlowNodeInstanceMetrics() {
+  public void shouldSendTelemetryWithActivityInstanceMetrics() {
     // given
     managementService.toggleTelemetry(true);
     for (int i = 0; i < 4; i++) {
@@ -494,7 +536,7 @@ public class TelemetryReporterTest {
     }
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 4, 0, 12, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 4, 0, 0, 12, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -527,7 +569,7 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 3);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 0, 6, 3);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -833,14 +875,14 @@ public class TelemetryReporterTest {
   }
 
   protected Map<String, Metric> getDefaultMetrics() {
-    return assembleMetrics(0, 0, 0, 0);
+    return assembleMetrics(0, 0, 0, 0, 0);
   }
 
-  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionCount, long flowNodeCount, long workerCount) {
+  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionElementsCount, long decisionInstancesCount, long activityInstanceCount, long workerCount) {
     Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
-    Map<String, Metric> metrics = assembleMetrics(processCount, decisionCount, flowNodeCount, workerCount);
+    Map<String, Metric> metrics = assembleMetrics(processCount, decisionElementsCount, decisionInstancesCount, activityInstanceCount, workerCount);
     internals.setMetrics(metrics);
 
     // to clean up the recorded commands
@@ -857,11 +899,12 @@ public class TelemetryReporterTest {
     return new Data(telemetryData.getInstallation(), new Product(telemetryData.getProduct()));
   }
 
-  protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {
+  protected Map<String, Metric> assembleMetrics(long processCount, long decisionElementsCount, long decisionInstancesCount, long activityInstanceCount, long workerCount) {
     Map<String, Metric> metrics = new HashMap<>();
     metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(processCount));
-    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionCount));
-    metrics.put(ACTIVTY_INSTANCE_START, new Metric(flowNodeCount));
+    metrics.put(EXECUTED_DECISION_ELEMENTS, new Metric(decisionElementsCount));
+    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionInstancesCount));
+    metrics.put(ACTIVTY_INSTANCE_START, new Metric(activityInstanceCount));
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(workerCount));
     return metrics;
   }
@@ -872,6 +915,18 @@ public class TelemetryReporterTest {
     calendar.add(Calendar.HOUR_OF_DAY, 1);
     Date newDate = calendar.getTime();
     return newDate;
+  }
+
+  protected BpmnModelInstance createProcessWithBusinessRuleTask(String processId, String decisionRef) {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processId)
+        .startEvent()
+        .businessRuleTask("task")
+        .endEvent()
+        .done();
+
+    BusinessRuleTask task = modelInstance.getModelElementById("task");
+    task.setCamundaDecisionRef(decisionRef);
+    return modelInstance;
   }
 
 }
