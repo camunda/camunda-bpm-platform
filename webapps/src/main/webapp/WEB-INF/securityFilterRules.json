@@ -22,6 +22,7 @@
       { "path": "/api/admin/auth/user/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.EngineRequestAuthorizer" },
       { "path": "/api/admin/setup/{engine}/user/create", "methods" : "POST" },
       { "path": "/api/admin/setup/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.EngineRequestAuthorizer" },
+      { "path": "/api/{app:admin}/plugin/license/{engine}/check-key", "methods" : "GET" },
       { "path": "/api/{app:admin}/plugin/{plugin}/static/.*", "methods" : "GET" },
       { "path": "/api/{app:admin}/plugin/{plugin}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.EngineRequestAuthorizer" },
       { "path": "/api/{app:tasklist}/plugin/{plugin}/static/.*", "methods" : "GET" },

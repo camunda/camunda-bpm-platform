@@ -74,13 +74,13 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
   public static final String MIME_TYPE_TEXT_JAVASCRIPT = "text/javascript";
 
   @Context
-  private ServletContext servletContext;
+  protected ServletContext servletContext;
 
   @Context
-  private HttpHeaders headers;
+  protected HttpHeaders headers;
 
   @Context
-  private UriInfo uriInfo;
+  protected UriInfo uriInfo;
 
   private final String pluginName;
 

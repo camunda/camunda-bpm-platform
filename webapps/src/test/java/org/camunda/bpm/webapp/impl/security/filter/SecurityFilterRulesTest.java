@@ -19,7 +19,6 @@ package org.camunda.bpm.webapp.impl.security.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -469,6 +468,16 @@ public class SecurityFilterRulesTest {
         assertThat(authorization.isAuthenticated()).isFalse();
       }
     });
+  }
+
+  @Test
+  public void shouldPassAdminLicenseCheck_GET_LOGGED_OUT() {
+
+    Authorization authorization =
+      getAuthorization("GET", applicationPath + "/api/admin/plugin/license/default/check-key");
+
+    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
   }
 
   protected Authorization getAuthorization(String method, String uri) {
