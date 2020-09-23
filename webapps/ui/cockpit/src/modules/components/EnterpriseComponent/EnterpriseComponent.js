@@ -26,7 +26,7 @@ export default function EnterpriseComponent({ children }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await get("%ADMIN_API%/plugin/license/default/key");
+      const res = await get("%ADMIN_API%/plugin/license/default/check-key");
       const json = await res.json();
       setHasLicense(json.valid);
     };
