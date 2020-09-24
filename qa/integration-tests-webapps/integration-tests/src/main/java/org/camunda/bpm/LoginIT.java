@@ -58,6 +58,9 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
 
     wait.until(presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
+    
+    wait.until(presenceOfElementLocated(By.cssSelector(".modal-close")))
+        .click();
   }
 
   @After
