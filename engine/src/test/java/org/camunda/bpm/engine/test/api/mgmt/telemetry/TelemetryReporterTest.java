@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
@@ -789,6 +790,38 @@ public class TelemetryReporterTest {
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
+  @Test
+  public void shouldSendDataWithCamundaIntegration() {
+    // given
+    Data expectedData = createDataWithCamundaIntegration(configuration.getTelemetryData(), "wildfly-integration");
+    // creating a new object as during the report the object is being modified
+    Data givenData = createDataWithCamundaIntegration(configuration.getTelemetryData(), "wildfly-integration");
+    managementService.toggleTelemetry(true);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    // using a separate reporter to avoid modifying the telemetry data of other tests
+    new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+                          configuration.getTelemetryEndpoint(),
+                          0,
+                          configuration.getTelemetryReportingPeriod(),
+                          givenData,
+                          configuration.getTelemetryHttpConnector(),
+                          configuration.getTelemetryRegistry(),
+                          configuration.getMetricsRegistry(),
+                          configuration.getTelemetryRequestTimeout())
+        .reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Jdk jdk = ParseUtil.parseJdkDetails();
@@ -802,6 +835,15 @@ public class TelemetryReporterTest {
 
     Product product = new Product("Runtime", "7.14.0", "special", internals);
     Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
+    return data;
+  }
+
+  protected Data createDataWithCamundaIntegration(Data telemetryData, String integrationString) {
+    Internals internals = new Internals(null, null, null, null);
+    Data data = new Data(telemetryData.getInstallation(), new Product("dummy", "dummy", "dummy", internals));
+    HashSet<String> integration = new HashSet<>();
+    integration.add(integrationString);
+    internals.setCamundaIntegration(integration);
     return data;
   }
 
@@ -910,5 +952,6 @@ public class TelemetryReporterTest {
     task.setCamundaDecisionRef(decisionRef);
     return modelInstance;
   }
+
 
 }
