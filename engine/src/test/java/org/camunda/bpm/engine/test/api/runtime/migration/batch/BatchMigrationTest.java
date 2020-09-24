@@ -43,10 +43,12 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -387,7 +389,30 @@ public class BatchMigrationTest {
   }
 
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenant() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      Batch batch = helper.migrateProcessInstancesAsyncForTenant(10, "someTenantId");
+      helper.completeSeedJobs(batch);
+
+      testRule.waitForJobExecutorToProcessAllJobs();
+
+      // then all process instances were migrated
+      assertEquals(0, helper.countSourceProcessInstances());
+      assertEquals(10, helper.countTargetProcessInstances());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+    }
+  }
+
+  @Test
+  @RequiredDatabase(includes = DbSqlSessionFactory.CRDB)
+  public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenantUsesCockroachDB() {
     ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
     processEngineConfiguration.setAuthorizationEnabled(true);
@@ -398,8 +423,7 @@ public class BatchMigrationTest {
 
       // extend waiting time for CRDB since it takes longer to process all the jobs there
       // see CAM-12239 for more details
-      long maxMillisToWait = testRule.isOptimisticLockingExceptionSuppressible()? 10000L : 30000L;
-      testRule.waitForJobExecutorToProcessAllJobs(maxMillisToWait);
+      testRule.waitForJobExecutorToProcessAllJobs(30000L);
 
       // then all process instances where migrated
       assertEquals(0, helper.countSourceProcessInstances());
@@ -408,7 +432,6 @@ public class BatchMigrationTest {
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
     }
-
   }
 
   @Test

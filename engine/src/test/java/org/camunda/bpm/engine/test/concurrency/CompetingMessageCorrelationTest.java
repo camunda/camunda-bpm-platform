@@ -204,7 +204,6 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // thread two correlates and acquires the exclusive lock on the event subscription of instance2
     // depending on the database and locking used, this may block thread2
     thread2.makeContinue();
-    Thread.sleep(3000); // wait a bit until t2 is blocked during the flush
 
     // thread 1 completes successfully
     thread1.waitUntilDone();

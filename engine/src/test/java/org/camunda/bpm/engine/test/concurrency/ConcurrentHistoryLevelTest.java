@@ -79,7 +79,9 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
       assertNull(thread2Exception);
     } else {
       // on CRDB, the pessimistic lock is disabled and the concurrent transaction
-      // with fail with a CrdbTransactionRetryException and will need to be retried
+      // with fail with a CrdbTransactionRetryException and will be retried. However,
+      // by default, the CRDB-related `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
       assertThat(thread2Exception).isInstanceOf(CrdbTransactionRetryException.class);
     }
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();

@@ -96,8 +96,10 @@ alter table ACT_RU_EXT_TASK
 alter table ACT_RU_VARIABLE
     drop CONSTRAINT ACT_FK_VAR_BATCH;
 
--- unique constraints must be dropped as indexes in CRDB
--- cascade must be used to drop these types of constraints
+-- A UNIQUE constraint in CRDB creates an index in the background.
+-- There is a dependency between the UNIQUE constraint and the index,
+-- so CRDB requires DROP INDEX CASCADE to be used for the removal of
+-- these types of constraints.
 drop index ACT_UNIQ_AUTH_GROUP cascade;
 drop index ACT_UNIQ_AUTH_USER cascade;
 drop index ACT_UNIQ_VARIABLE cascade;
@@ -125,6 +127,7 @@ drop index ACT_IDX_AUTH_GROUP_ID;
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
 drop index ACT_IDX_TASK_ASSIGNEE;
+drop index ACT_IDX_TASK_OWNER;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;

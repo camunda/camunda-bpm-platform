@@ -30,8 +30,10 @@ alter table ACT_ID_TENANT_MEMBER
 alter table ACT_ID_TENANT_MEMBER
     drop constraint ACT_FK_TENANT_MEMB_GROUP;
 
--- unique constraints must be dropped as indexes in CRDB
--- cascade must be used to drop these types of constraints
+-- A UNIQUE constraint in CRDB creates an index in the background.
+-- There is a dependency between the UNIQUE constraint and the index,
+-- so CRDB requires DROP INDEX CASCADE to be used for the removal of
+-- these types of constraints.
 drop index ACT_UNIQ_TENANT_MEMB_USER cascade;
 drop index ACT_UNIQ_TENANT_MEMB_GROUP cascade;
 

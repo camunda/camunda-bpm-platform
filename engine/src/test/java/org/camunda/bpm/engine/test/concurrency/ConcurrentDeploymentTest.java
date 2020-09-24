@@ -69,13 +69,16 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
         createDeploymentBuilder().enableDuplicateFiltering(false),
         createDeploymentBuilder().enableDuplicateFiltering(false));
 
-    if (testRule.isOptimisticLockingExceptionSuppressible()) {
-      // ensure that although both transactions were run concurrently, only one deployment was constructed.
-      DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-      assertThat(deploymentQuery.count()).isEqualTo(1L);
-    } else {
+    // ensure that although both transactions were run concurrently, only one deployment was constructed.
+    assertThat(thread1.getException()).isNull();
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+    assertThat(deploymentQuery.count()).isEqualTo(1L);
+
+    if (!testRule.isOptimisticLockingExceptionSuppressible()) {
       // on CockroachDB, the deployment pessimistic lock is disabled
-      // and concurrent deployments rely on the CRDB optimistic locking mechanism
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
       assertCockroachDBConcurrentFailure();
     }
   }
@@ -100,8 +103,13 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
       assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
       assertThat(processDefinitions.get(1).getVersion()).isEqualTo(2);
     } else {
+      assertThat(thread1.getException()).isNull();
+      assertThat(processDefinitions.size()).isEqualTo(1);
+      assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
       // on CockroachDB, the deployment pessimistic lock is disabled
-      // and concurrent deployments rely on the CRDB optimistic locking mechanism
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
       assertCockroachDBConcurrentFailure();
     }
   }
@@ -150,7 +158,6 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
   }
 
   protected void assertCockroachDBConcurrentFailure() {
-    assertThat(thread1.getException()).isNull();
     assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
   }
 

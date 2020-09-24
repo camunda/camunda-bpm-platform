@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -105,9 +106,10 @@ public class CompetingJobAcquisitionTest {
       // but the job was not acquired
       assertEquals(0, threadTwo.jobs.size());
     } else {
-      // if the Process Engine runs on CockroachDB
-      // the acquisition fails due to an OLE that can't be handled or ignored
-      assertThat(threadTwo.exception).isInstanceOf(OptimisticLockingException.class);
+      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
+      // like the `FetchExternalTasksCmd` will not be retried, but report
+      // a `CrdbTransactionRetryException` to the caller.
+      assertThat(threadTwo.exception).isInstanceOf(CrdbTransactionRetryException.class);
     }
   }
 

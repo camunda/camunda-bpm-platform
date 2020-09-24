@@ -62,13 +62,8 @@ import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 /**
- * This test covers the behavior of two competing JobAcquisition threads.
- *
- * In the test:
- * 1. The first JobAcquisition thread is started.
- * 1.1.
- *
  * @author Thorben Lindhauer
+ *
  */
 public class ConcurrentJobExecutorTest {
 
