@@ -308,10 +308,4 @@ public class CommandLogger extends ProcessEngineLogger {
       cause.getMessage());
   }
 
-  public void debugDisabledHistoryCleanupLock() {
-    logDebug(
-      "046", "No exclusive lock is acquired while creating the HistoryCleanupJob " +
-        "on CockroachDB because it is disabled. ");
-  }
-
 }

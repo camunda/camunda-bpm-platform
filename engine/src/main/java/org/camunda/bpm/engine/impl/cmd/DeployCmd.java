@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
@@ -56,7 +55,6 @@ import org.camunda.bpm.engine.impl.repository.CandidateDeploymentImpl;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.CandidateDeployment;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -188,8 +186,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {
-    if (commandContext.getProcessEngineConfiguration().isDeploymentLockUsed()
-        && !DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+    if (commandContext.getProcessEngineConfiguration().isDeploymentLockUsed()) {
       // Acquire global exclusive lock: this ensures that there can be only one
       // transaction in the cluster which is allowed to perform deployments.
       // This is important to ensure that duplicate filtering works correctly
@@ -641,6 +638,19 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
     }
   }
 
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The Deploy command only executes internal code, so we are certain that a retry
+   * of a failed deployment will not impact user data, and may be performed multiple times.
+   */
   @Override
   public boolean isRetryable() {
     return true;

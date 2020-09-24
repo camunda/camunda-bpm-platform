@@ -114,15 +114,25 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {
-    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
-      PropertyManager propertyManager = commandContext.getPropertyManager();
-      //exclusive lock
-      propertyManager.acquireExclusiveLockForStartup();
-    } else {
-      LOG.debugDisabledStartupLock();
-    }
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForStartup();
   }
 
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The HistoryLevelSetup command only executes internal code, so we are certain
+   * that a retry of a failed command will not impact user data, and may be performed
+   * multiple times.
+   */
   @Override
   public boolean isRetryable() {
     return true;

@@ -23,6 +23,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
@@ -153,7 +155,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     thread2.waitForSync();
 
     // STEP 2: make Thread 1 proceed and wait until it has deployed but not yet committed
-    // -> will still hold the exclusive lock
     thread1.makeContinue();
     thread1.waitForSync();
 
@@ -162,7 +163,9 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     // -> it will attempt a deployment
     thread2.makeContinue();
 
-    // wait for 2 seconds
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for adding the new deployment.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
     // STEP 4: allow Thread 1 to terminate
@@ -196,11 +199,18 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
    * for the test case without retries, and with an exclusive lock.
    */
   @Test
-  public void shouldEnableTelemetryWithoutExclusiveLock() throws InterruptedException {
+  public void shouldEnableTelemetryWithoutExclusiveLock() throws InterruptedException,
+      InvocationTargetException,
+      NoSuchMethodException,
+      InstantiationException,
+      IllegalAccessException {
+
     // given
     // two concurrent commands to create a new telemetry property
-    ControllableUpdateTelemetrySetupCommand telemetrySetupCommand1 = new ControllableUpdateTelemetrySetupCommand();
-    ControllableUpdateTelemetrySetupCommand telemetrySetupCommand2 = new ControllableUpdateTelemetrySetupCommand();
+    ControllableProcessEngineBootstrapCommand telemetrySetupCommand1 =
+        new ControllableProcessEngineBootstrapCommand(ControllableUpdateTelemetrySetupCommand.class);
+    ControllableProcessEngineBootstrapCommand telemetrySetupCommand2 =
+        new ControllableProcessEngineBootstrapCommand(ControllableUpdateTelemetrySetupCommand.class);
 
     ConcurrencyTestHelper.ThreadControl thread1 = executeControllableCommand(telemetrySetupCommand1);
     thread1.reportInterrupts();
@@ -217,6 +227,9 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     // the second command initializes the property
     thread2.makeContinue();
 
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for updating the telemetry flag.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
     // the first commands flushes its result
@@ -248,13 +261,18 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
    * for the test case without retries, and with an exclusive lock.
    */
   @Test
-  public void shouldSetInstallationIdWithoutExclusiveLock() throws InterruptedException {
+  public void shouldSetInstallationIdWithoutExclusiveLock() throws InterruptedException,
+      InvocationTargetException,
+      NoSuchMethodException,
+      InstantiationException,
+      IllegalAccessException {
+
     // given
     // two concurrent commands to set an installation id
-    ControllableInstallationIdInitializationCommand initializationCommand1 =
-      new ControllableInstallationIdInitializationCommand();
-    ControllableInstallationIdInitializationCommand initializationCommand2 =
-      new ControllableInstallationIdInitializationCommand();
+    ControllableProcessEngineBootstrapCommand initializationCommand1 =
+      new ControllableProcessEngineBootstrapCommand(ControllableInstallationIdInitializationCommand.class);
+    ControllableProcessEngineBootstrapCommand initializationCommand2 =
+      new ControllableProcessEngineBootstrapCommand(ControllableInstallationIdInitializationCommand.class);
     ConcurrencyTestHelper.ThreadControl thread1 = executeControllableCommand(initializationCommand1);
     thread1.reportInterrupts();
     thread1.waitForSync();
@@ -270,6 +288,9 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     // the second command initializes an installation id property
     thread2.makeContinue();
 
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for updating the installation id.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
     // the first command flushes its installation id
@@ -293,10 +314,10 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     // but the second failed with an OLE, and was retried
     assertThat(initializationCommand2.getTries()).isEqualTo(2);
 
-    // the installation id of the second command is the last one
+    // the second command will detect the first installation id and set it in the configuration
     String secondInstallationId = processEngineConfiguration.getInstallationId();
     assertThat(secondInstallationId).isNotEmpty();
-    assertThat(secondInstallationId).isNotEqualTo(firstInstallationId);
+    assertThat(secondInstallationId).isEqualTo(firstInstallationId);
     assertThat(secondInstallationId).matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
   }
 
@@ -319,13 +340,16 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     thread2.reportInterrupts();
     thread2.waitForSync();
 
-    // first thread executes the job, reconfigures the next one and waits to flush to the db
+    // first thread reconfigures the next History Cleanup job and waits to flush to the db
     thread1.makeContinue();
     thread1.waitForSync();
 
-    // second thread executes the job, reconfigures the next one and waits to flush to the db
+    // second thread also reconfigures the next History Cleanup job and waits to flush to the db
     thread2.makeContinue();
 
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for updating the HC job.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
     // first thread flushes the changes to the db
@@ -362,7 +386,12 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
    * for the test case without retries, and with an exclusive lock.
    */
   @Test
-  public void shouldRetryTxToBootstrapConcurrentProcessEngineWithoutExclusiveLock() throws InterruptedException {
+  public void shouldRetryTxToBootstrapConcurrentProcessEngineWithoutExclusiveLock() throws InterruptedException,
+      InvocationTargetException,
+      NoSuchMethodException,
+      InstantiationException,
+      IllegalAccessException {
+
     // given
     historyService.cleanUpHistoryAsync(true);
 
@@ -370,21 +399,26 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     thread1.reportInterrupts();
     thread1.waitForSync();
 
-    ControllableProcessEngineBootstrapCommand bootstrapCommand = new ControllableProcessEngineBootstrapCommand();
+    ControllableProcessEngineBootstrapCommand bootstrapCommand =
+        new ControllableProcessEngineBootstrapCommand(ControllableHistoryCleanupBootstrapEngineCommand.class);
     ThreadControl thread2 = executeControllableCommand(bootstrapCommand);
     thread2.reportInterrupts();
     thread2.waitForSync();
 
-    // the first Bootstrap Engine cmd performs its initialization steps
+    // the "JobExecutor" thread executes the history cleanup command
+    // and reconfigures the next HC job one
     thread1.makeContinue();
     thread1.waitForSync();
 
-    // the second Bootstrap Engine cmd performs its initialization steps
+    // the BootstrapEngineCmd thread performs its initialization steps
     thread2.makeContinue();
 
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for updating the HC job.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
-    // the first Bootstrap Engine cmd flushes its changes
+    // the "JobExecutor" thread flushes the reconfigured HC job
     thread1.waitUntilDone();
 
     // when
@@ -430,6 +464,9 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     // the second command determines the history level
     thread2.makeContinue();
 
+    // wait 2 seconds until thread2/TX2 is correctly blocked,
+    // and enters the TX wait queue for updating the history level.
+    // This avoids a race condition when TX1 commits.
     Thread.sleep(2000);
 
     // the first command flushes the history level to the database
@@ -512,8 +549,12 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
 
     protected ControllableBootstrapEngineCommand bootstrapCommand;
 
-    public ControllableProcessEngineBootstrapCommand() {
-      this.bootstrapCommand = new ControllableBootstrapEngineCommand(this.monitor);
+    public ControllableProcessEngineBootstrapCommand(Class<? extends ControllableBootstrapEngineCommand> bootstrapCommandClass) throws NoSuchMethodException,
+        IllegalAccessException,
+        InvocationTargetException,
+        InstantiationException {
+      Constructor<?> cons = bootstrapCommandClass.getConstructor(ThreadControl.class);
+      this.bootstrapCommand = (ControllableBootstrapEngineCommand) cons.newInstance(this.monitor);
     }
 
     @Override
@@ -523,7 +564,8 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
           ProcessEngineConfiguration
               .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setCommandRetries(COMMAND_RETRIES)
-          .setProcessEngineName(PROCESS_ENGINE_NAME);
+          .setProcessEngineName(PROCESS_ENGINE_NAME)
+          .setInitializeTelemetry(false);
       processEngineConfiguration.setProcessEngineBootstrapCommand(bootstrapCommand);
 
       processEngineConfiguration.buildProcessEngine();
@@ -551,18 +593,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
       this.tries = 0;
     }
 
-    @Override
-    protected void createHistoryCleanupJob(CommandContext commandContext) {
-
-      monitor.sync();
-
-      tries++;
-      super.createHistoryCleanupJob(commandContext);
-      spy = Context.getCommandInvocationContext();
-
-      monitor.sync();
-    }
-
     public int getTries() {
       return tries;
     }
@@ -574,6 +604,63 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
 
     public CommandInvocationContext getSpy() {
       return spy;
+    }
+  }
+
+  protected static class ControllableHistoryCleanupBootstrapEngineCommand extends ControllableBootstrapEngineCommand {
+
+    public ControllableHistoryCleanupBootstrapEngineCommand(ThreadControl threadControl) {
+      super(threadControl);
+    }
+
+    @Override
+    protected void createHistoryCleanupJob(CommandContext commandContext) {
+
+      monitor.sync();
+
+      tries++;
+      super.createHistoryCleanupJob(commandContext);
+      spy = Context.getCommandInvocationContext();
+
+      monitor.sync();
+    }
+  }
+
+  protected static class ControllableInstallationIdInitializationCommand extends ControllableBootstrapEngineCommand {
+
+    public ControllableInstallationIdInitializationCommand(ThreadControl threadControl) {
+      super(threadControl);
+    }
+
+    @Override
+    public void initializeInstallationId(CommandContext commandContext) {
+
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
+
+      tries++;
+      super.initializeInstallationId(commandContext);
+
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
+
+    }
+  }
+
+  protected static class ControllableUpdateTelemetrySetupCommand extends ControllableBootstrapEngineCommand {
+
+    public ControllableUpdateTelemetrySetupCommand(ThreadControl threadControl) {
+      super(threadControl);
+    }
+
+    @Override
+    public void initializeTelemetryProperty(CommandContext commandContext) {
+
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
+
+      tries++;
+      super.initializeTelemetryProperty(commandContext);
+
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
+
     }
   }
 
@@ -603,70 +690,6 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     @Override
     public boolean isRetryable() {
       return historyCleanupCmd.isRetryable();
-    }
-
-    public int getTries() {
-      return tries;
-    }
-  }
-
-  protected static class ControllableInstallationIdInitializationCommand extends ConcurrencyTestHelper.ControllableCommand<Void> {
-
-    protected int tries;
-    protected BootstrapEngineCommand bootstrapEngineCommand;
-
-    public ControllableInstallationIdInitializationCommand() {
-      this.tries = 0;
-      this.bootstrapEngineCommand = new BootstrapEngineCommand();
-    }
-
-    public Void execute(CommandContext commandContext) {
-
-      monitor.sync(); // thread will block here until makeContinue() is called form main thread
-
-      tries++;
-      bootstrapEngineCommand.initializeInstallationId(commandContext);
-
-      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
-
-      return null;
-    }
-
-    @Override
-    public boolean isRetryable() {
-      return bootstrapEngineCommand.isRetryable();
-    }
-
-    public int getTries() {
-      return tries;
-    }
-  }
-
-  protected static class ControllableUpdateTelemetrySetupCommand extends ConcurrencyTestHelper.ControllableCommand<Void> {
-
-    protected int tries;
-    protected BootstrapEngineCommand bootstrapEngineCommand;
-
-    public ControllableUpdateTelemetrySetupCommand() {
-      this.tries = 0;
-      this.bootstrapEngineCommand = new BootstrapEngineCommand();
-    }
-
-    public Void execute(CommandContext commandContext) {
-
-      monitor.sync(); // thread will block here until makeContinue() is called form main thread
-
-      tries++;
-      bootstrapEngineCommand.initializeTelemetryProperty(commandContext);
-
-      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
-
-      return null;
-    }
-
-    @Override
-    public boolean isRetryable() {
-      return bootstrapEngineCommand.isRetryable();
     }
 
     public int getTries() {

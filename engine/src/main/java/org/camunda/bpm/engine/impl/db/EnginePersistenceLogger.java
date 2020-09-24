@@ -832,21 +832,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     );
   }
 
-  public void debugDisabledTelemetryLock() {
+  public void debugDisabledPessimisticLocks() {
     logDebug(
-      "106", "No exclusive lock is acquired while setting up telemetry configuration " +
-        "on CockroachDB because it is disabled. ");
-  }
-
-  public void debugDisabledInstallationIdLock() {
-    logDebug(
-      "107", "No exclusive lock is acquired while creating the Installation Id " +
-        "on CockroachDB because it is disabled. ");
-  }
-
-  public void debugDisabledStartupLock() {
-    logDebug(
-      "108", "No exclusive startup lock is acquired while determining the history level " +
-        "on CockroachDB because it is disabled. ");
+      "106", "No exclusive lock is acquired on CockroachDB, " +
+            "as pessimistic locks are disabled on this database.");
   }
 }
