@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -44,7 +42,6 @@ import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -58,8 +55,6 @@ import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.Reco
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -74,14 +69,7 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
   protected static final int DEFAULT_NUM_JOBS_TO_ACQUIRE = 3;
   protected static final int COMMAND_RETRIES = 3;
   protected static final String PROCESS_ENGINE_NAME = "failingProcessEngine";
-  protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")
-      .startEvent()
-      .serviceTask()
-      .camundaExpression("${true}")
-      .camundaAsyncBefore()
-      .endEvent()
-      .done();
-  
+
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
       c -> c.setCommandRetries(COMMAND_RETRIES));
@@ -124,7 +112,6 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
   public void tearDown() throws Exception {
     jobExecutor1.shutdown();
     jobExecutor2.shutdown();
-    closeDownProcessEngine();
   }
   
   /**
@@ -337,21 +324,21 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
   @Test
   public void shouldNotRetryCommandByDefault() {
     // given
-    // a failing command
-    ControllableFailingCommand failingCommand = new ControllableFailingCommand();
-    ThreadControl failingCommandThread = executeControllableCommand(failingCommand);
-    failingCommandThread.reportInterrupts();
-    failingCommandThread.waitForSync();
+    // a regular, non-retryable command that throws a CrdbTransactionRetryException
+    CrdbFailingCommand failingCommand = new CrdbFailingCommand();
+
+    // then
+    // a CrdbTransactionRetryException should be reported to the caller of the command
+    thrown.expect(CrdbTransactionRetryException.class);
+    thrown.expectMessage("Does not retry");
 
     // when
     // the command is executed and fails
-    failingCommandThread.waitUntilDone(true);
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(failingCommand);
 
     // then
-    // the exception is thrown to the called
-    assertThat(failingCommandThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
-    // and the command is only tried once
-    assertThat(failingCommand.getTries()).isOne();
+    // also the command should be executed only once
+    assertThat(failingCommand.getTries()).isEqualTo(1);
   }
 
   protected static class ControlledFetchAndLockCommand extends ControllableCommand<List<LockedExternalTask>> {
@@ -410,26 +397,18 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
     }
   }
 
-  protected static class ControllableFailingCommand extends ControllableCommand<Void> {
+  protected static class CrdbFailingCommand implements Command<Void> {
 
-    protected int tries = 0;
+    protected static int tries = 0;
 
     @Override
     public Void execute(CommandContext commandContext) {
-
-      monitor.sync();
-
       tries++;
       throw new CrdbTransactionRetryException("Does not retry");
     }
 
-    public int getTries() {
+    public static int getTries() {
       return tries;
-    }
-
-    @Override
-    public boolean isRetryable() {
-      return false;
     }
   }
 
@@ -476,30 +455,6 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
       monitor.sync();
 
       return null;
-    }
-  }
-
-  protected void closeDownProcessEngine() {
-    final ProcessEngine otherProcessEngine = ProcessEngines.getProcessEngine(PROCESS_ENGINE_NAME);
-    if (otherProcessEngine != null) {
-
-      ((ProcessEngineConfigurationImpl)otherProcessEngine.getProcessEngineConfiguration())
-          .getCommandExecutorTxRequired()
-          .execute((Command<Void>) commandContext -> {
-
-            List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
-            if (jobs.size() > 0) {
-              assertEquals(1, jobs.size());
-              String jobId = jobs.get(0).getId();
-              commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-            }
-
-            return null;
-          });
-
-      otherProcessEngine.close();
-      ProcessEngines.unregister(otherProcessEngine);
     }
   }
 }

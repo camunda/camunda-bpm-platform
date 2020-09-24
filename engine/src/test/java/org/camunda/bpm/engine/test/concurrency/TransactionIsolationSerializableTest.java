@@ -106,8 +106,8 @@ public class TransactionIsolationSerializableTest extends ConcurrencyTestCase {
    *      ========             ========
    * ------READ---------------------------
    * ---------------------------READ------
-   * ------WRITE-------------------------- | FAILS due to concurrent update
-   * ---------------------------WRITE----- | PASSES since to changes were made
+   * ------WRITE-------------------------- | FAILS due to an unrelated, runtime error and is rolled back.
+   * ---------------------------WRITE----- | PASSES since there are no concurrent changes.
    *
    * Data may become inconsistent if transactions are not ordered properly
    */

@@ -72,12 +72,14 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 
@@ -179,19 +181,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     if(firstResult == -1 ||  maxResults==-1) {
       return Collections.EMPTY_LIST;
     }
-    try {
-
-      List loadedObjects = persistenceSession.selectList(statement, parameter);
-      return filterLoadedObjects(loadedObjects);
-    } catch (Exception e) {
-
-      if (DbSqlSession.isCrdbConcurrencyConflict(e)) {
-        // on CRDB, selects might fail with an OLE and the transaction must be retried.
-        throw LOG.crdbTransactionRetryExceptionOnSelect(e);
-      }
-      // if it's not a CRDB TransactionRetryError, simply rethrow the exception
-      throw e;
-    }
+    List loadedObjects = persistenceSession.selectList(statement, parameter);
+    return filterLoadedObjects(loadedObjects);
   }
 
   public Object selectOne(String statement, Object parameter) {
@@ -284,8 +275,18 @@ public class DbEntityManager implements Session, EntityLoadListener {
     lock(statement, null);
   }
 
+  /**
+   * Pessimistic locks are disabled on CockroachDB since this database uses
+   * a stricter, SERIALIZABLE transaction isolation which ensures a serialized
+   * manner of transaction execution, making our use-case of pessimistic locks
+   * redundant.
+   */
   public void lock(String statement, Object parameter) {
-    persistenceSession.lock(statement, parameter);
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+      persistenceSession.lock(statement, parameter);
+    } else {
+      LOG.debugDisabledPessimisticLocks();
+    }
   }
 
   public boolean isDirty(DbEntity dbEntity) {
@@ -434,8 +435,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
     
     // CRDB concurrent modification exceptions always lead to the transaction
     // being aborted, so we must always throw an exception.
-    
-    // TODO: hand in root cause
     throw LOG.crdbTransactionRetryException(dbOperation);
   }
 
