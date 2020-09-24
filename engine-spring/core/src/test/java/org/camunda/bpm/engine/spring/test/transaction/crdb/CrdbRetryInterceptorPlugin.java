@@ -16,23 +16,22 @@
  */
 package org.camunda.bpm.engine.spring.test.transaction.crdb;
 
-import org.camunda.bpm.engine.CrdbIntegrationProvider;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import java.util.Collections;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.spring.SpringProcessEnginePlugin;
 
 public class CrdbRetryInterceptorPlugin extends SpringProcessEnginePlugin {
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.setCommandRetries(3);
-    processEngineConfiguration.setCrdbIntegrationProvider(new CrdbIntegrationProvider() {
-      @Override
-      public boolean registerCrdbRetryInterceptor(ProcessEngineConfiguration configuration) {
-        // enable the CrdbTransactionRetryInterceptor on H2,
-        // so that a CRDB concurrency error can be simulated.
-        return true;
-      }
-    });
+    int commandRetries = 3;
+    processEngineConfiguration.setCommandRetries(commandRetries);
+    processEngineConfiguration
+        .setCustomPreCommandInterceptorsTxRequired(Collections
+            .singletonList(new CrdbTransactionRetryInterceptor(commandRetries)))
+        .setCustomPreCommandInterceptorsTxRequiresNew(Collections
+            .singletonList(new CrdbTransactionRetryInterceptor(commandRetries)));
   }
 }

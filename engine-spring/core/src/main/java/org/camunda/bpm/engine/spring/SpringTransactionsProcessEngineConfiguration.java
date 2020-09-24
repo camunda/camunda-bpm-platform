@@ -75,39 +75,33 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     }
 
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
+    // CRDB interceptor is added before the SpringTransactionInterceptor,
+    // so that a Spring TX may be rolled back before retrying.
+    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
+    }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-
-    // CRDB interceptor is added before the SpringTransactionInterceptor,
-    // so that a Spring TX may be rolled back before retrying.
-    if (crdbIntegrationProvider.registerCrdbRetryInterceptor(this)) {
-      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
-    }
     defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED));
-
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this);
     defaultCommandInterceptorsTxRequired.add(commandContextInterceptor);
-
     return defaultCommandInterceptorsTxRequired;
   }
 
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
+    // CRDB interceptor is added before the SpringTransactionInterceptor,
+    // so that a Spring TX may be rolled back before retrying.
+    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
+    }
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-
-    // CRDB interceptor is added before the SpringTransactionInterceptor,
-    // so that a Spring TX may be rolled back before retrying.
-    if (crdbIntegrationProvider.registerCrdbRetryInterceptor(this)) {
-      defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
-    }
     defaultCommandInterceptorsTxRequiresNew.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRES_NEW));
-
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this, true);
     defaultCommandInterceptorsTxRequiresNew.add(commandContextInterceptor);
-
     return defaultCommandInterceptorsTxRequiresNew;
   }
 

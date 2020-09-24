@@ -42,8 +42,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     "CrdbTransactionIntegrationTest-applicationContext.xml"})
 public class CrdbTransactionIntegrationTest {
 
-  protected boolean throwException = true;
-
   @Rule
   @Autowired
   public ProcessEngineRule rule;
@@ -56,12 +54,12 @@ public class CrdbTransactionIntegrationTest {
 
   @Test
   @Deployment(resources = {
-      "org/camunda/bpm/engine/spring/test/transaction/"
-          + "CrdbTransactionIntegrationTest.simpleProcess.bpmn20.xml" })
+      "org/camunda/bpm/engine/spring/test/transaction/" +
+          "CrdbTransactionIntegrationTest.simpleProcess.bpmn20.xml" })
   public void shouldRetryEngineManagedTransaction() {
     // given
     // a custom, retryable Command that starts a Process Instance of a simple process
-    // and fails (only) on the first try with a CrdbTransactionRetryException.
+    // with a delegate, and fails (only) on the first try with a CrdbTransactionRetryException.
 
     // when
     // the command is executed
@@ -71,15 +69,9 @@ public class CrdbTransactionIntegrationTest {
         @Override
         public Void execute(CommandContext commandContext) {
 
-          // start a simple process
+          // and a simple process is started with a failing delegate
           commandContext.getProcessEngineConfiguration().getRuntimeService()
               .startProcessInstanceByKey("simpleProcess");
-
-          // throw a concurrency exception on the first run only
-          if (throwException) {
-            throwException = false;
-            throw new CrdbTransactionRetryException("Simulate CRDB optimistic locking error.");
-          }
 
           return null;
         }
@@ -92,12 +84,13 @@ public class CrdbTransactionIntegrationTest {
       });
 
     // then
-    // a new transaction is used on the second, successful custom command invocation,
+    // a new transaction is used on the second, successful command invocation,
     // and only one simple process is committed to the database
     long historicProcessInstanceCount =  historyService.createHistoricProcessInstanceQuery()
         .processDefinitionKey("simpleProcess")
         .count();
     assertThat(historicProcessInstanceCount).isEqualTo(1L);
+    assertThat(CrdbConcurrencyConflictDelegate.getTransactions().size()).isEqualTo(2);
   }
 
 }

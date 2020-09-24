@@ -65,38 +65,32 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
-    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
-    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-
     // CRDB interceptor is added before the JtaTransactionInterceptor,
     // so that a Java EE managed TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
+    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
-
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
-
     return defaultCommandInterceptorsTxRequired;
   }
 
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
-    defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
-    defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-
     // CRDB interceptor is added before the JtaTransactionInterceptor,
     // so that a Java EE managed TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
     }
+    defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
+    defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
-
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
-
     return defaultCommandInterceptorsTxRequiresNew;
   }
 
