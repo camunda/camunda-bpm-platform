@@ -120,7 +120,9 @@ public class LoginIT extends AbstractWebappUiIT {
   }
 
   @After
-  public void logout() {
+  public void logout() throws InterruptedException {
+    Thread.sleep(200);
+
     if (appName.equals("cockpit")) {
       wait.until(presenceOfElementLocated(By.cssSelector(".UserInformation .user")))
           .click();
