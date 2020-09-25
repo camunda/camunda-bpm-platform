@@ -144,15 +144,7 @@ public class ProcessEngineExtension implements TestWatcher,
     
     Deployment methodAnnotation = testMethod.getAnnotation(Deployment.class);
     if (methodAnnotation != null) {
-      String[] resources = methodAnnotation.resources();
-      if (resources.length == 0) {
-        deploymentBuilder.addClasspathResource(TestHelper.getBpmnProcessDefinitionResource(
-            testClass, testMethod.getName()));
-      } else {
-        for (int i = 0; i < resources.length; i++) {
-          deploymentBuilder.addClasspathResource(resources[i]);
-        }
-      }
+      getDeploymentResources(testClass, testMethod.getName(), methodAnnotation, deploymentBuilder);
       LOG.info("annotation @Deployment creates deployment for {}.{}", testClass.getName(), testMethod.getName());
       deploymentId = deploymentBuilder
           .deploy()
@@ -160,10 +152,9 @@ public class ProcessEngineExtension implements TestWatcher,
     } else {
       Deployment classAnnotation = testClass.getAnnotation(Deployment.class);
       if (classAnnotation != null) {
+        getDeploymentResources(testClass, null, classAnnotation, deploymentBuilder);
         LOG.info("annotation @Deployment creates deployment for {}.{}", testClass.getName(), testMethod.getName());
         deploymentId = deploymentBuilder
-            .addClasspathResource(TestHelper.getBpmnProcessDefinitionResource(
-                testClass, null))
             .deploy()
             .getId();
       } else {
@@ -177,13 +168,25 @@ public class ProcessEngineExtension implements TestWatcher,
           }
         }
         if (classAnnotation != null) {
+          getDeploymentResources(lookForAnnotationClass, null, classAnnotation, deploymentBuilder);
           LOG.info("annotation @Deployment creates deployment for {}.{}", testClass.getName(), testMethod.getName());
           deploymentId = deploymentBuilder
-              .addClasspathResource(TestHelper.getBpmnProcessDefinitionResource(
-                  lookForAnnotationClass, null))
               .deploy()
               .getId();
         }
+      }
+    }
+  }
+
+  private void getDeploymentResources(Class<?> testClass, String testMethodName, Deployment annotation,
+      DeploymentBuilder deploymentBuilder) {
+    String[] resources = annotation.resources();
+    if (resources.length == 0) {
+      deploymentBuilder.addClasspathResource(TestHelper.getBpmnProcessDefinitionResource(
+          testClass, testMethodName));
+    } else {
+      for (int i = 0; i < resources.length; i++) {
+        deploymentBuilder.addClasspathResource(resources[i]);
       }
     }
   }
