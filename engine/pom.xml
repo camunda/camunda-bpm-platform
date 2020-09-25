@@ -345,6 +345,9 @@
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/camunda.cfg.xml</include>
