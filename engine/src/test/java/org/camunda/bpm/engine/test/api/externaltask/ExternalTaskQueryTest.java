@@ -676,7 +676,6 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     }
   }
 
-  @Ignore("https://jira.camunda.com/browse/CAM-12333")
   @Test
   public void shouldCheckPresenceOfVersionTag() {
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
