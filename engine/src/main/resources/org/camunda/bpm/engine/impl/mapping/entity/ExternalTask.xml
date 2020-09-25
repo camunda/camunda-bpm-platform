@@ -324,10 +324,11 @@
 
   <sql id="selectExternalTaskByQueryCriteriaSql">
     from (
-    select RES.*, PI.BUSINESS_KEY_
+    select RES.*, PI.BUSINESS_KEY_, PD.VERSION_TAG_
     from ${prefix}ACT_RU_EXT_TASK RES
     
     left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
+    left join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
@@ -449,7 +450,8 @@
     RES.SUSPENSION_STATE_,
     RES.TENANT_ID_,
     RES.PRIORITY_,
-    RES.BUSINESS_KEY_
+    RES.BUSINESS_KEY_,
+    RES.VERSION_TAG_
   </sql>
 
 </mapper>
