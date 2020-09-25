@@ -1,0 +1,12 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>camunda-bpm-junit5</artifactId>
+  <packaging>jar</packaging>
+  
+  <parent>
+    <groupId>org.camunda.bpm.extension</groupId>
+    <artifactId>camunda-bpm-junit5-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  
+</project>
