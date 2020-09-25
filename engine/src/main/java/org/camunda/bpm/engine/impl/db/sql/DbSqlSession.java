@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -130,9 +131,16 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
     // Id using the DbIdGenerator while performing a deployment.
-    if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
+    //
+    // On CockroachDB, pessimistic locks are disabled since this database uses
+    // a stricter, SERIALIZABLE transaction isolation which ensures a serialized
+    // manner of transaction execution, making our use-case of pessimistic locks
+    // redundant.
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB, DbSqlSessionFactory.H2)) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
       executeSelectForUpdate(mappedStatement, parameter);
+    } else {
+      LOG.debugDisabledPessimisticLocks();
     }
   }
 
@@ -142,14 +150,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
                                        int rowsAffected,
                                        Exception failure) {
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       DbEntity dbEntity = operation.getEntity();
 
@@ -189,7 +190,12 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
     if (failure != null) {
       operation.setFailure(failure);
-      operation.setState(State.FAILED_ERROR);
+
+      State failedState = State.FAILED_ERROR;
+      if (isCrdbConcurrencyConflict(failure)) {
+        failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
+      }
+      operation.setState(failedState);
     } else {
       operation.setRowsAffected(rowsAffected);
       operation.setState(State.APPLIED);
@@ -201,20 +207,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
                                        Exception failure) {
     
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      DbOperation dependencyOperation = operation.getDependentOperation();
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else if (dependencyOperation != null && dependencyOperation.getState() != null && dependencyOperation.getState() != State.APPLIED) {
-        // the owning operation was not successful, so the prerequisite for this operation was not given
-        LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
-        operation.setState(State.NOT_APPLIED);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       operation.setRowsAffected(rowsAffected);
 
@@ -227,6 +220,35 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         operation.setState(State.APPLIED);
       }
     }
+  }
+
+  protected void configureFailedDbEntityOperation(DbEntityOperation operation, Exception failure) {
+    operation.setRowsAffected(0);
+    operation.setFailure(failure);
+
+    DbOperationType operationType = operation.getOperationType();
+    DbOperation dependencyOperation = operation.getDependentOperation();
+
+    State failedState;
+    if (isCrdbConcurrencyConflict(failure)) {
+      failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
+      
+    } else if (isConcurrentModificationException(operation, failure)) {
+
+      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+    } else if (DbOperationType.DELETE.equals(operationType)
+              && dependencyOperation != null
+              && dependencyOperation.getState() != null
+              && dependencyOperation.getState() != State.APPLIED) {
+
+      // the owning operation was not successful, so the prerequisite for this operation was not given
+      LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
+      failedState = State.NOT_APPLIED;
+    } else {
+
+      failedState = State.FAILED_ERROR;
+    }
+    operation.setState(failedState);
   }
 
   protected boolean isConcurrentModificationException(DbOperation failedOperation,
@@ -258,6 +280,29 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
     return false;
   }
+
+  /**
+   * In cases where CockroachDB is used, and a failed operation is detected,
+   * the method checks if the exception was caused by a CockroachDB
+   * <code>TransactionRetryException</code>.
+   *
+   * @param cause for which an operation failed
+   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
+   *          Otherwise, it's false.
+   */
+  public static boolean isCrdbConcurrencyConflict(Throwable cause) {
+    // only check when CRDB is used
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+      boolean isCrdbTxRetryException = ExceptionUtil.checkCrdbTransactionRetryException(cause);
+      if (isCrdbTxRetryException) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
 
   // insert //////////////////////////////////////////
 
@@ -291,14 +336,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     DbEntity entity = operation.getEntity();
 
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       // set revision of our copy to 1
       if (entity instanceof HasDbRevision) {
@@ -572,9 +610,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         schema = dbSqlSessionFactory.getDatabaseSchema();
       }
 
-      String databaseType = dbSqlSessionFactory.getDatabaseType();
-
-      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
+      if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
         tableName = tableName.toLowerCase();
       }
 
@@ -609,8 +645,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           String schema = getDbSqlSessionFactory().getDatabaseSchema();
           String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
-          // for postgres we have to use lower case
-          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
+          // for postgres or cockroachdb, we have to use lower case
+          if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
             schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }

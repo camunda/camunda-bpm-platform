@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -133,11 +134,11 @@ public class ControllableJobExecutor extends JobExecutor {
 
   public class ControllableAcquisitionCommand extends ControllableCommand<AcquiredJobs> {
 
-    protected int numJobsToAcquire;
-
+    protected AcquireJobsCmd wrappedCommand;
+    
     public ControllableAcquisitionCommand(ThreadControl threadControl, int numJobsToAcquire) {
       super(threadControl);
-      this.numJobsToAcquire = numJobsToAcquire;
+      this.wrappedCommand = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire);
     }
 
     public AcquiredJobs execute(CommandContext commandContext) {
@@ -148,22 +149,32 @@ public class ControllableJobExecutor extends JobExecutor {
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
-      AcquiredJobs acquiredJobs = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire).execute(commandContext);
+      AcquiredJobs acquiredJobs = wrappedCommand.execute(commandContext);
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
       return acquiredJobs;
     }
+    
+    @Override
+    public boolean isRetryable() {
+      return wrappedCommand.isRetryable();
+    }
 
     protected void rethrowOptimisticLockingException(CommandContext commandContext) {
       commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
 
+        @Override
         public Class<? extends DbEntity> getEntityType() {
           return JobEntity.class;
         }
 
-        public void failedOperation(DbOperation operation) {
+        @Override
+        public OptimisticLockingResult failedOperation(DbOperation operation) {
           oleThrown = true;
+
+          // Mark OLE as handled
+          return OptimisticLockingResult.IGNORE;
         }
 
       });

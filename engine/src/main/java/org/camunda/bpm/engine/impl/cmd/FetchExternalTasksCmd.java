@@ -16,13 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.externaltask.LockedExternalTaskImpl;
@@ -94,14 +99,36 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     return result;
   }
 
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The FetchExternalTasks command only executes internal code, so we are certain
+   * that a retry of a failed external task locking will not impact user data, and
+   * may be performed multiple times.
+   */
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
+
   protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
     commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
 
+      @Override
       public Class<? extends DbEntity> getEntityType() {
         return ExternalTaskEntity.class;
       }
 
-      public void failedOperation(DbOperation operation) {
+      @Override
+      public OptimisticLockingResult failedOperation(DbOperation operation) {
+
         if (operation instanceof DbEntityOperation) {
           DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
           DbEntity dbEntity = dbEntityOperation.getEntity();
@@ -118,10 +145,20 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
             }
           }
 
+          // If the entity that failed with an OLE is not in the list,
+          // we rethrow the OLE to the caller.
           if (!failedOperationEntityInList) {
-            throw LOG.concurrentUpdateDbEntityException(operation);
+            return OptimisticLockingResult.THROW;
           }
+
+          // If the entity that failed with an OLE has been removed
+          // from the list, we suppress the OLE.
+          return OptimisticLockingResult.IGNORE;
         }
+
+        // If none of the conditions are satisfied, this might indicate a bug,
+        // so we throw the OLE.
+        return OptimisticLockingResult.THROW;
       }
     });
   }

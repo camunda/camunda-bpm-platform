@@ -19,8 +19,10 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
@@ -28,7 +30,9 @@ import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
@@ -39,6 +43,8 @@ import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -49,6 +55,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -56,6 +63,14 @@ import org.camunda.connect.spi.ConnectorRequest;
 public class TelemetrySendingTask extends TimerTask {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
+
+  static {
+    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_ELEMENTS);
+    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
+  }
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
@@ -63,19 +78,25 @@ public class TelemetrySendingTask extends TimerTask {
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
+  protected MetricsRegistry metricsRegistry;
+  protected int telemetryRequestTimeout;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               int telemetryRequestRetries,
                               Data data,
                               Connector<? extends ConnectorRequest<?>> httpConnector,
-                              TelemetryRegistry telemetryRegistry) {
+                              TelemetryRegistry telemetryRegistry,
+                              MetricsRegistry metricsRegistry,
+                              int telemetryRequestTimeout) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
     this.staticData = data;
     this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
+    this.metricsRegistry = metricsRegistry;
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
   }
 
   @Override
@@ -84,8 +105,11 @@ public class TelemetrySendingTask extends TimerTask {
 
     if (!isTelemetryEnabled()) {
       LOG.telemetryDisabled();
+      updateTelemetryFlag(false);
       return;
     }
+
+    updateTelemetryFlag(true);
 
     int triesLeft = telemetryRequestRetries + 1;
     boolean requestSuccessful = false;
@@ -106,9 +130,6 @@ public class TelemetrySendingTask extends TimerTask {
           throw e;
         }
 
-        // reset report time
-        telemetryRegistry.setStartReportTime(ClockUtil.getCurrentTime());
-
         requestSuccessful = true;
       } catch (Exception e) {
         LOG.exceptionWhileSendingTelemetryData(e);
@@ -123,6 +144,10 @@ public class TelemetrySendingTask extends TimerTask {
       ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
     }
+
+    // license key data is fed from the outside to the registry but needs to be constantly updated
+    internals.setLicenseKey(telemetryRegistry.getLicenseKey());
+
   }
 
   protected boolean isTelemetryEnabled() {
@@ -137,6 +162,7 @@ public class TelemetrySendingTask extends TimerTask {
           telemetryEndpoint,
           MediaType.APPLICATION_JSON,
           telemetryData);
+      requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
 
       ConnectorRequest<?> request = httpConnector.createRequest();
       request.setRequestParameters(requestParams);
@@ -175,6 +201,7 @@ public class TelemetrySendingTask extends TimerTask {
     internals.setApplicationServer(null);
     internals.setCommands(null);
     internals.setMetrics(null);
+    internals.setLicenseKey(null);
   }
 
   protected void restoreDynamicData(Internals internals) {
@@ -182,6 +209,15 @@ public class TelemetrySendingTask extends TimerTask {
 
     for (Map.Entry<String, Command> entry : commands.entrySet()) {
       telemetryRegistry.markOccurrence(entry.getKey(), entry.getValue().getCount());
+    }
+
+    if (metricsRegistry != null) {
+      Map<String, Metric> metrics = internals.getMetrics();
+
+      for (String metricToReport : METRICS_TO_REPORT) {
+        Metric metricValue = metrics.get(metricToReport);
+        metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
+      }
     }
   }
 
@@ -217,28 +253,25 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected Map<String, Metric> calculateMetrics() {
 
-    Date startReportTime = telemetryRegistry.getStartReportTime();
     Date currentTime = ClockUtil.getCurrentTime();
 
-    return commandExecutor.execute(c -> {
-      ManagementService managementService = c.getProcessEngineConfiguration().getManagementService();
+    Map<String, Metric> metrics = new HashMap<>();
 
-      Map<String, Metric> metrics = new HashMap<>();
+    if (metricsRegistry != null) {
+      Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-      long sum = calculateMetricCount(managementService, startReportTime, currentTime, ROOT_PROCESS_INSTANCE_START);
-      metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(sum));
+      for (String metricToReport : METRICS_TO_REPORT) {
+        long value = telemetryMeters.get(metricToReport).getAndClear();
+        metrics.put(metricToReport, new Metric(value));
+      }
+    }
 
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, EXECUTED_DECISION_INSTANCES);
-      metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(sum));
-
-      sum = calculateMetricCount(managementService, startReportTime, currentTime, ACTIVTY_INSTANCE_START);
-      metrics.put(ACTIVTY_INSTANCE_START, new Metric(sum));
-
-      sum = calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), startReportTime, currentTime);
-      metrics.put(UNIQUE_TASK_WORKERS, new Metric(sum));
-
-      return metrics;
+    Long taskWorkers = commandExecutor.execute(c -> {
+      return calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), currentTime);
     });
+    metrics.put(UNIQUE_TASK_WORKERS, new Metric(taskWorkers));
+
+    return metrics;
   }
 
   protected long calculateMetricCount(ManagementService managementService,
@@ -254,7 +287,6 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected long calculateUniqueUserCount(CommandContext commandContext,
                                           HistoryLevel historyLevel,
-                                          Date startReportTime,
                                           Date currentTime) {
     if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       return 0;
@@ -272,6 +304,10 @@ public class TelemetrySendingTask extends TimerTask {
     calendar.add(Calendar.DAY_OF_YEAR, -1);
     Date result = calendar.getTime();
     return result;
+  }
+
+  protected void updateTelemetryFlag(boolean enabled) {
+    TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
   }
 
 }

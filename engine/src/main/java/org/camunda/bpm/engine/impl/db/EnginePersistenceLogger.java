@@ -23,6 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
@@ -796,4 +797,44 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 			  taskId);
   }
 
+  public CrdbTransactionRetryException crdbTransactionRetryException(DbOperation operation) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "102",
+        "Execution of '{}' failed. Entity was updated by another transaction concurrently, " +
+            "and the transaction needs to be retried",
+        operation),
+        operation.getFailure());
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnSelect(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+      "103",
+      "Execution of SELECT statement failed. The transaction needs to be retried."),
+      cause
+    );
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnCommit(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "104",
+        "Could not commit transaction. The transaction needs to be retried."),
+        cause
+    );
+  }
+
+  public void crdbFailureIgnored(DbOperation operation) {
+    logDebug(
+      "105",
+      "An OptimisticLockingListener attempted to ignore a failure of: {}. "
+      + "Since CockroachDB aborted the transaction, ignoring the failure "
+      + "is not possible and an exception is thrown instead.",
+      operation
+    );
+  }
+
+  public void debugDisabledPessimisticLocks() {
+    logDebug(
+      "106", "No exclusive lock is acquired on CockroachDB or H2, " +
+            "as pessimistic locks are disabled on these databases.");
+  }
 }

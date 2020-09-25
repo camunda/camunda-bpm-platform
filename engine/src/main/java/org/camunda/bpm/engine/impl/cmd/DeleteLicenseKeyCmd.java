@@ -27,11 +27,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
 
   boolean deleteProperty;
-  
+  boolean updateTelemetry;
+
   public DeleteLicenseKeyCmd(boolean deleteProperty) {
-    this.deleteProperty = deleteProperty;
+    this(deleteProperty, true);
   }
-  
+
+  public DeleteLicenseKeyCmd(boolean deleteProperty, boolean updateTelemetry) {
+    this.deleteProperty = deleteProperty;
+    this.updateTelemetry = updateTelemetry;
+  }
+
   @Override
   public Object execute(CommandContext commandContext) {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
@@ -39,7 +45,7 @@ public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
 
     final ResourceManager resourceManager = commandContext.getResourceManager();
     final PropertyManager propertyManager = commandContext.getPropertyManager();
-    
+
     // lock the property
     @SuppressWarnings("unused")
     PropertyEntity licenseProperty = propertyManager.findPropertyById(LICENSE_KEY_BYTE_ARRAY_ID);
@@ -56,6 +62,10 @@ public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     if(deleteProperty) {
       // delete license key byte array id
       new DeletePropertyCmd(LICENSE_KEY_BYTE_ARRAY_ID).execute(commandContext);
+    }
+
+    if (updateTelemetry) {
+      commandContext.getProcessEngineConfiguration().getTelemetryRegistry().setLicenseKey(null);
     }
 
     return null;

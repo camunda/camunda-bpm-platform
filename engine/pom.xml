@@ -352,10 +352,8 @@
         <includes>
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
-          <include>**/camunda.cfg.db.xml</include>
-          <include>**/camunda.cfg.plugins.xml</include>
-          <include>**/camunda.cfg.prefix.xml</include>
-          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
+          <include>**/camunda.cfg.*.xml</include>
+          <include>testconfig.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -661,6 +659,22 @@
       </build>
     </profile>
 
+    <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>
@@ -823,7 +837,7 @@
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
                 <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
-                <exclude>**/TelemetrySuiteTest.java</exclude>
+                <exclude>**/TelemetryTaskWorkerMetricsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

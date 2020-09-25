@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -171,6 +172,8 @@ public class SuppressSqlExceptionsTest {
         .isInstanceOf(PersistenceException.class);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_ACTIVITY)
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MARIADB)
   @Test
   public void shouldThrowExceptionOnInsert_ColumnSizeExceeded() {
     // given
@@ -314,6 +317,7 @@ public class SuppressSqlExceptionsTest {
   }
 
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MARIADB)
   public void shouldThrowExceptionOnUpdate() {
     // given
     HistoryLevel historyLevel = engineConfig.getHistoryLevel();

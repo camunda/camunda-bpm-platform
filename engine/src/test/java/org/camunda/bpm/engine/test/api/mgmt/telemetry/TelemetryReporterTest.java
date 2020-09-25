@@ -27,12 +27,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
-
 import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
@@ -65,8 +67,14 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
@@ -85,10 +93,14 @@ import com.google.gson.Gson;
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
-public class TelemetryReporterSuiteElement {
+public class TelemetryReporterTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
+
+  public static String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
+  public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
+
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule =
@@ -99,15 +111,16 @@ public class TelemetryReporterSuiteElement {
             );
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   @ClassRule
-  public static WireMockRule wireMockRule = new WireMockRule(8081);
+  public static WireMockRule wireMockRule = new WireMockRule(8084);
 
   protected ProcessEngine standaloneProcessEngine;
   protected ProcessEngineConfigurationImpl configuration;
@@ -115,6 +128,8 @@ public class TelemetryReporterSuiteElement {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected IdentityService identityService;
+
+  protected Data defaultTelemetryData;
 
   @Before
   public void init() {
@@ -132,8 +147,10 @@ public class TelemetryReporterSuiteElement {
 
     clearMetrics();
 
-    // clean up the recorded commands
+    // clean up the registry data
     configuration.getTelemetryRegistry().clear();
+
+    defaultTelemetryData = new Data(configuration.getTelemetryData());
   }
 
   @After
@@ -156,10 +173,12 @@ public class TelemetryReporterSuiteElement {
         .init();
 
     WireMock.resetAllRequests();
+
+    configuration.setTelemetryData(defaultTelemetryData);
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = configuration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = configuration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
@@ -182,7 +201,9 @@ public class TelemetryReporterSuiteElement {
                                                                 1000,
                                                                 data,
                                                                 configuration.getTelemetryHttpConnector(),
-                                                                configuration.getTelemetryRegistry());
+                                                                configuration.getTelemetryRegistry(),
+                                                                configuration.getMetricsRegistry(),
+                                                                configuration.getTelemetryRequestTimeout());
 
     // when
     telemetryReporter.reportNow();
@@ -222,7 +243,31 @@ public class TelemetryReporterSuiteElement {
     String applicationServerVersion = "Tomcat 10";
     configuration.getTelemetryRegistry().setApplicationServer(applicationServerVersion);
 
-    Data expectedData = adjustDataWithProductVersionAndAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
+    Data expectedData = adjustDataWithAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithLicenseInfo() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization
+    LicenseKeyData licenseKey = new LicenseKeyData("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    Data expectedData = adjustDataWithLicenseInfo(configuration.getTelemetryData(), licenseKey);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -236,6 +281,65 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
               .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
               .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithOverriddenLicenseInfo() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization
+    LicenseKeyData licenseKey = new LicenseKeyData("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+    // report once
+    configuration.getTelemetryReporter().reportNow();
+    configuration.getTelemetryRegistry().getCommands().clear();
+
+    // change license key
+    licenseKey = new LicenseKeyData("customer b", "UNIFIED", "2029-08-01", false, Collections.singletonMap("cawemo", "true"), "new raw license");
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+
+    Data expectedData = adjustDataWithLicenseInfo(configuration.getTelemetryData(), licenseKey);
+
+    String requestBody = new Gson().toJson(expectedData);
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithRawLicenseInfoOnly() {
+    // given default telemetry data (no license key)
+    managementService.toggleTelemetry(true);
+    // set key after initialization via management service
+    String licenseKeyRaw = "raw license";
+    managementService.setLicenseKey(licenseKeyRaw);
+
+    Data expectedData = adjustDataWithRawLicenseInfo(configuration.getTelemetryData(), licenseKeyRaw);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+
+    // cleanup
+    managementService.deleteLicenseKey();
   }
 
   @Test
@@ -265,20 +369,6 @@ public class TelemetryReporterSuiteElement {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void shouldSetStartReportTimeWhenTelemetryEnabled() {
-    // given
-    Date currentTime = ClockUtil.getCurrentTime();
-
-    // when
-    managementService.toggleTelemetry(true);
-
-    // then
-    assertThat(configuration.getTelemetryRegistry().getStartReportTime()).isInSameSecondWindowAs(currentTime);
-
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldSendTelemetryWithRooProcessInstanceMetrics() {
     // given
     managementService.toggleTelemetry(true);
@@ -292,7 +382,7 @@ public class TelemetryReporterSuiteElement {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 0, 6, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -306,49 +396,35 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void shouldSendTelemetryOnceWithRooProcessInstanceMetrics() {
+  public void shouldNotSendMetricsTwice() {
     // given
-    managementService.toggleTelemetry(false);
-    for (int i = 0; i < 3; i++) {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    }
-    configuration.getDbMetricsReporter().reportNow();
-
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
     managementService.toggleTelemetry(true);
 
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
     for (int i = 0; i < 3; i++) {
       runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 0, 0, 0, 0, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-            .willReturn(aResponse()
-                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
-    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // when sending telemetry again
     configuration.getTelemetryReporter().reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -363,7 +439,7 @@ public class TelemetryReporterSuiteElement {
     }
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 2, 2, 4, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 2, 2, 2, 4, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -377,13 +453,41 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(EXECUTED_DECISION_INSTANCES).getCount()).isEqualTo(2);
+  }
+
+  @Test
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml" })
+  public void shouldSendTelemetryWithExecutedDecisionElementMetrics() {
+    // given
+    BpmnModelInstance modelInstance = createProcessWithBusinessRuleTask("testProcess", "decision");
+
+    testRule.deploy(configuration.getRepositoryService().createDeployment()
+        .addModelInstance("process.bpmn", modelInstance)
+        .addClasspathResource(DMN_FILE));
+    managementService.toggleTelemetry(true);
+    runtimeService.startProcessInstanceByKey("testProcess", VARIABLES);
+
+    ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 1, 16, 1, 3, 0);
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void shouldSendTelemetryWithFlowNodeInstanceMetrics() {
+  public void shouldSendTelemetryWithActivityInstanceMetrics() {
     // given
     managementService.toggleTelemetry(true);
     for (int i = 0; i < 4; i++) {
@@ -393,7 +497,7 @@ public class TelemetryReporterSuiteElement {
     }
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 4, 0, 12, 0);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 4, 0, 0, 12, 0);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -407,8 +511,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(12);
   }
 
   @Test
@@ -428,7 +530,7 @@ public class TelemetryReporterSuiteElement {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 6, 3);
+    Data expectedData = adjustDataWithMetricCounts(configuration.getTelemetryData(), 3, 0, 0, 6, 3);
 
     String requestBody = new Gson().toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -442,8 +544,6 @@ public class TelemetryReporterSuiteElement {
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(UNIQUE_TASK_WORKERS).getCount()).isEqualTo(3);
   }
 
   @Test
@@ -519,10 +619,7 @@ public class TelemetryReporterSuiteElement {
     configuration.getTelemetryReporter().reportNow();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Sending telemetry is disabled").size()).isPositive();
-    // it might have two logs:
-    // first during process engine start
-    // second during #reportNow call
+    assertThat(loggingRule.getFilteredLog("Sending telemetry is disabled").size()).isOne();
   }
 
   @Test
@@ -551,7 +648,9 @@ public class TelemetryReporterSuiteElement {
                                                                 1000,
                                                                 data,
                                                                 null,
-                                                                configuration.getTelemetryRegistry());
+                                                                configuration.getTelemetryRegistry(),
+                                                                configuration.getMetricsRegistry(),
+                                                                configuration.getTelemetryRequestTimeout());
 
     // when
     telemetryReporter.reportNow();
@@ -666,10 +765,34 @@ public class TelemetryReporterSuiteElement {
         );
   }
 
+
+  @Test
+  public void shouldSendTelemetryWhenDbMetricsDisabled() {
+    // given
+    boolean telemetryInitialized = true;
+    StandaloneInMemProcessEngineConfiguration inMemoryConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    inMemoryConfiguration
+        .setInitializeTelemetry(telemetryInitialized)
+        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+        .setMetricsEnabled(false)
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
+    standaloneProcessEngine = inMemoryConfiguration.buildProcessEngine();
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse().withStatus(HttpURLConnection.HTTP_NO_CONTENT)));
+
+    // when
+    inMemoryConfiguration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
   protected Data createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Jdk jdk = ParseUtil.parseJdkDetails();
-    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), jdk);
+    Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), null, jdk);
 
     Map<String, Command> commands = getDefaultCommandCounts();
     internals.setCommands(commands);
@@ -682,12 +805,8 @@ public class TelemetryReporterSuiteElement {
     return data;
   }
 
-  protected Data adjustDataWithProductVersionAndAppServerInfo(Data telemetryData, String applicationServerVersion) {
-    Data result = new Data(telemetryData.getInstallation(), telemetryData.getProduct());
-
-    Product product = result.getProduct();
-    product.setVersion("7.14.0");
-    result.setProduct(product);
+  protected Data adjustDataWithAppServerInfo(Data telemetryData, String applicationServerVersion) {
+    Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
 
@@ -702,12 +821,30 @@ public class TelemetryReporterSuiteElement {
   }
 
   protected Data adjustDataWithCommandCounts(Data telemetryData) {
-    Data result = adjustDataWithProductVersionAndAppServerInfo(telemetryData, "Wildfly 10");
+    Data result = initData(telemetryData);
 
     Map<String, Command> commands = result.getProduct().getInternals().getCommands();
     commands.put("GetHistoryLevelCmd", new Command(1));
     commands.put("GetLicenseKeyCmd", new Command(1));
     result.getProduct().getInternals().setCommands(commands);
+
+    return result;
+  }
+
+  protected Data adjustDataWithLicenseInfo(Data telemetryData, LicenseKeyData licenseKeyData) {
+    Data result = initData(telemetryData);
+
+    Internals internals = result.getProduct().getInternals();
+    internals.setLicenseKey(licenseKeyData);
+
+    return result;
+  }
+
+  protected Data adjustDataWithRawLicenseInfo(Data telemetryData, String licenseKeyRaw) {
+    Data result = initData(telemetryData);
+
+    Internals internals = result.getProduct().getInternals();
+    internals.setLicenseKey(new LicenseKeyData(null, null, null, null, null, licenseKeyRaw));
 
     return result;
   }
@@ -720,14 +857,14 @@ public class TelemetryReporterSuiteElement {
   }
 
   protected Map<String, Metric> getDefaultMetrics() {
-    return assembleMetrics(0, 0, 0, 0);
+    return assembleMetrics(0, 0, 0, 0, 0);
   }
 
-  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionCount, long flowNodeCount, long workerCount) {
-    Data result = adjustDataWithProductVersionAndAppServerInfo(telemetryData, "JBoss EAP 7.2.0.GA");
+  protected Data adjustDataWithMetricCounts(Data telemetryData, long processCount, long decisionElementsCount, long decisionInstancesCount, long activityInstanceCount, long workerCount) {
+    Data result = initData(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
-    Map<String, Metric> metrics = assembleMetrics(processCount, decisionCount, flowNodeCount, workerCount);
+    Map<String, Metric> metrics = assembleMetrics(processCount, decisionElementsCount, decisionInstancesCount, activityInstanceCount, workerCount);
     internals.setMetrics(metrics);
 
     // to clean up the recorded commands
@@ -740,11 +877,16 @@ public class TelemetryReporterSuiteElement {
     return result;
   }
 
-  protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {
+  protected Data initData(Data telemetryData) {
+    return new Data(telemetryData.getInstallation(), new Product(telemetryData.getProduct()));
+  }
+
+  protected Map<String, Metric> assembleMetrics(long processCount, long decisionElementsCount, long decisionInstancesCount, long activityInstanceCount, long workerCount) {
     Map<String, Metric> metrics = new HashMap<>();
     metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(processCount));
-    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionCount));
-    metrics.put(ACTIVTY_INSTANCE_START, new Metric(flowNodeCount));
+    metrics.put(EXECUTED_DECISION_ELEMENTS, new Metric(decisionElementsCount));
+    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionInstancesCount));
+    metrics.put(ACTIVTY_INSTANCE_START, new Metric(activityInstanceCount));
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(workerCount));
     return metrics;
   }
@@ -755,6 +897,18 @@ public class TelemetryReporterSuiteElement {
     calendar.add(Calendar.HOUR_OF_DAY, 1);
     Date newDate = calendar.getTime();
     return newDate;
+  }
+
+  protected BpmnModelInstance createProcessWithBusinessRuleTask(String processId, String decisionRef) {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processId)
+        .startEvent()
+        .businessRuleTask("task")
+        .endEvent()
+        .done();
+
+    BusinessRuleTask task = modelInstance.getModelElementById("task");
+    task.setCamundaDecisionRef(decisionRef);
+    return modelInstance;
   }
 
 }

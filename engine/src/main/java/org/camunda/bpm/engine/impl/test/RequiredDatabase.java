@@ -38,12 +38,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 @Inherited
 public @interface RequiredDatabase {
 
-  public String[] excludes();
-
-  /*
-   * Ideas for improvement:
-   * - an includes array that allows you to only specify the
-   *   databases on which you want the test to run
-   */
-
+  public String[] excludes() default {};
+  
+  public String[] includes() default {};
 }

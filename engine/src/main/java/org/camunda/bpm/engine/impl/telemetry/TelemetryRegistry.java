@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 
 public class TelemetryRegistry {
 
@@ -29,8 +28,9 @@ public class TelemetryRegistry {
 
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
-  protected Date startReportTime = ClockUtil.getCurrentTime();
+  protected LicenseKeyData licenseKey;
   protected String camundaIntegration;
+  protected boolean isCollectingTelemetryDataEnabled = false;
 
   public synchronized ApplicationServer getApplicationServer() {
     return applicationServer;
@@ -48,20 +48,28 @@ public class TelemetryRegistry {
     return commands;
   }
 
-  public Date getStartReportTime() {
-    return startReportTime;
-  }
-
-  public void setStartReportTime(Date lastReport) {
-    this.startReportTime = lastReport;
-  }
-
   public String getCamundaIntegration() {
     return camundaIntegration;
   }
 
   public void setCamundaIntegration(String camundaIntegration) {
     this.camundaIntegration = camundaIntegration;
+  }
+
+  public LicenseKeyData getLicenseKey() {
+    return licenseKey;
+  }
+
+  public void setLicenseKey(LicenseKeyData licenseKey) {
+    this.licenseKey = licenseKey;
+  }
+
+  public boolean isCollectingTelemetryDataEnabled() {
+    return isCollectingTelemetryDataEnabled;
+  }
+
+  public void setCollectingTelemetryDataEnabled(boolean isTelemetryEnabled) {
+    this.isCollectingTelemetryDataEnabled = isTelemetryEnabled;
   }
 
   public void markOccurrence(String name) {
@@ -84,6 +92,8 @@ public class TelemetryRegistry {
 
   public void clear() {
     commands.clear();
+    licenseKey = null;
+    applicationServer = null;
   }
 
 }

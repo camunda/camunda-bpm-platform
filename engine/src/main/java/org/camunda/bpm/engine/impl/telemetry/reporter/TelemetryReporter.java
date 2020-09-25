@@ -20,6 +20,7 @@ import java.util.Timer;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
@@ -47,6 +48,8 @@ public class TelemetryReporter {
   protected Data data;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected TelemetryRegistry telemetryRegistry;
+  protected MetricsRegistry metricsRegistry;
+  protected int telemetryRequestTimeout;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
@@ -54,7 +57,9 @@ public class TelemetryReporter {
                            long telemetryReportingPeriod,
                            Data data,
                            Connector<? extends ConnectorRequest<?>> httpConnector,
-                           TelemetryRegistry telemetryRegistry) {
+                           TelemetryRegistry telemetryRegistry,
+                           MetricsRegistry metricsRegistry,
+                           int telemetryRequestTimeout) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
@@ -62,6 +67,8 @@ public class TelemetryReporter {
     this.data = data;
     this.httpConnector = httpConnector;
     this.telemetryRegistry = telemetryRegistry;
+    this.metricsRegistry = metricsRegistry;
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
     initTelemetrySendingTask();
   }
 
@@ -71,7 +78,9 @@ public class TelemetryReporter {
                                                     telemetryRequestRetries,
                                                     data,
                                                     httpConnector,
-                                                    telemetryRegistry);
+                                                    telemetryRegistry,
+                                                    metricsRegistry,
+                                                    telemetryRequestTimeout);
   }
 
   public synchronized void start() {

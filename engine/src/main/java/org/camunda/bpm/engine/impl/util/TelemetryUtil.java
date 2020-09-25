@@ -14,22 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.mgmt.telemetry;
+package org.camunda.bpm.engine.impl.util;
 
-import org.camunda.bpm.engine.test.standalone.telemetry.TelemetryTaskWorkerMetricsSuiteElement;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 
-/**
- * All tests that use WireMock should run in one suite, so that they
- * are not executed and parallel and try to bind to the same ports.
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-  TelemetryReporterSuiteElement.class,
-  TelemetryMultipleEnginesSuiteElement.class,
-  TelemetryTaskWorkerMetricsSuiteElement.class
-})
-public class TelemetrySuiteTest {
+public class TelemetryUtil {
 
+  public static void updateCollectingTelemetryDataEnabled(TelemetryRegistry telemetryRegistry, MetricsRegistry metricsRegistry, boolean enabled) {
+    if (telemetryRegistry != null) {
+      telemetryRegistry.setCollectingTelemetryDataEnabled(enabled);
+    }
+    if (metricsRegistry != null) {
+      metricsRegistry.setCollectingTelemetryMetrics(enabled);
+    }
+  }
 }

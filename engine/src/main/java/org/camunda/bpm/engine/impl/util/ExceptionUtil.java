@@ -186,6 +186,24 @@ public class ExceptionUtil {
     return false;
   }
 
+  public static Boolean checkCrdbTransactionRetryException(Throwable cause) {
+    List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
+    for (SQLException exception : relatedSqlExceptions) {
+      String errorMessage = exception.getMessage().toLowerCase();
+      int errorCode = exception.getErrorCode();
+      if ((errorCode == 40001 || errorMessage != null)
+          && (errorMessage.contains("restart transaction") || errorMessage.contains("retry txn"))
+          // TX retry errors with RETRY_COMMIT_DEADLINE_EXCEEDED are handled
+          // as a ProcessEngineException (cause: Process engine persistence exception)
+          // due to a long-running transaction
+          && !errorMessage.contains("retry_commit_deadline_exceeded")) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static BatchExecutorException findBatchExecutorException(Throwable exception) {
     Throwable cause = exception;
     do {

@@ -302,4 +302,10 @@ public class CommandLogger extends ProcessEngineLogger {
         variableName));
   }
 
+  public void crdbTransactionRetryAttempt(Throwable cause) {
+    logDebug("045",
+      "A CockroachDB transaction retry attempt will be made. Reason: {}",
+      cause.getMessage());
+  }
+
 }

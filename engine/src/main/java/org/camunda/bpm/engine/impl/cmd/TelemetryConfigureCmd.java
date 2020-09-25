@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 public class TelemetryConfigureCmd implements Command<Void> {
 
@@ -65,9 +65,12 @@ public class TelemetryConfigureCmd implements Command<Void> {
 
     if (isReportedActivated && currentValue != null && !currentValue.booleanValue() && telemetryEnabled) {
       telemetryReporter.reschedule();
-      // set start report time
-      processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
     }
+
+    // update registry flags
+    TelemetryUtil.updateCollectingTelemetryDataEnabled(
+        processEngineConfiguration.getTelemetryRegistry(),
+        processEngineConfiguration.getMetricsRegistry(), telemetryEnabled);
   }
 
 }

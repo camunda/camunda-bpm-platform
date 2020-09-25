@@ -24,12 +24,20 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
+import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 /**
  * @author Nikola Koevski
@@ -72,8 +80,10 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         }
 
         @Override
-        public void failedOperation(DbOperation operation) {
-          // nothing do to, reconfiguration will be handled later on
+        public OptimisticLockingResult failedOperation(DbOperation operation) {
+
+          // nothing to do, reconfiguration will be handled later on
+          return OptimisticLockingResult.IGNORE;
         }
       });
       Context.getProcessEngineConfiguration().getHistoryService().cleanUpHistoryAsync();
@@ -104,12 +114,22 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
       checkTelemetryLockExists(commandContext);
 
-      commandContext.getPropertyManager().acquireExclusiveLockForTelemetry();
+      acquireExclusiveTelemetryLock(commandContext);
       PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
 
+      ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (databaseTelemetryProperty == null) {
         LOG.noTelemetryPropertyFound();
         createTelemetryProperty(commandContext);
+      }
+
+      // enable collecting dynamic data in case telemetry is initialized with true
+      // or already enabled
+      if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
+          || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
+        TelemetryUtil.updateCollectingTelemetryDataEnabled(processEngineConfiguration.getTelemetryRegistry(),
+                                                           processEngineConfiguration.getMetricsRegistry(),
+                                                           true);
       }
 
     } catch (Exception e) {
@@ -134,7 +154,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createTelemetryProperty(CommandContext commandContext) {
-    Boolean telemetryEnabled = Context.getProcessEngineConfiguration().isInitializeTelemetry();
+    Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = null;
     if (telemetryEnabled != null) {
       property = new PropertyEntity(TELEMETRY_PROPERTY_NAME, Boolean.toString(telemetryEnabled));
@@ -152,7 +172,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
     if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
 
-      commandContext.getPropertyManager().acquireExclusiveLockForInstallationId();
+      acquireExclusiveInstallationIdLock(commandContext);
       databaseInstallationId = databaseInstallationId(commandContext);
 
       if (databaseInstallationId == null || databaseInstallationId.isEmpty()) {
@@ -194,8 +214,18 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     String installationId = processEngineConfiguration.getInstallationId();
 
+    Data telemetryData = processEngineConfiguration.getTelemetryData();
+
     // set installationId in the telemetry data
-    processEngineConfiguration.getTelemetryData().setInstallation(installationId);
+    telemetryData.setInstallation(installationId);
+
+    // set the persisted license key in the telemetry data and registry
+    String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
+    if (licenseKey != null) {
+      LicenseKeyData licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
+      processEngineConfiguration.getTelemetryRegistry().setLicenseKey(licenseKeyData);
+      telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
+    }
   }
 
   protected void startTelemetryReporter(CommandContext commandContext) {
@@ -212,11 +242,40 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     if (telemetryReporter != null && telemetryReporterActivate) {
       try {
         telemetryReporter.start();
-        // set start report time
-        processEngineConfiguration.getTelemetryRegistry().setStartReportTime(ClockUtil.getCurrentTime());
       } catch (Exception e) {
         ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
       }
     }
+  }
+
+  protected void acquireExclusiveTelemetryLock(CommandContext commandContext) {
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForTelemetry();
+  }
+
+  protected void acquireExclusiveInstallationIdLock(CommandContext commandContext) {
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForInstallationId();
+  }
+
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The BootstrapEngine command only executes internal code, so we are certain that
+   * a retry of a failed engine bootstrap will not impact user data, and may be
+   * performed multiple times.
+   */
+  @Override
+  public boolean isRetryable() {
+    return true;
   }
 }

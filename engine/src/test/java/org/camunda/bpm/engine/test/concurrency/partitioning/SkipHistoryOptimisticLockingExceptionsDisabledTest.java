@@ -49,15 +49,13 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
 
     asyncThread.waitForSync();
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        HistoricVariableInstanceEntity historicVariableInstanceEntity =
-          (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+    commandExecutor.execute((Command<Void>) commandContext -> {
+      HistoricVariableInstanceEntity historicVariableInstanceEntity =
+        (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
 
-        commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
+      commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
 
-        return null;
-      }
+      return null;
     });
 
     // assume
@@ -66,7 +64,7 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     asyncThread.waitUntilDone();
 
     // then
-    testRule.assertTextPresent("Entity was updated by another transaction concurrently.", asyncThread.getException().getMessage());
+    testRule.assertTextPresent("Entity was updated by another transaction concurrently", asyncThread.getException().getMessage());
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

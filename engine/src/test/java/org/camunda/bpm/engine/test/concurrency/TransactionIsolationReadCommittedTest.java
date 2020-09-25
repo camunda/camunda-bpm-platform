@@ -24,9 +24,11 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.After;
 import org.junit.Test;
@@ -36,7 +38,8 @@ import org.junit.Test;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-public class DbDeadlockTest extends ConcurrencyTestCase {
+@RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB })
+public class TransactionIsolationReadCommittedTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
@@ -128,16 +131,12 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     thread1.waitUntilDone();
 
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        public Void execute(CommandContext commandContext) {
-          List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
-          for (HistoricProcessInstance historicProcessInstance : list) {
-            commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
-          }
-          return null;
+      .execute((Command<Void>) commandContext -> {
+        List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
+        for (HistoricProcessInstance historicProcessInstance : list) {
+          commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
         }
-
+        return null;
       });
   }
 

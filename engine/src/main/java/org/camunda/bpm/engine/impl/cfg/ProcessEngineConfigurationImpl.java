@@ -20,12 +20,16 @@ package org.camunda.bpm.engine.impl.cfg;
 import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -40,9 +44,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -100,7 +101,6 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.batch.variables.BatchSetVariablesHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
@@ -109,6 +109,7 @@ import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandl
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.update.UpdateProcessInstancesSuspendStateJobHandler;
+import org.camunda.bpm.engine.impl.batch.variables.BatchSetVariablesHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -210,6 +211,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
@@ -460,6 +462,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected CommandExecutor commandExecutorSchemaOperations;
 
+  /**
+   * Allows for specific commands to be retried when using CockroachDB. This is due to the fact that
+   * OptimisticLockingExceptions can't be handled on CockroachDB and transactions must be rolled back.
+   * The commands where CockroachDB retries are possible are:
+   *
+   * <ul>
+   *   <li>BootstrapEngineCommand</li>
+   *   <li>AcquireJobsCmd</li>
+   *   <li>DeployCmd</li>
+   *   <li>FetchExternalTasksCmd</li>
+   *   <li>HistoryCleanupCmd</li>
+   *   <li>HistoryLevelSetupCommand</li>
+   * </ul>
+   */
+  protected int commandRetries = 0;
+
   // SESSION FACTORIES ////////////////////////////////////////////////////////
 
   protected List<SessionFactory> customSessionFactories;
@@ -587,6 +605,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * </ul>
    */
   protected boolean dmnEnabled = true;
+  /**
+   * When set to <code>false</code>, the following behavior changes:
+   * <ul>
+   *   <li>Standalone tasks can no longer be created via API.</li>
+   *   <li>Standalone tasks are not returned by the TaskQuery.</li>
+   * </ul>
+   */
+  protected boolean standaloneTasksEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
 
@@ -723,7 +749,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDeploymentLockUsed = true;
 
   /**
-   * If true then several deployments will be processed strictly sequentally. When false they may be processed in parallel.
+   * If true then several deployments will be processed strictly sequentially. When false they may be processed in parallel.
    */
   protected boolean isDeploymentSynchronized = true;
 
@@ -933,6 +959,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** default: once every 24 hours */
   protected long telemetryReportingPeriod = 24 * 60 * 60;
   protected Data telemetryData;
+  /** the connection and socket timeout configuration of the telemetry request
+   * in milliseconds
+   *  default: 15 seconds */
+  protected int telemetryRequestTimeout = 15 * 1000;
 
 
   // buildProcessEngine ///////////////////////////////////////////////////////
@@ -966,6 +996,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
+
+    // Database type needs to be detected before CommandExecutors are initialized
+    initDataSource();
+
     initCommandExecutors();
     initServices();
     initIdGenerator();
@@ -975,7 +1009,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initExternalTaskPriorityProvider();
     initBatchHandlers();
     initJobExecutor();
-    initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
     initIdentityProviderSessionFactory();
@@ -1482,6 +1515,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
   protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
   protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
+  protected static final String POSTGRES_DB_PRODUCT_NAME = "PostgreSQL";
+  protected static final String CRDB_DB_PRODUCT_NAME = "CockroachDB";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
@@ -1489,7 +1524,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty(MY_SQL_PRODUCT_NAME, "mysql");
     databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME, "mariadb");
     databaseTypeMappings.setProperty("Oracle", "oracle");
-    databaseTypeMappings.setProperty("PostgreSQL", "postgres");
+    databaseTypeMappings.setProperty(POSTGRES_DB_PRODUCT_NAME, "postgres");
+    databaseTypeMappings.setProperty(CRDB_DB_PRODUCT_NAME, "cockroachdb");
     databaseTypeMappings.setProperty("Microsoft SQL Server", "mssql");
     databaseTypeMappings.setProperty("DB2", "db2");
     databaseTypeMappings.setProperty("DB2", "db2");
@@ -1521,6 +1557,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       String databaseProductName = databaseMetaData.getDatabaseProductName();
       if (MY_SQL_PRODUCT_NAME.equals(databaseProductName)) {
         databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
+      }
+      if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
+        databaseProductName = checkForCrdb(connection);
       }
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
@@ -1570,6 +1609,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     return databaseName;
+  }
+
+  protected String checkForCrdb(Connection connection) {
+    try {
+      ResultSet result = connection.prepareStatement("select version() as version;").executeQuery();
+      if (result.next()) {
+        String versionData = result.getString(1);
+        if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
+          return CRDB_DB_PRODUCT_NAME;
+        }
+      }
+    } catch (SQLException ignore) {
+    }
+
+    return POSTGRES_DB_PRODUCT_NAME;
   }
 
   protected void initDatabaseVendorAndVersion(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -1661,6 +1715,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("orderBy", DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
       properties.put("limitBeforeNativeQuery", DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
       properties.put("distinct", DbSqlSessionFactory.databaseSpecificDistinct.get(databaseType));
+      properties.put("numericCast", DbSqlSessionFactory.databaseSpecificNumericCast.get(databaseType));
 
       properties.put("countDistinctBeforeStart", DbSqlSessionFactory.databaseSpecificCountDistinctBeforeStart.get(databaseType));
       properties.put("countDistinctBeforeEnd", DbSqlSessionFactory.databaseSpecificCountDistinctBeforeEnd.get(databaseType));
@@ -2256,15 +2311,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
     metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
-    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
+    metricsRegistry.createDbMeter(Metrics.ACTIVTY_INSTANCE_END);
 
-    metricsRegistry.createMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_SUCCESS);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_FAILURE);
-    metricsRegistry.createMeter(Metrics.JOB_SUCCESSFUL);
-    metricsRegistry.createMeter(Metrics.JOB_FAILED);
-    metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
-    metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_SUCCESS);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_FAILURE);
+    metricsRegistry.createDbMeter(Metrics.JOB_SUCCESSFUL);
+    metricsRegistry.createDbMeter(Metrics.JOB_FAILED);
+    metricsRegistry.createDbMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
+    metricsRegistry.createDbMeter(Metrics.JOB_EXECUTION_REJECTED);
 
     metricsRegistry.createMeter(Metrics.ROOT_PROCESS_INSTANCE_START);
 
@@ -2655,7 +2710,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                                                   telemetryReportingPeriod,
                                                   telemetryData,
                                                   telemetryHttpConnector,
-                                                  telemetryRegistry);
+                                                  telemetryRegistry,
+                                                  metricsRegistry,
+                                                  telemetryRequestTimeout);
       }
     }
   }
@@ -2665,7 +2722,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     Jdk jdk = ParseUtil.parseJdkDetails();
 
-    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), jdk);
+    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
 
     String camundaIntegration = telemetryRegistry.getCamundaIntegration();
     if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
@@ -3938,6 +3995,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.dmnEnabled = dmnEnabled;
   }
 
+  public boolean isStandaloneTasksEnabled() {
+    return standaloneTasksEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setStandaloneTasksEnabled(boolean standaloneTasksEnabled) {
+    this.standaloneTasksEnabled = standaloneTasksEnabled;
+    return this;
+  }
+
   public ScriptFactory getScriptFactory() {
     return scriptFactory;
   }
@@ -4844,4 +4910,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.telemetryData = telemetryData;
     return this;
   }
+
+  public int getTelemetryRequestTimeout() {
+    return telemetryRequestTimeout;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryRequestTimeout(int telemetryRequestTimeout) {
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setCommandRetries(int commandRetries) {
+    this.commandRetries = commandRetries;
+    return this;
+  }
+
+  public int getCommandRetries() {
+    return commandRetries;
+  }
+
+  protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
+    return new CrdbTransactionRetryInterceptor(commandRetries);
+  }
+
 }

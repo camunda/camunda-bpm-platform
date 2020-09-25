@@ -25,14 +25,29 @@ import java.util.Map;
  */
 public class MetricsRegistry {
 
-  protected Map<String, Meter> meters = new HashMap<String, Meter>();
+  protected Map<String, Meter> dbMeters = new HashMap<String, Meter>();
+  protected Map<String, Meter> telemetryMeters = new HashMap<String, Meter>();
 
-  public Meter getMeterByName(String name) {
-    return meters.get(name);
+  protected boolean isCollectingTelemetryMetrics = false;
+
+  public Meter getDbMeterByName(String name) {
+    return dbMeters.get(name);
   }
 
-  public Map<String, Meter> getMeters() {
-    return meters;
+  public Map<String, Meter> getDbMeters() {
+    return dbMeters;
+  }
+
+  public Map<String, Meter> getTelemetryMeters() {
+    return telemetryMeters;
+  }
+
+  public boolean isCollectingTelemetryMetrics() {
+    return isCollectingTelemetryMetrics;
+  }
+
+  public void setCollectingTelemetryMetrics(boolean isCollectingTelemetryMetrics) {
+    this.isCollectingTelemetryMetrics = isCollectingTelemetryMetrics;
   }
 
   public void markOccurrence(String name) {
@@ -40,6 +55,17 @@ public class MetricsRegistry {
   }
 
   public void markOccurrence(String name, long times) {
+    markOccurrence(dbMeters, name, times);
+    if (isCollectingTelemetryMetrics) {
+      markOccurrence(telemetryMeters, name, times);
+    }
+  }
+
+  public void markTelemetryOccurrence(String name, long times) {
+    markOccurrence(telemetryMeters, name, times);
+  }
+
+  protected void markOccurrence(Map<String, Meter> meters, String name, long times) {
     Meter meter = meters.get(name);
 
     if (meter != null) {
@@ -47,10 +73,22 @@ public class MetricsRegistry {
     }
   }
 
-  public Meter createMeter(String name) {
-    Meter meter = new Meter(name);
-    meters.put(name, meter);
-    return meter;
+  /**
+   * Creates a meter for both database and telemetry collection.
+   */
+  public void createMeter(String name) {
+    Meter dbMeter = new Meter(name);
+    dbMeters.put(name, dbMeter);
+
+    Meter telemetryMeter = new Meter(name);
+    telemetryMeters.put(name, telemetryMeter);
   }
 
+  /**
+   * Creates a meter only for database collection.
+   */
+  public void createDbMeter(String name) {
+    Meter dbMeter = new Meter(name);
+    dbMeters.put(name, dbMeter);
+  }
 }

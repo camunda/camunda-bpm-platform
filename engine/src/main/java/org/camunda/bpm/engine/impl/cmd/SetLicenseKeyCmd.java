@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.LicenseKeyUtil.addToTelemetry;
+
 import java.nio.charset.StandardCharsets;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -42,7 +44,7 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     final ResourceManager resourceManager = commandContext.getResourceManager();
     ResourceEntity key = resourceManager.findLicenseKeyResource();
     if (key != null) {
-      new DeleteLicenseKeyCmd(false).execute(commandContext);
+      new DeleteLicenseKeyCmd(false, false).execute(commandContext);
     }
     key = new ResourceEntity();
     key.setName(LICENSE_KEY_PROPERTY_NAME);
@@ -55,6 +57,9 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
 
     // cleanup legacy property
     new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME).execute(commandContext);
+
+    // add raw license to telemetry data if not there already
+    addToTelemetry(licenseKey, commandContext.getProcessEngineConfiguration().getTelemetryRegistry());
 
     return null;
   }

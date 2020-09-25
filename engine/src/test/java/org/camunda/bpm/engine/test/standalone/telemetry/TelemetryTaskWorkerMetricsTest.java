@@ -52,7 +52,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.api.mgmt.telemetry.TelemetrySuiteTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -69,9 +68,9 @@ import com.google.gson.Gson;
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
-public class TelemetryTaskWorkerMetricsSuiteElement {
+public class TelemetryTaskWorkerMetricsTest {
 
-  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8081/pings";
+  protected static final String TELEMETRY_ENDPOINT = "http://localhost:8083/pings";
   private static final String TELEMETRY_ENDPOINT_PATH = "/pings";
 
   @ClassRule
@@ -88,7 +87,7 @@ public class TelemetryTaskWorkerMetricsSuiteElement {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule);
 
   @ClassRule
-  public static WireMockRule wireMockRule = new WireMockRule(8081);
+  public static WireMockRule wireMockRule = new WireMockRule(8083);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementService managementService;
@@ -117,7 +116,7 @@ public class TelemetryTaskWorkerMetricsSuiteElement {
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = configuration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = configuration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
@@ -150,7 +149,9 @@ public class TelemetryTaskWorkerMetricsSuiteElement {
                           1000,
                           data,
                           configuration.getTelemetryHttpConnector(),
-                          configuration.getTelemetryRegistry()).reportNow();
+                          configuration.getTelemetryRegistry(),
+                          configuration.getMetricsRegistry(),
+                          configuration.getTelemetryRequestTimeout()).reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))

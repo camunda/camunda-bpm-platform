@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.ImmutablePair;
 
 /**
@@ -84,8 +85,8 @@ public class ExternalTaskManager extends AbstractManager {
     List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
     orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
     parameters.put("orderingProperties", orderingProperties);
-    String databaseType = Context.getProcessEngineConfiguration().getDatabaseType();
-    parameters.put("usesPostgres", DbSqlSessionFactory.POSTGRES.equals(databaseType));
+    parameters.put("usesPostgres",
+        DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB));
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureQuery(parameter);
