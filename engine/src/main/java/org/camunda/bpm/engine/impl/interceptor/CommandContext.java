@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -234,7 +235,9 @@ public class CommandContext {
   }
 
   protected boolean shouldLogFine(Throwable exception) {
-    return exception instanceof OptimisticLockingException || exception instanceof BadUserRequestException;
+    return exception instanceof OptimisticLockingException ||
+        exception instanceof BadUserRequestException ||
+        exception instanceof AuthorizationException;
   }
 
   protected boolean shouldLogCmdException() {
