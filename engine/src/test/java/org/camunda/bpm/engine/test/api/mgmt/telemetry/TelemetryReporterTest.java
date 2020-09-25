@@ -129,6 +129,7 @@ public class TelemetryReporterTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected IdentityService identityService;
+  protected TelemetryReporter standaloneReporter;
 
   protected Data defaultTelemetryData;
 
@@ -162,6 +163,10 @@ public class TelemetryReporterTest {
 
     clearMetrics();
 
+    if (standaloneReporter != null) {
+      standaloneReporter.stop(false);
+      standaloneReporter = null;
+    }
     if (standaloneProcessEngine != null) {
       standaloneProcessEngine.close();
       ProcessEngines.unregister(standaloneProcessEngine);
@@ -176,6 +181,7 @@ public class TelemetryReporterTest {
     WireMock.resetAllRequests();
 
     configuration.setTelemetryData(defaultTelemetryData);
+
   }
 
   protected void clearMetrics() {
@@ -196,7 +202,7 @@ public class TelemetryReporterTest {
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+    standaloneReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 TELEMETRY_ENDPOINT,
                                                                 0,
                                                                 1000,
@@ -207,7 +213,7 @@ public class TelemetryReporterTest {
                                                                 configuration.getTelemetryRequestTimeout());
 
     // when
-    telemetryReporter.reportNow();
+    standaloneReporter.reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -643,7 +649,7 @@ public class TelemetryReporterTest {
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+    standaloneReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 TELEMETRY_ENDPOINT,
                                                                 0,
                                                                 1000,
@@ -654,7 +660,7 @@ public class TelemetryReporterTest {
                                                                 configuration.getTelemetryRequestTimeout());
 
     // when
-    telemetryReporter.reportNow();
+    standaloneReporter.reportNow();
 
     // then
     assertThat(loggingRule.getFilteredLog("Could not send telemetry data. "
