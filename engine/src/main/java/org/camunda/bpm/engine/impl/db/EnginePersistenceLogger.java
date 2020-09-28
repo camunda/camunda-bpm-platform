@@ -789,11 +789,11 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         preconditionMessage,
         failedOperation.toString());
   }
-  
+
   public void logTaskWithoutExecution(String taskId) {
 	  logDebug("091",
 			  "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
-			  + "It is not returned by the current fetch and lock command.", 
+			  + "It is not returned by the current fetch and lock command.",
 			  taskId);
   }
 
@@ -837,4 +837,11 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       "106", "No exclusive lock is acquired on CockroachDB or H2, " +
             "as pessimistic locks are disabled on these databases.");
   }
+
+  public void errorFetchingTelemetryInitialMessagePropertyInDatabase(Exception exception) {
+    logDebug(
+        "107",
+        "Error while fetching the telemetry initial message status property from the database: {}", exception.getMessage());
+  }
+
 }

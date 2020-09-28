@@ -38,6 +38,7 @@ import java.util.TimerTask;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -45,6 +46,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -53,7 +55,9 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.connect.spi.CloseableConnectorResponse;
@@ -64,6 +68,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
+  protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
 
   static {
     METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
@@ -80,6 +85,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
   protected int telemetryRequestTimeout;
+  protected boolean sendInitialMessage;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
@@ -88,7 +94,8 @@ public class TelemetrySendingTask extends TimerTask {
                               Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
                               MetricsRegistry metricsRegistry,
-                              int telemetryRequestTimeout) {
+                              int telemetryRequestTimeout,
+                              boolean sendInitialMessage) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
@@ -97,11 +104,16 @@ public class TelemetrySendingTask extends TimerTask {
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
     this.telemetryRequestTimeout = telemetryRequestTimeout;
+    this.sendInitialMessage = sendInitialMessage;
   }
 
   @Override
   public void run() {
     LOG.startTelemetrySendingTask();
+
+    if (sendInitialMessage) {
+      sendInitialMessage();
+    }
 
     if (!isTelemetryEnabled()) {
       LOG.telemetryDisabled();
@@ -123,7 +135,7 @@ public class TelemetrySendingTask extends TimerTask {
         mergedData.mergeInternals(dynamicData);
 
         try {
-          sendData(mergedData);
+          sendData(mergedData, false);
         } catch (Exception e) {
           // so that we send it again the next time
           restoreDynamicData(dynamicData);
@@ -132,9 +144,59 @@ public class TelemetrySendingTask extends TimerTask {
 
         requestSuccessful = true;
       } catch (Exception e) {
-        LOG.exceptionWhileSendingTelemetryData(e);
+        LOG.exceptionWhileSendingTelemetryData(e, false);
       }
     } while (!requestSuccessful && triesLeft > 0);
+  }
+
+  protected void sendInitialMessage() {
+    try {
+      commandExecutor.execute(commandContext -> {
+          sendInitialMessage(commandContext);
+          return null;
+      });
+    } catch (ProcessEngineException pex) {
+      // the property might have been inserted already by another cluster node after we checked it, ignore that
+      if (!ExceptionUtil.checkConstraintViolationException(pex)) {
+        LOG.exceptionWhileSendingTelemetryData(pex, true);
+      }
+    } catch (Exception e) {
+      LOG.exceptionWhileSendingTelemetryData(e, true);
+    }
+  }
+
+  protected void sendInitialMessage(CommandContext commandContext) {
+    /*
+     * check on init message property to minimize the risk of sending the
+     * message twice in case another node in the cluster toggled the value
+     * and successfully sent the message already - it is not 100% safe but
+     * good enough as sending the message twice is still OK
+     */
+    if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
+      // message has not been sent yet
+      int triesLeft = telemetryRequestRetries + 1;
+      boolean requestSuccessful = false;
+      do {
+        try {
+          triesLeft--;
+
+          Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
+          Internals internals = new Internals();
+          internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
+          initData.getProduct().setInternals(internals);
+
+          sendData(initData, true);
+          requestSuccessful = true;
+          sendInitialMessage = false;
+          commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
+        } catch (Exception e) {
+          LOG.exceptionWhileSendingTelemetryData(e, true);
+        }
+      } while (!requestSuccessful && triesLeft > 0);
+    } else {
+      // message has already been sent by another node
+      sendInitialMessage = false;
+    }
   }
 
   protected void updateStaticData() {
@@ -143,6 +205,10 @@ public class TelemetrySendingTask extends TimerTask {
     if (internals.getApplicationServer() == null) {
       ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
+    }
+
+    if (internals.getTelemetryEnabled() == null) {
+      internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
     }
 
     // license key data is fed from the outside to the registry but needs to be constantly updated
@@ -155,7 +221,7 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-  protected void sendData(Data dataToSend) {
+  protected void sendData(Data dataToSend, boolean isInitialMessage) {
 
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -167,23 +233,23 @@ public class TelemetrySendingTask extends TimerTask {
       ConnectorRequest<?> request = httpConnector.createRequest();
       request.setRequestParameters(requestParams);
 
-      LOG.sendingTelemetryData(telemetryData);
+      LOG.sendingTelemetryData(telemetryData, isInitialMessage);
       CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
 
       if (response == null) {
-        LOG.unexpectedResponseWhileSendingTelemetryData();
+        LOG.unexpectedResponseWhileSendingTelemetryData(isInitialMessage);
       } else {
         int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
 
         if (isSuccessStatusCode(responseCode)) {
           if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
-            LOG.unexpectedResponseSuccessCode(responseCode);
+            LOG.unexpectedResponseSuccessCode(responseCode, isInitialMessage);
           }
 
-          LOG.telemetrySentSuccessfully();
+          LOG.telemetrySentSuccessfully(isInitialMessage);
 
         } else {
-          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
+          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode, isInitialMessage);
         }
       }
   }

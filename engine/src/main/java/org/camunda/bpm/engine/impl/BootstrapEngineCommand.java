@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
@@ -34,8 +33,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
@@ -47,7 +44,10 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
+  protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
   protected static final String INSTALLATION_PROPERTY_NAME = "camunda.installation.id";
+
+  protected boolean sendInitialTelemetryMessage = false;
 
   @Override
   public Void execute(CommandContext commandContext) {
@@ -116,11 +116,15 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
       acquireExclusiveTelemetryLock(commandContext);
       PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
+      PropertyEntity databaseTelemetryInitMessageProperty = databaseTelemetryInitialMessageSent(commandContext);
 
       ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (databaseTelemetryProperty == null) {
         LOG.noTelemetryPropertyFound();
         createTelemetryProperty(commandContext);
+      } else if (databaseTelemetryInitMessageProperty == null) {
+        // we need to still send an initial message because it didn't happen yet
+        initializeInitialTelemetryMessage();
       }
 
       // enable collecting dynamic data in case telemetry is initialized with true
@@ -153,6 +157,15 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
   }
 
+  protected PropertyEntity databaseTelemetryInitialMessageSent(CommandContext commandContext) {
+    try {
+      return commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME);
+    } catch (Exception e) {
+      LOG.errorFetchingTelemetryInitialMessagePropertyInDatabase(e);
+      return null;
+    }
+  }
+
   protected void createTelemetryProperty(CommandContext commandContext) {
     Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = null;
@@ -163,6 +176,11 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
+    initializeInitialTelemetryMessage();
+  }
+
+  protected void initializeInitialTelemetryMessage() {
+    sendInitialTelemetryMessage = true;
   }
 
   public void initializeInstallationId(CommandContext commandContext) {
@@ -241,7 +259,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     // was enabled by another engine in the cluster.
     if (telemetryReporter != null && telemetryReporterActivate) {
       try {
-        telemetryReporter.start();
+        telemetryReporter.start(sendInitialTelemetryMessage);
       } catch (Exception e) {
         ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
       }
