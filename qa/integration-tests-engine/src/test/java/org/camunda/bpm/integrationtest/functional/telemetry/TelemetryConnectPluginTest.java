@@ -87,7 +87,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
       wireMockServer.stop();
     }
     if (telemetryReporter!=null) {
-      telemetryReporter.close(false);
+      telemetryReporter.stop(false);
       telemetryReporter = null;
     }
   }
