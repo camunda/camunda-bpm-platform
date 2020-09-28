@@ -63,8 +63,12 @@ public class TelemetryConfigureCmd implements Command<Void> {
     boolean isReportedActivated = processEngineConfiguration.isTelemetryReporterActivate();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
 
-    if (isReportedActivated && currentValue != null && !currentValue.booleanValue() && telemetryEnabled) {
-      telemetryReporter.reschedule();
+    if (isReportedActivated) {
+      // telemetry enabled or set for the first time
+      if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
+        telemetryReporter.reschedule(currentValue == null);
+      }
+
     }
 
     // update registry flags

@@ -28,6 +28,7 @@ public class Internals {
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
+  public static final String SERIALIZED_TELEMETRY_ENABLED = "telemetry-enabled";
 
   protected Database database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
@@ -41,6 +42,9 @@ public class Internals {
   protected Map<String, Metric> metrics;
 
   protected Jdk jdk;
+
+  @SerializedName(value = SERIALIZED_TELEMETRY_ENABLED)
+  protected Boolean telemetryEnabled;
 
   public Internals() {
     this(null, null, null, null);
@@ -60,6 +64,7 @@ public class Internals {
     this.camundaIntegration = internals.camundaIntegration == null ? null : new HashSet<>(internals.getCamundaIntegration());
     this.commands = new HashMap<>(internals.getCommands());
     this.metrics = internals.metrics == null ? null : new HashMap<>(internals.getMetrics());
+    this.telemetryEnabled = internals.telemetryEnabled;
   }
 
   public Database getDatabase() {
@@ -121,6 +126,14 @@ public class Internals {
 
   public void setLicenseKey(LicenseKeyData licenseKey) {
     this.licenseKey = licenseKey;
+  }
+
+  public Boolean getTelemetryEnabled() {
+    return telemetryEnabled;
+  }
+
+  public void setTelemetryEnabled(Boolean telemetryEnabled) {
+    this.telemetryEnabled = telemetryEnabled;
   }
 
 }
