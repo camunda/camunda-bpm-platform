@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -333,9 +334,8 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-
-    thrown.expect(ProcessEngineException.class);
-
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("No group found with id 'unexistinggroup'.: group is null");
     identityService.createMembership(johndoe.getId(), "unexistinggroup");
   }
 
@@ -343,9 +343,8 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
-
-    thrown.expect(ProcessEngineException.class);
-
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("No user found with id 'unexistinguser'.: user is null");
     identityService.createMembership("unexistinguser", sales.getId());
   }
 
