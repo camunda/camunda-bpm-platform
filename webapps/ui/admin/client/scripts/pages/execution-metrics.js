@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-'use strict';
+('use strict');
 
 var fs = require('fs');
 
@@ -71,70 +71,135 @@ var Controller = [
       }
     };
 
-    var load = ($scope.load = function() {
-      $scope.loadingState = 'LOADING';
-      // promises??? NOPE!
-      CamSDK.utils.series(
+    function updateView() {
+      var phase = $scope.$root.$$phase;
+      if (phase !== '$apply' && phase !== '$digest') {
+        $scope.$apply();
+      }
+    }
+
+    function fetchTaskWorkerMetric(cb) {
+      fetch(
+        Uri.appUri('plugin://base/:engine/metrics/task-worker/sum') +
+          `?startDate=${encodeURIComponent(
+            fixDate($scope.startDate)
+          )}&endDate=${encodeURIComponent(fixDate($scope.endDate))}`,
         {
-          flowNodes: function(cb) {
-            MetricsResource.sum(
-              {
-                name: 'activity-instance-start',
-                startDate: fixDate($scope.startDate),
-                endDate: fixDate($scope.endDate)
+          headers: {
+            method: 'GET',
+            'Content-Type': 'application/json'
+          }
+        }
+      ).then(
+        function(res) {
+          if (res.status >= 200 && res.status < 300) {
+            res.json().then(
+              function(res) {
+                cb(null, res.result);
               },
-              function(err, res) {
-                cb(err, !err ? res.result : null);
+              function(err) {
+                cb(err, null);
               }
             );
-          },
-          decisionElements: function(cb) {
-            MetricsResource.sum(
-              {
-                name: 'executed-decision-elements',
-                startDate: fixDate($scope.startDate),
-                endDate: fixDate($scope.endDate)
-              },
-              function(err, res) {
-                cb(err, !err ? res.result : null);
-              }
-            );
-          },
-          rootProcessInstances: function(cb) {
-            MetricsResource.sum(
-              {
-                name: 'root-process-instance-start',
-                startDate: fixDate($scope.startDate),
-                endDate: fixDate($scope.endDate)
-              },
-              function(err, res) {
-                cb(err, !err ? res.result : null);
-              }
-            );
-          },
-          decisionInstances: function(cb) {
-            MetricsResource.sum(
-              {
-                name: 'executed-decision-instances',
-                startDate: fixDate($scope.startDate),
-                endDate: fixDate($scope.endDate)
-              },
-              function(err, res) {
-                cb(err, !err ? res.result : null);
-              }
-            );
+          } else {
+            cb(res, null);
           }
         },
-        function(err, res) {
-          $scope.loadingState = 'LOADED';
-          if (err) {
-            setLoadingError('Could not set start and end dates.');
-            $scope.loadingState = 'ERROR';
-            return;
-          }
-          $scope.metrics = res;
+        function(err) {
+          cb(err, null);
         }
       );
+    }
+
+    $scope.$watch('isTaskWorkerMetric', function() {
+      if ($scope.isTaskWorkerMetric) {
+        $scope.loadingState = 'LOADING';
+        fetchTaskWorkerMetric(function(err, result) {
+          if (!err) {
+            $scope.loadingState = 'LOADED';
+            $scope.metrics.taskWorkers = result;
+          } else {
+            setLoadingError('Could not load task worker metrics.');
+            $scope.loadingState = 'ERROR';
+          }
+          updateView();
+        });
+      } else {
+        $scope.loadingState = 'LOADED';
+      }
+    });
+
+    var load = ($scope.load = function() {
+      $scope.loadingState = 'LOADING';
+      var series = {
+        flowNodes: function(cb) {
+          MetricsResource.sum(
+            {
+              name: 'activity-instance-start',
+              startDate: fixDate($scope.startDate),
+              endDate: fixDate($scope.endDate)
+            },
+            function(err, res) {
+              cb(err, !err ? res.result : null);
+            }
+          );
+        },
+        decisionElements: function(cb) {
+          MetricsResource.sum(
+            {
+              name: 'executed-decision-elements',
+              startDate: fixDate($scope.startDate),
+              endDate: fixDate($scope.endDate)
+            },
+            function(err, res) {
+              cb(err, !err ? res.result : null);
+            }
+          );
+        },
+        rootProcessInstances: function(cb) {
+          MetricsResource.sum(
+            {
+              name: 'root-process-instance-start',
+              startDate: fixDate($scope.startDate),
+              endDate: fixDate($scope.endDate)
+            },
+            function(err, res) {
+              cb(err, !err ? res.result : null);
+            }
+          );
+        },
+        decisionInstances: function(cb) {
+          MetricsResource.sum(
+            {
+              name: 'executed-decision-instances',
+              startDate: fixDate($scope.startDate),
+              endDate: fixDate($scope.endDate)
+            },
+            function(err, res) {
+              cb(err, !err ? res.result : null);
+            }
+          );
+        }
+      };
+
+      if ($scope.isTaskWorkerMetric) {
+        series.taskWorkers = fetchTaskWorkerMetric;
+      } else {
+        delete series.taskWorkers;
+      }
+
+      // promises??? NOPE!
+      CamSDK.utils.series(series, function(err, res) {
+        $scope.loadingState = 'LOADED';
+        if (err) {
+          setLoadingError('Could not set start and end dates.');
+          $scope.loadingState = 'ERROR';
+          updateView();
+          return;
+        }
+        $scope.metrics = res;
+        updateView();
+      });
     });
 
     load();
