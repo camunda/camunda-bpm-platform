@@ -67,6 +67,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
   ProcessEngine engineConnect;
   ProcessEngineConfigurationImpl configuration;
   WireMockServer wireMockServer;
+  TelemetryReporter telemetryReporter;
 
   @Before
   public void setEngines() {
@@ -76,13 +77,18 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
 
     // clean up the recorded commands
     configuration.getTelemetryRegistry().clear();
+    
   }
 
   @After
   public void tearDown() {
-    configuration.getManagementService().toggleTelemetry(true);
+    configuration.getManagementService().toggleTelemetry(false);
     if (wireMockServer != null) {
       wireMockServer.stop();
+    }
+    if (telemetryReporter!=null) {
+      telemetryReporter.stop(false);
+      telemetryReporter = null;
     }
   }
 
@@ -114,6 +120,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
   @OperateOnDeployment("myDeployment")
   public void shouldSendTelemetryData() {
     // given
+    configuration.getManagementService().toggleTelemetry(true);
     wireMockServer = new WireMockServer(WireMockConfiguration.options().port(18090));
     wireMockServer.start();
     Data data = createDataToSend();
@@ -123,7 +130,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
-    TelemetryReporter telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+    telemetryReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
                                                                 configuration.getTelemetryEndpoint(),
                                                                 0,
                                                                 configuration.getTelemetryReportingPeriod(),
