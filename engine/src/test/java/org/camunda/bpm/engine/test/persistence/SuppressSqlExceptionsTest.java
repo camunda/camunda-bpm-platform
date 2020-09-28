@@ -398,8 +398,14 @@ public class SuppressSqlExceptionsTest {
         .isInstanceOf(PersistenceException.class);
   }
 
+  /**
+   * This test expects an exception when performing a pessimistic lock
+   * in this scenario. Since pessimistic locks are disabled on H2 and CRDB,
+   * this test will fail, and it needs to be excluded from the test suite
+   * for these two databases.
+   */
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
   public void shouldThrowExceptionOnLock() {
     // given
     failForSqlStatement("lockDeploymentLockProperty");
