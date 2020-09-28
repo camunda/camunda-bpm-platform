@@ -57,6 +57,7 @@ public class Internals {
 
   public Internals(Internals internals) {
     this(internals.database, internals.applicationServer, internals.licenseKey, internals.jdk);
+    this.camundaIntegration = internals.camundaIntegration == null ? null : new HashSet<>(internals.getCamundaIntegration());
     this.commands = new HashMap<>(internals.getCommands());
     this.metrics = internals.metrics == null ? null : new HashMap<>(internals.getMetrics());
   }
