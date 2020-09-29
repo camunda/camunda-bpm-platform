@@ -41,6 +41,7 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldSubmitApplicationServerData() {
+    System.out.println(((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).isTelemetryReporterActivate());
     TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
 
     // then
