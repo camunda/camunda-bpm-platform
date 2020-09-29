@@ -15,7 +15,7 @@
 
   <properties>
     <!-- should be updated during a release together with the camunda.version tag in the project pom -->
-    <camunda.version>7.14.0-alpha1</camunda.version>
+    <camunda.version>7.14.0-alpha4</camunda.version>
 
     <version.httpclient>4.5.9</version.httpclient>
     <version.jackson>2.10.0</version.jackson>
