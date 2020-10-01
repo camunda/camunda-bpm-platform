@@ -89,22 +89,27 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/compo
     </fieldset>
   </form>
 
-  <div ng-if="status === 'SUCCESS' && isProcessInstance"
+  <div ng-if="status === 'SUCCESS' && isBatchOperation"
+       translate="VARIABLE_ADD_STATUS_SUCCESS_BATCH"
+       translate-values="{ name: newVariable.name }">
+  </div>
+
+  <div ng-if="status === 'SUCCESS' && isProcessInstance && !isBatchOperation"
        translate="VARIABLE_ADD_STATUS_SUCCESS_PROCESS"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-if="status === 'SUCCESS' && !isProcessInstance"
+  <div ng-if="status === 'SUCCESS' && !isProcessInstance && !isBatchOperation"
        translate="VARIABLE_ADD_STATUS_SUCCESS_CASE"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-show="status === 'FAIL' && isProcessInstance"
+  <div ng-show="status === 'FAIL' && isProcessInstance && !isBatchOperation"
        translate="VARIABLE_ADD_STATUS_FAIL_PROCESS"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-show="status === 'FAIL' && !isProcessInstance"
+  <div ng-show="status === 'FAIL' && !isProcessInstance && !isBatchOperation"
        translate="VARIABLE_ADD_STATUS_FAIL_CASE"
        translate-values="{ name: newVariable.name }">
   </div>
