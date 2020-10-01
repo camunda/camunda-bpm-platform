@@ -45,11 +45,11 @@ actual integration tests are located in the `qa/integration-tests-engine` and `q
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
-We have different maven profiles for selecting
-* *Runtime containers & environments*: tomcat, wildfly
-* *The testsuite*: engine-integration, webapps-integration
+We have different maven profiles for selecting:
+* *Runtime containers & environments*: tomcat, wildfly.
+* *The testsuite*: engine-integration, webapps-integration.
 * *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
-  postgresql are supported in engine-integration tests)
+  postgresql are supported in engine-integration tests).
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
@@ -77,10 +77,10 @@ There is a special profile for the WildFly Application Servers:
 
 Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
 
-There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
+There are two properties that can be used for that: ``test.includes`` and ``test.excludes``.
 
 When using the includes only the packages listed will be include and with excludes the other way around.
-For example calling Maven in the engine directory with
+For example calling Maven in the engine directory with:
 ```
 mvn clean test -Dtest.includes=bpmn
 ```
