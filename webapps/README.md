@@ -100,7 +100,7 @@ To run the tests, call
 grunt test-e2e --protractorConfig=ui/common/tests/develop.conf.js
 ```
 
-Now, it opens a new browser at [http://localhost:8080](http://localhost:8080) and do the tests steps. If you want to tests only one spec or a part of it then you can annotate the description of the spec with the keyword `only`:
+Now, it opens a new browser at [http://localhost:8080](http://localhost:8080) and does the test steps. If you want to test only one spec or a part of it then you can annotate the description of the spec with the keyword `only`:
 
 ```javascript
 describe.only('Cockpit Dashboard Spec', function() {
