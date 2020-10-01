@@ -401,10 +401,15 @@ module.exports = [
           $scope.saveVar(info, v).then(
             function(saved) {
               info.variable.name = saved.name;
-              info.variable.type = saved.type;
+              var type = (info.variable.type = saved.type);
               info.variable.value = saved.value;
-              info.variable.valueInfo = saved.valueInfo;
               delete info._copy;
+
+              if (type !== "Object") {
+                delete info.variable.valueInfo;
+              } else {
+                info.variable.valueInfo = saved.valueInfo;
+              }
             },
             function(/*err*/) {
               // console.error(err);
