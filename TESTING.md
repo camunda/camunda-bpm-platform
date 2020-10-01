@@ -18,7 +18,7 @@
     ...
   }
   ```
-* Project `camunda-engine`: As an alternative to the above, you can extend extend the `org.camunda.bpm.engine.test.util.PluggableProcessEngineTest` class.
+* Project `camunda-engine`: As an alternative to the above, you can extend the `org.camunda.bpm.engine.test.util.PluggableProcessEngineTest` class.
   The class already provides an instance of the `ProvidedProcessEngineRule`, as well as the `ProcessEngineTestRule` that
   provides some additional custom assertions and helper methods.
   * However, if you need to make modifications to the `ProcessEngineConfiguration`, then please use the `ProcessEngineBootstrapRule`
@@ -37,13 +37,13 @@
 # Running Integration Tests
 
 The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for 
-each server runtime we support. These projects are responsible for taking a runtime container 
-distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
+each server runtime we support. These projects take a runtime container 
+distribution (i.e. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
 actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
- * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
- * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
+ * *integration-tests-engine*: This module contains an extensive testsuite that tests the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
+ * *integration-tests-webapps*: This module tests the camunda BPM web applications inside the runtime containers. These integration tests run inside a client / server setting: the web application is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
-In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
+To run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
 We have different maven profiles for selecting
 * *Runtime containers & environments*: tomcat, wildfly
@@ -51,7 +51,7 @@ We have different maven profiles for selecting
 * *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
   postgresql are supported in engine-integration tests)
 
-In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
+To configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
 ```
 mvn clean install -Pengine-integration,wildfly,h2
@@ -63,7 +63,7 @@ If you want to test against an XA database, just add the corresponding XA databa
 mvn clean install -Pengine-integration,wildfly,postgresql,postgresql-xa
 ```
 
-You can select multiple testsuites but only a single database and a single runtime container. This is valid:
+You can select multiple testsuites, but only a single database and a single runtime container. This is valid:
 
 ```
 mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
@@ -80,11 +80,11 @@ Due to the fact that the number of unit tests in the camunda engine increases da
 There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
 
 When using the includes only the packages listed will be include and with excludes the other way around.
-For example calling Maven in the engine directory with
+For example, calling Maven in the engine directory with
 ```
 mvn clean test -Dtest.includes=bpmn
 ```
-will test all packages that contain "bpmn". This will include e.g. ``*test.bpmn*`` and ``*api.bpmn*``. If you want to limit this further you have to get more concrete. Additionally, you can combine certain packages with a pipe:
+will test all packages that contain "bpmn". This will include e.g. ``*test.bpmn*`` and ``*api.bpmn*``. If you want to limit this further, you have to get more concrete. Additionally, you can combine certain packages with a pipe:
 ```
 mvn clean test -Dtest.includes=bpmn|cmmn
 ```
@@ -96,7 +96,7 @@ mvn clean test -Dtest.includes=bpmn -Dtest.excludes=bpmn.async
 ```
 Please note that excludes take precedence over includes.
 
-To make it easier for you we created some profiles with predefined in- and excludes:
+To make it easier for you, we created some profiles with pre-defined in-hand excludes:
 - testBpmn
 - testCmmn
 - testBpmnCmmn
@@ -104,7 +104,7 @@ To make it easier for you we created some profiles with predefined in- and exclu
 - testExceptCmmn
 - testExceptBpmnCmmn
 
-So simply call
+So call
 ```
 mvn clean test -PtestExceptBpmn
 ```
