@@ -1,4 +1,4 @@
-# Testing Guidelines
+# Testing Guidelines for Project
 
 * [Best Practices for Writing Test Cases](#best-practices-for-writing-test-cases)
 * [Running Integration Tests](#running-integration-tests)
@@ -6,7 +6,7 @@
 
 # Best Practices for Writing Test Cases
 
-* write JUnit4-style tests, not JUnit3
+* Write JUnit4-style tests, not JUnit3
 * Project `camunda-engine`: If you need a process engine object, use the JUnit rule `org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule`. It ensures that the process engine object is reused across test cases and that certain integrity checks are performed after every test. For example:
   ```
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
