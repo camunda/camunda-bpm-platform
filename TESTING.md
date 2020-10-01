@@ -94,7 +94,7 @@ The same works for excludes. Also, you can combine both:
 ```
 mvn clean test -Dtest.includes=bpmn -Dtest.excludes=bpmn.async
 ```
-Please note that excludes take precedence over includes.
+Please note that excludes taking precedence over includes.
 
 To make it easier for you we created some profiles with predefined in- and excludes:
 - testBpmn
