@@ -46,7 +46,7 @@ In contrast to other vendor BPM platforms, camunda BPM strives to be highly inte
 Out of the box, camunda BPM provides infrastructure-level integration with Java EE Application Servers and Servlet Containers.
 
 ### Embeddable
-Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST Api as a library to your application and assemble your custom BPM platform configuration.
+Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST API as a library to your application and assemble your custom BPM platform configuration.
 
 
 ## Contributing
