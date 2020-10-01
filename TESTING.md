@@ -80,7 +80,7 @@ Due to the fact that the number of unit tests in the camunda engine increases da
 There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
 
 When using the includes only the packages listed will be include and with excludes the other way around.
-For example calling Maven in the engine directory with
+For example, calling Maven in the engine directory with
 ```
 mvn clean test -Dtest.includes=bpmn
 ```
