@@ -51,9 +51,13 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/src/legacy/camunda-c
             <li>
                 <b>{{'TELEMETRY_DETAILS_META_DATA' | translate}}</b>
                 <p>{{'TELEMETRY_DETAILS_META_DATA_WHAT' | translate}}</p>
-                <i>{{'TELEMETRY_DETAILS_META_DATA_WHY' | translate}}</i>
+            </li>
+            <li>
+                <b>{{'TELEMETRY_DETAILS_USAGE_STATISTICS' | translate}}</b>
+                <p>{{'TELEMETRY_DETAILS_USAGE_STATISTICS_WHAT' | translate}}</p>
             </li>
         </ul>
+        <i>{{'TELEMETRY_DETAILS_META_DATA_WHY' | translate}}</i>
         <button class="btn btn-default next" ng-click="next()">
             {{'TELEMETRY_NEXT' | translate}}
         </button>
@@ -71,7 +75,6 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/src/legacy/camunda-c
                 <div class="col-xs-10 col-sm-10 form-control-static ">
                     <label for="usage-statistics">{{'TELEMETRY_PREFERENCES_META' | translate}}</label>
                     <p class="details">{{'TELEMETRY_PREFERENCES_META_DETAILS' | translate}}</p>
-
                 </div>
             </div>
         </form>
