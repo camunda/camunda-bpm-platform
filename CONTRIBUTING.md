@@ -137,7 +137,7 @@ One of the following:
 * feat (feature)
 * fix (bug fix)
 * docs (documentation)
-* style (formatting, missing semi colons, …)
+* style (formatting, missing semicolons, …)
 * refactor
 * test (when adding missing tests)
 * chore (maintain)
@@ -189,6 +189,6 @@ We usually check for new community-submitted pull requests once a week. We will 
 
 Note that due to other responsibilities (our own implementation tasks, releases), feedback can sometimes be a bit delayed. Especially for larger contributions, it can take a bit until we have the time to assess your code properly.
 
-During review we will provide you with feedback and help to get your contribution merge-ready. However, before requesting a review, please go through our [contribution checklist](#contribution-checklist).
+During review, we will provide you with feedback and help to get your contribution merge-ready. However, before requesting a review, please go through our [contribution checklist](#contribution-checklist).
 
 Once your code is merged, it will be shipped in the next alpha and minor releases. We usually build alpha releases once a month and minor releases once every six months. If you are curious about the exact next minor release date, check our [release announcements](https://docs.camunda.org/enterprise/announcement/) page.
