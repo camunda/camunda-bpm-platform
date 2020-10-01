@@ -14,7 +14,7 @@ camunda BPM platform is a flexible framework for workflow and process automation
 
 ## Components
 
-camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
+Camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
 
 #### Process Implementation and Execution
  * camunda engine - The core component responsible for executing BPMN 2.0 processes.
@@ -22,17 +22,17 @@ camunda BPM platform provides a rich set of components centered around the BPM l
  * Spring, CDI integration - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
- * camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
+ * Camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
 
 #### Process Operations
- * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
- * camunda cockpit - Web application tool for process operations.
- * camunda admin - Web application for managing users, groups, and their access permissions.
+ * Camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
+ * Camunda cockpit - Web application tool for process operations.
+ * Camunda admin - Web application for managing users, groups, and their access permissions.
 
 #### Human Task Management
- * camunda tasklist - Web application for managing and completing user tasks in the context of processes.
+ * Camunda tasklist - Web application for managing and completing user tasks in the context of processes.
 
-#### And there's more...
+#### And there are more...
 
  * [bpmn.io](https://bpmn.io/) - Toolkits for BPMN, CMMN, and DMN in Java Script (rendering, modeling)
  * [Community Extensions](https://docs.camunda.org/manual/7.5/introduction/extensions/) - Extensions on top of Camunda BPM provided and maintained by our great open source community
@@ -46,7 +46,7 @@ In contrast to other vendor BPM platforms, camunda BPM strives to be highly inte
 Out of the box, camunda BPM provides infrastructure-level integration with Java EE Application Servers and Servlet Containers.
 
 ### Embeddable
-Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST Api as a library to your application and assemble your custom BPM platform configuration.
+Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST API as a library to your application and assemble your custom BPM platform configuration.
 
 
 ## Contributing
