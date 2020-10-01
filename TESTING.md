@@ -36,12 +36,10 @@
   
 # Running Integration Tests
 
-The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for 
-each server runtime we support. These projects are responsible for taking a runtime container 
-distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
+The integration test suites are located under `qa/`. There you'll find a folder named XX-runtime for each server runtime we support. These projects are responsible for taking a runtime container distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
 actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
  * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
- * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
+ * *integration-tests-webapps*: This module tests the camunda BPM web applications inside the runtime containers. These integration tests run inside a client/server setting: the web application is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
@@ -51,7 +49,7 @@ We have different maven profiles for selecting
 * *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 and 
   postgresql are supported in engine-integration tests)
 
-In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
+In order to configure the build, compose the profiles for runtime container, test suite, database. Example:
 
 ```
 mvn clean install -Pengine-integration,wildfly,h2
@@ -60,7 +58,7 @@ mvn clean install -Pengine-integration,wildfly,h2
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
 
 ```
-mvn clean install -Pengine-integration,wildfly,postgresql,postgresql-xa
+mvn clean install -Pengine-integration,wildfly,Postgresql,Postgresql-xa
 ```
 
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
@@ -75,9 +73,9 @@ There is a special profile for the WildFly Application Servers:
 
 # Limiting the Number of Engine Unit Tests
 
-Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
+Because the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
 
-There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
+Two properties can be used for that: ``test.includes`` and ``test.excludes``
 
 When using the includes only the packages listed will be include and with excludes the other way around.
 For example calling Maven in the engine directory with
@@ -108,4 +106,4 @@ So simply call
 ```
 mvn clean test -PtestExceptBpmn
 ```
-and all the bpmn testcases won't bother you any longer.
+and all the bpmn test cases won't bother you any longer.
