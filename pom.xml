@@ -60,7 +60,7 @@
       </activation>
       <modules>
         <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
-          any modules that have a dependency to the webapps. See also the referenced POMs,
+          any modules that have a dependency on the webapps. See also the referenced POMs,
           they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
