@@ -54,7 +54,7 @@ var Controller = [
     }
 
     // called every time date input changes
-    $scope.handleDateChange = function handleDateChange() {
+    function handleDateChange() {
       var form = $scope.form;
       if (form.$valid) {
         return load();
@@ -69,7 +69,19 @@ var Controller = [
       ) {
         setLoadingError('Invalid Date Value.');
       }
-    };
+    }
+
+    $scope.$watch('startDate', function(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        handleDateChange();
+      }
+    });
+
+    $scope.$watch('endDate', function(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        handleDateChange();
+      }
+    });
 
     function updateView() {
       var phase = $scope.$root.$$phase;
