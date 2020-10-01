@@ -36,7 +36,7 @@
   
 # Running Integration Tests
 
-The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for 
+The integration test suites are located under `qa/`. There you'll find a folder named XX-runtime for 
 each server runtime we support. These projects are responsible for taking a runtime container 
 distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
 actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
