@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-('use strict');
+'use strict';
 
 var fs = require('fs');
 
@@ -111,8 +111,8 @@ var Controller = [
       );
     }
 
-    $scope.$watch('isTaskWorkerMetric', function() {
-      if ($scope.isTaskWorkerMetric) {
+    $scope.$watch('showTaskWorkerMetric', function() {
+      if ($scope.showTaskWorkerMetric) {
         $scope.loadingState = 'LOADING';
         fetchTaskWorkerMetric(function(err, result) {
           if (!err) {
@@ -124,7 +124,7 @@ var Controller = [
           }
           updateView();
         });
-      } else {
+      } else if (typeof $scope.showTaskWorkerMetric !== 'undefined') {
         $scope.loadingState = 'LOADED';
       }
     });
@@ -182,7 +182,7 @@ var Controller = [
         }
       };
 
-      if ($scope.isTaskWorkerMetric) {
+      if ($scope.showTaskWorkerMetric) {
         series.taskWorkers = fetchTaskWorkerMetric;
       } else {
         delete series.taskWorkers;

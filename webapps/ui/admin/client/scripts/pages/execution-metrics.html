@@ -53,7 +53,7 @@
   </div>
 
   <div class="task-worker-metrics">
-    <input class="tw-checkbox-show" type="checkbox" ng-model="isTaskWorkerMetric" id="show-task-worker" />
+    <input class="tw-checkbox-show" type="checkbox" ng-model="showTaskWorkerMetric" id="show-task-worker" />
     <label class="tw-checkbox-show-label" for="show-task-worker">
       {{ 'EXECUTION_METRICS_TASK_WORKERS_SHOW' | translate }}
     </label>
@@ -78,7 +78,7 @@
           <li>
             <strong>{{ metrics.decisionInstances.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_DI' | translate }}
           </li>
-          <li ng-if="isTaskWorkerMetric">
+          <li ng-if="showTaskWorkerMetric">
             <strong>{{ metrics.taskWorkers.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_TW' | translate }}
           </li>
         </ul>
