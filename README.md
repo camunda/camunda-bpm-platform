@@ -1,8 +1,9 @@
 # Camunda BPM - The open source BPM platform
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent)
+Camunda BPM is an open-source workflow and decision automation platform. Camunda BPM ships with tools for creating workflow and decision models, operating deployed models in production, and allowing users to execute workflow tasks assigned to them.[1] It is developed in Java and released as open-source software under the terms of Apache License.
 
-camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
+Camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
 
 * Web Site: https://www.camunda.org/
 * Getting Started: https://docs.camunda.org/get-started/
@@ -14,7 +15,7 @@ camunda BPM platform is a flexible framework for workflow and process automation
 
 ## Components
 
-camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
+Camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
 
 #### Process Implementation and Execution
  * camunda engine - The core component responsible for executing BPMN 2.0 processes.
@@ -22,15 +23,15 @@ camunda BPM platform provides a rich set of components centered around the BPM l
  * Spring, CDI integration - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
- * camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
+ * Camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
 
 #### Process Operations
- * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
- * camunda cockpit - Web application tool for process operations.
+ * Camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
+ * Camunda cockpit - Web application tool for process operations.
  * camunda admin - Web application for managing users, groups, and their access permissions.
 
 #### Human Task Management
- * camunda tasklist - Web application for managing and completing user tasks in the context of processes.
+ * Camunda tasklist - Web application for managing and completing user tasks in the context of processes.
 
 #### And there's more...
 
