@@ -2,7 +2,7 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent)
 
-camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
+Camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
 
 * Web Site: https://www.camunda.org/
 * Getting Started: https://docs.camunda.org/get-started/
@@ -14,7 +14,7 @@ camunda BPM platform is a flexible framework for workflow and process automation
 
 ## Components
 
-camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
+Camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
 
 #### Process Implementation and Execution
  * camunda engine - The core component responsible for executing BPMN 2.0 processes.
@@ -40,10 +40,10 @@ camunda BPM platform provides a rich set of components centered around the BPM l
 
 ## A Framework
 
-In contrast to other vendor BPM platforms, camunda BPM strives to be highly integrable and embeddable. We seek to deliver a great experience to developers that want to use BPM technology in their projects.
+In contrast to other vendor BPM platforms, Camunda BPM strives to be highly integrable and embeddable. We seek to deliver an exceptional experience to developers that want to use BPM technology in their projects.
 
 ### Highly Integrable
-Out of the box, camunda BPM provides infrastructure-level integration with Java EE Application Servers and Servlet Containers.
+Out of the box, Camunda BPM provides infrastructure-level integration with Java EE Application Servers and Servlet Containers.
 
 ### Embeddable
 Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST Api as a library to your application and assemble your custom BPM platform configuration.
