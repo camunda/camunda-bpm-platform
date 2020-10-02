@@ -91,6 +91,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   private static final long serialVersionUID = 1L;
   protected String taskId;
+  protected String[] taskIdIn;
   protected String name;
   protected String nameNotEqual;
   protected String nameLike;
@@ -184,6 +185,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQueryImpl taskId(String taskId) {
     ensureNotNull("Task id", taskId);
     this.taskId = taskId;
+    return this;
+  }
+
+  @Override
+  public TaskQueryImpl taskIdIn(String... taskIds) {
+    ensureNotNull("taskIds", (Object[]) taskIds);
+    this.taskIdIn = taskIds;
     return this;
   }
 
@@ -1553,6 +1561,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskId;
   }
 
+  public String[] getTaskIdIn() {
+	return taskIdIn;
+  }
+
   public String getDescription() {
     return description;
   }
@@ -1915,6 +1927,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getTaskId() != null) {
       extendedQuery.taskId(this.getTaskId());
+    }
+
+    if (extendingQuery.getTaskIdIn() != null) {
+      extendedQuery.taskIdIn(extendingQuery.getTaskIdIn());
+    } else if (this.getTaskIdIn() != null) {
+      extendedQuery.taskIdIn(this.getTaskIdIn());
     }
 
     if (extendingQuery.getDescription() != null) {
