@@ -358,7 +358,7 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  public void shouldReportInitialDataOnceInitTelemetryUndefined() {
+  public void shouldReportInitialDataOnlyOnceInitTelemetryUndefinedReportPlusClose() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(null);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -368,8 +368,9 @@ public class TelemetryReporterTest {
     Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), null);
     String requestBody = new Gson().toJson(expectedData);
 
-    // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
     standaloneProcessEngine.close();
     standaloneProcessEngine = null;
 
@@ -381,7 +382,7 @@ public class TelemetryReporterTest {
 
 
   @Test
-  public void shouldReportInitialDataOnceInitTelemetryDisabled() {
+  public void shouldReportInitialDataOnlyOnceInitTelemetryDisabledReportPlusClose() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(false);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -391,8 +392,9 @@ public class TelemetryReporterTest {
     Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), false);
     String requestBody = new Gson().toJson(expectedData);
 
-    // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
     standaloneProcessEngine.close();
     standaloneProcessEngine = null;
 
@@ -404,7 +406,7 @@ public class TelemetryReporterTest {
 
   @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
-  public void shouldReportInitialDataOnceInitTelemetryEnabled() {
+  public void shouldReportInitialDataOnlyOnceInitTelemetryEnabledReportPlusClose() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(true);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -414,8 +416,9 @@ public class TelemetryReporterTest {
     Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), true);
     String requestBody = new Gson().toJson(expectedData);
 
-    // when
     processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
     standaloneProcessEngine.close();
     standaloneProcessEngine = null;
 
@@ -428,7 +431,7 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  public void shouldReportInitialDataOnlyOnce() {
+  public void shouldReportInitialDataOnlyOnceWhenReportingTwice() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(false);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
