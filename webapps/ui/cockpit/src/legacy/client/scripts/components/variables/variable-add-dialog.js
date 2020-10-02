@@ -111,6 +111,8 @@ var Controller = [
           changed: false
         });
 
+        $scope.$root.$broadcast("variable.added");
+
         $scope.status = SUCCESS;
       } else {
         if (data.type === "Date") {

@@ -64,7 +64,8 @@ module.exports = [
         downloadVar: "=?onDownload",
         uploadVar: "=?onUpload",
         onSortChange: "&",
-        onValidation: "&",
+        onChangeStart: "&",
+        onChangeEnd: "&",
         defaultSort: "=?",
         ignoreTypes: "=?"
       },
@@ -249,7 +250,6 @@ module.exports = [
             }
           }
 
-          $scope.onValidation();
           info.changed = hasChanged(i);
         }
 
@@ -396,7 +396,7 @@ module.exports = [
 
         $scope.saveVariable = function(v) {
           var info = $scope.variables[v];
-          info.editMode = false;
+          $scope.enableEditMode(info, false);
 
           $scope.saveVar(info, v).then(
             function(saved) {
@@ -413,7 +413,7 @@ module.exports = [
             },
             function(/*err*/) {
               // console.error(err);
-              info.editMode = true;
+              $scope.enableEditMode(info, true);
             }
           );
         };
@@ -424,13 +424,38 @@ module.exports = [
           $scope.uploadVar(info, v).then(
             function(/*saved*/) {
               delete info._copy;
-              info.editMode = false;
+              $scope.enableEditMode(info, false);
             },
             function(/*err*/) {
               // console.error(err);
-              info.editMode = false;
+              $scope.enableEditMode(info, false);
             }
           );
+        };
+
+        $scope.enableEditMode = function(info, enableEditMode) {
+          info.editMode = enableEditMode;
+          if (enableEditMode) {
+            var uncompletedCount = 0;
+            $scope.variables.forEach(function(variable) {
+              if (variable.editMode) {
+                uncompletedCount++;
+              }
+            });
+            if (uncompletedCount === 1) {
+              $scope.onChangeStart();
+            }
+          } else {
+            var completedCount = 0;
+            $scope.variables.forEach(function(variable) {
+              if (!variable.editMode) {
+                completedCount++;
+              }
+            });
+            if (completedCount === $scope.variables.length) {
+              $scope.onChangeEnd();
+            }
+          }
         };
       }
     };
