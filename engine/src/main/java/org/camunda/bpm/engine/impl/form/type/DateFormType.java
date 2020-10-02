@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.joda.time.DateTime;
 
 
 /**
@@ -58,7 +59,10 @@ public class DateFormType extends AbstractFormFieldType {
     if(value == null) {
       return Variables.dateValue(null, propertyValue.isTransient());
     }
-    else if(value instanceof Date) {
+    if (value instanceof DateTime) {
+      value = ((DateTime) value).toDate();
+    }
+    if(value instanceof Date) {
       return Variables.dateValue((Date) value, propertyValue.isTransient());
     }
     else if(value instanceof String) {
@@ -69,7 +73,7 @@ public class DateFormType extends AbstractFormFieldType {
       try {
         return Variables.dateValue((Date) dateFormat.parseObject(strValue), propertyValue.isTransient());
       } catch (ParseException e) {
-        throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
+        throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.", e);
       }
     }
     else {
@@ -94,6 +98,12 @@ public class DateFormType extends AbstractFormFieldType {
     if (propertyValue==null || "".equals(propertyValue)) {
       return null;
     }
+    if (propertyValue instanceof Date) {
+      return propertyValue;
+    }
+    if (propertyValue instanceof DateTime) {
+      return ((DateTime) propertyValue).toDate();
+    }
     try {
       return dateFormat.parseObject(propertyValue.toString());
     } catch (ParseException e) {
@@ -105,6 +115,8 @@ public class DateFormType extends AbstractFormFieldType {
     if (modelValue==null) {
       return null;
     }
+    if (modelValue instanceof DateTime)
+      modelValue = ((DateTime) modelValue).toDate();
     return dateFormat.format(modelValue);
   }
 
