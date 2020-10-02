@@ -40,6 +40,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery taskId(String taskId);
 
+  /** Only select tasks with the given task ids. */
+  TaskQuery taskIdIn(String... taskIds);
+
   /**
    * Only select tasks with the given name.
    * The query will match the names of tasks in a case-insensitive way.

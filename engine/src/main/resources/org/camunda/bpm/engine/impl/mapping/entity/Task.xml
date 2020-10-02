@@ -339,6 +339,13 @@
             <if test="query.taskId != null">
               ${queryType} RES.ID_ = #{query.taskId}
             </if>
+            <if test="query.taskIdIn != null &amp;&amp; query.taskIdIn.length > 0">
+              ${queryType} RES.ID_ in
+              <foreach item="item" index="index" collection="query.taskIdIn"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
             <if test="query.name != null">
               <!-- based on CAM-6363 compare name case insensitive -->
               ${queryType} UPPER(RES.NAME_) = UPPER(#{query.name})

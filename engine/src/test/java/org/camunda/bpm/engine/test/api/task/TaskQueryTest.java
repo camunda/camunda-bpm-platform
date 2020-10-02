@@ -54,6 +54,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -146,10 +147,26 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
 
   @Test
   public void testQueryByTaskId() {
-    TaskQuery query = taskService.createTaskQuery().taskId(taskIds.get(0));
+    String taskId = taskIds.get(0);
+	TaskQuery query = taskService.createTaskQuery().taskId(taskId);
     assertNotNull(query.singleResult());
-    assertEquals(1, query.list().size());
     assertEquals(1, query.count());
+    List<Task> foundTasks = query.list();
+	assertEquals(1, foundTasks.size());
+    List<String> foundTaskIds = foundTasks.stream().map(Task::getId).collect(Collectors.toList());
+    assertThat(foundTaskIds).containsOnly(taskId);
+  }
+
+  @Test
+  public void testQueryByTaskIdIn() {
+    String task0Id = taskIds.get(0);
+    String task1Id = taskIds.get(1);
+	TaskQuery query = taskService.createTaskQuery().taskIdIn(task0Id, task1Id);
+	assertEquals(2, query.count());
+    List<Task> foundTasks = query.list();
+    assertEquals(2, foundTasks.size());
+    List<String> foundTaskIds = foundTasks.stream().map(Task::getId).collect(Collectors.toList());
+    assertThat(foundTaskIds).containsOnly(task0Id, task1Id);
   }
 
   @Test
