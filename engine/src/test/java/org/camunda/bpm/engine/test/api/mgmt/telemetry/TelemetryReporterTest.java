@@ -45,7 +45,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -182,7 +181,6 @@ public class TelemetryReporterTest {
         standaloneProcessEngine.getManagementService().toggleTelemetry(false);
       }
       standaloneProcessEngine.close();
-      ProcessEngines.unregister(standaloneProcessEngine);
     }
 
     DefaultDmnEngineConfiguration dmnEngineConfiguration = configuration
@@ -256,6 +254,49 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldNotReportInitialDataWhenReporterActivatedAndInitTelemetryUndefinedDuringProcessEngineClose() {
+    // given
+    createEngineWithInitMessage(null);
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(0, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+  }
+
+  @Test
+  public void shouldNotReportInitialDataWhenReporterActivatedAndInitTelemetryDisabledDuringProcessEngineClose() {
+    // given
+    createEngineWithInitMessage(false);
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(0, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+  }
+
+  @Test
+  public void shouldNotReportInitialDataWhenReporterActivatedAndInitTelemetryEnabledDuringProcessEngineClose() {
+    // given
+    createEngineWithInitMessage(true);
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(1, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withHeader("Content-Type",  equalTo("application/json")));  }
+
+  @Test
   public void shouldReportInitialDataWhenReporterActivatedAndInitTelemetryUndefined() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(null);
@@ -274,6 +315,7 @@ public class TelemetryReporterTest {
               .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
+
 
   @Test
   public void shouldReportInitialDataWhenReporterActivatedAndInitTelemetryDisabled() {
@@ -316,7 +358,80 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  public void shouldReportInitialDataOnlyOnce() {
+  public void shouldReportInitialDataOnlyOnceInitTelemetryUndefinedReportPlusClose() {
+    // given
+    ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(null);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), null);
+    String requestBody = new Gson().toJson(expectedData);
+
+    processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(1, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+
+  @Test
+  public void shouldReportInitialDataOnlyOnceInitTelemetryDisabledReportPlusClose() {
+    // given
+    ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(false);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), false);
+    String requestBody = new Gson().toJson(expectedData);
+
+    processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(1, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldReportInitialDataOnlyOnceInitTelemetryEnabledReportPlusClose() {
+    // given
+    ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(true);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    Data expectedData = createInitialDataToSend(processEngineConfiguration.getTelemetryData(), true);
+    String requestBody = new Gson().toJson(expectedData);
+
+    processEngineConfiguration.getTelemetryReporter().reportNow();
+
+    // when
+    standaloneProcessEngine.close();
+    standaloneProcessEngine = null;
+
+    // then
+    verify(3, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withHeader("Content-Type",  equalTo("application/json")));
+    assertThat(loggingRule.getFilteredLog("Sending initial telemetry data").size()).isOne();
+    assertThat(loggingRule.getFilteredLog("Initial telemetry request was successful.").size()).isOne();
+  }
+
+  @Test
+  public void shouldReportInitialDataOnlyOnceWhenReportingTwice() {
     // given
     ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithInitMessage(false);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
