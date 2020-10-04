@@ -215,6 +215,11 @@ var criteria = [
         help: userExpLangHelp
       },
       {
+        name: 'assigned',
+        label: 'Assigned',
+        bool: true
+      },
+      {
         name: 'unassigned',
         label: 'Unassigned',
         bool: true
