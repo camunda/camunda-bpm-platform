@@ -370,6 +370,18 @@ public class BpmnParseTest {
     }
   }
 
+  @Test
+  public void testParseWithoutStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseWithoutStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although the process did not contain a start event.");
+    } catch (ParseException e) {
+      testRule.assertTextPresent("process must define a startEvent element", e.getMessage());
+      assertErrors(e.getResorceReports().get(0).getErrors(), "Process_1");
+    }
+  }
+
   /**
    * this test case check if the multiple start event is supported the test case
    * doesn't fail in this behavior because the {@link BpmnParse} parse the event
