@@ -103,6 +103,10 @@ var Controller = [
     var modalResolved = true;
 
     $scope.open = function(ignoreSearch) {
+      if (!modalResolved) {
+        return;
+      }
+
       if (!ignoreSearch) {
         search.updateSilently({processStart: true});
       }
