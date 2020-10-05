@@ -83,7 +83,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED));
+    defaultCommandInterceptorsTxRequired.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRED, this));
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this);
     defaultCommandInterceptorsTxRequired.add(commandContextInterceptor);
     return defaultCommandInterceptorsTxRequired;
@@ -99,7 +99,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRES_NEW));
+    defaultCommandInterceptorsTxRequiresNew.add(new SpringTransactionInterceptor(transactionManager, TransactionTemplate.PROPAGATION_REQUIRES_NEW, this));
     CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, this, true);
     defaultCommandInterceptorsTxRequiresNew.add(commandContextInterceptor);
     return defaultCommandInterceptorsTxRequiresNew;
