@@ -83,10 +83,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
     processInstance = executionManager.findExecutionById(processInstanceId);
 
-    if (!processInstance.hasChildren()) {
-      if (processInstance.isCanceled() && processInstance.isRemoved()) {
-        processInstance.propagateEnd();
-      } else if (processInstance.getActivity() == null) {
+    if (!processInstance.hasChildren() && !processInstance.isCanceled() && !processInstance.isRemoved()) {
+      if (processInstance.getActivity() == null) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
         deletePropagate(processInstance, builder.getModificationReason(), builder.isSkipCustomListeners(), builder.isSkipIoMappings(),
