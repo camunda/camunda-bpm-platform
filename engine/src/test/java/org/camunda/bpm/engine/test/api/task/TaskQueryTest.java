@@ -148,11 +148,11 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByTaskId() {
     String taskId = taskIds.get(0);
-	TaskQuery query = taskService.createTaskQuery().taskId(taskId);
+    TaskQuery query = taskService.createTaskQuery().taskId(taskId);
     assertNotNull(query.singleResult());
     assertEquals(1, query.count());
     List<Task> foundTasks = query.list();
-	assertEquals(1, foundTasks.size());
+    assertEquals(1, foundTasks.size());
     List<String> foundTaskIds = foundTasks.stream().map(Task::getId).collect(Collectors.toList());
     assertThat(foundTaskIds).containsOnly(taskId);
   }
@@ -161,8 +161,8 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryByTaskIdIn() {
     String task0Id = taskIds.get(0);
     String task1Id = taskIds.get(1);
-	TaskQuery query = taskService.createTaskQuery().taskIdIn(task0Id, task1Id);
-	assertEquals(2, query.count());
+    TaskQuery query = taskService.createTaskQuery().taskIdIn(task0Id, task1Id);
+    assertEquals(2, query.count());
     List<Task> foundTasks = query.list();
     assertEquals(2, foundTasks.size());
     List<String> foundTaskIds = foundTasks.stream().map(Task::getId).collect(Collectors.toList());
