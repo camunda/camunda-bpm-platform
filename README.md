@@ -57,3 +57,7 @@ Please see our [contribution guidelines](CONTRIBUTING.md).
 ## Tests
 
 To run the tests in this repository, please see our [testing tips and tricks](TESTING.md).
+
+
+## License
+This project is licensed under [Apache Licence 2.0](https://github.com/atharwa-24/camunda-bpm-platform/blob/master/LICENSE)
