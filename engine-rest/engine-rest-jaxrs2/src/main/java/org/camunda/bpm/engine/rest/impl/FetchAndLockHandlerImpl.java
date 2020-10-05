@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.rest.util.EngineUtil;
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
-  private final static Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
+  private static final Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
 
   protected static final String UNIQUE_WORKER_REQUEST_PARAM_NAME = "fetch-and-lock-unique-worker-request";
 
@@ -139,7 +139,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
         Throwable processEngineException = result.getThrowable();
         asyncResponse.resume(processEngineException);
 
-        LOG.log(Level.FINEST, "Resume and remove request with error {0}", processEngineException);
+        LOG.log(Level.FINEST, "Resume and remove request with error", processEngineException);
 
         iterator.remove();
       }
@@ -199,7 +199,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     try {
       handlerThread.join();
     } catch (InterruptedException e) {
-      LOG.log(Level.WARNING, "Shutting down the handler thread failed: {0}", e);
+      LOG.log(Level.WARNING, "Shutting down the handler thread failed", e);
     }
   }
 
@@ -333,7 +333,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       Throwable processEngineException = result.getThrowable();
       asyncResponse.resume(processEngineException);
 
-      LOG.log(Level.FINEST, "Resuming request with error {0}", processEngineException);
+      LOG.log(Level.FINEST, "Resuming request with error", processEngineException);
     }
   }
 
