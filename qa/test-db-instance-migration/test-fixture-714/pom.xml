@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.14.0</version>
+    <version>7.14.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-714</artifactId>
@@ -23,7 +23,7 @@
 <!--       <dependency> -->
 <!--         <groupId>org.camunda.bpm</groupId> -->
 <!--         <artifactId>camunda-bom</artifactId> -->
-<!--         <version>7.14.0</version> -->
+<!--         <version>7.14.1-SNAPSHOT</version> -->
 <!--         <scope>import</scope> -->
 <!--         <type>pom</type> -->
 <!--       </dependency> -->
@@ -130,7 +130,7 @@
                       <artifactId>camunda-sql-scripts</artifactId>
                       <!-- Replace after 7.14.0 release -->
                       <version>${camunda.version.current}</version>
-                      <!--<version>7.14.0</version>-->
+                      <!--<version>7.14.1-SNAPSHOT</version>-->
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>

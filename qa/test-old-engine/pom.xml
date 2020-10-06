@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.14.0</version>
+    <version>7.14.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-old-engine</artifactId>
