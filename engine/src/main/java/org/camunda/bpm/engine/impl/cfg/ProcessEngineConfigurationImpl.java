@@ -344,7 +344,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -1612,8 +1611,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected String checkForCrdb(Connection connection) {
-    try {
-      ResultSet result = connection.prepareStatement("select version() as version;").executeQuery();
+    try (ResultSet result = connection.prepareStatement("select version() as version;").executeQuery()) {
       if (result.next()) {
         String versionData = result.getString(1);
         if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
@@ -1653,9 +1651,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
 
       if (sqlSessionFactory == null) {
-        InputStream inputStream = null;
-        try {
-          inputStream = getMyBatisXmlConfigurationSteam();
+        try (InputStream inputStream = getMyBatisXmlConfigurationSteam()) {
 
           // update the jdbc parameters to the configured ones...
           Environment environment = new Environment("default", transactionFactory, dataSource);
@@ -1691,8 +1687,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         } catch (Exception e) {
           throw new ProcessEngineException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
-        } finally {
-          IoUtil.closeSilently(inputStream);
         }
       }
     }

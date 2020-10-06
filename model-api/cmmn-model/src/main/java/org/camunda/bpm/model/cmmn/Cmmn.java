@@ -19,12 +19,7 @@ package org.camunda.bpm.model.cmmn;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import org.camunda.bpm.model.cmmn.impl.CmmnParser;
 import org.camunda.bpm.model.cmmn.impl.instance.ApplicabilityRuleImpl;
@@ -239,17 +234,12 @@ public class Cmmn {
   }
 
   protected CmmnModelInstance doReadModelFromFile(File file) {
-    InputStream is = null;
-    try {
-      is = new FileInputStream(file);
+    try (InputStream is = new FileInputStream(file)) {
       return doReadModelFromInputStream(is);
-
     } catch (FileNotFoundException e) {
       throw new CmmnModelException("Cannot read model from file "+file+": file does not exist.");
-
-    } finally {
-      IoUtil.closeSilently(is);
-
+    } catch (IOException e) {
+      throw new CmmnModelException(String.format("Cannot read model from file %s exception %s", file, e.getMessage()));
     }
   }
 
@@ -258,15 +248,12 @@ public class Cmmn {
   }
 
   protected void doWriteModelToFile(File file, CmmnModelInstance modelInstance) {
-    OutputStream os = null;
-    try {
-      os = new FileOutputStream(file);
+    try (OutputStream os = new FileOutputStream(file)) {
       doWriteModelToOutputStream(os, modelInstance);
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       throw new CmmnModelException("Cannot write model to file "+file+": file does not exist.");
-    } finally {
-      IoUtil.closeSilently(os);
+    } catch (IOException e) {
+      throw new CmmnModelException(String.format("Cannot write model to file %s exception %s", file, e.getMessage()));
     }
   }
 

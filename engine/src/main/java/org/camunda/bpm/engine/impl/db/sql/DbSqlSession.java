@@ -54,10 +54,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
-import org.camunda.bpm.engine.impl.util.ExceptionUtil;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.impl.util.*;
 
 /**
 *
@@ -205,7 +202,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   protected void entityDeletePerformed(DbEntityOperation operation,
                                        int rowsAffected,
                                        Exception failure) {
-    
+
     if (failure != null) {
       configureFailedDbEntityOperation(operation, failure);
     } else {
@@ -232,7 +229,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     State failedState;
     if (isCrdbConcurrencyConflict(failure)) {
       failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
-      
+
     } else if (isConcurrentModificationException(operation, failure)) {
 
       failedState = State.FAILED_CONCURRENT_MODIFICATION;
@@ -679,38 +676,23 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected List<String> getTablesPresentInOracleDatabase() throws SQLException {
     List<String> tableNames = new ArrayList<>();
-    Connection connection = null;
-    PreparedStatement prepStat = null;
-    ResultSet tablesRs = null;
     String selectTableNamesFromOracle = "SELECT table_name FROM all_tables WHERE table_name LIKE ?";
     String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
 
-    try {
-      connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
-      prepStat = connection.prepareStatement(selectTableNamesFromOracle);
+    try (Connection connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
+        PreparedStatement prepStat = connection.prepareStatement(selectTableNamesFromOracle)) {
       prepStat.setString(1, databaseTablePrefix + "ACT_%");
 
-      tablesRs = prepStat.executeQuery();
-      while (tablesRs.next()) {
-        String tableName = tablesRs.getString("TABLE_NAME");
-        tableName = tableName.toUpperCase();
-        tableNames.add(tableName);
-      }
-      LOG.fetchDatabaseTables("oracle all_tables", tableNames);
-
-    } finally {
-      if (tablesRs != null) {
-        tablesRs.close();
-      }
-      if (prepStat != null) {
-        prepStat.close();
-      }
-      if (connection != null) {
-        connection.close();
+      try (ResultSet tablesRs = prepStat.executeQuery()) {
+        while (tablesRs.next()) {
+          String tableName = tablesRs.getString("TABLE_NAME");
+          tableName = tableName.toUpperCase();
+          tableNames.add(tableName);
+        }
+        LOG.fetchDatabaseTables("oracle all_tables", tableNames);
+        return tableNames;
       }
     }
-
-    return tableNames;
   }
 
 
@@ -756,14 +738,12 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   public void executeSchemaResource(String schemaFileResourceName) {
-    FileInputStream inputStream = null;
-    try {
-      inputStream = new FileInputStream(new File(schemaFileResourceName));
+    try (FileInputStream inputStream = new FileInputStream(new File(schemaFileResourceName))) {
       executeSchemaResource("schema operation", "process engine", schemaFileResourceName, inputStream);
     } catch (FileNotFoundException e) {
       throw LOG.missingSchemaResourceFileException(schemaFileResourceName, e);
-    } finally {
-      IoUtil.closeSilently(inputStream);
+    } catch (IOException e) {
+      ProcessEngineLogger.UTIL_LOGGER.debugCloseException(e);
     }
   }
 
