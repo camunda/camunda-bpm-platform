@@ -821,10 +821,27 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery initializeFormKeys();
 
-  /** Only select tasks with one of the given tenant ids. */
+  /**
+   * Only select tasks with one of the given tenant ids.
+   *
+   * @throws ProcessEngineException
+   *   <ul>
+   *     <li>When a query is executed and {@link #withoutTenantId()} has been executed on
+   *         the "and query" instance. No exception is thrown when a query is executed
+   *         and {@link #withoutTenantId()} has been executed on the "or query" instance.
+   *     </li>
+   *     <li>When a <code>null</code> tenant id is passed.</li>
+   *   </ul>
+   */
   TaskQuery tenantIdIn(String... tenantIds);
 
-  /** Only select tasks which have no tenant id. */
+  /**
+   * Only select tasks which have no tenant id.
+   *
+   * @throws ProcessEngineException When query is executed and {@link #tenantIdIn(String...)}
+   *     has been executed on the "and query" instance. No exception is thrown when query is
+   *     executed and {@link #tenantIdIn(String...)} has been executed on the "or query" instance.
+   */
   TaskQuery withoutTenantId();
 
   // ordering ////////////////////////////////////////////////////////////

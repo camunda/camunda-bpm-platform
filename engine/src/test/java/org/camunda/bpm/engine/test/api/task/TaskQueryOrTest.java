@@ -180,6 +180,38 @@ public class TaskQueryOrTest {
   }
 
   @Test
+  public void shouldThrowExceptionOnTenantIdsAndWithoutTenantIdInAndQuery() {
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set both tenantIdIn and withoutTenantId filters.");
+
+    // when
+    taskService.createTaskQuery()
+        .tenantIdIn("tenant1", "tenant2")
+        .withoutTenantId();
+  }
+
+  @Test
+  public void shouldReturnTasksOnTenantIdsAndWithoutTenantIdInOrQuery() {
+    // given
+    Task taskTenant1 = taskService.newTask();
+    taskTenant1.setTenantId("tenant1");
+    taskService.saveTask(taskTenant1);
+    Task taskNoTenant = taskService.newTask();
+    taskService.saveTask(taskNoTenant);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+        .or()
+          .tenantIdIn("tenant1")
+          .withoutTenantId()
+        .endOr();
+
+    // then
+    assertThat(query.count()).isEqualTo(2L);
+  }
+
+  @Test
   public void shouldReturnNoTasksWithTaskCandidateUserAndOrTaskCandidateGroup() {
     // given
     Task task1 = taskService.newTask();
