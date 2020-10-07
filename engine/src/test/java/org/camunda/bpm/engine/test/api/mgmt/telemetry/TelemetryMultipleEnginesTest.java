@@ -62,11 +62,13 @@ public class TelemetryMultipleEnginesTest {
 
   @ClassRule
   public static ProcessEngineBootstrapRule secondEngineRule = new ProcessEngineBootstrapRule(config ->
-      config.setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
 
   @ClassRule
   public static ProcessEngineBootstrapRule defaultEngineRule = new ProcessEngineBootstrapRule(config ->
-  config.setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
 
   protected ProcessEngine defaultEngine;
   protected ProcessEngine secondEngine;
