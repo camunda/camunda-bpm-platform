@@ -7,25 +7,28 @@
     <version>7.15.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-upgrade-test-fixture-714</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-715</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.14.0</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.15.0</name>
 
   <properties>
-    <camunda.version.previous>7.13.0</camunda.version.previous>
+    <!-- delete when 7.15 is released -->
+    <camunda.version.current>${project.version}</camunda.version.current>
+    <camunda.version.previous>7.14.0</camunda.version.previous>
   </properties>
 
-   <dependencyManagement>
-     <dependencies>
-       <dependency>
-         <groupId>org.camunda.bpm</groupId>
-         <artifactId>camunda-bom</artifactId>
-         <version>7.14.0</version>
-         <scope>import</scope>
-         <type>pom</type>
-       </dependency>
-     </dependencies>
-   </dependencyManagement>
+  <!-- uncomment when 7.15 is released -->
+<!--   <dependencyManagement> -->
+<!--     <dependencies> -->
+<!--       <dependency> -->
+<!--         <groupId>org.camunda.bpm</groupId> -->
+<!--         <artifactId>camunda-bom</artifactId> -->
+<!--         <version>7.15.0</version> -->
+<!--         <scope>import</scope> -->
+<!--         <type>pom</type> -->
+<!--       </dependency> -->
+<!--     </dependencies> -->
+<!--   </dependencyManagement> -->
 
 
   <dependencies>
@@ -93,7 +96,7 @@
                     <mkdir dir="${current.sql.upgrade.dir}/" />
 
                     <!-- concatenated patches for last minor version -->
-                    <!-- 7.12.0 is on a clean state so we can again use the concatenated patches -->
+                    <!-- 7.14.0 is on a clean state so we can again use the concatenated patches -->
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql" />
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql" />
 
@@ -125,7 +128,9 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>7.14.0</version>
+                      <!-- Replace after 7.15.0 release -->
+                      <version>${camunda.version.current}</version>
+                      <!--<version>7.15.0</version>-->
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
@@ -148,7 +153,9 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>7.14.0</versionString>
+                  <!-- Replace after 7.15.0 release -->
+                  <versionString>${camunda.version.current}</versionString>
+                  <!--<versionString>7.15.0</versionString>-->
                 </configuration>
               </execution>
               <execution>
@@ -216,7 +223,8 @@
               -->
             </executions>
           </plugin>
-          <plugin>
+          <!-- uncomment when 7.15 is released -->
+          <!--<plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
@@ -237,7 +245,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
+          </plugin>-->
         </plugins>
       </build>
     </profile>
