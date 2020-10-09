@@ -14,7 +14,7 @@
 
   <properties>
     <camunda-assert.artifact>camunda-bpm-assert-assertj3-11-1</camunda-assert.artifact>
-    <camunda-assert.version>4.0.0</camunda-assert.version>
+    <camunda-assert.version>8.0.0</camunda-assert.version>
   </properties>
 
   <dependencies>
