@@ -13,7 +13,7 @@
   <name>camunda BPM - Spring Boot Starter - Test</name>
 
   <properties>
-    <camunda-assert.artifact>camunda-bpm-assert-assertj3-11-1</camunda-assert.artifact>
+    <camunda-assert.artifact>camunda-bpm-assert</camunda-assert.artifact>
     <camunda-assert.version>8.0.0</camunda-assert.version>
   </properties>
 
