@@ -17,6 +17,7 @@
 
 import React, { useEffect, useState } from "react";
 import { get } from "utils/request";
+import { getEngine } from "utils/config";
 import { LoadingIndicator } from "components";
 
 import "./EnterpriseComponent.scss";
@@ -26,7 +27,7 @@ export default function EnterpriseComponent({ children }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await get("%ADMIN_API%/plugin/license/default/check-key");
+      const res = await get("%ADMIN_API%/plugin/license/%ENGINE%/check-key");
       const json = await res.json();
       setHasLicense(json.valid);
     };
@@ -48,9 +49,9 @@ export default function EnterpriseComponent({ children }) {
       </p>
       <p>This functionality requires a valid license key.</p>
       <a
-        // TODO: Replace with cross-site link
-        href="../../admin/default/#/system?section=system-settings-license"
+        href={`../../admin/${getEngine()}/#/system?section=system-settings-license`}
         target="_blank"
+        rel="noopener noreferrer"
       >
         Enter your license key now
       </a>

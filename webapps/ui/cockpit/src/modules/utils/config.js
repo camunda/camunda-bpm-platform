@@ -20,6 +20,7 @@ import eePlugins from "../../enterprise";
 import defaultConfig from "./defaultConfig.json";
 
 const inProduction = process.env.NODE_ENV === "production";
+const engine = window.location.href.replace(/.*cockpit\/([^/]*).*/, "$1");
 const baseImportPath = inProduction
   ? document.querySelector("base").href + "../"
   : "../../";
@@ -189,5 +190,6 @@ export const getConfig = () => config;
 export const getLocale = () => config["locale"];
 export const getPlugins = () => config["plugins"];
 export const getCSRFCookieName = () => config["csrfCookieName"];
+export const getEngine = () => engine;
 
 export default config;
