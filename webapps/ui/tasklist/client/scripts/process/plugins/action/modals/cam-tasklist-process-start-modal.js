@@ -79,7 +79,8 @@ module.exports = [
     processStartData.set('currentProcessDefinitionId', {id: null});
 
     var DEFAULT_OPTIONS = ($scope.options = {
-      hideCompleteButton: false,
+      hideCompleteButton: true,
+      hideStartButton: false,
       hideLoadVariablesButton: true,
       autoFocus: true,
       disableForm: false,

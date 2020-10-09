@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<div class="modal-body start-process-modal">
+<div class="modal-body">
 
   <div notifications-panel></div>
 
@@ -132,7 +132,7 @@
               type="submit"
               ng-disabled="$invalid || requestInProgress"
               ng-click="startProcessInstance()"
-              ng-hide="options.hideCompleteButton">
+              ng-hide="options.hideStartButton">
         {{ 'START' | translate }}
       </button>
     </div>
