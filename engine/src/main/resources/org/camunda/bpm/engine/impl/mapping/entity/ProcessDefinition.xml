@@ -316,9 +316,12 @@
       	and (EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName})
       </if>
       <if test="authorizationUserId != null">
-        AND (exists (select ID_  from ${prefix} ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
-             OR exists (select IDN.ID_  from ${prefix} ACT_RU_IDENTITYLINK  IDN,  ${prefix} ACT_ID_MEMBERSHIP MBMR where IDN.PROC_DEF_ID_ = RES.ID_ and MBMR.USER_ID_ =  #{authorizationUserId} and IDN.GROUP_ID_ = MBMR.GROUP_ID_)
-             )
+        AND (exists (select ID_ from ${prefix} ACT_RU_IDENTITYLINK IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
+          <if test="candidateGroups != null &amp;&amp; candidateGroups.size > 0">
+              OR exists (select IDN.ID_ from ${prefix} ACT_RU_IDENTITYLINK IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.GROUP_ID_ in 
+              <foreach item="group" index="index" collection="candidateGroups" open="(" separator="," close=")">#{group, jdbcType=VARCHAR}</foreach>)
+          </if>
+       )
       </if>
       <if test="incidentType != null">
         and INC.INCIDENT_TYPE_ = #{incidentType}
