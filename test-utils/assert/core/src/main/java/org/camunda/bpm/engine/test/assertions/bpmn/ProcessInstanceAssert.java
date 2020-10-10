@@ -374,6 +374,24 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
   }
 
   /**
+   * Verifies the expectation that the {@link ProcessInstance} has the
+   * given businessKey.
+   *
+   * @param businessKey the expected key
+   * @return  this {@link ProcessInstanceAssert}
+   */
+  public ProcessInstanceAssert hasBusinessKey(String businessKey) {
+    isNotNull();
+    final String message = "Expecting %s to have business key '%s', " +
+      "but instead found it to have business key '%s'.";
+    String currentBusinessKey = getCurrent().getBusinessKey();
+    Assertions.assertThat(businessKey)
+      .overridingErrorMessage(message, toString(actual), businessKey, currentBusinessKey)
+      .isEqualTo(currentBusinessKey);
+    return this;
+  }
+
+  /**
    * Verifies the expectation that the {@link ProcessInstance} is ended.
    *
    * @return  this {@link ProcessInstanceAssert}
