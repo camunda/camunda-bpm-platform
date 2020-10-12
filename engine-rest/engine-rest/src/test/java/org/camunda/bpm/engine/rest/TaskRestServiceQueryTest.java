@@ -400,6 +400,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParams(booleanQueryParameters)
       .queryParam("activityInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("activityInstanceIdIn")))
       .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
+      .queryParam("taskIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskIdIn")))
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
       .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
       .queryParam("tenantIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("tenantIdIn")))
@@ -446,11 +447,13 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String[] tenantIds = { MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID };
     String[] assigneeIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
     String[] assigneeNotIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
+    String[] taskId = { MockProvider.EXAMPLE_USER_ID, "anTaskId" };
     String[] processInstanceIds = { MockProvider.EXAMPLE_PROCESS_INSTANCE_ID , MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID };
 
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
     parameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
+    parameters.put("taskIdIn", taskId);
     parameters.put("processDefinitionKeyIn", processDefinitionKeys);
     parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
     parameters.put("tenantIdIn", tenantIds);
@@ -477,6 +480,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("candidateGroup", "aCandidateGroup");
     parameters.put("candidateUser", "aCandidate");
     parameters.put("includeAssignedTasks", "false");
+    parameters.put("taskId", "aTaskId");
     parameters.put("taskDefinitionKey", "aTaskDefKey");
     parameters.put("taskDefinitionKeyLike", "aTaskDefKeyLike");
     parameters.put("description", "aDesc");
@@ -561,6 +565,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
     verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
+    verify(mockQuery).taskIdIn(stringArrayParameters.get("taskIdIn"));
     verify(mockQuery).taskAssigneeIn(stringArrayParameters.get("assigneeIn"));
     verify(mockQuery).taskAssigneeNotIn(stringArrayParameters.get("assigneeNotIn"));
     verify(mockQuery).processInstanceIdIn(stringArrayParameters.get("processInstanceIdIn"));

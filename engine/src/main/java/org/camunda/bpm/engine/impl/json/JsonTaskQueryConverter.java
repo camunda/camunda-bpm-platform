@@ -41,6 +41,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   public static final String ID = "id";
   public static final String TASK_ID = "taskId";
+  public static final String TASK_ID_IN = "taskIdIn";
   public static final String NAME = "name";
   public static final String NAME_NOT_EQUAL = "nameNotEqual";
   public static final String NAME_LIKE = "nameLike";
@@ -133,6 +134,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     TaskQueryImpl query = (TaskQueryImpl) taskQuery;
 
     JsonUtil.addField(json, TASK_ID, query.getTaskId());
+    JsonUtil.addArrayField(json, TASK_ID_IN, query.getTaskIdIn());
     JsonUtil.addField(json, NAME, query.getName());
     JsonUtil.addField(json, NAME_NOT_EQUAL, query.getNameNotEqual());
     JsonUtil.addField(json, NAME_LIKE, query.getNameLike());
@@ -287,6 +289,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(TASK_ID)) {
       query.taskId(JsonUtil.getString(json,TASK_ID));
+    }
+    if (json.has(TASK_ID_IN)) {
+      query.taskIdIn(getArray(JsonUtil.getArray(json, TASK_ID_IN)));
     }
     if (json.has(NAME)) {
       query.taskName(JsonUtil.getString(json, NAME));
