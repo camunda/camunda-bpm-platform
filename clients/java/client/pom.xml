@@ -25,7 +25,7 @@
     <version.plugin.helper>3.0.0</version.plugin.helper>
     <version.plugin.cargo>1.6.10</version.plugin.cargo>
 
-    <version.junit>4.10</version.junit>
+    <version.junit>4.13.1</version.junit>
     <version.slf4j>1.6.1</version.slf4j>
     <version.assertj>3.9.0</version.assertj>
     <version.jsonassert>1.5.0</version.jsonassert>
