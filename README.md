@@ -7,10 +7,6 @@ camunda BPM platform is a flexible framework for workflow and process automation
 * Web Site: https://www.camunda.org/
 * Getting Started: https://docs.camunda.org/get-started/
 * User Forum: https://forum.camunda.org/
-* Issue Tracker: https://app.camunda.com/jira
-* Contribution Guidelines: https://camunda.org/contribute/
-* License: The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
-
 
 ## Components
 
@@ -51,8 +47,8 @@ Most of the components that make up the platform can even be completely embedded
 
 ## Contributing
 
-Please see our [contribution guidelines](CONTRIBUTING.md).
-
+- Please see our [contribution guidelines](CONTRIBUTING.md).
+- Issue Tracker: [Issues](https://app.camunda.com/jira).
 
 ## Tests
 
