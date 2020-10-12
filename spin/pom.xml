@@ -29,7 +29,7 @@
     <spin.version.old>1.10.0</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-    <powermock.version>1.5.6</powermock.version>
+    <powermock.version>1.7.4</powermock.version>
     <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
@@ -47,7 +47,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.11</version>
+        <version>4.13.1</version>
       </dependency>
 
       <dependency>
