@@ -247,12 +247,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   }
 
   protected void addTenantIdFields(JsonObject jsonObject, TaskQueryImpl query) {
-    if (query.isTenantIdSet()) {
-      if (query.getTenantIds() != null) {
-        JsonUtil.addArrayField(jsonObject, TENANT_IDS, query.getTenantIds());
-      } else {
-        JsonUtil.addField(jsonObject, WITHOUT_TENANT_ID, true);
-      }
+    if (query.getTenantIds() != null) {
+      JsonUtil.addArrayField(jsonObject, TENANT_IDS, query.getTenantIds());
+    }
+    if (query.isWithoutTenantId()) {
+      JsonUtil.addField(jsonObject, WITHOUT_TENANT_ID, true);
     }
   }
 

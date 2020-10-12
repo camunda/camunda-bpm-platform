@@ -552,17 +552,15 @@
                 #{item}
               </foreach>
             </if>
-            <if test="query.isTenantIdSet">
-              <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
-                ${queryType} RES.TENANT_ID_ in
-                <foreach item="tenantId" index="index" collection="query.tenantIds"
-                         open="(" separator="," close=")">
-                  #{tenantId}
-                </foreach>
-              </if>
-              <if test="query.tenantIds == null">
-                ${queryType} RES.TENANT_ID_ is null
-              </if>
+            <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
+              ${queryType} RES.TENANT_ID_ in
+              <foreach item="tenantId" index="index" collection="query.tenantIds"
+                       open="(" separator="," close=")">
+                #{tenantId}
+              </foreach>
+            </if>
+            <if test="query.isWithoutTenantId">
+              ${queryType} RES.TENANT_ID_ is null
             </if>
             <if test="query.candidateUser != null || query.candidateGroups != null || query.withCandidateGroups || query.withCandidateUsers">
               ${queryType}
