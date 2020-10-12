@@ -190,6 +190,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskIdIn(String... taskIds) {
+    ensureNotNull("taskIds", (Object[]) taskIds);
     this.taskIdIn = taskIds;
     return this;
   }
