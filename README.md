@@ -4,9 +4,11 @@
 
 camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
 
-* Web Site: https://www.camunda.org/
-* Getting Started: https://docs.camunda.org/get-started/
-* User Forum: https://forum.camunda.org/
+- Web Site: https://www.camunda.org/
+- Getting Started: https://docs.camunda.org/get-started/
+- User Forum: https://forum.camunda.org/
+- Issue Tracker: https://app.camunda.com/jira
+- Contribution Guidelines: https://camunda.org/contribute/
 
 ## Components
 
@@ -47,8 +49,8 @@ Most of the components that make up the platform can even be completely embedded
 
 ## Contributing
 
-- Please see our [contribution guidelines](CONTRIBUTING.md).
-- Issue Tracker: [Issues](https://app.camunda.com/jira).
+Please see our [contribution guidelines](CONTRIBUTING.md).
+
 
 ## Tests
 
@@ -56,4 +58,4 @@ To run the tests in this repository, please see our [testing tips and tricks](TE
 
 
 ## License
-This project is licensed under [Apache Licence 2.0](https://github.com/atharwa-24/camunda-bpm-platform/blob/master/LICENSE)
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
