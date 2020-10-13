@@ -273,7 +273,12 @@ module.exports = [
     $scope.completionCallback = function(err, result) {
       if (err) {
         $scope.requestInProgress = false;
-        return errorNotification('PROCESS_START_ERROR', err);
+
+        if (err.message !== 'camForm submission prevented') {
+          errorNotification('PROCESS_START_ERROR', err);
+        }
+
+        return;
       }
 
       executeAfterDestroy.push(function() {
