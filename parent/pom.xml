@@ -31,7 +31,7 @@
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
-    <version.junit>4.12</version.junit>
+    <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>1.9.5</version.mockito>
     <version.wiremock>1.58</version.wiremock>
