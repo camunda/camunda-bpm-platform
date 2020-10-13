@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static java.lang.Boolean.TRUE;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -90,6 +91,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   private static final long serialVersionUID = 1L;
   protected String taskId;
+  protected String[] taskIdIn;
   protected String name;
   protected String nameNotEqual;
   protected String nameLike;
@@ -135,7 +137,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processInstanceBusinessKey;
   protected String[] processInstanceBusinessKeys;
   protected String processInstanceBusinessKeyLike;
-  protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
+  protected List<TaskQueryVariableValue> variables = new ArrayList<>();
   protected Date dueDate;
   protected Date dueBefore;
   protected Date dueAfter;
@@ -152,7 +154,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Boolean variableValuesIgnoreCase;
 
   protected String parentTaskId;
-  protected boolean isTenantIdSet = false;
+  protected boolean isWithoutTenantId = false;
 
   protected String[] tenantIds;
   // case management /////////////////////////////
@@ -169,7 +171,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Map<String, List<String>> cachedUserGroups;
 
   // or query /////////////////////////////
-  protected List<TaskQueryImpl> queries = new ArrayList<TaskQueryImpl>(Arrays.asList(this));
+  protected List<TaskQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
   protected boolean isOrQueryActive = false;
 
   public TaskQueryImpl() {
@@ -183,6 +185,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQueryImpl taskId(String taskId) {
     ensureNotNull("Task id", taskId);
     this.taskId = taskId;
+    return this;
+  }
+
+  @Override
+  public TaskQueryImpl taskIdIn(String... taskIds) {
+    ensureNotNull("taskIds", (Object[]) taskIds);
+    this.taskIdIn = taskIds;
     return this;
   }
 
@@ -557,15 +566,31 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
+
+    // The tenantIdIn filter can't be used in an AND query with
+    // the withoutTenantId filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTenantId)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both tenantIdIn and withoutTenantId filters.");
+      }
+    }
+
     this.tenantIds = tenantIds;
-    this.isTenantIdSet = true;
     return this;
   }
 
   @Override
   public TaskQuery withoutTenantId() {
-    this.tenantIds = null;
-    this.isTenantIdSet = true;
+
+    // The tenantIdIn filter can't be used in an AND query with
+    // the withoutTenantId filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (tenantIds != null && tenantIds.length > 0) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both tenantIdIn and withoutTenantId filters.");
+      }
+    }
+
+    this.isWithoutTenantId = true;
     return this;
   }
 
@@ -997,7 +1022,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       cachedCandidateGroups = new ArrayList<>(candidateGroups);
       if (!isOrQueryActive) {
         // get intersection of candidateGroups and candidateGroup
-        cachedCandidateGroups.retainAll(Arrays.asList(candidateGroup));
+        cachedCandidateGroups.retainAll(Collections.singletonList(candidateGroup));
       } else {
         // get union of candidateGroups and candidateGroup
         if (!candidateGroups.contains(candidateGroup)) {
@@ -1005,7 +1030,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         }
       }
     } else if (candidateGroup != null) {
-      cachedCandidateGroups = Arrays.asList(candidateGroup);
+      cachedCandidateGroups = Collections.singletonList(candidateGroup);
     } else if (candidateGroups != null) {
       cachedCandidateGroups = candidateGroups;
     }
@@ -1145,8 +1170,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       }
     }
 
-    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
-    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, Boolean.TRUE.equals(variableNamesIgnoreCase), shouldMatchVariableValuesIgnoreCase));
+    boolean shouldMatchVariableValuesIgnoreCase = TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, TRUE.equals(variableNamesIgnoreCase), shouldMatchVariableValuesIgnoreCase));
   }
 
   protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
@@ -1536,6 +1561,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskId;
   }
 
+  public String[] getTaskIdIn() {
+	return taskIdIn;
+  }
+
   public String getDescription() {
     return description;
   }
@@ -1692,8 +1721,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskNameCaseInsensitive;
   }
 
-  public boolean isTenantIdSet() {
-    return isTenantIdSet;
+  public boolean isWithoutTenantId() {
+    return isWithoutTenantId;
   }
 
   public String[] getTaskDefinitionKeys() {
@@ -1701,7 +1730,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public boolean getIsTenantIdSet() {
-    return isTenantIdSet;
+    return isWithoutTenantId;
   }
 
   public Boolean isVariableNamesIgnoreCase() {
@@ -1783,21 +1812,21 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
     if (extendingQuery.getAssigneeIn() != null) {
       extendedQuery.taskAssigneeIn(extendingQuery
-                                       .getAssigneeIn()
-                                       .toArray(new String[extendingQuery.getAssigneeIn().size()]));
+          .getAssigneeIn()
+          .toArray(new String[extendingQuery.getAssigneeIn().size()]));
     }
     else if (this.getAssigneeIn() != null) {
       extendedQuery.taskAssigneeIn(this.getAssigneeIn()
-                                       .toArray(new String[this.getAssigneeIn().size()]));
+          .toArray(new String[this.getAssigneeIn().size()]));
     }
     if (extendingQuery.getAssigneeNotIn() != null) {
       extendedQuery.taskAssigneeNotIn(extendingQuery
-              .getAssigneeNotIn()
-              .toArray(new String[extendingQuery.getAssigneeNotIn().size()]));
+          .getAssigneeNotIn()
+          .toArray(new String[extendingQuery.getAssigneeNotIn().size()]));
     }
     else if (this.getAssigneeNotIn() != null) {
       extendedQuery.taskAssigneeNotIn(this.getAssigneeNotIn()
-              .toArray(new String[this.getAssigneeNotIn().size()]));
+          .toArray(new String[this.getAssigneeNotIn().size()]));
     }
 
     if (extendingQuery.getInvolvedUser() != null) {
@@ -1898,6 +1927,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getTaskId() != null) {
       extendedQuery.taskId(this.getTaskId());
+    }
+
+    if (extendingQuery.getTaskIdIn() != null) {
+      extendedQuery.taskIdIn(extendingQuery.getTaskIdIn());
+    } else if (this.getTaskIdIn() != null) {
+      extendedQuery.taskIdIn(this.getTaskIdIn());
     }
 
     if (extendingQuery.getDescription() != null) {
@@ -2164,18 +2199,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskNameCaseInsensitive();
     }
 
-    if (extendingQuery.isTenantIdSet()) {
-      if (extendingQuery.getTenantIds() != null) {
-        extendedQuery.tenantIdIn(extendingQuery.getTenantIds());
-      } else {
-        extendedQuery.withoutTenantId();
-      }
-    } else if (this.isTenantIdSet()) {
-      if (this.getTenantIds() != null) {
-        extendedQuery.tenantIdIn(this.getTenantIds());
-      } else {
-        extendedQuery.withoutTenantId();
-      }
+    if (extendingQuery.getTenantIds() != null) {
+      extendedQuery.tenantIdIn(extendingQuery.getTenantIds());
+    } else if (this.getTenantIds() != null) {
+      extendedQuery.tenantIdIn(this.getTenantIds());
+    }
+
+    if (extendingQuery.isWithoutTenantId() || this.isWithoutTenantId()) {
+      extendedQuery.withoutTenantId();
     }
 
     // merge variables
@@ -2192,7 +2223,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
     mergeOrdering(extendedQuery, extendingQuery);
 
-    extendedQuery.queries = new ArrayList<TaskQueryImpl>(Arrays.asList(extendedQuery));
+    extendedQuery.queries = new ArrayList<>(Arrays.asList(extendedQuery));
 
     if (queries.size() > 1) {
       queries.remove(0);
@@ -2214,7 +2245,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected void mergeVariables(TaskQueryImpl extendedQuery, TaskQueryImpl extendingQuery) {
     List<TaskQueryVariableValue> extendingVariables = extendingQuery.getVariables();
 
-    Set<TaskQueryVariableValueComparable> extendingVariablesComparable = new HashSet<TaskQueryVariableValueComparable>();
+    Set<TaskQueryVariableValueComparable> extendingVariablesComparable = new HashSet<>();
 
     // set extending variables and save names for comparison of original variables
     for (TaskQueryVariableValue extendingVariable : extendingVariables) {

@@ -37,7 +37,7 @@
     <version.cockroachdb>42.0.0</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.13.0</camunda.version.old>
+    <camunda.version.old>7.14.0</camunda.version.old>
   </properties>
 
   <dependencyManagement>

@@ -60,6 +60,15 @@ public class DefaultDatasourceConfigurationTest {
   }
 
   @Test
+  public void camundaTransactionManagerTest() {
+    defaultDatasourceConfiguration.dataSource = mock(DataSource.class);
+    PlatformTransactionManager camundaTransactionManager = mock(PlatformTransactionManager.class);
+    defaultDatasourceConfiguration.camundaTransactionManager = camundaTransactionManager;
+    defaultDatasourceConfiguration.preInit(configuration);
+    assertSame(camundaTransactionManager, configuration.getTransactionManager());
+  }
+
+  @Test
   public void defaultDataSourceTest() {
     DataSource datasourceMock = mock(DataSource.class);
     defaultDatasourceConfiguration.dataSource = datasourceMock;
