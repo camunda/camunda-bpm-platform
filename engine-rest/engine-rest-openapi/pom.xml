@@ -25,7 +25,7 @@
     <commons-lang3-version>3.9</commons-lang3-version>
     <maven-plugin-version>1.0.0</maven-plugin-version>
     <javax-annotation-version>1.0</javax-annotation-version>
-    <junit-version>4.13</junit-version>
+    <junit-version>4.13.1</junit-version>
   </properties>
 
   <dependencies>
