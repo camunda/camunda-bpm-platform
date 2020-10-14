@@ -272,7 +272,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
       (hasPassed ? "to have passed activities %s at least once"
         + (inOrder? " and in order" : "") + ", "
         : "NOT to have passed activities %s, ") +
-      "but actually we instead we found that it passed %s. (Please make sure you have set the history " +
+      "but actually we found that it passed %s. (Please make sure you have set the history " +
       "service of the engine to at least 'activity' or a higher level before making use of this assertion!)";
     ListAssert<String> assertion = (ListAssert<String>) Assertions.assertThat(finished)
       .overridingErrorMessage(message,
