@@ -71,6 +71,8 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  public static final String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
+  public static final String[] PG_JDBC_METADATA_TABLE_TYPES = { "TABLE", "PARTITIONED TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -562,8 +564,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
   }
 
-  public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
-
   @Override
   public boolean isEngineTablePresent(){
     return isTablePresent("ACT_RU_EXECUTION");
@@ -615,7 +615,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       }
 
       try {
-        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
+        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, getTableTypes());
         return tables.next();
       } finally {
         if (tables != null) {
@@ -652,7 +652,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           }
 
           DatabaseMetaData databaseMetaData = connection.getMetaData();
-          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, getTableTypes());
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
             if (!databaseTablePrefix.isEmpty()) {
@@ -859,6 +859,16 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       }
     }
     return false;
+  }
+
+  protected String[] getTableTypes() {
+    // the PostgreSQL JDBC API changed in 42.2.11 and partitioned tables
+    // are not detected unless the corresponding table type flag is added.
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
+      return PG_JDBC_METADATA_TABLE_TYPES;
+    }
+
+    return JDBC_METADATA_TABLE_TYPES;
   }
 
   // getters and setters //////////////////////////////////////////////////////
