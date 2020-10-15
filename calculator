@@ -1,0 +1,42 @@
+from tkinter import *
+def result(event):
+    global value
+    text=event.widget.cget("text")
+    if text=="=":
+        if value.get().isdigit():
+            result=int(value.get())
+        else:
+            try:
+                result=eval(str(value.get()))
+            except Exception as e:
+                result='Error'    
+        value.set(result)
+    elif text=="C":
+        value.set('')
+    elif text=="DEL":
+        try:
+            totalvalue=value.get()
+            value.set(totalvalue[:-1])
+        except Exception as e:
+            value.set('')
+    else:
+        value.set(value.get() + text)
+root=Tk()
+root.geometry("400x520")
+root.maxsize(400,520)
+root.minsize(400,520)
+root.title("Calculator")
+root.iconbitmap(r"D:\Calculator.ico")
+value=StringVar()
+value.set('')
+entrybox=Entry(root,textvariable=value,font="Vardan 40 bold",borderwidth=4,width=13).pack(pady=10,padx=5)
+frame=Frame(root)
+nlist=['C','%','DEL','/','7','8','9','*','4','5','6','-','1','2','3','+','0','00','.','=']
+p=0
+for i in nlist:
+    button=Button(frame,text=i,padx=32,font="Vardan 30",width=1).grid(row=p//4,column=p%4)
+    p+=1
+    root.bind("<Button-1>", result)
+    Label(frame,text="Created By: Rksaini" ,fg='red',font='Vardan 10 bold',pady=6).grid(row=5,columnspan=4)
+frame.pack()
+root.mainloop()
