@@ -1551,6 +1551,23 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       verify(mockedQuery).startedBefore(DateTimeUtil.parseDate(startedBefore));
     }
 
+  @Test
+  public void testQueryByStartedBeforeWithInvalidParameter() {
+    String startedBefore = "\"pizza\"";
+
+    given()
+      .queryParam("startedBefore", startedBefore)
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON).body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body(
+        "message",
+        containsString("Cannot convert value " + startedBefore))
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+  }
+
     @Test
     public void testQueryByStartedBeforeAsPost() {
       String startedBefore = MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME;
