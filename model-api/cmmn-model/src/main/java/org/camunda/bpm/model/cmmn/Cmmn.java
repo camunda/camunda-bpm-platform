@@ -239,7 +239,7 @@ public class Cmmn {
     } catch (FileNotFoundException e) {
       throw new CmmnModelException("Cannot read model from file "+file+": file does not exist.");
     } catch (IOException e) {
-      throw new CmmnModelException(String.format("Cannot read model from file %s exception %s", file, e.getMessage()));
+      throw new CmmnModelException("Cannot read model from file " + file, e);
     }
   }
 
@@ -253,7 +253,7 @@ public class Cmmn {
     } catch (FileNotFoundException e) {
       throw new CmmnModelException("Cannot write model to file "+file+": file does not exist.");
     } catch (IOException e) {
-      throw new CmmnModelException(String.format("Cannot write model to file %s exception %s", file, e.getMessage()));
+      throw new CmmnModelException("Cannot write model to file " + file, e);
     }
   }
 
