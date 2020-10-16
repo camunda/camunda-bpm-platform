@@ -211,6 +211,10 @@
                   <include name="**/module.xml" />
                 </replace>
 
+                <replace dir="target/modules" token="@version.feel-scala@" value="${version.feel-scala}">
+                  <include name="**/module.xml" />
+                </replace>
+
               </target>
             </configuration>
           </execution>

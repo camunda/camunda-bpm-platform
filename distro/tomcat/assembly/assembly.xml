@@ -54,6 +54,8 @@
         <include>org.camunda.bpm.model:*:jar</include>
         <include>org.camunda.bpm.dmn:*:jar</include>
 
+        <include>org.camunda.feel:*:jar</include>
+
         <include>org.freemarker:*:jar</include>
         <include>org.camunda.template-engines:*:jar</include>
       </includes>
@@ -83,6 +85,8 @@
         <include>org.camunda.bpm.model:*:jar</include>
 
         <include>org.camunda.bpm.dmn:*:jar</include>
+
+        <include>org.camunda.feel:*:jar</include>
 
         <include>org.freemarker:*:jar</include>
         <include>org.camunda.template-engines:*:jar</include>

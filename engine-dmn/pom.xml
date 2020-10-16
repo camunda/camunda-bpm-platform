@@ -50,6 +50,7 @@
       <dependency>
         <groupId>org.camunda.feel</groupId>
         <artifactId>feel-engine</artifactId>
+        <classifier>scala-shaded</classifier>
         <version>${version.feel-scala}</version>
       </dependency>
     </dependencies>
