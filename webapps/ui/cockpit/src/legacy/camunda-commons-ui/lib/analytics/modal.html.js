@@ -51,13 +51,19 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/src/legacy/camunda-c
             <li>
                 <b>{{'TELEMETRY_DETAILS_META_DATA' | translate}}</b>
                 <p>{{'TELEMETRY_DETAILS_META_DATA_WHAT' | translate}}</p>
+                <i>{{'TELEMETRY_DETAILS_META_DATA_WHY' | translate}}</i>
             </li>
             <li>
                 <b>{{'TELEMETRY_DETAILS_USAGE_STATISTICS' | translate}}</b>
                 <p>{{'TELEMETRY_DETAILS_USAGE_STATISTICS_WHAT' | translate}}</p>
+                <i>{{'TELEMETRY_DETAILS_USAGE_STATISTICS_WHY' | translate}}</i>
             </li>
         </ul>
-        <i>{{'TELEMETRY_DETAILS_META_DATA_WHY' | translate}}</i>
+
+        {{'TELEMETRY_DETAILS_DOCUMENTATION_1' | translate}} <a
+            href="https://docs.camunda.org/manual/latest/introduction/telemetry/"
+            target="_blank">{{'TELEMETRY_DETAILS_DOCUMENTATION_2' | translate}}</a>.
+
         <button class="btn btn-default next" ng-click="next()">
             {{'TELEMETRY_NEXT' | translate}}
         </button>
@@ -74,13 +80,16 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/src/legacy/camunda-c
                 </div>
                 <div class="col-xs-10 col-sm-10 form-control-static ">
                     <label for="usage-statistics">{{'TELEMETRY_PREFERENCES_META' | translate}}</label>
-                    <p class="details">{{'TELEMETRY_PREFERENCES_META_DETAILS' | translate}}</p>
+                    <p class="details">
+                        {{'TELEMETRY_PREFERENCES_META_DETAILS_1' | translate}}
+                    </p>
+                    <p class="details">
+                        {{'TELEMETRY_PREFERENCES_META_DETAILS_2' | translate}}
+                    </p>
                 </div>
             </div>
         </form>
-        <p class="disclaimer">
-            {{'TELEMETRY_PREFERENCES_DISCLAIMER' | translate}}
-        </p>
+
         <button class="btn btn-default next" ng-click="save()" ng-disabled="loadingState === 'LOADING'">
             {{'TELEMETRY_SAVE' | translate}}
         </button>
