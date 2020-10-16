@@ -49,7 +49,7 @@ Out of the box, Camunda BPM provides infrastructure-level integration with Java 
 
 ### Embeddable
 
-Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST API as library to your application and assemble your custom BPM platform configuration.
+Most of the components that make up the platform can even be completely embedded inside an application. For instance, you can add the process engine and the REST API as a library to your application and assemble your custom BPM platform configuration.
 
 ## Contributing
 
