@@ -371,9 +371,9 @@ public class BpmnParseTest {
   }
 
   @Test
-  public void testParseWithoutStartEvent() {
+  public void testInvalidProcessWithoutStartEvent() {
     try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseWithoutStartEvent");
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessWithoutStartEvent");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Process definition could be parsed, although the process did not contain a start event.");
     } catch (ParseException e) {
