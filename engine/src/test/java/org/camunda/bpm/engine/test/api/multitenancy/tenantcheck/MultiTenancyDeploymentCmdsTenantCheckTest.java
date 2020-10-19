@@ -53,7 +53,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
   protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
 
-  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
+  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().startEvent().done();
   protected static final BpmnModelInstance startEndProcess = Bpmn.createExecutableProcess().startEvent().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();

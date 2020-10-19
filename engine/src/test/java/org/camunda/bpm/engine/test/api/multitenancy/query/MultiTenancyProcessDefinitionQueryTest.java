@@ -38,7 +38,7 @@ import org.junit.Test;
 public class MultiTenancyProcessDefinitionQueryTest extends PluggableProcessEngineTest {
 
   protected static final String PROCESS_DEFINITION_KEY = "process";
-  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).done();
+  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done();
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";

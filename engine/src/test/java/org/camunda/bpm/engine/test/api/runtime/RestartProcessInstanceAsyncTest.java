@@ -825,7 +825,7 @@ public class RestartProcessInstanceAsyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
-    BpmnModelInstance instance2 = Bpmn.createExecutableProcess().done();
+    BpmnModelInstance instance2 = Bpmn.createExecutableProcess().startEvent().done();
     ProcessDefinition processDefinition2 = testRule.deployAndGetDefinition(instance2);
 
     // when

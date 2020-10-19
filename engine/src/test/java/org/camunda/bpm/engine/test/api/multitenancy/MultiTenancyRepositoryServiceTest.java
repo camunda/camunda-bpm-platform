@@ -55,7 +55,7 @@ public class MultiTenancyRepositoryServiceTest {
   protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
 
-  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
+  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().startEvent().done();
   protected static final String CMMN = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";
   protected static final String DMN = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
