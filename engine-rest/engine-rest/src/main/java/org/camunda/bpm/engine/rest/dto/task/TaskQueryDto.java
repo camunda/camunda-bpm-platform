@@ -882,6 +882,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return parentTaskId;
   }
 
+  public Boolean getAssigned() {
+    return assigned;
+  }
+
   public Boolean getUnassigned() {
     return unassigned;
   }
