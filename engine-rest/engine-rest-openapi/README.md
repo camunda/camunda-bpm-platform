@@ -38,6 +38,7 @@ NOTE: Please follow the next step to get familiar with the structure and the ins
 
 For the generation of the documentation, we use the [Freemarker](https://freemarker.apache.org/docs/index.html) templating language.
 The structure of the template is:
+
 ```
  +--main.ftl
  +--lib
@@ -190,6 +191,7 @@ Recommendations:
 * keep line length to a maximum of 120 characters
 * use indentation, avoid adding long descriptions on a single line,
 improve the readibility by splitting the next with single or multiple line breaks:
+
 ```
   "description": "Submits a list of modification instructions to change a process instance's execution state.
                   A modification instruction is one of the following:
@@ -223,7 +225,7 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 #### Nullable
 
-Disable `nullable` field to the properties of type `boolean` or with `format` field to specify that they cannot be `null`
+Disable `nullable` field to the properties of type `boolean` or `string`, or with `format` field, to specify that they cannot be `null`
 since the default value for those properties is `nullable=true` which ensures working C# clients:
 ```
     <@lib.property

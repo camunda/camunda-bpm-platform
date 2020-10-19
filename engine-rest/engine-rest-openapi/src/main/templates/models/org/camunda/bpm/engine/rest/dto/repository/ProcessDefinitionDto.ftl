@@ -3,11 +3,13 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the process definition" />
 
     <@lib.property
         name = "key"
         type = "string"
+        nullable = false
         desc = "The key of the process definition, i.e., the id of the BPMN 2.0 XML process definition." />
 
     <@lib.property
@@ -35,11 +37,13 @@
     <@lib.property
         name = "resource"
         type = "string"
+        nullable = false
         desc = "The file name of the process definition." />
 
     <@lib.property
         name = "deploymentId"
         type = "string"
+        nullable = false
         desc = "The deployment id of the process definition." />
 
     <@lib.property

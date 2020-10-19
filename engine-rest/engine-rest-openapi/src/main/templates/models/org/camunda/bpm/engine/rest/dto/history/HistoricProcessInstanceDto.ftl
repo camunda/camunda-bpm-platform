@@ -4,6 +4,7 @@
   <@lib.property
       name = "id"
       type = "string"
+      nullable = false
       desc = "The id of the process instance."/>
 
   <@lib.property
@@ -29,6 +30,7 @@
   <@lib.property
       name = "processDefinitionName"
       type = "string"
+      nullable = false
       desc = "The name of the process definition that this process instance belongs to."/>
 
   <@lib.property
@@ -46,6 +48,7 @@
   <@lib.property
       name = "processDefinitionId"
       type = "string"
+      nullable = false
       desc = "The id of the process definition that this process instance belongs to."/>
 
   <@lib.property
@@ -75,7 +78,6 @@
       name = "durationInMillis"
       type = "integer"
       format = "int32"
-      nullable = true
       desc = "The time the instance took to finish (in milliseconds)."/>
 
   <@lib.property

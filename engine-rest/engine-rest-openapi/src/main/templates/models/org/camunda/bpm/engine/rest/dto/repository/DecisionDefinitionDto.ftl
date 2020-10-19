@@ -3,11 +3,13 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the decision definition" />
 
     <@lib.property
         name = "key"
         type = "string"
+        nullable = false
         desc = "The key of the decision definition, i.e., the id of the DMN 1.0 XML decision definition." />
 
     <@lib.property
@@ -30,11 +32,13 @@
     <@lib.property
         name = "resource"
         type = "string"
+        nullable = false
         desc = "The file name of the decision definition." />
 
     <@lib.property
         name = "deploymentId"
         type = "string"
+        nullable = false
         desc = "The deployment id of the decision definition." />
 
     <@lib.property

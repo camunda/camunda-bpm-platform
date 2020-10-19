@@ -3,6 +3,7 @@
   <@lib.property
       name = "errorCode"
       type = "string"
+      nullable = false
       desc = "An error code that indicates the predefined error. It is used to identify the BPMN
               error handler." />
 

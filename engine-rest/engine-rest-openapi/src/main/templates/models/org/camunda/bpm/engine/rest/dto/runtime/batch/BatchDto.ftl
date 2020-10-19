@@ -3,11 +3,13 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the batch." />
 
     <@lib.property
         name = "type"
         type = "string"
+        nullable = false
         desc = "The type of the batch." />
 
     <@lib.property
@@ -43,16 +45,19 @@
     <@lib.property
         name = "seedJobDefinitionId"
         type = "string"
+        nullable = false
         desc = "The job definition id for the seed jobs of this batch." />
 
     <@lib.property
         name = "monitorJobDefinitionId"
         type = "string"
+        nullable = false
         desc = "The job definition id for the monitor jobs of this batch." />
 
     <@lib.property
         name = "batchJobDefinitionId"
         type = "string"
+        nullable = false
         desc = "The job definition id for the batch execution jobs of this batch." />
 
     <@lib.property

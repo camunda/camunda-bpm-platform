@@ -15,7 +15,7 @@
     <@lib.property
         name = "processDefinitionKey"
         type = "string"
-        desc = "	The key of the process definitions to activate or suspend." />
+        desc = "The key of the process definitions to activate or suspend." />
 
     <@lib.property
         name = "includeProcessInstances"

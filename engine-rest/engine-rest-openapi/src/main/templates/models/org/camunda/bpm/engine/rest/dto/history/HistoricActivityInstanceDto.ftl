@@ -3,6 +3,7 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the activity instance."/>
 
     <@lib.property
@@ -13,6 +14,7 @@
     <@lib.property
         name = "activityId"
         type = "string"
+        nullable = false
         desc = "The id of the activity that this object is an instance of."/>
 
     <@lib.property
@@ -83,7 +85,6 @@
         name = "durationInMillis"
         type = "integer"
         format = "int32"
-        nullable = false
         desc = "The time the instance took to finish (in milliseconds)."/>
 
     <@lib.property
