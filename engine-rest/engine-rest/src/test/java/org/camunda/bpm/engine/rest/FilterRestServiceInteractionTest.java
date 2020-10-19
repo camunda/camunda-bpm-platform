@@ -297,6 +297,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     when(query.getParentTaskId()).thenReturn(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID);
     when(query.getTenantIds()).thenReturn(MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
     when(query.isWithoutTenantId()).thenReturn(true);
+    when(query.isAssignedInternal()).thenReturn(true);
+    when(query.isUnassignedInternal()).thenReturn(false);
 
     filterMock = MockProvider.createMockFilter(EXAMPLE_FILTER_ID, query);
     when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filterMock);
@@ -340,6 +342,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("query.owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
       .body("query.parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
       .body("query.tenantIdIn", hasItems(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID))
+      .body("query.assigned", equalTo(true))
+      .body("query.unassigned", equalTo(false))
     .when()
       .get(SINGLE_FILTER_URL);
 
