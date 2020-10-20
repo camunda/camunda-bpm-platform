@@ -1,6 +1,6 @@
 # Prerequisites
 
-- Node 14.6.0 or newer
+- Node LTS (currently 12.x)
 - A c++ compiler
 
 ## For Windows
