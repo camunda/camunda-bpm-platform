@@ -14,7 +14,7 @@
         desc = "The id of the process instance to retrieve the variables from."/>
 
     <@lib.parameter
-        name = "deserializeValue"
+        name = "deserializeValues"
         location = "query"
         type = "boolean"
         defaultValue = "true"

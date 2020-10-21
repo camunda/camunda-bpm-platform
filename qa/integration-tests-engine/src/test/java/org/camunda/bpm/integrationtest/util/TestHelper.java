@@ -35,10 +35,10 @@ import static org.junit.Assert.*;
 
 
 public abstract class TestHelper {
-  
-  public final static String PROCESS_XML = 
-          "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"  targetNamespace=\"Examples\"><process id=\"PROCESS_KEY\" isExecutable=\"true\" /></definitions>";
-    
+
+  public final static String PROCESS_XML =
+          "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"  targetNamespace=\"Examples\"><process id=\"PROCESS_KEY\" isExecutable=\"true\"><startEvent id=\"start\"/></process></definitions>";
+
   public static Asset getStringAsAssetWithReplacements(String string, String[][] replacements) {
 
     for (String[] replacement : replacements) {
@@ -48,15 +48,15 @@ public abstract class TestHelper {
     return new ByteArrayAsset(string.getBytes());
 
   }
-  
+
   public static Asset[] generateProcessAssets(int amount) {
-    
+
     Asset[] result = new Asset[amount];
-    
+
     for (int i = 0; i < result.length; i++) {
       result[i] = getStringAsAssetWithReplacements(PROCESS_XML, new String[][]{new String[]{"PROCESS_KEY","process-"+i}});
     }
-    
+
     return result;
 
   }
@@ -127,5 +127,5 @@ public abstract class TestHelper {
           if (stream2 != null) stream2.close();
       }
   }
-  
+
 }

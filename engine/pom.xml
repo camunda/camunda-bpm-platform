@@ -67,10 +67,6 @@
         <!-- these exclusions are needed when building with Maven >= 3.3
           see CAM-11822 for details -->
         <exclusion>
-          <groupId>org.camunda.feel</groupId>
-          <artifactId>feel-engine</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.scala-lang.modules</groupId>
           <artifactId>scala-parser-combinators_2.13</artifactId>
         </exclusion>
@@ -418,6 +414,7 @@
               <exclude>org.camunda.bpm.dmn:*</exclude>
               <exclude>org.camunda.commons:*</exclude>
               <exclude>org.camunda.connect:*</exclude>
+              <exclude>org.camunda.feel:*</exclude>
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>

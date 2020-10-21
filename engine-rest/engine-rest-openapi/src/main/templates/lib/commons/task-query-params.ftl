@@ -1,3 +1,13 @@
+  <@lib.parameter name = "taskId"
+      location = "query"
+      type = "string"
+      desc = "Restrict to task with the given id." />
+
+  <@lib.parameter name = "taskIdIn"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks with any of the given ids." />
+
   <@lib.parameter name = "processInstanceId"
       location = "query"
       type = "string"

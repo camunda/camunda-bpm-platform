@@ -876,8 +876,8 @@ public class BpmnParse extends Parse {
         parseExecutionListenersOnScope(startEventElement, startEventActivity);
       }
     } else {
-      if (parentElement.getTagName().equals("subProcess") ) {
-        addError("subProcess must define a startEvent element", parentElement);
+      if (Arrays.asList("process", "subProcess").contains(parentElement.getTagName())) {
+        addError(parentElement.getTagName() + " must define a startEvent element", parentElement);
       }
     }
     if (scope instanceof ProcessDefinitionEntity) {

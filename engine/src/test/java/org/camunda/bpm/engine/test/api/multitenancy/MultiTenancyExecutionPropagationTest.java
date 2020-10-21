@@ -57,7 +57,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
   @Test
   public void testPropagateTenantIdToProcessDefinition() {
 
-    testRule.deployForTenant(TENANT_ID,  Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).done());
+    testRule.deployForTenant(TENANT_ID,  Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done());
 
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
