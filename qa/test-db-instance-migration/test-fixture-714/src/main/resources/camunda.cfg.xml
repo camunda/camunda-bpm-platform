@@ -12,7 +12,7 @@
     <property name="jdbcPassword" value="${database.password}" />
 
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="false" />
+    <property name="databaseSchemaUpdate" value="${databaseSchemaUpdate}" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />

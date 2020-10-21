@@ -13,6 +13,8 @@
 
   <properties>
     <camunda.version.previous>7.13.0</camunda.version.previous>
+    <!-- this property is different for CockroachDB since support begins from version 7.14.0 -->
+    <databaseSchemaUpdate>false</databaseSchemaUpdate>
   </properties>
 
    <dependencyManagement>
@@ -240,6 +242,12 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>cockroachdb</id>
+      <properties>
+        <databaseSchemaUpdate>create</databaseSchemaUpdate>
+      </properties>
     </profile>
   </profiles>
 

@@ -206,6 +206,36 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <!-- exclude instance migration tests for older Camunda versions (<7.14)
+                   before Cockroachdb support was added -->
+              <excludes combine.children="append">
+                <exclude>**/authorization/**</exclude>
+                <exclude>**/scenarios720/**</exclude>
+                <exclude>**/scenarios730/**</exclude>
+                <exclude>**/scenarios750/**</exclude>
+                <exclude>**/scenarios760/**</exclude>
+                <exclude>**/scenarios770/**</exclude>
+                <exclude>**/scenarios780/**</exclude>
+                <exclude>**/scenarios790/**</exclude>
+                <exclude>**/scenarios7110/**</exclude>
+                <exclude>**/scenarios7120/**</exclude>
+                <exclude>**/scenarios7130/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -81,15 +82,12 @@ public class AuthorizationTest {
 
   }
 
+  // The below test cases are skipped for H2 as there is a bug in H2 version 1.3 (Query does not return the expected output)
+  // This H2 exclusion check will be removed as part of CAM-6044, when the H2 database is upgraded to the version 1.4 (Bug was fixed)
+  // Update: Upgrading to 1.4.190 did not help, still failing
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.H2)
   public void testDefaultAuthorizationForCamundaAdminOnUpgrade() {
-
-    // The below test cases are skipped for H2 as there is a bug in H2 version 1.3 (Query does not return the expected output)
-    // This H2 exclusion check will be removed as part of CAM-6044, when the H2 database is upgraded to the version 1.4 (Bug was fixed)
-    // Update: Upgrading to 1.4.190 did not help, still failing -> CAM-
-    if (DbSqlSessionFactory.H2.equals(processEngineConfiguration.getDatabaseType())) {
-      return;
-    }
 
     processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true,authorizationService.isUserAuthorized(null, Collections.singletonList(Groups.CAMUNDA_ADMIN), Permissions.ALL, Resources.TENANT));

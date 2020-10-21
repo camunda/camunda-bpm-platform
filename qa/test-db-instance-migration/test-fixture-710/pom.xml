@@ -170,6 +170,9 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
+            <configuration>
+              <skip>${maven.sql.skip}</skip>
+            </configuration>
             <executions>
               <execution>
                 <id>patch-previous-schema</id>
@@ -227,6 +230,7 @@
               <includeProjectDependencies>true</includeProjectDependencies>
               <includePluginDependencies>false</includePluginDependencies>
               <classpathScope>test</classpathScope>
+              <skip>${maven.exec.skip}</skip>
             </configuration>
             <executions>
               <execution>
@@ -243,6 +247,13 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>cockroachdb</id>
+      <properties>
+        <maven.exec.skip>true</maven.exec.skip>
+        <maven.sql.skip>true</maven.sql.skip>
+      </properties>
     </profile>
   </profiles>
 
