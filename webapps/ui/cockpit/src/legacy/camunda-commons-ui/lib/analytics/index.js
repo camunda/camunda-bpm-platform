@@ -20,6 +20,12 @@ var angular = require("angular");
 var modalTemplate = require("./modal.html");
 var camundaLogo = require("../auth/page/logo.svg");
 
+// REACT_APP_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
+var camundaVersion = (process.env.REACT_APP_VERSION || "").match(
+  /([0-9]+.[0-9]+)/
+);
+camundaVersion = camundaVersion ? camundaVersion[0] : "latest"; // if 'latest' is chosen, something went wrong
+
 var previousUrl = "";
 
 // As long as we don't have a global Modal service, this is how we find out if we just logged in.
@@ -34,6 +40,7 @@ var modalController = [
   "telemetryResource",
   "$translate",
   function(scope, $sce, Notifications, telemetryResource, $translate) {
+    scope.camundaVersion = camundaVersion;
     scope.loadingState = "INITIAL";
     scope.logo = $sce.trustAsHtml(camundaLogo);
     scope.enableUsage = false;

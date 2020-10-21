@@ -17,7 +17,10 @@
 
 var fs = require('fs');
 var through = require('through2');
+var envify = require('envify/custom');
 
+// Path is relative to the working dir the grunt task was started from
+var packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 module.exports = function(grunt, dirname, licensebookConfig) {
   'use strict';
@@ -46,6 +49,10 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     var b = require(dirname + '/node_modules/persistify')( this.data.options.browserifyOptions, this.data.options, { "ignore-watch": false } );
 
     b.transform('brfs', { global: true });
+    b.transform(envify({
+      CAMUNDA_VERSION: packageJson.version
+    }))
+
 
     for(var key in externalModules) {
       b.external(key);

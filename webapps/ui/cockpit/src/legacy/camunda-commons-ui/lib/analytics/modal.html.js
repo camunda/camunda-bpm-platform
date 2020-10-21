@@ -61,7 +61,7 @@ module.exports = `<!-- # CE - camunda-bpm-webapp/ui/cockpit/src/legacy/camunda-c
         </ul>
 
         {{'TELEMETRY_DETAILS_DOCUMENTATION_1' | translate}} <a
-            href="https://docs.camunda.org/manual/latest/introduction/telemetry/"
+            href={{"https://docs.camunda.org/manual/"+camundaVersion+"/introduction/telemetry/"}}
             target="_blank">{{'TELEMETRY_DETAILS_DOCUMENTATION_2' | translate}}</a>.
 
         <button class="btn btn-default next" ng-click="next()">

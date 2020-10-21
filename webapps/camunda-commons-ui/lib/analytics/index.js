@@ -21,6 +21,9 @@ var angular = require('angular');
 var modalTemplate = fs.readFileSync(__dirname + '/modal.html', 'utf8');
 var camundaLogo = fs.readFileSync(__dirname + '/../auth/page/logo.svg', 'utf8');
 
+// CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
+var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(/([0-9]+.[0-9]+)/);
+camundaVersion = camundaVersion ? camundaVersion[0] : 'latest'; // if 'latest' is chosen, something went wrong
 
 var modalController = [
   '$scope',
@@ -29,6 +32,7 @@ var modalController = [
   'telemetryResource',
   '$translate',
   function(scope, $sce, Notifications, telemetryResource, $translate) {
+    scope.camundaVersion = camundaVersion;
     scope.loadingState = "INITIAL";
     scope.logo = $sce.trustAsHtml(camundaLogo);
     scope.enableUsage = false;
