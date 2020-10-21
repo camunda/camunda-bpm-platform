@@ -4,6 +4,7 @@
   </resources>
 
   <dependencies>
+    <module name="sun.jdk" />
     <module name="org.slf4j" />
   </dependencies>
 </module>
