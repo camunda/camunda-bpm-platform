@@ -17,7 +17,12 @@
 
   <dependencyManagement>
     <dependencies>
-
+      <dependency>
+        <groupId>org.camunda.feel</groupId>
+        <artifactId>feel-engine</artifactId>
+        <version>${version.feel-scala}</version>
+        <classifier>scala-shaded</classifier>
+      </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>

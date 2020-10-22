@@ -46,12 +46,6 @@
         <artifactId>juel-spi</artifactId>
         <version>${version.juel}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.camunda.feel</groupId>
-        <artifactId>feel-engine</artifactId>
-        <version>${version.feel-scala}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
