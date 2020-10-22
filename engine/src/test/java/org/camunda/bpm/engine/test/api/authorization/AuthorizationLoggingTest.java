@@ -18,10 +18,14 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -44,6 +48,15 @@ public class AuthorizationLoggingTest {
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
       .watch(CONTEXT_LOGGER)
       .level(Level.DEBUG);
+
+  @After
+  public void tearDown() {
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
+    AuthorizationService authorizationService = engineRule.getAuthorizationService();
+    for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+      authorizationService.deleteAuthorization(authorization.getId());
+    }
+  }
 
   @Test
   public void shouldLogOnDebugLevel() {
