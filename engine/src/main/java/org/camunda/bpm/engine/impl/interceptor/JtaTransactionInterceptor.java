@@ -43,10 +43,6 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
   protected final boolean requiresNew;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public JtaTransactionInterceptor(TransactionManager transactionManager, boolean requiresNew) {
-    this(transactionManager, requiresNew, null);
-  }
-
   public JtaTransactionInterceptor(TransactionManager transactionManager,
                                    boolean requiresNew,
                                    ProcessEngineConfigurationImpl processEngineConfiguration) {

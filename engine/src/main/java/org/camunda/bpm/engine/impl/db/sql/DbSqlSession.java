@@ -322,7 +322,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   public static boolean isCrdbConcurrencyConflictOnCommit(Throwable cause, ProcessEngineConfigurationImpl configuration) {
     // only check when CRDB is used
     if (DatabaseUtil.checkDatabaseType(configuration, DbSqlSessionFactory.CRDB)) {
-      // with externally managed transactions, the real cause is sometimes suppressed
+      // with Java EE (JTA) transactions, the real cause is suppressed,
+      // and replaced with a RollbackException. We need to look into the
+      // suppressed exceptions to find the CRDB TransactionRetryError.
       List<Throwable> causes = new ArrayList<>(Arrays.asList(cause.getSuppressed()));
       causes.add(cause);
       for (Throwable throwable : causes) {

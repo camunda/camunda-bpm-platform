@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.spring;
 
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
@@ -31,11 +33,21 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Tom Baeyens
  */
 public class SpringTransactionInterceptor extends CommandInterceptor {
-  
+
   protected PlatformTransactionManager transactionManager;
   protected int transactionPropagation;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  
+
+  /**
+   * This constructor doesn't pass an instance of the {@link ProcessEngineConfigurationImpl} class.
+   * As a result, if it is used with CockroachDB, concurrency conflicts that occur on transaction
+   * commit will not be handled by the process engine.
+   *
+   * @deprecated use the {@link #SpringTransactionInterceptor(PlatformTransactionManager, int, ProcessEngineConfigurationImpl)}
+   *    constructor to ensure that when used with CockroachDB, concurrency conflicts that occur
+   *    on transaction commit are detected and handled.
+   */
+  @Deprecated
   public SpringTransactionInterceptor(PlatformTransactionManager transactionManager, int transactionPropagation) {
     this(transactionManager, transactionPropagation, null);
   }
@@ -59,7 +71,8 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
       // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
       // To ensure that these errors are still detected as OLEs, we must catch them and wrap
       // them in a CrdbTransactionRetryException
-      if (DbSqlSession.isCrdbConcurrencyConflictOnCommit(ex, processEngineConfiguration)) {
+      if (processEngineConfiguration != null
+          && DbSqlSession.isCrdbConcurrencyConflictOnCommit(ex, processEngineConfiguration)) {
         throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
       } else {
         throw ex;
