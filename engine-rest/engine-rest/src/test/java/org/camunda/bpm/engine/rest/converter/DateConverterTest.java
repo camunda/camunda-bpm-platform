@@ -14,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.converter;
+package org.camunda.bpm.engine.rest.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,7 +38,6 @@ public class DateConverterTest {
   @Before
   public void setUp() throws Exception {
     converter = new DateConverter();
-
   }
 
   @Test(expected = InvalidRequestException.class)
@@ -53,9 +56,10 @@ public class DateConverterTest {
   public void shouldConvertDate() throws JsonProcessingException {
     //given
     String value = "2014-01-01T00:00:00+0200";
-    ObjectMapper mock = Mockito.mock(ObjectMapper.class);
+    ObjectMapper mock = mock(ObjectMapper.class);
     converter.setObjectMapper(mock);
-    Mockito.when(mock.readValue(Mockito.anyString(), Mockito.eq(Date.class))).thenReturn(DateTimeUtil.parseDate(value));
+    when(mock.readValue(anyString(), eq(Date.class))).thenReturn(DateTimeUtil.parseDate(value));
+
     //when
     Date date = converter.convertQueryParameterToType(value);
 
