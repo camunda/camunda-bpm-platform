@@ -37,16 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskAlreadyClaimedException;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -2471,7 +2463,7 @@ public class TaskServiceTest {
     // non-existing task
 
     // then
-    thrown.expect(NullValueException.class);
+    thrown.expect(NotFoundException.class);
     thrown.expectMessage("Cannot find task with id non-existing: task is null");
 
     // when
@@ -2518,6 +2510,41 @@ public class TaskServiceTest {
     VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName("errorCodeVar").singleResult();
     assertEquals(ERROR_CODE, errorCodeVariable.getValue());
   }
+
+  @Test
+  public void testHandleBpmnErrorWithEmptyErrorCodeVariable() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("errorCode is empty");
+
+    // when
+    taskService.handleBpmnError(task.getId(), "");
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithNullErrorCodeVariable() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("errorCode is null");
+
+    // when
+    taskService.handleBpmnError(task.getId(), null);
+  }
+
 
   @Test
   public void testHandleBpmnErrorIncludingMessage() {
