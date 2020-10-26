@@ -36,6 +36,9 @@ public class TelemetryRegistry {
   protected boolean isCollectingTelemetryDataEnabled = false;
 
   public synchronized ApplicationServer getApplicationServer() {
+    if (applicationServer == null) {
+      applicationServer = PlatformTelemetryRegistry.getApplicationServer();
+    }
     return applicationServer;
   }
 
