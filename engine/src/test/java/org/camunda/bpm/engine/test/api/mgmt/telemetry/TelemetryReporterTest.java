@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.NoInitMessageInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -481,7 +483,7 @@ public class TelemetryReporterTest {
     managementService.toggleTelemetry(true);
     // set application server after initialization
     String applicationServerVersion = "Tomcat 10";
-    configuration.getTelemetryRegistry().setApplicationServer(applicationServerVersion);
+    PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
 
     Data expectedData = adjustDataWithAppServerInfo(configuration.getTelemetryData(), applicationServerVersion);
 
@@ -492,6 +494,29 @@ public class TelemetryReporterTest {
 
     // when
     configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithApplicationServerInfoWhenSentBeforeInitialization() {
+    // given
+    String applicationServerVersion = "Tomcat 10";
+    PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
+    ProcessEngineConfigurationImpl processEngineConfiguration = createEngineWithoutInitMessage(true);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    Data expectedData = initData(processEngineConfiguration.getTelemetryData());
+    expectedData.getProduct().getInternals().setApplicationServer(new ApplicationServer(applicationServerVersion));
+    String requestBody = new Gson().toJson(expectedData);
+
+    // when
+    processEngineConfiguration.getTelemetryReporter().reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
@@ -1122,6 +1147,17 @@ public class TelemetryReporterTest {
 
   protected ProcessEngineConfigurationImpl createEngineWithInitMessage(Boolean initTelemetry) {
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    buildEngine(processEngineConfiguration, initTelemetry);
+    return processEngineConfiguration;
+  }
+
+  protected ProcessEngineConfigurationImpl createEngineWithoutInitMessage(Boolean initTelemetry) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = new NoInitMessageInMemProcessEngineConfiguration();
+    buildEngine(processEngineConfiguration, initTelemetry);
+    return processEngineConfiguration;
+  }
+
+  protected void buildEngine(ProcessEngineConfigurationImpl processEngineConfiguration, Boolean initTelemetry) {
     processEngineConfiguration
         .setProcessEngineName("standalone")
         .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
@@ -1130,7 +1166,6 @@ public class TelemetryReporterTest {
       processEngineConfiguration.setInitializeTelemetry(initTelemetry);
     }
     standaloneProcessEngine = processEngineConfiguration.buildProcessEngine();
-    return processEngineConfiguration;
   }
 
   protected Data createDataToSend() {
