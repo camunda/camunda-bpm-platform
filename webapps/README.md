@@ -34,11 +34,11 @@ See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#
 
 ## Libraries
 
-### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-webapp/tree/master/camunda-bpm-sdk-js)
+### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/camunda-bpm-sdk-js)
 
 Has tools to work with the REST API and forms (included transitively via camunda-commons-ui).
 
-### [camunda-commons-ui](https://github.com/camunda/camunda-bpm-webapp/tree/master/camunda-commons-ui)
+### [camunda-commons-ui](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/camunda-commons-ui)
 
 Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules.
 
@@ -49,7 +49,7 @@ Contains the translation files for all application texts in different languages.
 
 ## Development
 
-**Please note that with Camunda 7.14.0 we moved Cockpit to a separate build step. Check out the development build and prerequisites in the [Cockpit directory](https://github.com/camunda/camunda-bpm-webapp/tree/master/ui/cockpit).** 
+**Please note that with Camunda 7.14.0 we moved Cockpit to a separate build step. Check out the development build and prerequisites in the [Cockpit directory](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/ui/cockpit).** 
 
 ### Prerequisite
 
@@ -67,8 +67,8 @@ Installing the webapps is done by Grunt:
 
 ```sh
 # cd <path to your workspace>
-git clone git@github.com:camunda/camunda-bpm-webapp.git
-cd camunda-bpm-webapp
+git clone git@github.com:camunda/camunda-bpm-platform.git
+cd camunda-bpm-platform/webapps
 npm install
 grunt
 ```
@@ -112,9 +112,9 @@ describe.only('Cockpit Dashboard Spec', function() {
 
 The supported browsers are:
 
-- Chrome
-- Firefox
-- Edge 79+
+- Chrome Latest
+- Firefox Latest
+- Edge Latest
 
 
 ## Contributing

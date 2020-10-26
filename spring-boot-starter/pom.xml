@@ -55,7 +55,7 @@
     <profile>
       <id>distro-starter</id>
       <!-- This profile is run in the release CI for building the enterprise artifacts
-          It can be removed if the webapp repo is merged to the platform and
+          It can be removed if the distro job is merged with the assembly and
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>starter-webapp-core</module>
