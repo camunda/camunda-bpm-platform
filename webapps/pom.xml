@@ -7,7 +7,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <version>7.15.0-SNAPSHOT</version>
-    <relativePath>../camunda-bpm-platform/database</relativePath>
+    <relativePath>../database</relativePath>
   </parent>
 
   <artifactId>camunda-webapp</artifactId>
@@ -42,7 +42,7 @@
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-    
+
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
     declare only dependencies that are actually needed -->
@@ -331,6 +331,24 @@
         <configuration>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>zip-frontend-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

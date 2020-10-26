@@ -66,7 +66,7 @@
 
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
@@ -81,6 +81,8 @@
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
+
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -105,7 +107,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO);
+        <!-- This profile is run in the CI after the webapps were built (platform-ASSEMBLY);
           It should activate any module that has a dependency to the webapps -->
         <module>spring-boot-starter</module>
 
@@ -121,12 +123,14 @@
       <modules>
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
+
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -199,7 +203,7 @@
     <profile>
       <id>distro-starter</id>
       <!-- This profile is run in the release CI for building the enterprise artifacts
-          It can be removed if the webapp repo is merged to the platform and
+          It can be removed if the distro job is merged with the assembly job and
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>spring-boot-starter</module>
@@ -247,6 +251,8 @@
         <module>engine-dmn</module>
 
         <module>javaee/ejb-client</module>
+
+        <module>webapps</module>
 
         <module>engine-plugins</module>
 

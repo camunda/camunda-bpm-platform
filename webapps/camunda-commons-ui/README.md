@@ -123,4 +123,4 @@ The source files in this repository are made available under the [Apache License
  - [Nico _Nikku_ Rehwaldt](https://github.com/nikku) - [@nrehwaldt](http://twitter.com/nrehwaldt)
  - [Sebastian Stamm](https://github.com/SebastianStamm) - [@seb_stamm](https://twitter.com/seb_stamm)
 
-[webapp]: https://github.com/camunda/camunda-bpm-webapp
+[webapp]: https://github.com/camunda/camunda-bpm-platform/tree/master/webapps
