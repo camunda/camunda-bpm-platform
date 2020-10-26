@@ -35,7 +35,6 @@
     <exec.shell>bash</exec.shell>
     <exec.arg>-c</exec.arg>
 
-    <grunt.target>development</grunt.target>
     <skip.frontend.build>false</skip.frontend.build>
 
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
@@ -337,12 +336,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>distro</id>
-      <properties>
-        <grunt.target>production</grunt.target>
-      </properties>
-    </profile>
     <profile>
       <id>os</id>
       <activation>
