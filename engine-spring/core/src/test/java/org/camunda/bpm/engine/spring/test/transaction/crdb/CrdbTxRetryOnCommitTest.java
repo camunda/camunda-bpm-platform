@@ -18,9 +18,11 @@ package org.camunda.bpm.engine.spring.test.transaction.crdb;
 
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -47,24 +49,33 @@ public class CrdbTxRetryOnCommitTest {
   @Autowired
   public ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  /**
-   * Scenario can't be successfully run without modifying runtime code
-   * since we only use H2 in the Spring integration tests, and this test
-   * requires the hard-coded CRDB check to work.
-   */
+  protected String dbType;
+
+  @Before
+  public void setUp() {
+    dbType = processEngineConfiguration.getDatabaseType();
+    processEngineConfiguration.setDatabaseType(DbSqlSessionFactory.CRDB);
+
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.setDatabaseType(dbType);
+  }
+
   @Test
-  @Ignore
   @Deployment(resources = {"org/camunda/bpm/engine/spring/test/transaction/" +
       "CrdbTransactionIntegrationTest.crdbFailureProcess.bpmn20.xml" })
   public void shouldReportCrdbException() {
     // given a command that fails with a CRDB concurrency error on commit
 
     // then
-    // the StartProcessInstanceCmd is not retryable, and an exception is thrown
+    // the StartProcessInstanceCmd is not retryable,
+    // and a CrdbTransactionRetryException exception is thrown
     thrown.expect(CrdbTransactionRetryException.class);
 
     // when
-    // the command is executed
+    // the appropriate command is executed
     processEngineConfiguration.getRuntimeService()
         .startProcessInstanceByKey("crdbFailureProcess");
   }
