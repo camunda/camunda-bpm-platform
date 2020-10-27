@@ -10,6 +10,20 @@ Camunda BPM platform is a flexible framework for workflow and process automation
 - Issue Tracker: https://app.camunda.com/jira
 - Contribution Guidelines: https://camunda.org/contribute/
 
+Table of Contents
+=================
+  -[Components](#components)
+    -[Process Implementation and Execution](#process-implementation-and-exceution)
+    -[Process Design](#process-design)
+    -[Process Operations](#process-operations)
+    -[And there's more...](#and-there-more)
+  -[A Framework](a-framework)
+    -[Highly Integrable](#highly-integrable)
+    -[Embeddable](#embeddable)
+  -[Contributing](#contributing)
+  -[Tests](#tests)
+  -[License](#license)
+
 ## Components
 
 Camunda BPM platform provides a rich set of components centered around the BPM lifecycle.
