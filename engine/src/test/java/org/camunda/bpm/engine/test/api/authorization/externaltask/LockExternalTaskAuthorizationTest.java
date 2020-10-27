@@ -24,35 +24,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-/**
- *
- * @author Christopher Zell <christopher.zell@camunda.com>
- */
 @RunWith(Parameterized.class)
-public class SetExternalTaskPriorityAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public class LockExternalTaskAuthorizationTest extends HandleExternalTaskAuthorizationTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testSetPriority() {
+  public void shouldLockExternalTaskWithAuthorizations() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    ExternalTask task = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ExternalTask externalTask = engineRule.getExternalTaskService()
+        .createExternalTaskQuery().notLocked().singleResult();
 
     // when
     authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId", processInstance.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
-
-    engineRule.getExternalTaskService().setPriority(task.getId(), 5);
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("processInstanceId", processInstance.getId())
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess")
+        .start();
+    engineRule.getExternalTaskService().lock(externalTask.getId(), "workerId", 2000L);
 
     // then
     if (authRule.assertScenario(scenario)) {
-      task = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
-      Assert.assertEquals(5, task.getPriority());
+      ExternalTask lockedTask = engineRule.getExternalTaskService().createExternalTaskQuery().locked().singleResult();
+      Assert.assertNotNull(lockedTask);
     }
-  }  
+  }
 }

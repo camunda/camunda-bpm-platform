@@ -20,13 +20,9 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSc
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
@@ -34,14 +30,11 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runners.Parameterized;
 
 /**
- * Represents a base class for  some similar handle external task authorization test cases.
- * 
- * @author Christopher Zell <christopher.zell@camunda.com>
+ * Represents a base class for to define authorization test scenarios for a single external task.
  */
 public abstract class HandleExternalTaskAuthorizationTest {
 
@@ -52,33 +45,33 @@ public abstract class HandleExternalTaskAuthorizationTest {
   public RuleChain chain = RuleChain.outerRule(engineRule).around(authRule);
 
   @Parameterized.Parameter
-  public AuthorizationScenario scenario;  
-  
+  public AuthorizationScenario scenario;
+
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario()
+            .withoutAuthorizations()
+            .failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds()
+    );
   }
 
   @Before
@@ -91,46 +84,4 @@ public abstract class HandleExternalTaskAuthorizationTest {
     authRule.deleteUsersAndGroups();
   }
 
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testCompleteExternalTask() {
-
-    // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> tasks = engineRule.getExternalTaskService()
-        .fetchAndLock(5, "workerId")
-        .topic("externalTaskTopic", 5000L)
-        .execute();
-
-    LockedExternalTask task = tasks.get(0);
-
-    // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId", processInstance.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
-
-    testExternalTaskApi(task);
-
-    // then
-    if (authRule.assertScenario(scenario)) {      
-      assertExternalTaskResults();
-    }
-  }
-  
-  /**
-   * Tests or either executes the external task api.
-   * The given locked external task is used to test there api.
-   * 
-   * @param task the external task which should be tested
-   */
-  public abstract void testExternalTaskApi(LockedExternalTask task);
-  
-  /**
-   *  Contains assertions for the external task results, which are executed after the external task 
-   *  was executed.
-   */
-  public abstract void assertExternalTaskResults();
 }

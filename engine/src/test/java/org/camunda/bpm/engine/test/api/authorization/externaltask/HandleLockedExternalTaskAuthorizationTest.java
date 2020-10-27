@@ -16,28 +16,33 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
-import org.camunda.bpm.engine.externaltask.ExternalTask;
+import java.util.List;
+
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
- *
+ * Represents a base class for authorization test cases to handle
+ * an already locked (single) external task.
+ * 
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-@RunWith(Parameterized.class)
-public class SetExternalTaskPriorityAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public abstract class HandleLockedExternalTaskAuthorizationTest extends HandleExternalTaskAuthorizationTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testSetPriority() {
+  public void testCompleteExternalTask() {
 
     // given
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    ExternalTask task = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    List<LockedExternalTask> tasks = engineRule.getExternalTaskService()
+        .fetchAndLock(5, "workerId")
+        .topic("externalTaskTopic", 5000L)
+        .execute();
+
+    LockedExternalTask task = tasks.get(0);
 
     // when
     authRule
@@ -47,12 +52,26 @@ public class SetExternalTaskPriorityAuthorizationTest extends HandleExternalTask
       .bindResource("processDefinitionKey", "oneExternalTaskProcess")
       .start();
 
-    engineRule.getExternalTaskService().setPriority(task.getId(), 5);
+    testExternalTaskApi(task);
 
     // then
-    if (authRule.assertScenario(scenario)) {
-      task = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
-      Assert.assertEquals(5, task.getPriority());
+    if (authRule.assertScenario(scenario)) {      
+      assertExternalTaskResults();
     }
-  }  
+  }
+  
+  /**
+   * Tests or either executes the external task api.
+   * The given locked external task is used to test there api.
+   * 
+   * @param task the external task which should be tested
+   */
+  public abstract void testExternalTaskApi(LockedExternalTask task);
+  
+  /**
+   *  Contains assertions for the external task results, which are executed after the external task 
+   *  was executed.
+   */
+  public abstract void assertExternalTaskResults();
+
 }

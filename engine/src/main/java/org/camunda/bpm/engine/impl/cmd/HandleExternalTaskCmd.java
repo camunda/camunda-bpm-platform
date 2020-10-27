@@ -48,7 +48,7 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
     EnsureUtil.ensureNotNull(NotFoundException.class,
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
 
-    if (!workerId.equals(externalTask.getWorkerId())) {      
+    if (validateWorkerViolation(externalTask)) {
       throw new BadUserRequestException(getErrorMessageOnWrongWorkerAccess() + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
     }
 
@@ -75,5 +75,12 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
   @Override
   protected void validateInput() {
     EnsureUtil.ensureNotNull("workerId", workerId);
+  }
+
+  /**
+   * Validates the caller's workerId against the workerId of the external task.
+   */
+  protected boolean validateWorkerViolation(ExternalTaskEntity externalTask) {
+    return !workerId.equals(externalTask.getWorkerId());
   }
 }

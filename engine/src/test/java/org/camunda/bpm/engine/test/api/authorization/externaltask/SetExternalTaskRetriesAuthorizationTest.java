@@ -16,83 +16,20 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-
-import java.util.Collection;
-
-import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 @RunWith(Parameterized.class)
-public class SetExternalTaskRetriesAuthorizationTest {
-
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
-
-  @Rule
-  public RuleChain chain = RuleChain.outerRule(engineRule).around(authRule);
-
-  @Parameter
-  public AuthorizationScenario scenario;
-
-  @Parameters(name = "Scenario {index}")
-  public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
-  }
-
-  @Before
-  public void setUp() {
-    authRule.createUserAndGroup("userId", "groupId");
-  }
-
-  @After
-  public void tearDown() {
-    authRule.deleteUsersAndGroups();
-  }
+public class SetExternalTaskRetriesAuthorizationTest extends HandleExternalTaskAuthorizationTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
