@@ -36,6 +36,7 @@ import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 import org.camunda.bpm.tasklist.Tasklist;
 import org.camunda.bpm.tasklist.TasklistRuntimeDelegate;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
@@ -179,12 +180,12 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
         } else {
           // serve the index page as a setup page
           // setup will be handled by app
-          serveIndexPage(appName, engineName, applicationPath, contextPath, response);
+          serveIndexPage(appName, engineName, applicationPath, contextPath, response, request.getServletContext());
         }
       } else {
         if (!setupPage) {
           // correctly serving index page
-          serveIndexPage(appName, engineName, applicationPath, contextPath, response);
+          serveIndexPage(appName, engineName, applicationPath, contextPath, response, request.getServletContext());
         } else {
           response.sendRedirect(String.format("%s%s/app/%s/%s/", contextPath, applicationPath,
             appName, engineName));
@@ -264,7 +265,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
                                 String engineName,
                                 String applicationPath,
                                 String contextPath,
-                                HttpServletResponse response) throws IOException {
+                                HttpServletResponse response,
+                                ServletContext servletContext) throws IOException {
+    setWebappInTelemetry(engineName, appName, servletContext);
     String data = getWebResourceContents("/app/" + appName + "/index.html");
 
     data = replacePlaceholder(data, appName, engineName, applicationPath, contextPath);
@@ -273,6 +276,13 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     response.setContentType("text/html");
 
     response.getWriter().append(data);
+  }
+
+  protected void setWebappInTelemetry(String engineName, String appName, ServletContext servletContext) {
+    if (!ServletContextUtil.isTelemetryDataSentAlready(appName, engineName, servletContext) &&
+        WebApplicationUtil.setWebapp(engineName, appName)) {
+      ServletContextUtil.setTelemetryDataSent(appName, engineName, servletContext);
+    }
   }
 
   protected String replacePlaceholder(String data,
