@@ -27,7 +27,7 @@ import org.junit.runners.Parameterized;
  * @author Christopher Zell
  */
 @RunWith(Parameterized.class)
-public class HandleExternalTaskFailureAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public class HandleExternalTaskFailureAuthorizationTest extends HandleLockedExternalTaskAuthorizationTest {
 
   @Override
   public void testExternalTaskApi(LockedExternalTask task) {

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 
@@ -57,7 +58,7 @@ public interface ExternalTaskService {
    * whether priority should be regarded or not.
    * The builder allows to specify multiple topics to fetch tasks for and
    * individual lock durations. For every topic, variables can be fetched
-   * in addition.Is the priority enabled the tasks with the highest priority are fetched.</p>
+   * in addition. If priority is enabled, the tasks with the highest priority are fetched.</p>
    *
    * <p>Returned tasks are locked for the given worker until
    * <code>now + lockDuration</code> expires.
@@ -94,10 +95,26 @@ public interface ExternalTaskService {
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
 
   /**
+   * <p>Lock an external task on behalf of a worker.</p>
+   *
+   * @param externalTaskId the id of the external task to lock
+   * @param workerId  the id of the worker to lock the task for
+   * @param lockDuration the duration in milliseconds for which task should be locked
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task was already locked by a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void lock(String externalTaskId, String workerId, long lockDuration);
+
+  /**
    * <p>Completes an external task on behalf of a worker. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @throws NotFoundException if no external task with the given id exists
    * @throws BadUserRequestException if the task is assigned to a different worker
@@ -114,7 +131,7 @@ public interface ExternalTaskService {
    * to the process instance before continuing execution. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @param variables a map of variables to set on the execution (non-local)
    *   the external task is assigned to
@@ -134,7 +151,7 @@ public interface ExternalTaskService {
    * to the process instance before continuing execution. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @param variables a map of variables to set on the execution
    *   the external task is assigned to
