@@ -30,7 +30,9 @@ import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
+
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.EntityTypes;
@@ -1094,6 +1097,29 @@ public class TelemetryReporterTest {
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
+  @Test
+  public void shouldSendDataWithWebapps() {
+    // given default telemetry data (no webapp data)
+    managementService.toggleTelemetry(true);
+    // set webapps after initialization
+    Set<String> webapps = new HashSet<>(Arrays.asList("cockpit", "admin"));
+    configuration.getTelemetryRegistry().setWebapps(webapps);
+
+    Data expectedData = adjustDataWithWebappInfo(configuration.getTelemetryData(), webapps);
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
   protected ProcessEngineConfigurationImpl createEngineWithInitMessage(Boolean initTelemetry) {
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     processEngineConfiguration
@@ -1182,6 +1208,15 @@ public class TelemetryReporterTest {
 
     Internals internals = result.getProduct().getInternals();
     internals.setLicenseKey(new LicenseKeyData(null, null, null, null, null, licenseKeyRaw));
+
+    return result;
+  }
+
+  protected Data adjustDataWithWebappInfo(Data telemetryData, Set<String> webapps) {
+    Data result = initData(telemetryData);
+
+    Internals internals = result.getProduct().getInternals();
+    internals.setWebapps(webapps);
 
     return result;
   }
