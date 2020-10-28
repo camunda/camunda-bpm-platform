@@ -16,16 +16,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
-public class ExtendLockOnExternalTaskDto extends HandleExternalTaskDto {
+public class LockExternalTaskDto extends HandleExternalTaskDto {
 
-  protected long newDuration;
+  protected long lockDuration;
 
-  public long getNewDuration() {
-    return newDuration;
+  public long getLockDuration() {
+    return lockDuration;
   }
 
-  public void setNewDuration(long newDuration) {
-    this.newDuration = newDuration;
+  public void setLockDuration(long lockDuration) {
+    this.lockDuration = lockDuration;
   }
 
 }

@@ -1,9 +1,4 @@
-<@lib.dto>
-
-  <@lib.property
-      name = "workerId"
-      type = "string"
-      desc = "The id of the worker that completes the task. Must match the id of the worker who has most recently locked the task." />
+<@lib.dto extends = "HandleExternalTaskDto" >
 
   <@lib.property
       name = "variables"
