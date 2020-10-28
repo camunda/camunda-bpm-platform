@@ -24,19 +24,10 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
  * @author Thorben Lindhauer
  *
  */
-public class CompleteExternalTaskDto {
+public class CompleteExternalTaskDto extends HandleExternalTaskDto {
 
-  protected String workerId;
   protected Map<String, VariableValueDto> variables;
   protected Map<String, VariableValueDto> localVariables;
-
-  public String getWorkerId() {
-    return workerId;
-  }
-
-  public void setWorkerId(String workerId) {
-    this.workerId = workerId;
-  }
 
   public Map<String, VariableValueDto> getVariables() {
     return variables;

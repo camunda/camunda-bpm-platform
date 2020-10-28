@@ -16,16 +16,31 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
-public class ExtendLockOnExternalTaskDto extends HandleExternalTaskDto {
+/**
+ * Base DTO class for Worker-related External Task operations.
+ * Contains the <code>workerId</code> property.
+ *
+ * Used in:
+ * <ul>
+ *   <li>{@link LockExternalTaskDto}</li>
+ *   <li>{@link ExtendLockOnExternalTaskDto}</li>
+ *   <li>{@link ExternalTaskFailureDto}</li>
+ *   <li>{@link CompleteExternalTaskDto}</li>
+ * </ul>
+ *
+ * Note: the {@link ExternalTaskBpmnError} class doesn't extend this class. Any adjustments made here
+ * should be mirrored in that class as well.
+ */
+public class HandleExternalTaskDto {
 
-  protected long newDuration;
+  protected String workerId;
 
-  public long getNewDuration() {
-    return newDuration;
+  public String getWorkerId() {
+    return workerId;
   }
 
-  public void setNewDuration(long newDuration) {
-    this.newDuration = newDuration;
+  public void setWorkerId(String workerId) {
+    this.workerId = workerId;
   }
 
 }
