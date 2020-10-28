@@ -13,7 +13,7 @@
 
     <#include "/lib/commons/deployment-query-params.ftl" >
 
-    <#assign sortBy = [ '"id"', '"name"', '"deploymentTime"', '"tenantId"' ] >
+    <#assign sortByValues = [ '"id"', '"name"', '"deploymentTime"', '"tenantId"' ] >
     <#include "/lib/commons/sort-params.ftl" >
 
     <#assign last = true >
