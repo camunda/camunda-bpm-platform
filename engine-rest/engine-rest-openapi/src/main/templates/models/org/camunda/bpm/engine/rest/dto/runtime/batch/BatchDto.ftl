@@ -10,7 +10,9 @@
         name = "type"
         type = "string"
         nullable = false
-        desc = "The type of the batch." />
+        desc = "The type of the batch.
+                See the [User Guide](${docsUrl}/user-guide/process-engine/batch/#creating-a-batch)
+                for more information about batch types." />
 
     <@lib.property
         name = "totalJobs"
