@@ -3398,7 +3398,6 @@ public class TaskRestServiceInteractionTest extends
         .post(HANDLE_BPMN_ERROR_URL);
   }
 
-
   @Test
   public void testHandleBpmnErrorThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))

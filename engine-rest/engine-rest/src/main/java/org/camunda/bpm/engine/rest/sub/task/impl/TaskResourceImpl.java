@@ -415,7 +415,8 @@ public class TaskResourceImpl implements TaskResource {
     return Response.ok(deployedTaskForm, MediaType.APPLICATION_XHTML_XML).build();
   }
 
-  @Override public void handleBpmnError(TaskBpmnErrorDto dto) {
+  @Override
+  public void handleBpmnError(TaskBpmnErrorDto dto) {
     TaskService taskService = engine.getTaskService();
 
     try {
