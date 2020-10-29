@@ -34,14 +34,15 @@
         format = "int32"
         nullable = false
         desc = "The number of batch execution jobs created per seed job invocation.
-                The batch seed job is invoked until it has created all batch execution jobs required by the batch (see totalJobs property)." />
+                The batch seed job is invoked until it has created all batch execution jobs required by the batch
+                (see `totalJobs` property)." />
 
     <@lib.property
         name = "invocationsPerBatchJob"
         type = "integer"
         format = "int32"
         nullable = false
-        desc = "Every batch execution job invokes the command executed by the batch invocationsPerBatchJob times.
+        desc = "Every batch execution job invokes the command executed by the batch `invocationsPerBatchJob` times.
                 E.g., for a process instance migration batch this specifies the number of process instances which are migrated per batch execution job." />
 
     <@lib.property
