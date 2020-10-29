@@ -19,13 +19,13 @@ package org.camunda.bpm.dmn.feel.impl.scala;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.feel.context.VariableProvider;
-import scala.Option;
-import scala.Some;
-import scala.collection.Iterable;
+import camundajar.impl.scala.Option;
+import camundajar.impl.scala.Some;
+import camundajar.impl.scala.collection.Iterable;
 
 import java.util.Set;
 
-import static scala.jdk.CollectionConverters.SetHasAsScala;
+import static camundajar.impl.scala.jdk.CollectionConverters.SetHasAsScala;
 
 public class ContextVariableWrapper implements VariableProvider {
 
@@ -42,7 +42,7 @@ public class ContextVariableWrapper implements VariableProvider {
       return new Some(value);
 
     } else {
-      return scala.None$.MODULE$;
+      return camundajar.impl.scala.None$.MODULE$;
 
     }
   }

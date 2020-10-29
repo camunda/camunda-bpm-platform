@@ -211,9 +211,9 @@ public class TelemetrySendingTask extends TimerTask {
       internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
     }
 
-    // license key data is fed from the outside to the registry but needs to be constantly updated
+    // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
     internals.setLicenseKey(telemetryRegistry.getLicenseKey());
-
+    internals.setWebapps(telemetryRegistry.getWebapps());
   }
 
   protected boolean isTelemetryEnabled() {

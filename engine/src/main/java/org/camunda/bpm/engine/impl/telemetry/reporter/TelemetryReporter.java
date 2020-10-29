@@ -123,6 +123,8 @@ public class TelemetryReporter {
       timer.cancel();
       timer = null;
 
+      // sending initial message only upon start
+      telemetrySendingTask.sendInitialMessage = false;
       if (report) {
         // collect and send manually for the last time
         reportNow();

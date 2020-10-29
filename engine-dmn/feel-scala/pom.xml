@@ -4,29 +4,18 @@
   <parent>
     <groupId>org.camunda.bpm.dmn</groupId>
     <artifactId>camunda-engine-dmn-root</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-feel-scala</artifactId>
   <name>camunda DMN - engine FEEL - SCALA</name>
-
-  <properties>
-    <!-- We shade artifacts into the jar, so we need to generate 
-    a dependency BOM for the license book -->
-    <skip-third-party-bom>false</skip-third-party-bom>
-  </properties>
 
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.feel</groupId>
       <artifactId>feel-engine</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
+      <classifier>scala-shaded</classifier>
     </dependency>
 
     <dependency>
@@ -74,44 +63,5 @@
     </dependency>
 
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>true</createDependencyReducedPom>
-              <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
-              <createSourcesJar>true</createSourcesJar>
-              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.slf4j:slf4j-api</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-logging</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-utils</exclude>
-                  <exclude>org.camunda.commons:camunda-commons-typed-values</exclude>
-                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-api</exclude>
-                </excludes>
-              </artifactSet>
-
-              <relocations>
-                <relocation>
-                  <pattern>scala</pattern>
-                  <shadedPattern>camundajar.impl.scala</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

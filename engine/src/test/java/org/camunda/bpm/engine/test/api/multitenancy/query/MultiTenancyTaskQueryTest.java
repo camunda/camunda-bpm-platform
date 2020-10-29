@@ -43,7 +43,7 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTest {
   private static final String TENANT_TWO = "tenant2";
   private static final String TENANT_NON_EXISTING = "nonExistingTenant";
 
-  private final List<String> taskIds = new ArrayList<String>();
+  private final List<String> taskIds = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
@@ -92,6 +92,19 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTest {
       .withoutTenantId();
 
     assertThat(query.count(), is(1L));
+  }
+
+  @Test
+  public void testQueryWithAndWithoutTenantId() {
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+        .or()
+          .tenantIdIn(TENANT_ONE, TENANT_TWO)
+          .withoutTenantId()
+        .endOr();
+
+    // then
+    assertThat(query.list().size(), is(3));
   }
 
   @Test
@@ -172,7 +185,7 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTest {
     assertThat(query.count(), is(3L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(taskService.createTaskQuery().withoutTenantId().count(), is(1L));
   }
 
   @Test

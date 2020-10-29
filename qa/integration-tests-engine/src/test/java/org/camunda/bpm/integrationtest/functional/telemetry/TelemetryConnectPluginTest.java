@@ -28,6 +28,7 @@ import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TAS
 import static org.junit.Assert.assertNotNull;
 
 import java.net.HttpURLConnection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,6 +161,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
     internals.setMetrics(metrics);
     internals.setTelemetryEnabled(true);
 
+    internals.setWebapps(Collections.emptySet());
     Product product = new Product("Runtime", "7.14.0", "special", internals);
     Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
     return data;

@@ -99,7 +99,8 @@
 
   "finished": {
     "type": "boolean",
-    "desc": "Only include finished process instances. Value may only be `true`, as `false` is the default behavior."
+    "desc": "Only include finished process instances. This flag includes all process instances
+             that are completed or terminated. Value may only be `true`, as `false` is the default behavior."
   },
 
   "unfinished": {

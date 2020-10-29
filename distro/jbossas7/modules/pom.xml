@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -179,6 +179,17 @@
                   </mapper>
                 </copy>
 
+                <delete dir="target/modules/org/camunda/feel" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.feel.feel-engine.*)/(([A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.feel-scala}-scala-shaded.jar" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
                 </copy>
@@ -208,6 +219,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.mybatis@" value="${version.mybatis}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.feel-scala@" value="${version.feel-scala}">
                   <include name="**/module.xml" />
                 </replace>
 

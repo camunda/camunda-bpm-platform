@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,7 +86,14 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
   protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
   protected Object[] variableValues = new Object[] {1, 2, "3", "4", 5, 6};
-  protected QueryOperator[] variableOperators = new QueryOperator[] {QueryOperator.EQUALS, QueryOperator.GREATER_THAN_OR_EQUAL, QueryOperator.LESS_THAN, QueryOperator.LIKE, QueryOperator.NOT_EQUALS, QueryOperator.LESS_THAN_OR_EQUAL};
+  protected QueryOperator[] variableOperators = new QueryOperator[] {
+      QueryOperator.EQUALS,
+      QueryOperator.GREATER_THAN_OR_EQUAL,
+      QueryOperator.LESS_THAN,
+      QueryOperator.LIKE,
+      QueryOperator.NOT_EQUALS,
+      QueryOperator.LESS_THAN_OR_EQUAL
+  };
   protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false};
   protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, false, false};
   protected User testUser;
@@ -95,7 +103,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
   @Before
   public void setUp() {
-    filter = filterService.newTaskFilter("name").setOwner("owner").setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
+    filter = filterService.newTaskFilter("name")
+        .setOwner("owner")
+        .setQuery(taskService.createTaskQuery())
+        .setProperties(new HashMap<>());
     testUser = identityService.newUser("user");
     testGroup = identityService.newGroup("group");
     identityService.saveUser(testUser);
@@ -2025,6 +2036,28 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Test
+  public void testTaskIdInPositive() {
+    // given
+    List<Task> existingTasks = taskService.createTaskQuery().list();
+    String task1 = existingTasks.get(0).getId();
+    String task2 = existingTasks.get(1).getId();
+    TaskQueryImpl query = (TaskQueryImpl) taskService.createTaskQuery().taskIdIn(task1, task2);
+    Filter filter = filterService.newTaskFilter("taskIDfilter");
+    filter.setQuery(query);
+
+    // when
+    // save filter
+    filterService.saveFilter(filter);
+
+    // then
+    filter = filterService.createTaskFilterQuery().singleResult();
+    query = filter.getQuery();
+
+    // then
+    assertThat(query.getTaskIdIn()).containsOnly(task1, task2);
   }
 
   @Test

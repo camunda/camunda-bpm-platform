@@ -821,10 +821,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     String deploymentId = deployment.getId();
     List<String> resourceNames = repositoryService.getDeploymentResourceNames(deploymentId);
-    Set<String> expectedResourceNames = new HashSet<String>();
+    Set<String> expectedResourceNames = new HashSet<>();
     expectedResourceNames.add("org/camunda/bpm/engine/test/test/HelloWorld.string");
     expectedResourceNames.add("org/camunda/bpm/engine/test/test/TheAnswer.string");
-    assertEquals(expectedResourceNames, new HashSet<String>(resourceNames));
+    assertEquals(expectedResourceNames, new HashSet<>(resourceNames));
 
     InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, "org/camunda/bpm/engine/test/test/HelloWorld.string");
     assertTrue(Arrays.equals("hello world".getBytes(), IoUtil.readInputStream(resourceStream, "test")));
@@ -1176,12 +1176,12 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   @Test
   public void testGetProcessDefinitions() {
-    List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 2' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 3' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 1' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 2' isExecutable='true' />" + "</definitions>")));
+    List<String> deploymentIds = new ArrayList<>();
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 2' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 3' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 1' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 2' isExecutable='true'><startEvent id='start'/></process></definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService
       .createProcessDefinitionQuery()
@@ -1228,9 +1228,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   @Test
   public void testDeployIdenticalProcessDefinitions() {
-    List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' isExecutable='true' />" + "</definitions>")));
+    List<String> deploymentIds = new ArrayList<>();
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + "><process id='IDR' name='Insurance Damage Report' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + "><process id='IDR' name='Insurance Damage Report' isExecutable='true'><startEvent id='start'/></process></definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService
       .createProcessDefinitionQuery()

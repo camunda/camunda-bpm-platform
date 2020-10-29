@@ -17,7 +17,7 @@
         desc = "The id of the task to retrieve the variables from."/>
 
     <@lib.parameter
-        name = "deserializeValue"
+        name = "deserializeValues"
         location = "query"
         type = "boolean"
         defaultValue = "true"

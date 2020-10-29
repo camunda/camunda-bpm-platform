@@ -68,7 +68,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTest {
     Filter savedFilter = filterService.getFilter(filterId);
     TaskQueryImpl savedQuery = savedFilter.getQuery();
 
-    assertThat(savedQuery.isTenantIdSet(), is(true));
+    assertThat(savedQuery.isWithoutTenantId(), is(true));
     assertThat(savedQuery.getTenantIds(), is(nullValue()));
   }
 

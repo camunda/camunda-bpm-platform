@@ -11,5 +11,7 @@
     <module name="org.camunda.commons.camunda-commons-logging" />
 
     <module name="org.camunda.bpm.camunda-engine-plugin-spin" optional="true" />
+
+    <module name="org.camunda.feel.feel-engine" />
   </dependencies>
 </module>
