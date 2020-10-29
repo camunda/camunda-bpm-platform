@@ -1159,7 +1159,7 @@ public interface TaskService {
    * @param errorCode the error code of the corresponding bmpn error
    *
    * @throws NotFoundException if no task with the given id exists
-   * @throws BadUserRequestException if no task id or error code were given
+   * @throws BadUserRequestException if task id or error code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or

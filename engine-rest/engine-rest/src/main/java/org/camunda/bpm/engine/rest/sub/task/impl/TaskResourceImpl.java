@@ -415,15 +415,15 @@ public class TaskResourceImpl implements TaskResource {
     return Response.ok(deployedTaskForm, MediaType.APPLICATION_XHTML_XML).build();
   }
 
-  @Override
-  public void handleBpmnError(TaskBpmnErrorDto dto) {
-    TaskService taskService = engine.getTaskService(); 
+  @Override public void handleBpmnError(TaskBpmnErrorDto dto) {
+    TaskService taskService = engine.getTaskService();
 
     try {
-      taskService.handleBpmnError(taskId, dto.getErrorCode(), dto.getErrorMessage(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
-    } catch(NotFoundException e){
+      taskService.handleBpmnError(taskId, dto.getErrorCode(), dto.getErrorMessage(),
+          VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
+    } catch (NotFoundException e) {
       throw new RestException(Status.NOT_FOUND, e, e.getMessage());
-    }  catch (BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
     }
   }
