@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getBatches"
       tag = "Batch"
+      summary = "Get List"
       desc = "Queries for batches that fulfill given parameters. Parameters may be the properties of batches, such as the id or type.
               The size of the result set can be retrieved by using the
               [Get Batch Count](${docsUrl}/reference/rest/batch/get-query-count/) method." />
@@ -31,6 +32,7 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
+                       "description": "Response for GET `/batch?type=aBatchType&sortBy=batchId&sortOrder=asc`",
                        "value": {
                          "id": "aBatchId",
                          "type": "aBatchType",
