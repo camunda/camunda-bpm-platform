@@ -2555,7 +2555,6 @@ public class TaskServiceTest {
     taskService.handleBpmnError(task.getId(), null);
   }
 
-
   @Test
   public void testHandleBpmnErrorIncludingMessage() {
     // given
