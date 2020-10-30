@@ -53,8 +53,7 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Bad Request
-                Returned if some of the query parameters are invalid,
+        desc = "Returned if some of the query parameters are invalid,
                 for example if a `sortOrder` parameter is supplied, but no `sortBy`,
                 or if an invalid operator for variable comparison is used.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
