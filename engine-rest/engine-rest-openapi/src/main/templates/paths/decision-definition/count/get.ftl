@@ -4,7 +4,8 @@
       tag = "Decision Definition"
       summary = "Get List Count"
       desc = "Requests the number of decision definitions that fulfill the query criteria.
-              Takes the same filtering parameters as the [Get Decision Definition](${docsUrl}/reference/rest/decision-definition/get-query/) method." />
+              Takes the same filtering parameters as the
+              [Get Decision Definition](${docsUrl}/reference/rest/decision-definition/get-query/) method." />
 
   "parameters" : [
 
