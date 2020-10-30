@@ -430,7 +430,8 @@ public class RuntimeServiceTest {
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcessWithIncompleteIoMapping.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcessWithIncompleteIoMapping.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   public void testDeleteProcessInstanceWithoutSkipIoMappingsAndIncompleteMapping() {
@@ -445,9 +446,8 @@ public class RuntimeServiceTest {
       testRule.assertTextPresent("Unknown property used in expression: ${var}. Cause: Cannot resolve identifier 'var'",
           e.getMessage());
     }
-    // then
+    // then no changes should have been made
     testRule.assertProcessNotEnded(instance.getId());
-    // should i keep this below?
     assertEquals(0,
         historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
     assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
