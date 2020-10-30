@@ -425,12 +425,37 @@ public class RuntimeServiceTest {
 
     // then
     testRule.assertProcessEnded(instance.getId());
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
+    assertEquals(2,
+        historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcessWithIncompleteIoMapping.bpmn20.xml" })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
+  public void testDeleteProcessInstanceWithoutSkipIoMappingsAndIncompleteMapping() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
+    // when the process instance is deleted and we do not skip the io mappings
+    try {
+      runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("Unknown property used in expression: ${var}. Cause: Cannot resolve identifier 'var'",
+          e.getMessage());
+    }
+    // then
+    testRule.assertProcessNotEnded(instance.getId());
+    // should i keep this below?
+    assertEquals(0,
+        historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
@@ -439,7 +464,8 @@ public class RuntimeServiceTest {
     // given a process instance
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
 
-    ProcessInstance instance2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).singleResult();
+    ProcessInstance instance2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId())
+        .singleResult();
 
     // when the process instance is deleted and we do skip the io mappings
     runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, true);
