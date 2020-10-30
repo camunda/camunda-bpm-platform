@@ -32,8 +32,7 @@
         examples = ['"example-1": {
                        "summary": "Status 200 response",
                        "description": "Response for GET `/decision-definition/key/dish-decision/tenant-id/aTenantId`",
-                       "value": [
-                         {
+                       "value": {
                             "id": "aDecisionDefinitionId",
                             "key": "dish-decision",
                             "category": "http://camunda.org/schema/1.0/dmn",
@@ -47,8 +46,7 @@
                             "versionTag": null,
                             "historyTimeToLive": 5
                          }
-                       ]
-                     }'] />
+                       }'] />
 
     <@lib.response
         code = "404"
