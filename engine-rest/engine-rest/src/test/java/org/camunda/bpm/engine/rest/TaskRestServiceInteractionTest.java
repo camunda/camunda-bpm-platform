@@ -3387,15 +3387,15 @@ public class TaskRestServiceInteractionTest extends
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("errorCode", "");
     given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(parameters)
-        .pathParam("id", "aTaskId")
-        .then()
-        .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(RestException.class.getSimpleName()))
-        .when()
-        .post(HANDLE_BPMN_ERROR_URL);
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
   }
 
   @Test

@@ -2522,13 +2522,11 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testHandleBpmnErrorWithEmptyErrorCodeVariable() {
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHandleBpmnErrorWithEmptyErrorCode() {
     // given
-    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
-    testRule.deploy(model);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
 
     // then
     thrown.expect(BadUserRequestException.class);
@@ -2539,13 +2537,11 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testHandleBpmnErrorWithNullErrorCodeVariable() {
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHandleBpmnErrorWithNullErrorCode() {
     // given
-    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
-    testRule.deploy(model);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
 
     // then
     thrown.expect(BadUserRequestException.class);
