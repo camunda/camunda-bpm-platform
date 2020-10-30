@@ -69,18 +69,12 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
       if (failIfNotExists) {
-        runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings,
-            skipSubprocesses);
+        runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);
       } else {
-        runtimeService.deleteProcessInstanceIfExists(processInstanceId, null, skipCustomListeners, true, skipIoMappings,
-            skipSubprocesses);
+        runtimeService.deleteProcessInstanceIfExists(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);
       }
-    } catch (AuthorizationException e) {
-      throw e;
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
-    } catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
     }
 
   }
