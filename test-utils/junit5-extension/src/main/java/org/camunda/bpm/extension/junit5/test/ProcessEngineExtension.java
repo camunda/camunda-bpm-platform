@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
  * Used as 
  * <code>@ExtendWith(ProcessEngineExtension.class)</code>
  * the process engine is build from the configuration file
- * <tt>camunda.cfg.xml</tt> found on the classpath.
+ * {@code camunda.cfg.xml} found on the classpath.
  * <p>
- * Used as <pre>{@code 
- * @RegisterExtension
+ * Used as 
+ * <pre>{@code  @RegisterExtension
  * ProcessEngineExtension extension = ProcessEngineExtension.builder()
  *    .configurationResource("myConfigurationFile.xml")
  *    .build();}</pre>
