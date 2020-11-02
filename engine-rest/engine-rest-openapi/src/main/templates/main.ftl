@@ -31,6 +31,7 @@
 
   ],
   "tags": [
+    {"name": "Batch"},
     {"name": "Condition"},
     {"name": "Deployment"},
     {"name": "Engine"},
