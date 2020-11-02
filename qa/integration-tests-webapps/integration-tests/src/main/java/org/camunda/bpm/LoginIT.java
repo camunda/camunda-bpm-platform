@@ -57,7 +57,6 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
       loginToCockpit();
     } catch (WebDriverException e) {
       loginToCockpit();
-      System.out.println("second time passed");
     }
   }
 
@@ -78,7 +77,6 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
       loginToTasklist();
     } catch (WebDriverException e) {
       loginToTasklist();
-      System.out.println("second time passed");
     }
   }
 
@@ -99,7 +97,6 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
       loginToAdmin();
     } catch (WebDriverException e) {
       loginToAdmin();
-      System.out.println("second time passed");
     }
   }
 
@@ -120,7 +117,6 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
       loginToWelcome();
     } catch (WebDriverException e) {
       loginToWelcome();
-      System.out.println("second time passed");
     }
   }
 

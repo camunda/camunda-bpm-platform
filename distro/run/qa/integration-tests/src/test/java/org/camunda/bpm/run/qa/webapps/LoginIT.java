@@ -17,8 +17,6 @@
 package org.camunda.bpm.run.qa.webapps;
 
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -29,6 +27,7 @@ import org.junit.runners.Parameterized.BeforeParam;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URI;
@@ -36,8 +35,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 /**
  * NOTE:
@@ -67,8 +66,6 @@ public class LoginIT extends AbstractWebappUiIT {
   protected static SpringBootManagedContainer container;
 
   protected WebDriverWait wait;
-  protected String appName;
-
 
   @BeforeParam
   public static void runStartScript(String[] commands) {
@@ -93,55 +90,38 @@ public class LoginIT extends AbstractWebappUiIT {
     }
   }
 
-  @Before
-  public void login() throws InterruptedException {
-    appName = name.getMethodName()
-        .replace("shouldLoginTo", "")
-        .toLowerCase();
-    appName = appName.substring(0, appName.length() - 3);// added so the parameter is also removed from the name
+  public void login(String appName) {
+    driver.manage().deleteAllCookies();
 
     driver.get(appUrl + "app/" + appName + "/default/");
 
     wait = new WebDriverWait(driver, 10);
 
-    Thread.sleep(200);
-
-    wait.until(presenceOfElementLocated(By.cssSelector("input[type=\"text\"]")))
+    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")))
         .sendKeys("demo");
 
-    wait.until(presenceOfElementLocated(By.cssSelector("input[type=\"password\"]")))
+    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"password\"]")))
         .sendKeys("demo");
 
-    wait.until(presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
+    wait.until(visibilityOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
 
-    wait.until(presenceOfElementLocated(By.cssSelector(".modal-close")))
+    wait.until(visibilityOfElementLocated(By.cssSelector(".modal-close")))
         .click();
-  }
-
-  @After
-  public void logout() throws InterruptedException {
-    Thread.sleep(200);
-
-    if (appName.equals("cockpit")) {
-      wait.until(presenceOfElementLocated(By.cssSelector(".UserInformation .user")))
-          .click();
-
-      wait.until(presenceOfElementLocated(By.xpath("//button[text()='Log out']")))
-          .click();
-
-    } else {
-      wait.until(presenceOfElementLocated(By.cssSelector(".account .dropdown-toggle")))
-          .click();
-
-      wait.until(presenceOfElementLocated(By.cssSelector(".logout")))
-          .click();
-
-    }
   }
 
   @Test
   public void shouldLoginToCockpit() throws URISyntaxException {
+    try {
+      loginToCockpit();
+    } catch (WebDriverException e) {
+      loginToCockpit();
+    }
+  }
+
+  public void loginToCockpit() throws URISyntaxException {
+    String appName = "cockpit";
+    login(appName);
     wait.until(textToBePresentInElementLocated(
         By.cssSelector(".deployed .processes .stats-label"),
         "Process Definitions"));
@@ -152,6 +132,16 @@ public class LoginIT extends AbstractWebappUiIT {
 
   @Test
   public void shouldLoginToTasklist() {
+    try {
+      loginToTasklist();
+    } catch (WebDriverException e) {
+      loginToTasklist();
+    }
+  }
+
+  public void loginToTasklist() {
+    String appName = "tasklist";
+    login(appName);
     wait.until(textToBePresentInElementLocated(
         By.cssSelector(".start-process-action view a"),
         "Start process"));
@@ -162,6 +152,16 @@ public class LoginIT extends AbstractWebappUiIT {
 
   @Test
   public void shouldLoginToAdmin() throws URISyntaxException {
+    try {
+      loginToAdmin();
+    } catch (WebDriverException e) {
+      loginToAdmin();
+    }
+  }
+
+  public void loginToAdmin() throws URISyntaxException {
+    String appName = "admin";
+    login(appName);
     wait.until(textToBePresentInElementLocated(
         By.cssSelector("[ng-class=\"activeClass('#/authorization')\"] a"),
         "Authorizations"));
@@ -172,6 +172,16 @@ public class LoginIT extends AbstractWebappUiIT {
 
   @Test
   public void shouldLoginToWelcome() throws URISyntaxException {
+    try {
+      loginToWelcome();
+    } catch (WebDriverException e) {
+      loginToWelcome();
+    }
+  }
+
+  public void loginToWelcome() throws URISyntaxException {
+    String appName = "welcome";
+    login(appName);
     wait.until(textToBePresentInElementLocated(
         By.cssSelector(".webapps .section-title"),
         "Applications"));
