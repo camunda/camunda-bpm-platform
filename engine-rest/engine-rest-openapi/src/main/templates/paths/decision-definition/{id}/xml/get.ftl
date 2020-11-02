@@ -24,7 +24,7 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 response",
-                       "description": "Response for GET `/decision-definition/aDecisionDefinitionId`",
+                       "description": "Response for GET `/decision-definition/aDecisionDefinitionId/xml`",
                        "value": {
                          "id": "aDecisionDefinitionId",
                          "dmnXml": "<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>
