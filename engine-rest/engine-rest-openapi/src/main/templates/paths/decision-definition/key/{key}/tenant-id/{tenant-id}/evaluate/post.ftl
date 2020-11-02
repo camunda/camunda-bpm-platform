@@ -1,9 +1,9 @@
 {
   <@lib.endpointInfo
-      id = "evaluateDecisionByKey"
+      id = "evaluateDecisionByKeyAndTenant"
       tag = "Decision Definition"
-      summary = "Evaluate By Key"
-      desc = "Evaluates the latest version of the decision definition which belongs to no tenant.
+      summary = "Evaluate By Key And Tenant"
+      desc = "Evaluates the latest version of the decision definition for tenant.
               The input values of the decision have to be supplied in the request body." />
 
   "parameters" : [
@@ -13,15 +13,23 @@
         location = "path"
         type = "string"
         required = true
-        last = true
         desc = "The key of the decision definition (the latest version thereof) to be evaluated." />
+
+    <@lib.parameter
+        name = "tenant-id"
+        location = "path"
+        type = "string"
+        required = true
+        last = true
+        desc = "The id of the tenant the decision definition belongs to." />
+
   ],
 
     <@lib.requestBody
         mediaType = "application/json"
         dto = "EvaluateDecisionDto"
         examples = [ '"example-1": {
-                       "summary": "POST /decision-definition/key/aKey/evaluate",
+                       "summary": "POST /decision-definition/key/aKey/tenand-id/aTenantId/evaluate",
                        "value": {
                          "variables" : {
                            "amount" : { "value" : 600, "type" : "Double" },
@@ -39,7 +47,7 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 response",
-                       "description": "Response for POST `/decision-definition/key/aKey/evaluate`",
+                       "description": "Response for POST `/decision-definition/akey/aKey/tenand-id/aTenantId/evaluate`",
                        "value": [
                          {
                            "result": { "value" : "management", "type" : "String", "valueInfo" : null }

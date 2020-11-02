@@ -21,7 +21,7 @@
         mediaType = "application/json"
         dto = "EvaluateDecisionDto"
         examples = [ '"example-1": {
-                       "summary": "PUT /decision-definition/aDecisionDefinitionId/evaluate",
+                       "summary": "POST /decision-definition/aDecisionDefinitionId/evaluate",
                        "value": {
                          "variables" : {
                            "amount" : { "value" : 600, "type" : "Double" },
@@ -39,7 +39,7 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 response",
-                       "description": "Response for PUT `/decision-definition/aDecisionDefinitionId/evaluate`",
+                       "description": "Response for POST `/decision-definition/aDecisionDefinitionId/evaluate`",
                        "value": [
                          {
                            "result": { "value" : "management", "type" : "String", "valueInfo" : null }
