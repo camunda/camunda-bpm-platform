@@ -3,7 +3,7 @@
       id = "getDecisionDefinitionDmnXmlByKeyAndTenant"
       tag = "Decision Definition"
       summary = "Get XML By Key and Tenant"
-      desc = "Retrieves the DMN XML of a decision definition." />
+      desc = "Retrieves the XML of the latest version of the decision definition for tenant" />
 
   "parameters" : [
 
