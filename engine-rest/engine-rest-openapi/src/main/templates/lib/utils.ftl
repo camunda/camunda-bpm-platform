@@ -90,12 +90,9 @@
 
         <#if format?has_content>
           "format": "${format}",
-          <#if nullable>
-            "nullable": true,
-          </#if>
         </#if>
 
-        <#if type == "boolean">
+        <#if type == "boolean" | type == "string" | format?has_content>
           <#if nullable>
             "nullable": true,
           </#if>

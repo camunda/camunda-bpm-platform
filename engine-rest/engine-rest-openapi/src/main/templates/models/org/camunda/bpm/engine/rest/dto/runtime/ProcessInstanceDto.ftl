@@ -4,11 +4,13 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the process instance." />
 
     <@lib.property
         name = "definitionId"
         type = "string"
+        nullable = false
         desc = "The id of the process definition that this process instance belongs to." />
 
     <@lib.property

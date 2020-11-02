@@ -4,6 +4,7 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the transition instance."/>
 
     <@lib.property
@@ -14,6 +15,7 @@
     <@lib.property
         name = "activityId"
         type = "string"
+        nullable = false
         desc = "The id of the activity that this instance enters (asyncBefore job) or leaves (asyncAfter job)"/>
 
     <@lib.property
@@ -24,21 +26,25 @@
     <@lib.property
         name = "activityType"
         type = "string"
+        nullable = false
         desc = "The type of the activity that this instance enters (asyncBefore job) or leaves (asyncAfter job)"/>
 
     <@lib.property
         name = "processInstanceId"
         type = "string"
+        nullable = false
         desc = "The id of the process instance this instance is part of."/>
 
     <@lib.property
         name = "processDefinitionId"
         type = "string"
+        nullable = false
         desc = "The id of the process definition."/>
 
     <@lib.property
         name = "executionId"
         type = "string"
+        nullable = false
         desc = "The execution id."/>
 
     <@lib.property

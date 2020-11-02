@@ -12,6 +12,7 @@
       name = "periodUnit"
       type = "string"
       enumValues = ["MONTH", "QUARTER"]
+      nullable = false
       desc = "The unit of the given period. Possible values are `MONTH` and `QUARTER`."/>
 
   <@lib.property

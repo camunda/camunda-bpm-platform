@@ -3,6 +3,7 @@
     <@lib.property
         name = "incidentType"
         type = "string"
+        nullable = false
         desc = "The type of the incident the number of incidents is aggregated for. See the [User Guide](${docsUrl}/user-guide/process-engine/incidents/#incident-types) for a list of incident types."/>
 
     <@lib.property

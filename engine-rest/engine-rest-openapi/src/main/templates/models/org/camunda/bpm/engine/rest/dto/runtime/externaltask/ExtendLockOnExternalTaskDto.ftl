@@ -3,6 +3,7 @@
   <@lib.property
       name = "workerId"
       type = "string"
+      nullable = false
       desc = "The ID of a worker who is locking the external task." />
 
   <@lib.property

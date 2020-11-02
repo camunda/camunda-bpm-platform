@@ -4,6 +4,7 @@
     <@lib.property
         name = "type"
         type = "string"
+        nullable = false
         enumValues = ['"startBeforeActivity"', '"startAfterActivity"', '"startTransition"']
         desc = "**Mandatory**. One of the following values: `startBeforeActivity`, `startAfterActivity`, `startTransition`.
 

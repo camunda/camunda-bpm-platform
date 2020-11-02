@@ -5,6 +5,7 @@
     <@lib.property
         name = "workerId"
         type = "string"
+        nullable = false
         desc = "**Mandatory.** The id of the worker on which behalf tasks are fetched. The returned tasks are locked for
                 that worker and can only be completed when providing the same worker id." />
 

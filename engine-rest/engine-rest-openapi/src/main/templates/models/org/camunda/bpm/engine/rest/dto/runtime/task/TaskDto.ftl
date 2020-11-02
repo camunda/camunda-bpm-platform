@@ -3,6 +3,7 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The task id." />
 
     <@lib.property
@@ -100,6 +101,7 @@
     <@lib.property
         name = "taskDefinitionKey"
         type = "string"
+        nullable = false
         desc = "The task's key." />
 
     <@lib.property

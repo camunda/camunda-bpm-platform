@@ -3,6 +3,7 @@
     <@lib.property
         name = "id"
         type = "string"
+        nullable = false
         desc = "The id of the task attachment." />
 
     <@lib.property
@@ -23,6 +24,7 @@
     <@lib.property
         name = "type"
         type = "string"
+        nullable = false
         desc = "Indication of the type of content that this attachment refers to.
                 Can be MIME type or any other indication." />
 
