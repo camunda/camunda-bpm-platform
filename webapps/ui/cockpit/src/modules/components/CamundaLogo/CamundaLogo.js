@@ -15,36 +15,13 @@
  * limitations under the License.
  */
 
-import angular from "angular";
+import React from "react";
+import { ReactComponent as Logo } from "./logo-big.svg";
 
-import React, { useEffect } from "react";
-
-import withUser from "HOC/withUser";
-import AngularApp from "../AngularApp";
-
-const auth = function() {
-  const node = document.createElement("div");
-  const ngModule = angular.module("reactLogin", []);
-
-  node.innerHTML = `
-  <div ng-view></div>
-  `;
-
-  return { node, module: ngModule };
-};
-
-function LoginRoute({ refreshUser }) {
-  useEffect(() => {
-    // Set user on logout
-    refreshUser();
-    return () => {
-      // Set user on login
-      refreshUser();
-    };
-  }, [refreshUser]);
-
-  return <AngularApp component={auth} />;
+export default function CamundaLogo() {
+  return (
+    <span className="CamundaLogo big">
+      <Logo />
+    </span>
+  );
 }
-const LoginComponent = withUser(LoginRoute);
-
-export default LoginComponent;

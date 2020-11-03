@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-export { default as LoginComponent } from "./auth";
 export { default as batch } from "./batch";
 export { default as dashboard } from "./dashboard";
 export { default as decisionDefinition } from "./decisionDefinition";

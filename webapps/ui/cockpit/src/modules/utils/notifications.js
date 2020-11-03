@@ -68,12 +68,17 @@ export function add(notification) {
     if (typeof exclusive == "boolean") {
       clearAll();
     } else {
-      var filter = {};
-      exclusive.forEach(key => {
-        filter[key] = notification[key];
-      });
+      /*
+       * Exclusive will be an array with a key to the Notification
+       * eg: {exclusive: ['http'], http: true}
+       */
 
-      clear(filter);
+      notifications.forEach(notification => {
+        const shouldBeRemoved = exclusive.some(key => notification[key]);
+        if (shouldBeRemoved) {
+          clear(notification);
+        }
+      });
     }
   }
 

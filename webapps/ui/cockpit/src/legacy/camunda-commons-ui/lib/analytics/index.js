@@ -18,7 +18,7 @@
 var angular = require("angular");
 
 var modalTemplate = require("./modal.html");
-var camundaLogo = require("../auth/page/logo.svg");
+var camundaLogo = require("./logo.svg");
 
 // REACT_APP_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
 var camundaVersion = (process.env.REACT_APP_VERSION || "").match(

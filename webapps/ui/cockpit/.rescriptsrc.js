@@ -1,8 +1,12 @@
-const {appendWebpackPlugin} = require('@rescripts/utilities')
+const { appendWebpackPlugin } = require('@rescripts/utilities')
 const { LicenseWebpackPlugin } = require('license-webpack-plugin');
 
 module.exports = appendWebpackPlugin(    
   new LicenseWebpackPlugin({
+    stats: {
+      warnings: false,
+      errors: true
+    },  
     outputFilename: '../dependencies.json',
     perChunkOutput: false,
     renderLicenses: (modules) => {

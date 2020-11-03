@@ -29,6 +29,12 @@ window.addEventListener("hashchange", function(event) {
   }
 });
 
+let callback = async () => {};
+
+export async function refreshUser() {
+  await callback();
+}
+
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
@@ -42,10 +48,9 @@ export function UserProvider({ children }) {
 
       if (
         user &&
-        ((previousUrl && window.location.href.includes("/dashboard")) || // redirect after login
+        (previousUrl || // redirect after login
           window.location.href.includes("/login")) // Navigated to login when logged in
       ) {
-        window.location.href = previousUrl || "#/dashboard";
         previousUrl = null;
       }
 
@@ -58,6 +63,8 @@ export function UserProvider({ children }) {
       setUser(null);
     }
   };
+
+  callback = refreshUser;
 
   useEffect(() => {
     refreshUser();

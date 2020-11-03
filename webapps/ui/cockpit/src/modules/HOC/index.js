@@ -16,3 +16,7 @@
  */
 
 export { UserProvider, default as withUser } from "./withUser";
+export {
+  PreviousLocationProvider,
+  default as withPreviousLocation
+} from "./withPreviousLocation";

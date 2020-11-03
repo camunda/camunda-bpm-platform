@@ -27,12 +27,14 @@ import { Dropdown } from "components";
 import "./UserInformation.scss";
 import SmallScreenSwitch from "./SmallScreenSwitch";
 import { addMessage } from "utils/notifications";
+import withUser from "HOC/withUser";
 
-function UserInformation({ user, history }) {
+function UserInformation({ user, refreshUser, history }) {
   const profile = user.profile;
 
   function logout() {
-    post("%ADMIN_API%/auth/user/%ENGINE%/logout").then(() => {
+    post("%ADMIN_API%/auth/user/%ENGINE%/logout").then(async () => {
+      await refreshUser();
       history.push("/login");
       var getDayContext = function() {
         var now = new Date();
@@ -99,4 +101,4 @@ function UserInformation({ user, history }) {
   );
 }
 
-export default withRouter(UserInformation);
+export default withRouter(withUser(UserInformation));

@@ -187,6 +187,7 @@ export async function loadConfig() {
 }
 
 export const getConfig = () => config;
+export const getDisableWelcomeMessage = () => config["disableWelcomeMessage"];
 export const getLocale = () => config["locale"];
 export const getPlugins = () => config["plugins"];
 export const getCSRFCookieName = () => config["csrfCookieName"];

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+export { CamundaLogo } from "./CamundaLogo";
 export { Dropdown } from "./Dropdown";
 export { EnterpriseComponent } from "./EnterpriseComponent";
 export { LinkButton } from "./LinkButton";

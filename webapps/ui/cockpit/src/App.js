@@ -20,13 +20,12 @@ import { HashRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import AngularApp from "./AngularApp";
 
-import { Footer, Header } from "./components";
+import { Footer, Header, Login } from "./components";
 import { LoadingIndicator, Notifications } from "components";
 
 import RedirectToLoginIfUnauthenticated from "./RedirectToLoginIfUnauthenticated";
 
 import {
-  LoginComponent,
   batch,
   dashboard,
   decisions,
@@ -39,7 +38,7 @@ import {
   processes
 } from "./angularBridges";
 import PluginPoint from "utils/PluginPoint";
-import { UserProvider } from "./modules/HOC";
+import { UserProvider, PreviousLocationProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
 
 function AngularRoute({ component, ...props }) {
@@ -67,71 +66,73 @@ function App() {
   return (
     <HashRouter>
       <UserProvider>
-        <RedirectToLoginIfUnauthenticated />
-        <div className="App">
-          <Header />
-          <Switch>
-            <Route exact path="/">
-              <Redirect to="/dashboard" />
-            </Route>
-            <Route path="/login">
-              <LoginComponent />
-            </Route>
-            <AngularRoute path="/dashboard" component={dashboard} />
-            <AngularRoute path="/processes" component={processes} />
-            <Route
-              exact
-              path="/process-definition/:id/"
-              render={props => (
-                <Redirect
-                  to={`/process-definition/${props.match.params.id}/runtime`}
-                />
-              )}
-            />
-            <AngularRoute
-              path="/process-definition/:id/runtime"
-              component={processDefinition}
-            />
-
-            <Route
-              exact
-              path="/process-instance/:id/"
-              render={props => (
-                <Redirect
-                  to={`/process-instance/${props.match.params.id}/runtime`}
-                />
-              )}
-            />
-            <AngularRoute
-              path="/process-instance/:id/runtime"
-              component={processInstance}
-            />
-            <AngularRoute path="/decisions" component={decisions} />
-            <AngularRoute
-              path="/decision-definition"
-              component={decisionDefinition}
-            />
-            <AngularRoute
-              path="/decision-instance"
-              component={decisionInstance}
-            />
-            <AngularRoute path="/tasks" component={tasks} />
-            <AngularRoute path="/repository" component={repository} />
-            <AngularRoute exact path="/batch" component={batch} />
-            <Route>
-              <PluginPoint
-                location="cockpit.route"
-                wrapPlugins={({ children, properties }) => (
-                  <Route exact path={properties.path}>
-                    {children}
-                  </Route>
+        <PreviousLocationProvider>
+          <RedirectToLoginIfUnauthenticated />
+          <div className="App">
+            <Header />
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="/dashboard" />
+              </Route>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <AngularRoute path="/dashboard" component={dashboard} />
+              <AngularRoute path="/processes" component={processes} />
+              <Route
+                exact
+                path="/process-definition/:id/"
+                render={props => (
+                  <Redirect
+                    to={`/process-definition/${props.match.params.id}/runtime`}
+                  />
                 )}
               />
-            </Route>
-          </Switch>
-          <Notifications className="page-notifications" />
-          <Footer />
-        </div>
+              <AngularRoute
+                path="/process-definition/:id/runtime"
+                component={processDefinition}
+              />
+
+              <Route
+                exact
+                path="/process-instance/:id/"
+                render={props => (
+                  <Redirect
+                    to={`/process-instance/${props.match.params.id}/runtime`}
+                  />
+                )}
+              />
+              <AngularRoute
+                path="/process-instance/:id/runtime"
+                component={processInstance}
+              />
+              <AngularRoute path="/decisions" component={decisions} />
+              <AngularRoute
+                path="/decision-definition"
+                component={decisionDefinition}
+              />
+              <AngularRoute
+                path="/decision-instance"
+                component={decisionInstance}
+              />
+              <AngularRoute path="/tasks" component={tasks} />
+              <AngularRoute path="/repository" component={repository} />
+              <AngularRoute exact path="/batch" component={batch} />
+              <Route>
+                <PluginPoint
+                  location="cockpit.route"
+                  wrapPlugins={({ children, properties }) => (
+                    <Route exact path={properties.path}>
+                      {children}
+                    </Route>
+                  )}
+                />
+              </Route>
+            </Switch>
+            <Notifications className="page-notifications" />
+            <Footer />
+          </div>
+        </PreviousLocationProvider>
       </UserProvider>
     </HashRouter>
   );

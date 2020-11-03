@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-import "./setupAngularRequirements";
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
+const localStorage = window.localStorage;
+const values = JSON.parse(localStorage.getItem("camunda") || "{}");
 
-// Will be removed in the minification step of production build
-if (process.env.NODE_ENV === "development") {
-  document.getElementsByTagName("base")[0].href = window.location.href.match(
-    /([^/]*\/){7}/
-  )[0];
+export function getItem(key, defaultValue) {
+  return typeof values[key] !== "undefined" ? values[key] : defaultValue;
 }
-
-ReactDOM.render(<App />, document.getElementById("root"));
+export function setItem(key, value) {
+  values[key] = value;
+  localStorage.setItem("camunda", JSON.stringify(values));
+}
+export function removeItem(key) {
+  delete values[key];
+  localStorage.setItem("camunda", JSON.stringify(values));
+}
