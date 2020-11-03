@@ -59,12 +59,12 @@
 
     <@lib.response
         code = "200"
-        additionalProperties = true
         dto = "VariableValueDto"
+        additionalProperties = true
         desc = "Request successful. A JSON object containing a property for each variable returned."
         examples = ['"example-1": {
                        "summary": "Status 200 Response",
-                       "description": "GET `/task/anId/form-variables`",
+                       "description": "GET `/process-definition/anId/form-variables`",
                        "value": {
                          "amount": {
                              "type": "integer",
