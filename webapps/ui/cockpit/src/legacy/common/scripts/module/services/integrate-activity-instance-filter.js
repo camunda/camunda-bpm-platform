@@ -16,6 +16,8 @@
  */
 
 var angular = require("../../../../camunda-commons-ui/vendor/angular");
+var registerFilter = require("../../../../../components/ProcessInstance/HOC/withFilter")
+  .registerFilter;
 
 module.exports = [
   "search",
@@ -31,6 +33,8 @@ module.exports = [
       // filter
       $scope.filter = parseFilterFromUri();
       processData.provide("filter", parseFilterFromUri());
+
+      registerFilter(processData);
 
       processData.observe(
         ["filter", "instanceIdToInstanceMap", "activityIdToInstancesMap"],
