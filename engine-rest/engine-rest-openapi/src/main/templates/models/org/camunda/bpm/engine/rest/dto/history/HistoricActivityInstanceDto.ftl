@@ -3,7 +3,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the activity instance."/>
 
     <@lib.property
@@ -14,7 +13,6 @@
     <@lib.property
         name = "activityId"
         type = "string"
-        nullable = false
         desc = "The id of the activity that this object is an instance of."/>
 
     <@lib.property

@@ -3,7 +3,6 @@
   <@lib.property
       name = "workerId"
       type = "string"
-      nullable = false
       desc = "The id of the worker that completes the task. Must match the id of the worker who has most recently locked the task." />
 
   <@lib.property

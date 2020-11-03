@@ -4,13 +4,11 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the process instance." />
 
     <@lib.property
         name = "definitionId"
         type = "string"
-        nullable = false
         desc = "The id of the process definition that this process instance belongs to." />
 
     <@lib.property
@@ -26,14 +24,12 @@
     <@lib.property
         name = "ended"
         type = "boolean"
-        nullable = false
         deprecated = true
         desc = "A flag indicating whether the process instance has ended or not. Deprecated: will always be false!" />
 
     <@lib.property
         name = "suspended"
         type = "boolean"
-        nullable = false
         desc = "A flag indicating whether the process instance is suspended or not." />
 
     <@lib.property

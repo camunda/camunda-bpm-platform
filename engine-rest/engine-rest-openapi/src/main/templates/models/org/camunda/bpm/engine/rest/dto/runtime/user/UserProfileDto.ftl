@@ -3,7 +3,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the user." />
 
     <@lib.property

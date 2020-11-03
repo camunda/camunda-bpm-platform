@@ -6,7 +6,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the deployment resource." />
 
     <@lib.property
@@ -17,7 +16,6 @@
     <@lib.property
         name = "deploymentId"
         type = "string"
-        nullable = false
         last = true
         desc = "The id of the deployment." />
 

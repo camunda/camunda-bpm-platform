@@ -3,7 +3,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the event subscription." />
 
     <@lib.property
@@ -36,7 +35,6 @@
         name = "createdDate"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time this event subscription was created." />
 
     <@lib.property

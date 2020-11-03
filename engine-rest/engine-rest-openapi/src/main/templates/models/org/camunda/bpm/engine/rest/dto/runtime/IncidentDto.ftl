@@ -2,19 +2,16 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the incident." />
 
     <@lib.property
         name = "processDefinitionId"
         type = "string"
-        nullable = false
         desc = "The id of the process definition this incident is associated with." />
 
     <@lib.property
         name = "processInstanceId"
         type = "string"
-        nullable = false
         desc = "The id of the process instance this incident is associated with." />
 
     <@lib.property
@@ -26,7 +23,6 @@
         name = "incidentTimestamp"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time this incident happened. By [default](${docsUrl}/reference/rest/overview/date-format/),
                 the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
 

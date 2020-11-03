@@ -4,13 +4,11 @@
         name = "timestamp"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The interval timestamp."/>
 
     <@lib.property
         name = "name"
         type = "string"
-        nullable = false
         desc = "The name of the metric."/>
 
     <@lib.property
@@ -22,7 +20,6 @@
         name = "value"
         type = "integer"
         format = "int64"
-        nullable = false
         last = true
         desc = "The value of the metric aggregated by the interval."/>
 

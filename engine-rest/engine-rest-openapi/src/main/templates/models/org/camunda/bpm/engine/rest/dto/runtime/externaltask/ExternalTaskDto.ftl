@@ -25,9 +25,7 @@
 
   <@lib.property
       name = "id"
-      nullable = false
       type = "string"
-      nullable = false
       desc = "The id of the external task." />
 
   <@lib.property
@@ -75,7 +73,6 @@
   <@lib.property
       name = "workerId"
       type = "string"
-      nullable = false
       desc = "The id of the worker that posesses or posessed the most recent lock." />
 
   <@lib.property

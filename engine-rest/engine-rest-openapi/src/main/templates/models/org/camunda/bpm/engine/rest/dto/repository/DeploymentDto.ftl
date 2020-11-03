@@ -4,7 +4,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the deployment." />
 
     <@lib.property
@@ -16,7 +15,6 @@
         name = "deploymentTime"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time when the deployment was created." />
 
     <@lib.property
