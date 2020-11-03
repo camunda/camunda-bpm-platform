@@ -275,7 +275,9 @@
                  </#if>
 
                  <#if additionalProperties>
-                   "type" : "object",
+                   <#if !array>
+                     "type" : "object",
+                   </#if>
                    "additionalProperties": {
                  </#if>
 
@@ -287,7 +289,11 @@
                   "type": "${flatType}"
                  </#if>
 
-                 <#if array || additionalProperties >
+                 <#if additionalProperties>
+                   }
+                 </#if>
+
+                 <#if array>
                    }
                  </#if>
                }

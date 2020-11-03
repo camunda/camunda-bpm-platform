@@ -43,6 +43,7 @@
     <@lib.response
         code = "200"
         dto = "VariableValueDto"
+        array = true
         additionalProperties = true
         desc = "Request successful."
         examples = ['"example-1": {
@@ -53,7 +54,7 @@
                            "result": { "value" : "management", "type" : "String", "valueInfo" : null }
                          }
                        ]
-                       }'] />
+                     }'] />
 
     <@lib.response
         code = "404"
