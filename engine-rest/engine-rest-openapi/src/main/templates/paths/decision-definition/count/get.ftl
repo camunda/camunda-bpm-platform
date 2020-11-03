@@ -34,8 +34,7 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Returned if some of the query parameters are invalid,
-                or if an invalid operator for variable comparison is used.
+        desc = "Returned if some of the query parameters are invalid.
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
   }
 }
