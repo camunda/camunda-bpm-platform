@@ -68,16 +68,14 @@
                        "summary": "POST `/task/anId/complete`",
                        "description": "Response Body",
                        "value": {
-                         "variables": {
-                           "aVariable": {
-                             "value": "aStringValue"
-                           },
-                           "anotherVariable": {
-                             "value": 42
-                           },
-                           "aThirdVariable": {
-                             "value": true
-                           }
+                         "aVariable": {
+                           "value": "aStringValue"
+                         },
+                         "anotherVariable": {
+                           "value": 42
+                         },
+                         "aThirdVariable": {
+                           "value": true
                          }
                        }
                      }'
