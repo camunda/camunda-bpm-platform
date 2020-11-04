@@ -3,13 +3,11 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the process definition" />
 
     <@lib.property
         name = "key"
         type = "string"
-        nullable = false
         desc = "The key of the process definition, i.e., the id of the BPMN 2.0 XML process definition." />
 
     <@lib.property
@@ -31,19 +29,16 @@
         name = "version"
         type = "integer"
         format = "int32"
-        nullable = false
         desc = "The version of the process definition that the engine assigned to it." />
 
     <@lib.property
         name = "resource"
         type = "string"
-        nullable = false
         desc = "The file name of the process definition." />
 
     <@lib.property
         name = "deploymentId"
         type = "string"
-        nullable = false
         desc = "The deployment id of the process definition." />
 
     <@lib.property
@@ -54,7 +49,6 @@
     <@lib.property
         name = "suspended"
         type = "boolean"
-        nullable = false
         desc = "A flag indicating whether the definition is suspended or not." />
 
     <@lib.property
@@ -78,7 +72,6 @@
     <@lib.property
         name = "startableInTasklist"
         type = "boolean"
-        nullable = false
         last = true
         desc = "A flag indicating whether the process definition is startable in Tasklist or not." />
 

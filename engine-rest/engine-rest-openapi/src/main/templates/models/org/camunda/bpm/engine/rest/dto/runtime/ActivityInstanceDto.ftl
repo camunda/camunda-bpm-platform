@@ -4,7 +4,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the activity instance."/>
 
     <@lib.property
@@ -15,7 +14,6 @@
     <@lib.property
         name = "activityId"
         type = "string"
-        nullable = false
         desc = "The id of the activity."/>
 
     <@lib.property
@@ -26,7 +24,6 @@
     <@lib.property
         name = "activityType"
         type = "string"
-        nullable = false
         desc = "The type of activity (corresponds to the XML element name in the BPMN 2.0, e.g., 'userTask')"/>
 
     <@lib.property

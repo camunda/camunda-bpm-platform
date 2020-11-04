@@ -3,7 +3,6 @@
     <@lib.property
         name = "messageName"
         type = "string"
-        nullable = false
         desc = "The name of the message to deliver."/>
 
     <@lib.property

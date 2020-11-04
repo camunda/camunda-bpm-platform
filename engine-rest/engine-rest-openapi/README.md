@@ -225,8 +225,9 @@ That will improve the clients that are generated from the OpenAPI documentation.
 
 #### Nullable
 
-Disable `nullable` field to the properties of type `boolean` or `string`, or with `format` field, to specify that they cannot be `null`
-since the default value for those properties is `nullable=true` which ensures working C# clients:
+By default, the properties of type `boolean`, `string`, `array`, and `dto` have `nullable` field enabled by default to ensure that the OpenAPI specification can work with C# clients.
+That way we create relaxed specification for clients where the fields should be specified explicitly whether they should be null or not.
+Disable `nullable` field to the properties where it's sure that they are required:
 ```
     <@lib.property
          name = "version"

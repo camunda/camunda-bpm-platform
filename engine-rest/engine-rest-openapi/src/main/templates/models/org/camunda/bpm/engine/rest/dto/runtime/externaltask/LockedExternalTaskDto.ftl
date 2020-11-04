@@ -31,7 +31,6 @@
   <@lib.property
       name = "id"
       type = "string"
-      nullable = false
       desc = "The id of the external task." />
 
   <@lib.property
@@ -43,13 +42,11 @@
   <@lib.property
       name = "processDefinitionId"
       type = "string"
-      nullable = false
       desc = "The id of the process definition the external task is defined in." />
 
   <@lib.property
       name = "processDefinitionKey"
       type = "string"
-      nullable = false
       desc = "The key of the process definition the external task is defined in." />
 
   <@lib.property
@@ -60,7 +57,6 @@
   <@lib.property
       name = "processInstanceId"
       type = "string"
-      nullable = false
       desc = "The id of the process instance the external task belongs to." />
 
   <@lib.property
@@ -82,7 +78,6 @@
   <@lib.property
       name = "workerId"
       type = "string"
-      nullable = false
       desc = "The id of the worker that posesses or posessed the most recent lock." />
 
   <@lib.property
@@ -94,7 +89,6 @@
   <@lib.property
       name = "topicName"
       type = "string"
-      nullable = false
       desc = "The topic name of the external task." />
 
   <@lib.property

@@ -3,13 +3,11 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The id of the case definition" />
 
     <@lib.property
         name = "key"
         type = "string"
-        nullable = false
         desc = "The key of the case definition, i.e., the id of the CMMN 2.0 XML case definition." />
 
     <@lib.property
@@ -26,19 +24,16 @@
         name = "version"
         type = "integer"
         format = "int32"
-        nullable = false
         desc = "The version of the case definition that the engine assigned to it." />
 
     <@lib.property
         name = "resource"
         type = "string"
-        nullable = false
         desc = "The file name of the case definition." />
 
     <@lib.property
         name = "deploymentId"
         type = "string"
-        nullable = false
         desc = "The deployment id of the case definition." />
 
     <@lib.property

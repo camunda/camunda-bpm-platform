@@ -92,7 +92,7 @@
           "format": "${format}",
         </#if>
 
-        <#if type == "boolean" | type == "string" | format?has_content>
+        <#if type == "boolean" | type == "string" | type == "array" | format?has_content | dto?has_content >
           <#if nullable>
             "nullable": true,
           </#if>

@@ -3,7 +3,6 @@
     <@lib.property
         name = "id"
         type = "string"
-        nullable = false
         desc = "The task id." />
 
     <@lib.property
@@ -25,7 +24,6 @@
         name = "created"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The date the task was created on.
                 [Default format](${docsUrl}/reference/rest/overview/date-format/)
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />
@@ -101,7 +99,6 @@
     <@lib.property
         name = "taskDefinitionKey"
         type = "string"
-        nullable = false
         desc = "The task's key." />
 
     <@lib.property
