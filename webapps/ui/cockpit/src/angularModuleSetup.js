@@ -16,6 +16,7 @@
  */
 
 import angular from "angular";
+import ReactDOM from "react-dom";
 
 import camCommonsModule from "./legacy/camunda-commons-ui/lib";
 import pluginsModule from "./legacy/plugins";
@@ -34,10 +35,11 @@ import { getPlugins, getConfig, getLocale } from "utils/config";
 import { addApiAttributes } from "utils/PluginPoint";
 import * as notifications from "utils/notifications";
 
-export default function setup(module) {
+export default function setup(module, setPlugins) {
   const config = getConfig();
   const locale = getLocale().labels;
   const plugins = getPlugins();
+  let reactPlugins = [];
 
   module.requires.push(
     camCommonsModule.name,
@@ -65,12 +67,29 @@ export default function setup(module) {
       "control",
       "$scope",
       ({ getViewer }, scope) => {
-        plugin.render(
+        const reactContent = plugin.render(
           getViewer(),
           addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
           scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
         );
-        scope.$on("$destroy", plugin.unmount);
+
+        let reactPortal;
+        if (reactContent) {
+          const isolatedContainer = document.createElement("div");
+          reactPortal = ReactDOM.createPortal(reactContent, isolatedContainer);
+          reactPlugins.push(reactPortal);
+          setPlugins([...reactPlugins]);
+        }
+
+        scope.$on("$destroy", () => {
+          plugin.unmount && plugin.unmount();
+          if (reactContent) {
+            reactPlugins = reactPlugins.filter(el => {
+              return reactPortal !== el;
+            });
+            setPlugins(reactPlugins);
+          }
+        });
       }
     ];
 
@@ -79,14 +98,32 @@ export default function setup(module) {
         return {
           link: function(scope, element) {
             const isolatedContainer = document.createElement("div");
-            plugin.render(
+            const reactContent = plugin.render(
               isolatedContainer,
               addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
               scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
             );
 
+            let reactPortal;
+            if (reactContent) {
+              reactPortal = ReactDOM.createPortal(
+                reactContent,
+                isolatedContainer
+              );
+              reactPlugins.push(reactPortal);
+              setPlugins([...reactPlugins]);
+            }
+
             element[0].appendChild(isolatedContainer);
-            scope.$on("$destroy", plugin.unmount);
+            scope.$on("$destroy", () => {
+              plugin.unmount && plugin.unmount();
+              if (reactContent) {
+                reactPlugins = reactPlugins.filter(el => {
+                  return reactPortal !== el;
+                });
+                setPlugins(reactPlugins);
+              }
+            });
           }
         };
       }

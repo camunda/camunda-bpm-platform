@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 import setup from "./angularModuleSetup";
 
@@ -23,12 +23,13 @@ import angular from "angular";
 
 export default function AngularApp({ component }) {
   const ref = useRef(null);
+  const [plugins, setPlugins] = useState([]);
 
   useEffect(() => {
     const promise = new Promise(resolve => {
       const { node, module } = component();
 
-      setup(module);
+      setup(module, setPlugins);
 
       const domNode = ref.current;
       domNode.appendChild(node);
@@ -50,5 +51,10 @@ export default function AngularApp({ component }) {
     };
   }, [component]);
 
-  return <div ref={ref} />;
+  return (
+    <>
+      <div ref={ref} />
+      {plugins}
+    </>
+  );
 }
