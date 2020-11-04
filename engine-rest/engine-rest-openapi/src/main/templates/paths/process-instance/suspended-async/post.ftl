@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "updateSuspensionStateAsyncOperation"
       tag = "Process Instance"
+      summary = "Activate/Suspend In Batch"
       desc = "Activates or suspends process instances asynchronously with a list of process instance ids,
               a process instance query, and/or a historical process instance query." />
 

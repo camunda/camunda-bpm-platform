@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "modifyProcessInstance"
       tag = "Process Instance"
+      summary = "Modify Process Instance Execution State"
       desc = "Submits a list of modification instructions to change a process instance's execution state.
               A modification instruction is one of the following:
       

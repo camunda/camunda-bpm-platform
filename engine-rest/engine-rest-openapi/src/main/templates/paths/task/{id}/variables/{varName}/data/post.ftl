@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "setBinaryTaskVariable"
       tag = "Task Variable"
+      summary = "Update Task Variable (Binary)"
       desc = "Sets the serialized value for a binary variable or the binary value for a file variable visible from the
               task. A variable is visible from the task if it is a local task variable or declared in a parent scope of
               the task. See documentation on

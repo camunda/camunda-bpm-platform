@@ -3,7 +3,7 @@
   <@lib.endpointInfo
       id = "getTaskLocalVariable"
       tag = "Task Local Variable"
-      summary = "Get"
+      summary = "Get Local Task Variable"
       desc = "Retrieves a variable from the context of a given task by id." />
 
   "parameters" : [

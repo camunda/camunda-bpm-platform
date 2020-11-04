@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "deleteProcessInstanceVariable"
       tag = "Process Instance"
+      summary = "Delete Process Variable"
       desc = "Deletes a variable of a process instance by id." />
 
   "parameters": [
