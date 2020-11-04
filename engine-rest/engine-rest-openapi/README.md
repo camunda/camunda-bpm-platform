@@ -135,7 +135,7 @@ then the path parameters (`id` and `varName`) should always be included in the e
 * for `async` endpoints make sure to add `Operation` suffix to prevent collisions in generated C# clients, e.g. `setExternalTaskRetriesAsync` -> `setExternalTaskRetriesAsyncOperation`, `modifyProcessInstanceAsync` -> `modifyProcessInstanceAsyncOperation`
 In most of the cases, the java method name should be used (e.g. `deleteProcessInstancesAsync`). When this is not possible, please define it according to the Java conventions.
 * each endpoint definition contains a tag of its resource (e.g. `Process instance`, `Deployment`).
-* each endpoint definition contains a description.
+* each endpoint definition contains a description and summary (the latter is the title of Rest API doc page).
 * each endpoint definition contains at least one HTTP response object defined.
 * in the request body try to use a DTO when possible, always check the Java DTO for guidance;
 avoid constructing a request body without DTO and only with properties defined in the endpoint description.
