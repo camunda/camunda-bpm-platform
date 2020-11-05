@@ -442,8 +442,8 @@ public class RuntimeServiceTest {
     // when the process instance is deleted and we do not skip the io mappings
     try {
       runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
-      fail("NotFoundException expected");
-    } catch (NotFoundException e) {
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException e) {
       testRule.assertTextPresent("Unknown property used in expression: ${var}. Cause: Cannot resolve identifier 'var'",
           e.getMessage());
     }
@@ -569,6 +569,7 @@ public class RuntimeServiceTest {
     }catch (ProcessEngineException e) {
       //expected
       assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+      assertTrue(e instanceof NotFoundException);
     }
   }
 
