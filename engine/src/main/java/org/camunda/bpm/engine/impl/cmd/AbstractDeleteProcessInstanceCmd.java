@@ -75,7 +75,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     ExecutionManager executionManager = commandContext.getExecutionManager();
     final ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
 
-    if (!failIfNotExists && execution == null) {
+    if(!failIfNotExists && execution == null) {
       return;
     }
 
@@ -85,13 +85,12 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     checkDeleteProcessInstance(execution, commandContext);
 
     // delete process instance
-    commandContext.getExecutionManager()
-        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated,
-            skipIoMappings, skipSubprocesses);
+    commandContext
+        .getExecutionManager()
+        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
 
     if (skipSubprocesses) {
-      List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration().getRuntimeService()
-          .createProcessInstanceQuery()
+      List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery()
           .superProcessInstanceId(processInstanceId).list();
       triggerHistoryEvent(superProcesslist);
     }
