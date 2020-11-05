@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
@@ -590,7 +591,9 @@ public interface RuntimeService {
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -726,7 +729,9 @@ public interface RuntimeService {
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -747,7 +752,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -769,7 +776,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -791,7 +800,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -816,7 +827,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -839,7 +850,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -862,7 +875,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -888,7 +903,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
