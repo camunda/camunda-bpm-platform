@@ -37,6 +37,7 @@
     {"name": "Engine"},
     {"name": "Event Subscription"},
     {"name": "External Task"},
+    {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Process Instance"},
     {"name": "Incident"},
