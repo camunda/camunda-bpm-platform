@@ -30,7 +30,8 @@ var previousUrl = "";
 
 // As long as we don't have a global Modal service, this is how we find out if we just logged in.
 window.addEventListener("hashchange", event => {
-  previousUrl = event.oldURL;
+  // React renders first, than updates the location
+  previousUrl = event.newURL;
 });
 
 var modalController = [
