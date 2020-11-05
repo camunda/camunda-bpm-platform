@@ -3360,7 +3360,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testHandleBpmnErrorNonExistingTask() {
-    doThrow(new NullValueException())
+    doThrow(new NotFoundException())
       .when(taskServiceMock)
       .handleBpmnError(anyString(), anyString(), anyString(), anyMapOf(String.class, Object.class));
 
@@ -3374,7 +3374,26 @@ public class TaskRestServiceInteractionTest extends
       .expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Task with id aTaskId does not exist"))
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
+  }
+
+  @Test
+  public void testHandleBpmnErrorNoErrorCode() {
+    doThrow(new BadUserRequestException())
+        .when(taskServiceMock)
+        .handleBpmnError(anyString(), anyString(), anyString(), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "");
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
     .when()
       .post(HANDLE_BPMN_ERROR_URL);
   }

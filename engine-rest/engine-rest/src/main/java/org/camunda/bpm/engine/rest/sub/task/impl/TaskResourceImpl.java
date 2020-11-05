@@ -417,12 +417,13 @@ public class TaskResourceImpl implements TaskResource {
 
   @Override
   public void handleBpmnError(TaskBpmnErrorDto dto) {
-    TaskService taskService = engine.getTaskService(); 
+    TaskService taskService = engine.getTaskService();
 
     try {
-      taskService.handleBpmnError(taskId, dto.getErrorCode(), dto.getErrorMessage(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
-    } catch (NullValueException e) {
-      throw new RestException(Status.NOT_FOUND, e, "Task with id " + taskId + " does not exist");
+      taskService.handleBpmnError(taskId, dto.getErrorCode(), dto.getErrorMessage(),
+          VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, e.getMessage());
     } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
     }
