@@ -437,17 +437,18 @@ public class RuntimeServiceTest {
   @Test
   public void testDeleteProcessInstanceWithoutSkipIoMappingsAndIncompleteMapping() {
 
-    // given a process instance
+    // given a process instance with incomplete io mapping
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
     // when the process instance is deleted and we do not skip the io mappings
     try {
       runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
       fail("ProcessEngineException expected");
+    // then an exception should occur
     } catch (ProcessEngineException e) {
       testRule.assertTextPresent("Unknown property used in expression: ${var}. Cause: Cannot resolve identifier 'var'",
           e.getMessage());
     }
-    // then no changes should have been made
+    // and no changes should have been made
     testRule.assertProcessNotEnded(instance.getId());
     assertEquals(0,
         historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
