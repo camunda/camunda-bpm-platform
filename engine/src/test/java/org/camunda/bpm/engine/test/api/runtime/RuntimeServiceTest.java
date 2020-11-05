@@ -547,9 +547,9 @@ public class RuntimeServiceTest {
     try {
       runtimeService.deleteProcessInstance("aFake", null);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("No process instance found for id", ae.getMessage());
-      assertTrue(ae instanceof BadUserRequestException);
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("No process instance found for id", e.getMessage());
+      assertTrue(e instanceof NotFoundException);
     }
   }
 
