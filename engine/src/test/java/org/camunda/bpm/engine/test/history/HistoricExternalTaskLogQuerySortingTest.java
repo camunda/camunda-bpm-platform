@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskByTimestamp;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityInstanceId;
@@ -31,8 +32,6 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicE
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.createDefaultExternalTaskModel;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -616,8 +615,8 @@ public class HistoricExternalTaskLogQuerySortingTest {
   }
 
   protected void verifyQueryWithOrdering(HistoricExternalTaskLogQuery query, int countExpected, NullTolerantComparator<HistoricExternalTaskLog> expectedOrdering) {
-    assertThat(countExpected, is(query.list().size()));
-    assertThat((long) countExpected, is(query.count()));
+    assertThat(query.list()).hasSize(countExpected);
+    assertThat(query.count()).isEqualTo(countExpected);
     TestOrderingUtil.verifySorting(query.list(), expectedOrdering);
   }
 

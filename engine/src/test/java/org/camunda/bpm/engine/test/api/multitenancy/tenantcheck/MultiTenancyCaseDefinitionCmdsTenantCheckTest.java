@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -92,7 +90,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getCaseModel(caseDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -102,7 +100,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getCaseModel(caseDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -122,7 +120,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getCaseDiagram(caseDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -132,7 +130,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getCaseDiagram(caseDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -152,7 +150,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -162,7 +160,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -182,7 +180,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
   @Test
@@ -192,7 +190,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
   @Test
@@ -203,8 +201,8 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test
@@ -216,8 +214,8 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test

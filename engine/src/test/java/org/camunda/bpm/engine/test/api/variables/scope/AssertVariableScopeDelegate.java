@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.variables.scope;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -30,6 +28,6 @@ public class AssertVariableScopeDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    assertThat(execution.getVariableLocal("targetOrderId"),is(notNullValue()));
+    assertThat(execution.getVariableLocal("targetOrderId")).isNotNull();
   }
 }

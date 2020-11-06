@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -361,7 +360,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedSuspensionJob);
     String deploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(deploymentId));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(deploymentId);
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -420,7 +419,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedSuspensionJob);
     String deploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(deploymentId));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(deploymentId);
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -748,7 +747,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedSuspensionJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedSuspensionJob);
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -806,7 +805,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedSuspensionJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedSuspensionJob);
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -1125,7 +1124,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedSuspensionJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedSuspensionJob);
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -1181,7 +1180,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedSuspensionJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedSuspensionJob);
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -1440,7 +1439,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedSuspensionJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .orderByProcessDefinitionVersion().desc().list().get(0).getDeploymentId();
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -1495,7 +1494,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedSuspensionJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .orderByProcessDefinitionVersion().desc().list().get(0).getDeploymentId();
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());
@@ -1667,7 +1666,7 @@ public class SuspendJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedSuspensionJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedSuspensionJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedSuspensionJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedSuspensionJob.getId());

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -138,7 +137,7 @@ public class BatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NullValueException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
+      assertThat(e.getMessage()).contains("Batch id is null");
     }
   }
 
@@ -174,7 +173,7 @@ public class BatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NullValueException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
+      assertThat(e.getMessage()).contains("Type is null");
     }
   }
 
@@ -224,8 +223,8 @@ public class BatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
-          + "call asc() or desc() after using orderByXX()"));
+      assertThat(e.getMessage()).contains("Invalid query: "
+          + "call asc() or desc() after using orderByXX()");
     }
   }
 
@@ -236,8 +235,8 @@ public class BatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
-          + "first before specifying a direction"));
+      assertThat(e.getMessage()).contains("You should call any of the orderBy methods "
+          + "first before specifying a direction");
     }
   }
 
@@ -281,10 +280,10 @@ public class BatchQueryTest {
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }
-    Assert.assertThat(foundIds, hasItems(
+    assertThat(foundIds).contains(
       batch1.getId(),
       batch3.getId()
-    ));
+    );
   }
 
 }

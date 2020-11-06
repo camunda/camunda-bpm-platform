@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.EntityTypes.BATCH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,7 +44,6 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -116,7 +115,7 @@ public class BatchSuspensionTest {
       fail("Exception expected");
     }
     catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
+      assertThat(e.getMessage()).contains("Batch for id 'unknown' cannot be found");
     }
   }
 
@@ -127,7 +126,7 @@ public class BatchSuspensionTest {
       fail("Exception expected");
     }
     catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("batch id is null"));
+      assertThat(e.getMessage()).contains("batch id is null");
     }
   }
 
@@ -266,7 +265,7 @@ public class BatchSuspensionTest {
       fail("Exception expected");
     }
     catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
+      assertThat(e.getMessage()).contains("Batch for id 'unknown' cannot be found");
     }
   }
 
@@ -277,7 +276,7 @@ public class BatchSuspensionTest {
       fail("Exception expected");
     }
     catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("batch id is null"));
+      assertThat(e.getMessage()).contains("batch id is null");
     }
   }
 

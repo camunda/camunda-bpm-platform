@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -93,7 +90,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionModel(decisionDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -103,7 +100,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionModel(decisionDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -124,8 +121,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
-    assertThat(inputStream, nullValue());
+    // what should be deployed as a diagram resource for DMN?
+    assertThat(inputStream).isNull();
   }
 
   @Test
@@ -136,8 +133,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
-    assertThat(inputStream, nullValue());
+    // what should be deployed as a diagram resource for DMN?
+    assertThat(inputStream).isNull();
   }
 
   @Test
@@ -157,7 +154,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -167,7 +164,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -189,8 +186,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test
@@ -202,8 +199,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test
@@ -223,7 +220,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DmnModelInstance modelInstance = repositoryService.getDmnModelInstance(decisionDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
   @Test
@@ -233,7 +230,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DmnModelInstance modelInstance = repositoryService.getDmnModelInstance(decisionDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
 }

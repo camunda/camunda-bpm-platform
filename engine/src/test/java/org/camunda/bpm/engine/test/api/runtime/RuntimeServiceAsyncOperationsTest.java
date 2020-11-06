@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,7 +160,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     // then
     assertEquals(0, exceptions.size());
 
-    assertThat(managementService.createJobQuery().withException().list().size(), is(0));
+    assertThat(managementService.createJobQuery().withException().list().size()).isEqualTo(0);
 
     processIds.remove("aFake");
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
@@ -332,7 +331,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   protected void assertProcessInstancesAreDeleted() {
-    assertThat(runtimeService.createProcessInstanceQuery().list().size(), is(0));
+    assertThat(runtimeService.createProcessInstanceQuery().list().size()).isEqualTo(0);
   }
 
   @Test
@@ -357,7 +356,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     executeBatchJobs(batch);
 
     // then
-    assertThat(IncrementCounterListener.counter, is(0));
+    assertThat(IncrementCounterListener.counter).isEqualTo(0);
   }
 
   @Test
@@ -449,7 +448,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     executeBatchJobs(batch);
 
     // then
-    assertThat(IncrementCounterListener.counter, is(1));
+    assertThat(IncrementCounterListener.counter).isEqualTo(1);
   }
 
   @Test

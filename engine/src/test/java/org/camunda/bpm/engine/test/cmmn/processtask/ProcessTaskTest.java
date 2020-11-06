@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.cmmn.processtask;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1385,9 +1384,9 @@ public class ProcessTaskTest extends CmmnTest {
     String processInstanceId = queryProcessInstance().getId();
 
     TypedValue value = runtimeService.getVariableTyped(processInstanceId, variableName);
-    assertThat(value, is(variableValue));
+    assertThat(value).isEqualTo(variableValue);
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
-    assertThat(value, is(variableValue2));
+    assertThat(value).isEqualTo(variableValue2);
 
     String taskId = queryTask().getId();
 
@@ -1399,7 +1398,7 @@ public class ProcessTaskTest extends CmmnTest {
 
     value = caseService.getVariableTyped(caseInstanceId, variableName3);
 
-    assertThat(value, is(variableValue3));
+    assertThat(value).isEqualTo(variableValue3);
 
     // complete ////////////////////////////////////////////////////////
 
@@ -1426,9 +1425,9 @@ public class ProcessTaskTest extends CmmnTest {
 
     String processInstanceId = queryProcessInstance().getId();
     TypedValue value = runtimeService.getVariableTyped(processInstanceId, variableName);
-    assertThat(value, is(caseVariableValue));
+    assertThat(value).isEqualTo(caseVariableValue);
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
-    assertThat(value, is(caseVariableValue2));
+    assertThat(value).isEqualTo(caseVariableValue2);
 
 
     TypedValue processVariableValue = Variables.stringValue("cba");
@@ -1440,9 +1439,9 @@ public class ProcessTaskTest extends CmmnTest {
     taskService.complete(queryTask().getId());
 
     value = caseService.getVariableTyped(caseInstanceId, variableName);
-    assertThat(value, is(processVariableValue));
+    assertThat(value).isEqualTo(processVariableValue);
     value = caseService.getVariableTyped(caseInstanceId, variableName2);
-    assertThat(value, is(processVariableValue2));
+    assertThat(value).isEqualTo(processVariableValue2);
     // complete ////////////////////////////////////////////////////////
 
     testRule.assertProcessEnded(processInstanceId);
@@ -1829,15 +1828,15 @@ public class ProcessTaskTest extends CmmnTest {
   public void testOutputWhenErrorOccurs() {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     Task task = queryTask();
-    assertThat(task.getName(), is("SubTask"));
+    assertThat(task.getName()).isEqualTo("SubTask");
     String variableName = "foo";
     Object variableValue = "bar";
     runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
     taskService.complete(task.getId());
 
     Object variable = caseService.getVariable(caseInstanceId, variableName);
-    assertThat(variable, is(notNullValue()));
-    assertThat(variable, is(variableValue));
+    assertThat(variable).isNotNull();
+    assertThat(variable).isEqualTo(variableValue);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
@@ -1846,15 +1845,15 @@ public class ProcessTaskTest extends CmmnTest {
   public void testOutputWhenThrownBpmnErrorOccurs() {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     Task task = queryTask();
-    assertThat(task.getName(), is("SubTask"));
+    assertThat(task.getName()).isEqualTo("SubTask");
     String variableName = "foo";
     Object variableValue = "bar";
     runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
     taskService.complete(task.getId());
 
     Object variable = caseService.getVariable(caseInstanceId, variableName);
-    assertThat(variable, is(notNullValue()));
-    assertThat(variable, is(variableValue));
+    assertThat(variable).isNotNull();
+    assertThat(variable).isEqualTo(variableValue);
   }
 
   protected ProcessInstance queryProcessInstance() {

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByEndTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByStartTime;
@@ -156,7 +157,7 @@ public class HistoricBatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NullValueException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
+      assertThat(e.getMessage()).contains("Batch id is null");
     }
   }
 
@@ -217,7 +218,7 @@ public class HistoricBatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NullValueException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
+      assertThat(e.getMessage()).contains("Type is null");
     }
   }
 
@@ -333,8 +334,8 @@ public class HistoricBatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
-          + "call asc() or desc() after using orderByXX()"));
+      assertThat(e.getMessage()).contains("Invalid query: "
+          + "call asc() or desc() after using orderByXX()");
     }
   }
 
@@ -345,8 +346,8 @@ public class HistoricBatchQueryTest {
       Assert.fail("exception expected");
     }
     catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
-          + "first before specifying a direction"));
+      assertThat(e.getMessage()).contains("You should call any of the orderBy methods "
+          + "first before specifying a direction");
     }
   }
 }

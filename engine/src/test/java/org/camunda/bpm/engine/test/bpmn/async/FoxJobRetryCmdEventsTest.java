@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.deployment;
 import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareCompensationEventProcess;
 import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareEscalationEventProcess;
 import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareMessageEventProcess;
 import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareSignalEventProcess;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
 
@@ -93,7 +91,7 @@ public class FoxJobRetryCmdEventsTest {
   }
 
   protected void assertJobRetries(ProcessInstance pi) {
-    assertThat(pi,is(notNullValue()));
+    assertThat(pi).isNotNull();
 
     Job job = fetchJob(pi.getProcessInstanceId());
 
@@ -104,7 +102,7 @@ public class FoxJobRetryCmdEventsTest {
 
     // update job
     job = fetchJob(pi.getProcessInstanceId());
-    assertThat(job.getRetries(),is(4));
+    assertThat(job.getRetries()).isEqualTo(4);
   }
 
   protected Job fetchJob(String processInstanceId) {

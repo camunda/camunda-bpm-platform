@@ -215,7 +215,7 @@ public class FilterQueryTest extends PluggableProcessEngineTest {
     assertEquals(4, query.listPage(0, 15).size()); // there are only 4 tasks
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "deprecation" })
   @Test
   public void testQuerySorting() {
     List<String> sortedIds = new ArrayList<String>(filterIds);

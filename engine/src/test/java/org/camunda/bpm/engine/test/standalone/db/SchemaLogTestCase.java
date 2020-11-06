@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class SchemaLogTestCase {
     try {
       PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
       Resource[] resources = resolver.getResources("classpath:" + path + "/*");
-      assertThat(resources.length, greaterThan(0));
+      assertThat(resources.length).isGreaterThan(0);
       for (Resource res : resources) {
         files.add(res.getFilename());
       }

@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.multiinstance;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior.NUMBER_OF_INSTANCES;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class MultiInstanceVariablesTest {
     BpmnModelInstance testProcess = getBpmnSubProcessModelInstance();
 
     deployAndStartProcess(modelInstance, testProcess);
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(2));
+    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list()).hasSize(2);
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().active().list();
     for (Task task : tasks) {
@@ -68,8 +67,8 @@ public class MultiInstanceVariablesTest {
       engineRule.getTaskService().complete(task.getId());
     }
 
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(0));
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().activityId(CALL_ACTIVITY).list().size(),is(0));
+    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list()).hasSize(0);
+    assertThat(engineRule.getRuntimeService().createExecutionQuery().activityId(CALL_ACTIVITY).list()).hasSize(0);
   }
 
   protected void addAllOut(BpmnModelInstance modelInstance, CallActivityBuilder callActivityBuilder) {

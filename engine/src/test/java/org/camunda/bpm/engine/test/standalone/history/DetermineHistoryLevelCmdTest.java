@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,7 +70,7 @@ public class DetermineHistoryLevelCmdTest {
 
     HistoryLevel historyLevel = config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
 
-    assertThat(historyLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(historyLevel).isEqualTo(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
 
@@ -81,12 +81,12 @@ public class DetermineHistoryLevelCmdTest {
     // init the db with level=auto -> audit
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
     // the history Level has been overwritten with audit
-    assertThat(config.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(config.getHistoryLevel()).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
 
     // and this is written to the database
     HistoryLevel databaseLevel =
         config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
-    assertThat(databaseLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(databaseLevel).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
   }
 
   @Test

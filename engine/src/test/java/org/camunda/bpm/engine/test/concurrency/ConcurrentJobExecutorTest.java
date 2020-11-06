@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -284,7 +283,7 @@ public class ConcurrentJobExecutorTest {
     } else {
       // on CockroachDB, the TX of the acquisition thread
       // will fail with an un-ignorable OLE and needs to be retried
-      assertThat(acquisitionThread.exception, is(OptimisticLockingException.class));
+      assertThat(acquisitionThread.exception).isInstanceOf(OptimisticLockingException.class);
       // and no result will be returned
       assertNull(acquisitionThread.acquiredJobs);
     }
@@ -386,7 +385,7 @@ public class ConcurrentJobExecutorTest {
     } else {
       // on CockroachDB, the TX of the execution thread
       // will fail with an un-ignorable OLE and needs to be retried
-      assertThat(executionThread.exception, is(OptimisticLockingException.class));
+      assertThat(executionThread.exception).isInstanceOf(OptimisticLockingException.class);
       // and both jobs will remain available
       assertEquals(2L, remainingJobCount);
     }

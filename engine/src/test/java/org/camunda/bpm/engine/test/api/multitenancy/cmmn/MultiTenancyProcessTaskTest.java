@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -62,8 +60,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("testCaseDeployment", TENANT_TWO);
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -76,8 +74,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("testCase", TENANT_TWO);
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -95,8 +93,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
         .tenantIdIn(TENANT_TWO).processDefinitionKey("testProcess").latestVersion().singleResult();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).processDefinitionId(latestProcessTenantTwo.getId()).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).processDefinitionId(latestProcessTenantTwo.getId()).count()).isEqualTo(1L);
   }
 
   @Test
@@ -109,8 +107,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("testCaseVersion", TENANT_TWO);
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -124,7 +122,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed with key = 'testProcess'"));
+      assertThat(e.getMessage()).contains("no processes deployed with key = 'testProcess'");
     }
   }
 
@@ -139,7 +137,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed with key 'testProcess'"));
+      assertThat(e.getMessage()).contains("no processes deployed with key 'testProcess'");
     }
   }
 
@@ -156,7 +154,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed with key = 'testProcess'"));
+      assertThat(e.getMessage()).contains("no processes deployed with key = 'testProcess'");
     }
   }
 
@@ -168,7 +166,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
     caseService.withCaseDefinitionByKey("testCase").create();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -182,7 +180,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTest {
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {

@@ -17,12 +17,10 @@
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -660,7 +658,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
     catch (NullValueException nve) {
       fail("Shouldn't have received NullValueException");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Invalid format"));
+      assertThat(e.getMessage()).contains("Invalid format");
     }
   }
 

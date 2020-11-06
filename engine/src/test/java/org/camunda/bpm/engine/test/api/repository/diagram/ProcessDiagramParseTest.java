@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.repository.diagram;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.FileInputStream;
@@ -87,8 +86,8 @@ public class ProcessDiagramParseTest {
       fail("The test BPMN model file is missing. " + ex.getMessage());
     } catch (Exception e) {
       // then
-      assertThat(e.getMessage(), containsString("Error while parsing BPMN model"));
-      assertThat(e.getCause().getMessage(), containsString("http://apache.org/xml/features/disallow-doctype-decl"));
+      assertThat(e.getMessage()).contains("Error while parsing BPMN model");
+      assertThat(e.getCause().getMessage()).contains("http://apache.org/xml/features/disallow-doctype-decl");
     }
   }
 
@@ -118,8 +117,8 @@ public class ProcessDiagramParseTest {
       fail("The test BPMN model file is missing. " + ex.getMessage());
     } catch (Exception e) {
       // then
-      assertThat(e.getMessage(), containsString("Error while parsing BPMN model"));
-      assertThat(e.getCause().getMessage(), containsString("file.txt"));
+      assertThat(e.getMessage()).contains("Error while parsing BPMN model");
+      assertThat(e.getCause().getMessage()).contains("file.txt");
     }
   }
 }

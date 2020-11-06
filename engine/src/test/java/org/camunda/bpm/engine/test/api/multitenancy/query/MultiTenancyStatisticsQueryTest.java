@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,10 +63,10 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
         .createDeploymentStatisticsQuery()
         .list();
 
-    assertThat(deploymentStatistics.size(), is(3));
+    assertThat(deploymentStatistics).hasSize(3);
 
     Set<String> tenantIds = collectDeploymentTenantIds(deploymentStatistics);
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -77,10 +75,10 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
       .createProcessDefinitionStatisticsQuery()
       .list();
 
-    assertThat(processDefinitionStatistics.size(), is(3));
+    assertThat(processDefinitionStatistics).hasSize(3);
 
     Set<String> tenantIds = collectDefinitionTenantIds(processDefinitionStatistics);
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -88,11 +86,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
     identityService.setAuthentication("user", null, null);
 
     DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     Set<String> tenantIds = collectDeploymentTenantIds(query.list());
-    assertThat(tenantIds.size(), is(1));
-    assertThat(tenantIds.iterator().next(), is(nullValue()));
+    assertThat(tenantIds).hasSize(1);
+    assertThat(tenantIds.iterator().next()).isNull();
   }
 
   @Test
@@ -101,11 +99,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     Set<String> tenantIds = collectDeploymentTenantIds(query.list());
-    assertThat(tenantIds.size(), is(2));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE));
+    assertThat(tenantIds).hasSize(2);
+    assertThat(tenantIds).contains(null, TENANT_ONE);
   }
 
   @Test
@@ -114,11 +112,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
 
     Set<String> tenantIds = collectDeploymentTenantIds(query.list());
-    assertThat(tenantIds.size(), is(3));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).hasSize(3);
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -128,11 +126,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
 
     Set<String> tenantIds = collectDeploymentTenantIds(query.list());
-    assertThat(tenantIds.size(), is(3));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).hasSize(3);
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -140,11 +138,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
     identityService.setAuthentication("user", null, null);
 
     ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
-    assertThat(tenantIds.size(), is(1));
-    assertThat(tenantIds.iterator().next(), is(nullValue()));
+    assertThat(tenantIds).hasSize(1);
+    assertThat(tenantIds.iterator().next()).isNull();
   }
 
   @Test
@@ -153,11 +151,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
-    assertThat(tenantIds.size(), is(2));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE));
+    assertThat(tenantIds).hasSize(2);
+    assertThat(tenantIds).contains(null, TENANT_ONE);
   }
 
   @Test
@@ -166,11 +164,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
 
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
-    assertThat(tenantIds.size(), is(3));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).hasSize(3);
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -180,11 +178,11 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
 
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
-    assertThat(tenantIds.size(), is(3));
-    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+    assertThat(tenantIds).hasSize(3);
+    assertThat(tenantIds).contains(null, TENANT_ONE, TENANT_TWO);
   }
 
   @Test
@@ -193,7 +191,7 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
   }
 
@@ -205,35 +203,35 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTest 
 
     ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
   }
 
   @Test
   public void testQueryNoAuthenticatedTenantForActivityStatistics() {
-    
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
 
     identityService.setAuthentication("user", null);
 
     ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
 
   }
 
   @Test
   public void testQueryDisabledTenantCheckForActivityStatistics() {
-    
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
-    
+
     identityService.setAuthentication("user", null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
-    
-    assertThat(query.count(), is(1L));
-    
+
+    assertThat(query.count()).isEqualTo(1L);
+
   }
 
   protected Set<String> collectDeploymentTenantIds(List<DeploymentStatistics> deploymentStatistics) {

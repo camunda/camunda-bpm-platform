@@ -16,12 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
@@ -1281,7 +1279,7 @@ public class ProcessApplicationDeploymentTest {
   protected void assertThatOneProcessIsDeployed() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
         .singleResult();
-    assertThat(processDefinition, is(notNullValue()));
+    assertThat(processDefinition).isNotNull();
     assertEquals(1, processDefinition.getVersion());
   }
 

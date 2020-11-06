@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +97,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     Task task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -115,7 +112,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -130,7 +127,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -145,7 +142,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -157,21 +154,21 @@ public class TaskListenerDelegateCompletionTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(taskQuery.count(), is(1L));
+    assertThat(taskQuery.count()).isEqualTo(1L);
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
     testHelper.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat(taskQuery.count(), is(0L));
+    assertThat(taskQuery.count()).isEqualTo(0L);
   }
 
   @Test
   public void testCompletionIsNotPossibleOnComplete () {
     // expect
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("invalid task state"));
+    thrown.expectMessage("invalid task state");
     //given
     createProcessWithListener(TaskListener.EVENTNAME_COMPLETE);
 
@@ -186,7 +183,7 @@ public class TaskListenerDelegateCompletionTest {
   public void testCompletionIsNotPossibleOnDelete () {
     // expect
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("invalid task state"));
+    thrown.expectMessage("invalid task state");
 
     //given
     createProcessWithListener(TaskListener.EVENTNAME_DELETE);

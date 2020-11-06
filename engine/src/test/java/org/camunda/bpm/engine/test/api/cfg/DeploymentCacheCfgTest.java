@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +96,7 @@ public class DeploymentCacheCfgTest {
     Cache<String, ProcessDefinitionEntity> cache = deploymentCache.getProcessDefinitionCache();
 
     // then
-    assertThat(cache, instanceOf(MyCacheImplementation.class));
+    assertThat(cache).isInstanceOf(MyCacheImplementation.class);
   }
 
   @Test

@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -45,7 +44,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -561,7 +559,7 @@ public class IncidentQueryTest {
       fail("Should fail");
     }
     catch (NullValueException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("jobDefinitionIds contains null value"));
+      assertThat(e.getMessage()).contains("jobDefinitionIds contains null value");
     }
   }
 
@@ -573,7 +571,7 @@ public class IncidentQueryTest {
       fail("Should fail");
     }
     catch (NullValueException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("jobDefinitionIds is null"));
+      assertThat(e.getMessage()).contains("jobDefinitionIds is null");
     }
   }
 

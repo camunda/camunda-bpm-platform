@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
@@ -40,7 +39,7 @@ public class CaseSentryPartEntityTest extends PluggableProcessEngineTest {
     insertCaseSentryPart(caseSentryPartEntity);
 
     caseSentryPartEntity = readCaseSentryPart();
-    assertThat(caseSentryPartEntity.getTenantId(), is("tenant1"));
+    assertThat(caseSentryPartEntity.getTenantId()).isEqualTo("tenant1");
 
     deleteCaseSentryPart(caseSentryPartEntity);
   }

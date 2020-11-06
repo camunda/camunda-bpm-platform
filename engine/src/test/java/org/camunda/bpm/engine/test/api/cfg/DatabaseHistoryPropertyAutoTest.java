@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +79,8 @@ public class DatabaseHistoryPropertyAutoTest {
     ProcessEngineImpl processEngineTwo = buildEngine(config("true", ProcessEngineConfiguration.HISTORY_AUTO));
 
     // then
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory(), is(ProcessEngineConfiguration.HISTORY_AUTO));
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory()).isSameAs(ProcessEngineConfiguration.HISTORY_AUTO);
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel()).isSameAs(HistoryLevel.HISTORY_LEVEL_FULL);
 
   }
 
@@ -98,9 +96,9 @@ public class DatabaseHistoryPropertyAutoTest {
       }
     });
 
-    assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
+    assertThat(level).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId());
 
-    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel(), equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel()).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
   }
 
   @After

@@ -16,11 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -114,7 +110,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     CaseExecution caseExecution = getCaseExecution();
 
-    assertThat(caseExecution.isActive(), is(true));
+    assertThat(caseExecution.isActive()).isTrue();
   }
 
   @Test
@@ -128,7 +124,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     CaseExecution caseExecution = getCaseExecution();
 
-    assertThat(caseExecution.isActive(), is(true));
+    assertThat(caseExecution.isActive()).isTrue();
   }
 
   @Test
@@ -151,8 +147,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseActivityInstance historicCaseActivityInstance = getHistoricCaseActivityInstance();
 
-    assertThat(historicCaseActivityInstance, notNullValue());
-    assertThat(historicCaseActivityInstance.isDisabled(), is(true));
+    assertThat(historicCaseActivityInstance).isNotNull();
+    assertThat(historicCaseActivityInstance.isDisabled()).isTrue();
   }
 
   @Test
@@ -166,8 +162,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseActivityInstance historicCaseActivityInstance = getHistoricCaseActivityInstance();
 
-    assertThat(historicCaseActivityInstance, notNullValue());
-    assertThat(historicCaseActivityInstance.isDisabled(), is(true));
+    assertThat(historicCaseActivityInstance).isNotNull();
+    assertThat(historicCaseActivityInstance.isDisabled()).isTrue();
   }
 
   @Test
@@ -194,7 +190,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     CaseExecution caseExecution = getCaseExecution();
 
-    assertThat(caseExecution.isEnabled(), is(true));
+    assertThat(caseExecution.isEnabled()).isTrue();
   }
 
   @Test
@@ -210,7 +206,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     CaseExecution caseExecution = getCaseExecution();
 
-    assertThat(caseExecution.isEnabled(), is(true));
+    assertThat(caseExecution.isEnabled()).isTrue();
   }
 
   @Test
@@ -237,8 +233,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseActivityInstance historicCaseActivityInstance = getHistoricCaseActivityInstance();
 
-    assertThat(historicCaseActivityInstance, notNullValue());
-    assertThat(historicCaseActivityInstance.isCompleted(), is(true));
+    assertThat(historicCaseActivityInstance).isNotNull();
+    assertThat(historicCaseActivityInstance.isCompleted()).isTrue();
   }
 
   @Test
@@ -254,8 +250,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseActivityInstance historicCaseActivityInstance = getHistoricCaseActivityInstance();
 
-    assertThat(historicCaseActivityInstance, notNullValue());
-    assertThat(historicCaseActivityInstance.isCompleted(), is(true));
+    assertThat(historicCaseActivityInstance).isNotNull();
+    assertThat(historicCaseActivityInstance.isCompleted()).isTrue();
   }
 
   @Test
@@ -282,8 +278,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
 
-    assertThat(historicCaseInstance, notNullValue());
-    assertThat(historicCaseInstance.isClosed(), is(true));
+    assertThat(historicCaseInstance).isNotNull();
+    assertThat(historicCaseInstance.isClosed()).isTrue();
   }
 
   @Test
@@ -299,13 +295,13 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
 
-    assertThat(historicCaseInstance, notNullValue());
-    assertThat(historicCaseInstance.isClosed(), is(true));
+    assertThat(historicCaseInstance).isNotNull();
+    assertThat(historicCaseInstance.isClosed()).isTrue();
   }
 
   @Test
   public void terminateCaseInstanceNoAuthenticatedTenants() {
-    
+
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
@@ -322,25 +318,25 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
 
-    assertThat(historicCaseInstance, notNullValue());
-    assertThat(historicCaseInstance.isTerminated(), is(true));
+    assertThat(historicCaseInstance).isNotNull();
+    assertThat(historicCaseInstance.isTerminated()).isTrue();
 
   }
 
   @Test
   public void terminateCaseExecutionDisabledTenantCheck() {
-    
+
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     caseService.terminateCaseExecution(caseInstanceId);
-    
+
     HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
 
-    assertThat(historicCaseInstance, notNullValue());
-    assertThat(historicCaseInstance.isTerminated(), is(true));
+    assertThat(historicCaseInstance).isNotNull();
+    assertThat(historicCaseInstance.isTerminated()).isTrue();
   }
-  
+
   @Test
   public void getVariablesNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
@@ -357,8 +353,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
 
-    assertThat(variables, notNullValue());
-    assertThat(variables.keySet(), hasItem(VARIABLE_NAME));
+    assertThat(variables).isNotNull();
+    assertThat(variables.keySet()).contains(VARIABLE_NAME);
   }
 
   @Test
@@ -368,8 +364,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
 
-    assertThat(variables, notNullValue());
-    assertThat(variables.keySet(), hasItem(VARIABLE_NAME));
+    assertThat(variables).isNotNull();
+    assertThat(variables.keySet()).contains(VARIABLE_NAME);
   }
 
   @Test
@@ -388,7 +384,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     String variableValue = (String) caseService.getVariable(caseExecutionId, VARIABLE_NAME);
 
-    assertThat(variableValue, is(VARIABLE_VALUE));
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE);
   }
 
   @Test
@@ -398,7 +394,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     String variableValue = (String) caseService.getVariable(caseExecutionId, VARIABLE_NAME);
 
-    assertThat(variableValue, is(VARIABLE_VALUE));
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE);
   }
 
   @Test
@@ -417,7 +413,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     StringValue variable = caseService.getVariableTyped(caseExecutionId, VARIABLE_NAME);
 
-    assertThat(variable.getValue(), is(VARIABLE_VALUE));
+    assertThat(variable.getValue()).isEqualTo(VARIABLE_VALUE);
   }
 
   @Test
@@ -427,7 +423,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     StringValue variable = caseService.getVariableTyped(caseExecutionId, VARIABLE_NAME);
 
-    assertThat(variable.getValue(), is(VARIABLE_VALUE));
+    assertThat(variable.getValue()).isEqualTo(VARIABLE_VALUE);
   }
 
   @Test
@@ -449,7 +445,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
-    assertThat(variables.isEmpty(), is(true));
+    assertThat(variables.isEmpty()).isTrue();
   }
 
   @Test
@@ -462,7 +458,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
-    assertThat(variables.isEmpty(), is(true));
+    assertThat(variables.isEmpty()).isTrue();
   }
 
   @Test
@@ -484,8 +480,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
-    assertThat(variables, notNullValue());
-    assertThat(variables.keySet(), hasItems(VARIABLE_NAME, "newVar"));
+    assertThat(variables).isNotNull();
+    assertThat(variables.keySet()).contains(VARIABLE_NAME, "newVar");
   }
 
   @Test
@@ -498,8 +494,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     Map<String, Object> variables = caseService.getVariables(caseExecutionId);
-    assertThat(variables, notNullValue());
-    assertThat(variables.keySet(), hasItems(VARIABLE_NAME, "newVar"));
+    assertThat(variables).isNotNull();
+    assertThat(variables.keySet()).contains(VARIABLE_NAME, "newVar");
   }
 
   protected String createCaseInstance(String tenantId) {

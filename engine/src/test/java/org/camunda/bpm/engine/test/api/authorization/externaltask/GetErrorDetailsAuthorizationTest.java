@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
 import java.util.List;
@@ -133,7 +132,7 @@ public class GetErrorDetailsAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       //assertion method
-      assertThat(currentDetails,is(ERROR_DETAILS));
+      assertThat(currentDetails).isEqualTo(ERROR_DETAILS);
     }
   }
 

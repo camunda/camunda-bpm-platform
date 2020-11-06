@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
@@ -94,11 +92,11 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
   @Test
   public void testQueryIncludeInputsForNonExistingDecision() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().includeInputs();
-    assertThat(query.singleResult(), is(nullValue()));
+    assertThat(query.singleResult()).isNull();
 
     startProcessInstanceAndEvaluateDecision();
 
-    assertThat(query.decisionInstanceId("nonExisting").singleResult(), is(nullValue()));
+    assertThat(query.decisionInstanceId("nonExisting").singleResult()).isNull();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -116,18 +114,18 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
       // should throw exception if output is not fetched
     }
 
-    assertThat(query.includeOutputs().singleResult().getOutputs().size(), is(1));
+    assertThat(query.includeOutputs().singleResult().getOutputs()).hasSize(1);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   @Test
   public void testQueryIncludeOutputsForNonExistingDecision() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().includeOutputs();
-    assertThat(query.singleResult(), is(nullValue()));
+    assertThat(query.singleResult()).isNull();
 
     startProcessInstanceAndEvaluateDecision();
 
-    assertThat(query.decisionInstanceId("nonExisting").singleResult(), is(nullValue()));
+    assertThat(query.decisionInstanceId("nonExisting").singleResult()).isNull();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_NO_INPUT_DMN })
@@ -138,7 +136,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.includeInputs().singleResult().getInputs().size(), is(0));
+    assertThat(query.includeInputs().singleResult().getInputs()).isEmpty();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_NO_INPUT_DMN })
@@ -149,7 +147,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.includeOutputs().singleResult().getOutputs().size(), is(0));
+    assertThat(query.includeOutputs().singleResult().getOutputs()).isEmpty();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -161,8 +159,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.listPage(0, 2).size(), is(2));
-    assertThat(query.listPage(1, 1).size(), is(1));
+    assertThat(query.listPage(0, 2)).hasSize(2);
+    assertThat(query.listPage(1, 1)).hasSize(1);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -174,10 +172,10 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     startProcessInstanceAndEvaluateDecision();
 
     List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery().orderByEvaluationTime().asc().list();
-    assertThat(orderAsc.get(0).getEvaluationTime().before(orderAsc.get(1).getEvaluationTime()), is(true));
+    assertThat(orderAsc.get(0).getEvaluationTime().before(orderAsc.get(1).getEvaluationTime())).isTrue();
 
     List<HistoricDecisionInstance> orderDesc = historyService.createHistoricDecisionInstanceQuery().orderByEvaluationTime().desc().list();
-    assertThat(orderDesc.get(0).getEvaluationTime().after(orderDesc.get(1).getEvaluationTime()), is(true));
+    assertThat(orderDesc.get(0).getEvaluationTime().after(orderDesc.get(1).getEvaluationTime())).isTrue();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -191,9 +189,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionInstanceId(decisionInstanceId1).count(), is(1L));
-    assertThat(query.decisionInstanceId(decisionInstanceId2).count(), is(1L));
-    assertThat(query.decisionInstanceId("unknown").count(), is(0L));
+    assertThat(query.decisionInstanceId(decisionInstanceId1).count()).isEqualTo(1L);
+    assertThat(query.decisionInstanceId(decisionInstanceId2).count()).isEqualTo(1L);
+    assertThat(query.decisionInstanceId("unknown").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -207,9 +205,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionInstanceIdIn(decisionInstanceId1).count(), is(1L));
-    assertThat(query.decisionInstanceIdIn(decisionInstanceId2).count(), is(1L));
-    assertThat(query.decisionInstanceIdIn(decisionInstanceId1, decisionInstanceId2).count(), is(2L));
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId1).count()).isEqualTo(1L);
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId2).count()).isEqualTo(1L);
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId1, decisionInstanceId2).count()).isEqualTo(2L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -222,8 +220,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionId(decisionDefinitionId).count(), is(1L));
-    assertThat(query.decisionDefinitionId("other id").count(), is(0L));
+    assertThat(query.decisionDefinitionId(decisionDefinitionId).count()).isEqualTo(1L);
+    assertThat(query.decisionDefinitionId("other id").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN, DRG_DMN })
@@ -243,8 +241,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     //then
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionIdIn(decisionDefinitionId, decisionDefinitionId2).count(), is(2L));
-    assertThat(query.decisionDefinitionIdIn("other id", "anotherFake").count(), is(0L));
+    assertThat(query.decisionDefinitionIdIn(decisionDefinitionId, decisionDefinitionId2).count()).isEqualTo(2L);
+    assertThat(query.decisionDefinitionIdIn("other id", "anotherFake").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN, DRG_DMN})
@@ -272,8 +270,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     //then
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionKeyIn(DISH_DECISION, DECISION_DEFINITION_KEY).count(), is(2L));
-    assertThat(query.decisionDefinitionKeyIn("other id", "anotherFake").count(), is(0L));
+    assertThat(query.decisionDefinitionKeyIn(DISH_DECISION, DECISION_DEFINITION_KEY).count()).isEqualTo(2L);
+    assertThat(query.decisionDefinitionKeyIn("other id", "anotherFake").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN, DRG_DMN})
@@ -296,8 +294,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionKey(DECISION_DEFINITION_KEY).count(), is(1L));
-    assertThat(query.decisionDefinitionKey("other key").count(), is(0L));
+    assertThat(query.decisionDefinitionKey(DECISION_DEFINITION_KEY).count()).isEqualTo(1L);
+    assertThat(query.decisionDefinitionKey("other key").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -308,8 +306,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionName("sample decision").count(), is(1L));
-    assertThat(query.decisionDefinitionName("other name").count(), is(0L));
+    assertThat(query.decisionDefinitionName("sample decision").count()).isEqualTo(1L);
+    assertThat(query.decisionDefinitionName("other name").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_WITH_UNDERSCORE, DECISION_SINGLE_OUTPUT_DMN, DECISION_SINGLE_OUTPUT_DMN_WITH_UNDERSCORE })
@@ -321,8 +319,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionNameLike("%ample dec%").count(), is(1L));
-    assertThat(query.decisionDefinitionNameLike("%ample\\_%").count(), is(1L));
+    assertThat(query.decisionDefinitionNameLike("%ample dec%").count()).isEqualTo(1L);
+    assertThat(query.decisionDefinitionNameLike("%ample\\_%").count()).isEqualTo(1L);
 
   }
 
@@ -334,7 +332,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionDefinitionNameLike("%invalid%").count(), is(0L));
+    assertThat(query.decisionDefinitionNameLike("%invalid%").count()).isEqualTo(0L);
 
     try {
       query.decisionDefinitionNameLike(null);
@@ -353,8 +351,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.processDefinitionKey(processDefinitionKey).count(), is(1L));
-    assertThat(query.processDefinitionKey("other process").count(), is(0L));
+    assertThat(query.processDefinitionKey(processDefinitionKey).count()).isEqualTo(1L);
+    assertThat(query.processDefinitionKey("other process").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -366,8 +364,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.processDefinitionId(processDefinitionId).count(), is(1L));
-    assertThat(query.processDefinitionId("other process").count(), is(0L));
+    assertThat(query.processDefinitionId(processDefinitionId).count()).isEqualTo(1L);
+    assertThat(query.processDefinitionId("other process").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -380,8 +378,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.processInstanceId(processInstanceId).count(), is(1L));
-    assertThat(query.processInstanceId("other process").count(), is(0L));
+    assertThat(query.processInstanceId(processInstanceId).count()).isEqualTo(1L);
+    assertThat(query.processInstanceId("other process").count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -392,9 +390,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.activityIdIn("task").count(), is(1L));
-    assertThat(query.activityIdIn("other activity").count(), is(0L));
-    assertThat(query.activityIdIn("task", "other activity").count(), is(1L));
+    assertThat(query.activityIdIn("task").count()).isEqualTo(1L);
+    assertThat(query.activityIdIn("other activity").count()).isEqualTo(0L);
+    assertThat(query.activityIdIn("task", "other activity").count()).isEqualTo(1L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -406,9 +404,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     String activityInstanceId = historyService.createHistoricActivityInstanceQuery().activityId("task").singleResult().getId();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.activityInstanceIdIn(activityInstanceId).count(), is(1L));
-    assertThat(query.activityInstanceIdIn("other activity").count(), is(0L));
-    assertThat(query.activityInstanceIdIn(activityInstanceId, "other activity").count(), is(1L));
+    assertThat(query.activityInstanceIdIn(activityInstanceId).count()).isEqualTo(1L);
+    assertThat(query.activityInstanceIdIn("other activity").count()).isEqualTo(0L);
+    assertThat(query.activityInstanceIdIn(activityInstanceId, "other activity").count()).isEqualTo(1L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -422,9 +420,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     startProcessInstanceAndEvaluateDecision();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.evaluatedBefore(afterEvaluated).count(), is(1L));
-    assertThat(query.evaluatedBefore(evaluated).count(), is(1L));
-    assertThat(query.evaluatedBefore(beforeEvaluated).count(), is(0L));
+    assertThat(query.evaluatedBefore(afterEvaluated).count()).isEqualTo(1L);
+    assertThat(query.evaluatedBefore(evaluated).count()).isEqualTo(1L);
+    assertThat(query.evaluatedBefore(beforeEvaluated).count()).isEqualTo(0L);
 
     ClockUtil.reset();
   }
@@ -440,9 +438,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     startProcessInstanceAndEvaluateDecision();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.evaluatedAfter(beforeEvaluated).count(), is(1L));
-    assertThat(query.evaluatedAfter(evaluated).count(), is(1L));
-    assertThat(query.evaluatedAfter(afterEvaluated).count(), is(0L));
+    assertThat(query.evaluatedAfter(beforeEvaluated).count()).isEqualTo(1L);
+    assertThat(query.evaluatedAfter(evaluated).count()).isEqualTo(1L);
+    assertThat(query.evaluatedAfter(afterEvaluated).count()).isEqualTo(0L);
 
     ClockUtil.reset();
   }
@@ -454,14 +452,14 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseDefinitionKey("case").count(), is(1L));
+    assertThat(query.caseDefinitionKey("case").count()).isEqualTo(1L);
   }
 
   @Test
   public void testQueryByInvalidCaseDefinitionKey() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseDefinitionKey("invalid").count(), is(0L));
+    assertThat(query.caseDefinitionKey("invalid").count()).isEqualTo(0L);
 
     try {
       query.caseDefinitionKey(null);
@@ -477,14 +475,14 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseDefinitionId(caseInstance.getCaseDefinitionId()).count(), is(1L));
+    assertThat(query.caseDefinitionId(caseInstance.getCaseDefinitionId()).count()).isEqualTo(1L);
   }
 
   @Test
   public void testQueryByInvalidCaseDefinitionId() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseDefinitionId("invalid").count(), is(0L));
+    assertThat(query.caseDefinitionId("invalid").count()).isEqualTo(0L);
 
     try {
       query.caseDefinitionId(null);
@@ -500,14 +498,14 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseInstanceId(caseInstance.getId()).count(), is(1L));
+    assertThat(query.caseInstanceId(caseInstance.getId()).count()).isEqualTo(1L);
   }
 
   @Test
   public void testQueryByInvalidCaseInstanceId() {
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.caseInstanceId("invalid").count(), is(0L));
+    assertThat(query.caseInstanceId("invalid").count()).isEqualTo(0L);
 
     try {
       query.caseInstanceId(null);
@@ -523,7 +521,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.userId("demo").count(), is(1L));
+    assertThat(query.userId("demo").count()).isEqualTo(1L);
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
@@ -533,7 +531,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.userId("dem1").count(), is(0L));
+    assertThat(query.userId("dem1").count()).isEqualTo(0L);
 
     try {
       query.userId(null);
@@ -550,16 +548,16 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
       .evaluate();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
 
     String rootDecisionInstanceId = query.decisionDefinitionKey(DISH_DECISION).singleResult().getId();
     String requiredDecisionInstanceId1 = query.decisionDefinitionKey("season").singleResult().getId();
     String requiredDecisionInstanceId2 = query.decisionDefinitionKey("guestCount").singleResult().getId();
 
     query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.rootDecisionInstanceId(rootDecisionInstanceId).count(), is(3L));
-    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId1).count(), is(0L));
-    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId2).count(), is(0L));
+    assertThat(query.rootDecisionInstanceId(rootDecisionInstanceId).count()).isEqualTo(3L);
+    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId1).count()).isEqualTo(0L);
+    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId2).count()).isEqualTo(0L);
   }
 
   @Deployment(resources = { DRG_DMN })
@@ -571,9 +569,9 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(3L));
-    assertThat(query.rootDecisionInstancesOnly().count(), is(1L));
-    assertThat(query.rootDecisionInstancesOnly().singleResult().getDecisionDefinitionKey(), is(DISH_DECISION));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.rootDecisionInstancesOnly().count()).isEqualTo(1L);
+    assertThat(query.rootDecisionInstancesOnly().singleResult().getDecisionDefinitionKey()).isEqualTo(DISH_DECISION);
   }
 
   @Deployment(resources = { DRG_DMN })
@@ -587,8 +585,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionRequirementsDefinitionId("notExisting").count(), is(0L));
-    assertThat(query.decisionRequirementsDefinitionId(decisionRequirementsDefinition.getId()).count(), is(3L));
+    assertThat(query.decisionRequirementsDefinitionId("notExisting").count()).isEqualTo(0L);
+    assertThat(query.decisionRequirementsDefinitionId(decisionRequirementsDefinition.getId()).count()).isEqualTo(3L);
   }
 
   @Deployment(resources = { DRG_DMN })
@@ -600,8 +598,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.decisionRequirementsDefinitionKey("notExisting").count(), is(0L));
-    assertThat(query.decisionRequirementsDefinitionKey("dish").count(), is(3L));
+    assertThat(query.decisionRequirementsDefinitionKey("notExisting").count()).isEqualTo(0L);
+    assertThat(query.decisionRequirementsDefinitionKey("dish").count()).isEqualTo(3L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -615,14 +613,14 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService
         .createNativeHistoricDecisionInstanceQuery().sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST");
 
-    assertThat(nativeQuery.list().size(), is(1));
+    assertThat(nativeQuery.list().size()).isEqualTo(1);
 
     NativeHistoricDecisionInstanceQuery nativeQueryWithParameter = historyService
         .createNativeHistoricDecisionInstanceQuery()
         .sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST H WHERE H.DEC_DEF_KEY_ = #{decisionDefinitionKey}");
 
-    assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", DECISION_DEFINITION_KEY).list().size(), is(1));
-    assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", "other decision").list().size(), is(0));
+    assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", DECISION_DEFINITION_KEY).list().size()).isEqualTo(1);
+    assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", "other decision").list().size()).isEqualTo(0);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -636,7 +634,7 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService
         .createNativeHistoricDecisionInstanceQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_HI_DECINST");
 
-    assertThat(nativeQuery.count(), is(1L));
+    assertThat(nativeQuery.count()).isEqualTo(1L);
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -651,8 +649,8 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService.createNativeHistoricDecisionInstanceQuery()
         .sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST");
 
-    assertThat(nativeQuery.listPage(0, 2).size(), is(2));
-    assertThat(nativeQuery.listPage(1, 1).size(), is(1));
+    assertThat(nativeQuery.listPage(0, 2).size()).isEqualTo(2);
+    assertThat(nativeQuery.listPage(1, 1).size()).isEqualTo(1);
   }
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision() {

@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
@@ -89,9 +88,9 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(taskService.createTaskQuery().withoutTenantId().count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
+    assertThat(taskService.createTaskQuery().withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
@@ -112,8 +111,8 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -136,9 +135,9 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     runtimeService.messageEventReceived("message", execution.getId());
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test

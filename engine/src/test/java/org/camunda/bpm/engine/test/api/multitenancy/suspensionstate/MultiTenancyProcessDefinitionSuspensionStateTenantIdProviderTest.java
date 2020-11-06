@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -77,9 +76,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
         .singleResult();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
-    assertThat(query.active().count(), is(1L));
-    assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.suspended().count(), is(0L));
+    assertThat(query.active().count()).isEqualTo(1L);
+    assertThat(query.active().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.suspended().count()).isEqualTo(0L);
 
     // suspend all instances of process definition
     engineRule.getRepositoryService()
@@ -88,9 +87,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
       .includeProcessInstances(true)
       .suspend();
 
-    assertThat(query.active().count(), is(0L));
-    assertThat(query.suspended().count(), is(1L));
-    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.active().count()).isEqualTo(0L);
+    assertThat(query.suspended().count()).isEqualTo(1L);
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -110,9 +109,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
         .singleResult();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
-    assertThat(query.suspended().count(), is(1L));
-    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count()).isEqualTo(1L);
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.active().count()).isEqualTo(0L);
 
     // activate all instance of process definition
     engineRule.getRepositoryService()
@@ -121,8 +120,8 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
       .includeProcessInstances(true)
       .activate();
 
-    assertThat(query.suspended().count(), is(0L));
-    assertThat(query.active().count(), is(1L));
-    assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.suspended().count()).isEqualTo(0L);
+    assertThat(query.active().count()).isEqualTo(1L);
+    assertThat(query.active().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 }

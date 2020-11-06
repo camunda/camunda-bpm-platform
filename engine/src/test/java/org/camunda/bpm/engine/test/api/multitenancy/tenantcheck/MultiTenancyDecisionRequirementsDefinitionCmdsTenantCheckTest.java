@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -38,7 +36,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Deivarayan Azhagappan
  *
  */
@@ -92,7 +90,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -102,7 +100,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -122,7 +120,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -132,7 +130,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -152,7 +150,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -162,7 +160,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
 }

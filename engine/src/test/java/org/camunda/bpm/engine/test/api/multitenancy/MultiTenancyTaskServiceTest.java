@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -202,8 +200,8 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTest {
 
     // then a variable instance with the same tenant id is created
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
-    assertThat(variableInstance, is(notNullValue()));
-    assertThat(variableInstance.getTenantId(), is(tenant1));
+    assertThat(variableInstance).isNotNull();
+    assertThat(variableInstance.getTenantId()).isEqualTo(tenant1);
 
     deleteTasks(task);
   }
@@ -217,18 +215,18 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTest {
     .userTask("task").camundaCandidateUsers("aUserId")
     .endEvent()
     .done();
-    
+
     testRule.deployForTenant("tenant", oneTaskProcess);
-    
+
     ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
     .processDefinitionTenantId("tenant")
     .execute();
-    
+
     Task tenantTask = taskService
         .createTaskQuery()
         .processInstanceId(tenantProcessInstance.getId())
         .singleResult();
-    
+
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
     assertEquals(identityLinks.size(),1);
     assertEquals(identityLinks.get(0).getTenantId(), "tenant");
@@ -243,9 +241,9 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTest {
     .userTask("task").camundaCandidateGroups("aGroupId")
     .endEvent()
     .done();
-    
+
     testRule.deployForTenant("tenant", oneTaskProcess);
-    
+
     ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
     .processDefinitionTenantId("tenant")
     .execute();
@@ -254,7 +252,7 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTest {
         .createTaskQuery()
         .processInstanceId(tenantProcessInstance.getId())
         .singleResult();
-    
+
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
     assertEquals(identityLinks.size(),1);
     assertEquals(identityLinks.get(0).getTenantId(), "tenant");

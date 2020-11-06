@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.parse;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -182,7 +180,7 @@ public class GlobalRetryConfigurationTest {
   }
 
   private void assertJobRetries(ProcessInstance pi, int expectedJobRetries) {
-    assertThat(pi, is(notNullValue()));
+    assertThat(pi).isNotNull();
 
     Job job = fetchJob(pi.getProcessInstanceId());
 

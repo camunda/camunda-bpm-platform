@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -866,8 +867,7 @@ public class FullHistoryTest {
       fail("Exception expected when deleting process-instance that is still running");
     } catch(ProcessEngineException ae) {
       // Expected exception
-      Assert.assertThat(ae.getMessage(),
-          CoreMatchers.containsString("No historic process instance found with id: unexisting"));
+      assertThat(ae.getMessage()).contains("No historic process instance found with id: unexisting");
     }
   }
 
@@ -883,8 +883,7 @@ public class FullHistoryTest {
       fail("Exception expected when deleting process-instance that is still running");
     } catch(ProcessEngineException ae) {
       // Expected exception
-      Assert.assertThat(ae.getMessage(),
-          CoreMatchers.containsString("Process instance is still running, cannot delete historic process instance"));
+      assertThat(ae.getMessage()).contains("Process instance is still running, cannot delete historic process instance");
     }
   }
 
@@ -1503,8 +1502,7 @@ public class FullHistoryTest {
         typedValue.getValue();
       }
       catch(IllegalStateException e) {
-        Assert.assertThat(e.getMessage(),
-            CoreMatchers.containsString("Object is not deserialized"));
+        assertThat(e.getMessage()).contains("Object is not deserialized");
       }
       assertNotNull(typedValue.getValueSerialized());
     }

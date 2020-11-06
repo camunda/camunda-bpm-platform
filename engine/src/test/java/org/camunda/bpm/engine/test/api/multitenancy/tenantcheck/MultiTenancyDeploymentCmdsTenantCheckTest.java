@@ -17,10 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -87,8 +84,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -101,8 +98,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -114,9 +111,9 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     repositoryService.createDeployment().addModelInstance("emptyProcessTwo", startEndProcess).tenantId(TENANT_TWO).deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -143,8 +140,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
   }
 
   @Test
@@ -159,9 +156,9 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     repositoryService.deleteDeployment(deploymentTwo.getId());
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -184,7 +181,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
+    assertThat(deploymentResourceNames).hasSize(1);
   }
 
   @Test
@@ -196,10 +193,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentOne.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
+    assertThat(deploymentResourceNames).hasSize(1);
 
     deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentTwo.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
+    assertThat(deploymentResourceNames).hasSize(1);
   }
 
   @Test
@@ -222,7 +219,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
-    assertThat(deploymentResources, hasSize(1));
+    assertThat(deploymentResources).hasSize(1);
   }
 
   @Test
@@ -234,10 +231,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentOne.getId());
-    assertThat(deploymentResources, hasSize(1));
+    assertThat(deploymentResources).hasSize(1);
 
     deploymentResources = repositoryService.getDeploymentResources(deploymentTwo.getId());
-    assertThat(deploymentResources, hasSize(1));
+    assertThat(deploymentResources).hasSize(1);
   }
 
   @Test
@@ -264,7 +261,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(), resource.getName());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -279,10 +276,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     InputStream inputStream = repositoryService.getResourceAsStream(deploymentOne.getId(), resourceOne.getName());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
 
     inputStream = repositoryService.getResourceAsStream(deploymentTwo.getId(), resourceTwo.getName());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -309,7 +306,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     InputStream inputStream = repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -324,10 +321,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     InputStream inputStream = repositoryService.getResourceAsStreamById(deploymentOne.getId(), resourceOne.getId());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
 
     inputStream = repositoryService.getResourceAsStreamById(deploymentTwo.getId(), resourceTwo.getId());
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -365,8 +362,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
         .deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
   }
 
   @Test
@@ -386,9 +383,9 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
         .deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @After

@@ -16,11 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -68,7 +64,7 @@ public class MultiTenancyJobExecutorTest {
     ClockUtil.setCurrentTime(tomorrow());
     testRule.waitForJobExecutorToProcessAllJobs();
 
-    assertThat(engineRule.getTaskService().createTaskQuery().count(), is(1L));
+    assertThat(engineRule.getTaskService().createTaskQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -153,8 +149,8 @@ public class MultiTenancyJobExecutorTest {
         IdentityService identityService = execution.getProcessEngineServices().getIdentityService();
 
         Authentication currentAuthentication = identityService.getCurrentAuthentication();
-        assertThat(currentAuthentication, is(notNullValue()));
-        assertThat(currentAuthentication.getTenantIds(), hasItem(expectedTenantId));
+        assertThat(currentAuthentication).isNotNull();
+        assertThat(currentAuthentication.getTenantIds()).contains(expectedTenantId);
       }
     };
   }
@@ -167,7 +163,7 @@ public class MultiTenancyJobExecutorTest {
         IdentityService identityService = execution.getProcessEngineServices().getIdentityService();
 
         Authentication currentAuthentication = identityService.getCurrentAuthentication();
-        assertThat(currentAuthentication, is(nullValue()));
+        assertThat(currentAuthentication).isNull();
       }
     };
   }

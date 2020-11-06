@@ -17,12 +17,10 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1956,7 +1954,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (3L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(3L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 
@@ -1979,7 +1977,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(2L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 
@@ -2002,7 +2000,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(2L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 

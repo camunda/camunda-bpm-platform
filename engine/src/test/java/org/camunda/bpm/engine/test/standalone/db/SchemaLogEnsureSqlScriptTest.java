@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.isOneOf;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,17 +62,17 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     }
 
     if (!scriptsForDB.isEmpty()) {
-      assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+      assertThat(getLatestTargetVersion(scriptsForDB)).isEqualTo(currentSchemaVersion);
     } else {
       // databases that are newly added have no update scripts yet
-      assertThat(getCurrentMinorVersion(), is(currentSchemaVersion));
+      assertThat(getCurrentMinorVersion()).isEqualTo(currentSchemaVersion);
     }
   }
 
   @Test
   public void ensureOnlyScriptsForValidDatabaseTypes() {
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
-      assertThat(file.split("_")[0], isOneOf(DATABASES));
+      assertThat(file.split("_")[0]).isIn((Object[]) DATABASES);
     }
   }
 

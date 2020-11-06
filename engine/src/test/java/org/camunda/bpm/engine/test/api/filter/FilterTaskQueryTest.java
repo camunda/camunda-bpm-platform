@@ -16,12 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1083,7 +1081,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
 
     query = taskService.createTaskQuery();
     query.taskName("tASk 2");
@@ -1091,7 +1089,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
   }
 
   /**
@@ -1107,7 +1105,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
 
     query = taskService.createTaskQuery();
     query.taskDescription("dEscription 2");
@@ -1115,7 +1113,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
   }
 
   /**
@@ -1131,7 +1129,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(3));
+    assertThat(tasks).hasSize(3);
 
     query = taskService.createTaskQuery();
     query.taskNameLike("%Task%");
@@ -1139,7 +1137,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(3));
+    assertThat(tasks).hasSize(3);
   }
 
   @Test
@@ -1907,7 +1905,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1927,7 +1925,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1947,7 +1945,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1967,7 +1965,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1987,7 +1985,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2007,7 +2005,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2035,7 +2033,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Test
@@ -2157,7 +2155,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2178,7 +2176,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2199,7 +2197,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2220,7 +2218,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})

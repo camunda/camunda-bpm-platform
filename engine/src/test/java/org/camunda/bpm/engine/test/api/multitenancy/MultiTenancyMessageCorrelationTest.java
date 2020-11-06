@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -78,8 +76,8 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -89,7 +87,7 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -102,8 +100,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -116,8 +114,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -129,7 +127,7 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -141,7 +139,7 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -157,8 +155,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -174,8 +172,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -190,9 +188,9 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateAll();
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().list();
-    assertThat(tasks.size(), is(2));
-    assertThat(tasks.get(0).getTenantId(), is(nullValue()));
-    assertThat(tasks.get(1).getTenantId(), is(nullValue()));
+    assertThat(tasks.size()).isEqualTo(2);
+    assertThat(tasks.get(0).getTenantId()).isNull();
+    assertThat(tasks.get(1).getTenantId()).isNull();
   }
 
   @Test
@@ -208,8 +206,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateAll();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -228,9 +226,9 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateAll();
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().list();
-    assertThat(tasks.size(), is(2));
-    assertThat(tasks.get(0).getTenantId(), is(nullValue()));
-    assertThat(tasks.get(1).getTenantId(), is(nullValue()));
+    assertThat(tasks.size()).isEqualTo(2);
+    assertThat(tasks.get(0).getTenantId()).isNull();
+    assertThat(tasks.get(1).getTenantId()).isNull();
   }
 
   @Test
@@ -249,8 +247,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateAll();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -263,8 +261,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateStartMessage();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -277,8 +275,8 @@ public class MultiTenancyMessageCorrelationTest {
       .correlateStartMessage();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -289,8 +287,8 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateAll();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -304,8 +302,8 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateAll();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -317,8 +315,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateAll();
 
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(engineRule.getTaskService().createTaskQuery().tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(engineRule.getTaskService().createTaskQuery().tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   public void failToCorrelateMessageToIntermediateCatchEventsForMultipleTenants() {

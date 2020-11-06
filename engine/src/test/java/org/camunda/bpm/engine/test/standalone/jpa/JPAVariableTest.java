@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -221,11 +220,11 @@ public class JPAVariableTest {
 
     Object floatIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "floatIdJPAEntity");
     assertTrue(floatIdResult instanceof FloatIdJPAEntity);
-    assertThat(floatIdJPAEntity.getFloatId(), is(((FloatIdJPAEntity)floatIdResult).getFloatId()));
+    assertThat(floatIdJPAEntity.getFloatId()).isEqualTo(((FloatIdJPAEntity)floatIdResult).getFloatId());
 
     Object doubleIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "doubleIdJPAEntity");
     assertTrue(doubleIdResult instanceof DoubleIdJPAEntity);
-    assertThat(doubleIdJPAEntity.getDoubleId(), is(((DoubleIdJPAEntity)doubleIdResult).getDoubleId()));
+    assertThat(doubleIdJPAEntity.getDoubleId()).isEqualTo(((DoubleIdJPAEntity)doubleIdResult).getDoubleId());
 
     Object charIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "charIdJPAEntity");
     assertTrue(charIdResult instanceof CharIdJPAEntity);
