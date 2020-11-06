@@ -1117,6 +1117,27 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
   @Test
+  public void shouldLockAlreadyLockedExternalTaskWithSameWorker() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().notLocked().singleResult();
+    externalTaskService.lock(externalTask.getId(), WORKER_ID, LOCK_TIME);
+
+    ExternalTask externalTaskFirstLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
+    Date firstLockExpirationTime = externalTaskFirstLock.getLockExpirationTime();
+
+    // when
+    externalTaskService.lock(externalTaskFirstLock.getId(), WORKER_ID, LOCK_TIME * 10);
+
+    // then
+    ExternalTask externalTaskSecondLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
+    Date secondLockExpirationTime = externalTaskSecondLock.getLockExpirationTime();
+    assertThat(firstLockExpirationTime).isBefore(secondLockExpirationTime);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
+  @Test
   public void shouldFailToLockAlreadyLockedExternalTask() {
     // given
     String aSecondWorkerId = "aSecondWorkerId";
