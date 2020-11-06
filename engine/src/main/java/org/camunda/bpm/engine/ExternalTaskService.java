@@ -95,7 +95,10 @@ public interface ExternalTaskService {
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
 
   /**
-   * <p>Lock an external task on behalf of a worker.</p>
+   * <p>Lock an external task on behalf of a worker.
+   *    Note: Attempting to lock an already locked external task with the same <code>workerId</code>
+   *    will succeed and a new lock duration will be set, starting from the current moment.
+   * </p>
    *
    * @param externalTaskId the id of the external task to lock
    * @param workerId  the id of the worker to lock the task for
