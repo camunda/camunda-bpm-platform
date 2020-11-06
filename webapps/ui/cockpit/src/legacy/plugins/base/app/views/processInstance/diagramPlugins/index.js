@@ -18,7 +18,6 @@
 var angular = require("angular");
 var camCommon = require("cam-common");
 
-var instanceCount = require("./instanceCount");
 var callActivity = require("./callActivity");
 
 var ngModule = angular.module(
@@ -26,7 +25,6 @@ var ngModule = angular.module(
   [camCommon.name]
 );
 
-ngModule.config(instanceCount);
 ngModule.config(callActivity);
 
 module.exports = ngModule;
