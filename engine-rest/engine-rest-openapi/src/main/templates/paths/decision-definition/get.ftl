@@ -6,7 +6,7 @@
       desc = "Queries for decision definitions that fulfill given parameters.
               Parameters may be the properties of decision definitions, such as the name, key or version.
               The size of the result set can be retrieved by using
-              the[Get Decision Definition Count](${docsUrl}/reference/rest/decision-definition/get-query-count/) method." />
+              the [Get Decision Definition Count](${docsUrl}/reference/rest/decision-definition/get-query-count/) method." />
 
   "parameters" : [
 
