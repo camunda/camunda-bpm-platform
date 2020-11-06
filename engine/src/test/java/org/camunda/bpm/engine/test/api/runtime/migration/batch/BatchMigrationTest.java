@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.text.ParseException;
@@ -152,7 +150,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(null).processInstanceIds(Collections.singletonList("process")).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("migration plan is null"));
+      assertThat(e.getMessage()).contains("migration plan is null");
     }
   }
 
@@ -167,7 +165,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(migrationPlan).processInstanceIds((List<String>) null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -182,7 +180,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(migrationPlan).processInstanceIds(Arrays.asList("foo", null, "bar")).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("process instance ids contains null value");
     }
   }
 
@@ -197,7 +195,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.<String>emptyList()).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -213,7 +211,7 @@ public class BatchMigrationTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -229,7 +227,7 @@ public class BatchMigrationTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("process instance ids contains null value");
     }
   }
 
@@ -244,7 +242,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(migrationPlan).processInstanceQuery(null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -262,7 +260,7 @@ public class BatchMigrationTest {
       runtimeService.newMigration(migrationPlan).processInstanceQuery(emptyProcessInstanceQuery).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -654,8 +652,8 @@ public class BatchMigrationTest {
 
     Job failedJob = migrationJobs.get(0);
     assertEquals(2, failedJob.getRetries());
-    assertThat(failedJob.getExceptionMessage(), startsWith("ENGINE-23003"));
-    assertThat(failedJob.getExceptionMessage(), containsString("Process instance '" + deletedProcessInstanceId + "' cannot be migrated"));
+    assertThat(failedJob.getExceptionMessage()).startsWith("ENGINE-23003");
+    assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + deletedProcessInstanceId + "' cannot be migrated");
   }
 
   @Test
@@ -943,7 +941,7 @@ public class BatchMigrationTest {
     Batch batch = helper.migrateProcessInstancesAsync(15);
 
     // then
-    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
 
     // clear
     configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());

@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.PrintWriter;
@@ -396,7 +395,7 @@ public class JobQueryTest {
       managementService.createJobQuery().timers().messages().list();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot combine onlyTimers() with onlyMessages() in the same query"));
+      assertThat(e.getMessage()).contains("Cannot combine onlyTimers() with onlyMessages() in the same query");
     }
   }
 
@@ -840,14 +839,14 @@ public class JobQueryTest {
       managementService.createJobQuery().orderByJobId().list();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("call asc() or desc() after using orderByXX()"));
+      assertThat(e.getMessage()).contains("call asc() or desc() after using orderByXX()");
     }
 
     try {
       managementService.createJobQuery().asc();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("You should call any of the orderBy methods first before specifying a direction"));
+      assertThat(e.getMessage()).contains("You should call any of the orderBy methods first before specifying a direction");
     }
   }
 
@@ -882,7 +881,7 @@ public class JobQueryTest {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
     } catch(RuntimeException re) {
-      assertThat(re.getMessage(), containsString(EXCEPTION_MESSAGE));
+      assertThat(re.getMessage()).contains(EXCEPTION_MESSAGE);
     }
     return processInstance;
   }
@@ -894,7 +893,7 @@ public class JobQueryTest {
     assertNotNull(failedJob);
     assertEquals(processInstance.getId(), failedJob.getProcessInstanceId());
     assertNotNull(failedJob.getExceptionMessage());
-    assertThat(failedJob.getExceptionMessage(), containsString(EXCEPTION_MESSAGE));
+    assertThat(failedJob.getExceptionMessage()).contains(EXCEPTION_MESSAGE);
   }
 
   private void verifyQueryResults(JobQuery query, int countExpected) {

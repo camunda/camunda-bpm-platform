@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.cmmn.required;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -128,8 +127,8 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
         .activityId("PI_HumanTask_1")
         .singleResult();
 
-    assertThat(taskExecution, is(notNullValue()));
-    assertThat(taskExecution.isRequired(), is(true));
+    assertThat(taskExecution).isNotNull();
+    assertThat(taskExecution.isRequired()).isTrue();
   }
 
   @Deployment
@@ -142,7 +141,7 @@ public class RequiredRuleTest extends PluggableProcessEngineTest {
         .activityId("PI_HumanTask_1")
         .singleResult();
 
-    assertThat(taskExecution, is(notNullValue()));
-    assertThat(taskExecution.isRequired(), is(true));
+    assertThat(taskExecution).isNotNull();
+    assertThat(taskExecution.isRequired()).isTrue();
   }
 }

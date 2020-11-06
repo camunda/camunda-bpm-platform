@@ -16,15 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
-import static org.hamcrest.CoreMatchers.either;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -227,19 +223,19 @@ public class ParallelGatewayTest extends PluggableProcessEngineTest {
   public void testParallelGatewayBeforeAndInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     List<Task> tasks = taskService.createTaskQuery().list();
-    assertThat(tasks, hasSize(3));
+    assertThat(tasks).hasSize(3);
 
     ActivityInstance instance = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(instance.getActivityName(), is("Process1"));
+    assertThat(instance.getActivityName()).isEqualTo("Process1");
     ActivityInstance[] childActivityInstances = instance.getChildActivityInstances();
     for (ActivityInstance activityInstance : childActivityInstances) {
       if (activityInstance.getActivityId().equals("SubProcess_1")) {
         ActivityInstance[] instances = activityInstance.getChildActivityInstances();
         for (ActivityInstance activityInstance2 : instances) {
-          assertThat(activityInstance2.getActivityName(), is(either(equalTo("Inner User Task 1")).or(CoreMatchers.<Object>equalTo("Inner User Task 2"))));
+          assertThat(activityInstance2.getActivityName()).isIn("Inner User Task 1", "Inner User Task 2");
         }
       } else {
-        assertThat(activityInstance.getActivityName(), is("Outer User Task"));
+        assertThat(activityInstance.getActivityName()).isEqualTo("Outer User Task");
       }
     }
   }

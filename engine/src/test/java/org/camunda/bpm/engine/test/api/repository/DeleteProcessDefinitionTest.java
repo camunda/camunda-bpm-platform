@@ -20,10 +20,9 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.repository.RedeploymentTest.DEPLOYMENT_NAME;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -299,7 +298,7 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(repositoryService.createProcessDefinitionQuery().count(), is(3L));
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3L);
   }
 
   @Test
@@ -353,9 +352,9 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is(0L));
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
-    assertThat(repositoryService.createProcessDefinitionQuery().count(), is(0L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(0L);
+    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0L);
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(0L);
   }
 
   @Test
@@ -377,7 +376,7 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(IncrementCounterListener.counter, is(0));
+    assertThat(IncrementCounterListener.counter).isEqualTo(0);
   }
 
   @Test
@@ -400,7 +399,7 @@ public class DeleteProcessDefinitionTest {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
     // then
-    assertThat(processDefinitions.size(), is(0));
+    assertThat(processDefinitions.size()).isEqualTo(0);
   }
 
   @Test
@@ -442,7 +441,7 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(repositoryService.createProcessDefinitionQuery().count(), is(3L));
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(3L);
   }
 
   @Test
@@ -495,9 +494,9 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is(0L));
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
-    assertThat(repositoryService.createProcessDefinitionQuery().count(), is(0L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(0L);
+    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0L);
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(0L);
   }
 
   @Test
@@ -518,7 +517,7 @@ public class DeleteProcessDefinitionTest {
       .delete();
 
     // then
-    assertThat(IncrementCounterListener.counter, is(0));
+    assertThat(IncrementCounterListener.counter).isEqualTo(0);
   }
 
   @Test
@@ -542,7 +541,7 @@ public class DeleteProcessDefinitionTest {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
     // then
-    assertThat(processDefinitions.size(), is(0));
+    assertThat(processDefinitions.size()).isEqualTo(0);
   }
 
   private void deployTwoProcessDefinitions() {

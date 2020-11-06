@@ -16,11 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -101,7 +98,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   // set jobRetries
   @Test
   public void testSetJobRetriesWithAuthenticatedTenant() {
-    
+
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
@@ -117,7 +114,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
   @Test
   public void testSetJobRetriesWithNoAuthenticatedTenant() {
-    
+
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
@@ -125,7 +122,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     identityService.setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job '"+ timerJob.getId() 
+    thrown.expectMessage("Cannot update the job '"+ timerJob.getId()
       +"' because it belongs to no authenticated tenant.");
     managementService.setJobRetries(timerJob.getId(), 5);
 
@@ -133,7 +130,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
   @Test
   public void testSetJobRetriesWithDisabledTenantCheck() {
-    
+
     Job timerJob = managementService.createJobQuery()
       .processInstanceId(processInstance.getId())
       .singleResult();
@@ -148,7 +145,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     .processInstanceId(processInstance.getId())
     .singleResult()
     .getRetries());
-    
+
   }
 
   // set Jobretries based on job definition
@@ -156,7 +153,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   public void testSetJobRetriesDefinitionWithAuthenticatedTenant() {
 
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     managementService.setJobRetries(jobId, 0);
@@ -168,16 +165,16 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     assertEquals(1, selectJobByProcessInstanceId(processInstance.getId())
       .getRetries());
-    
+
   }
 
   @Test
   public void testSetJobRetriesDefinitionWithNoAuthenticatedTenant() {
 
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
-   
+
     managementService.setJobRetries(jobId, 0);
     identityService.setAuthentication("aUserId", null);
 
@@ -199,24 +196,24 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     managementService.setJobRetries(jobId, 0);
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-  
+
     managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
     // then
     assertEquals(1, selectJobByProcessInstanceId(processInstance.getId()).getRetries());
-  
+
   }
 
   // set JobDueDate
   @Test
   public void testSetJobDueDateWithAuthenticatedTenant() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     assertEquals(0, managementService.createJobQuery().duedateLowerThan(new Date()).count());
 
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());
     cal.add(Calendar.DATE, -3);
-    
+
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     managementService.setJobDuedate(timerJob.getId(), cal.getTime());
 
@@ -228,7 +225,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testSetJobDueDateWithNoAuthenticatedTenant() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     identityService.setAuthentication("aUserId", null);
 
     // then
@@ -242,14 +239,14 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testSetJobDueDateWithDisabledTenantCheck() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
 
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());
     cal.add(Calendar.DATE, -3);
-    
+
     managementService.setJobDuedate(timerJob.getId(), cal.getTime());
     // then
     assertEquals(1, managementService.createJobQuery()
@@ -261,7 +258,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testSetJobPriorityWithAuthenticatedTenant() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     managementService.setJobPriority(timerJob.getId(), 5);
 
@@ -272,7 +269,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testSetJobPriorityWithNoAuthenticatedTenant() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     identityService.setAuthentication("aUserId", null);
 
     // then
@@ -286,7 +283,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testSetJobPriorityWithDisabledTenantCheck() {
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
 
@@ -300,13 +297,13 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   public void testSetOverridingJobPriorityWithAuthenticatedTenant() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
     // then
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), is(1701L));
+      .getOverridingJobPriority()).isEqualTo(1701L);
   }
 
   @Test
@@ -314,7 +311,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     JobDefinition jobDefinition = managementService
       .createJobDefinitionQuery()
       .list().get(0);
-   
+
     identityService.setAuthentication("aUserId", null);
 
     // then
@@ -330,15 +327,15 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     JobDefinition jobDefinition = managementService
       .createJobDefinitionQuery()
       .list().get(0);
-   
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
     // then
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), is(1701L));
+      .getOverridingJobPriority()).isEqualTo(1701L);
   }
 
   // setOverridingJobPriority with cascade
@@ -346,13 +343,13 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   public void testSetOverridingJobPriorityWithCascadeAndAuthenticatedTenant() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701, true);
 
     // then
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), is(1701L));
+      .getOverridingJobPriority()).isEqualTo(1701L);
   }
 
   @Test
@@ -377,27 +374,27 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     JobDefinition jobDefinition = managementService
       .createJobDefinitionQuery()
       .list().get(0);
-   
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701, true);
     // then
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), is(1701L));
+      .getOverridingJobPriority()).isEqualTo(1701L);
   }
 
   // clearOverridingJobPriorityForJobDefinition
   @Test
   public void testClearOverridingJobPriorityWithAuthenticatedTenant() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), is(1701L));
+      .getOverridingJobPriority()).isEqualTo(1701L);
 
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
@@ -405,21 +402,21 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     assertThat(managementService.createJobDefinitionQuery()
     .jobDefinitionId(jobDefinition.getId()).singleResult()
-    .getOverridingJobPriority(), nullValue());
+    .getOverridingJobPriority()).isNull();
 
   }
 
   @Test
   public void testClearOverridingJobPriorityWithNoAuthenticatedTenant() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
     identityService.setAuthentication("aUserId", null);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition '" 
+    thrown.expectMessage("Cannot update the process definition '"
       + jobDefinition.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
     // when
@@ -430,24 +427,24 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testClearOverridingJobPriorityWithDisabledTenantCheck() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-  
+
     // then
     managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
     // then
     assertThat(managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult()
-      .getOverridingJobPriority(), nullValue());
+      .getOverridingJobPriority()).isNull();
   }
 
   // getJobExceptionStackTrace
   @Test
   public void testGetJobExceptionStackTraceWithAuthenticatedTenant() {
- 
+
     String processInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
@@ -458,14 +455,14 @@ public class MultiTenancyJobCmdsTenantCheckTest {
       .processInstanceId(processInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
-    assertThat(managementService.getJobExceptionStacktrace(timerJobId), notNullValue());
+    assertThat(managementService.getJobExceptionStacktrace(timerJobId)).isNotNull();
   }
 
   @Test
   public void testGetJobExceptionStackTraceWithNoAuthenticatedTenant() {
- 
+
     String processInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
@@ -476,12 +473,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
       .processInstanceId(processInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the job '" + timerJobId 
+    thrown.expectMessage("Cannot read the job '" + timerJobId
       +"' because it belongs to no authenticated tenant.");
 
     // when
@@ -490,24 +487,24 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
   @Test
   public void testGetJobExceptionStackTraceWithDisabledTenantCheck() {
- 
+
     String processInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
 
     testRule.executeAvailableJobs();
-    
+
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
 
     // when
     managementService.getJobExceptionStacktrace(timerJobId);
-    assertThat(managementService.getJobExceptionStacktrace(timerJobId), notNullValue());
+    assertThat(managementService.getJobExceptionStacktrace(timerJobId)).isNotNull();
   }
 
   // deleteJobs
@@ -517,7 +514,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
       .processInstanceId(processInstance.getId())
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     managementService.deleteJob(timerJobId);
 
@@ -533,12 +530,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
       .processInstanceId(processInstance.getId())
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job '" + timerJobId 
+    thrown.expectMessage("Cannot update the job '" + timerJobId
       +"' because it belongs to no authenticated tenant.");
 
     // when
@@ -551,7 +548,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
       .processInstanceId(processInstance.getId())
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
 
@@ -569,19 +566,19 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     String noFailProcessInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey("noFail")
-      .getId(); 
+      .getId();
 
     TaskQuery taskQuery = engineRule.getTaskService()
       .createTaskQuery()
       .processInstanceId(noFailProcessInstanceId);
-  
+
     assertEquals(1, taskQuery.list().size());
 
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(noFailProcessInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     managementService.executeJob(timerJobId);
 
@@ -594,18 +591,18 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     String noFailProcessInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey("noFail")
-      .getId(); 
+      .getId();
 
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(noFailProcessInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job '" + timerJobId 
+    thrown.expectMessage("Cannot update the job '" + timerJobId
       +"' because it belongs to no authenticated tenant.");
     managementService.executeJob(timerJobId);
 
@@ -616,13 +613,13 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     String noFailProcessInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey("noFail")
-      .getId(); 
+      .getId();
 
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(noFailProcessInstanceId)
       .singleResult()
       .getId();
-    
+
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
 

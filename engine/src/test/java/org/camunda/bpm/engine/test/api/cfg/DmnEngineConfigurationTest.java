@@ -16,11 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -70,7 +67,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the default expression language should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(), is("groovy"));
+    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage()).isEqualTo("groovy");
   }
 
   @Test
@@ -89,7 +86,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the custom listener should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners(), hasItem(customEvaluationListener));
+    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners()).contains(customEvaluationListener);
   }
 
   @Test
@@ -106,7 +103,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the feel engine factory should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getFeelEngineFactory(), is(feelEngineFactory));
+    assertThat(getConfigurationOfDmnEngine().getFeelEngineFactory()).isSameAs(feelEngineFactory);
   }
 
   @Test
@@ -123,7 +120,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the script engine resolver should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getScriptEngineResolver(), is(scriptEngineResolver));
+    assertThat(getConfigurationOfDmnEngine().getScriptEngineResolver()).isSameAs(scriptEngineResolver);
   }
 
   @Test
@@ -140,7 +137,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the el provider should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getElProvider(), is(elProvider));
+    assertThat(getConfigurationOfDmnEngine().getElProvider()).isSameAs(elProvider);
   }
 
   @Test
@@ -176,14 +173,14 @@ public class DmnEngineConfigurationTest {
 
     // checks that the configuration is set as on XML
     DefaultDmnEngineConfiguration dmnEngineConfiguration = processEngineConfiguration.getDmnEngineConfiguration();
-    assertThat(dmnEngineConfiguration, is(notNullValue()));
-    assertThat(dmnEngineConfiguration.getDefaultInputExpressionExpressionLanguage(), is("groovy"));
+    assertThat(dmnEngineConfiguration).isNotNull();
+    assertThat(dmnEngineConfiguration.getDefaultInputExpressionExpressionLanguage()).isEqualTo("groovy");
 
     // when the engine is initialized
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the default expression language should be set in the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(), is("groovy"));
+    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage()).isEqualTo("groovy");
   }
 
   protected ProcessEngineConfigurationImpl createProcessEngineConfiguration() {

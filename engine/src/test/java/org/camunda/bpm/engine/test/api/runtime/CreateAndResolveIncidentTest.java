@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -97,7 +96,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident("foo", null, "userTask1", "bar");
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Execution id cannot be null"));
+      assertThat(e.getMessage()).contains("Execution id cannot be null");
     }
   }
 
@@ -107,7 +106,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident(null, "processInstanceId", "foo", "bar");
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("incidentType is null"));
+      assertThat(e.getMessage()).contains("incidentType is null");
     }
   }
 
@@ -118,7 +117,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident("foo", "aaa", "bbb", "bar");
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an execution with executionId 'aaa'"));
+      assertThat(e.getMessage()).contains("Cannot find an execution with executionId 'aaa'");
     }
   }
 
@@ -143,7 +142,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident("foo");
       fail("Exception expected");
     } catch (NotFoundException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an incident with id 'foo'"));
+      assertThat(e.getMessage()).contains("Cannot find an incident with id 'foo'");
     }
   }
 
@@ -153,7 +152,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(null);
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("incidentId is null"));
+      assertThat(e.getMessage()).contains("incidentId is null");
     }
   }
 
@@ -179,7 +178,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(incident.getId());
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot resolve an incident of type failedJob"));
+      assertThat(e.getMessage()).contains("Cannot resolve an incident of type failedJob");
     }
   }
 

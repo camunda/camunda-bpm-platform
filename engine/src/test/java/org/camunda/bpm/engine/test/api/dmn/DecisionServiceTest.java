@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
@@ -319,17 +317,17 @@ public class DecisionServiceTest {
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
-    assertThat(decisionResult, is(notNullValue()));
-    assertThat(decisionResult.size(), is(1));
+    assertThat(decisionResult).isNotNull();
+    assertThat(decisionResult).hasSize(1);
     String value = decisionResult.getSingleResult().getFirstEntry();
-    assertThat(value, is(expectedValue));
+    assertThat(value).isEqualTo(expectedValue);
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
-    assertThat(decisionResult, is(notNullValue()));
-    assertThat(decisionResult.size(), is(1));
+    assertThat(decisionResult).isNotNull();
+    assertThat(decisionResult).hasSize(1);
     String value = decisionResult.getSingleResult().getFirstEntry();
-    assertThat(value, is(expectedValue));
+    assertThat(value).isEqualTo(expectedValue);
   }
 
 }

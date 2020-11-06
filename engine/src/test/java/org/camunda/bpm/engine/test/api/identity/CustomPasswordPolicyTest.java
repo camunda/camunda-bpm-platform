@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -66,8 +65,8 @@ public class CustomPasswordPolicyTest {
   @Test
   public void testPasswordPolicyConfiguration() {
     PasswordPolicy policy = processEngineConfiguration.getPasswordPolicy();
-    assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class), is(true));
-    assertThat(policy.getRules().size(), is(6));
+    assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class)).isTrue();
+    assertThat(policy.getRules()).hasSize(6);
   }
 
   @Test
@@ -75,7 +74,7 @@ public class CustomPasswordPolicyTest {
     User user = identityService.newUser("user");
     user.setPassword("this-is-1-STRONG-password");
     identityService.saveUser(user);
-    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(1L));
+    assertThat(identityService.createUserQuery().userId(user.getId()).count()).isEqualTo(1L);
   }
 
   @Test
@@ -85,6 +84,6 @@ public class CustomPasswordPolicyTest {
     user.setPassword("weakpassword");
     identityService.saveUser(user);
     thrown.expectMessage("Password does not match policy");
-    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(0L));
+    assertThat(identityService.createUserQuery().userId(user.getId()).count()).isEqualTo(0L);
   }
 }

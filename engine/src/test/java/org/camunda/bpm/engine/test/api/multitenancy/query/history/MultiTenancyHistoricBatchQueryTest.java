@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByTenantId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
@@ -39,7 +40,6 @@ import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHel
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -169,9 +169,8 @@ public class MultiTenancyHistoricBatchQueryTest {
     }
     catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers
-        .containsString("Cannot delete historic batch '"+ tenant2Batch.getId() 
-        +"' because it belongs to no authenticated tenant"));
+      assertThat(e.getMessage()).contains("Cannot delete historic batch '"+ tenant2Batch.getId()
+        +"' because it belongs to no authenticated tenant");
     }
 
     identityService.clearAuthentication();

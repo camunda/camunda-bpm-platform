@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
@@ -147,8 +146,8 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
-      assertThat(e.getMessage(),
-          is("The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
+      assertThat(e.getMessage()).isEqualTo(
+          "The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'.");
     }
   }
 
@@ -165,7 +164,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
     // then
     disableAuthorization();
-    assertThat(historyService.createHistoricDecisionInstanceQuery().count(), is(0L));
+    assertThat(historyService.createHistoricDecisionInstanceQuery().count()).isEqualTo(0L);
     enableAuthorization();
 }
 
@@ -181,7 +180,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
     // then
     disableAuthorization();
-    assertThat(historyService.createHistoricDecisionInstanceQuery().count(), is(0L));
+    assertThat(historyService.createHistoricDecisionInstanceQuery().count()).isEqualTo(0L);
     enableAuthorization();
   }
 
@@ -201,8 +200,8 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
-      assertThat(e.getMessage(),
-          is("The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
+      assertThat(e.getMessage()).isEqualTo(
+          "The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'.");
     }
   }
 

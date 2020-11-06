@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.deploy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -59,7 +58,7 @@ public class DeploymentTest {
      engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
 
      long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+     assertThat(count).isEqualTo(0L);
   }
 
   @Test
@@ -74,13 +73,13 @@ public class DeploymentTest {
          .createDeployment()
          .addModelInstance("foo.bpmn", instance)
          .deployWithResult();
-     
+
      engineRule.getRuntimeService().startProcessInstanceByKey("process");
-     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count(), is(1L));
+     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
 
      engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
 
      long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+     assertThat(count).isEqualTo(0L);
   }
 }

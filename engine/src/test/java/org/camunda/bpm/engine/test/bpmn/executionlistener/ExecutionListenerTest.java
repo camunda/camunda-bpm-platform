@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -178,25 +176,25 @@ public class ExecutionListenerTest {
     assertEquals("Start Event", recordedEvents.get(0).getActivityName());
     assertEquals("Start Event Listener", recordedEvents.get(0).getParameter());
     assertEquals("end", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(false));
+    assertThat(recordedEvents.get(0).isCanceled()).isFalse();
 
     assertEquals("noneEvent", recordedEvents.get(1).getActivityId());
     assertEquals("None Event", recordedEvents.get(1).getActivityName());
     assertEquals("Intermediate Catch Event Listener", recordedEvents.get(1).getParameter());
     assertEquals("end", recordedEvents.get(1).getEventName());
-    assertThat(recordedEvents.get(1).isCanceled(), is(false));
+    assertThat(recordedEvents.get(1).isCanceled()).isFalse();
 
     assertEquals("signalEvent", recordedEvents.get(2).getActivityId());
     assertEquals("Signal Event", recordedEvents.get(2).getActivityName());
     assertEquals("Intermediate Throw Event Listener", recordedEvents.get(2).getParameter());
     assertEquals("start", recordedEvents.get(2).getEventName());
-    assertThat(recordedEvents.get(2).isCanceled(), is(false));
+    assertThat(recordedEvents.get(2).isCanceled()).isFalse();
 
     assertEquals("theEnd", recordedEvents.get(3).getActivityId());
     assertEquals("End Event", recordedEvents.get(3).getActivityName());
     assertEquals("End Event Listener", recordedEvents.get(3).getParameter());
     assertEquals("start", recordedEvents.get(3).getEventName());
-    assertThat(recordedEvents.get(3).isCanceled(), is(false));
+    assertThat(recordedEvents.get(3).isCanceled()).isFalse();
 
   }
 
@@ -261,12 +259,12 @@ public class ExecutionListenerTest {
     assertEquals("timer1", recordedEvents.get(0).getActivityId());
     assertEquals("start boundary listener", recordedEvents.get(0).getParameter());
     assertEquals("start", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(false));
+    assertThat(recordedEvents.get(0).isCanceled()).isFalse();
 
     assertEquals("timer2", recordedEvents.get(1).getActivityId());
     assertEquals("end boundary listener", recordedEvents.get(1).getParameter());
     assertEquals("end", recordedEvents.get(1).getEventName());
-    assertThat(recordedEvents.get(1).isCanceled(), is(false));
+    assertThat(recordedEvents.get(1).isCanceled()).isFalse();
   }
 
   @Test
@@ -348,11 +346,11 @@ public class ExecutionListenerTest {
     testRule.assertProcessEnded(processInstance.getId());
 
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    assertThat(recordedEvents, hasSize(1));
+    assertThat(recordedEvents).hasSize(1);
 
     assertEquals("UserTask_1", recordedEvents.get(0).getActivityId());
     assertEquals("end", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(true));
+    assertThat(recordedEvents.get(0).isCanceled()).isTrue();
   }
 
   private static final String MESSAGE = "cancelMessage";

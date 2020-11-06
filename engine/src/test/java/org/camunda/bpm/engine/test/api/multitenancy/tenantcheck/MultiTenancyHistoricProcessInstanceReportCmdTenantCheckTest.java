@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -101,7 +100,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .createHistoricProcessInstanceReport()
         .duration(MONTH);
 
-    assertThat(result.size(), is(0));
+    assertThat(result).hasSize(0);
   }
 
   @Test
@@ -116,7 +115,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .createHistoricProcessInstanceReport()
         .duration(MONTH);
 
-    assertThat(result.size(), is(1));
+    assertThat(result).hasSize(1);
   }
 
   @Test
@@ -132,7 +131,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .createHistoricProcessInstanceReport()
         .duration(MONTH);
 
-    assertThat(result.size(), is(1));
+    assertThat(result).hasSize(1);
   }
 
   @Test
@@ -153,7 +152,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
         .duration(MONTH);
 
-    assertThat(result.size(), is(0));
+    assertThat(result).hasSize(0);
   }
 
   @Test
@@ -174,7 +173,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
         .duration(MONTH);
 
-    assertThat(result.size(), is(1));
+    assertThat(result).hasSize(1);
   }
 
   @Test
@@ -196,7 +195,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
         .duration(MONTH);
 
-    assertThat(result.size(), is(2));
+    assertThat(result).hasSize(2);
   }
 
   @Test
@@ -214,7 +213,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
         .duration(MONTH);
 
-    assertThat(result.size(), is(0));
+    assertThat(result).hasSize(0);
   }
 
   @Test
@@ -232,7 +231,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
         .duration(MONTH);
 
-    assertThat(result.size(), is(1));
+    assertThat(result).hasSize(1);
   }
 
   @Test
@@ -251,7 +250,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
         .duration(MONTH);
 
-    assertThat(result.size(), is(2));
+    assertThat(result).hasSize(2);
   }
 
   // helper //////////////////////////////////////////////////////////

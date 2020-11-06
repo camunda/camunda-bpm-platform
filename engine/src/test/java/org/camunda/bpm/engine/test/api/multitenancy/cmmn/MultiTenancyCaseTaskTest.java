@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -56,8 +54,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("caseTaskCaseDeployment", TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -70,8 +68,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("caseTaskCase", TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -86,12 +84,12 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("caseTaskCase", TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
 
     CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery().
         caseDefinitionKey("oneTaskCase").tenantIdIn(TENANT_TWO).latestVersion().singleResult();
     query = caseService.createCaseInstanceQuery().caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -104,8 +102,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     createCaseInstance("caseTaskCaseVersion", TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -119,7 +117,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key = 'oneTaskCase'"));
+      assertThat(e.getMessage()).contains("no case definition deployed with key = 'oneTaskCase'");
     }
   }
 
@@ -134,7 +132,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+      assertThat(e.getMessage()).contains("no case definition deployed with key 'oneTaskCase'");
     }
   }
 
@@ -151,7 +149,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key = 'oneTaskCase'"));
+      assertThat(e.getMessage()).contains("no case definition deployed with key = 'oneTaskCase'");
     }
   }
 
@@ -163,7 +161,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -174,7 +172,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTest {
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {

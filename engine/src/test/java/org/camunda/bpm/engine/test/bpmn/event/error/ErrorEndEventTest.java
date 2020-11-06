@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,11 +83,11 @@ public class ErrorEndEventTest {
     Map<String, Object> variables = runtimeService.getVariables(instance.getId());
 
     // then the error message defined in XML is accessible
-    assertThat((String) variables.get("errorCode"), is("123"));
-    assertThat((String) variables.get("errorMessage"), is("This is the error message indicating what went wrong."));
+    assertThat((String) variables.get("errorCode")).isEqualTo("123");
+    assertThat((String) variables.get("errorMessage")).isEqualTo("This is the error message indicating what went wrong.");
   }
 
-  
+
   @Test
   @Deployment
   public void testErrorMessageExpression() {
@@ -98,12 +97,12 @@ public class ErrorEndEventTest {
     initialVariables.put("errorMessageExpression", errorMessage);
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testErrorMessageExpression", initialVariables);
 
-    // when 
+    // when
     Map<String, Object> variables = runtimeService.getVariables(instance.getId());
 
     // then the error message expression is resolved
-    assertThat((String) variables.get("errorCode"), is("123"));
-    assertThat((String) variables.get("errorMessage"), is(errorMessage));
+    assertThat((String) variables.get("errorCode")).isEqualTo("123");
+    assertThat((String) variables.get("errorMessage")).isEqualTo(errorMessage);
   }
 
   @Test
@@ -111,12 +110,12 @@ public class ErrorEndEventTest {
   public void testError() {
     // given a process definition including an error
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testError");
-    
+
     // when
     Map<String, Object> variables = runtimeService.getVariables(instance.getId());
-    
+
     // then the error message defined in XML is accessible
-    assertThat((String) variables.get("errorCode"), is("123"));
+    assertThat((String) variables.get("errorCode")).isEqualTo("123");
     assertNull(variables.get("errorMessage"));
   }
 }

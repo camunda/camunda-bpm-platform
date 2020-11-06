@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -75,6 +73,6 @@ public class CustomUserOperationLogTest  {
         });
 
         // and check its there
-        assertThat(historyService.createUserOperationLogQuery().taskId(TASK_ID).singleResult().getUserId(), is("kermit"));
+        assertThat(historyService.createUserOperationLogQuery().taskId(TASK_ID).singleResult().getUserId()).isEqualTo("kermit");
     }
 }

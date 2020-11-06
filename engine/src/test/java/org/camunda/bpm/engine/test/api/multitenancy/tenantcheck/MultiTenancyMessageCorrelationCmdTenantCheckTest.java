@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
@@ -95,8 +94,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
@@ -112,8 +111,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -129,8 +128,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
       .correlateStartMessage();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -151,9 +150,9 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(taskService.createTaskQuery().withoutTenantId().count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(taskService.createTaskQuery().withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
@@ -172,8 +171,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -194,8 +193,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -214,9 +213,9 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(taskService.createTaskQuery().withoutTenantId().count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
+    assertThat(taskService.createTaskQuery().withoutTenantId().count()).isEqualTo(2L);
   }
 
   @Test
@@ -235,9 +234,9 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
@@ -255,9 +254,9 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
       .correlateAll();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(4L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
+    assertThat(query.count()).isEqualTo(4L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(2L);
   }
 
   @Test
@@ -293,8 +292,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -331,8 +330,8 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     identityService.clearAuthentication();
 
     TaskQuery query = taskService.createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
 }

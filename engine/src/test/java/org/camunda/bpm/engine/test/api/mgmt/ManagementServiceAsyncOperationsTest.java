@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +92,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).isEmpty();
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -125,7 +123,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).isEmpty();
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -145,16 +143,16 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     executeSeedJobs(batch, 2);
     // then batch jobs with different deployment ids exist
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
-    assertThat(batchJobs.size(), is(2));
-    assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(0).getDeploymentId(), is(not(batchJobs.get(1).getDeploymentId())));
+    assertThat(batchJobs).hasSize(2);
+    Assert.assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    Assert.assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    assertThat(batchJobs.get(0).getDeploymentId()).isNotEqualTo(batchJobs.get(1).getDeploymentId());
 
     // when the batch jobs for the first deployment are executed
-    assertThat(getJobCountWithUnchangedRetries(), is(4L));
+    assertThat(getJobCountWithUnchangedRetries()).isEqualTo(4L);
     getJobIdsByDeployment(batchJobs, firstDeploymentId).forEach(managementService::executeJob);
     // then the retries for jobs from process instances related to the first deployment should be changed
-    assertThat(getJobCountWithUnchangedRetries(), is(2L));
+    assertThat(getJobCountWithUnchangedRetries()).isEqualTo(2L);
 
     // when the remaining batch jobs are executed
     getJobIdsByDeployment(batchJobs, secondDeploymentId).forEach(managementService::executeJob);
@@ -192,7 +190,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     //then
-    assertThat(exceptions.size(), is(1));
+    assertThat(exceptions).hasSize(1);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -208,7 +206,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     //then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -225,7 +223,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -242,7 +240,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -258,7 +256,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -274,7 +272,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -293,7 +291,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -316,7 +314,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -451,7 +449,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
   protected void assertRetries(List<String> allJobIds, int i) {
     for (String id : allJobIds) {
-      Assert.assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries()).isEqualTo(i);
     }
   }
 

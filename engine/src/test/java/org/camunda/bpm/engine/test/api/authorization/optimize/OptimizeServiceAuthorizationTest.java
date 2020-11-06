@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.optimize;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -26,8 +27,6 @@ import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -300,7 +299,7 @@ public class OptimizeServiceAuthorizationTest {
     List<?> instance = methodToTest.apply(optimizeService);
 
     // then
-    assertThat(instance.size(), greaterThan(0));
+    assertThat(instance.size()).isGreaterThan(0);
   }
 
   private void generateTestData() {

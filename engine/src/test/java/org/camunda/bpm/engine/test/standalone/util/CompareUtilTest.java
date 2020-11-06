@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.util;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -40,14 +39,14 @@ public class CompareUtilTest {
     calendar.set(2015, Calendar.AUGUST, 15);
     Date second = calendar.getTime();
     Date nullDate = null;
-    assertThat(CompareUtil.areNotInAscendingOrder(null, first, null, second), is(false));
-    assertThat(CompareUtil.areNotInAscendingOrder(null, first, null, first), is(false));
-    assertThat(CompareUtil.areNotInAscendingOrder(null, second, null, first), is(true));
-    assertThat(CompareUtil.areNotInAscendingOrder(nullDate, nullDate, nullDate), is(false));
+    assertThat(CompareUtil.areNotInAscendingOrder(null, first, null, second)).isFalse();
+    assertThat(CompareUtil.areNotInAscendingOrder(null, first, null, first)).isFalse();
+    assertThat(CompareUtil.areNotInAscendingOrder(null, second, null, first)).isTrue();
+    assertThat(CompareUtil.areNotInAscendingOrder(nullDate, nullDate, nullDate)).isFalse();
 
-    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(first, second)), is(false));
-    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(first, first)), is(false));
-    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(second, first)), is(true));
+    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(first, second))).isFalse();
+    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(first, first))).isFalse();
+    assertThat(CompareUtil.areNotInAscendingOrder(Arrays.asList(second, first))).isTrue();
   }
 
   @Test
@@ -58,17 +57,17 @@ public class CompareUtilTest {
     String [] nullValues = null;
     List<String> nullList = null;
 
-    assertThat(CompareUtil.elementIsNotContainedInArray(element, values), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInArray(element, values2), is(true));
-    assertThat(CompareUtil.elementIsNotContainedInArray(null, values), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInArray(null, nullValues), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInArray(element, nullValues), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, values)).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, values2)).isTrue();
+    assertThat(CompareUtil.elementIsNotContainedInArray(null, values)).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInArray(null, nullValues)).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, nullValues)).isFalse();
 
-    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values2)), is(true));
-    assertThat(CompareUtil.elementIsNotContainedInList(null, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInList(null, nullList), is(false));
-    assertThat(CompareUtil.elementIsNotContainedInList(element, nullList), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values))).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values2))).isTrue();
+    assertThat(CompareUtil.elementIsNotContainedInList(null, Arrays.asList(values))).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInList(null, nullList)).isFalse();
+    assertThat(CompareUtil.elementIsNotContainedInList(element, nullList)).isFalse();
   }
 
   @Test
@@ -79,16 +78,16 @@ public class CompareUtilTest {
     String [] nullValues = null;
     List<String> nullList = null;
 
-    assertThat(CompareUtil.elementIsContainedInArray(element, values), is(true));
-    assertThat(CompareUtil.elementIsContainedInArray(element, values2), is(false));
-    assertThat(CompareUtil.elementIsContainedInArray(null, values), is(false));
-    assertThat(CompareUtil.elementIsContainedInArray(null, nullValues), is(false));
-    assertThat(CompareUtil.elementIsContainedInArray(element, nullValues), is(false));
+    assertThat(CompareUtil.elementIsContainedInArray(element, values)).isTrue();
+    assertThat(CompareUtil.elementIsContainedInArray(element, values2)).isFalse();
+    assertThat(CompareUtil.elementIsContainedInArray(null, values)).isFalse();
+    assertThat(CompareUtil.elementIsContainedInArray(null, nullValues)).isFalse();
+    assertThat(CompareUtil.elementIsContainedInArray(element, nullValues)).isFalse();
 
-    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values)), is(true));
-    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values2)), is(false));
-    assertThat(CompareUtil.elementIsContainedInList(null, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.elementIsContainedInList(null, nullList), is(false));
-    assertThat(CompareUtil.elementIsContainedInList(element, nullList), is(false));
+    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values))).isTrue();
+    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values2))).isFalse();
+    assertThat(CompareUtil.elementIsContainedInList(null, Arrays.asList(values))).isFalse();
+    assertThat(CompareUtil.elementIsContainedInList(null, nullList)).isFalse();
+    assertThat(CompareUtil.elementIsContainedInList(element, nullList)).isFalse();
   }
 }

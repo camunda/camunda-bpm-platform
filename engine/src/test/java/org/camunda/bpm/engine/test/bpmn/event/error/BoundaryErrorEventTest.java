@@ -19,12 +19,9 @@ package org.camunda.bpm.engine.test.bpmn.event.error;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwError;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -958,8 +955,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTest {
 
   private void checkErrorVariable(String variableName, Object expectedValue){
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
-    assertThat(errorVariable, is(notNullValue()));
-    assertThat(errorVariable.getValue(), is(expectedValue));
+    assertThat(errorVariable).isNotNull();
+    assertThat(errorVariable.getValue()).isEqualTo(expectedValue);
   }
 
   @Deployment(resources={

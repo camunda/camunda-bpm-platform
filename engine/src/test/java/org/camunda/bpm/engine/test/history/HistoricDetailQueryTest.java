@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -200,8 +199,8 @@ public class HistoricDetailQueryTest {
         .executionId(executionId).singleResult();
 
     //then
-    assertThat(detail.getProcessInstanceId(), is(processInstanceId));
-    assertThat(detail.getExecutionId(), is(executionId));
+    assertThat(detail.getProcessInstanceId()).isEqualTo(processInstanceId);
+    assertThat(detail.getExecutionId()).isEqualTo(executionId);
   }
 
   @Test
@@ -550,8 +549,8 @@ public class HistoricDetailQueryTest {
         .caseExecutionId(caseInstanceId).singleResult();
 
     // then
-    assertThat(detail.getCaseInstanceId(), is(caseInstanceId));
-    assertThat(detail.getCaseExecutionId(), is(caseInstanceId));
+    assertThat(detail.getCaseInstanceId()).isEqualTo(caseInstanceId);
+    assertThat(detail.getCaseExecutionId()).isEqualTo(caseInstanceId);
   }
 
   @Test

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -52,7 +52,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
           .create();
       fail("BadUserRequestException exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -68,7 +68,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
           .create();
       fail("BadUserRequestException exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -83,7 +83,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
           .create();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase' and tenant-id 'nonExistingTenantId'"));
+      assertThat(e.getMessage()).contains("no case definition deployed with key 'oneTaskCase' and tenant-id 'nonExistingTenantId'");
     }
   }
 
@@ -97,7 +97,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
           .create();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("multiple tenants."));
+      assertThat(e.getMessage()).contains("multiple tenants.");
     }
   }
 
@@ -110,8 +110,8 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
         .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
 
   }
 
@@ -122,7 +122,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
         .create();
 
-    assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -134,7 +134,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
         .caseDefinitionTenantId(TENANT_ONE)
         .create();
 
-    assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -148,7 +148,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
       .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -162,7 +162,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+      assertThat(e.getMessage()).contains("no case definition deployed with key 'oneTaskCase'");
     }
   }
 
@@ -179,7 +179,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot create an instance of the case definition"));
+      assertThat(e.getMessage()).contains("Cannot create an instance of the case definition");
     }
   }
 
@@ -198,7 +198,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot create an instance of the case definition"));
+      assertThat(e.getMessage()).contains("Cannot create an instance of the case definition");
     }
   }
 
@@ -214,8 +214,8 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
       .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -231,8 +231,8 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     caseService.withCaseDefinition(caseDefinition.getId()).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -245,8 +245,8 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
     caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -262,8 +262,8 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
       .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
 }

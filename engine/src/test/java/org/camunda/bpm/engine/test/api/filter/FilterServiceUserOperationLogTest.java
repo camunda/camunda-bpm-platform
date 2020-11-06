@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 
@@ -80,7 +78,7 @@ public class FilterServiceUserOperationLogTest {
         .setOwner("owner")
         .setQuery(taskService.createTaskQuery())
         .setProperties(new HashMap<String, Object>());
-    
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filterService.saveFilter(filter);
@@ -89,11 +87,11 @@ public class FilterServiceUserOperationLogTest {
     // then
     assertEquals(1L, historyService.createUserOperationLogQuery().count());
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.FILTER));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_CREATE));
-    assertThat(logEntry.getProperty(), is("filterId"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is(filter.getId()));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.FILTER);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+    assertThat(logEntry.getProperty()).isEqualTo("filterId");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(filter.getId());
   }
 
   @Test
@@ -105,7 +103,7 @@ public class FilterServiceUserOperationLogTest {
         .setQuery(taskService.createTaskQuery())
         .setProperties(new HashMap<String, Object>());
     filterService.saveFilter(filter);
-    
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filter.setName(filter.getName() + "_new");
@@ -115,11 +113,11 @@ public class FilterServiceUserOperationLogTest {
     // then
     assertEquals(1L, historyService.createUserOperationLogQuery().count());
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.FILTER));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_UPDATE));
-    assertThat(logEntry.getProperty(), is("filterId"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is(filter.getId()));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.FILTER);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_UPDATE);
+    assertThat(logEntry.getProperty()).isEqualTo("filterId");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(filter.getId());
   }
 
   @Test
@@ -131,7 +129,7 @@ public class FilterServiceUserOperationLogTest {
         .setQuery(taskService.createTaskQuery())
         .setProperties(new HashMap<String, Object>());
     filterService.saveFilter(filter);
-    
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filterService.deleteFilter(filter.getId());
@@ -140,11 +138,11 @@ public class FilterServiceUserOperationLogTest {
     // then
     assertEquals(1L, historyService.createUserOperationLogQuery().count());
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.FILTER));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), is("filterId"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is(filter.getId()));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.FILTER);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("filterId");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(filter.getId());
   }
 
 }

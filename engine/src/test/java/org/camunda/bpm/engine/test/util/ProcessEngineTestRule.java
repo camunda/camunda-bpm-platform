@@ -16,11 +16,8 @@
  */
 package org.camunda.bpm.engine.test.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -91,8 +88,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       .processInstanceId(processInstanceId)
       .singleResult();
 
-    assertThat("Process instance with id " + processInstanceId + " is not finished",
-        processInstance, is(nullValue()));
+    assertThat(processInstance).describedAs("Process instance with id " + processInstanceId + " is not finished").isNull();
   }
 
   public void assertProcessNotEnded(final String processInstanceId) {
@@ -115,8 +111,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       .caseInstanceId(caseInstanceId)
       .singleResult();
 
-    assertThat("Case instance with id " + caseInstanceId + " is not finished",
-        caseInstance, is(nullValue()));
+    assertThat(caseInstance).describedAs("Case instance with id " + caseInstanceId + " is not finished").isNull();
   }
 
   public DeploymentWithDefinitions deploy(BpmnModelInstance... bpmnModelInstances) {
@@ -281,7 +276,7 @@ public class ProcessEngineTestRule extends TestWatcher {
 
     if (jobs.isEmpty()) {
       if (expectedExecutions != Integer.MAX_VALUE) {
-        assertThat("executed less jobs than expected.", jobsExecuted, is(expectedExecutions));
+        assertThat(jobsExecuted).describedAs("executed less jobs than expected.").isEqualTo(expectedExecutions);
       }
       return;
     }
@@ -293,8 +288,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       } catch (Exception e) {}
     }
 
-    assertThat("executed more jobs than expected.",
-        jobsExecuted, lessThanOrEqualTo(expectedExecutions));
+    assertThat(jobsExecuted).describedAs("executed more jobs than expected.").isLessThanOrEqualTo(expectedExecutions);
 
     if (recursive) {
       executeAvailableJobs(jobsExecuted, expectedExecutions, recursive);
@@ -416,7 +410,7 @@ public class ProcessEngineTestRule extends TestWatcher {
         .setVariables(variables)
         .create();
   }
-  
+
   public String getDatabaseType() {
     return processEngineRule.getProcessEngineConfiguration()
         .getDbSqlSessionFactory()

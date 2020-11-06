@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +117,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     // then
     assertScenario();
 
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getCount()));
+    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(getScenario().getCount());
   }
 
   @Test
@@ -163,11 +162,11 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
       assertEquals("userId", batch.getCreateUserId());
 
       if (testHelper.isHistoryLevelFull()) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count(), is(BATCH_OPERATIONS));
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count()).isEqualTo(BATCH_OPERATIONS);
         HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);
         assertEquals("userId", historicBatch.getCreateUserId());
       }
-      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
+      assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0L);
     }
   }
 }

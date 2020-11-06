@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -85,7 +84,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("migration plan is null"));
+      assertThat(e.getMessage()).contains("migration plan is null");
     }
   }
 
@@ -101,7 +100,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -117,7 +116,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("process instance ids contains null value");
     }
   }
 
@@ -133,7 +132,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -149,7 +148,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("process instance ids contains null value");
     }
   }
 
@@ -165,7 +164,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -181,7 +180,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -202,7 +201,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23002"));
+      assertThat(e.getMessage()).startsWith("ENGINE-23002");
     }
   }
 
@@ -220,7 +219,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23003"));
+      assertThat(e.getMessage()).startsWith("ENGINE-23003");
     }
   }
 
@@ -238,7 +237,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("process instance ids contains null value");
     }
   }
 
@@ -284,7 +283,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -303,7 +302,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+      assertThat(e.getMessage()).contains("process instance ids is empty");
     }
   }
 
@@ -326,7 +325,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23002"));
+      assertThat(e.getMessage()).startsWith("ENGINE-23002");
     }
   }
 

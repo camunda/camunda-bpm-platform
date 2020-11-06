@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -81,7 +80,7 @@ public class DefaultUserPermissionNameForTaskCfgTest {
 
     } catch(ProcessEngineException e) {
       String expectedExceptionMessage = String.format("Invalid value '%s' for configuration property 'defaultUserPermissionNameForTask'.", "UNSUPPORTED");
-      assertThat(e.getMessage(), containsString(expectedExceptionMessage));
+      assertThat(e.getMessage()).contains(expectedExceptionMessage);
     }
   }
 
@@ -99,7 +98,7 @@ public class DefaultUserPermissionNameForTaskCfgTest {
 
     } catch(ProcessEngineException e) {
       String expectedExceptionMessage = "Invalid value 'null' for configuration property 'defaultUserPermissionNameForTask'.";
-      assertThat(e.getMessage(), containsString(expectedExceptionMessage));
+      assertThat(e.getMessage()).contains(expectedExceptionMessage);
     }
   }
 

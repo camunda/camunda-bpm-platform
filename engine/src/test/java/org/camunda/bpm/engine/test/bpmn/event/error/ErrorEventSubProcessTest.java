@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwError;
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.throwException;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.runtime.Execution;
@@ -312,10 +310,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTest {
     String variableName = "errorCode";
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
 
-    assertThat(errorVariable, is(notNullValue()));
+    assertThat(errorVariable).isNotNull();
     //the code we gave the thrown error
     Object errorCode = "error";
-    assertThat(errorVariable.getValue(), is(errorCode));
+    assertThat(errorVariable.getValue()).isEqualTo(errorCode);
 
   }
 
@@ -330,10 +328,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTest {
     String variableName = "errorCode";
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
 
-    assertThat(errorVariable, is(notNullValue()));
+    assertThat(errorVariable).isNotNull();
     //the code we gave the thrown error
     Object errorCode = "error";
-    assertThat(errorVariable.getValue(), is(errorCode));
+    assertThat(errorVariable.getValue()).isEqualTo(errorCode);
   }
 
   @Deployment(resources={
@@ -350,10 +348,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTest {
     //the code we gave the thrown error
     Object errorCode = "errorCode";
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
-    assertThat(errorVariable.getValue(), is(errorCode));
+    assertThat(errorVariable.getValue()).isEqualTo(errorCode);
 
     errorVariable = runtimeService.createVariableInstanceQuery().variableName("errorMessageVariable").singleResult();
-    assertThat(errorVariable.getValue(), is((Object)"ouch!"));
+    assertThat(errorVariable.getValue()).isEqualTo((Object)"ouch!");
   }
 
   @Deployment(resources={

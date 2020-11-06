@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -102,9 +100,9 @@ public class IdentityServiceTenantTest {
     identityService.saveTenant(tenant);
 
     tenant = identityService.createTenantQuery().singleResult();
-    assertThat(tenant, is(notNullValue()));
-    assertThat(tenant.getId(), is(TENANT_ONE));
-    assertThat(tenant.getName(), is("Tenant"));
+    assertThat(tenant).isNotNull();
+    assertThat(tenant.getId()).isEqualTo(TENANT_ONE);
+    assertThat(tenant.getName()).isEqualTo("Tenant");
   }
 
   @Test
@@ -135,7 +133,7 @@ public class IdentityServiceTenantTest {
 
     // update
     tenant = identityService.createTenantQuery().singleResult();
-    assertThat(tenant, is(notNullValue()));
+    assertThat(tenant).isNotNull();
 
     tenant.setName("newName");
     identityService.saveTenant(tenant);
@@ -216,13 +214,13 @@ public class IdentityServiceTenantTest {
     identityService.saveTenant(tenant);
 
     TenantQuery query = identityService.createTenantQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenant("nonExisting");
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenant(TENANT_ONE);
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -333,16 +331,16 @@ public class IdentityServiceTenantTest {
     identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
 
     TenantQuery query = identityService.createTenantQuery().userMember(USER_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantUserMembership("nonExisting", USER_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantUserMembership(TENANT_ONE, "nonExisting");
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantUserMembership(TENANT_ONE, USER_ONE);
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -356,16 +354,16 @@ public class IdentityServiceTenantTest {
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
 
     TenantQuery query = identityService.createTenantQuery().groupMember(GROUP_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantGroupMembership("nonExisting", GROUP_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantGroupMembership(TENANT_ONE, "nonExisting");
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteTenantGroupMembership(TENANT_ONE, GROUP_ONE);
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -379,10 +377,10 @@ public class IdentityServiceTenantTest {
     identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
 
     TenantQuery query = identityService.createTenantQuery().userMember(USER_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteUser(USER_ONE);
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -396,10 +394,10 @@ public class IdentityServiceTenantTest {
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
 
     TenantQuery query = identityService.createTenantQuery().groupMember(GROUP_ONE);
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     identityService.deleteGroup(GROUP_ONE);
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -418,12 +416,12 @@ public class IdentityServiceTenantTest {
 
     UserQuery userQuery = identityService.createUserQuery().memberOfTenant(TENANT_ONE);
     GroupQuery groupQuery = identityService.createGroupQuery().memberOfTenant(TENANT_ONE);
-    assertThat(userQuery.count(), is(1L));
-    assertThat(groupQuery.count(), is(1L));
+    assertThat(userQuery.count()).isEqualTo(1L);
+    assertThat(groupQuery.count()).isEqualTo(1L);
 
     identityService.deleteTenant(TENANT_ONE);
-    assertThat(userQuery.count(), is(0L));
-    assertThat(groupQuery.count(), is(0L));
+    assertThat(userQuery.count()).isEqualTo(0L);
+    assertThat(groupQuery.count()).isEqualTo(0L);
   }
 
 }

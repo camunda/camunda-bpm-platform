@@ -17,12 +17,10 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -259,7 +257,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   protected void assertRetries(List<String> allJobIds, int i) {
     for (String id : allJobIds) {
-      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries()).isEqualTo(i);
     }
   }
 

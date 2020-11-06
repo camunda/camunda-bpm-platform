@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -670,7 +670,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
         .includeRootIncidents()
         .list();
     } catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), containsString("It is not possible to use includeIncident() and includeRootIncidents() to execute one query"));
+      assertThat(e.getMessage()).contains("It is not possible to use includeIncident() and includeRootIncidents() to execute one query");
     }
   }
 

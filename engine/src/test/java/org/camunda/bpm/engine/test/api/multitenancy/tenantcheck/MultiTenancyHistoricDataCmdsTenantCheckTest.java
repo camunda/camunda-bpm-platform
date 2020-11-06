@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -89,7 +87,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent().endEvent().done();
-  
+
   protected static final BpmnModelInstance BPMN_ONETASK_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent().userTask("task1").moveToActivity("task1").endEvent().done();
 
@@ -116,7 +114,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     historyService = engineRule.getHistoryService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     identityService.clearAuthentication();
@@ -151,7 +149,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -169,7 +167,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     historyService.deleteHistoricProcessInstance(processInstanceIdTwo);
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -196,7 +194,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -212,7 +210,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -241,7 +239,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -259,7 +257,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     historyService.deleteHistoricCaseInstance(caseInstanceIdTwo);
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -276,7 +274,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -292,7 +290,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -310,7 +308,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionIdTwo);
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -351,7 +349,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     // then
     identityService.clearAuthentication();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -367,7 +365,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     HistoricDecisionInstanceQuery query =
         historyService.createHistoricDecisionInstanceQuery();
     List<HistoricDecisionInstance> historicDecisionInstances = query.includeInputs().includeOutputs().list();
-    assertThat(historicDecisionInstances.size(), is(2));
+    assertThat(historicDecisionInstances.size()).isEqualTo(2);
 
     // when user has no authorization
     identityService.setAuthentication("user", null, null);
@@ -380,7 +378,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     // then
     identityService.clearAuthentication();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -413,7 +411,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     String historicJobLogExceptionStacktrace = historyService.getHistoricJobLogExceptionStacktrace(log.getId());
 
-    assertThat(historicJobLogExceptionStacktrace, notNullValue());
+    assertThat(historicJobLogExceptionStacktrace).isNotNull();
   }
 
   @Test
@@ -432,7 +430,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     String historicJobLogExceptionStacktrace = historyService.getHistoricJobLogExceptionStacktrace(log.getId());
 
-    assertThat(historicJobLogExceptionStacktrace, notNullValue());
+    assertThat(historicJobLogExceptionStacktrace).isNotNull();
   }
 
   @Test
@@ -460,14 +458,14 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     String processInstanceId = startProcessInstance(null);
     runtimeService.setVariable(processInstanceId, "myVariable", "testValue");
     HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId);
-    
-    assertThat(variableQuery.count(), is(1L));
+
+    assertThat(variableQuery.count()).isEqualTo(1L);
     String variableInstanceId = variableQuery.singleResult().getId();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     historyService.deleteHistoricVariableInstance(variableInstanceId);
-    assertThat(variableQuery.count(), is(0L));
+    assertThat(variableQuery.count()).isEqualTo(0L);
     cleanUpAfterVariableInstanceTest(processInstanceId);
   }
 
@@ -478,14 +476,14 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     String processInstanceIdOne = startProcessInstance(TENANT_ONE);
     String processInstanceIdTwo = startProcessInstance(TENANT_TWO);
-    
+
     runtimeService.setVariable(processInstanceIdOne, "myVariable", "testValue");
     runtimeService.setVariable(processInstanceIdTwo, "myVariable", "testValue");
     HistoricVariableInstanceQuery variableQueryOne = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdOne);
     HistoricVariableInstanceQuery variableQueryTwo = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdTwo);
-    
-    assertThat(variableQueryOne.count(), is(1L));
-    assertThat(variableQueryTwo.count(), is(1L));
+
+    assertThat(variableQueryOne.count()).isEqualTo(1L);
+    assertThat(variableQueryTwo.count()).isEqualTo(1L);
     String variableInstanceIdOne = variableQueryOne.singleResult().getId();
     String variableInstanceIdTwo = variableQueryTwo.singleResult().getId();
 
@@ -494,12 +492,12 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     historyService.deleteHistoricVariableInstance(variableInstanceIdOne);
     historyService.deleteHistoricVariableInstance(variableInstanceIdTwo);
-    assertThat(variableQueryOne.count(), is(0L));
-    assertThat(variableQueryTwo.count(), is(0L));;
-    
+    assertThat(variableQueryOne.count()).isEqualTo(0L);
+    assertThat(variableQueryTwo.count()).isEqualTo(0L);
+
     cleanUpAfterVariableInstanceTest(processInstanceIdOne, processInstanceIdTwo);
   }
-  
+
   @Test
   public void failToDeleteHistoricVariableInstancesNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, BPMN_ONETASK_PROCESS);
@@ -525,14 +523,14 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     String processInstanceId = startProcessInstance(null);
     runtimeService.setVariable(processInstanceId, "myVariable", "testValue");
     runtimeService.setVariable(processInstanceId, "myVariable", "testValue2");
-    
+
     HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId);
-    assertThat(variableQuery.count(), is(1L));
+    assertThat(variableQuery.count()).isEqualTo(1L);
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
-    assertThat(variableQuery.count(), is(0L));
+    assertThat(variableQuery.count()).isEqualTo(0L);
     cleanUpAfterVariableInstanceTest(processInstanceId);
   }
 
@@ -543,27 +541,27 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     String processInstanceIdOne = startProcessInstance(TENANT_ONE);
     String processInstanceIdTwo = startProcessInstance(TENANT_TWO);
-    
+
     runtimeService.setVariable(processInstanceIdOne, "myVariable", "testValue");
     runtimeService.setVariable(processInstanceIdOne, "mySecondVariable", "testValue2");
     runtimeService.setVariable(processInstanceIdTwo, "myVariable", "testValue");
     runtimeService.setVariable(processInstanceIdTwo, "mySecondVariable", "testValue2");
     HistoricVariableInstanceQuery variableQueryOne = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdOne);
     HistoricVariableInstanceQuery variableQueryTwo = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdTwo);
-    
-    assertThat(variableQueryOne.count(), is(2L));
-    assertThat(variableQueryTwo.count(), is(2L));
+
+    assertThat(variableQueryOne.count()).isEqualTo(2L);
+    assertThat(variableQueryTwo.count()).isEqualTo(2L);
 
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceIdOne);
-    assertThat(variableQueryOne.count(), is(0L));
-    assertThat(variableQueryTwo.count(), is(2L));
-    
+    assertThat(variableQueryOne.count()).isEqualTo(0L);
+    assertThat(variableQueryTwo.count()).isEqualTo(2L);
+
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceIdTwo);
-    assertThat(variableQueryTwo.count(), is(0L));;
-    
+    assertThat(variableQueryTwo.count()).isEqualTo(0L);
+
     cleanUpAfterVariableInstanceTest(processInstanceIdOne, processInstanceIdTwo);
   }
 
@@ -619,7 +617,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     return task.getId();
   }
-  
+
   protected void cleanUpAfterVariableInstanceTest(String... processInstanceIds) {
     processEngineConfiguration.setTenantCheckEnabled(false);
     for (String processInstanceId : processInstanceIds) {
@@ -633,7 +631,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     identityService.clearAuthentication();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
     processEngineConfiguration.setTenantCheckEnabled(true);
   }
 

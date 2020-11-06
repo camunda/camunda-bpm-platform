@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -36,19 +35,16 @@ public class ProcessEngineRuleRequiredHistoryLevelClassTest {
   @Test
   public void requiredHistoryLevelOnClass() {
 
-    assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+    assertThat(currentHistoryLevel()).isIn(ProcessEngineConfiguration.HISTORY_AUDIT, ProcessEngineConfiguration.HISTORY_FULL);
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void overrideRequiredHistoryLevelOnClass() {
 
-    assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
-        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+    assertThat(currentHistoryLevel()).isIn(ProcessEngineConfiguration.HISTORY_ACTIVITY,
+        ProcessEngineConfiguration.HISTORY_AUDIT,
+        ProcessEngineConfiguration.HISTORY_FULL);
   }
 
   protected String currentHistoryLevel() {

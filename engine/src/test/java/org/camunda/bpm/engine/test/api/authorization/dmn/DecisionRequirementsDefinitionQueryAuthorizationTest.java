@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.dmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,13 +112,14 @@ public class DecisionRequirementsDefinitionQueryAuthorizationTest {
 
     DecisionRequirementsDefinitionQuery query = engineRule.getRepositoryService().createDecisionRequirementsDefinitionQuery();
     long count = query.count();
+    List<DecisionRequirementsDefinition> definitions = query.list();
 
     // then
     if (authRule.assertScenario(scenario)) {
-      assertThat(count, is((long) expectedDefinitionKeys.length));
+      assertThat(count).isEqualTo((long) expectedDefinitionKeys.length);
 
-      List<String> definitionKeys = getDefinitionKeys(query.list());
-      assertThat(definitionKeys, hasItems(expectedDefinitionKeys));
+      List<String> definitionKeys = getDefinitionKeys(definitions);
+      assertThat(definitionKeys).containsExactlyInAnyOrder(expectedDefinitionKeys);
     }
   }
 

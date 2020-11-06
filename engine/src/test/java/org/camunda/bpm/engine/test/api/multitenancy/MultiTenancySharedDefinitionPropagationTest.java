@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.runtime.Job;
@@ -61,9 +59,9 @@ public class MultiTenancySharedDefinitionPropagationTest {
     engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 
     ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().singleResult();
-    assertThat(processInstance, is(notNullValue()));
+    assertThat(processInstance).isNotNull();
     // get the tenant id from the provider
-    assertThat(processInstance.getTenantId(), is(TENANT_ID));
+    assertThat(processInstance.getTenantId()).isEqualTo(TENANT_ID);
   }
 
   @Test
@@ -79,9 +77,9 @@ public class MultiTenancySharedDefinitionPropagationTest {
 
     // the job is created when the timer event is reached
     Job job = engineRule.getManagementService().createJobQuery().singleResult();
-    assertThat(job, is(notNullValue()));
+    assertThat(job).isNotNull();
     // inherit the tenant id from execution
-    assertThat(job.getTenantId(), is(TENANT_ID));
+    assertThat(job.getTenantId()).isEqualTo(TENANT_ID);
   }
 
   @Test
@@ -97,9 +95,9 @@ public class MultiTenancySharedDefinitionPropagationTest {
 
     // the job is created when the asynchronous activity is reached
     Job job = engineRule.getManagementService().createJobQuery().singleResult();
-    assertThat(job, is(notNullValue()));
+    assertThat(job).isNotNull();
     // inherit the tenant id from execution
-    assertThat(job.getTenantId(), is(TENANT_ID));
+    assertThat(job.getTenantId()).isEqualTo(TENANT_ID);
   }
 
 }

@@ -18,9 +18,8 @@ package org.camunda.bpm.engine.test.api.history.removaltime.cleanup;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.apache.commons.lang3.time.DateUtils.addSeconds;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.START_DELAY;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 
@@ -118,7 +117,7 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
     Job job = historyService.findHistoryCleanupJobs().get(0);
 
     // then
-    assertThat(job.getDuedate(), is(removalTime));
+    assertThat(job.getDuedate()).isEqualTo(removalTime);
   }
 
   @Test
@@ -159,7 +158,7 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
     Job job = historyService.findHistoryCleanupJobs().get(0);
 
     // then
-    assertThat(job.getDuedate(), is(addSeconds(removalTime, START_DELAY)));
+    assertThat(job.getDuedate()).isEqualTo(addSeconds(removalTime, START_DELAY));
   }
 
 }

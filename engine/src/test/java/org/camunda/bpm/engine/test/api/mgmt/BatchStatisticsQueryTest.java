@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -596,10 +595,10 @@ public class BatchStatisticsQueryTest {
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }
-    assertThat(foundIds, hasItems(
+    assertThat(foundIds).contains(
       batch1.getId(),
       batch3.getId()
-    ));
+    );
   }
 
   protected void deleteMigrationJobs(Batch batch) {

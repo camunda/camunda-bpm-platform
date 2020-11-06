@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionKey;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionName;
@@ -23,12 +24,9 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicP
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1507,7 +1505,7 @@ public class HistoricProcessInstanceTest {
       .executedActivityIdIn((String[]) null).list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
+      assertThat(e.getMessage()).contains("activity ids is null");
     }
   }
 
@@ -1518,7 +1516,7 @@ public class HistoricProcessInstanceTest {
       .executedActivityIdIn(null, "1").list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
+      assertThat(e.getMessage()).contains("activity ids contains null");
     }
   }
 
@@ -1555,7 +1553,7 @@ public class HistoricProcessInstanceTest {
       .activeActivityIdIn((String[]) null).list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
+      assertThat(e.getMessage()).contains("activity ids is null");
     }
   }
 
@@ -1566,7 +1564,7 @@ public class HistoricProcessInstanceTest {
       .activeActivityIdIn(null, "1").list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
+      assertThat(e.getMessage()).contains("activity ids contains null");
     }
   }
 
@@ -1645,15 +1643,15 @@ public class HistoricProcessInstanceTest {
     runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
 
     // assume
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(9l));
+    assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(9l);
 
     // when
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
       .processDefinitionKeyIn("ONE_TASKS_PROCESS", "TWO_TASKS_PROCESS");
 
     // then
-    assertThat(query.count(), is(6l));
-    assertThat(query.list().size(), is(6));
+    assertThat(query.count()).isEqualTo(6l);
+    assertThat(query.list().size()).isEqualTo(6);
   }
 
   @Test
@@ -1667,8 +1665,8 @@ public class HistoricProcessInstanceTest {
       .processDefinitionKeyIn("not-existing-key");
 
     // then
-    assertThat(query.count(), is(0l));
-    assertThat(query.list().size(), is(0));
+    assertThat(query.count()).isEqualTo(0l);
+    assertThat(query.list().size()).isEqualTo(0);
   }
 
   @Test

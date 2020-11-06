@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -787,7 +786,7 @@ public class MigrationPlanCreationTest {
   }
 
   protected void assertExceptionMessage(Exception e, String message) {
-    assertThat(e.getMessage(), CoreMatchers.containsString(message));
+    assertThat(e.getMessage()).contains(message);
   }
 
 }

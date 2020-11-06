@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -64,7 +63,7 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
   }
 
   protected static DelegateCaseExecutionAsserter hasTenantId(final String expectedTenantId) {
-    return execution -> assertThat(execution.getTenantId(), is(expectedTenantId));
+    return execution -> assertThat(execution.getTenantId()).isEqualTo(expectedTenantId);
   }
 
 }
