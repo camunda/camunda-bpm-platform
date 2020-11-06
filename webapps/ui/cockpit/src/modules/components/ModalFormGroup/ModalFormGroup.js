@@ -15,14 +15,33 @@
  * limitations under the License.
  */
 
-export { CamundaLogo } from "./CamundaLogo";
-export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
-export { LinkButton } from "./LinkButton";
-export { LoadingIndicator } from "./LoadingIndicator";
-export { Notifications } from "./Notifications";
-export { StateCircle } from "./StateCircle";
-export { Table } from "./Table";
-export { ActionButton } from "./ActionButton";
-export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
-export { ModalFormGroup } from "./ModalFormGroup";
+import React from "react";
+import {
+  Tooltip,
+  OverlayTrigger,
+  FormGroup,
+  Col,
+  ControlLabel
+} from "react-bootstrap";
+import translate from "utils/translation";
+
+export default function ModalFormGroup({ label, tooltip, formControl }) {
+  return (
+    <FormGroup>
+      <Col componentClass={ControlLabel} xs={5}>
+        {translate(label)}&nbsp;
+        {tooltip && (
+          <OverlayTrigger
+            placement="right"
+            overlay={<Tooltip id="tooltip">{translate(tooltip)}</Tooltip>}
+          >
+            <span className="glyphicon glyphicon-question-sign" />
+          </OverlayTrigger>
+        )}
+      </Col>
+      <Col componentClass={ControlLabel} xs={7}>
+        {formControl}
+      </Col>
+    </FormGroup>
+  );
+}

@@ -47,8 +47,6 @@ var angular = require("angular"),
   jobRetryBulkDialog = require("./processInstance/jobRetryBulkDialog"),
   jobRetryDialog = require("./processInstance/jobRetryDialog"),
   externalTaskRetryDialog = require("./processInstance/externalTaskRetryDialog"),
-  cancelProcessInstanceAction = require("./processInstance/cancelProcessInstanceAction"),
-  cancelProcessInstanceDialog = require("./processInstance/cancelProcessInstanceDialog"),
   addVariableAction = require("./processInstance/addVariableAction"),
   updateSuspensionStateActionPI = require("./processInstance/updateSuspensionStateAction"),
   updateSuspensionStateDialogPI = require("./processInstance/updateSuspensionStateDialog"),
@@ -88,11 +86,6 @@ jobRetryBulkAction(ngModule);
 ngModule.controller("JobRetriesController", jobRetryBulkDialog);
 ngModule.controller("JobRetryController", jobRetryDialog);
 ngModule.controller("ExternalTaskRetryController", externalTaskRetryDialog);
-cancelProcessInstanceAction(ngModule);
-ngModule.controller(
-  "CancelProcessInstanceController",
-  cancelProcessInstanceDialog
-);
 ngModule.config(addVariableAction);
 ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller(

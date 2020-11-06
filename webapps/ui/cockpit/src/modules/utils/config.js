@@ -187,6 +187,8 @@ export async function loadConfig() {
 }
 
 export const getConfig = () => config;
+export const getSkipCustomListeners = () => config["skipCustomListeners"];
+export const getSkipIoMappings = () => config["skipIoMappings"];
 export const getDisableWelcomeMessage = () => config["disableWelcomeMessage"];
 export const getLocale = () => config["locale"];
 export const getPlugins = () => config["plugins"];

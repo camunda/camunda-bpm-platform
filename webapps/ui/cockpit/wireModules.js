@@ -9,4 +9,9 @@ if (!fs.existsSync(srcDirectory + "/node_modules")) {
     srcDirectory + "/node_modules",
     "dir"
   );
+  fs.symlinkSync(
+    srcDirectory + "/enterprise",
+    srcDirectory + "/node_modules/enterprise",
+    "dir"
+  );
 }

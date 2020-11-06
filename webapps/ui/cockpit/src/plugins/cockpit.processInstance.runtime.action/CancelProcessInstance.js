@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-export { CamundaLogo } from "./CamundaLogo";
-export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
-export { LinkButton } from "./LinkButton";
-export { LoadingIndicator } from "./LoadingIndicator";
-export { Notifications } from "./Notifications";
-export { StateCircle } from "./StateCircle";
-export { Table } from "./Table";
-export { ActionButton } from "./ActionButton";
-export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
-export { ModalFormGroup } from "./ModalFormGroup";
+import React from "react";
+import { CancelProcessInstance } from "components";
+
+export default {
+  id: "cockpit.processInstance.runtime.action.CancelProcessInstance",
+  pluginPoint: "cockpit.processInstance.runtime.action",
+  priority: 20,
+  render: (node, { processInstanceId }) => {
+    return <CancelProcessInstance processInstanceId={processInstanceId} />;
+  }
+};

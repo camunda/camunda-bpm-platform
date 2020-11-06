@@ -27,5 +27,6 @@ public/styles/*
 !public/styles/user-styles.css
 src/node_modules
 src/enterprise
+src/modules/enterprise
 
 public/locales/*.json

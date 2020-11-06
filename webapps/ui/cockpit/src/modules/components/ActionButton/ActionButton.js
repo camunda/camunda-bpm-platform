@@ -15,14 +15,30 @@
  * limitations under the License.
  */
 
-export { CamundaLogo } from "./CamundaLogo";
-export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
-export { LinkButton } from "./LinkButton";
-export { LoadingIndicator } from "./LoadingIndicator";
-export { Notifications } from "./Notifications";
-export { StateCircle } from "./StateCircle";
-export { Table } from "./Table";
-export { ActionButton } from "./ActionButton";
-export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
-export { ModalFormGroup } from "./ModalFormGroup";
+import React from "react";
+import { Tooltip, OverlayTrigger, Button } from "react-bootstrap";
+import translate from "utils/translation";
+
+export default function ActionButton({ icon, labels, disabled, onClick }) {
+  return (
+    <OverlayTrigger
+      placement="left"
+      overlay={
+        <Tooltip id="tooltip">
+          {translate(disabled ? labels.disabled : labels.enabled)}
+        </Tooltip>
+      }
+    >
+      <div>
+        <Button
+          bsStyle="default"
+          className="btn-toolbar"
+          onClick={disabled ? () => {} : onClick}
+          disabled={disabled}
+        >
+          <span className={"glyphicon glyphicon-" + icon} />
+        </Button>
+      </div>
+    </OverlayTrigger>
+  );
+}
