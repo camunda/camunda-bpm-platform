@@ -38,6 +38,20 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
+  public void lock(ExternalTask externalTask, long lockDuration) {
+    lock(externalTask.getId(), lockDuration);
+  }
+
+  @Override
+  public void lock(String externalTaskId, long lockDuration) {
+    try {
+      engineClient.lock(externalTaskId, lockDuration);
+    } catch (EngineClientException e) {
+      throw LOG.externalTaskServiceException("locking task", e);
+    }
+  }
+
+  @Override
   public void unlock(ExternalTask externalTask) {
     try {
       engineClient.unlock(externalTask.getId());

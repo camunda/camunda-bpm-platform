@@ -294,6 +294,46 @@ public class ExternalTaskHandlerIT {
   }
 
   @Test
+  public void shouldLock() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      // an external task may be locked again by the same worker
+      client.lock(task, LOCK_DURATION * 10);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+    ExternalTask externalTaskBeforeLock = handler.getHandledTasks().get(0);
+    ExternalTask externalTaskAfterLock = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+    assertThat(externalTaskAfterLock.getLockExpirationTime()).isAfter(externalTaskBeforeLock.getLockExpirationTime());
+  }
+
+  @Test
+  public void shouldLockById() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      // an external task may be locked again by the same worker
+      client.lock(task.getId(), LOCK_DURATION * 10);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+    ExternalTask externalTaskBeforeLock = handler.getHandledTasks().get(0);
+    ExternalTask externalTaskAfterLock = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+    assertThat(externalTaskAfterLock.getLockExpirationTime()).isAfter(externalTaskBeforeLock.getLockExpirationTime());
+  }
+
+  @Test
   public void shouldExtendLock() {
     // given
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {

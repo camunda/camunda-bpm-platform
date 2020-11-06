@@ -32,6 +32,36 @@ import java.util.Map;
 public interface ExternalTaskService {
 
   /**
+   * Locks a task by a given amount of time.
+   *
+   * Note: This method should be used to lock external tasks
+   * that have been obtained without using the fetch & lock API.
+   *
+   * @param externalTaskId the id of the external task whose lock will be extended
+   * @param lockDuration specifies the lock duration in milliseconds
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws ConnectionLostException if the connection could not be established
+   */
+  void lock(String externalTaskId, long lockDuration);
+
+  /**
+   * Locks a task by a given amount of time.
+   *
+   * Note: This method should be used to lock external tasks
+   * that have been obtained without using the fetch & lock API.
+   *
+   * @param externalTask which lock will be extended
+   * @param lockDuration specifies the lock duration in milliseconds
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws ConnectionLostException if the connection could not be established
+   */
+  void lock(ExternalTask externalTask, long lockDuration);
+
+  /**
    * Unlocks a task and clears the tasks lock expiration time and worker id.
    *
    * @param externalTask which will be unlocked

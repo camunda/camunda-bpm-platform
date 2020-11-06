@@ -26,6 +26,7 @@ import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
 import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
 import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
 import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
+import org.camunda.bpm.client.task.impl.dto.LockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
@@ -40,11 +41,12 @@ public class EngineClient {
   protected static final String FETCH_AND_LOCK_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/fetchAndLock";
   public static final String ID_PATH_PARAM = "{id}";
   protected static final String ID_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/" + ID_PATH_PARAM;
+  public static final String LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/lock";
+  public static final String EXTEND_LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/extendLock";
   public static final String UNLOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/unlock";
   public static final String COMPLETE_RESOURCE_PATH = ID_RESOURCE_PATH + "/complete";
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
   public static final String BPMN_ERROR_RESOURCE_PATH = ID_RESOURCE_PATH + "/bpmnError";
-  public static final String EXTEND_LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/extendLock";
   public static final String NAME_PATH_PARAM = "{name}";
   public static final String EXECUTION_RESOURCE_PATH = "/execution";
   public static final String EXECUTION_ID_RESOURCE_PATH = EXECUTION_RESOURCE_PATH + "/" + ID_PATH_PARAM;
@@ -77,6 +79,13 @@ public class EngineClient {
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);
+  }
+
+  public void lock(String taskId, long lockDuration) throws EngineClientException {
+    LockRequestDto payload = new LockRequestDto(workerId, lockDuration);
+    String resourcePath = LOCK_RESOURCE_PATH.replace("{id}", taskId);
+    String resourceUrl = baseUrl + resourcePath;
+    engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
   public void unlock(String taskId) throws EngineClientException {
