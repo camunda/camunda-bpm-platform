@@ -3,7 +3,7 @@
   <@lib.endpointInfo
       id = "getComment"
       tag = "Task Comment"
-      summary = "Get List"
+      summary = "Get"
       desc = "Retrieves a task comment by task id and comment id." />
 
   "parameters" : [
