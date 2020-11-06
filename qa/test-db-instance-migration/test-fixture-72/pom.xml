@@ -72,7 +72,7 @@
               <includeProjectDependencies>true</includeProjectDependencies>
               <includePluginDependencies>false</includePluginDependencies>
               <classpathScope>test</classpathScope>
-              <skip>${maven.exec.skip}</skip>
+              <skip>${skip-test-fixture}</skip>
             </configuration>
             <executions>
               <execution>
@@ -93,7 +93,7 @@
     <profile>
       <id>cockroachdb</id>
       <properties>
-        <maven.exec.skip>true</maven.exec.skip>
+        <skip-test-fixture>true</skip-test-fixture>
       </properties>
     </profile>
   </profiles>

@@ -174,7 +174,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
             <configuration>
-              <skip>${maven.sql.skip}</skip>
+              <skip>${skip-test-fixture}</skip>
             </configuration>
             <executions>
               <execution>
@@ -218,7 +218,7 @@
               <includeProjectDependencies>true</includeProjectDependencies>
               <includePluginDependencies>false</includePluginDependencies>
               <classpathScope>test</classpathScope>
-              <skip>${maven.exec.skip}</skip>
+              <skip>${skip-test-fixture}</skip>
             </configuration>
             <executions>
               <execution>
@@ -239,8 +239,7 @@
     <profile>
       <id>cockroachdb</id>
       <properties>
-        <maven.exec.skip>true</maven.exec.skip>
-        <maven.sql.skip>true</maven.sql.skip>
+        <skip-test-fixture>true</skip-test-fixture>
       </properties>
     </profile>
   </profiles>

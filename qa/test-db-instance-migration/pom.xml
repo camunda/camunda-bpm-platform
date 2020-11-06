@@ -15,8 +15,10 @@
 
   <properties>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
-    <maven.exec.skip>false</maven.exec.skip>
-    <maven.sql.skip>false</maven.sql.skip>
+    <!-- the `skip-test-fixture` property is used to skip the execution of `test-fixture`
+         modules for those versions that are not supported for a given database
+         (e.g. for CockroachDB, all `test-fixture` modules before 7.14 are skipped). -->
+    <skip-test-fixture>false</skip-test-fixture>
   </properties>
 
   <modules>
