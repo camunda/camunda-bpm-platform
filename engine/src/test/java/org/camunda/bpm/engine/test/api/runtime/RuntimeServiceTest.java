@@ -431,30 +431,6 @@ public class RuntimeServiceTest {
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcessWithIncompleteIoMapping.bpmn20.xml" })
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  @Test
-  public void testDeleteProcessInstanceWithoutSkipIoMappingsAndIncompleteMapping() {
-
-    // given a process instance with incomplete io mapping
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
-    // when the process instance is deleted and we do not skip the io mappings
-    try {
-      runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
-      fail("ProcessEngineException expected");
-    // then an exception should occur
-    } catch (ProcessEngineException e) {
-      testRule.assertTextPresent("Unknown property used in expression: ${var}. Cause: Cannot resolve identifier 'var'",
-          e.getMessage());
-    }
-    // and no changes should have been made
-    testRule.assertProcessNotEnded(instance.getId());
-    assertEquals(0,
-        historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
-    assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
-  }
-
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
