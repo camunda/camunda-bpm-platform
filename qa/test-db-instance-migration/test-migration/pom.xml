@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.15.0-alpha1</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-migration</artifactId>
@@ -216,8 +216,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <!-- exclude instance migration tests for older Camunda versions (<7.14)
-                   before Cockroachdb support was added -->
+              <!-- exclude instance migration tests for older Camunda versions (<7.14) before Cockroachdb support was added -->
               <excludes combine.children="append">
                 <exclude>**/authorization/**</exclude>
                 <exclude>**/scenarios720/**</exclude>
