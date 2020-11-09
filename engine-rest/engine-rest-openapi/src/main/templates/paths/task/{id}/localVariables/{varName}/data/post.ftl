@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "setBinaryTaskLocalVariable"
       tag = "Task Local Variable"
+      summary = "Update Local Task Variable (Binary)"
       desc = "Sets the serialized value for a binary variable or the binary value for a file variable." />
 
   "parameters": [

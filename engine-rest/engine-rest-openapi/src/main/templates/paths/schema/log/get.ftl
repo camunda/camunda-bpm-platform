@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "getSchemaLog"
       tag = "Schema Log"
+      summary = "Get List"
       desc = "Queries for schema log entries that fulfill given parameters." />
 
   "parameters" : [

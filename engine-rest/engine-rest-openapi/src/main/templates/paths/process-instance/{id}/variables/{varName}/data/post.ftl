@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "setProcessInstanceVariableBinary"
       tag = "Process Instance"
+      summary = "Update Process Variable (Binary)"
       desc = "Sets the serialized value for a binary variable or the binary value for a file variable." />
 
   "parameters": [

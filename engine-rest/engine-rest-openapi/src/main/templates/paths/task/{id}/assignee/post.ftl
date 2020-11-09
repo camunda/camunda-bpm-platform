@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "setAssignee"
       tag = "Task"
+      summary = "Set Assignee"
       desc = "Changes the assignee of a task to a specific user.
 
               **Note:** The difference with the [Claim Task](${docsUrl}/reference/rest/task/post-claim/)

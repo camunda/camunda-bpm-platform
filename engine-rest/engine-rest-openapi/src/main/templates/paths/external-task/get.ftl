@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getExternalTasks"
       tag = "External Task"
+      summary = "Get List"
       desc = "Queries for the external tasks that fulfill given parameters. Parameters may be static as well as dynamic
               runtime properties of executions. The size of the result set can be retrieved by using the
               [Get External Task Count](${docsUrl}/reference/rest/external-task/get-query-count/) method." />

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "putTaskLocalVariable"
       tag = "Task Local Variable"
+      summary = "Update Local Task Variable"
       desc = "Sets a variable in the context of a given task." />
 
   "parameters": [

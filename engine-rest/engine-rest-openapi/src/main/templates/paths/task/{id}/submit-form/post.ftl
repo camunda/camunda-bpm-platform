@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "submit"
       tag = "Task"
+      summary = "Submit Form"
       desc = "Completes a task and updates process variables using a form submit. There are two
               difference between this method and the `complete` method:
 

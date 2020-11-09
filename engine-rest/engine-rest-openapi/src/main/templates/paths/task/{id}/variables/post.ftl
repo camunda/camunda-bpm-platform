@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "modifyTaskVariables"
       tag = "Task Variable"
+      summary = "Update/Delete Task Variables"
       desc = "Updates or deletes the variables visible from the task. Updates precede deletions. So, if a variable is
               updated AND deleted, the deletion overrides the update. A variable is visible from the task if it is a
               local task variable or declared in a parent scope of the task. See documentation on

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "resolve"
       tag = "Task"
+      summary = "Resolve"
       desc = "Resolves a task and updates execution variables.
 
               Resolving a task marks that the assignee is done with the task delegated to them, and

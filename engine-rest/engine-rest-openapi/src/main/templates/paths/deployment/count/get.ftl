@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeploymentsCount"
       tag = "Deployment"
+      summary = "Get List Count"
       desc = "Queries for the number of deployments that fulfill given parameters. Takes the same parameters as the
               [Get Deployments](${docsUrl}/reference/rest/deployment/get-query/) method." />
 

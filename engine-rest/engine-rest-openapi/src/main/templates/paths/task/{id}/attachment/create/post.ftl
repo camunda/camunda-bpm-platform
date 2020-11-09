@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "addAttachment"
       tag = "Task Attachment"
+      summary = "Create"
       desc = "Creates an attachment for a task." />
 
   "parameters" : [

@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "interval"
       tag = "Metrics"
+      summary = "Get Metrics in Interval"
       desc = "Retrieves a list of metrics, aggregated for a given interval." />
 
   "parameters" : [

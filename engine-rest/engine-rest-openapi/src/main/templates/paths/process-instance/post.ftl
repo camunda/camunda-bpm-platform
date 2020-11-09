@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "queryProcessInstances"
       tag = "Process Instance"
+      summary = "Get List (POST)"
       desc = "Queries for process instances that fulfill given parameters through a JSON object.
               This method is slightly more powerful than the Get Instances method because
               it allows filtering by multiple process variables of types `string`, `number` or `boolean`." />

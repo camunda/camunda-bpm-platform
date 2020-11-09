@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeployment"
       tag = "Deployment"
+      summary = "Get"
       desc = "Retrieves a deployment by id, according to the `Deployment` interface of the engine." />
 
   "parameters" : [

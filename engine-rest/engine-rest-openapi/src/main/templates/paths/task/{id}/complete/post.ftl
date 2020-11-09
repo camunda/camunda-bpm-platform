@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "complete"
       tag = "Task"
+      summary = "Complete"
       desc = "Completes a task and updates process variables." />
 
   "parameters" : [

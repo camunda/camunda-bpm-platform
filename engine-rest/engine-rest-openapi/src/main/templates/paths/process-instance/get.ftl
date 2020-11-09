@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "getProcessInstances"
       tag = "Process Instance"
+      summary = "Get List"
       desc = "Queries for process instances that fulfill given parameters.
               Parameters may be static as well as dynamic runtime properties of process instances.
               The size of the result set can be retrieved by using the Get Instance Count method." />

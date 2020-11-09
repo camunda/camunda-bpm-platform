@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "setExternalTaskResourcePriority"
       tag = "External Task"
+      summary = "Set Priority"
       desc = "Sets the priority of an existing external task by id. The default value of a priority is 0." />
 
   "parameters" : [

@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "fetchAndLock"
       tag = "External Task"
+      summary = "Fetch and Lock"
       desc = "Fetches and locks a specific number of external tasks for execution by a worker. Query can be restricted
               to specific task topics and for each task topic an individual lock time can be provided." />
 

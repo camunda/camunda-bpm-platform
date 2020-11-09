@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "queryExternalTasksCount"
       tag = "External Task"
+      summary = "Get List Count (POST)"
       desc = "Queries for the number of external tasks that fulfill given parameters. This method takes the same message
               body as the [Get External Tasks (POST)](${docsUrl}/reference/rest/external-task/post-query/) method." />
 

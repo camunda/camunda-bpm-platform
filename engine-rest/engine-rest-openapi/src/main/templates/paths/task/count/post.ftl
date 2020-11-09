@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "queryTasksCount"
       tag = "Task"
+      summary = "Get List Count (POST)"
       desc = "Retrieves the number of tasks that fulfill the given filter. Corresponds to the size
               of the result set of the [Get Tasks (POST)](${docsUrl}/reference/rest/task/post-query/)
               method and takes the same parameters.

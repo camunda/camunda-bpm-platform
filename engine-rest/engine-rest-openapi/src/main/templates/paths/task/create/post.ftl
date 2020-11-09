@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "createTask"
       tag = "Task"
+      summary = "Create"
       desc = "Creates a new task." />
 
   <@lib.requestBody

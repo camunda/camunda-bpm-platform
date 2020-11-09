@@ -2,6 +2,7 @@
   <@lib.endpointInfo
       id = "modifyProcessInstanceVariables"
       tag = "Process Instance"
+      summary = "Update/Delete Process Variables"
       desc = "Updates or deletes the variables of a process instance by id. Updates precede deletions.
               So, if a variable is updated AND deleted, the deletion overrides the update." />
 

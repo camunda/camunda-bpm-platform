@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "updateTask"
       tag = "Task"
+      summary = "Update"
       desc = "Updates a task." />
 
   "parameters" : [

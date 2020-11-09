@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "addIdentityLink"
       tag = "Task Identity Link"
+      summary = "Add"
       desc = "Adds an identity link to a task by id. Can be used to link any user or group to a task
               and specify a relation." />
 
