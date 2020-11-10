@@ -606,7 +606,7 @@
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.181</version>
+                <version>1.4.200</version>
               </dependency>
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
@@ -773,7 +773,7 @@
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.181</version>
+                <version>1.4.200</version>
               </dependency>
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
