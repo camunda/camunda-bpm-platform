@@ -59,7 +59,7 @@ You need [node.js](http://nodejs.org) and npm. You will also need to install [gr
 
 #### Adjusting Maven Settings
 
-See https://github.com/camunda/camunda-bpm-platform#building-camunda-bpm-platform
+See https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md#build-from-source
 
 #### Using Grunt
 
