@@ -9,7 +9,7 @@
     "@testing-library/react": "9.3.2",
     "@testing-library/user-event": "7.1.2",
     "angular-animate": "1.8.0",
-    "angular-cookies": "1.8.0",
+    "angular-cookies": "1.8.2",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend.git#master",
     "angular-resource": "1.8.0",
     "angular-route": "1.8.0",
