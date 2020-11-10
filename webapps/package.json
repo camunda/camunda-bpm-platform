@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@bpmn-io/dmn-migrate": "0.4.3",
-    "angular": "1.8.0",
+    "angular": "1.8.2",
     "angular-animate": "1.8.0",
     "angular-cookies": "1.8.0",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend.git#8e3b66914c611069e3698fd5d4275e6cf8055d01",
