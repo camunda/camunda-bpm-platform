@@ -1,0 +1,82 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    {{ 'MANAGE_GROUPS' | translate }}
+  </h3>
+</div>
+
+<div class="modal-body groups-modal">
+
+  <div notifications-panel></div>
+
+  <form name="taskGroupForm"
+        class="form-horizontal"
+        ng-controller="camTaskGroupsCtrl"
+        ng-hide="!modalGroupsState.$loaded || modalGroupsState.$error"
+        ng-submit="(isValid() && addGroup())">
+
+  <div ng-show="!modalGroupsState.$loaded && !modalGroupsState.$error"
+       class="loader">
+    <span class="animate-spin glyphicon glyphicon-refresh"></span>
+    {{ 'LOADING' | translate }}
+  </div>
+
+  <div class="text-help">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'USE_ADD_GROUP' | translate }}
+  </div>
+
+    <div class="form-group">
+      <div class="col-xs-4 align-right">
+        <button class="btn btn-link"
+                ng-click="addGroup()"
+                type="button"
+                ng-disabled="!isValid()">
+          <span class="hidden-sm hidden-xs">{{ 'GROUP_ADD' | translate }}</span>
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </button>
+      </div>
+
+      <div class="col-xs-8"
+           ng-class="{'has-error': newGroup.error }">
+        <input type="text"
+               name="newGroup"
+               required
+               placeholder="{{ 'GROUP_ID' | translate }}"
+               class="form-control"
+               ng-model="newGroup.groupId"
+               ng-change="validateNewGroup()"/>
+
+        <span ng-if="newGroup.error"
+              class="help-block">
+          {{ newGroup.error.message | translate }}
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group values"
+         ng-repeat="group in _groups">
+      <div class="col-xs-4 row-action">
+        <a href
+           ng-click="removeGroup(group, $index)"
+           class="glyphicon glyphicon-remove-sign"></a>
+      </div>
+
+      <div class="col-xs-8 value">
+        {{ group.id }}
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <div class="row row-action">
+    <div class="col-xs-12">
+      <button class="btn btn-xs btn-link"
+              type="button"
+              ng-click="$dismiss()"
+              translate="CLOSE">Close</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div uib-alert class="alert alert-danger"
+     ng-if="error">
+  <strong>{{ 'CAM_WIDGET_DMN_VIEWER_ERROR' | translate }}</strong><br/>
+  {{ error.message }}
+</div>
+
+<div ng-show="!error"
+     ng-if="!loaded && !disableLoader"
+     class="placeholder-container">
+  <div class="placeholder-content">
+    {{ 'CAM_WIDGET_DMN_VIEWER_LOADING' | translate }}<br />
+    <span class="glyphicon glyphicon-refresh animate-spin"></span>
+  </div>
+</div>
+
+<div ng-show="!error"
+     ng-class="{
+      'grab-cursor': isDrd && !grabbing,
+      'cursor-move': isDrd && grabbing
+     }"
+     class="table-holder">
+</div>
+
+<div ng-if="!error && !disableNavigation && isDrd">
+  <div class="navigation zoom">
+    <button class="btn btn-default in"
+            title="zoom in"
+            ng-click="zoomIn()">
+      <span class="glyphicon glyphicon-plus"></span>
+    </button>
+    <button class="btn btn-default out"
+            title="zoom out"
+            ng-click="zoomOut()">
+      <span class="glyphicon glyphicon-minus"></span>
+    </button>
+  </div>
+
+  <div class="navigation reset">
+    <button class="btn btn-default"
+            title="reset zoom"
+            ng-click="resetZoom()">
+      <span class="glyphicon glyphicon-screenshot"></span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="default">
+    <configuration>org.camunda.bpm.pa.DevProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="authorizationEnabled">true</property>
+      <property name="history">full</property>
+      <property name="queryMaxResultsLimit">2000</property>
+    </properties>
+
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+      </plugin>
+      <plugin>
+        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
+  </process-engine>
+
+  <process-engine name="engine2">
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
+      <property name="authorizationEnabled">true</property>
+    </properties>
+
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+      </plugin>
+      <plugin>
+        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
+  </process-engine>
+
+  <process-engine name="engine3">
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti3;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
+      <property name="authorizationEnabled">true</property>
+    </properties>
+
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+      </plugin>
+      <plugin>
+        <class>org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
+  </process-engine>
+
+  <process-archive name="first-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa1</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="second-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa2</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="third-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa3</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="tenant1-processes" tenantId="tenant1">
+    <properties>
+      <property name="resourceRootPath">pa:pa3/invoice</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="tenant2-processes" tenantId="tenant2">
+    <properties>
+      <property name="resourceRootPath">pa:pa3/invoice</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="deployed-form-test-process">
+    <resource>pa4/process-with-deployment-form.bpmn</resource>
+    <resource>pa4/process-with-http-form.bpmn</resource>
+    <resource>pa4/process-with-invalid-form.bpmn</resource>
+    <resource>pa4/deployed-form.html</resource>
+  </process-archive>
+
+</process-application>

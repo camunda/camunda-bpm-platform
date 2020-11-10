@@ -1,0 +1,53 @@
+.labels-left {
+  .control-label {
+    text-align: left;
+  }
+}
+
+.row-action {
+  text-align: right;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px;
+
+
+  > a[ng-click],
+  .btn-link {
+    white-space: nowrap;
+    display: inline-block;
+
+    > span {
+      max-width: 100%;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      z-index: 1;
+
+      padding-right: 1.4em;
+      margin-right: -1.4em;
+    }
+
+    > .glyphicon {
+      padding: 0;
+      margin: 0;
+      z-index: 2;
+      top: -3px;
+    }
+  }
+}
+
+.control-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-footer {
+  .row-action {
+    padding-top: 0;
+  }
+
+  button {
+    min-height: 31px;
+  }
+}

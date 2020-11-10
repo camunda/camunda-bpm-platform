@@ -1,0 +1,58 @@
+.Header {
+  display: flex;
+  justify-content: space-between;
+
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  z-index: 1030;
+  margin-bottom: 0;
+  border-top: 3px solid #b5152b;
+  box-shadow: 0 2px 10px -4px #555;
+  color: #545454;
+  background-color: #fff;
+  font-size: 14px;
+  float: left;
+  line-height: 45px;
+
+  white-space: nowrap;
+
+  .Dropdown ul {
+    line-height: 25px;
+    padding: 0;
+  }
+
+  .app-banner {
+    font-size: 21px;
+    line-height: 42px;
+    color: #000;
+    padding: 0 15px 0 11px;
+    display: flex;
+    align-items: center;
+
+    .logo {
+      margin-right: 10px;
+      fill: #666;
+    }
+  }
+
+  a {
+    color: #545454;
+    text-decoration: none;
+  }
+
+  .divider {
+    margin-left: auto;
+  }
+
+  > div {
+    margin: 0 10px;
+
+    &:last-of-type {
+      margin-right: 20px;
+    }
+  }
+}

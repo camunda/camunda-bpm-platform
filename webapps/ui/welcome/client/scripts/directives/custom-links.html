@@ -1,0 +1,14 @@
+<div class="custom-links"
+     ng-if="links.length">
+  <h3 class="section-title">{{'LINKS' | translate}}</h3>
+  <div class="row">
+    <div ng-repeat="link in links"
+         class="col-xs-6 col-md-4 custom-link-wrapper">
+      <a ng-href="{{ link.href }}">
+        <span class="h4">{{ link.label | translate }}</span>
+      </a>
+      <span ng-if="link.description"
+            class="custom-link-description">{{ link.description | translate }}</span>
+    </div>
+  </div>
+</div>

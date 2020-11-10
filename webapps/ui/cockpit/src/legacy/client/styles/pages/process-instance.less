@@ -1,0 +1,40 @@
+.incidents-tab {
+  position: relative;
+  > tbody > tr > td.message {
+    padding: 0;
+  }
+  td.message {
+    position: relative;
+    width: 200px;
+
+    .auto-cutoff {
+      padding: 5px;
+    }
+
+    &:hover {
+      position: static;
+      overflow: visible;
+
+      .auto-cutoff {
+        max-width: 100%;
+        max-height: 100px;
+        background-color: mix(@body-bg, @brand-primary);
+      }
+    }
+  }
+
+  .auto-cutoff {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    max-height: @line-height-computed * 1.5;
+    background-color: transparent;
+    position: absolute;
+    z-index: 9;
+    transition: max-width 0.218s ease,
+                max-height 0.218s ease,
+                background-color 0.218s ease;
+  }
+}

@@ -1,0 +1,31 @@
+.tasks-dashboard {
+  [cam-widget-search] {
+    margin-bottom: 5px;
+  }
+
+  .pagination {
+    margin-bottom: 0;
+  }
+
+  #task-group-counts {
+    margin-bottom: @grid-gutter-width * 0.5;
+  }
+  #multiple-groups-info {
+    margin-bottom: 0;
+  }
+
+  .loader-state.loaded {
+    max-width: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+  .search-results {
+    .task.uuid,
+    .instance-id {
+      @media screen and (max-width: 1200px) {
+        max-width: 12vw;
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+/*
+[cam-in-place-text-field] {
+}
+*/
+.inline-edit {
+  input,
+  textarea {
+    border-bottom-right-radius: 0;
+  }
+
+  textarea {
+    resize:vertical;
+  }
+}
+
+.inline-edit-footer {
+  position: relative;
+  min-height: 30px;
+
+  > p {
+    padding-right: 102px;
+  }
+
+  > .btn-group {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    > .btn {
+      .border-top-radius(0);
+    }
+  }
+}

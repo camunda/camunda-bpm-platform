@@ -1,0 +1,26 @@
+<div class="variable-inputs">
+  <div class="form-group">
+    <input type="text"
+           placeholder="{{ 'VARIABLE_NAME' | translate }}"
+           class="form-control input-sm"
+           ng-model="variable.varName"
+           autofocus />
+  </div>
+
+  <div class="form-group">
+    <select class="form-control input-sm"
+            ng-model="variable.varType">
+      <option ng-repeat="(varType, varText) in variableTypes"
+              ng-selected="varType === variable.varType"
+              value="{{ varType }}">{{ varText }}</option>
+    </select>
+  </div>
+
+  <div class="form-group actions">
+    <button ng-click="applySorting($event)"
+            ng-disabled="!variable"
+            class="btn btn-primary btn-sm">
+      {{ (change ? 'CHANGE' : 'ADD') | translate }}
+    </button>
+  </div>
+</div>

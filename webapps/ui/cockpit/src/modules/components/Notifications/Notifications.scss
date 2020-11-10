@@ -1,0 +1,55 @@
+.Notifications {
+
+  .message {
+    display: block;
+  }
+
+  .close {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: .2;
+
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+
+    margin-left: 12px;
+
+    position: relative;
+    line-height: 20px;
+  }
+
+  .notification {
+    &.info {
+      color: #31708f;
+      background-color: #d9edf7;
+      border-color: #bce8f1;
+    }
+
+    &.error {
+      color: #a94442;
+      background-color: #f2dede;
+      border-color: #ebccd1;
+    }
+
+    &.success {
+      color: #3c763d;
+      background-color: #dff0d8;
+      border-color: #d6e9c6;
+    }
+  }
+
+  &.page-notifications {
+    position: absolute;
+
+    max-height: 70%;
+    overflow: auto;
+
+    bottom: 20px;
+    right: 30px;
+  }
+
+}

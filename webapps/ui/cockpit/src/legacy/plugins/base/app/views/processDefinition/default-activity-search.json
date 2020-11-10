@@ -1,0 +1,50 @@
+{
+  "type": {
+    "values": [
+      {
+        "key": "businessKey",
+        "value": "Business Key"
+      },
+      {
+        "key": "activityIdIn",
+        "value": "Activity Id"
+      },
+      {
+        "key": "startedDate",
+        "value": "Started Date"
+      },
+      {
+        "key": "variables",
+        "value": "Variable"
+      }
+    ],
+    "value": {
+      "key": "activityIdIn",
+      "value": "Activity Id"
+    },
+    "tooltip": "Type"
+  },
+  "name": {
+    "value": "",
+    "tooltip": "Property"
+  },
+  "operator": {
+    "tooltip": "Operator",
+    "values": [
+      {
+        "key": "eq",
+        "value": "="
+      }
+    ],
+    "value": {
+      "key": "eq",
+      "value": "="
+    }
+  },
+  "value": {
+    "value": "",
+    "tooltip": "Value"
+  },
+  "potentialNames": [],
+  "valid": true
+}

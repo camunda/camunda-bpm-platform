@@ -1,0 +1,376 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Search Pill</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>The search pill is used in the tasklist app and the cockpit EE search plugin. It represents a single component of a possibly complex search query.<br/>
+        A search can contain multiple search pills. Search pills have a type, an operator and a value and can optionally have a variable name.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> valid</dt>
+        <dd>Boolean flag which indicates whether the search pill is valid or not. Invalid pills are rendered differently</dd>
+        <dt><span class="badge">=</span> extended</dt>
+        <dd>If set to true, the pill will contain an additional name field</dd>
+        <dt><span class="badge">=</span> basic</dt>
+        <dd>If set to true, the pill will only contain the type field (no operator and no value field)</dd>
+        <dt><span class="badge">=</span> allow-dates</dt>
+        <dd>Allows the user to enter date values via a datepicker in addition to standard text input</dd>
+        <dt><span class="badge">=</span> enforce-dates</dt>
+        <dd>Enforces the date picker as input method.</dd>
+        <dt><span class="badge">=</span> enforce-string</dt>
+        <dd>Enforces that the input is parsed as string.</dd>
+        <dt><span class="badge">@</span> invalid-text</dt>
+        <dd>Text which will be rendered as tooltip when the valid flag is set to false</dd>
+        <dt><span class="badge">@</span> delete-text</dt>
+        <dd>Text which will be rendered as tooltip when the user hovers over the delete button</dd>
+        <dt><span class="badge">=</span> type</dt>
+        <dd>An object specifying possible types for the search pill. Keys of this object must be values, which contains an array of key/value-pairs of possible type values, and value, which will contain the selected type. Can also specify an optional tooltip field.</dd>
+        <dt><span class="badge">=</span> name</dt>
+        <dd>An object containing a value and an optional tooltip field. Only used in combination with the extended flag.</dd>
+        <dt><span class="badge">=</span> operator</dt>
+        <dd>An object specifying possible operators for the search pill. Keys of this object must be values, which contains an array of key/value-pairs of possible oeprator values, and value, which will contain the selected operator. Can also specify an optional tooltip field.</dd>
+        <dt><span class="badge">=</span> value</dt>
+        <dd>An object containing a value and an optional tooltip field.</dd>
+        <dt><span class="badge">=?</span> potential-names</dt>
+        <dd>An array containing key,value pairs of possible values that can be used in the name field. This list is non-exclusive, the user can still enter names not in the array.</dd>
+        <dt><span class="badge">=</span> options</dt>
+        <dd>An array containing possible choices for value. If sets value field becomes select field.</dd>
+        <dt><span class="badge">&amp;</span> on-change</dt>
+        <dd>Function which is called whenever a component of the search pill is changed. Gets the arguments field, before and value.</dd>
+        <dt><span class="badge">&amp;</span> on-delete</dt>
+        <dd>Function which is called when the delete button is clicked.</dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="basic">
+        <h3>Basic Search Pill</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search1 = {
+  type: {
+    values: [{key: 'foo', value: 'Foo'}, {key: 'bar', value: 'Bar'}],
+    value: null
+  },
+  operator: {
+    values: [{key:'eq', value: '='}, {key:'neq', value:'!='}],
+    value: null
+  },
+  value: {
+    value: ''
+  },
+  valid: false,
+  update: function() {
+    $scope.search1.valid =
+      $scope.search1.type.value !== null &amp;&amp;
+      $scope.search1.operator.value !== null &amp;&amp;
+      $scope.search1.value.value !== '';
+  }
+};
+
+&lt;span cam-widget-search-pill
+            valid="search1.valid"
+            type="search1.type"
+            operator="search1.operator"
+            value="search1.value"
+            on-change="search1.update()" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                id="pill1"
+                valid="search1.valid"
+                type="search1.type"
+                operator="search1.operator"
+                value="search1.value"
+                on-change="search1.update()" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="basic">
+        <h3>Single operator</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.singleOperator = {
+  type: {
+    values: [{key: 'foo', value: 'Foo'}, {key: 'bar', value: 'Bar'}],
+    value: null
+  },
+  operator: {
+    values: [{key:'eq', value: '='}],
+    value: null
+  },
+  value: {
+    value: ''
+  },
+  valid: false,
+  update: function() {
+    $scope.singleOperator.valid =
+      $scope.singleOperator.type.value !== null &amp;&amp;
+      $scope.singleOperator.operator.value !== null &amp;&amp;
+      $scope.singleOperator.value.value !== '';
+  }
+};
+
+&lt;span cam-widget-search-pill
+            valid="singleOperator.valid"
+            type="singleOperator.type"
+            operator="singleOperator.operator"
+            value="singleOperator.value"
+            on-change="singleOperator.update()" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                id="single-operator"
+                valid="singleOperator.valid"
+                type="singleOperator.type"
+                operator="singleOperator.operator"
+                value="singleOperator.value"
+                on-change="singleOperator.update()" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="enforcing-dates">
+        <h3>Enforcing Dates</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search2 = angular.copy($scope.search1);
+$scope.search2.enforceDates = true;
+
+&lt;span cam-widget-search-pill
+            valid="search2.valid"
+            type="search2.type"
+            operator="search2.operator"
+            value="search2.value"
+            enforce-dates="search2.enforceDates" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                id="pill2"
+                valid="search2.valid"
+                type="search2.type"
+                operator="search2.operator"
+                value="search2.value"
+                enforce-dates="search2.enforceDates" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="allowing-dates">
+        <h3>Allowing Dates</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search3 = angular.copy($scope.search1);
+$scope.search3.allowDates = true;
+
+&lt;span cam-widget-search-pill
+            valid="search3.valid"
+            type="search3.type"
+            operator="search3.operator"
+            value="search3.value"
+            allow-dates="search3.allowDates" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                id="pill3"
+                valid="search3.valid"
+                type="search3.type"
+                operator="search3.operator"
+                value="search3.value"
+                allow-dates="search3.allowDates" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="extended">
+        <h3>Extended</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search4 = angular.copy($scope.search1);
+$scope.search4.name = {
+  value: ''
+};
+$scope.search4.update = function() {
+  $scope.search4.extended = $scope.search4.type.value &amp;&amp; $scope.search4.type.value.key === "bar";
+};
+
+&lt;span cam-widget-search-pill
+            valid="search4.valid"
+            name="search4.name"
+            type="search4.type"
+            operator="search4.operator"
+            value="search4.value"
+            extended="search4.extended"
+            on-change="search4.update()" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                  id="pill4"
+                  valid="search4.valid"
+                  name="search4.name"
+                  potential-names="search4.potentialNames"
+                  type="search4.type"
+                  operator="search4.operator"
+                  value="search4.value"
+                  extended="search4.extended"
+                  on-change="search4.update()" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="names">
+        <h3>Potential Names</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search5 = angular.copy($scope.search1);
+$scope.search5.potentialNames = [
+  {key:'name1', value:'Value 1 (name1)'},
+  {key:'name2', value:'Value 2 (name2)'}
+];
+$scope.search5.name = {
+  value: ''
+};
+$scope.search5.extended = true;
+
+&lt;span cam-widget-search-pill
+            valid="search5.valid"
+            name="search5.name"
+            type="search5.type"
+            operator="search5.operator"
+            value="search5.value"
+            extended="search5.extended"
+            potential-names="search5.potentialNames" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                  id="pill5"
+                  valid="search5.valid"
+                  name="search5.name"
+                  potential-names="search5.potentialNames"
+                  type="search5.type"
+                  operator="search5.operator"
+                  value="search5.value"
+                  extended="search5.extended" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="basic-attribute">
+        <h3>Basic</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search6 = angular.copy($scope.search1);
+$scope.search6.basic = true;
+
+&lt;span cam-widget-search-pill
+            valid="search6.valid"
+            type="search6.type"
+            basic="search6.basic" /&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-search-pill
+                  id="pill6"
+                  valid="search6.valid"
+                  type="search6.type"
+                  basic="search6.basic" />
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+    </section>
+
+    <div class="widget-example"
+         id="enforceString-attribute">
+        <h3>Enforce String</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search7 = angular.copy($scope.search1);
+$scope.search7.enforceString = true;
+
+&lt;span cam-widget-search-pill
+            valid="search7.valid"
+            type="search7.type"
+            operator="search7.operator"
+            value="search7.value"
+            enforce-string="search7.enforceString" /&gt;</pre>
+            <div class="test-container">
+            <span cam-widget-search-pill
+                  id="pill7"
+                  valid="search7.valid"
+                  type="search7.type"
+                  operator="search7.operator"
+                  value="search7.value"
+                  enforce-string="search7.enforceString"/>
+            </div>
+        </div>
+    </div><!-- /.widget-example -->
+
+    <div class="widget-example"
+         id="options-attribute">
+        <h3>Options</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+$scope.search8 = angular.copy($scope.search1);
+$scope.search8.options = ['yes', 'maybe', 'no'];
+
+&lt;span cam-widget-search-pill
+            valid="search7.valid"
+            type="search7.type"
+            operator="search7.operator"
+            value="search7.value"
+            enforce-string="search7.enforceString" /&gt;</pre>
+            <div class="test-container">
+            <span cam-widget-search-pill
+                  id="pill8"
+                  valid="search8.valid"
+                  type="search8.type"
+                  operator="search8.operator"
+                  value="search8.value"
+                  options="search8.options"/>
+            </div>
+        </div>
+    </div><!-- /.widget-example -->
+    </section>
+
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/search-pill/test/cam-widget-search-pill.build.js"></script>
+  </body>
+</html>
