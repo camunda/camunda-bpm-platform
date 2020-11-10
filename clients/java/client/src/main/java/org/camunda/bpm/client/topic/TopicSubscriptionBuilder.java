@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.client.topic;
 
+import java.util.Map;
+
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 
@@ -95,6 +97,21 @@ public interface TopicSubscriptionBuilder {
    * @return the builder
    */
   TopicSubscriptionBuilder processDefinitionVersionTag(String processDefinitionVersionTag);
+
+  /**
+   * @param processVariables of which the external tasks to be retrieved are related to
+   * 
+   * @return the builder
+   */
+  TopicSubscriptionBuilder processVariablesEqualsIn(Map<String, Object> processVariables);
+
+  /**
+   * @param processVariables of which the external tasks to be retrieved are related to
+   * When called more than once, retrieves tasks related to ANY of the given processVariables
+   * In such cases, consider using <code>processVariablesEqualsIn(Map<String, Object>)</code> instead
+   * @return the builder
+   */
+  TopicSubscriptionBuilder processVariableEquals(String name, Object value);
 
   /**
    * Filter for external tasks without tenant

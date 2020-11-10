@@ -19,6 +19,7 @@ package org.camunda.bpm.client.topic.impl.dto;
 import org.camunda.bpm.client.topic.TopicSubscription;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -35,6 +36,7 @@ public class TopicRequestDto {
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
   protected String processDefinitionVersionTag;
+  protected Map<String, Object> processVariables;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
   protected boolean includeExtensionProperties;
@@ -110,6 +112,14 @@ public class TopicRequestDto {
     this.processDefinitionVersionTag = processDefinitionVersionTag;
   }
 
+  public Map<String, Object> getProcessVariables() {
+    return processVariables;
+  }
+
+  public void setProcessVariables(Map<String, Object> processVariables) {
+    this.processVariables = processVariables;
+  }
+
   public boolean isWithoutTenantId() {
     return withoutTenantId;
   }
@@ -167,7 +177,10 @@ public class TopicRequestDto {
     if(topicSubscription.getProcessDefinitionVersionTag() != null) {
       topicRequestDto.setProcessDefinitionVersionTag(topicSubscription.getProcessDefinitionVersionTag());
     }
-    if(topicSubscription.isLocalVariables()) {
+    if (topicSubscription.getProcessVariables() != null) {
+      topicRequestDto.setProcessVariables(topicSubscription.getProcessVariables());
+    }
+    if (topicSubscription.isLocalVariables()) {
       topicRequestDto.setLocalVariables(topicSubscription.isLocalVariables());
     }
     if(topicSubscription.isIncludeExtensionProperties()) {

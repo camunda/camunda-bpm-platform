@@ -19,7 +19,9 @@ package org.camunda.bpm.client.topic.impl;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.topic.TopicSubscription;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -38,6 +40,7 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
   protected String processDefinitionVersionTag;
+  protected Map<String, Object> processVariables;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
   protected boolean includeExtensionProperties;
@@ -128,6 +131,19 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
     this.processDefinitionVersionTag = processDefinitionVersionTag;
+  }
+
+  public HashMap<String, Object> getProcessVariables() {
+    return (HashMap<String, Object>) processVariables;
+  }
+
+  public void setProcessVariables(Map<String, Object> processVariables) {
+    if (this.processVariables == null) {
+      this.processVariables = new HashMap<>();
+    }
+    for (Map.Entry<String, Object> processVariable : processVariables.entrySet()) {
+      this.processVariables.put(processVariable.getKey(), processVariable.getValue());
+    }
   }
 
   public boolean isWithoutTenantId() {

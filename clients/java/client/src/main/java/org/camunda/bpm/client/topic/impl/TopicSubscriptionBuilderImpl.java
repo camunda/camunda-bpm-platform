@@ -22,7 +22,9 @@ import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -41,6 +43,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeys;
   protected String processDefinitionVersionTag;
+  protected Map<String, Object> processVariables;
   protected boolean withoutTenantId;
   protected List<String> tenantIds;
   protected ExternalTaskHandler externalTaskHandler;
@@ -109,6 +112,27 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder processVariablesEqualsIn(Map<String, Object> processVariables) {
+    ensureNotNull(processVariables, "processVariables");
+    if (this.processVariables == null) {
+      this.processVariables = new HashMap<>();
+    }
+    for (Map.Entry<String, Object> processVariable : processVariables.entrySet()) {
+      ensureNotNull(processVariable.getKey(), "processVariableName");
+      this.processVariables.put(processVariable.getKey(), processVariable.getValue());
+    }
+    return this;
+  }
+
+  public TopicSubscriptionBuilder processVariableEquals(String name, Object value) {
+    ensureNotNull(name, "processVariableName");
+    if (this.processVariables == null) {
+      this.processVariables = new HashMap<>();
+    }
+    this.processVariables.put(name, value);
+    return this;
+  }
+
   public TopicSubscriptionBuilder withoutTenantId() {
     withoutTenantId = true;
     return this;
@@ -160,7 +184,10 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     if(processDefinitionVersionTag != null) {
       subscription.setProcessDefinitionVersionTag(processDefinitionVersionTag);
     }
-    if(localVariables) {
+    if (processVariables != null) {
+      subscription.setProcessVariables(processVariables);
+    }
+    if (localVariables) {
       subscription.setLocalVariables(localVariables);
     }
     if(includeExtensionProperties) {

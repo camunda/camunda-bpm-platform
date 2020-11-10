@@ -25,14 +25,17 @@ import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.util.HashMap;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.*;
@@ -45,8 +48,10 @@ public class TopicSubscriptionIT {
   protected static final String BUSINESS_KEY = "aBusinessKey";
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String ANOTHER_VARIABLE_NAME = "anotherVariableName";
+  protected static final String NOT_EXISTING_VARIABLE_NAME = "notExistingVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
   protected static final String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
+  protected static final String NOT_EXISTING_VARIABLE_VALUE = "notExistingVariableValue";
 
   protected ClientRule clientRule = new ClientRule();
   protected EngineRule engineRule = new EngineRule();
@@ -338,7 +343,7 @@ public class TopicSubscriptionIT {
 
     assertThat(handler.getHandledTasks().size()).isEqualTo(1);
     ExternalTask task = handler.getHandledTasks().get(0);
-    assertThat(task.getTenantId()).isNull();;
+    assertThat(task.getTenantId()).isNull();
     assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(topicSubscription.isWithoutTenantId()).isTrue();
   }
@@ -408,7 +413,7 @@ public class TopicSubscriptionIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .variables("notExistingVariable")
+      .variables(NOT_EXISTING_VARIABLE_NAME)
       .handler(handler)
       .open();
 
@@ -549,6 +554,201 @@ public class TopicSubscriptionIT {
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
       .handler(handler)
       .open();
+  }
+
+  @Test
+  public void shouldFilterByOneToOneProcessVariableEquals() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariableEquals(VARIABLE_NAME,VARIABLE_VALUE)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldFilterByOneToAnyProcessVariableEquals() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariableEquals(VARIABLE_NAME, VARIABLE_VALUE)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldFilterByManyToAnyProcessVariableEquals() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariableEquals(VARIABLE_NAME, VARIABLE_VALUE)
+        .processVariableEquals(ANOTHER_VARIABLE_NAME, ANOTHER_VARIABLE_VALUE)
+        .processVariableEquals(NOT_EXISTING_VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+
+  }
+
+  @Test
+  public void shouldNotFilterByManyToNoneProcessVariableEquals() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariableEquals(VARIABLE_NAME, ANOTHER_VARIABLE_VALUE)
+        .processVariableEquals(VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE)
+        .processVariableEquals(ANOTHER_VARIABLE_NAME, VARIABLE_VALUE)
+        .processVariableEquals(ANOTHER_VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE)
+        .processVariableEquals(NOT_EXISTING_VARIABLE_NAME, VARIABLE_VALUE)
+        .processVariableEquals(NOT_EXISTING_VARIABLE_NAME, ANOTHER_VARIABLE_VALUE)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldFilterByOneToOneProcessVariablesEqualsIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+
+    // when
+    Map<String, Object> processVariables = new HashMap<>();
+    processVariables.put(VARIABLE_NAME, VARIABLE_VALUE);
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariablesEqualsIn(processVariables)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldFilterByOneToAnyProcessVariablesEqualsIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    Map<String, Object> processVariables = new HashMap<>();
+    processVariables.put(VARIABLE_NAME, VARIABLE_VALUE);
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariablesEqualsIn(processVariables)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldFilterByManyToAnyProcessVariablesEqualsIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY,
+        VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    Map<String, Object> processVariables = new HashMap<>();
+    processVariables.put(VARIABLE_NAME, VARIABLE_VALUE);
+    processVariables.put(ANOTHER_VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
+    processVariables.put(NOT_EXISTING_VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE);
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariablesEqualsIn(processVariables)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldNotFilterByManyToNoneProcessVariablesEqualsIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    Map<String, TypedValue> twoProcessVariables = new HashMap<>();
+    twoProcessVariables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE));
+    twoProcessVariables.put(ANOTHER_VARIABLE_NAME, Variables.stringValue(ANOTHER_VARIABLE_VALUE));
+    engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY, twoProcessVariables);
+
+    // when
+    Map<String, Object> processVariables = new HashMap<>();
+    processVariables.put(VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
+    processVariables.put(VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE);
+    processVariables.put(ANOTHER_VARIABLE_NAME, VARIABLE_VALUE);
+    processVariables.put(ANOTHER_VARIABLE_NAME, NOT_EXISTING_VARIABLE_VALUE);
+    processVariables.put(NOT_EXISTING_VARIABLE_NAME, VARIABLE_VALUE);
+    processVariables.put(NOT_EXISTING_VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .processVariablesEqualsIn(processVariables)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(0);
   }
 
 }
