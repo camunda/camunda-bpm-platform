@@ -1,0 +1,148 @@
+.day.row {
+  margin-top: (@grid-gutter-width / 1);
+  border-top: 1px @line-style @line-color;
+  padding-top: (@grid-gutter-width / 1);
+
+  margin-bottom: (@grid-gutter-width / 1);
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+.instant {
+  overflow: hidden;
+
+  &.row {
+    margin-bottom: 0;
+  }
+
+  h4 {
+    margin-top: 0;
+  }
+
+  h5 {
+    margin-top: 2px;
+    margin-bottom: 0;
+  }
+
+  > div {
+    padding-top: (@grid-gutter-width / 2);
+    &:before {
+      display: block;
+      content: ' ';
+      width: 100%;
+      height: 1px;
+      margin-top: -1px;
+      border-top: 1px @line-style-alt @line-color-alt;
+      margin-bottom: (@grid-gutter-width / 2);
+    }
+  }
+
+  &:first-child {
+    > div {
+      padding-top: 0;
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  .event {
+    margin-bottom: (@grid-gutter-width);
+  }
+
+  .operation-meta {
+    text-align: center;
+  }
+
+  .operation-time {
+    margin-bottom: 9px;
+  }
+
+  .operation-user {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.date-badge {
+  max-width: 75px;
+  margin: auto;
+
+  > div {
+    border-radius: 50%;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+
+    overflow: hidden;
+    background-color: @gray-lighter;
+  }
+
+  span {
+    display: block;
+    width: 100%;
+    text-align: center;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .day {
+    font-size: 16px;
+    margin-top: 5px;
+  }
+}
+
+.time-badge {
+  text-align: center;
+}
+
+.event {
+  .operation {
+    margin-bottom: (@grid-gutter-width / 2);
+    overflow: hidden;
+  }
+
+  .label,
+  .value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .label {
+    font-style: italic;
+  }
+}
+
+.event-body {
+  > .line {
+    overflow: hidden;
+    margin-top: (@grid-gutter-width / 2);
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.original-value,
+.new-value {
+  // word-wrap: break-word;
+}
+
+.original-value {
+  text-decoration: line-through;
+  color: @gray-light;
+}
+
+.new-value {
+  margin-bottom: 7px;
+}
+
+.event-property {
+  font-weight: bold;
+  padding-right: (@grid-gutter-width / 2);
+}

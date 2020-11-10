@@ -1,0 +1,10 @@
+<div class="description-pane">
+  <div ng-hide="task.description"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'NO_DESCRIPTION' | translate }}
+  </div>
+  <div ng-show="task.description">
+    {{ task.description }}
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div ng-show="!state.$loaded && !state.$error"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-show="state.$error" uib-alert class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">{{ 'FAILURE' | translate }}:</strong>
+  <span class="message">{{ 'FILTERS_LOADING_FAILURE' | translate }}</span>
+</div>
+
+<div ng-show="state.$loaded && !state.$error"
+     class="list-unstyled">
+
+  <div ng-hide="totalItems"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'NO_AVAILABLE_FILTER' | translate }}
+    <div class="add-initial-filter" ng-if="userCanCreateFilter">
+      <a class="filter-hint"
+         ng-click="addAllFilter()">
+        <span class="glyphicon glyphicon-plus"></span>
+        {{ 'ADD_FILTER_HINT' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <div ng-show="totalItems"
+       ng-repeat="(delta, filter) in filters"
+       class="item task-filter cells-wrapper"
+       ng-class="{active: isFocused(filter)}"
+       ng-style="filter.style"
+       ng-click="focus(filter)">
+
+    <h4 class="name"
+        uib-tooltip="{{ filter.properties.description }}"
+        tooltip-placement="top">
+      <a href
+         ng-style="{color: filter.properties.color}">
+        {{ filter.name }}
+
+        <span ng-show="isFocused(filter)"
+              class="counter">{{ filterCount }}</span>
+      </a>
+    </h4>
+
+    <div class="actions"
+         ng-style="{visibility: isFocused(filter) ? 'visible' : 'hidden'}">
+      <a ng-click="openModal($event, filter)"
+         uib-tooltip="{{ 'FILTER_DETAILS' | translate }}"
+         tooltip-placement="top"
+         href>
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    </div>
+  </div>
+
+  <ul uib-pagination
+    ng-if="page.total > page.size"
+    class="pagination-sm"
+
+    page="page.current"
+    ng-model="page.current"
+    ng-change="onPaginationchange(page)"
+
+    total-items="page.total"
+    items-per-page="page.size"
+
+    max-size="3"
+    boundary-links="false"></ul>
+</div>

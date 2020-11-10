@@ -1,0 +1,88 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/users.html -->
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>{{ 'USERS_LIST_OF_USERS' | translate }}</h3>
+      </div>
+      <div class="col-xs-4 text-right">
+        <a class="btn btn-default"
+           ng-show="availableOperations.create"
+           href="#/user-create">
+          {{ 'USERS_ADD_USER' | translate }}
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
+    <div cam-searchable-area
+         config="searchConfig"
+         on-search-change="onSearchChange(query, pages)"
+         loading-state="loadingState"
+         text-empty="{{ 'USERS_NOT_FOUND' | translate }}"
+         storage-group="'ANU'"
+         blocked="blocked">
+      <table class="cam-table">
+        <thead cam-sortable-table-header
+               default-sort-by="userId"
+               default-sort-order="asc"
+               sorting-id="admin-sorting-users"
+               on-sort-change="onSortChanged(sorting)"
+               on-sort-initialized="onSortInitialized(sorting)">
+          <tr ng-if="canSortEntries">
+            <th class="username"
+                cam-sortable-table-column
+                sort-by-property="userId">{{ 'USERS_ID' | translate }}
+            </th>
+            <th class="firstname"
+                cam-sortable-table-column
+                sort-by-property="firstName">{{ 'USERS_FIRSTNAME' | translate }}
+            </th>
+            <th class="lastname"
+                cam-sortable-table-column
+                sort-by-property="lastName">{{ 'USERS_LASTNAME' | translate }}
+            </th>
+            <th class="email"
+                cam-sortable-table-column
+                sort-by-property="email">{{ 'USERS_EMAIL' | translate }}
+            </th>
+            <th class="action">{{ 'USERS_ACTION' | translate }}</th>
+          </tr>
+          <tr ng-if="!canSortEntries">
+            <th class="username">{{ 'USERS_ID' | translate }}</th>
+            <th class="firstname">{{ 'USERS_FIRSTNAME' | translate }}</th>
+            <th class="lastname">{{ 'USERS_LASTNAME' | translate }}</th>
+            <th class="email">{{ 'USERS_EMAIL' | translate }}</th>
+            <th class="action">{{ 'USERS_ACTION' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="user in userList">
+            <td class="username">
+              <a href="#/users/{{user.id | escape}}">{{user.id}}</a>
+            </td>
+
+            <td class="firstname">
+              {{user.firstName}}
+            </td>
+
+            <td class="lastname">
+              {{user.lastName}}
+            </td>
+
+            <td class="email">
+              {{user.email}}
+            </td>
+
+            <td class="action">
+              <a ng-href="#/users/{{user.id | escape}}">{{ 'USERS_EDIT' | translate }}</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/users.html -->

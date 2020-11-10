@@ -1,0 +1,193 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "variableName",
+        "value": "PLUGIN_VIEW_VARIABLE_TYPE_VARIABLE_NAME"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityInstanceIdIn",
+        "value": "PLUGIN_VIEW_VARIABLE_ACTIVITY_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "variableValues",
+        "value": "PLUGIN_VIEW_VARIABLE_VARIABLE_VALUE"
+      },
+      "extended": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "neq",
+          "value": "!="
+        },
+        {
+          "key": "gt",
+          "value": ">"
+        },
+        {
+          "key": "gteq",
+          "value": ">="
+        },
+        {
+          "key": "lt",
+          "value": "<"
+        },
+        {
+          "key": "lteq",
+          "value": "<="
+        },
+        {
+          "key": "like",
+          "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
+        }
+      ]
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
+      }
+    ],
+    "number":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "boolean":    [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object":     [{
+      "key": "eq",
+      "value": "="
+    },
+      {
+        "key": "neq",
+        "value": "!="
+      }],
+    "date":     [{
+      "key": "lteq",
+      "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_BEFORE"
+    },
+      {
+        "key": "gteq",
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_AFTER"
+      }]
+  },
+  "tooltips": {
+    "inputPlaceholder": "PLUGIN_VIEW_VARIABLE_ADD_CRITERIA",
+    "invalid": "PLUGIN_VIEW_VARIABLE_INVALID",
+    "deleteSearch": "PLUGIN_VIEW_VARIABLE_DELETE_SEARCH",
+    "type": "PLUGIN_VIEW_VARIABLE_TYPE",
+    "name": "PLUGIN_VIEW_VARIABLE_NAME",
+    "operator": "PLUGIN_VIEW_VARIABLE_OPERATOR",
+    "value": "PLUGIN_VIEW_VARIABLE_VALUE"
+  }
+}

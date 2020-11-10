@@ -1,0 +1,40 @@
+<!-- # CE - src/main/webapp/develop/forms/select.html -->
+<form>
+  <div class="form-group">
+
+    <!--
+      javascript that does the magic:
+        * gets notified upon value changes
+        * sets the value on the hidden form-field
+    -->
+    <script form-script type="text/form-script">
+      $scope.selectionChanged = function(choice) {
+        // mapping the current choice to the input field
+        $scope.variablesForm.serviceTaskType.$setViewValue(choice);
+      };
+    </script>
+
+    <!-- choice list and label -->
+    <div class="form-group">
+      <label for="choiceList" class="control-label">Choose</label>
+      <select ng-change="selectionChanged(choice)" class="form-control" name="choice" required ng-model="choice">
+        <option value="WS Generic">WebService Generic</option>
+        <option value="WS Generated">WebService Generated</option>
+      </select>
+    </div>
+
+    <!-- validation messages for choice -->
+    <p ng-if="variablesForm.choice.$invalid" style="color: red">
+      Please select a method.
+    </p>
+
+    <p ng-if="variablesForm.choice.$valid">
+      You may proceed.
+    </p>
+
+    <div style="display: none;">
+      <input form-field type="string" name="serviceTaskType" />
+    </div>
+  </div>
+</form>
+<!-- / CE - src/main/webapp/develop/forms/select.html -->

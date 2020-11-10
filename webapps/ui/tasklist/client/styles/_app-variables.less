@@ -1,0 +1,21 @@
+// loads the Camunda variables
+@import "shared/_variables.less";
+
+// overrides some of the variables for this app secifically
+
+@color-shift:                       4%;
+@column-left-bg:                    @body-bg;//darken(@body-bg, @color-shift * 6.18);
+@column-center-bg:                  @body-bg;//darken(@body-bg, @color-shift * (6.18 * 0.618));
+@column-right-bg:                   @body-bg;//darken(@body-bg, @color-shift * 0);
+@column-top-height:                 22px;
+
+
+@line-style:                        dotted;
+@line-color:                        @gray-light;
+
+@line-style-alt:                    solid;
+@line-color-alt:                    #ddd;
+
+@modal-header-bg:                   lighten(@gray-lighter, 3%);
+@modal-footer-bg:                   @modal-header-bg;
+

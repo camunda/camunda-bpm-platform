@@ -1,0 +1,21 @@
+ul.processes {
+  list-style: none;
+  padding: 0;
+  margin: (@grid-gutter-width / 2) 0 0 0;
+
+  max-height: 300px;
+  overflow: auto;
+
+  li {
+    padding: 7px 0;
+    border-bottom: 1px solid @custom-gray-light;
+
+    &:hover {
+      background-color: @gray-lighter;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}

@@ -1,0 +1,149 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body class="cam-widget-chart-line-test-page">
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Chart: Line</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>Provides an integration for the `lib/chart/line.js` line chart library.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=?</span> fontFamily</dt>
+        <dd>defaults to the element CSS value</dd>
+
+        <dt><span class="badge">=?</span> fontSize</dt>
+        <dd>defaults to the element CSS value</dd>
+
+        <dt><span class="badge">=?</span> handleColor</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> handleColorHover</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> handleWidth</dt>
+        <dd>defaults to `4`</dd>
+
+        <dt><span class="badge">=?</span> interval</dt>
+        <dd>an integer representing the amount of second between data records, defaults to `900`</dd>
+
+        <dt><span class="badge">=?</span> lineColors</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> lineWidth</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> rulersColor</dt>
+        <dd>defaults to the element CSS `currentColor` value</dd>
+
+        <dt><span class="badge">=?</span> selectingColor</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">&amp;onSelection</span> selection</dt>
+        <dd>a function to be called when time selection changes</dd>
+
+        <dt><span class="badge">=?</span> textPadding</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> tickSize</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> timeLabelFormats</dt>
+        <dd>moment.js notation to format times, defaults to <code>{ day: 'HH:mm', week: 'dd DD', month: 'DD MMM' }</code></dd>
+
+        <dt><span class="badge">=?</span> timespan</dt>
+        <dd>either `day`, `week` or `month`, defaults to `day`</dd>
+
+        <dt><span class="badge">=?</span> timestampFormat</dt>
+        <dd>moment.js notation to format times, defaults to `YYYY-MM-DDTHH:mm:ss`</dd>
+
+        <dt><span class="badge">=?</span> unselectedColor</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=?</span> valueLabelsCount</dt>
+        <!-- <dd></dd> -->
+
+        <dt><span class="badge">=</span> values</dt>
+        <dd>an array of data</dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="initial-state"
+           ng-controller="testController">
+        <h3>Default usage</h3>
+        <pre ng-non-bindable>
+&lt;select ng-model="timespan"&gt;
+  &lt;option value="day"&gt;day&lt;/option&gt;
+  &lt;option value="week"&gt;week&lt;/option&gt;
+  &lt;option value="month"&gt;month&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;span ng-if="!selectedStart"&gt;Select a time range on the chart&lt;/span&gt;
+&lt;span ng-if="selectedStart"&gt;Selected from "{{ selectedStart }}" to "{{ selectedEnd }}"&lt;/span&gt;
+
+&lt;div cam-widget-chart-line
+     values="values"
+     lines-colors="colors"
+     timespan="timespan"
+     interval="interval"&gt;&lt;/div&gt;
+        </pre>
+        <div class="test-container">
+          <select ng-model="timespan">
+            <option value="day">day</option>
+            <option value="week">week</option>
+            <option value="month">month</option>
+          </select>
+
+          <span ng-if="!selectedStart">Select a time range on the chart</span>
+          <span ng-if="selectedStart">Selected from "{{ selectedStart }}" to "{{ selectedEnd }}"</span>
+
+          <div cam-widget-chart-line
+               on-selection="selectionChanged({info: info})"
+               values="values"
+               line-colors="colors"
+               timespan="timespan"
+               interval="interval"></div>
+
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+    </section>
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/chart-line/test/cam-widget-chart-line.build.js"></script>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+.deployed-processes .tab-pane {
+  overflow: hidden;
+
+  > table {
+    margin: (@grid-gutter-width / 2) 0;
+  }
+
+  .diagram-rendering-error {
+    margin-top: 88px;
+  }
+}
+
+[data-plugin-id="search-process-instances"] .btn-primary {
+  width: 100%;
+}
+
+.tile-grid {
+  overflow: hidden;
+  padding: 0;
+  margin: (@grid-gutter-width / 2) (0 - (@grid-gutter-width / 2));
+}
+
+
+.tile {
+  margin-bottom: (@grid-gutter-width / 2);
+
+  > a {
+    display: block;
+    width: 100%;
+    color: @gray;
+
+    &:hover,
+    &:focus {
+      .box-shadow(0 1px 4px fade(@link-color, 50));
+
+      .tile-header,
+      .tile-footer {
+        border-color: @link-color;
+      }
+      .tile-body {
+        border-left-color: @link-color;
+        border-right-color: @link-color;
+      }
+    }
+  }
+}
+
+
+.tile-header,
+.tile-footer {
+  margin: 0;
+  background: @breadcrumb-bg;
+  border: 1px solid @breadcrumb-color;
+  padding: @padding-base-vertical;
+}
+
+.tile-header {
+  border-bottom: none;
+  border-radius: 0;
+  padding: @padding-base-vertical;
+  .border-top-radius(@border-radius-base);
+  .text-overflow();
+}
+
+.tile-body {
+  height: 218px;
+  border: 1px solid @breadcrumb-color;
+  text-align: center;
+  position: relative;
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.tile-footer {
+  line-height: 30px;
+  font-size: 16px;
+  border-top: none;
+  .border-bottom-radius(@border-radius-base);
+  position: relative;
+
+  .instances {
+    width: 100%;
+    display: block;
+    padding-right: 40px;
+    .text-overflow();
+  }
+  [state-circle] {
+    position: absolute;
+    top: 50%;
+    margin-top: (0 - (@state-circle-size / 2));
+    right: @padding-base-vertical;
+  }
+}
+
+span {
+  &.tile-body,
+  &.tile-footer {
+    display: block;
+  }
+}
+
+
+table {
+  th {
+    &.start-time,
+    &.end-time {
+      width: 150px;
+    }
+    &.sorting {
+      text-align: right;
+    }
+  }
+  td.definitionId {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+table.processes-list {
+  th {
+    &.instances {
+      width: 150px;
+    }
+  }
+}
+
+.search-results-sorting {
+  text-align: right;
+}

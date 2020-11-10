@@ -1,0 +1,30 @@
+<ul uib-dropdown-menu class="dropdown-menu">
+  <!-- single time selectable -->
+  <li ng-repeat="(name, label) in options">
+    <a href
+       tabindex="0"
+       translate="{{ label }}"
+       ng-click="handleClick($event, name)">
+    </a>
+  </li>
+
+  <li class="divider"
+      ng-if="hasOptions()"></li>
+
+  <!-- multiple times selectable -->
+  <li ng-repeat="(name, label) in sortableVariables"
+      ng-click="showInputs($event, name)"
+      ng-class="{'active': name === focusedOn}">
+    <a href
+       translate="{{ label }}"
+       tabindex="0"></a>
+
+    <div ng-show="name === focusedOn"
+         cam-sorting-inputs
+         change="change"
+         apply-handler="handleClick($event, name)"
+         variable="variable"
+         reset-function="resetInputs[name]"></div>
+  </li>
+
+</ul>

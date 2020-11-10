@@ -1,0 +1,26 @@
+.DropdownOption {
+  > button {
+    padding-left: 8px;
+    border-style: hidden;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  a {
+    display: block;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+   > button {
+    border-width: 0 0 0 3px;
+    border-color: #155cb5;
+    border-style: solid;
+    padding-left: 5px;
+   }
+  }
+}

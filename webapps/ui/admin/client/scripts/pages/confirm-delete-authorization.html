@@ -1,0 +1,58 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/confirm-delete-authorization.html -->
+<div class="modal-header">
+  <h3>{{ 'AUTHORIZATION_CONFIRM_DELETE_TITLE' | translate }}</h3>
+</div>
+
+<div class="confirm-delete-authorization modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    <p>{{ 'AUTHORIZATION_CONFIRM_DELETE_MESSAGE' | translate }}</p>
+
+    <dl class="dl-horizontal">
+      <dt>{{ 'AUTHORIZATION_TYPE' | translate }}</dt>
+      <dd>{{getType(authorizationToDelete)}}</dd>
+      <dt>{{ 'AUTHORIZATION_USER' | translate }}</dt>
+      <dd>
+        {{authorizationToDelete.userId}} &nbsp;
+      </dd>
+      <dt>{{ 'AUTHORIZATION_GROUP' | translate }}</dt>
+      <dd>
+        {{authorizationToDelete.groupId}} &nbsp;
+      </dd>
+      <dt>{{ 'AUTHORIZATION_PERMISSIONS' | translate }}</dt>
+      <dd>{{formatPermissions(authorizationToDelete.permissions)}}</dd>
+      <dt>{{ 'AUTHORIZATION_RESOURCE' | translate }}</dt>
+      <dd>{{getResource(authorizationToDelete.resourceType)}}</dd>
+      <dt>{{ 'AUTHORIZATION_RESOURCE_ID' | translate }}</dt>
+      <dd>{{authorizationToDelete.resourceId}}</dd>
+    </dl>
+  </div>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p>{{ 'AUTHORIZATION_DELETE_MESSAGE' | translate }}</p>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    {{ 'AUTHORIZATION_DELETE_CLOSE' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED'">
+    {{ 'AUTHORIZATION_DELETE_OK' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="performDelete()"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    {{ 'AUTHORIZATION_DELETE_DELETE' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/confirm-delete-authorization.html -->

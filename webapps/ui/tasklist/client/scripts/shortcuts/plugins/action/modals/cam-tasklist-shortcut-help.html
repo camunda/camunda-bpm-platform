@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    {{ 'SHORTCUT_HELP' | translate }}
+  </h3>
+</div>
+
+<div class="modal-body">
+    <table class="cam-table">
+      <thead>
+        <tr>
+          <th>{{ 'SHORTCUT' | translate }}</th>
+          <th>{{ 'DESCRIPTION' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="shortcut in shortcuts">
+          <td>{{shortcut.key}}</td>
+          <td>{{shortcut.description}}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+
+<div class="modal-footer">
+  <div class="row row-action">
+    <div class="col-xs-12">
+      <button class="btn btn-xs btn-link"
+              type="button"
+              ng-click="$dismiss()"
+              translate="CLOSE">Close</button>
+    </div>
+  </div>
+</div>

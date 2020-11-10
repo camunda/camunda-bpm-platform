@@ -1,0 +1,33 @@
+@import (reference) "shared/_mixins";
+
+[cam-tasklist-variables] {
+  font-size: 12px;
+
+  .undefined {
+    color: fade(@text-color, 50%);
+  }
+
+
+  div.row {
+    margin-bottom: (@grid-gutter-width / 5);
+
+    > div {
+      padding-top: (@grid-gutter-width / 5);
+      padding-bottom: (@grid-gutter-width / 5);
+      background-color: @gray-lighter;
+      overflow: hidden;
+    }
+
+    span {
+      overflow: hidden;
+
+      > span,
+      > a,
+      > strong {
+        .truncate(100%);
+        display: inline-block;
+        max-height: 1.5em;
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+<div class="row welcome-page">
+  <div class="col-sm-8 col-xs-12">
+    <section ng-init="authorized = $root.authentication.authorizedApps"
+             class="webapps">
+      <div class="inner"
+           ng-init="cols = columnWidth()">
+        <div class="row">
+          <div class="col-xs-12">
+            <h3 class="section-title">{{'APPLICATIONS' | translate}}</h3>
+          </div>
+        </div>
+
+        <div class="row">
+          <div ng-if="canAccessApp('cockpit')"
+               ng-class="'col-xs-' + cols"
+               class="cockpit-app">
+            <a class="app-label-wrapper"
+               ng-href="./../../cockpit/{{currentEngine}}/">
+            </a>
+            <h3 class="app-name">
+              <a ng-href="./../../cockpit/{{currentEngine}}/">{{'COCKPIT' | translate}}</a>
+            </h3>
+          </div>
+
+
+          <div ng-if="canAccessApp('tasklist')"
+               ng-class="'col-xs-' + cols"
+               class="tasklist-app">
+            <a class="app-label-wrapper"
+               ng-href="./../../tasklist/{{currentEngine}}/">
+            </a>
+            <h3 class="app-name">
+              <a ng-href="./../../tasklist/{{currentEngine}}/">{{'TASKLIST' | translate}}</a>
+            </h3>
+          </div>
+
+
+          <div ng-if="canAccessApp('admin')"
+               ng-class="'col-xs-' + cols"
+               class="admin-app">
+            <a class="app-label-wrapper"
+               ng-href="./../../admin/{{currentEngine}}/">
+            </a>
+            <h3 class="app-name">
+              <a ng-href="./../../admin/{{currentEngine}}/">{{'ADMIN' | translate}}</a>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="inner" custom-links></div>
+    </section>
+  </div>
+
+
+  <section ng-if="profilePlugins.length"
+           class="col-sm-4 col-xs-12"
+           id="user-profile">
+    <div class="inner">
+      <view ng-repeat="plugin in profilePlugins"
+            class="plugin"
+            ng-class="plugin.id"
+            data-plugin-id="{{ plugin.id }}"
+            provider="plugin"></view>
+    </div>
+  </section>
+
+  <div ng-if="plugins.length"
+       class="col-xs-12 plugins">
+    <div class="row">
+      <view ng-repeat="plugin in plugins"
+            class="plugin"
+            ng-class="plugin.id"
+            data-plugin-id="{{ plugin.id }}"
+            provider="plugin"></view>
+    </div>
+  </div>
+</div>

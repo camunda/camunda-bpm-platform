@@ -1,0 +1,21 @@
+.Navigation {
+  > div {
+    display: inline-block;
+    height: 42px;
+    padding: 0 6px;
+
+    &.active {
+      color: #000;
+      background-color: #eee;
+    }
+  }
+  .DropdownOption.active {
+    background-color: #eee;
+    > button {
+      border-width: 0 0 0 3px;
+      border-color: #b5152b;
+      border-style: solid;
+      padding-left: 5px;
+    }
+  }
+}

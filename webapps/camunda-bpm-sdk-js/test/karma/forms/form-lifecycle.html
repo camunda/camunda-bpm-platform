@@ -1,0 +1,47 @@
+<form cam-form role="form">
+
+  <input cam-variable-name="stringVar"
+         cam-variable-type="String"
+         type="text"
+         class="form-control"
+         id="stringVar">
+
+  <input type="text"
+         class="form-control"
+         id="customField">
+
+  <script cam-script type="text/form-script">
+
+    var variableManager = camForm.variableManager;
+    var formElement = camForm.formElement;
+
+    camForm.on('form-loaded', function() {
+
+      // declare a new variable
+      variableManager.createVariable({
+        'name': 'customVar',
+        'type': 'String',
+        'value': 'someValue'
+      });
+
+    });
+
+    camForm.on('variables-fetched', function() {
+
+      $('#customField', formElement)
+        .val(variableManager.variableValue('customVar'));
+
+    });
+
+    camForm.on('submit', function(evt) {
+
+      // prevent submit if value of form field was not changed
+      if($('#customField', formElement).val() == 'someValue') {
+        evt.submitPrevented = true;
+      }
+
+    });
+
+  </script>
+
+</form>

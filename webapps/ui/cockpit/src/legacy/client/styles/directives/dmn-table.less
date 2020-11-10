@@ -1,0 +1,80 @@
+@import "dmn-viewer/cam-widget-dmn-viewer.less";
+
+.edit-dmn-modal,
+.confirm-dmn-modal {
+  > .modal-dialog {
+    width: auto;
+    margin-left: @grid-gutter-width * 0.5;
+    margin-right: @grid-gutter-width * 0.5;
+  }
+}
+
+
+.confirm-dmn-modal {
+  .glyphicon-fire {
+    color: @brand-danger;
+  }
+
+  .help-block {
+    padding: (@grid-gutter-width * 0.5);
+    color: @state-warning-text;
+    background-color: @state-warning-bg;
+    border: 1px solid @state-warning-border;
+    margin: 0 0 (@grid-gutter-width * 0.5) 0;
+  }
+
+  .deployment-name {
+    display: table;
+    table-layout: fixed;
+    margin: (@grid-gutter-width * 0.5) 0;
+    width: 100%;
+
+    > label,
+    > div {
+      display: table-cell;
+    }
+
+    > label {
+      padding-right: (@grid-gutter-width * 0.5);
+      width: 210px;
+    }
+
+    > div {
+      .form-control {
+        width: 100%;
+      }
+    }
+  }
+}
+
+
+// yes we can
+.dmn-table {
+  > .dmn-js-powered-by {
+    display: none;
+  }
+
+  > .tjs-container > .tjs-controls {
+    right: 0;
+  }
+}
+
+
+
+.ctn-tabbed-content [cam-widget-variable][display] {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+
+.tjs-context-menu,
+.dmn-clauseexpression-setter,
+.dmn-clausevalues-setter,
+.dmn-hitpolicy-setter {
+  z-index: 99 + @zindex-modal;
+}
+
+
+.dmn-combobox-suggestions {
+  z-index: 100 + @zindex-modal;
+}

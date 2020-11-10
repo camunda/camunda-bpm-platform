@@ -1,0 +1,31 @@
+<!-- # CE - camunda-commons-ui/lib/widgets/variable/cam-widget-variable-dialog.html -->
+<div class="modal-header">
+  <h3 translate="CAM_WIDGET_STRING_DIALOG_TITLE"
+      translate-values="{name: variable.name}"></h3>
+</div>
+
+<div class="modal-body">
+  <div class="form-group">
+    <label for="value"
+           cam-widget-clipboard="variable.value"
+           no-tooltip
+           ng-class="{hovered: hovered === 'var-value'}">
+      {{ 'CAM_WIDGET_STRING_DIALOG_LABEL_VALUE' | translate }}
+    </label>
+    <textarea ng-model="variable.value"
+              id="value"
+              rows="10"
+              class="form-control cam-string-variable"
+              ng-readonly="readonly"
+              ng-mouseenter="toggleHover('var-value')"
+              ng-mouseleave="toggleHover()"></textarea>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="$dismiss('close')">
+    {{ 'CAM_WIDGET_STRING_DIALOG_LABEL_CLOSE' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-commons-ui/lib/widgets/variable/cam-widget-variable-dialog.html -->

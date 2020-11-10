@@ -1,0 +1,19 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/system.html -->
+<section ng-cloak>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('section='+systemSettingsProvider.id)"
+          ng-if="!!systemSettingsProvider.accessible"
+          ng-repeat="systemSettingsProvider in systemSettingsProviders">
+        <a href="#/system/?section={{systemSettingsProvider.id}}">
+          {{systemSettingsProvider.label | translate}}
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="section-content">
+    <view provider="activeSettingsProvier" />
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/system.html -->
