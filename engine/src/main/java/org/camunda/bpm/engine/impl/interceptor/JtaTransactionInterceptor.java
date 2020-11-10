@@ -161,7 +161,7 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private static class TransactionException extends RuntimeException {
+  public static class TransactionException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private TransactionException() {
