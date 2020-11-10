@@ -12,7 +12,7 @@
     "angular-cookies": "1.8.0",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend.git#master",
     "angular-resource": "1.8.0",
-    "angular-route": "1.8.0",
+    "angular-route": "1.8.2",
     "angular-sanitize": "1.8.0",
     "angular-translate": "2.18.2",
     "bootstrap": "3.4.1",
