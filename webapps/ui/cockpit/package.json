@@ -68,7 +68,7 @@
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-camunda-licensed": "0.4.3",
     "eslint-plugin-prettier": "3.1.2",
-    "http-proxy-middleware": "0.20.0",
+    "http-proxy-middleware": "1.0.6",
     "husky": "3.1.0",
     "less": "3.10.3",
     "license-checker": "25.0.1",
