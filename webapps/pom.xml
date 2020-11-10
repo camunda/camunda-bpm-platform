@@ -611,7 +611,7 @@
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
                 <artifactId>java-uuid-generator</artifactId>
-                <version>3.1.2</version>
+                <version>4.0.1</version>
               </dependency>
             </dependencies>
           </plugin>
@@ -778,7 +778,7 @@
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
                 <artifactId>java-uuid-generator</artifactId>
-                <version>3.1.2</version>
+                <version>4.0.1</version>
               </dependency>
             </dependencies>
           </plugin>
