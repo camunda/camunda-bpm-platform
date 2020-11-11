@@ -16,3 +16,7 @@
  */
 
 export default [];
+
+export const getLicense = async () => {
+  return false;
+};

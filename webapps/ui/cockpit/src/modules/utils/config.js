@@ -16,7 +16,8 @@
  */
 
 import buildInPlugins from "../../plugins";
-import eePlugins from "../../enterprise";
+import eePlugins, { getLicense } from "../../enterprise";
+
 import defaultConfig from "./defaultConfig.json";
 
 const inProduction = process.env.NODE_ENV === "production";
@@ -29,6 +30,7 @@ const baseFetchPath = inProduction
   : "/";
 
 let config = {};
+let licenseValid = false;
 
 function getLanguage() {
   const nav = window.navigator;
@@ -173,6 +175,10 @@ async function loadBpmnJsExtensions() {
   return await Promise.all([modulePromise, ...moddlePromises]);
 }
 
+async function loadLicense() {
+  licenseValid = await getLicense();
+}
+
 export async function loadConfig() {
   let loadedConfig = (
     await import(
@@ -182,7 +188,12 @@ export async function loadConfig() {
     )
   ).default;
   config = { ...defaultConfig, ...loadedConfig };
-  await Promise.all([loadPlugins(), loadLocale(), loadBpmnJsExtensions()]);
+  await Promise.all([
+    loadPlugins(),
+    loadLocale(),
+    loadBpmnJsExtensions(),
+    loadLicense()
+  ]);
   return config;
 }
 
@@ -194,5 +205,6 @@ export const getLocale = () => config["locale"];
 export const getPlugins = () => config["plugins"];
 export const getCSRFCookieName = () => config["csrfCookieName"];
 export const getEngine = () => engine;
+export const hasLicense = () => licenseValid;
 
 export default config;
