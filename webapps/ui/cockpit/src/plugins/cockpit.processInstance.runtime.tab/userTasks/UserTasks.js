@@ -25,11 +25,19 @@ import { formatDate } from "utils/formatting";
 import { getItem, setItem } from "utils/localstorage";
 import { post } from "utils/request";
 
-import { LinkButton, LoadingIndicator, Pagination, Table } from "components";
+import {
+  Clipboard,
+  LinkButton,
+  LoadingIndicator,
+  Pagination,
+  Table
+} from "components";
 import AssigneeEdit from "./AssigneeEdit";
 import { UserAction, GroupAction } from "./Actions";
 
 import "./UserTasks.scss";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import translate from "utils/translation";
 
 function UserTasks({
   processInstanceId,
@@ -193,9 +201,20 @@ function UserTasks({
               <Table.Cell>{row.priority}</Table.Cell>
               <Table.Cell>{row.delegationState}</Table.Cell>
               <Table.Cell>
-                <a href={`../../tasklist/${getEngine()}/#/?task=${row.id}`}>
-                  {row.id}
-                </a>
+                <Clipboard text={row.id}>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="tooltip">
+                        {translate("PLUGIN_USER_TASKS_LINK_TO_TASKLIST")}
+                      </Tooltip>
+                    }
+                  >
+                    <a href={`../../tasklist/${getEngine()}/#/?task=${row.id}`}>
+                      {row.id}
+                    </a>
+                  </OverlayTrigger>
+                </Clipboard>
               </Table.Cell>
               <Table.Cell>
                 <GroupAction {...row} />
