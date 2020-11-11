@@ -3,9 +3,9 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // @Library('camunda-ci') _
 
-String getMavenAgent(Integer mavenCpuLimit = 4, String dockerTag = '3.6.3-openjdk-8'){
-  String mavenForkCount = mavenCpuLimit;
-  String mavenMemoryLimit = mavenCpuLimit * 2;
+String getMavenAgent(Integer cpuLimit = 4, String dockerTag = '3.6.3-openjdk-8'){
+  String mavenForkCount = cpuLimit;
+  String mavenMemoryLimit = cpuLimit * 2;
   """
 metadata:
   labels:
@@ -18,8 +18,8 @@ spec:
     operator: "Exists"
     effect: "NoSchedule"
   containers:
-  - name: maven
-    image: maven:${dockerTag}
+  - name: main
+    icpuLimit gcr.io/ci-30-162810/centos:v0.4.6
     command: ["cat"]
     tty: true
     env:
@@ -29,10 +29,10 @@ spec:
       value: Europe/Berlin
     resources:
       limits:
-        cpu: ${mavenCpuLimit}
+        cpu: ${cpuLimit}
         memory: ${mavenMemoryLimit}Gi
       requests:
-        cpu: ${mavenCpuLimit}
+        cpu: ${cpuLimit}
         memory: ${mavenMemoryLimit}Gi
   """
 }
