@@ -3,7 +3,7 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // @Library('camunda-ci') _
 
-String getMavenAgent(Integer cpuLimit = 4, String dockerTag = '3.6.3-openjdk-8'){
+String getMavenAgent(Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
   String mavenMemoryLimit = cpuLimit * 2;
   """
