@@ -42,7 +42,6 @@ var angular = require("angular"),
   variableInstancesTab = require("./processInstance/variableInstancesTab"),
   incidentsTab = require("./processInstance/incidentsTab"),
   calledProcessInstanceTable = require("./processInstance/calledProcessInstanceTable"),
-  userTasksTable = require("./processInstance/userTasksTable"),
   jobRetryBulkAction = require("./processInstance/jobRetryBulkAction"),
   jobRetryBulkDialog = require("./processInstance/jobRetryBulkDialog"),
   jobRetryDialog = require("./processInstance/jobRetryDialog"),
@@ -81,7 +80,6 @@ ngModule.config(pdIncidentsTab);
 variableInstancesTab(ngModule);
 ngModule.config(incidentsTab);
 calledProcessInstanceTable(ngModule);
-userTasksTable(ngModule);
 jobRetryBulkAction(ngModule);
 ngModule.controller("JobRetriesController", jobRetryBulkDialog);
 ngModule.controller("JobRetryController", jobRetryDialog);

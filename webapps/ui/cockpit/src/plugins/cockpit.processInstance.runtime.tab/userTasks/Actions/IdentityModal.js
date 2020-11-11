@@ -107,12 +107,7 @@ export default function GroupModal({ id, open, onClose, type }) {
   }
 
   return (
-    <Modal
-      show={open}
-      onHide={handleClose}
-      restoreFocus={false}
-      className="IdentityModal"
-    >
+    <Modal show={open} onHide={handleClose} className="IdentityModal">
       <Modal.Header>
         <Modal.Title componentClass="h3">{labels.header}</Modal.Title>
       </Modal.Header>

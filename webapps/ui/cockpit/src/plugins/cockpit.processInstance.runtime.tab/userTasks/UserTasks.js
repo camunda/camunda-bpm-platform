@@ -38,12 +38,14 @@ import { UserAction, GroupAction } from "./Actions";
 import "./UserTasks.scss";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import translate from "utils/translation";
+import withBpmn from "../../../components/ProcessInstance/HOC/withBpmn";
 
 function UserTasks({
   processInstanceId,
   filter,
   setFilter,
   activityIdToInstancesMap,
+  bpmnElements,
   startingPage = 1
 }) {
   const [userTasks, setUserTasks] = useState(null);
@@ -188,7 +190,9 @@ function UserTasks({
             <Table.Row key={idx}>
               <Table.Cell>
                 <LinkButton onClick={() => handleSearch(row)}>
-                  {row.name || row.taskDefinitionKey}
+                  {bpmnElements[row.taskDefinitionKey]?.name ||
+                    row.name ||
+                    row.taskDefinitionKey}
                 </LinkButton>
               </Table.Cell>
               <Table.Cell>
@@ -234,5 +238,5 @@ function UserTasks({
 }
 
 export default withActivityInstanceMap(
-  withFilter(paginateComponent(UserTasks))
+  withFilter(withBpmn(paginateComponent(UserTasks)))
 );

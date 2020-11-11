@@ -15,7 +15,5 @@
  * limitations under the License.
  */
 
-// import * as formatDate
-
 export { default as abbreviateNumber } from "./abbreviateNumber";
 export { default as formatDate } from "./dateFormat";

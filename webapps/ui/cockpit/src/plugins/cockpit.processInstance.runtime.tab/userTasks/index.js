@@ -19,16 +19,20 @@ import React from "react";
 
 import UserTasks from "./UserTasks";
 import { ActivityProvider } from "../../../components/ProcessInstance/HOC/withActivityInstanceMap";
+import { BpmnProvider } from "../../../components/ProcessInstance/HOC/withBpmn";
 
 export default {
   id: "user-tasks-tab",
   pluginPoint: "cockpit.processInstance.runtime.tab",
   priority: 6,
-  render: (node, { processInstanceId }) => {
+  render: (node, { processInstanceId }, { processInstance }) => {
     return (
-      <ActivityProvider processInstanceId={processInstanceId}>
-        <UserTasks processInstanceId={processInstanceId} />
-      </ActivityProvider>
+      // To be refactored when we have a processInstance Provider
+      <BpmnProvider processDefinitionId={processInstance.definitionId}>
+        <ActivityProvider processInstanceId={processInstanceId}>
+          <UserTasks processInstanceId={processInstanceId} />
+        </ActivityProvider>
+      </BpmnProvider>
     );
   },
   properties: {
