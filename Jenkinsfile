@@ -19,8 +19,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: main
-    icpuLimit gcr.io/ci-30-162810/centos:v0.4.6
-    command: ["cat"]
+    image: gcr.io/ci-30-162810/centos:v0.4.6
     tty: true
     env:
     - name: LIMITS_CPU
