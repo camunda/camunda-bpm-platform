@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-import * as cockpitNavigation from "./cockpit.navigation";
-import * as diagramOverlays from "./cockpit.processInstance.diagram.plugin";
-import * as processInstanceRuntimeTabs from "./cockpit.processInstance.runtime.tab";
-import * as processInstanceRuntimeActions from "./cockpit.processInstance.runtime.action";
+import React, { useEffect } from "react";
+import search from "utils/search";
 
-export default [
-  ...Object.values(cockpitNavigation),
-  ...Object.values(diagramOverlays),
-  ...Object.values(processInstanceRuntimeTabs),
-  ...Object.values(processInstanceRuntimeActions)
-];
+export default Component => props => {
+  useEffect(
+    () => () => {
+      search.delete("page");
+    },
+    []
+  );
+
+  return (
+    <Component {...props} startingPage={parseInt(search.get("page") || "1")} />
+  );
+};

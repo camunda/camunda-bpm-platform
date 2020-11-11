@@ -15,14 +15,20 @@
  * limitations under the License.
  */
 
-import * as cockpitNavigation from "./cockpit.navigation";
-import * as diagramOverlays from "./cockpit.processInstance.diagram.plugin";
-import * as processInstanceRuntimeTabs from "./cockpit.processInstance.runtime.tab";
-import * as processInstanceRuntimeActions from "./cockpit.processInstance.runtime.action";
+import React from "react";
+import classNames from "classnames";
 
-export default [
-  ...Object.values(cockpitNavigation),
-  ...Object.values(diagramOverlays),
-  ...Object.values(processInstanceRuntimeTabs),
-  ...Object.values(processInstanceRuntimeActions)
-];
+export default function({ type, children, className, ...props }) {
+  return (
+    <span
+      className={classNames(
+        "GlyphIcon glyphicon",
+        `glyphicon-${type}`,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}

@@ -341,7 +341,7 @@ module.exports = function(ngModule) {
               controller: "IdentityLinksController",
               template: identityLinksTemplate,
               windowClass: "identity-link-modal",
-              appendTo: angular.element('.angular-app')
+              appendTo: angular.element(".angular-app")
             })
             .result.catch(angular.noop);
         });
