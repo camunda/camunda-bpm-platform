@@ -454,23 +454,27 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // determine tenant Id if null
-    provideTenantId(variables);
+    provideTenantId(variables, formProperties);
     super.start(variables, formProperties);
   }
 
   @Override
   public void startWithoutExecuting(Map<String, Object> variables) {
     setRootProcessInstanceId(getProcessInstanceId());
-    provideTenantId(variables);
+    provideTenantId(variables, null);
     super.startWithoutExecuting(variables);
   }
 
-  protected void provideTenantId(Map<String, Object> variables) {
+  protected void provideTenantId(Map<String, Object> variables, VariableMap properties) {
     if (tenantId == null) {
       TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
 
       if (tenantIdProvider != null) {
         VariableMap variableMap = Variables.fromMap(variables);
+        if(properties != null && !properties.isEmpty()) {
+          variableMap.putAll(properties);
+        }
+
         ProcessDefinition processDefinition = getProcessDefinition();
 
         TenantIdProviderProcessInstanceContext ctx;

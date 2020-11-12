@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -1018,6 +1020,33 @@ public class TenantIdProviderTest {
     engineRule.getCaseService().withCaseExecution(caseExecution.getId()).manualStart();
   }
 
+  @Test
+  public void shouldHaveAccessToFormPropertiesFromTenantIdProvider() {
+    // given
+    String variableKey = "varKey";
+    String variableValue = "varValue";
+    VariableMap variableMap = Variables.createVariables().putValueTyped(variableKey, stringValue(variableValue));
+
+    AccessProcessInstanceVariableTenantIdProvider tenantIdProvider = new AccessProcessInstanceVariableTenantIdProvider(TENANT_ID, variableKey);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent().camundaFormKey("embedded:app:forms/FORM_NAME.htmls")
+        .userTask("UserTask")
+        .endEvent()
+        .done();
+
+    testRule.deploy(process);
+
+    String procDefId = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult().getId();
+
+    // when
+    engineRule.getFormService().submitStartForm(procDefId, variableMap);
+
+    // then
+    assertThat(tenantIdProvider.retreivedVariableValue).isEqualTo(variableValue);
+  }
+
   // helpers //////////////////////////////////////////
 
   public static class TestTenantIdProvider implements TenantIdProvider {
@@ -1188,4 +1217,31 @@ public class TenantIdProviderTest {
     }
   }
 
+  public static class AccessProcessInstanceVariableTenantIdProvider implements TenantIdProvider {
+
+    private final String tenantIdToSet;
+    private final String variableToAccess;
+    protected Object retreivedVariableValue;
+
+    public AccessProcessInstanceVariableTenantIdProvider(String tenantIdToSet, String variableToAccess) {
+      this.tenantIdToSet = tenantIdToSet;
+      this.variableToAccess = variableToAccess;
+    }
+
+    @Override
+    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+      retreivedVariableValue = ctx.getVariables().get(variableToAccess);
+      return tenantIdToSet;
+    }
+
+    @Override
+    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
+      return null;
+    }
+
+    @Override
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return null;
+    }
+  }
 }
