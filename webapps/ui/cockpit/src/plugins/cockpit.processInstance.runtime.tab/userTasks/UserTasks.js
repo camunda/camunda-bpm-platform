@@ -16,15 +16,19 @@
  */
 
 import React, { useState, useEffect } from "react";
-import withFilter from "../../../components/ProcessInstance/HOC/withFilter";
+
 import withActivityInstanceMap from "../../../components/ProcessInstance/HOC/withActivityInstanceMap";
+import withBpmn from "../../../components/ProcessInstance/HOC/withBpmn";
+import withFilter from "../../../components/ProcessInstance/HOC/withFilter";
 import { paginateComponent } from "components/Pagination";
 
 import { getEngine } from "utils/config";
 import { formatDate } from "utils/formatting";
 import { getItem, setItem } from "utils/localstorage";
 import { post } from "utils/request";
+import translate from "utils/translation";
 
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   Clipboard,
   LinkButton,
@@ -36,9 +40,6 @@ import AssigneeEdit from "./AssigneeEdit";
 import { UserAction, GroupAction } from "./Actions";
 
 import "./UserTasks.scss";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import translate from "utils/translation";
-import withBpmn from "../../../components/ProcessInstance/HOC/withBpmn";
 
 function UserTasks({
   processInstanceId,
