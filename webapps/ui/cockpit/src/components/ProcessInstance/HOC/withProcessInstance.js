@@ -22,7 +22,7 @@ import { get } from "utils/request";
 const ProcessInstanceContext = createContext();
 
 export function ProcessInstanceProvider({ processInstanceId, children }) {
-  const [processInstance, setProcessInstance] = useState(null);
+  const [processInstance, setProcessInstance] = useState({});
 
   useEffect(() => {
     const loadProcessInstance = async () => {
@@ -44,5 +44,5 @@ export function ProcessInstanceProvider({ processInstanceId, children }) {
 }
 
 export default Component => props => (
-  <Component {...useContext(ProcessInstanceContext)} {...props} />
+  <Component processInstance={useContext(ProcessInstanceContext)} {...props} />
 );

@@ -38,7 +38,9 @@ const STATUS = Object.freeze({
   NOT_FOUND: 6
 });
 
-function CancelProcessInstance({ id, definitionId }) {
+function CancelProcessInstance({ processInstance }) {
+  const {id, definitionId} = processInstance;
+
   const [status, setStatus] = useState(null);
 
   const [subProcessInstances, setSubProcessInstances] = useState(null);
