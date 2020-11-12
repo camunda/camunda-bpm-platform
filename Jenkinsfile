@@ -76,7 +76,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -94,7 +94,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -112,7 +112,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -130,7 +130,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -148,7 +148,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               unstash "platform-stash-distro"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
@@ -171,7 +171,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -189,7 +189,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -207,7 +207,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                 sh """
@@ -225,7 +225,7 @@ pipeline {
             }
           }
           steps{
-            container("maven"){
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               unstash "platform-stash-runtime"
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                // sh """
