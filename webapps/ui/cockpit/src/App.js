@@ -40,12 +40,24 @@ import {
 import PluginPoint from "utils/PluginPoint";
 import { UserProvider, PreviousLocationProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
+import { ProcessInstanceProvider } from "./components/ProcessInstance/HOC/withProcessInstance";
 
-function AngularRoute({ component, ...props }) {
+function AngularRoute({
+  component,
+  wrapApp: AppWrapper = ({ children }) => children,
+  ...props
+}) {
   return (
-    <Route {...props}>
-      <AngularApp component={component} />
-    </Route>
+    <Route
+      {...props}
+      render={props => {
+        return (
+          <AppWrapper params={props.match.params}>
+            <AngularApp component={component} />
+          </AppWrapper>
+        );
+      }}
+    />
   );
 }
 
@@ -105,6 +117,13 @@ function App() {
               <AngularRoute
                 path="/process-instance/:id/runtime"
                 component={processInstance}
+                wrapApp={({ children, params }) => {
+                  return (
+                    <ProcessInstanceProvider processInstanceId={params.id}>
+                      {children}
+                    </ProcessInstanceProvider>
+                  );
+                }}
               />
               <AngularRoute path="/decisions" component={decisions} />
               <AngularRoute

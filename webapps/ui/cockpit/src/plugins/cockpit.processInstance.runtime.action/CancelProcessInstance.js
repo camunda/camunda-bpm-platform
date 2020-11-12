@@ -22,7 +22,7 @@ export default {
   id: "cockpit.processInstance.runtime.action.CancelProcessInstance",
   pluginPoint: "cockpit.processInstance.runtime.action",
   priority: 20,
-  render: (node, { processInstanceId }) => {
-    return <CancelProcessInstance processInstanceId={processInstanceId} />;
+  render: () => {
+    return <CancelProcessInstance />;
   }
 };
