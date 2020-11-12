@@ -17,7 +17,7 @@
 
 import $ from "jquery";
 import translate from "utils/translation";
-import { abbreviateNumber } from "utils/filters";
+import { abbreviateNumber } from "utils/formatting";
 
 const getBadges = (instanceCount = "", incidentCount = "") => {
   const template = `<div class="activity-bottom-left-position instances-overlay">

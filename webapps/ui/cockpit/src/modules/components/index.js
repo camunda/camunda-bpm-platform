@@ -16,11 +16,14 @@
  */
 
 export { CamundaLogo } from "./CamundaLogo";
+export { Clipboard } from "./Clipboard";
 export { Dropdown } from "./Dropdown";
 export { EnterpriseComponent } from "./EnterpriseComponent";
+export { GlyphIcon } from "./Icons";
 export { LinkButton } from "./LinkButton";
 export { LoadingIndicator } from "./LoadingIndicator";
 export { Notifications } from "./Notifications";
+export { Pagination } from "./Pagination";
 export { StateCircle } from "./StateCircle";
 export { Table } from "./Table";
 export { ActionButton } from "./ActionButton";

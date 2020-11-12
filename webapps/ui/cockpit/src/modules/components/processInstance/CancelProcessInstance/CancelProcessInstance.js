@@ -56,9 +56,9 @@ export default function CancelProcessInstance({ processInstanceId }) {
 
   useEffect(() => {
     const loadProcessInstance = async () => {
-      return await (await get(
-        `%ENGINE_API%/process-instance/${processInstanceId}`
-      )).json();
+      return await (
+        await get(`%ENGINE_API%/process-instance/${processInstanceId}`)
+      ).json();
     };
 
     loadProcessInstance()
@@ -75,16 +75,20 @@ export default function CancelProcessInstance({ processInstanceId }) {
   useEffect(() => {
     if (show) {
       const loadSubProcessInstances = async () => {
-        return await (await post(
-          `%ENGINE_API%/process-instance?firstResult=0&maxResults=5`,
-          { superProcessInstance: processInstanceId }
-        )).json();
+        return await (
+          await post(
+            `%ENGINE_API%/process-instance?firstResult=0&maxResults=5`,
+            { superProcessInstance: processInstanceId }
+          )
+        ).json();
       };
 
       const loadSubProcessInstancesCount = async () => {
-        return await (await post(`%ENGINE_API%/process-instance/count`, {
-          superProcessInstance: processInstanceId
-        })).json();
+        return await (
+          await post(`%ENGINE_API%/process-instance/count`, {
+            superProcessInstance: processInstanceId
+          })
+        ).json();
       };
 
       setStatus(STATUS.LOADING);
@@ -211,9 +215,7 @@ export default function CancelProcessInstance({ processInstanceId }) {
                         <tr key={subProcessInstance.id}>
                           <td className="instance-id uuid">
                             <a
-                              href={`#/process-instance/${
-                                subProcessInstance.id
-                              }`}
+                              href={`#/process-instance/${subProcessInstance.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

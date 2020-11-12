@@ -15,14 +15,34 @@
  * limitations under the License.
  */
 
-import * as cockpitNavigation from "./cockpit.navigation";
-import * as diagramOverlays from "./cockpit.processInstance.diagram.plugin";
-import * as processInstanceRuntimeTabs from "./cockpit.processInstance.runtime.tab";
-import * as processInstanceRuntimeActions from "./cockpit.processInstance.runtime.action";
+import moment from "moment";
 
-export default [
-  ...Object.values(cockpitNavigation),
-  ...Object.values(diagramOverlays),
-  ...Object.values(processInstanceRuntimeTabs),
-  ...Object.values(processInstanceRuntimeActions)
-];
+const variants = {
+  monthName: "MMMM",
+  day: "DD",
+  abbr: "lll",
+  normal: "YYYY-MM-DD[T]HH:mm:ss", // yyyy-MM-dd'T'HH:mm:ss => 2013-01-23T14:42:45
+  long: "LLLL",
+  short: "LL"
+};
+
+const getDateFormat = variant => {
+  variant = variant || "normal";
+  return variants[variant];
+};
+
+export function setDateFormat(newFormat, variant) {
+  variant = variant || "normal";
+  variants[variant] = newFormat;
+}
+
+export default function formatDate(date, variant) {
+  if (!date) {
+    return "";
+  }
+
+  if (typeof date === "number") {
+    date = new Date(date);
+  }
+  return moment(date, moment.ISO_8601).format(getDateFormat(variant));
+}

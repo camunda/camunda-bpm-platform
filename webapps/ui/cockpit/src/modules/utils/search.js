@@ -15,14 +15,26 @@
  * limitations under the License.
  */
 
-import * as cockpitNavigation from "./cockpit.navigation";
-import * as diagramOverlays from "./cockpit.processInstance.diagram.plugin";
-import * as processInstanceRuntimeTabs from "./cockpit.processInstance.runtime.tab";
-import * as processInstanceRuntimeActions from "./cockpit.processInstance.runtime.action";
+const getSearch = () => new URLSearchParams(window.location.hash.split("?")[1]);
+const setSearch = search => {
+  window.location.hash =
+    window.location.hash.split("?")[0] + "?" + search.toString();
+};
 
-export default [
-  ...Object.values(cockpitNavigation),
-  ...Object.values(diagramOverlays),
-  ...Object.values(processInstanceRuntimeTabs),
-  ...Object.values(processInstanceRuntimeActions)
-];
+export default {
+  get: key => {
+    const locationSearch = getSearch();
+    return locationSearch.get(key);
+  },
+  set: (key, value) => {
+    const locationSearch = getSearch();
+    locationSearch.set(key, value);
+
+    setSearch(locationSearch);
+  },
+  delete: key => {
+    const locationSearch = getSearch();
+    locationSearch.delete(key);
+    setSearch(locationSearch);
+  }
+};
