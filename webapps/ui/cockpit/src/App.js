@@ -42,9 +42,10 @@ import { UserProvider, PreviousLocationProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
 import { ProcessInstanceProvider } from "./components/ProcessInstance/HOC/withProcessInstance";
 
+const DefaultWrapper = ({ children }) => children;
 function AngularRoute({
   component,
-  wrapApp: AppWrapper = ({ children }) => children,
+  wrapApp: AppWrapper = DefaultWrapper,
   ...props
 }) {
   return (
