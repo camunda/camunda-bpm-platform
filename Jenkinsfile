@@ -18,8 +18,9 @@ spec:
     operator: "Exists"
     effect: "NoSchedule"
   containers:
-  - name: main
-    image: gcr.io/ci-30-162810/centos:v0.4.6
+  - name: "jnlp"
+    image: "gcr.io/ci-30-162810/centos:v0.4.6"
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
     tty: true
     env:
     - name: LIMITS_CPU
@@ -33,9 +34,12 @@ spec:
       requests:
         cpu: ${cpuLimit}
         memory: ${mavenMemoryLimit}Gi
+    workingDir: "/home/work"
+    volumeMounts:
+      - mountPath: /home/work
+        name: workspace-volume
   """
 }
-
 
 pipeline {
   agent none
@@ -47,12 +51,16 @@ pipeline {
         }
       }
       steps {
-        nodejs('nodejs-14.6.0'){
-          withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
+          withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
             sh '''
               mvn --version
               java -version
             '''
+            nodejs('nodejs-14.6.0'){
+              sh '''
+                npm version
+              '''
+            }
             configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
               sh """
                 mvn -s \$MAVEN_SETTINGS_XML -T\$LIMITS_CPU clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
@@ -62,7 +70,6 @@ pipeline {
             stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
             stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
           }
-        }
       }
     }
     stage('h2 tests') {
