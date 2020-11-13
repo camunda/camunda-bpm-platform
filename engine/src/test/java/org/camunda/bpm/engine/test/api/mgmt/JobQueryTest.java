@@ -536,6 +536,30 @@ public class JobQueryTest {
   }
 
   @Test
+  public void shouldReturnNoJobDueToExcludingCriteria() {
+    JobQuery query = managementService.createJobQuery().processInstanceId(processInstanceIdOne);
+
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+
+    query = query.createdBefore(new Date(0)).createdAfter(new Date());
+
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void shouldReturnJobDueToIncludingCriteria() {
+    JobQuery query = managementService.createJobQuery().processInstanceId(processInstanceIdOne);
+
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+
+    query = query.createdBefore(new Date()).createdAfter(new Date(0));
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testQueryByException() {
     JobQuery query = managementService.createJobQuery().withException();
