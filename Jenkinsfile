@@ -1,4 +1,3 @@
-
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
 
@@ -57,7 +56,6 @@ pipeline {
         }
       }
       steps {
-
         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
           nodejs('nodejs-14.6.0'){
              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
@@ -66,7 +64,7 @@ pipeline {
                """
              }
           }
-        
+
           // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
           // add a new line for each group of artifacts
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt', followSymlinks: false
@@ -359,6 +357,166 @@ pipeline {
         }
       }
     }
+    stage("engine-UNIT DB tests") {
+      matrix {
+        axes {
+          axis {
+            name 'DB'
+            values 'postgresql_96', 'mariadb_103'
+          }
+        }
+        when {
+          anyOf {
+            branch 'pipeline-master';
+            allOf {
+              changeRequest();
+              expression {
+                withLabels("all-db") || withDbLabel(env.DB)
+              }
+            }
+          }
+        }
+        agent {
+          kubernetes {
+            yaml getDbAgent(env.DB)
+          }
+        }
+        stages {
+          stage("engine-UNIT") {
+            steps {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'engine/', 'clean test -P' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              }
+            }
+          }
+        }
+      }
+    }
+    stage("engine-UNIT-authorizations DB tests") {
+      matrix {
+        axes {
+          axis {
+            name 'DB'
+            values 'postgresql_96', 'mariadb_103'
+          }
+        }
+        agent {
+          kubernetes {
+            yaml getDbAgent(env.DB)
+          }
+        }
+        when {
+          anyOf {
+            branch 'pipeline-master';
+            allOf {
+              changeRequest();
+              expression {
+                withLabels("all-db") || withDbLabel(env.DB)
+              }
+            }
+          }
+        }
+        stages {
+          stage("engine-UNIT-authorizations") {
+            steps {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'engine/', 'clean test -PcfgAuthorizationCheckRevokesAlways' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              }
+            }
+          }
+        }
+      }
+    }
+    stage("webapp-UNIT DB tests") {
+      matrix {
+        axes {
+          axis {
+            name 'DB'
+            values 'postgresql_96', 'mariadb_103'
+          }
+        }
+        agent {
+          kubernetes {
+            yaml getDbAgent(env.DB)
+          }
+        }
+        when {
+          anyOf {
+            branch 'pipeline-master';
+            allOf {
+              changeRequest();
+              expression {
+                withLabels("all-db") || withDbLabel(env.DB)
+              }
+            }
+          }
+        }
+        stages {
+          stage("webapp-UNIT") {
+            steps {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'webapps/', 'clean test -Dskip.frontend.build=true -P' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              }
+            }
+          }
+        }
+      }
+    }
+    stage("webapp-UNIT-authorizations DB tests") {
+      matrix {
+        axes {
+          axis {
+            name 'DB'
+            values 'postgresql_96', 'mariadb_103'
+          }
+        }
+        agent {
+          kubernetes {
+            yaml getDbAgent(env.DB)
+          }
+        }
+        when {
+          anyOf {
+            branch 'pipeline-master';
+            allOf {
+              changeRequest();
+              expression {
+                withLabels("all-db") || withDbLabel(env.DB)
+              }
+            }
+          }
+        }
+        stages {
+          stage("webapp-UNIT-authorizations") {
+            steps {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'webapps/', 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              }
+            }
+          }
+        }
+      }
+    }
     stage('db tests + CE webapps IT') {
       parallel {
         stage('engine-api-compatibility') {
@@ -392,8 +550,8 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, false,'engine/', 'clean test -Pdb-table-prefix')
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+              runMaven(true, false, false, 'engine/', 'clean test -Pdb-table-prefix')
             }
           }
         }
@@ -418,8 +576,8 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, false,'.', 'clean verify -Pcheck-engine,wls-compatibility,jersey')
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+              runMaven(true, false, false, '.', 'clean verify -Pcheck-engine,wls-compatibility,jersey')
             }
           }
         }
@@ -430,8 +588,8 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, true,'qa/', 'clean install -Pwildfly-domain,h2,engine-integration')
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+              runMaven(true, true, false, 'qa/', 'clean install -Pwildfly-domain,h2,engine-integration')
             }
           }
         }
@@ -442,22 +600,11 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, true,'qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration')
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+              runMaven(true, true, true, 'qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration')
             }
           }
         }
-//        stage('EE-platform-DISTRO-dummy') {
-//          agent {
-//            kubernetes {
-//              yaml getAgent()
-//            }
-//          }
-//          steps{
-//            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
-//            }
-//          }
-//        }
       }
     }
   }
@@ -487,7 +634,7 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   if (qaStash) unstash "platform-stash-qa"
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
+    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
   }
 }
 
@@ -495,4 +642,86 @@ void withLabels(String... labels) {
   for ( l in labels) {
     pullRequest.labels.contains(labelName)
   }
+}
+
+void withDbLabel(String dbLabel) {
+  withLabels(getDbType(dbLabel))
+}
+
+String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
+  Map dbInfo = getDbInfo(dbLabel)
+  String mavenMemoryLimit = cpuLimit * 4;
+  """
+metadata:
+  labels:
+    name: "${dbLabel}"
+    jenkins: "slave"
+    jenkins/label: "jenkins-slave-${dbInfo.type}"
+spec:
+  containers:
+  - name: "jnlp"
+    image: "gcr.io/ci-30-162810/${dbInfo.type}:${dbInfo.version}"
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+    tty: true
+    env:
+    - name: LIMITS_CPU
+      value: ${mavenForkCount}
+    - name: TZ
+      value: Europe/Berlin
+    resources:
+      limits:
+        memory: ${mavenMemoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${mavenMemoryLimit}Gi
+    volumeMounts:
+    - mountPath: "/home/work"
+      name: "workspace-volume"
+    workingDir: "/home/work"
+    nodeSelector:
+      cloud.google.com/gke-nodepool: "agents-n1-standard-4-netssd-preempt"
+    restartPolicy: "Never"
+    tolerations:
+    - effect: "NoSchedule"
+      key: "agents-n1-standard-4-netssd-preempt"
+      operator: "Exists"
+    volumes:
+    - emptyDir:
+        medium: ""
+      name: "workspace-volume"
+  """
+}
+
+Map getDbInfo(String databaseLabel) {
+  Map SUPPORTED_DBS = ['postgresql_96': [
+                           type: 'postgresql',
+                           version: '9.6v0.2.2',
+                           profiles: 'postgresql',
+                           extra: ''],
+                       'mariadb_103': [
+                           type: 'mariadb',
+                           version: '10.3v0.3.2',
+                           profiles: 'mariadb',
+                           extra: ''],
+                       'sqlserver_2017': [
+                           type: 'mssql',
+                           version: '2017v0.1.1',
+                           profiles: 'sqlserver',
+                           extra: '-Ddatabase.name=camunda -Ddatabase.username=sa -Ddatabase.password=cam_123$']
+  ]
+
+  return SUPPORTED_DBS[databaseLabel]
+}
+
+String getDbType(String dbLabel) {
+  String[] database = dbLabel.split("_")
+  return database[0]
+}
+
+String getDbProfiles(String dbLabel) {
+  return getDbInfo(dbLabel).profiles
+}
+
+String getDbExtras(String dbLabel) {
+  return getDbInfo(dbLabel).extra
 }
