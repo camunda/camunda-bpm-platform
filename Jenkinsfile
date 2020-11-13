@@ -41,6 +41,26 @@ spec:
   """
 }
 
+String getChromeAgent(Integer cpuLimit = 1){
+  String memoryLimit = cpuLimit * 2;
+  """
+  - name: chrome
+    image: 'gcr.io/ci-30-162810/chrome:78v0.1.2'
+    command: ["cat"]
+    tty: true
+    env:
+    - name: TZ
+      value: Europe/Berlin
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${memoryLimit}Gi
+  """
+}
+
 pipeline {
   agent none
   stages {
