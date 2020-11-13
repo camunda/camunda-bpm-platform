@@ -47,10 +47,12 @@ pipeline {
     stage('ASSEMBLY') {
       agent {
         kubernetes {
-          yaml getAgent()
+          yaml getAgent(16)
         }
       }
-      steps {
+      stages {
+        stage ('setup-npm') {
+          steps {
           withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
             sh '''
               mvn --version
@@ -71,7 +73,12 @@ pipeline {
             stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
             stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
           }
+          }
+        }
+
       }
+
+
     }
     stage('h2 tests') {
       parallel {
@@ -82,14 +89,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('h2-db')
+                  withLabels('h2')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent(16)
+              yaml getAgent(16)
             }
           }
           steps{
@@ -105,14 +112,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('h2-db')
+                  withLabels('h2')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent(16)
+              yaml getAgent(16)
             }
           }
           steps{
@@ -135,7 +142,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent()
             }
           }
           steps{
@@ -158,7 +165,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent()
             }
           }
           steps{
@@ -174,14 +181,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapp')
+                  withLabels('webapps')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent()
             }
           }
           steps{
@@ -204,7 +211,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent()
             }
           }
           steps{
@@ -227,14 +234,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapp', 'IT')
+                  withLabels('webapps', 'IT')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getChromeAgent()
+              yaml getAgent() + getChromeAgent()
             }
           }
           steps{
@@ -257,14 +264,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapp', 'IT')
+                  withLabels('webapps', 'IT')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getChromeAgent()
+              yaml getAgent() + getChromeAgent()
             }
           }
           steps{
@@ -282,14 +289,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapp', 'run', 'spring-boot')
+                  withLabels('IT', 'run', 'spring-boot')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getChromeAgent()
+              yaml getAgent() + getChromeAgent()
             }
           }
           steps{
@@ -312,14 +319,14 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapp', 'spring-boot')
+                  withLabels('IT', 'spring-boot')
                 }
               }
             }
           }
           agent {
             kubernetes {
-              yaml getMavenAgent() + getChromeAgent()
+              yaml getAgent() + getChromeAgent()
             }
           }
           steps{
@@ -342,7 +349,7 @@ pipeline {
         stage('engine-api-compatibility') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent(16)
             }
           }
           steps{
@@ -354,7 +361,7 @@ pipeline {
         stage('engine-UNIT-plugins') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent(16)
             }
           }
           steps{
@@ -366,7 +373,7 @@ pipeline {
         stage('webapp-UNIT-database-table-prefix') {
           agent {
             kubernetes {
-              yaml getMavenAgent()
+              yaml getAgent()
             }
           }
           steps{
