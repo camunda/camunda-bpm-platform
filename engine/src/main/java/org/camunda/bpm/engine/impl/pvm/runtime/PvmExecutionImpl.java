@@ -277,7 +277,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     if (variables != null) {
       setVariables(variables);
     }
-    
+
     if (formProperties != null) {
       FormPropertyHelper.initFormPropertiesOnScope(formProperties, this);
     }
@@ -294,15 +294,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   public void startWithoutExecuting(Map<String, Object> variables) {
     initialize();
-    initializeTimerDeclarations();
+
     fireHistoricProcessStartEvent();
+
+    setActivityInstanceId(getId());
+    setVariables(variables);
+
+    initializeTimerDeclarations();
+
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
 
     setActivity(null);
-    setActivityInstanceId(getId());
-
-    // set variables
-    setVariables(variables);
   }
 
   public abstract void fireHistoricProcessStartEvent();
