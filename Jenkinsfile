@@ -230,6 +230,8 @@ pipeline {
             }
           }
           steps{
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
+            }
           }
         }
       }
