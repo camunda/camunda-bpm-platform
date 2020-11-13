@@ -50,20 +50,17 @@ pipeline {
           yaml getAgent(16)
         }
       }
-      stages {
-        stage ('setup-npm') {
-          steps {
-          withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
+      steps {
+        withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
+          sh '''
+            mvn --version
+            java -version
+          '''
+          nodejs('nodejs-14.6.0'){
             sh '''
-              mvn --version
-              java -version
+              node -v
+              npm version
             '''
-            nodejs('nodejs-14.6.0'){
-              sh '''
-                node -v
-                npm version
-              '''
-
             configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
               sh """
                 node -v
@@ -71,24 +68,19 @@ pipeline {
                 mvn -s \$MAVEN_SETTINGS_XML -T\$LIMITS_CPU clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
               """
             }
-            }
+          }
             stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
             stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
             stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
-          }
-          }
         }
-
       }
-
-
     }
     stage('h2 tests') {
       parallel {
         stage('engine-UNIT-h2') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -111,7 +103,7 @@ pipeline {
         stage('engine-UNIT-authorizations-h2') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -134,7 +126,7 @@ pipeline {
         stage('engine-rest-UNIT-jersey-2') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -157,7 +149,7 @@ pipeline {
         stage('engine-rest-UNIT-resteasy3') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -180,7 +172,7 @@ pipeline {
         stage('webapp-UNIT-h2') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -203,7 +195,7 @@ pipeline {
         stage('engine-IT-tomcat-9-h2') {// TODO change it to `postgresql-96`
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -233,7 +225,7 @@ pipeline {
         stage('webapp-IT-tomcat-9-h2') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -263,7 +255,7 @@ pipeline {
         stage('webapp-IT-standalone-wildfly') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -288,7 +280,7 @@ pipeline {
         stage('camunda-run-IT') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
@@ -318,7 +310,7 @@ pipeline {
         stage('spring-boot-starter-IT') {
           when {
             anyOf {
-              branch 'hackdays-ya';
+              branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
