@@ -221,7 +221,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     // when
     ProcessInstance instance = runtimeService
       .createProcessInstanceByKey("exclusiveGateway")
-      // set the variables directly one the instance
+      // set the variables directly on the instance
       .setVariable("aVar", "aValue")
       .startBeforeActivity("task1")
       .execute();
