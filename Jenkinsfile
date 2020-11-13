@@ -60,6 +60,7 @@ pipeline {
             '''
             nodejs('nodejs-14.6.0'){
               sh '''
+                node -v
                 npm version
               '''
             }
