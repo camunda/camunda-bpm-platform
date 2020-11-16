@@ -3,7 +3,7 @@
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
 
-String getAgent(Integer cpuLimit = 4){
+String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
   String mavenMemoryLimit = cpuLimit * 2;
   """
@@ -19,7 +19,7 @@ spec:
     effect: "NoSchedule"
   containers:
   - name: "jnlp"
-    image: "gcr.io/ci-30-162810/centos:v0.4.6"
+    image: "${dockerImage}"
     args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
     tty: true
     env:
@@ -38,26 +38,6 @@ spec:
     volumeMounts:
       - mountPath: /home/work
         name: workspace-volume
-  """
-}
-
-String getChromeAgent(Integer cpuLimit = 2){
-  String memoryLimit = cpuLimit * 2;
-  """
-  - name: chrome
-    image: 'gcr.io/ci-30-162810/chrome:78v0.1.2'
-    command: ["cat"]
-    tty: true
-    env:
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        cpu: ${cpuLimit}
-        memory: ${memoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}
-        memory: ${memoryLimit}Gi
   """
 }
 
@@ -254,7 +234,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent() + getChromeAgent()
+              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
             }
           }
           steps{
@@ -284,7 +264,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent() + getChromeAgent()
+              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
             }
           }
           steps{
@@ -309,7 +289,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent() + getChromeAgent()
+              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
             }
           }
           steps{
@@ -339,7 +319,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent(16) + getChromeAgent()
+              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
             }
           }
           steps{
