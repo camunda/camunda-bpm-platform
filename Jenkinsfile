@@ -391,7 +391,9 @@ pipeline {
           }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, false,'webapps/', 'clean test -Pdb-table-prefix')
+              nodejs('nodejs-14.6.0'){
+                runMaven(true, false,'webapps/', 'clean test -Pdb-table-prefix')
+              }
             }
           }
         }
