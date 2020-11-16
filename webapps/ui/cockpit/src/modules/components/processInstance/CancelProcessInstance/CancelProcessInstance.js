@@ -18,10 +18,11 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Modal, Button, Form, FormControl, Table } from "react-bootstrap";
+import withProcessInstance from "../../../../components/ProcessInstance/HOC/withProcessInstance";
 import translate from "utils/translation";
 import { getSkipCustomListeners, getSkipIoMappings } from "utils/config";
 import { addMessage, addError, clearAll } from "utils/notifications";
-import { del, get, post } from "utils/request";
+import { del, post } from "utils/request";
 import { Notifications, ActionButton, ModalFormGroup } from "components";
 
 import eePlugins from "enterprise/cockpit/cockpitPluginsEE";
@@ -37,10 +38,11 @@ const STATUS = Object.freeze({
   NOT_FOUND: 6
 });
 
-export default function CancelProcessInstance({ processInstanceId }) {
+function CancelProcessInstance({ processInstance }) {
+  const { id, definitionId } = processInstance;
+
   const [status, setStatus] = useState(null);
 
-  const [processInstance, setProcessInstance] = useState(null);
   const [subProcessInstances, setSubProcessInstances] = useState(null);
   const [subProcessInstancesCount, setSubProcessInstancesCount] = useState(
     null
@@ -55,54 +57,38 @@ export default function CancelProcessInstance({ processInstanceId }) {
   const [checked, setChecked] = useState(initialChecked);
 
   useEffect(() => {
-    const loadProcessInstance = async () => {
-      return await (
-        await get(`%ENGINE_API%/process-instance/${processInstanceId}`)
-      ).json();
-    };
-
-    loadProcessInstance()
-      .then(processInstance => {
-        setProcessInstance(processInstance);
-      })
-      .catch(error => {
-        if (error.status === 404) {
-          setStatus(STATUS.NOT_FOUND);
-        }
-      });
-  }, [processInstanceId]);
-
-  useEffect(() => {
-    if (show) {
-      const loadSubProcessInstances = async () => {
-        return await (
-          await post(
+    if (id) {
+      if (show) {
+        const loadSubProcessInstances = async () => {
+          return await (await post(
             `%ENGINE_API%/process-instance?firstResult=0&maxResults=5`,
-            { superProcessInstance: processInstanceId }
-          )
-        ).json();
-      };
+            { superProcessInstance: id }
+          )).json();
+        };
 
-      const loadSubProcessInstancesCount = async () => {
-        return await (
-          await post(`%ENGINE_API%/process-instance/count`, {
-            superProcessInstance: processInstanceId
+        const loadSubProcessInstancesCount = async () => {
+          return await (await post(`%ENGINE_API%/process-instance/count`, {
+            superProcessInstance: id
+          })).json();
+        };
+
+        setStatus(STATUS.LOADING);
+
+        Promise.all([loadSubProcessInstances(), loadSubProcessInstancesCount()])
+          .then(([subProcessInstances, subProcessInstancesCount]) => {
+            setSubProcessInstances(subProcessInstances);
+            setSubProcessInstancesCount(subProcessInstancesCount.count);
           })
-        ).json();
-      };
-
-      setStatus(STATUS.LOADING);
-
-      Promise.all([loadSubProcessInstances(), loadSubProcessInstancesCount()])
-        .then(([subProcessInstances, subProcessInstancesCount]) => {
-          setSubProcessInstances(subProcessInstances);
-          setSubProcessInstancesCount(subProcessInstancesCount.count);
-        })
-        .finally(() => {
-          setStatus(STATUS.INITIAL);
-        });
+          .finally(() => {
+            setStatus(STATUS.INITIAL);
+          });
+      } else {
+        setStatus(null);
+      }
+    } else {
+      setStatus(STATUS.NOT_FOUND);
     }
-  }, [processInstanceId, show]);
+  }, [id, show]);
 
   const handleChange = event => {
     setChecked({
@@ -125,8 +111,8 @@ export default function CancelProcessInstance({ processInstanceId }) {
     if (!check(STATUS.ACTION_PENDING)) {
       if (check(STATUS.CONFIRMATION)) {
         const pathname = isEnterprise
-          ? `/process-instance/${processInstanceId}/history`
-          : `/process-definition/${processInstance.definitionId}`;
+          ? `/process-instance/${id}/history`
+          : `/process-definition/${definitionId}`;
 
         if (history.location.pathname === pathname) {
           window.location.reload(false);
@@ -145,7 +131,7 @@ export default function CancelProcessInstance({ processInstanceId }) {
     setStatus(STATUS.ACTION_PENDING);
 
     del(
-      `%ENGINE_API%/process-instance/${processInstanceId}` +
+      `%ENGINE_API%/process-instance/${id}` +
         `?skipCustomListeners=${checked.skipCustomListeners}` +
         `&skipIoMappings=${checked.skipIoMappings}`
     )
@@ -215,7 +201,9 @@ export default function CancelProcessInstance({ processInstanceId }) {
                         <tr key={subProcessInstance.id}>
                           <td className="instance-id uuid">
                             <a
-                              href={`#/process-instance/${subProcessInstance.id}`}
+                              href={`#/process-instance/${
+                                subProcessInstance.id
+                              }`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -328,3 +316,5 @@ export default function CancelProcessInstance({ processInstanceId }) {
     </>
   );
 }
+
+export default withProcessInstance(CancelProcessInstance);
