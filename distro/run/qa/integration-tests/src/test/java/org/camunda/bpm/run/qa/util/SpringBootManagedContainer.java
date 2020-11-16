@@ -180,21 +180,30 @@ public class SpringBootManagedContainer {
 
   protected boolean isRunning() {
     try {
-      URLConnection conn = new URL(this.baseUrl).openConnection();
-      HttpURLConnection hconn = (HttpURLConnection) conn;
-      hconn.setAllowUserInteraction(false);
-      hconn.setDoInput(true);
-      hconn.setUseCaches(false);
-      hconn.setDoOutput(false);
-      hconn.setRequestMethod("OPTIONS");
-      hconn.setRequestProperty("User-Agent", "Camunda-Managed-SpringBoot-Container/1.0");
-      hconn.setRequestProperty("Accept", "text/plain");
-      hconn.connect();
-      processResponse(hconn);
+      processOptionsRequests(this.baseUrl);
+      return true;
     } catch (Exception e) {
-      return false;
+      try {
+        processOptionsRequests(this.baseUrl + "/engine-rest/engine");
+      } catch (Exception ex) {
+        return false;
+      }
     }
     return true;
+  }
+
+  protected void processOptionsRequests(String urlToCall) throws IOException {
+    URLConnection conn = new URL(urlToCall).openConnection();
+    HttpURLConnection hconn = (HttpURLConnection) conn;
+    hconn.setAllowUserInteraction(false);
+    hconn.setDoInput(true);
+    hconn.setUseCaches(false);
+    hconn.setDoOutput(false);
+    hconn.setRequestMethod("OPTIONS");
+    hconn.setRequestProperty("User-Agent", "Camunda-Managed-SpringBoot-Container/1.0");
+    hconn.setRequestProperty("Accept", "text/plain");
+    hconn.connect();
+    processResponse(hconn);
   }
 
   protected void processResponse(HttpURLConnection hconn) throws IOException {
@@ -216,8 +225,8 @@ public class SpringBootManagedContainer {
     try {
       Process p = null;
       Integer pid = null;
-      
-      // must kill a hierachy of processes: the script process (which corresponds to the pid value) 
+
+      // must kill a hierachy of processes: the script process (which corresponds to the pid value)
       // and the Java process it has spawned
       if (isUnixLike()) {
         pid = unixLikeProcessId(process);
