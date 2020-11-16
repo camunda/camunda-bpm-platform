@@ -420,8 +420,8 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          currentBuild.result = 'ABORTED'
-          currentBuild.description = "Aborted due to connection error"
+          //currentBuild.result = 'ABORTED'
+          //currentBuild.description = "Aborted due to connection error"
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
