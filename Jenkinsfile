@@ -339,7 +339,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent(4) + getChromeAgent()
+              yaml getAgent(16) + getChromeAgent()
             }
           }
           steps{
