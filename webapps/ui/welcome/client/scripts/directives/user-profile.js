@@ -63,7 +63,7 @@ module.exports = [
 
         var groupResource = camAPI.resource('group');
 
-        groupResource.count().then(function(res) {
+        groupResource.count({member: $scope.user.id}).then(function(res) {
           groupPages.total = res.count;
         });
 
