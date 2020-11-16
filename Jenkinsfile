@@ -397,17 +397,17 @@ pipeline {
             }
           }
         }
-        stage('EE-platform-DISTRO-dummy') {
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
-            }
-          }
-        }
+//        stage('EE-platform-DISTRO-dummy') {
+//          agent {
+//            kubernetes {
+//              yaml getAgent()
+//            }
+//          }
+//          steps{
+//            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
+//            }
+//          }
+//        }
       }
     }
   }
