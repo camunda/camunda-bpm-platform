@@ -99,7 +99,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     when(historyServiceMock.createHistoricDecisionInstanceQuery()).thenReturn(historicQueryMock);
     when(historicQueryMock.decisionInstanceId(anyString())).thenReturn(historicQueryMock);
-    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+    when((Object) historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
   }
 
   @Test
