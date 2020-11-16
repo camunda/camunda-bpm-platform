@@ -47,7 +47,7 @@ pipeline {
     stage('ASSEMBLY') {
       agent {
         kubernetes {
-          yaml getAgent(16)
+          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
         }
       }
       steps {
@@ -89,7 +89,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent(16)
+              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
             }
           }
           steps{
@@ -112,7 +112,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent(16)
+              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
             }
           }
           steps{
