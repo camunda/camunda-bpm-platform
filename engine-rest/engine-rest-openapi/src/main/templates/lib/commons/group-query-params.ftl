@@ -1,8 +1,7 @@
-<!-- is this the right name? -->
 <#assign sortByValues = [
   '"id"',
   '"name"',
-  '"type"',
+  '"type"'
 ]>
 
 <#if requestMethod == "GET">
