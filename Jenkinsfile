@@ -42,6 +42,9 @@ spec:
 }
 
 pipeline {
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
+  }
   agent none
   stages {
     stage('ASSEMBLY') {
