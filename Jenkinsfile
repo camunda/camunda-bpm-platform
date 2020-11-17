@@ -131,7 +131,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('rest')
+                  withLabels('rest-api')
                 }
               }
             }
@@ -154,7 +154,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('rest')
+                  withLabels('rest-api')
                 }
               }
             }
