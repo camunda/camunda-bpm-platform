@@ -52,8 +52,6 @@ import org.camunda.commons.logging.MdcAccess;
  */
 public class ProcessDataContext {
 
-  public static final String PROPERTY_ACTIVITY_ID = "activityId";
-
   protected static final String NULL_VALUE = "~NULL_VALUE~";
 
   protected String mdcPropertyActivityId;
@@ -63,42 +61,61 @@ public class ProcessDataContext {
   protected String mdcPropertyInstanceId;
   protected String mdcPropertyTenantId;
 
-  protected List<String> mdcPropertyNames = new ArrayList<>();
-  protected Map<String, String> basicToMdcPropertyNames = new HashMap<>();
   protected boolean handleMdc = false;
 
-  protected Map<String, Deque<String>> propertyValues = new HashMap<>();
-
-  protected boolean startNewSection = false;
-  protected Deque<List<String>> sections = new ArrayDeque<>();
+  protected ProcessDataStack activityIdStack;
+  /**
+   * All data stacks we need to keep for MDC logging
+   */
+  protected Map<String, ProcessDataStack> mdcDataStacks = new HashMap<>();
+  protected ProcessDataSections sections = new ProcessDataSections();
 
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
+    this(configuration, false);
+  }
+
+  public ProcessDataContext(ProcessEngineConfigurationImpl configuration, boolean initFromCurrentMdc) {
     mdcPropertyActivityId = configuration.getLoggingContextActivityId();
+
+    // always keep track of activity ids, because those are used to
+    // populate the Job#getFailedActivityId field. This is independent
+    // of the logging configuration
+    activityIdStack = new ProcessDataStack(isNotBlank(mdcPropertyActivityId) ? mdcPropertyActivityId : null);
     if (isNotBlank(mdcPropertyActivityId)) {
-      mdcPropertyNames.add(mdcPropertyActivityId);
-      basicToMdcPropertyNames.put(PROPERTY_ACTIVITY_ID, mdcPropertyActivityId);
+      mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
     mdcPropertyApplicationName = configuration.getLoggingContextApplicationName();
     if (isNotBlank(mdcPropertyApplicationName)) {
-      mdcPropertyNames.add(mdcPropertyApplicationName);
+      mdcDataStacks.put(mdcPropertyApplicationName, new ProcessDataStack(mdcPropertyApplicationName));
     }
     mdcPropertyBusinessKey = configuration.getLoggingContextBusinessKey();
     if (isNotBlank(mdcPropertyBusinessKey)) {
-      mdcPropertyNames.add(mdcPropertyBusinessKey);
+      mdcDataStacks.put(mdcPropertyBusinessKey, new ProcessDataStack(mdcPropertyBusinessKey));
     }
     mdcPropertyDefinitionId = configuration.getLoggingContextProcessDefinitionId();
     if (isNotBlank(mdcPropertyDefinitionId)) {
-      mdcPropertyNames.add(mdcPropertyDefinitionId);
+      mdcDataStacks.put(mdcPropertyDefinitionId, new ProcessDataStack(mdcPropertyDefinitionId));
     }
     mdcPropertyInstanceId = configuration.getLoggingContextProcessInstanceId();
     if (isNotBlank(mdcPropertyInstanceId)) {
-      mdcPropertyNames.add(mdcPropertyInstanceId);
+      mdcDataStacks.put(mdcPropertyInstanceId, new ProcessDataStack(mdcPropertyInstanceId));
     }
     mdcPropertyTenantId = configuration.getLoggingContextTenantId();
     if (isNotBlank(mdcPropertyTenantId)) {
-      mdcPropertyNames.add(mdcPropertyTenantId);
+      mdcDataStacks.put(mdcPropertyTenantId, new ProcessDataStack(mdcPropertyTenantId));
     }
-    handleMdc = !mdcPropertyNames.isEmpty();
+    handleMdc = !mdcDataStacks.isEmpty();
+
+    if (initFromCurrentMdc) {
+      mdcDataStacks.values().forEach(stack -> {
+        boolean valuePushed = stack.pushCurrentValueFromMdc();
+        if (valuePushed) {
+          sections.addToCurrentSection(stack);
+        }
+      });
+
+      sections.sealCurrentSection();
+    }
   }
 
   /**
@@ -119,11 +136,13 @@ public class ProcessDataContext {
    *         should be popped later by {@link #popSection()}
    */
   public boolean pushSection(ExecutionEntity execution) {
-    if (handleMdc && propertyValues.isEmpty()) {
+    if (handleMdc && hasNoMdcValues()) {
       clearMdc();
     }
-    startNewSection = true;
-    addToStack(execution.getActivityId(), PROPERTY_ACTIVITY_ID, mdcPropertyActivityId != null);
+
+    int numSections = sections.size();
+
+    addToStack(activityIdStack, execution.getActivityId());
     addToStack(execution.getProcessDefinitionId(), mdcPropertyDefinitionId);
     addToStack(execution.getProcessInstanceId(), mdcPropertyInstanceId);
     addToStack(execution.getTenantId(), mdcPropertyTenantId);
@@ -139,139 +158,66 @@ public class ProcessDataContext {
       addToStack(execution.getBusinessKey(), mdcPropertyBusinessKey);
     }
 
-    return !startNewSection;
+    sections.sealCurrentSection();
+
+    boolean newSectionCreated = numSections != sections.size();
+
+    return newSectionCreated;
   }
+
+  protected boolean hasNoMdcValues() {
+    return mdcDataStacks.values().stream()
+        .allMatch(ProcessDataStack::isEmpty);
+  }
+
 
   /**
    * Pop the latest section, remove all pushed properties of that section and -
    * if logging context properties are defined - update the MDC accordingly.
    */
   public void popSection() {
-    List<String> section = sections.pollFirst();
-    if (section != null) {
-      for (String property : section) {
-        removeFromStack(property);
-      }
-    }
+    sections.popCurrentSection();
   }
 
   /** Remove all logging context properties from the MDC */
   public void clearMdc() {
     if (handleMdc) {
-      for (String property : mdcPropertyNames) {
-        MdcAccess.remove(getMdcProperty(property));
-      }
+      mdcDataStacks.values().forEach(ProcessDataStack::clearMdcProperty);
     }
   }
 
   /** Update the MDC with the current values of this logging context */
-  public void updateMdc() {
-    if (handleMdc && !propertyValues.isEmpty()) {
-      // only update MDC if this context has set anything as well
-      for (String property : mdcPropertyNames) {
-        updateMdc(getMdcProperty(property));
-      }
-    }
-  }
-
-  /** Preserve the current MDC values and store them in the context */
-  public void fetchCurrentContext() {
+  public void updateMdcFromCurrentValues() {
     if (handleMdc) {
-      startNewSection = true;
-      for (String property : mdcPropertyNames) {
-        String mdcProperty = getMdcProperty(property);
-        addToStack(MdcAccess.get(mdcProperty), mdcProperty, false);
-      }
-      startNewSection = false;
+      mdcDataStacks.values().forEach(ProcessDataStack::updateMdcWithCurrentValue);
     }
   }
 
   /**
-   * @param property
-   *          the property to retrieve the latest value for
-   * @return the latest value of the property if there is one, <code>null</code>
+   * @return the latest value of the activity id property if exists, <code>null</code>
    *         otherwise
    */
-  public String getLatestPropertyValue(String property) {
-    if (!propertyValues.isEmpty()) {
-      Deque<String> deque = propertyValues.get(property);
-      if (deque != null) {
-        return deque.peekFirst();
-      }
-    }
-    return null;
+  public String getLatestActivityId() {
+    return activityIdStack.getCurrentValue();
   }
 
   protected void addToStack(String value, String property) {
-    addToStack(value, property, true);
-  }
-
-  protected void addToStack(String value, String property, boolean updateMdc) {
     if (!isNotBlank(property)) {
       return;
     }
-    Deque<String> deque = getDeque(property);
-    String current = deque.peekFirst();
+
+    ProcessDataStack stack = mdcDataStacks.get(property);
+    addToStack(stack, value);
+  }
+
+  protected void addToStack(ProcessDataStack stack, String value) {
+    String current = stack.getCurrentValue();
     if (valuesEqual(current, value)) {
       return;
     }
-    addToCurrentSection(property);
-    if (value == null) {
-      deque.addFirst(NULL_VALUE);
-      if (handleMdc && updateMdc) {
-        MdcAccess.remove(getMdcProperty(property));
-      }
-    } else {
-      deque.addFirst(value);
-      if (handleMdc && updateMdc) {
-        MdcAccess.put(getMdcProperty(property), value);
-      }
-    }
-  }
 
-  protected void removeFromStack(String property) {
-    if (property == null) {
-      return;
-    }
-    getDeque(property).removeFirst();
-    if (handleMdc) {
-      updateMdc(getMdcProperty(property));
-    }
-  }
-
-  protected Deque<String> getDeque(String property) {
-    Deque<String> deque = propertyValues.get(property);
-    if (deque == null) {
-      deque = new ArrayDeque<>();
-      propertyValues.put(property, deque);
-    }
-    return deque;
-  }
-
-  protected void addToCurrentSection(String property) {
-    List<String> section = sections.peekFirst();
-    if (startNewSection) {
-      section = new ArrayList<>();
-      sections.addFirst(section);
-      startNewSection = false;
-    }
-    section.add(property);
-  }
-
-  protected void updateMdc(String property) {
-    if (handleMdc) {
-      String previousValue = propertyValues.containsKey(property) ? propertyValues.get(property).peekFirst() : null;
-      String mdcProperty = getMdcProperty(property);
-      if (isNull(previousValue)) {
-        MdcAccess.remove(mdcProperty);
-      } else {
-        MdcAccess.put(mdcProperty, previousValue);
-      }
-    }
-  }
-
-  protected String getMdcProperty(String property) {
-    return basicToMdcPropertyNames.containsKey(property) ? basicToMdcPropertyNames.get(property) : property;
+    stack.pushCurrentValue(value);
+    sections.addToCurrentSection(stack);
   }
 
   protected static boolean isNotBlank(String property) {
@@ -289,4 +235,125 @@ public class ProcessDataContext {
     return value == null || NULL_VALUE.equals(value);
   }
 
+  protected static class ProcessDataStack {
+
+    protected String mdcName;
+    protected Deque<String> deque = new ArrayDeque<>();
+
+    /**
+     * @param mdcName is optional. If present, any additions to a stack will also be reflected in the MDC context
+     */
+    public ProcessDataStack(String mdcName) {
+      this.mdcName = mdcName;
+    }
+
+    public boolean isEmpty() {
+      return deque.isEmpty();
+    }
+
+    public String getCurrentValue() {
+      return deque.peekFirst();
+    }
+
+    public void pushCurrentValue(String value) {
+      deque.addFirst(value != null ? value : NULL_VALUE);
+
+      updateMdcWithCurrentValue();
+    }
+
+    /**
+     * @return true if a value was obtained from the mdc
+     *   and added to the stack
+     */
+    public boolean pushCurrentValueFromMdc() {
+      if (isNotBlank(mdcName)) {
+        String mdcValue = MdcAccess.get(mdcName);
+
+        deque.addFirst(mdcValue != null ? mdcValue : NULL_VALUE);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    public void removeCurrentValue() {
+      deque.removeFirst();
+
+      updateMdcWithCurrentValue();
+    }
+
+    public void clearMdcProperty() {
+      if (isNotBlank(mdcName)) {
+        MdcAccess.remove(mdcName);
+      }
+    }
+
+    public void updateMdcWithCurrentValue() {
+      if (isNotBlank(mdcName)) {
+        String currentValue = getCurrentValue();
+
+        if (isNull(currentValue)) {
+          MdcAccess.remove(mdcName);
+        } else {
+          MdcAccess.put(mdcName, currentValue);
+        }
+      }
+    }
+  }
+
+  protected static class ProcessDataSections {
+
+    /**
+     * Keeps track of when we added values to which stack (as we do not add
+     * a new value to every stack with every update, but only changed values)
+     */
+    protected Deque<List<ProcessDataStack>> sections = new ArrayDeque<>();
+
+    protected boolean currentSectionSealed = true;
+
+    /**
+     * Adds a stack to the current section. If the current section is already sealed,
+     * a new section is created.
+     */
+    public void addToCurrentSection(ProcessDataStack stack) {
+      List<ProcessDataStack> currentSection;
+
+      if (currentSectionSealed) {
+        currentSection = new ArrayList<>();
+        sections.addFirst(currentSection);
+        currentSectionSealed = false;
+
+      } else {
+        currentSection = sections.peekFirst();
+      }
+
+      currentSection.add(stack);
+    }
+
+    /**
+     * Pops the current section and removes the
+     * current values from the referenced stacks (including updates
+     * to the MDC)
+     */
+    public void popCurrentSection() {
+      List<ProcessDataStack> section = sections.pollFirst();
+      if (section != null) {
+        section.forEach(ProcessDataStack::removeCurrentValue);
+      }
+
+      currentSectionSealed = true;
+    }
+
+    /**
+     * After a section is sealed, a new section will be created
+     * with the next call to {@link #addToCurrentSection(ProcessDataStack)}
+     */
+    public void sealCurrentSection() {
+      currentSectionSealed = true;
+    }
+
+    public int size() {
+      return sections.size();
+    }
+  }
 }
