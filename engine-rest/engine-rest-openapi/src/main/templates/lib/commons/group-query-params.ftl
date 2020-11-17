@@ -21,7 +21,7 @@
     "desc": "Filter by a list of group ids."
   },
   "name": {
-    "type": "TODO",
+    "type": "string",
     "desc": "Filter by the name of the group."
   },
   "nameLike": {
