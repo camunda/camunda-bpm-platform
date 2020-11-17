@@ -418,7 +418,7 @@ void runMaven(boolean runtimeStash, boolean distroStash, String directory, Strin
   if (runtimeStash) unstash "platform-stash-runtime"
   if (distroStash) unstash "platform-stash-distro"
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B")
+    sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B -Dmaven.repo.local=\$(pwd)/.m2")
   }
 }
 
