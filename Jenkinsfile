@@ -292,7 +292,7 @@ pipeline {
           }
           agent {
             kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
+              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
             }
           }
           steps{
