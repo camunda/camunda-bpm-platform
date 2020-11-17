@@ -64,11 +64,11 @@ pipeline {
               node -v
               npm version
             '''
-            configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+            //configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
               sh """
                 mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
               """
-            }
+            //}
           }
             stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
             stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
@@ -96,7 +96,7 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
               runMaven(true, false,'engine/', ' test -Pdatabase,h2')
             }
           }
@@ -241,7 +241,7 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 runMaven(true, true,'qa/', 'clean install -Ptomcat,h2,webapps-integration')
               }
@@ -418,7 +418,7 @@ void runMaven(boolean runtimeStash, boolean distroStash, String directory, Strin
   if (runtimeStash) unstash "platform-stash-runtime"
   if (distroStash) unstash "platform-stash-distro"
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B -Dmaven.repo.local=\$(pwd)/.m2")
+    sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B")
   }
 }
 
