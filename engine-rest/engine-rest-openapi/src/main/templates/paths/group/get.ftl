@@ -9,16 +9,19 @@
 
   "parameters" : [
 
-    <#assign last = false >
     <#assign requestMethod="GET"/>
     <#include "/lib/commons/group-query-params.ftl" >
-    <@lib.parameters
-        object = params/>
+
+    <#assign last = false >
 
     <#include "/lib/commons/sort-params.ftl" >
 
-    <#assign last = true >
     <#include "/lib/commons/pagination-params.ftl" >
+
+    <@lib.parameters
+        object = params
+        last = true
+    />
 
   ],
 

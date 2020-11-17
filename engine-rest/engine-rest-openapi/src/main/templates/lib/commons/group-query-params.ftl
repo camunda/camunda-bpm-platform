@@ -41,5 +41,3 @@
     "desc": "Only retrieve groups which are members of the given tenant."
   }
 }>
-
-}>
