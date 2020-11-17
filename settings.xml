@@ -31,7 +31,7 @@
             <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
 			<updatePolicy>never</updatePolicy>
           </snapshots>
           <url>https://app.camunda.com/nexus/content/groups/internal</url>
