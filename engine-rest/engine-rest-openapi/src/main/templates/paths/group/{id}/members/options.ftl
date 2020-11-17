@@ -23,7 +23,6 @@
   "responses" : {
 
     <@lib.response
-        mediaType = "application/json"
         code = "200"
         dto = "ResourceOptionsDto"
         last = true
