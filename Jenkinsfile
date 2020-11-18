@@ -94,7 +94,7 @@ pipeline {
           }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
-              //runMaven(true, false,'engine/', 'test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways')
+              runMaven(true, false,'engine/', 'test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways')
             }
           }
         }
@@ -312,7 +312,7 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
-  if (runtimeStash) unstash "platform-stash-runtime"
+  //if (runtimeStash) unstash "platform-stash-runtime"
   //if (distroStash) unstash "platform-stash-distro"
   sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -nsu -B -X")
 }
