@@ -78,7 +78,7 @@ pipeline {
           stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
          }
 
-        build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>')], quietPeriod: 10, wait: false
+        build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'), booleanParam(name: 'STANDALONE', value: false)], quietPeriod: 10, wait: false
 
       }
     }
