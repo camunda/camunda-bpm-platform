@@ -312,7 +312,7 @@ pipeline {
 
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
   if (runtimeStash) unstash "platform-stash-runtime"
-  sh("ls -al && mkdir .m2 && mv platform-stash-runtime/org .m2")
+  sh("ls .m2/-al && && mv platform-stash-runtime/org .m2")
   //if (distroStash) unstash "platform-stash-distro"
   sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -nsu -B")
 }
