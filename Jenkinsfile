@@ -59,14 +59,12 @@ pipeline {
             java -version
           '''
           nodejs('nodejs-14.6.0'){
-            sh '''
-              node -v
-              npm version
-              mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
-            '''
+ //           sh '''
+ //             node -v
+ //             npm version
+ //             mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
+ //           '''
           }
-          runMaven(false, false,'internal-dependencies/', 'clean verify -Pcheck-api-compatibility -X')
-          runMaven(false, false,'engine/', 'clean verify -Pcheck-api-compatibility -X')
           //stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
           //stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
           //stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
@@ -83,7 +81,8 @@ pipeline {
           }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
-              //runMaven(true, false,'engine/', ' test -Pdatabase,h2')
+              
+              runMaven(true, false,'engine/', ' test -Pdatabase,h2')
             }
           }
         }
@@ -314,9 +313,8 @@ pipeline {
 
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
   if (runtimeStash) unstash "platform-stash-runtime"
-  sh("ls .m2/org/camunda/bpm/camunda-core-internal-dependencies/7.15.0-SNAPSHOT/ -al")
   //if (distroStash) unstash "platform-stash-distro"
-  sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -nsu -B")
+  sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -nsu -B -X")
 }
 
 void withLabels(String... labels) {
