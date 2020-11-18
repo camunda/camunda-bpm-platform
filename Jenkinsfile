@@ -1,4 +1,3 @@
-#!/usr/bin/env groovy
 
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
