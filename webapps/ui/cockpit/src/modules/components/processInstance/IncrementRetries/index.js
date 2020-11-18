@@ -15,13 +15,4 @@
  * limitations under the License.
  */
 
-module.exports = `<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-action.html -->
-<a class="btn btn-default btn-toolbar"
-   href
-   ng-click="openDialog()"
-   uib-tooltip="{{ 'PLUGIN_JOB_RETRY_BULK_RETRIES_FAILED_JOB' | translate }}"
-   tooltip-placement="left">
-  <span class="glyphicon glyphicon-repeat"></span>
-</a>
-<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-action.html -->
-`;
+export { default as IncrementRetries } from "./IncrementRetries";

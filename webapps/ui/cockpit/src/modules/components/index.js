@@ -28,4 +28,6 @@ export { StateCircle } from "./StateCircle";
 export { Table } from "./Table";
 export { ActionButton } from "./ActionButton";
 export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
+export { IncrementRetries } from "./processInstance/IncrementRetries";
 export { ModalFormGroup } from "./ModalFormGroup";
+export { TablePaginated } from "./TablePaginated";

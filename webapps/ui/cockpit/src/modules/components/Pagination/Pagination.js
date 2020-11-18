@@ -27,14 +27,17 @@ function Pagination({
   current = 1,
   pages = 0,
   maxItems = 7,
-  onPageChange = () => {}
+  onPageChange = () => {},
+  enableSearch = true
 }) {
   pages = Math.ceil(pages);
 
   function handlePageChange(page) {
-    const searchPage = search.get("page");
-    if (searchPage !== page.toString()) {
-      search.set("page", page);
+    if (enableSearch) {
+      const searchPage = search.get("page");
+      if (searchPage !== page.toString()) {
+        search.set("page", page);
+      }
     }
 
     if (!page || page === current || page > pages) {

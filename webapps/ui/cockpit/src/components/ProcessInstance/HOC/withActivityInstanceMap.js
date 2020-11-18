@@ -22,6 +22,7 @@ function generateActivityMap(rootActivity) {
   if (!rootActivity) return [null, null];
   const activityIdToInstancesMap = {};
   const activityIdToIncidentsMap = {};
+  const instanceIdToInstancesMap = {};
 
   function addIncidents(incidents) {
     incidents.forEach(function(incident) {
@@ -42,6 +43,9 @@ function generateActivityMap(rootActivity) {
         child.name = activityId;
         child.isTransitionInstance = false;
         activityIdToInstancesMap[activityId] = instances;
+        if (!instanceIdToInstancesMap[child.id]) {
+          instanceIdToInstancesMap[child.id] = child;
+        }
 
         addIncidents(child.incidents);
 
@@ -62,6 +66,9 @@ function generateActivityMap(rootActivity) {
 
         transition.isTransitionInstance = true;
         activityIdToInstancesMap[targetActivityId] = transitionInstances;
+        if (!instanceIdToInstancesMap[transition.id]) {
+          instanceIdToInstancesMap[transition.id] = transition;
+        }
 
         addIncidents(transition.incidents);
 
@@ -71,7 +78,11 @@ function generateActivityMap(rootActivity) {
   }
   decorateActivityInstanceTree(rootActivity);
 
-  return [activityIdToInstancesMap, activityIdToIncidentsMap];
+  return [
+    activityIdToInstancesMap,
+    activityIdToIncidentsMap,
+    instanceIdToInstancesMap
+  ];
 }
 
 const ActivityContext = createContext();
@@ -81,23 +92,24 @@ export function ActivityProvider({ processInstanceId, children }) {
   const [activityInstances, setActivityInstances] = useState();
   const [activityIdToInstancesMap, setActivityIdToInstancesMap] = useState();
   const [activityIdToIncidentsMap, setActivityIdToIncidentsMap] = useState();
+  const [instanceIdToInstancesMap, setInstanceIdToInstancesMap] = useState();
 
   useEffect(() => {
     const fetchActivityInstances = async () => {
-      const activityInstances = await (
-        await get(
-          `%ENGINE_API%/process-instance/${processInstanceId}/activity-instances`
-        )
-      ).json();
+      const activityInstances = await (await get(
+        `%ENGINE_API%/process-instance/${processInstanceId}/activity-instances`
+      )).json();
 
       const [
         activityIdToInstancesMap,
-        activityIdToIncidentsMap
+        activityIdToIncidentsMap,
+        instanceIdToInstancesMap
       ] = generateActivityMap(activityInstances);
 
       setActivityInstances(activityInstances);
       setActivityIdToInstancesMap(activityIdToInstancesMap);
       setActivityIdToIncidentsMap(activityIdToIncidentsMap);
+      setInstanceIdToInstancesMap(instanceIdToInstancesMap);
     };
 
     fetchActivityInstances();
@@ -108,7 +120,8 @@ export function ActivityProvider({ processInstanceId, children }) {
       value={{
         activityInstances,
         activityIdToInstancesMap,
-        activityIdToIncidentsMap
+        activityIdToIncidentsMap,
+        instanceIdToInstancesMap
       }}
     >
       {children}

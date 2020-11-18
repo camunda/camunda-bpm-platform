@@ -15,5 +15,4 @@
  * limitations under the License.
  */
 
-export { default as CancelProcessInstance } from "./CancelProcessInstance";
-export { default as IncrementRetries } from "./IncrementRetries";
+export { default as TablePaginated } from "./TablePaginated";

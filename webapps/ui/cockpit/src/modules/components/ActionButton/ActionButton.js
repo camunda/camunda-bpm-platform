@@ -18,6 +18,7 @@
 import React from "react";
 import { Tooltip, OverlayTrigger, Button } from "react-bootstrap";
 import translate from "utils/translation";
+import GlyphIcon from "../Icons/GlyphIcon";
 
 export default function ActionButton({ icon, labels, disabled, onClick }) {
   return (
@@ -36,7 +37,7 @@ export default function ActionButton({ icon, labels, disabled, onClick }) {
           onClick={disabled ? () => {} : onClick}
           disabled={disabled}
         >
-          <span className={"glyphicon glyphicon-" + icon} />
+          <GlyphIcon type={icon} />
         </Button>
       </div>
     </OverlayTrigger>

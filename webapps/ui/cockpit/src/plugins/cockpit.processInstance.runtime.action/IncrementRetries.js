@@ -15,5 +15,23 @@
  * limitations under the License.
  */
 
-export { default as CancelProcessInstance } from "./CancelProcessInstance";
-export { default as IncrementRetries } from "./IncrementRetries";
+import React from "react";
+import { BpmnProvider } from "../../components/ProcessInstance/HOC/withBpmn";
+import { ActivityProvider } from "../../components/ProcessInstance/HOC/withActivityInstanceMap";
+import { IncrementRetries } from "components";
+
+export default {
+  id: "cockpit.processInstance.runtime.action.IncrementRetries",
+  pluginPoint: "cockpit.processInstance.runtime.action",
+  priority: 20,
+  render: (node, { processInstanceId }, { processInstance }) => {
+    return (
+      // To be refactored when we have a processInstance Provider
+      <BpmnProvider processDefinitionId={processInstance.definitionId}>
+        <ActivityProvider processInstanceId={processInstanceId}>
+          <IncrementRetries />
+        </ActivityProvider>
+      </BpmnProvider>
+    );
+  }
+};
