@@ -54,46 +54,32 @@ pipeline {
         }
       }
       steps {
+        withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
+          sh '''
+            mvn --version
+            java -version
+          '''
+          nodejs('nodejs-14.6.0'){
+            sh '''
+              node -v
+              npm version
+            '''
+             configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+               sh """
+                 mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
+               """
+             }
+          }
 
-        archiveArtifacts artifacts: 'database/**', followSymlinks: false
-        // withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-        //   sh '''
-        //     mvn --version
-        //     java -version
-        //   '''
-        //   nodejs('nodejs-14.6.0'){
-        //     sh '''
-        //       node -v
-        //       npm version
-        //     '''
-        //     // configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-        //     //   sh """
-        //     //     mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
-        //     //   """
-        //     // }
-        //   }
-        //     // archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**', excludes: '**/*.zip,**/*.tar.gz', followSymlinks: false
-            
+          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**', excludes: '**/*.zip,**/*.tar.gz', followSymlinks: false
 
-        //     // stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
-        //     // stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
-        //     // stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
-
-
-        // }
-        // build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', wait: false, propagate: false, quietPeriod: 1, parameters: [[$class: 'StringParameterValue', name: 'copyArtifactSelector', value: '<TriggeredBuildSelector />']]
-
-        // build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>')], propagate: false, quietPeriod: 1
+          stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
+          // stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+          stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
+         }
 
         build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>')], quietPeriod: 10, wait: false
 
-        // build
-        //   job: "cambpm-jenkins-pipelines-ee",
-        //   propagate: false,
-        //   wait: false,
-        //   parameters: [
-        //       [$class: 'StringParameterValue', name: 'copyArtifactSelector', value: "<TriggeredBuildSelector />"]
-        //   ]
       }
     }
     stage('h2 tests') {
@@ -400,17 +386,6 @@ pipeline {
             }
           }
         }
-//        stage('EE-platform-DISTRO-dummy') {
-//          agent {
-//            kubernetes {
-//              yaml getAgent()
-//            }
-//          }
-//          steps{
-//            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
-//            }
-//          }
-//        }
       }
     }
   }
@@ -437,9 +412,7 @@ pipeline {
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
   if (runtimeStash) unstash "platform-stash-runtime"
   if (distroStash) unstash "platform-stash-distro"
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B -Dmaven.repo.local=\$(pwd)/.m2")
-  }
+  sh("export MAVEN_OPTS='-Dmaven.repo.local=\$(pwd)/.m2' && cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -B -Dmaven.repo.local=\$(pwd)/.m2")
 }
 
 void withLabels(String... labels) {
