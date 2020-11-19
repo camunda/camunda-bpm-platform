@@ -59,7 +59,7 @@ pipeline {
              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                sh """
                  cd internal-dependencies
-                 mvn -s \$MAVEN_SETTINGS_XML clean install -Dmaven.repo.local=\$(pwd)/.m2 
+                 mvn -s \$MAVEN_SETTINGS_XML clean install -Dmaven.repo.local=\${WORKSPACE}/.m2 
                """
              }
           }
