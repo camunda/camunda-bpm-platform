@@ -274,8 +274,8 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
-  if (runtimeStash) unstash "platform-stash-runtime"
-  if (distroStash) unstash "platform-stash-distro"
+  //if (runtimeStash) unstash "platform-stash-runtime"
+  //if (distroStash) unstash "platform-stash-distro"
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh 'export MAVEN_OPTS="-Dmaven.repo.local=\${WORKSPACE}/.m2"'
     sh("cd ${directory} && mvn -s \${WORKSPACE}/settings.xml ${cmd} -nsu -B  -X")
