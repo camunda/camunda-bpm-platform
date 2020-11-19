@@ -43,9 +43,6 @@ spec:
 
 pipeline {
   agent none
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
-  }
   stages {
     stage('ASSEMBLY') {
       agent {
@@ -53,25 +50,24 @@ pipeline {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
         }
       }
-        options {
-    skipDefaultCheckout true
-  }
       steps {
         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
           sh '''
             mvn --version
             java -version
           '''
-          nodejs('nodejs-14.6.0'){
- //           sh '''
- //             node -v
- //             npm version
- //             mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
- //           '''
+          configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+            nodejs('nodejs-14.6.0'){
+              sh '''
+                node -v
+                npm version
+                mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests com.mycila:license-maven-plugin:check -B
+              '''
+            }
           }
-          //stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
+          stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
+          stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
           //stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
-          //stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
         }
       }
     }
@@ -97,7 +93,7 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
               runMaven(true, false,'engine/', 'test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways')
             }
           }
@@ -109,7 +105,7 @@ pipeline {
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
               runMaven(true, false,'engine-rest/engine-rest/', 'clean install -Pjersey2')
             }
           }
@@ -281,17 +277,6 @@ pipeline {
             }
           }
         }
-//        stage('EE-platform-DISTRO-dummy') {
-//          agent {
-//            kubernetes {
-//              yaml getAgent()
-//            }
-//          }
-//          steps{
-//            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
-//            }
-//          }
-//        }
       }
     }
   }
@@ -316,8 +301,8 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
-  //if (runtimeStash) unstash "platform-stash-runtime"
-  //if (distroStash) unstash "platform-stash-distro"
+  if (runtimeStash) unstash "platform-stash-runtime"
+  if (distroStash) unstash "platform-stash-distro"
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh 'export MAVEN_OPTS="-Dmaven.repo.local=\${WORKSPACE}/.m2"'
     sh("cd ${directory} && mvn -s \${WORKSPACE}/settings.xml ${cmd} -nsu -B  -X")
