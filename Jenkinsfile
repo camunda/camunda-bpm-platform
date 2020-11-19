@@ -70,7 +70,7 @@ pipeline {
           stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
          }
     
-        build job: 'cambpm-jenkins-pipelines-ee/pipeline-master', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'), booleanParam(name: 'STANDALONE', value: false)], quietPeriod: 10, wait: false
+        build job: 'cambpm-jenkins-pipelines-ee/pipeline-stash', parameters: [string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'), booleanParam(name: 'STANDALONE', value: false)], quietPeriod: 10, wait: false
     
       }
     }
@@ -123,17 +123,6 @@ pipeline {
           }
         }
         stage('engine-rest-UNIT-jersey-2') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('rest')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -146,17 +135,6 @@ pipeline {
           }
         }
         stage('engine-rest-UNIT-resteasy3') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('rest')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -192,17 +170,6 @@ pipeline {
           }
         }
         stage('engine-IT-tomcat-9-h2') {// TODO change it to `postgresql-96`
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -222,17 +189,6 @@ pipeline {
           }
         }
         stage('webapp-IT-tomcat-9-h2') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps', 'IT')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
@@ -252,17 +208,6 @@ pipeline {
           }
         }
         stage('webapp-IT-standalone-wildfly') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps', 'IT')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
@@ -277,17 +222,6 @@ pipeline {
           }
         }
         stage('camunda-run-IT') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT', 'run', 'spring-boot')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
@@ -307,17 +241,6 @@ pipeline {
           }
         }
         stage('spring-boot-starter-IT') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT', 'spring-boot')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
