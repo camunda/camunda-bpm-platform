@@ -24,7 +24,7 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful."
+        desc = "Request successful. This method returns no content."
     />
 
     <@lib.response
