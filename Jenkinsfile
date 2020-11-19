@@ -58,7 +58,8 @@ pipeline {
           nodejs('nodejs-14.6.0'){
              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                sh """
-                 mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\$(pwd)/.m2 com.mycila:license-maven-plugin:check -B
+                 cd internal-dependencies
+                 mvn -s \$MAVEN_SETTINGS_XML clean install -Dmaven.repo.local=\$(pwd)/.m2 
                """
              }
           }
