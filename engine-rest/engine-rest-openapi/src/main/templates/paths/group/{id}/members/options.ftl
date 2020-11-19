@@ -28,7 +28,8 @@
         last = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "OPTIONS /group/sales/members",
+                       "summary": "Status 200 response",
+                       "description": "OPTIONS /group/sales/members",
                        "value": {"links":[
                                     {"method":"GET","href":"http://localhost:8080/camunda/api/engine/engine/default/group/sales/members","rel":"self"},
                                     {"method":"DELETE","href":"http://localhost:8080/camunda/api/engine/engine/default/group/sales/members","rel":"delete"},

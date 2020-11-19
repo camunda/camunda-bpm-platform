@@ -21,7 +21,7 @@
 
      <@lib.response
         code = "200"
-        dto = "TODO"
+        dto = "GroupDto"
         desc = "Request successful."
         examples = ['"example-1": {
                           "summary": "Status 200.",

@@ -28,11 +28,8 @@
 
     <@lib.response
         code = "204"
-        desc = "Request successful."
-        examples = ['"example-1": {
-                        "summary": "Status 204. No content."
-                        }'
-        ]/>
+        desc = "Request successful. This method returns no content."
+    />
 
     <@lib.response
         code = "403"
