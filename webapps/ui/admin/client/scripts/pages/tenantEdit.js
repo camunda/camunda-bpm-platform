@@ -243,7 +243,7 @@ var Controller = [
             )
               .then(function(res) {
                 $scope.canSortUserEntries = false;
-                $scope.groupUserList = res;
+                $scope.tenantUserList = res;
                 $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
 
                 Notifications.addMessage({
