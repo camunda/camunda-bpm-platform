@@ -52,6 +52,9 @@ pipeline {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
         }
       }
+        options {
+    skipDefaultCheckout true
+  }
       steps {
         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
           sh '''
@@ -206,7 +209,7 @@ pipeline {
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings', mavenSettingsFilePath: './settings.xml') {
               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true,'distro/run/', 'clean install -Pintegration-test-camunda-run')
+                runMaven(true, true,"distro/run/", "clean install -Pintegration-test-camunda-run")
               }
             }
           }
