@@ -8,7 +8,7 @@
       <id>camunda-nexus</id>
       <mirrorOf>*</mirrorOf>
       <name>Camunda Nexus</name>
-      <url>http://repository-ci-camunda-cloud.nexus:8081/content/groups/internal/</url>
+      <url>https://app.camunda.com/nexus/content/groups/internal</url>
     </mirror>
   </mirrors>
 

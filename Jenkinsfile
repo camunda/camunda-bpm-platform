@@ -44,214 +44,18 @@ spec:
 pipeline {
   agent none
   stages {
-    stage('h2 tests') {
-      parallel {
-        stage('engine-UNIT-h2') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              
-              runMaven(true, false,'engine/', ' test -Pdatabase,h2')
-            }
-          }
-        }
-        stage('engine-UNIT-authorizations-h2') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              runMaven(true, false,'engine/', 'test -Pdatabase,h2,cfgAuthorizationCheckRevokesAlways')
-            }
-          }
-        }
-        stage('engine-rest-UNIT-jersey-2') {
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              runMaven(true, false,'engine-rest/engine-rest/', 'clean install -Pjersey2')
-            }
-          }
-        }
         stage('engine-rest-UNIT-resteasy3') {
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('rest')
-                }
-              }
-            }
-          }
           agent {
             kubernetes {
               yaml getAgent()
             }
           }
           steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest') {
               runMaven(true, false,'engine-rest/engine-rest/', 'clean install -Presteasy3')
             }
           }
         }
-        stage('webapp-UNIT-h2') {
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              runMaven(true, false,'webapps/', 'clean test -Pdatabase,h2 -Dskip.frontend.build=true')
-            }
-          }
-        }
-        stage('engine-IT-tomcat-9-h2') {// TODO change it to `postgresql-96`
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true, 'qa/', 'clean install -Ptomcat,h2,engine-integration')
-              }
-            }
-          }
-          post {
-            always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-            }
-          }
-        }
-        stage('webapp-IT-tomcat-9-h2') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true,'qa/', 'clean install -Ptomcat,h2,webapps-integration')
-              }
-            }
-          }
-          post {
-            always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-            }
-          }
-        }
-        stage('webapp-IT-standalone-wildfly') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true,'qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa')
-              }
-            }
-          }
-        }
-        stage('camunda-run-IT') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true,"distro/run/", "clean install -Pintegration-test-camunda-run")
-              }
-            }
-          }
-          post {
-            always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-            }
-          }
-        }
-        stage('spring-boot-starter-IT') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                runMaven(true, true,'spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter')
-              }
-            }
-          }
-          post {
-            always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-            }
-          }
-        }
-      }
-    }
-    stage('db tests + CE webapps IT + EE platform') {
-      parallel {
-        stage('engine-api-compatibility') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              runMaven(true, false,'engine/', 'clean verify -Pcheck-api-compatibility')
-            }
-          }
-        }
-        stage('engine-UNIT-plugins') {
-          agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              runMaven(true, false,'engine/', 'clean test -Pcheck-plugins')
-            }
-          }
-        }
-        stage('webapp-UNIT-database-table-prefix') {
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
-          steps{
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsFilePath: './settings.xml') {
-              nodejs('nodejs-14.6.0'){
-                runMaven(true, false,'webapps/', 'clean test -Pdb-table-prefix')
-              }
-            }
-          }
-        }
-      }
-    }
   }
   post {
     changed {
@@ -276,10 +80,10 @@ pipeline {
 void runMaven(boolean runtimeStash, boolean distroStash, String directory, String cmd) {
   //if (runtimeStash) unstash "platform-stash-runtime"
   //if (distroStash) unstash "platform-stash-distro"
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+  //configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh 'export MAVEN_OPTS="-Dmaven.repo.local=\${WORKSPACE}/.m2"'
     sh("cd ${directory} && mvn -s \${WORKSPACE}/settings.xml ${cmd} -nsu -B  -X")
-  }
+  //}
 }
 
 void withLabels(String... labels) {
