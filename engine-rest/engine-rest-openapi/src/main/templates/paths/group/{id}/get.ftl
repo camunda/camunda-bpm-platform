@@ -19,18 +19,20 @@
 
   "responses" : {
 
-    <@lib.response
+     <@lib.response
         code = "200"
-        dto = "GroupDto"
+        dto = "TODO"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/group/sales`",
-                       "value":
-                         {"id":"sales",
-                          "name":"Sales",
-                          "type":"Organizational Unit"}
-
-                     }'] />
+                          "summary": "Status 200.",
+                          "description": "GET `/group/sales`",
+                          "value": {
+                            "id": "sales",
+                            "name": "Sales",
+                            "type": "Organizational Unit"
+                          }
+                        }']
+    />
 
     <@lib.response
         code = "404"

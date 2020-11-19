@@ -33,7 +33,8 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/group?name=Sales`",
+                       "summary": "Status 200.",
+                       "description": "GET `/group?name=Sales`",
                        "value": [
                          {"id":"sales",
                           "name":"Sales",
