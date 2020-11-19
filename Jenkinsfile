@@ -319,8 +319,8 @@ void runMaven(boolean runtimeStash, boolean distroStash, String directory, Strin
   //if (distroStash) unstash "platform-stash-distro"
   sh """
     export MAVEN_OPTS="-Dmaven.repo.local=\${WORKSPACE}/.m2"
-    cd \${directory}
-    mvn \${cmd} -nsu -B -s \$MAVEN_SETTINGS_XML -X
+    cd ${directory}
+    mvn ${cmd} -nsu -B -s $MAVEN_SETTINGS_XML -X
   """
 }
 
