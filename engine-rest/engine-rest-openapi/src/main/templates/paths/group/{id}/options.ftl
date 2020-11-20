@@ -1,9 +1,9 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/group/options/index.html -->
 {
   <@lib.endpointInfo
-      id = "availableGroupOperations"
+      id = "availableGroupInstanceOperations"
       tag = "Group"
-      summary = "Group Resource Options"
+      summary = "Group Resource Instance Options"
       desc = "The `/group` resource supports two custom OPTIONS requests, one for the resource as such and this one for individual group instances.
               The OPTIONS request allows checking for the set of available operations that the currently authenticated user can perform on the
               `/group/{id}` resource instance. If the user can perform an operation or not may depend on various things, including the users authorizations
