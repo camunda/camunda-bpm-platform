@@ -15,14 +15,4 @@
  * limitations under the License.
  */
 
-import React from "react";
-import classNames from "classnames";
-import "./DropdownOption.scss";
-
-export default function DropdownOption({ children, className, onClick }) {
-  return (
-    <li className={classNames(className, "DropdownOption")}>
-      <button onMouseDown={onClick}>{children}</button>
-    </li>
-  );
-}
+export { default as Typeahead } from "./Typeahead";

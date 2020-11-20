@@ -16,3 +16,4 @@
  */
 
 export { default as userTasks } from "./userTasks";
+export { default as variables } from "./variables";

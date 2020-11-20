@@ -22,8 +22,14 @@ import translate from "utils/translation";
 
 import "./Clipboard.scss";
 
-export default function({ children, text }) {
-  const [icon, setIcon] = useState("copy");
+export default function({
+  children,
+  text,
+  initialIcon = "copy",
+  tooltip = null,
+  fade = true
+}) {
+  const [icon, setIcon] = useState(initialIcon);
   const [needsResize, setNeedsResize] = useState(false);
 
   const parentRef = useRef();
@@ -67,7 +73,7 @@ export default function({ children, text }) {
     }
 
     await new Promise(resolve => setTimeout(resolve, 1200));
-    setIcon("copy");
+    setIcon(initialIcon);
   }
 
   return (
@@ -78,12 +84,20 @@ export default function({ children, text }) {
       >
         {children}
       </span>
-      <Button className="copyButton" bsStyle="link" onClick={copyToClipboard}>
+      <Button
+        className={classNames("copyButton", fade ? "fade" : null)}
+        bsStyle="link"
+        onClick={copyToClipboard}
+      >
         <OverlayTrigger
           placement="top"
           overlay={
             <Tooltip id="tooltip">
-              {translate("CAM_WIDGET_COPY", { value: text })}
+              {tooltip
+                ? tooltip
+                : translate("CAM_WIDGET_COPY", {
+                    value: text
+                  })}
             </Tooltip>
           }
         >

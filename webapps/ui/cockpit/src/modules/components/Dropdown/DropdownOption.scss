@@ -13,7 +13,7 @@
     display: block;
   }
 
-  &:hover {
+  &:hover, &.active {
     cursor: pointer;
 
    > button {

@@ -1,0 +1,88 @@
+.SearchPills {
+  display: block;
+  height: auto;
+  overflow: visible;
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #aaaaaa;
+  border-radius: 2px;
+  margin-bottom: 15px;
+  min-height: 35px;
+  padding: 2px 12px 2px 12px;
+  box-shadow: none;
+
+  .pill {
+    display: inline-block;
+    border: 1px solid #e5e5e5;
+    background-color: #fafafa;
+    color: #555555;
+    border-radius: 3px;
+    margin-top: 4px;
+    margin-right: 12px;
+    height: 22px;
+    &.invalid {
+      background-color: #f2dede;
+      border-color: #ebccd1;
+    }
+
+    .LinkButton {
+      padding: 0 2px;
+    }
+
+    input[type="text"] {
+      width: auto;
+      min-width: 40px;
+      max-width: 100%;
+      margin-bottom: -1px;
+      height: 100%;
+      padding-left: 3px;
+      padding-right: 3px;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-radius: 2px 0 2px 2px;
+      border: 1px solid #0b2d5f;
+      color: #0b2d5f;
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  & > .Dropdown input[type="text"] {
+    &:focus {
+      outline: none;
+    }
+    &::placeholder {
+      font-style: italic;
+      color: #aaaaaa;
+    }
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    border-radius: 2px;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 0;
+    border: none;
+    margin: 5px 0 4px 0;
+  }
+
+  .controls {
+    padding-right: 12px;
+    position: absolute;
+    bottom: 6px;
+    right: 0;
+    &,
+    button {
+      color: #333;
+    }
+    & > span,
+    & > button {
+      margin-left: 12px;
+    }
+    .Clipboard {
+      display: inline;
+    }
+  }
+}

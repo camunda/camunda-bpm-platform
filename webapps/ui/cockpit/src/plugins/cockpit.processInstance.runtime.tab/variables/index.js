@@ -16,13 +16,16 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import "./DropdownOption.scss";
+import Variables from "./Variables";
 
-export default function DropdownOption({ children, className, onClick }) {
-  return (
-    <li className={classNames(className, "DropdownOption")}>
-      <button onMouseDown={onClick}>{children}</button>
-    </li>
-  );
-}
+export default {
+  id: "variables-tab",
+  pluginPoint: "cockpit.processInstance.runtime.tab",
+  priority: 100,
+  render: (node, { api }) => {
+    return <Variables engineApi={api.engineApi} />;
+  },
+  properties: {
+    label: "PLUGIN_VARIABLE_INSTANCES_LABEL"
+  }
+};

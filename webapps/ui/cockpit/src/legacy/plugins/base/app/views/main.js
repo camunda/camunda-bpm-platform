@@ -39,7 +39,6 @@ var angular = require("angular"),
   updateSuspensionStateDialog = require("./processDefinition/updateSuspensionStateDialog"),
   pdIncidentsTab = require("./processDefinition/pdIncidentsTab"),
   // process instance
-  variableInstancesTab = require("./processInstance/variableInstancesTab"),
   incidentsTab = require("./processInstance/incidentsTab"),
   calledProcessInstanceTable = require("./processInstance/calledProcessInstanceTable"),
   jobRetryBulkAction = require("./processInstance/jobRetryBulkAction"),
@@ -77,7 +76,6 @@ ngModule.controller(
 );
 ngModule.config(pdIncidentsTab);
 
-variableInstancesTab(ngModule);
 ngModule.config(incidentsTab);
 calledProcessInstanceTable(ngModule);
 jobRetryBulkAction(ngModule);

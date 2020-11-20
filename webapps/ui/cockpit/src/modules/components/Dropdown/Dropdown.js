@@ -21,45 +21,73 @@ import classNames from "classnames";
 import DropdownOption from "./DropdownOption";
 import "./Dropdown.scss";
 
-export default function Dropdown({ title, children, position }) {
+export default function Dropdown({
+  title,
+  children,
+  position,
+  blur = false,
+  onToggle = () => {},
+  show = false
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    const handleClick = ({ target }) => {
-      // Close if we click outside of the menu or on a Option
-      if (
-        isOpen &&
-        (!ref.current.contains(target) || target.closest(".DropdownOption"))
-      ) {
+    setIsOpen(show);
+  }, [show]);
+
+  useEffect(() => {
+    if (!blur) {
+      const handleClick = ({ target }) => {
+        // Close if we click outside of the menu or on a Option
+        if (
+          isOpen &&
+          (!ref.current.contains(target) || target.closest(".DropdownOption"))
+        ) {
+          setIsOpen(false);
+        }
+      };
+
+      document.body.addEventListener("click", handleClick, true);
+      return () => {
+        document.body.removeEventListener("click", handleClick, true);
+      };
+    }
+  }, [isOpen, blur]);
+
+  let props = null;
+  if (blur) {
+    props = {
+      onFocus: () => {
+        setIsOpen(true);
+        onToggle(true);
+      },
+      onBlur: () => {
         setIsOpen(false);
+        onToggle(false);
       }
     };
-
-    document.body.addEventListener("click", handleClick, true);
-    return () => {
-      document.body.removeEventListener("click", handleClick, true);
+  } else {
+    props = {
+      onClick: () => setIsOpen(!isOpen)
     };
-  }, [isOpen]);
+  }
 
   return (
     <div className="Dropdown" ref={ref}>
-      <div
-        className="title"
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
-      >
+      <div className="title" {...props}>
         {title}
       </div>
-      <ul className={classNames("menu", position, { open: isOpen })}>
-        {children}
-      </ul>
+      {children.length > 0 && (
+        <ul className={classNames("menu", position, { open: isOpen })}>
+          {children}
+        </ul>
+      )}
     </div>
   );
 }
 
 Dropdown.Option = DropdownOption;
 Dropdown.Divider = function Divider() {
-  return <li className="divider"></li>;
+  return <li className="divider" />;
 };

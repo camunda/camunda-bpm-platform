@@ -34,6 +34,7 @@ const NOOP = () => {};
  * @param fetchRowsCount is a function which returns the total amount of rows wrapped in a promise
  * @param noRows is {JSX.Element} which is rendered when the rows count is zero
  * @param onRowSelection is a function which is called when a row is selected and passes the selected rows
+ * @param onRowsCount is a function which is called when the rows count is set and passes the rows count
  * @returns the TablePaginated component as {JSX.Element}
  */
 function TablePaginated({
@@ -43,12 +44,13 @@ function TablePaginated({
   fetchPage,
   fetchRowsCount = ZERO_NOOP,
   noRows = null,
-  onRowSelection = NOOP
+  onRowSelection = NOOP,
+  onRowsCount = () => {}
 }) {
   const [allSelected, setAllSelected] = useState(false);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState([]);
-  const [rowsCount, setRowsCount] = useState(0);
+  const [rowsCount, setRowsCount] = useState();
   const [rowSelection, setRowSelection] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -59,6 +61,10 @@ function TablePaginated({
       setRowsCount(1);
     }
   }, [fetchRowsCount]);
+
+  useEffect(() => {
+    onRowsCount(rowsCount);
+  }, [rowsCount, onRowsCount]);
 
   useEffect(() => {
     setAllSelected(false);

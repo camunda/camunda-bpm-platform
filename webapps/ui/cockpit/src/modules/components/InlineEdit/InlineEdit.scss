@@ -1,0 +1,12 @@
+.InlineEdit {
+  position: relative;
+  & > .input-controls {
+    position: absolute;
+    margin-top: -22px;
+    top: 0;
+    right: 0;
+    & > button {
+      margin-left: 0;
+    }
+  }
+}
