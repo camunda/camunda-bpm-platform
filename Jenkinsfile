@@ -85,6 +85,11 @@ pipeline {
             booleanParam(name: 'STANDALONE', value: false),
             string(name: 'UPS_BRANCH_NAME', value: "${BRANCH_NAME}")
         ], quietPeriod: 10, wait: false
+        build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
+            string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+            booleanParam(name: 'STANDALONE', value: false),
+            string(name: 'UPS_BRANCH_NAME', value: "${BRANCH_NAME}")
+        ], quietPeriod: 10, wait: false
       }
     }
     stage('h2 tests') {
@@ -414,12 +419,13 @@ pipeline {
   }
 }
 
-void runMaven(boolean runtimeStash, boolean distroStash, boolean qaStash, String directory, String cmd) {
+void runMaven(boolean runtimeStash, boolean distroStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
   if (runtimeStash) unstash "platform-stash-runtime"
   if (distroStash) unstash "platform-stash-distro"
   if (qaStash) unstash "platform-stash-qa"
+  String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B")
+    sh("cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B")
   }
 }
 
