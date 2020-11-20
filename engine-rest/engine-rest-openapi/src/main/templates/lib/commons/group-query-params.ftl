@@ -5,9 +5,9 @@
 ]>
 
 <#if requestMethod == "GET">
-  <#assign listTypeDescription = "TODO">
+  <#assign listTypeDescription = "comma seperated list of">
 <#elseif requestMethod == "POST">
-  <#assign listTypeDescription = "TODO">
+  <#assign listTypeDescription = "JSON string array of">
 </#if>
 
 <#assign params = {
@@ -18,7 +18,7 @@
   "idIn": {
     "type": "array",
     "itemType": "string",
-    "desc": "Filter by a list of group ids."
+    "desc": "Filter by a ${listTypeDescription} group ids."
   },
   "name": {
     "type": "string",
