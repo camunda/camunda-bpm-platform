@@ -99,7 +99,11 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
     } else {
 
-      if (isFirstJobExecution(job)) {
+      boolean isFirstExecution = isFirstJobExecution(job);
+
+      logException(job);
+
+      if (isFirstExecution) {
         // then change default retries to the ones configured
         initializeRetries(job, retryConfiguration.getRetries());
 
@@ -115,7 +119,6 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
       job.setDuedate(durationHelper.getDateAfter());
       job.unlock();
 
-      logException(job);
       decrementRetries(job);
       notifyAcquisition(commandContext);
     }
