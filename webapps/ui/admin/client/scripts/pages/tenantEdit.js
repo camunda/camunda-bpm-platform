@@ -224,6 +224,7 @@ var Controller = [
       });
     }
 
+    $scope.canSortUserEntries = true;
     function updateTenantUserView() {
       var prep = prepareTenantMemberView(tenantUserPages);
 
@@ -235,7 +236,25 @@ var Controller = [
             $scope.tenantUserList = res;
             $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
           } else {
-            $scope.userLoadingState = 'ERROR';
+            // When using LDAP, sorting parameters might not work and throw errors
+            // Try again with default sorting
+            UserResource.list(
+              angular.extend({}, prep.searchParams, prep.pagingParams)
+            )
+              .then(function(res) {
+                $scope.canSortUserEntries = false;
+                $scope.tenantUserList = res;
+                $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
+
+                Notifications.addMessage({
+                  status: $translate.instant('USERS_NO_SORTING_HEADER'),
+                  message: $translate.instant('USERS_NO_SORTING_BODY'),
+                  exclusive: true
+                });
+              })
+              .catch(function() {
+                $scope.userLoadingState = 'ERROR';
+              });
           }
         }
       );

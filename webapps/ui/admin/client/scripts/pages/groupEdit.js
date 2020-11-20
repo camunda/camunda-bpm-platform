@@ -198,6 +198,7 @@ var Controller = [
       };
     };
 
+    $scope.canSortUserEntries = true;
     var updateGroupUserView = function() {
       var pagingParams = preparePaging(groupUserPages);
       var searchParams = {memberOfGroup: $scope.decodedGroupId};
@@ -210,7 +211,23 @@ var Controller = [
             $scope.groupUserList = res;
             $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
           } else {
-            $scope.userLoadingState = 'ERROR';
+            // When using LDAP, sorting parameters might not work and throw errors
+            // Try again with default sorting
+            UserResource.list(angular.extend({}, searchParams, pagingParams))
+              .then(function(res) {
+                $scope.canSortUserEntries = false;
+                $scope.groupUserList = res;
+                $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
+
+                Notifications.addMessage({
+                  status: $translate.instant('USERS_NO_SORTING_HEADER'),
+                  message: $translate.instant('USERS_NO_SORTING_BODY'),
+                  exclusive: true
+                });
+              })
+              .catch(function() {
+                $scope.userLoadingState = 'ERROR';
+              });
           }
         }
       );

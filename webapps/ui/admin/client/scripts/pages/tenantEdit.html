@@ -84,13 +84,18 @@
                  sorting-id="admin-sorting-tenants-users"
                  on-sort-change="onUsersSortingChanged(sorting)"
                  on-sort-initialized="onUsersSortingInitialized(sorting)">
-            <tr>
+            <tr ng-if="canSortUserEntries">
               <th cam-sortable-table-column
                   sort-by-property="userId">{{ 'USERS_ID' | translate }}</th>
               <th cam-sortable-table-column
                   sort-by-property="firstName">{{ 'USERS_FIRSTNAME' | translate }}</th>
               <th cam-sortable-table-column
                   sort-by-property="lastName">{{ 'USERS_LASTNAME' | translate }}</th>
+            </tr>
+            <tr ng-if="!canSortUserEntries">
+              <th>{{ 'USERS_ID' | translate }}</th>
+              <th>{{ 'USERS_FIRSTNAME' | translate }}</th>
+              <th>{{ 'USERS_LASTNAME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
