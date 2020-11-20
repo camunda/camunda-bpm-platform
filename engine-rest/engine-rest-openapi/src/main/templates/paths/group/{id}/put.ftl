@@ -3,7 +3,7 @@
   <@lib.endpointInfo
       id = "updateGroup"
       tag = "Group"
-      summary = "Update group"
+      summary = "Update Group"
       desc = "Updates a given group by id."
   />
 

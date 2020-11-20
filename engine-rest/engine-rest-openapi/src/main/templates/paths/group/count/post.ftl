@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/group/post-query-count/index.html -->
 {
   <@lib.endpointInfo
-      id = "TODO"
+      id = "queryGroupCount"
       tag = "Group"
       summary = "Get List Count (POST)"
       desc = "Queries for groups using a list of parameters and retrieves the count."

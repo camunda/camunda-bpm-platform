@@ -1,5 +1,4 @@
 {
-
   <@lib.endpointInfo
       id = "getGroup"
       tag = "Group"

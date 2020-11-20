@@ -3,7 +3,7 @@
   <@lib.endpointInfo
       id = "createGroup"
       tag = "Group"
-      summary = "Create group"
+      summary = "Create Group"
       desc = "Creates a new group."
   />
 
