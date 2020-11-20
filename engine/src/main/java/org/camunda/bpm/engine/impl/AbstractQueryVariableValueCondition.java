@@ -33,7 +33,7 @@ public abstract class AbstractQueryVariableValueCondition {
     this.wrappedQueryValue = variableValue;
   }
 
-  public abstract void initializeValue(VariableSerializers serializers);
+  public abstract void initializeValue(VariableSerializers serializers, String dbType);
 
   public abstract List<SingleQueryVariableValueCondition> getDisjunctiveConditions();
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -351,12 +352,13 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     super.ensureVariablesInitialized();
 
     if (!queries.isEmpty()) {
-      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
-          .getVariableSerializers();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+      String dbType = processEngineConfiguration.getDatabaseType();
 
       for (ProcessInstanceQueryImpl orQuery: queries) {
         for (QueryVariableValue var : orQuery.queryVariableValues) {
-          var.initialize(variableSerializers);
+          var.initialize(variableSerializers, dbType);
         }
       }
     }

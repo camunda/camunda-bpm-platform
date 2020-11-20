@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -193,8 +194,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected void ensureVariablesInitialized() {
     if (this.queryVariableValue != null) {
-      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
-      queryVariableValue.initialize(variableSerializers);
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+      String dbType = processEngineConfiguration.getDatabaseType();
+      queryVariableValue.initialize(variableSerializers, dbType);
     }
   }
 

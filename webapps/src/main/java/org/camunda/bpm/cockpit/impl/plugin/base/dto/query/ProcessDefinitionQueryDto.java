@@ -98,8 +98,8 @@ public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<Pr
     return queryVariableValues;
   }
 
-  public void initQueryVariableValues(VariableSerializers variableTypes) {
-    queryVariableValues = createQueryVariableValues(variableTypes, variables);
+  public void initQueryVariableValues(VariableSerializers variableTypes, String dbType) {
+    queryVariableValues = createQueryVariableValues(variableTypes, variables, dbType);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<Pr
     return false;
   }
 
-  private List<QueryVariableValue> createQueryVariableValues(VariableSerializers variableTypes, List<VariableQueryParameterDto> variables) {
+  private List<QueryVariableValue> createQueryVariableValues(VariableSerializers variableTypes, List<VariableQueryParameterDto> variables, String dbType) {
 
     List<QueryVariableValue> values = new ArrayList<QueryVariableValue>();
 
@@ -127,7 +127,7 @@ public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<Pr
           ConditionQueryParameterDto.getQueryOperator(variable.getOperator()),
           false);
 
-      value.initialize(variableTypes);
+      value.initialize(variableTypes, dbType);
       values.add(value);
     }
 

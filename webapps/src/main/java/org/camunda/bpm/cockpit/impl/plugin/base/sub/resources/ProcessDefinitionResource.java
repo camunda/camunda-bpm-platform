@@ -81,7 +81,7 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
       parameter.setHistoryEnabled(false);
     }
 
-    parameter.initQueryVariableValues(processEngineConfiguration.getVariableSerializers());
+    parameter.initQueryVariableValues(processEngineConfiguration.getVariableSerializers(), processEngineConfiguration.getDatabaseType());
   }
 
   protected void configureExecutionQuery(ProcessDefinitionQueryDto query) {

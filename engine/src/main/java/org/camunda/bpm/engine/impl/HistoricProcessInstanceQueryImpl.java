@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -399,12 +400,13 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     super.ensureVariablesInitialized();
 
     if (!queries.isEmpty()) {
-      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
-          .getVariableSerializers();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+      String dbType = processEngineConfiguration.getDatabaseType();
 
       for (HistoricProcessInstanceQueryImpl orQuery: queries) {
         for (QueryVariableValue var : orQuery.queryVariableValues) {
-          var.initialize(variableSerializers);
+          var.initialize(variableSerializers, dbType);
         }
       }
     }

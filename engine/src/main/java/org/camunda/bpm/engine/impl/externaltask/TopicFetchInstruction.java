@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.externaltask;
 
 import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.QueryVariableValue;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 
@@ -165,11 +166,11 @@ public class TopicFetchInstruction implements Serializable {
 
   public void ensureVariablesInitialized() {
     if (!filterVariables.isEmpty()) {
-      VariableSerializers variableSerializers = Context
-          .getProcessEngineConfiguration()
-          .getVariableSerializers();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+      String dbType = processEngineConfiguration.getDatabaseType();
       for(QueryVariableValue queryVariableValue : filterVariables) {
-        queryVariableValue.initialize(variableSerializers);
+        queryVariableValue.initialize(variableSerializers, dbType);
       }
     }
   }

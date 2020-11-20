@@ -19,6 +19,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.variable.EmptyStringVariableScenario;
 
 public class TestFixture {
 
@@ -36,7 +37,7 @@ public class TestFixture {
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
     // example scenario setup
-    // runner.setupScenarios(ExampleScenario.class);
+   runner.setupScenarios(EmptyStringVariableScenario.class);
 
     processEngine.close();
   }
