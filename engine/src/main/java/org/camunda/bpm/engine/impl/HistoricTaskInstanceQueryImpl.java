@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -281,7 +282,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     this.unfinished = true;
     return this;
   }
-  
+
   @Override
   public HistoricTaskInstanceQuery matchVariableNamesIgnoreCase() {
     this.variableNamesIgnoreCase = true;
@@ -409,15 +410,17 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   protected void ensureVariablesInitialized() {
-    VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+    String dbType = processEngineConfiguration.getDatabaseType();
     for(QueryVariableValue var : variables) {
-      var.initialize(types);
+      var.initialize(variableSerializers, dbType);
     }
 
     if (!queries.isEmpty()) {
       for (HistoricTaskInstanceQueryImpl orQuery: queries) {
         for (QueryVariableValue var : orQuery.variables) {
-          var.initialize(types);
+          var.initialize(variableSerializers, dbType);
         }
       }
     }

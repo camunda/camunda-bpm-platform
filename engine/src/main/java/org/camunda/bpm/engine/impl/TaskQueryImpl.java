@@ -1135,15 +1135,17 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   protected void ensureVariablesInitialized() {
-    VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+    String dbType = processEngineConfiguration.getDatabaseType();
     for(QueryVariableValue var : variables) {
-      var.initialize(types);
+      var.initialize(variableSerializers, dbType);
     }
 
     if (!queries.isEmpty()) {
       for (TaskQueryImpl orQuery: queries) {
         for (QueryVariableValue var : orQuery.variables) {
-          var.initialize(types);
+          var.initialize(variableSerializers, dbType);
         }
       }
     }

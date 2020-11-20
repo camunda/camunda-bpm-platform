@@ -37,7 +37,7 @@ public class QueryVariableValue implements Serializable {
   protected boolean local;
 
   protected AbstractQueryVariableValueCondition valueCondition;
-  
+
   protected boolean variableNameIgnoreCase;
   protected boolean variableValueIgnoreCase;
 
@@ -54,14 +54,14 @@ public class QueryVariableValue implements Serializable {
     this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
 
-  public void initialize(VariableSerializers serializers) {
+  public void initialize(VariableSerializers serializers, String dbType) {
     if (value.getType() != null && value.getType().isAbstract()) {
       valueCondition = new CompositeQueryVariableValueCondition(this);
     } else {
       valueCondition = new SingleQueryVariableValueCondition(this);
     }
 
-    valueCondition.initializeValue(serializers);
+    valueCondition.initializeValue(serializers, dbType);
   }
 
   public List<SingleQueryVariableValueCondition> getValueConditions() {
@@ -94,7 +94,7 @@ public class QueryVariableValue implements Serializable {
   public boolean isLocal() {
     return local;
   }
-  
+
 
   public boolean isVariableNameIgnoreCase() {
     return variableNameIgnoreCase;
