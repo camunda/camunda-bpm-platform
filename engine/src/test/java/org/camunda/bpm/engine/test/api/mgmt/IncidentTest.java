@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -45,6 +48,7 @@ import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
 public class IncidentTest extends PluggableProcessEngineTest {
@@ -169,6 +173,47 @@ public class IncidentTest extends PluggableProcessEngineTest {
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
     assertEquals(job.getId(), incident.getConfiguration());
     assertEquals(job.getJobDefinitionId(), incident.getJobDefinitionId());
+  }
+
+  @Test
+  public void shouldCreateIncidentWithCorrectMessageWhenZeroRetriesAreDefined() {
+    // given
+    String key = "process";
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key)
+      .startEvent()
+      .serviceTask("theServiceTask")
+      .camundaClass(AlwaysFailingDelegate.class)
+      .camundaAsyncBefore()
+      .camundaFailedJobRetryTimeCycle("R0/PT30S")
+      .endEvent()
+      .done();
+    testRule.deploy(model);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key);
+
+    // when
+    testRule.executeAvailableJobs();
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    assertThat(incident.getId()).isNotNull();
+    assertThat(incident.getIncidentTimestamp()).isNotNull();
+    assertThat(incident.getIncidentType()).isEqualTo(Incident.FAILED_JOB_HANDLER_TYPE);
+    assertThat(incident.getIncidentMessage()).isEqualTo(AlwaysFailingDelegate.MESSAGE);
+    assertThat(incident.getExecutionId()).isEqualTo(processInstance.getId());
+    assertThat(incident.getActivityId()).isEqualTo("theServiceTask");
+    assertThat(incident.getFailedActivityId()).isEqualTo("theServiceTask");
+    assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
+    assertThat(incident.getCauseIncidentId()).isEqualTo(incident.getId());
+    assertThat(incident.getRootCauseIncidentId()).isEqualTo(incident.getId());
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertThat(job.getExceptionMessage()).isEqualTo(AlwaysFailingDelegate.MESSAGE);
+
+    String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
+    assertThat(stacktrace).isNotNull();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidents.bpmn",
