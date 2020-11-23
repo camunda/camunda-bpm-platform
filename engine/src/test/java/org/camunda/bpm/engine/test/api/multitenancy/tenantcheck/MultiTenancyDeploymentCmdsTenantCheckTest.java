@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -39,7 +40,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -59,9 +59,6 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -122,11 +119,11 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the deployment");
+    // when/then
+    assertThatThrownBy(() -> repositoryService.deleteDeployment(deployment.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the deployment");
 
-    repositoryService.deleteDeployment(deployment.getId());
   }
 
   @Test
@@ -167,11 +164,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getDeploymentResourceNames(deployment.getId());
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDeploymentResourceNames(deployment.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the deployment");
   }
 
   @Test
@@ -205,11 +201,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getDeploymentResources(deployment.getId());
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDeploymentResources(deployment.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the deployment");
   }
 
   @Test
@@ -245,11 +240,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getResourceAsStream(deployment.getId(), resource.getName());
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getResourceAsStream(deployment.getId(), resource.getName()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the deployment");
   }
 
   @Test
@@ -290,11 +284,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId());
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the deployment");
   }
 
   @Test
@@ -337,13 +330,13 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.createDeployment()
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDeployment()
         .addDeploymentResources(deploymentOne.getId())
         .tenantId(TENANT_TWO)
-        .deploy();
+        .deploy())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the deployment");
   }
 
   @Test

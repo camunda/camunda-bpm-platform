@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -61,8 +61,9 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Frederik Heremans
@@ -73,9 +74,6 @@ public class ExecutionListenerTest {
   protected static final String PROCESS_KEY = "Process";
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(processEngineRule).around(testRule);
@@ -1112,10 +1110,6 @@ public class ExecutionListenerTest {
 
   @Test
   public void testThrowBpmnErrorInStartListenerOnModificationShouldNotTriggerPropagation() {
-    // expect
-    thrown.expect(BpmnError.class);
-    thrown.expectMessage("business error");
-
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
         .startEvent()
@@ -1142,8 +1136,10 @@ public class ExecutionListenerTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    // when the listeners are invoked
-    runtimeService.createModification(definition.getId()).startBeforeActivity("throw").processInstanceIds(processInstance.getId()).execute();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createModification(definition.getId()).startBeforeActivity("throw").processInstanceIds(processInstance.getId()).execute())
+      .isInstanceOf(BpmnError.class)
+      .hasMessageContaining("business error");
   }
 
   @Test

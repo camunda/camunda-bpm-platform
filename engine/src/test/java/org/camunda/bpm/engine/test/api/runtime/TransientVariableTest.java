@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITIONAL_PROCESS_KEY;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.USER_TASK_ID;
@@ -63,7 +64,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
@@ -72,9 +72,6 @@ public class TransientVariableTest {
   private static final int OUTPUT_VALUE = 2;
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -560,12 +557,11 @@ public class TransientVariableTest {
     variables.put("transient1", true);
     variables.put("transient2", false);
 
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot set transient variable with name variable to non-transient variable and vice versa.");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("Process", variables))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set transient variable with name variable to non-transient variable and vice versa.");
 
-    // when
-    runtimeService.startProcessInstanceByKey("Process", variables);
   }
 
   @Test
@@ -585,14 +581,12 @@ public class TransientVariableTest {
     variables.put("transient1", false);
     variables.put("transient2", true);
 
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot set transient variable with name variable to non-transient variable and vice versa.");
-
-    // when
-    runtimeService.startProcessInstanceByKey("Process", variables);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("Process", variables))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set transient variable with name variable to non-transient variable and vice versa.");
   }
-  
+
 
 
   @Test
@@ -610,12 +604,10 @@ public class TransientVariableTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("var", false);
 
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot set transient variable with name var to non-transient variable and vice versa.");
-
-    // when
-    runtimeService.startProcessInstanceByKey("Process", variables);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("Process", variables))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set transient variable with name var to non-transient variable and vice versa.");
   }
 
   /**
@@ -640,9 +632,9 @@ public class TransientVariableTest {
     Object value = runtimeService.getVariable(processInstanceId, "var");
     assertThat(value).isNull();
   }
-  
 
-  
+
+
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testTransientLocalVariable() {
@@ -654,16 +646,16 @@ public class TransientVariableTest {
         .done();
 
     testRule.deploy(model);
-    
+
     // when
     runtimeService.startProcessInstanceByKey("process");
-    
+
     // then
-    long numHistoricVariables = 
+    long numHistoricVariables =
         engineRule.getHistoryService()
           .createHistoricVariableInstanceQuery()
           .count();
-    
+
     assertThat(numHistoricVariables).isEqualTo(0);
   }
 
@@ -687,7 +679,7 @@ public class TransientVariableTest {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
     }
   }
-  
+
   public static class SetTransientLocalVariableDelegate implements JavaDelegate {
 
     @Override
@@ -738,7 +730,7 @@ public class TransientVariableTest {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, transient2));
     }
   }
-  
+
 
 
 }

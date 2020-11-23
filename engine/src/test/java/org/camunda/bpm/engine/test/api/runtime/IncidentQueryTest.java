@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator.MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +37,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
@@ -47,7 +51,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -69,9 +72,6 @@ public class IncidentQueryTest {
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private List<String> processInstanceIds;
 
@@ -242,11 +242,9 @@ public class IncidentQueryTest {
     // given
     IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
 
-    // then
-    exception.expect(ProcessEngineException.class);
-
-    // when
-    incidentQuery.processDefinitionKeyIn((String[]) null);
+    // when/then
+    assertThatThrownBy(() -> incidentQuery.processDefinitionKeyIn((String[]) null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -254,11 +252,9 @@ public class IncidentQueryTest {
     // given
     IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
 
-    // then
-    exception.expect(ProcessEngineException.class);
-
-    // when
-    incidentQuery.processDefinitionKeyIn((String) null);
+    // when/then
+    assertThatThrownBy(() -> incidentQuery.processDefinitionKeyIn((String) null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test

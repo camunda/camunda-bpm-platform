@@ -17,8 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,7 +46,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyProcessDefinitionSuspensionStateTest {
@@ -70,9 +68,6 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
@@ -635,17 +630,16 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery()
         .processDefinitionKey(PROCESS_DEFINITION_KEY).tenantIdIn(TENANT_ONE).singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition '"+ processDefinition.getId()
-      + "' because it belongs to no authenticated tenant");
-
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    engineRule.getRepositoryService()
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRepositoryService()
         .updateProcessDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinition.getId())
-        .suspend();
+        .suspend())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process definition '"+ processDefinition.getId()
+      + "' because it belongs to no authenticated tenant");
   }
 
   @Test

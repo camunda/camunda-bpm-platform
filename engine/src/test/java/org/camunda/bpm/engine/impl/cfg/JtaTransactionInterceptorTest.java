@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-import java.sql.SQLException;
-
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import java.sql.SQLException;
 
 import javax.transaction.RollbackException;
 import javax.transaction.TransactionManager;
@@ -30,9 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor.TransactionException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -55,9 +54,6 @@ public class JtaTransactionInterceptorTest {
   @Mock
   public CommandInterceptor nextInterceptor;
 
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
   @Before
   public void mockEngineConfiguration() {
     when(engineConfiguration.getDatabaseType()).thenReturn(DbSqlSessionFactory.CRDB);
@@ -76,11 +72,9 @@ public class JtaTransactionInterceptorTest {
 
     doThrow(exception).when(txManager).commit();
 
-    // then the exception is converted to a CRDB exception that can be retried
-    exceptionRule.expect(CrdbTransactionRetryException.class);
-
-    // when
-    interceptor.execute(c -> null);
+    // when/then
+    assertThatThrownBy(() -> interceptor.execute(c -> null))
+      .isInstanceOf(CrdbTransactionRetryException.class);
   }
 
   @Test
@@ -96,12 +90,10 @@ public class JtaTransactionInterceptorTest {
 
     doThrow(exception).when(txManager).commit();
 
-    // then the exception is converted to a CRDB exception that can be retried
-    exceptionRule.expect(TransactionException.class);
-    exceptionRule.expectMessage("Unable to commit transaction");
-
-    // when
-    interceptor.execute(c -> null);
+    // when/then the exception is converted to a CRDB exception that can be retried
+    assertThatThrownBy(() -> interceptor.execute(c -> null))
+      .isInstanceOf(TransactionException.class)
+      .hasMessage("Unable to commit transaction");
   }
 
 
@@ -115,11 +107,9 @@ public class JtaTransactionInterceptorTest {
 
     doThrow(new RuntimeException()).when(txManager).commit();
 
-    // then the exception is converted to a CRDB exception that can be retried
-    exceptionRule.expect(RuntimeException.class);
-
-    // when
-    interceptor.execute(c -> null);
+    // when/then the exception is converted to a CRDB exception that can be retried
+    assertThatThrownBy(() -> interceptor.execute(c -> null))
+      .isInstanceOf(RuntimeException.class);
   }
 
   private Exception buildCrdbCommitException() {

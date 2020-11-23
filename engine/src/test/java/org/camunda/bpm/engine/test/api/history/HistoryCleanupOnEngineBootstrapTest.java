@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -43,9 +44,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Nikola Koevski
@@ -56,9 +55,6 @@ public class HistoryCleanupOnEngineBootstrapTest {
   private static final String ENGINE_NAME = "engineWithHistoryCleanupBatchWindow";
 
   private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testConsecutiveEngineBootstrapHistoryCleanupJobReconfiguration() {
@@ -183,12 +179,12 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
   @Test
   public void testBatchWindowXmlConfigParsingException() throws ParseException {
-    thrown.expect(Exception.class);
-    thrown.expectMessage("startTime");
-
-    ProcessEngineConfiguration
+    // when/then
+    assertThatThrownBy(() -> ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map-wrong-values.camunda.cfg.xml")
-      .buildProcessEngine();
+      .buildProcessEngine())
+    .isInstanceOf(Exception.class)
+    .hasMessageContaining("startTime");
   }
 
   @Test

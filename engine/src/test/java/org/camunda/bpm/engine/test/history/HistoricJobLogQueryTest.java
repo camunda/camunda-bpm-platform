@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByActivityId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByDeploymentId;
@@ -61,7 +62,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -76,9 +76,6 @@ public class HistoricJobLogQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -533,14 +530,19 @@ public class HistoricJobLogQueryTest {
     // given
     String testHostname1 = "HOST_1";
     processEngineConfiguration.setHostname(testHostname1);
-    thrown.expectMessage("Expected_exception");
-    startProcessInstanceWithJobAndCompleteJob(true);
 
+    // when/then
+    assertThatThrownBy(() -> startProcessInstanceWithJobAndCompleteJob(true))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Expected_exception");
 
     String testHostname2 = "HOST_2";
     processEngineConfiguration.setHostname(testHostname2);
-    thrown.expectMessage("Expected_exception");
-    startProcessInstanceWithJobAndCompleteJob(true);
+
+    // when/then
+    assertThatThrownBy(() -> startProcessInstanceWithJobAndCompleteJob(true))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Expected_exception");
 
     // when
     HistoricJobLogQuery query1 = historyService.createHistoricJobLogQuery()

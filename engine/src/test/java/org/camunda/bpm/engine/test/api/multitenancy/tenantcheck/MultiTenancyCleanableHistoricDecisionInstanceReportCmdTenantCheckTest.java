@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -65,9 +64,6 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void init() {

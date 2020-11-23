@@ -34,7 +34,6 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -55,9 +54,6 @@ public abstract class AbstractMetricsIntervalTest {
 
   @Rule
   public RuleChain RULE_CHAIN = RuleChain.outerRule(ENGINE_RULE).around(TEST_RULE);
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;

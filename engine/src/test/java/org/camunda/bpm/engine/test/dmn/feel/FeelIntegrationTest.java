@@ -26,17 +26,15 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class FeelIntegrationTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(thrown);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected DecisionService decisionService;
 

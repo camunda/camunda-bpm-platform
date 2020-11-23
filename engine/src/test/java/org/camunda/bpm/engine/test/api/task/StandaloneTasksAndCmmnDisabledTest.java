@@ -17,9 +17,6 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -33,7 +30,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -42,7 +38,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class StandaloneTasksAndCmmnDisabledTest {
@@ -56,9 +51,6 @@ public class StandaloneTasksAndCmmnDisabledTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule);
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;

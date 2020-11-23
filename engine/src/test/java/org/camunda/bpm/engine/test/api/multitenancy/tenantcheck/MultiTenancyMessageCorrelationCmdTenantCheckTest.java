@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 
@@ -37,7 +38,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
@@ -65,9 +65,6 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -266,15 +263,14 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("messageCatch")
         .processDefinitionTenantId(TENANT_ONE).execute();
 
-    // declared expected exception
-    thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate message");
-
     identityService.setAuthentication("user", null, null);
 
-    runtimeService.createMessageCorrelation("message")
-      .processInstanceId(processInstance.getId())
-      .correlate();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createMessageCorrelation("message")
+        .processInstanceId(processInstance.getId())
+        .correlate())
+      .isInstanceOf(MismatchingMessageCorrelationException.class)
+      .hasMessageContaining("Cannot correlate message");
   }
 
   @Test
@@ -303,15 +299,15 @@ public class MultiTenancyMessageCorrelationCmdTenantCheckTest {
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().
         processDefinitionKey("messageStart").tenantIdIn(TENANT_ONE).singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot create an instance of the process definition");
-
     identityService.setAuthentication("user", null, null);
 
-    runtimeService.createMessageCorrelation("message")
-      .processDefinitionId(processDefinition.getId())
-      .correlateStartMessage();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createMessageCorrelation("message")
+        .processDefinitionId(processDefinition.getId())
+        .correlateStartMessage())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot create an instance of the process definition");
+
   }
 
   @Test

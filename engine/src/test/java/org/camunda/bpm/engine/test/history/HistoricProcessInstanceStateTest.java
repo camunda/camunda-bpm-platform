@@ -38,7 +38,6 @@ import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.TerminateEventDefinition;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -58,9 +57,6 @@ public class HistoricProcessInstanceStateTest {
   public RuleChain ruleChain = RuleChain
       .outerRule(processEngineTestRule)
       .around(processEngineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testTerminatedInternalWithGateway() {

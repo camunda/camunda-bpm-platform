@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -39,7 +40,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class IdentityServiceTenantTest {
 
@@ -56,9 +56,6 @@ public class IdentityServiceTenantTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
   protected ProcessEngine processEngine;
@@ -236,11 +233,11 @@ public class IdentityServiceTenantTest {
     tenant1.setName("name");
     identityService.saveTenant(tenant1);
 
-    thrown.expect(ProcessEngineException.class);
-
     // fail to update old revision
     tenant2.setName("other name");
-    identityService.saveTenant(tenant2);
+
+    assertThatThrownBy(() -> identityService.saveTenant(tenant2))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -251,10 +248,9 @@ public class IdentityServiceTenantTest {
 
     Tenant tenant = processEngine.getIdentityService().newTenant("*");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("has an invalid id: id cannot be *. * is a reserved identifier.");
-
-    processEngine.getIdentityService().saveTenant(tenant);
+    assertThatThrownBy(() -> processEngine.getIdentityService().saveTenant(tenant))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("has an invalid id: id cannot be *. * is a reserved identifier.");
   }
 
   @Test
@@ -262,10 +258,9 @@ public class IdentityServiceTenantTest {
     User user = identityService.newUser(USER_ONE);
     identityService.saveUser(user);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No tenant found with id 'nonExisting'.");
-
-    identityService.createTenantUserMembership("nonExisting", user.getId());
+    assertThatThrownBy(() -> identityService.createTenantUserMembership("nonExisting", user.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No tenant found with id 'nonExisting'.");
   }
 
   @Test
@@ -273,10 +268,9 @@ public class IdentityServiceTenantTest {
     Tenant tenant = identityService.newTenant(TENANT_ONE);
     identityService.saveTenant(tenant);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No user found with id 'nonExisting'.");
-
-    identityService.createTenantUserMembership(tenant.getId(), "nonExisting");
+    assertThatThrownBy(() -> identityService.createTenantUserMembership(tenant.getId(), "nonExisting"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No user found with id 'nonExisting'.");
   }
 
   @Test
@@ -284,10 +278,10 @@ public class IdentityServiceTenantTest {
     Tenant tenant = identityService.newTenant(TENANT_ONE);
     identityService.saveTenant(tenant);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No group found with id 'nonExisting'.");
+    assertThatThrownBy(() -> identityService.createTenantGroupMembership(tenant.getId(), "nonExisting"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No group found with id 'nonExisting'.");
 
-    identityService.createTenantGroupMembership(tenant.getId(), "nonExisting");
   }
 
   @Test
@@ -300,9 +294,8 @@ public class IdentityServiceTenantTest {
 
     identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
 
-    thrown.expect(ProcessEngineException.class);
-
-    identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
+    assertThatThrownBy(() -> identityService.createTenantUserMembership(TENANT_ONE, USER_ONE))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -315,9 +308,8 @@ public class IdentityServiceTenantTest {
 
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
 
-    thrown.expect(ProcessEngineException.class);
-
-    identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
+    assertThatThrownBy(() -> identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test

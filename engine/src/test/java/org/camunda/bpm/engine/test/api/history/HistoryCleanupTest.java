@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
@@ -89,7 +90,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -130,9 +130,6 @@ public class HistoryCleanupTest {
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
   private Random random = new Random();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private HistoryService historyService;
   private RuntimeService runtimeService;
@@ -253,12 +250,10 @@ public class HistoryCleanupTest {
     // given
     processEngineConfiguration.setHistoryCleanupEnabled(false);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("History cleanup is disabled for this engine");
-
-    // when
-    historyService.cleanUpHistoryAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.cleanUpHistoryAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("History cleanup is disabled for this engine");
   }
 
   @Test
@@ -266,12 +261,10 @@ public class HistoryCleanupTest {
     // given
     processEngineConfiguration.setHistoryCleanupEnabled(false);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("History cleanup is disabled for this engine");
-
-    // when
-    historyService.cleanUpHistoryAsync(true);
+    // when/then
+    assertThatThrownBy(() -> historyService.cleanUpHistoryAsync(true))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("History cleanup is disabled for this engine");
   }
 
   @Test
@@ -1131,29 +1124,29 @@ public class HistoryCleanupTest {
   public void testLessThanThresholdOutsideBatchWindowAfterMidnightDaylightSaving() throws ParseException {
     //given
     prepareData(5);
-  
+
     //we're outside batch window, batch window passes midnight
     ClockUtil.setCurrentTime(sdf.parse("2019-05-28T01:10:00"));  // 01:10
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00CET");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00CET");
     processEngineConfiguration.initHistoryCleanup();
-  
+
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
     managementService.executeJob(jobId);
-  
+
     //then
     JobEntity jobEntity = getJobEntity(jobId);
     HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
-  
+
     //job rescheduled till next batch window start
     Date nextRun = getNextRunWithinBatchWindow(ClockUtil.getCurrentTime());
     assertTrue(jobEntity.getDuedate().equals(nextRun));
     assertTrue(nextRun.after(ClockUtil.getCurrentTime()));
-  
+
     //countEmptyRuns canceled
     assertEquals(0, configuration.getCountEmptyRuns());
-  
+
     //nothing was removed
     assertResult(5);
   }
@@ -1263,41 +1256,48 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupBatchWindowStartTime");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupBatchWindowStartTime");
   }
 
   @Test
   public void testConfigurationFailureWrongDayOfTheWeekStartTime() throws ParseException {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("startTime");
-    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23", "01:00"));
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.getHistoryCleanupBatchWindows()
+        .put(Calendar.MONDAY, new BatchWindowConfiguration("23", "01:00")))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("startTime");
   }
 
   @Test
   public void testConfigurationFailureWrongDayOfTheWeekEndTime() throws ParseException {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("endTime");
-    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23:00", "01"));
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.getHistoryCleanupBatchWindows()
+        .put(Calendar.MONDAY, new BatchWindowConfiguration("23:00", "01")))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("endTime");
   }
 
   @Test
   public void testConfigurationFailureWrongDegreeOfParallelism() {
     processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(0);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupDegreeOfParallelism");
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupDegreeOfParallelism");
 
-    processEngineConfiguration.initHistoryCleanup();
+    // and
+    processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(HistoryCleanupCmd.MAX_THREADS_NUMBER + 1);
 
-    processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(HistoryCleanupCmd.MAX_THREADS_NUMBER);
-
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupDegreeOfParallelism");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupDegreeOfParallelism");
   }
 
   @Test
@@ -1305,70 +1305,70 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("wrongValue");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupBatchWindowEndTime");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupBatchWindowEndTime");
   }
 
   @Test
   public void testConfigurationFailureWrongBatchSize() {
     processEngineConfiguration.setHistoryCleanupBatchSize(501);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupBatchSize");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupBatchSize");
   }
 
   @Test
   public void testConfigurationFailureWrongBatchSize2() {
     processEngineConfiguration.setHistoryCleanupBatchSize(-5);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupBatchSize");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupBatchSize");
   }
 
   @Test
   public void testConfigurationFailureWrongBatchThreshold() {
     processEngineConfiguration.setHistoryCleanupBatchThreshold(-1);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupBatchThreshold");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyCleanupBatchThreshold");
   }
 
   @Test
   public void testConfigurationFailureMalformedHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("PP5555DDDD");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyTimeToLive");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyTimeToLive");
   }
 
   @Test
   public void testConfigurationFailureInvalidHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("invalidValue");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyTimeToLive");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyTimeToLive");
   }
 
   @Test
   public void testConfigurationFailureNegativeHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("-6");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyTimeToLive");
-
-    processEngineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyTimeToLive");
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {

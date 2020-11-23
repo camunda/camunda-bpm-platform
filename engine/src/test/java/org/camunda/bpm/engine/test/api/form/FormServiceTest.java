@@ -91,7 +91,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -110,9 +109,6 @@ public class FormServiceTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;

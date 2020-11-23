@@ -45,7 +45,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class CreateAndResolveIncidentTest {
@@ -55,9 +54,6 @@ public class CreateAndResolveIncidentTest {
       configuration.setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler())));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(processEngineBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.IdentityService;
@@ -33,7 +34,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class StandaloneTasksDisabledTest {
@@ -47,9 +47,6 @@ public class StandaloneTasksDisabledTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule);
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -78,12 +75,10 @@ public class StandaloneTasksDisabledTest {
     // given
     Task task = taskService.newTask();
 
-    // then
-    exception.expect(NotAllowedException.class);
-    exception.expectMessage("Cannot save standalone task. They are disabled in the process engine configuration.");
-
-    // when
-    taskService.saveTask(task);
+    // when/then
+    assertThatThrownBy(() -> taskService.saveTask(task))
+      .isInstanceOf(NotAllowedException.class)
+      .hasMessageContaining("Cannot save standalone task. They are disabled in the process engine configuration.");
   }
 
   @Test

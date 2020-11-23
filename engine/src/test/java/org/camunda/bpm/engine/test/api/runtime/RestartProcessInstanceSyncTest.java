@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -67,7 +68,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -80,9 +80,6 @@ public class RestartProcessInstanceSyncTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -349,26 +346,26 @@ public class RestartProcessInstanceSyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.setVariable(processInstance.getId(), "bar", "foo");
-  
+
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
-  
+
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
     .startBeforeActivity("userTask")
     .processInstanceIds(processInstance.getId())
     .initialSetOfVariables()
     .execute();
-  
+
     // then
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
     assertEquals(0, variables.size());
-  
+
     // details
     HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historyService
         .createHistoricDetailQuery()
         .singleResult();
-  
+
     assertNotNull(detail);
     assertFalse(detail.isInitial());
     assertEquals("bar", detail.getVariableName());
@@ -853,15 +850,13 @@ public class RestartProcessInstanceSyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-
-    // when
-    runtimeService.restartProcessInstances(processDefinition.getId())
-      .startBeforeActivity("userTask1")
-      .initialSetOfVariables()
-      .processInstanceIds(processInstance.getId())
-      .execute();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.restartProcessInstances(processDefinition.getId())
+        .startBeforeActivity("userTask1")
+        .initialSetOfVariables()
+        .processInstanceIds(processInstance.getId())
+        .execute())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   public static class SetVariableExecutionListenerImpl implements ExecutionListener {

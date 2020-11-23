@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueDeserialized;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
@@ -45,7 +46,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -65,9 +65,6 @@ public class JavaSerializationProhibitedTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -112,14 +109,14 @@ public class JavaSerializationProhibitedTest {
     new ObjectOutputStream(baos).writeObject(javaSerializable);
     String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot set variable with name simpleBean. Java serialization format is prohibited");
-
-    runtimeService.setVariable(instance.getId(), "simpleBean",
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariable(instance.getId(), "simpleBean",
         serializedObjectValue(serializedObject)
         .serializationDataFormat(JAVA_DATA_FORMAT)
         .objectTypeName(JavaSerializable.class.getName())
-        .create());
+        .create()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set variable with name simpleBean. Java serialization format is prohibited");
 
   }
 
@@ -134,13 +131,13 @@ public class JavaSerializationProhibitedTest {
     new ObjectOutputStream(baos).writeObject(javaSerializable);
     String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot set variable with name simpleBean. Java serialization format is prohibited");
-
-    runtimeService.setVariable(instance.getId(), "simpleBean",
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariable(instance.getId(), "simpleBean",
       serializedObjectValue(serializedObject)
         .objectTypeName(JavaSerializable.class.getName())
-        .create());
+        .create()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set variable with name simpleBean. Java serialization format is prohibited");
 
   }
 
@@ -152,14 +149,14 @@ public class JavaSerializationProhibitedTest {
     String taskId = task.getId();
 
     try {
-      thrown.expect(ProcessEngineException.class);
-      thrown.expectMessage("Cannot set variable with name instrument. Java serialization format is prohibited");
-
-      taskService.setVariable(taskId, "instrument",
+      // when/then
+      assertThatThrownBy(() -> taskService.setVariable(taskId, "instrument",
         Variables.serializedObjectValue("any value")
           .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
           .setTransient(true)
-          .create());
+          .create()))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("Cannot set variable with name instrument. Java serialization format is prohibited");
     } finally {
       taskService.deleteTask(taskId, true);
     }

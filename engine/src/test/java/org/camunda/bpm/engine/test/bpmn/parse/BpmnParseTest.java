@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.parse;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
@@ -70,7 +71,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -87,9 +87,6 @@ public class BpmnParseTest {
 
   @Rule
   public SystemPropertiesRule systemProperties = SystemPropertiesRule.resetPropsAfterTest();
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   public RepositoryService repositoryService;
   public RuntimeService runtimeService;
@@ -1209,15 +1206,14 @@ public class BpmnParseTest {
     String resource =
         TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
 
-    // then
-    exception.expectMessage(containsString("DOCTYPE is disallowed when the feature " +
-        "\"http://apache.org/xml/features/disallow-doctype-decl\" set to true."));
-
-    // when
-    repositoryService.createDeployment()
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDeployment()
         .name(resource)
         .addClasspathResource(resource)
-        .deploy();
+        .deploy())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("DOCTYPE is disallowed when the feature " +
+          "\"http://apache.org/xml/features/disallow-doctype-decl\" set to true.");
   }
 
   @Test
@@ -1228,15 +1224,14 @@ public class BpmnParseTest {
     String resource =
         TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
 
-    // then
-    exception.expectMessage(containsString("Could not parse"));
-    exception.expectMessage(containsString("file.txt"));
-
-    // when
-    repositoryService.createDeployment()
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDeployment()
         .name(resource)
         .addClasspathResource(resource)
-        .deploy();
+        .deploy())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Could not parse")
+      .hasMessageContaining("file.txt");
   }
 
   @Test
@@ -1285,13 +1280,12 @@ public class BpmnParseTest {
 
     System.setProperty("javax.xml.accessExternalSchema", ""); // empty string prohibits all external schema access
 
-    // then
+    // when/then
     // fails, because the BPMN XSD references other external XSDs, e.g. BPMNDI
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Could not parse 'process.bpmn'");
+    assertThatThrownBy(() -> testRule.deploy(builder))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Could not parse 'process.bpmn'");
 
-    // when
-    testRule.deploy(builder);
   }
 
   @Test
@@ -1315,16 +1309,16 @@ public class BpmnParseTest {
   @Test
   public void testTimerWithoutFullDefinition() {
     try {
-      String timerWithoutDetails = "<?xml version='1.0' encoding='UTF-8'?>" + 
-          "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" + 
-          "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" + 
-          "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" + 
-          "  targetNamespace='Examples'>" + 
-          "  <process id='process' isExecutable='true'>" + 
-          "    <startEvent id='start'>" + 
-          "      <timerEventDefinition id='TimerEventDefinition_1'/>" + 
-          "    </startEvent>" + 
-          "  </process>" + 
+      String timerWithoutDetails = "<?xml version='1.0' encoding='UTF-8'?>" +
+          "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" +
+          "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" +
+          "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" +
+          "  targetNamespace='Examples'>" +
+          "  <process id='process' isExecutable='true'>" +
+          "    <startEvent id='start'>" +
+          "      <timerEventDefinition id='TimerEventDefinition_1'/>" +
+          "    </startEvent>" +
+          "  </process>" +
           "</definitions>";
       repositoryService.createDeployment().addString("process.bpmn20.xml", timerWithoutDetails).deploy();
       fail("Exception expected: Process definition could be parsed, it contains uncomplete timer event definition.");
@@ -1339,15 +1333,15 @@ public class BpmnParseTest {
   @Test
   public void testSequenceFlowNoIdAndUnexistantDestination() {
     try {
-      String incorrectSequenceFlow = "<?xml version='1.0' encoding='UTF-8'?>" + 
-          "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" + 
-          "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" + 
-          "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" + 
-          "  targetNamespace='Examples'>" + 
-          "  <process id='process' isExecutable='true'>" + 
-          "    <startEvent id='start'/>" + 
-          "    <sequenceFlow sourceRef='start' targetRef='eventBasedGateway' />" + 
-          "  </process>" + 
+      String incorrectSequenceFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
+          "<definitions xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" +
+          "  xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'" +
+          "  xmlns:camunda='http://camunda.org/schema/1.0/bpmn'" +
+          "  targetNamespace='Examples'>" +
+          "  <process id='process' isExecutable='true'>" +
+          "    <startEvent id='start'/>" +
+          "    <sequenceFlow sourceRef='start' targetRef='eventBasedGateway' />" +
+          "  </process>" +
           "</definitions>";
       repositoryService.createDeployment().addString("process.bpmn20.xml", incorrectSequenceFlow).deploy();
       fail("Exception expected: Unexisting target.");

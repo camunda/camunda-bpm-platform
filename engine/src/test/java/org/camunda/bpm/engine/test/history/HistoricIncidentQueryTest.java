@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -47,7 +48,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -72,9 +72,6 @@ public class HistoricIncidentQueryTest {
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
@@ -281,11 +278,9 @@ public class HistoricIncidentQueryTest {
     // given
     IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
 
-    // then
-    exception.expect(ProcessEngineException.class);
-
-    // when
-    incidentQuery.processDefinitionKeyIn((String[]) null);
+    // when/then
+    assertThatThrownBy(() -> incidentQuery.processDefinitionKeyIn((String[]) null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -293,11 +288,9 @@ public class HistoricIncidentQueryTest {
     // given
     IncidentQuery incidentQuery = runtimeService.createIncidentQuery();
 
-    // then
-    exception.expect(ProcessEngineException.class);
-
-    // when
-    incidentQuery.processDefinitionKeyIn((String) null);
+    // when/then
+    assertThatThrownBy(() -> incidentQuery.processDefinitionKeyIn((String) null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test

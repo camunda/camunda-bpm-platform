@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static junit.framework.TestCase.assertFalse;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -34,7 +35,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.python.google.common.collect.Sets;
 
@@ -45,10 +45,6 @@ public class UpdateProcessInstancesSuspendStateTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -254,11 +250,11 @@ public class UpdateProcessInstancesSuspendStateTest {
     // given
     // nothing
 
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("No process instance ids given");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().suspend())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("No process instance ids given");
 
-    // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().suspend();
   }
 
   @Test
@@ -266,11 +262,10 @@ public class UpdateProcessInstancesSuspendStateTest {
     // given
     // nothing
 
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("No process instance ids given");
-
-  // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activate();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activate())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("No process instance ids given");
 
   }
 
@@ -283,11 +278,10 @@ public class UpdateProcessInstancesSuspendStateTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
 
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot be null");
-
-    // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activate();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activate())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot be null");
 
   }
 
@@ -299,11 +293,10 @@ public class UpdateProcessInstancesSuspendStateTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
 
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot be null");
-
-    // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspend();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspend())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot be null");
 
   }
 

@@ -17,10 +17,12 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
@@ -144,8 +146,10 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.deploymentId(null);
+
+    // when/then
+    assertThatThrownBy(() -> query.deploymentId(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -172,8 +176,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionName(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionName(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -199,8 +204,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionNameLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionNameLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -226,8 +232,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionNameLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionNameLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -256,8 +263,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionKey(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionKey(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -283,8 +291,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionKeyLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionKeyLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -306,8 +315,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionCategory(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionCategory(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -339,8 +349,9 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionCategoryLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionCategoryLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -367,11 +378,13 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionVersion(-1);
+    // when/then
+    assertThatThrownBy(() -> query.caseDefinitionVersion(-1))
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query.caseDefinitionVersion(null);
+    // and
+    assertThatThrownBy(() -> query.caseDefinitionVersion(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -398,36 +411,40 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
   public void testInvalidUsageOfLatest() {
     CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
-    exceptionRule.expect(NotValidException.class);
-    query
-      .caseDefinitionId("test")
-      .latestVersion()
-      .list();
+    // when/then
+    assertThatThrownBy(() -> query
+        .caseDefinitionId("test")
+        .latestVersion()
+        .list())
+      .isInstanceOf(NotValidException.class);
 
+    // and
+    assertThatThrownBy(() -> query
+        .caseDefinitionName("test")
+        .latestVersion()
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
-      .caseDefinitionName("test")
-      .latestVersion()
-      .list();
+    // and
+    assertThatThrownBy(() -> query
+        .caseDefinitionNameLike("test")
+        .latestVersion()
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
-      .caseDefinitionNameLike("test")
-      .latestVersion()
-      .list();
+    // and
+    assertThatThrownBy(() -> query
+        .caseDefinitionVersion(1)
+        .latestVersion()
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
-      .caseDefinitionVersion(1)
-      .latestVersion()
-      .list();
-
-    exceptionRule.expect(NotValidException.class);
-    query
-      .deploymentId("test")
-      .latestVersion()
-      .list();
+    // and
+    assertThatThrownBy(() -> query
+        .deploymentId("test")
+        .latestVersion()
+        .list())
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test

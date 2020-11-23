@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -33,7 +34,6 @@ import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -52,9 +52,6 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -77,11 +74,10 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public void failToGetCaseModelNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case definition");
-
-    repositoryService.getCaseModel(caseDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getCaseModel(caseDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case definition");
   }
 
   @Test
@@ -107,11 +103,10 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public void failToGetCaseDiagramNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case definition");
-
-    repositoryService.getCaseDiagram(caseDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getCaseDiagram(caseDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case definition");
   }
 
   @Test
@@ -137,11 +132,11 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public void failToGetCaseDefinitionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case definition");
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getCaseDefinition(caseDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case definition");
 
-    repositoryService.getCaseDefinition(caseDefinitionId);
   }
 
   @Test
@@ -167,11 +162,10 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public void failToGetCmmnModelInstanceNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case definition");
-
-    repositoryService.getCmmnModelInstance(caseDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getCmmnModelInstance(caseDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case definition");
   }
 
   @Test
@@ -222,11 +216,10 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public void updateHistoryTimeToLiveNoAuthenticatedTenants(){
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case definition");
-
-    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, 6);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, 6))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case definition");
   }
 
 }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.decisionDefinitionByDeployTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
@@ -42,7 +43,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class DecisionDefinitionQueryTest {
@@ -56,10 +56,9 @@ public class DecisionDefinitionQueryTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(exceptionRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RepositoryService repositoryService;
 
@@ -160,8 +159,10 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.deploymentId(null);
+    // when/then
+    assertThatThrownBy(() -> query.deploymentId(null))
+      .isInstanceOf(NotValidException.class);
+
   }
 
   @Test
@@ -275,8 +276,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionName(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionName(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -300,8 +302,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionNameLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionNameLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -325,8 +328,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionNameLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionNameLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -352,8 +356,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionKey(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionKey(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -377,8 +382,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionKeyLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionKeyLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -398,8 +404,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionCategory(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionCategory(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -427,8 +434,9 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionCategoryLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionCategoryLike(null))
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test
@@ -452,11 +460,13 @@ public class DecisionDefinitionQueryTest {
 
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionVersion(-1);
+    // when/then
+    assertThatThrownBy(() -> query.decisionDefinitionVersion(-1))
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query.decisionDefinitionVersion(null);
+    assertThatThrownBy(() -> query.decisionDefinitionVersion(null))
+    .isInstanceOf(NotValidException.class);
+
   }
 
   @Test
@@ -484,35 +494,36 @@ public class DecisionDefinitionQueryTest {
   public void testInvalidUsageOfLatest() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
-    exceptionRule.expect(NotValidException.class);
-    query
+    // when/then
+    assertThatThrownBy(() -> query
         .decisionDefinitionId("test")
         .latestVersion()
-        .list();
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
+    assertThatThrownBy(() -> query
         .decisionDefinitionName("test")
         .latestVersion()
-        .list();
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
+    assertThatThrownBy(() -> query
         .decisionDefinitionNameLike("test")
         .latestVersion()
-        .list();
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
+    assertThatThrownBy(() -> query
         .decisionDefinitionVersion(1)
         .latestVersion()
-        .list();
+        .list())
+      .isInstanceOf(NotValidException.class);
 
-    exceptionRule.expect(NotValidException.class);
-    query
+    assertThatThrownBy(() -> query
         .deploymentId("test")
         .latestVersion()
-        .list();
+        .list())
+      .isInstanceOf(NotValidException.class);
   }
 
   @Test

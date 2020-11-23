@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
@@ -32,17 +34,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class JobExecutorCleanupTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(thrown);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -66,12 +66,11 @@ public class JobExecutorCleanupTest {
     historyService.cleanUpHistoryAsync(true); // schedule cleanup job
     configuration.setHistoryCleanupEnabled(false);
 
+    // when/then
     // then: job cannot be acquired & executed
-    thrown.expect(AssertionError.class);
-    thrown.expectMessage("time limit of 10000 was exceeded");
-
-    // when: execute cleanup job
-    testRule.waitForJobExecutorToProcessAllJobs();
+    assertThatThrownBy(() -> testRule.waitForJobExecutorToProcessAllJobs())
+      .isInstanceOf(AssertionError.class)
+      .hasMessageContaining("time limit of 10000 was exceeded");
   }
 
   @After

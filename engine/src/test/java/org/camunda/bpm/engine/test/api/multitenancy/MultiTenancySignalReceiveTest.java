@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -34,7 +35,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancySignalReceiveTest {
@@ -75,9 +75,6 @@ public class MultiTenancySignalReceiveTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -264,10 +261,10 @@ public class MultiTenancySignalReceiveTest {
   @Test
   public void failToSendSignalWithExecutionIdForTenant() {
 
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot specify a tenant-id when deliver a signal to a single execution.");
-
-    runtimeService.createSignalEvent("signal").executionId("id").tenantId(TENANT_ONE).send();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createSignalEvent("signal").executionId("id").tenantId(TENANT_ONE).send())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot specify a tenant-id when deliver a signal to a single execution.");
   }
 
   @Test

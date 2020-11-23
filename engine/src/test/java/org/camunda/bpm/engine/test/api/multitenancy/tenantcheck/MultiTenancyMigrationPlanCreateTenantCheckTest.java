@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -27,7 +29,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -38,9 +39,6 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -72,15 +70,13 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
     ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
-    // then
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Cannot get process definition '" + tenant1Definition.getId()
-        + "' because it belongs to no authenticated tenant");
-
-    // when
-    engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities()
+        .build())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get process definition '" + tenant1Definition.getId()
+      + "' because it belongs to no authenticated tenant");
   }
 
   @Test
@@ -90,15 +86,13 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
     ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
-    // then
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Cannot get process definition '" + tenant2Definition.getId()
-        + "' because it belongs to no authenticated tenant");
-
-    // when
-    engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities()
+        .build())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get process definition '" + tenant2Definition.getId()
+      + "' because it belongs to no authenticated tenant");
   }
 
   @Test
@@ -108,15 +102,13 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
     ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    // then
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Cannot get process definition '" + sourceDefinition.getId()
-        + "' because it belongs to no authenticated tenant");
-
-    // when
-    engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities()
+        .build())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get process definition '" + sourceDefinition.getId()
+      + "' because it belongs to no authenticated tenant");
   }
 
 

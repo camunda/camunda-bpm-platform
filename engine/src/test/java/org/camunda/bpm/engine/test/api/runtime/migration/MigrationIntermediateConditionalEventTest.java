@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator.MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.USER_TASK_ID;
@@ -33,7 +34,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 
@@ -59,9 +59,6 @@ public class MigrationIntermediateConditionalEventTest {
   protected static final String NEW_VAR_CONDITION = "${variable == 2}";
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
@@ -95,15 +92,14 @@ public class MigrationIntermediateConditionalEventTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_CONDITION_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ONE_CONDITION_PROCESS);
 
-    //expect migration validation exception
-    exceptionRule.expect(MigrationPlanValidationException.class);
-    exceptionRule.expectMessage(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
-
     //when conditional event is migrated without update event trigger
-    rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(CONDITION_ID, CONDITION_ID)
-      .build();
+    // then
+    assertThatThrownBy(() -> rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(CONDITION_ID, CONDITION_ID)
+        .build())
+      .isInstanceOf(MigrationPlanValidationException.class)
+      .hasMessageContaining(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
   }
 
   @Test

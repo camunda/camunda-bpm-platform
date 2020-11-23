@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 
@@ -34,7 +35,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
@@ -55,9 +55,6 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -152,13 +149,13 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
       .tenantIdIn(TENANT_ONE)
       .singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance");
-
     identityService.setAuthentication("user", null, null);
 
-    runtimeService.messageEventReceived("message", execution.getId());
+    // when/then
+    assertThatThrownBy(() -> runtimeService.messageEventReceived("message", execution.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance");
+
   }
 
 }

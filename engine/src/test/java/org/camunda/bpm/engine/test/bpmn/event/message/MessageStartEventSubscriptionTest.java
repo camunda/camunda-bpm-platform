@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,7 +25,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -43,8 +43,9 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import junit.framework.AssertionFailedError;
 
 public class MessageStartEventSubscriptionTest {
 
@@ -70,9 +71,6 @@ public class MessageStartEventSubscriptionTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
@@ -217,14 +215,13 @@ public class MessageStartEventSubscriptionTest {
     // delete it
     repositoryService.deleteDeployment(deployment.getId(), true);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No subscriptions were found during evaluation of the conditional start events.");
-
-    // when
-    runtimeService
-      .createConditionEvaluation()
-      .setVariable("foo", 1)
-      .evaluateStartConditions();
+    // when/then
+    assertThatThrownBy(() -> runtimeService
+        .createConditionEvaluation()
+        .setVariable("foo", 1)
+        .evaluateStartConditions())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No subscriptions were found during evaluation of the conditional start events.");
   }
 
   @Test

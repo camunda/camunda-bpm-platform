@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,7 +51,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 
@@ -63,9 +63,6 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -172,10 +169,11 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithNullList() throws Exception {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("processInstanceIds is empty");
 
   }
 
@@ -183,10 +181,11 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithEmptyList() throws Exception {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), null, TESTING_INSTANCE_DELETE);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), null, TESTING_INSTANCE_DELETE))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("processInstanceIds is empty");
 
   }
 
@@ -308,10 +307,11 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithNullQueryParameter() throws Exception {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("processInstanceIds is empty");
   }
 
   @Deployment(resources = {
@@ -323,11 +323,11 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
         .processInstanceBusinessKey("invalid");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceIds is empty");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.deleteProcessInstancesAsync(null, query, TESTING_INSTANCE_DELETE))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("processInstanceIds is empty");
 
-    // when
-    runtimeService.deleteProcessInstancesAsync(null, query, TESTING_INSTANCE_DELETE);
   }
 
   protected void assertProcessInstancesAreDeleted() {

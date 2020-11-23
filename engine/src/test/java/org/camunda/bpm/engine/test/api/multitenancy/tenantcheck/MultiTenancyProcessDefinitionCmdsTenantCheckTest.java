@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
@@ -43,7 +44,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -62,9 +62,6 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -91,11 +88,10 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void failToGetProcessModelNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition");
-
-    repositoryService.getProcessModel(processDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getProcessModel(processDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition");
   }
 
   @Test
@@ -121,11 +117,10 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void failToGetProcessDiagramNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition");
-
-    repositoryService.getProcessDiagram(processDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getProcessDiagram(processDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition");
   }
 
   @Test
@@ -151,11 +146,10 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void failToGetProcessDiagramLayoutNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition");
-
-    repositoryService.getProcessDiagramLayout(processDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getProcessDiagramLayout(processDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition");
   }
 
   @Test
@@ -181,11 +175,10 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void failToGetProcessDefinitionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition");
-
-    repositoryService.getProcessDefinition(processDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getProcessDefinition(processDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition");
   }
 
   @Test
@@ -211,11 +204,10 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void failToGetBpmnModelInstanceNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition");
-
-    repositoryService.getBpmnModelInstance(processDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getBpmnModelInstance(processDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition");
   }
 
   @Test
@@ -244,12 +236,11 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     //and user with no tenant authentication
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the process definition");
-
+    // when/then
     //deletion should end in exception, since tenant authorization is missing
-    repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
+    assertThatThrownBy(() -> repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the process definition");
   }
 
   @Test
@@ -350,15 +341,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No process definition found");
-
-    // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withoutTenantId()
-      .delete();
+    // when/then
+    assertThatThrownBy(() -> repositoryService.deleteProcessDefinitions()
+        .byKey("process")
+        .withoutTenantId()
+        .delete())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No process definition found");
   }
 
   @Test
@@ -483,14 +472,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the process definition");
+    // when/then
+    assertThatThrownBy(() -> repositoryService.deleteProcessDefinitions()
+        .byIds(processDefinitionIds)
+        .delete())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the process definition");
 
-    // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
   }
 
   @Test
@@ -619,11 +607,11 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   public void updateHistoryTimeToLiveNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition");
+    // when/then
+    assertThatThrownBy(() -> repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitionId, 6))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process definition");
 
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitionId, 6);
   }
 
   private String[] findProcessDefinitionIdsByKey(String processDefinitionKey) {

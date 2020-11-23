@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -30,11 +31,10 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Deivarayan Azhagappan
  *
  */
@@ -42,15 +42,15 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyFormVariablesCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  
+
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 
   protected static final String VARIABLE_1 = "testVariable1";
   protected static final String VARIABLE_2 = "testVariable2";
-  
+
   protected static final String VARIABLE_VALUE_1 = "test1";
   protected static final String VARIABLE_VALUE_2 = "test2";
-  
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -60,14 +60,11 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
 
   protected ProcessInstance instance;
 
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
-
   protected static final String START_FORM_RESOURCE = "org/camunda/bpm/engine/test/api/form/FormServiceTest.startFormFields.bpmn20.xml";
 
   @Before
   public void init() {
-    
+
     // deploy tenants
     testRule.deployForTenant(TENANT_ONE, START_FORM_RESOURCE);
     instance = engineRule.getRuntimeService()
@@ -80,7 +77,7 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
   public void testGetStartFormVariablesWithAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
- 
+
     assertEquals(4, engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId()).size());
 
   }
@@ -90,11 +87,11 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition '"
-      + instance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
-
-    engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId());
+    // when/then
+    assertThatThrownBy(() -> engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the process definition '"
+          + instance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -103,7 +100,7 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     assertEquals(4, engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId()).size());
 
   }
@@ -112,9 +109,9 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
   public void testGetTaskFormVariablesWithAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
-    
+
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-    
+
     assertEquals(2, engineRule.getFormService().getTaskFormVariables(task.getId()).size());
 
   }
@@ -123,14 +120,14 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
   public void testGetTaskFormVariablesWithNoAuthenticatedTenant() {
 
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-    
-    engineRule.getIdentityService().setAuthentication("aUserId", null);
-    
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task '"
-      + task.getId() +"' because it belongs to no authenticated tenant.");
 
-    engineRule.getFormService().getTaskFormVariables(task.getId());
+    engineRule.getIdentityService().setAuthentication("aUserId", null);
+
+    // when/then
+    assertThatThrownBy(() -> engineRule.getFormService().getTaskFormVariables(task.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot read the task '"
+          + task.getId() +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -138,10 +135,10 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
   public void testGetTaskFormVariablesWithDisabledTenantCheck() {
 
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-    
+
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     assertEquals(2, engineRule.getFormService().getTaskFormVariables(task.getId()).size());
 
   }

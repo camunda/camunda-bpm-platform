@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -37,17 +38,13 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class IncidentUserOperationLogTest {
-  
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -62,7 +59,7 @@ public class IncidentUserOperationLogTest {
     historyService = engineRule.getHistoryService();
     identityService = engineRule.getIdentityService();
   }
-  
+
   @Test
   public void shouldLogIncidentCreation() {
     // given
@@ -77,7 +74,7 @@ public class IncidentUserOperationLogTest {
 
     // then
     assertEquals(2, historyService.createUserOperationLogQuery().count());
-    
+
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery().property("incidentType").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, entry.getOperationType());
     assertEquals(EntityTypes.PROCESS_INSTANCE, entry.getEntityType());
@@ -88,7 +85,7 @@ public class IncidentUserOperationLogTest {
     assertEquals(processInstance.getId(), entry.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), entry.getProcessDefinitionId());
     assertEquals("Process", entry.getProcessDefinitionKey());
-    
+
     entry = historyService.createUserOperationLogQuery().property("configuration").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, entry.getOperationType());
     assertEquals(EntityTypes.PROCESS_INSTANCE, entry.getEntityType());
@@ -105,12 +102,11 @@ public class IncidentUserOperationLogTest {
   public void shouldNotLogIncidentCreationFailure() {
     // given
     assertEquals(0, historyService.createUserOperationLogQuery().count());
-    
-    // when
-    thrown.expect(BadUserRequestException.class);
-    runtimeService.createIncident("foo", null, "userTask1", "bar");
-    
-    // then
+
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createIncident("foo", null, "userTask1", "bar"))
+      .isInstanceOf(BadUserRequestException.class);
+
     assertEquals(0, historyService.createUserOperationLogQuery().count());
   }
 
@@ -146,12 +142,11 @@ public class IncidentUserOperationLogTest {
   public void shouldNotLogIncidentResolutionFailure() {
     // given
     assertEquals(0, historyService.createUserOperationLogQuery().count());
-    
-    // when
-    thrown.expect(NotFoundException.class);
-    runtimeService.resolveIncident("foo");
-    
-    // then
+
+    // when/then
+    assertThatThrownBy(() -> runtimeService.resolveIncident("foo"))
+      .isInstanceOf(NotFoundException.class);
+
     assertEquals(0, historyService.createUserOperationLogQuery().count());
   }
 }
