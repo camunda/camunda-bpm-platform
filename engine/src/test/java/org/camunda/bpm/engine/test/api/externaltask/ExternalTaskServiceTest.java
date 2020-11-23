@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
@@ -1145,14 +1146,12 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ExternalTask externalTask = externalTaskService.createExternalTaskQuery().notLocked().singleResult();
     externalTaskService.lock(externalTask.getId(), WORKER_ID, LOCK_TIME);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("External Task " + externalTask.getId()
-        + " cannot be locked by worker '" + aSecondWorkerId
-        + "'. It is locked by worker '" + WORKER_ID + "'.");
-
-    // when
-    externalTaskService.lock(externalTask.getId(), aSecondWorkerId, LOCK_TIME);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock(externalTask.getId(), aSecondWorkerId, LOCK_TIME))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("External Task " + externalTask.getId()
+      + " cannot be locked by worker '" + aSecondWorkerId
+      + "'. It is locked by worker '" + WORKER_ID + "'.");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
@@ -1162,12 +1161,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
     ExternalTask externalTask = externalTaskService.createExternalTaskQuery().notLocked().singleResult();
 
-    // then
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("workerId is null");
-
-    // when
-    externalTaskService.lock(externalTask.getId(), null, LOCK_TIME);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock(externalTask.getId(), null, LOCK_TIME))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("workerId is null");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
@@ -1176,12 +1173,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    // then
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("Cannot find external task with id null: externalTask is null");
-
-    // when
-    externalTaskService.lock(null, WORKER_ID, LOCK_TIME);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock(null, WORKER_ID, LOCK_TIME))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Cannot find external task with id null: externalTask is null");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
@@ -1190,13 +1185,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    // then
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("Cannot find external task with id fakeExternalTaskId: " +
-        "externalTask is null");
-
-    // when
-    externalTaskService.lock("fakeExternalTaskId", WORKER_ID, LOCK_TIME);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock("fakeExternalTaskId", WORKER_ID, LOCK_TIME))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Cannot find external task with id fakeExternalTaskId: " +
+          "externalTask is null");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
@@ -1205,12 +1198,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("lockDuration is not greater than 0");
-
-    // when
-    externalTaskService.lock("fakeExternalTaskId", WORKER_ID, 0);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock("fakeExternalTaskId", WORKER_ID, 0))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("lockDuration is not greater than 0");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
@@ -1219,12 +1210,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("lockDuration is not greater than 0");
-
-    // when
-    externalTaskService.lock("fakeExternalTaskId", WORKER_ID, -1);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.lock("fakeExternalTaskId", WORKER_ID, -1))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("lockDuration is not greater than 0");
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
@@ -3545,7 +3534,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     ExternalTask topic1Task = externalTaskService.createExternalTaskQuery().topicName("topic1").singleResult();
     ExternalTask topic2Task = externalTaskService.createExternalTaskQuery().topicName("topic2").singleResult();
     ExternalTask topic3Task = externalTaskService.createExternalTaskQuery().topicName("topic3").singleResult();
-    
+
     externalTaskService.setRetries(topic1Task.getId(), 3);
     externalTaskService.setRetries(topic2Task.getId(), 0);
     externalTaskService.setRetries(topic3Task.getId(), 0);
@@ -3566,7 +3555,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // when
     List<String> result = externalTaskService.getTopicNames();
-    
+
     //then
     assertThat(result).containsExactlyInAnyOrder("topic1", "topic2", "topic3");
   }

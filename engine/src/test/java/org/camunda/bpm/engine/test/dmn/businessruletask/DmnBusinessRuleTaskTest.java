@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -33,7 +34,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class DmnBusinessRuleTaskTest {
@@ -74,9 +74,6 @@ public class DmnBusinessRuleTaskTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
   protected RuntimeService runtimeService;
 
   @Before
@@ -105,23 +102,25 @@ public class DmnBusinessRuleTaskTest {
   public void testDmn13Decision() {
     decisionRef();
   }
-  
+
   @Deployment(resources = DECISION_PROCESS)
   @Test
   public void noDecisionFound() {
-    thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key 'testDecision'");
 
-    runtimeService.startProcessInstanceByKey("testProcess");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+      .isInstanceOf(DecisionDefinitionNotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key 'testDecision'");
   }
 
   @Deployment(resources = DECISION_PROCESS_EXPRESSION)
   @Test
   public void noDecisionFoundRefByExpression() {
-    thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'testDecision', version = '1' and tenant-id 'null");
 
-   startExpressionProcess("testDecision", 1);
+    // when/then
+    assertThatThrownBy(() -> startExpressionProcess("testDecision", 1))
+      .isInstanceOf(DecisionDefinitionNotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key = 'testDecision', version = '1' and tenant-id 'null");
   }
 
   @Deployment(resources = { DECISION_PROCESS_LATEST, DECISION_OKAY_DMN })
@@ -198,49 +197,46 @@ public class DmnBusinessRuleTaskTest {
 
   @Test
   public void decisionRefVersionTagBindingWithoutVersionTag() {
-    // expected
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Could not parse BPMN process.");
 
-    // when
-    testRule.deploy(Bpmn.createExecutableProcess("process")
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
-          .camundaDecisionRef("testDecision")
-          .camundaDecisionRefBinding("versionTag")
-          .camundaMapDecisionResult("singleEntry")
-          .camundaResultVariable("result")
+        .camundaDecisionRef("testDecision")
+        .camundaDecisionRefBinding("versionTag")
+        .camundaMapDecisionResult("singleEntry")
+        .camundaResultVariable("result")
         .endEvent()
-          .camundaAsyncBefore()
-        .done());
+        .camundaAsyncBefore()
+        .done();
+
+    // when/then
+    assertThatThrownBy(() -> testRule.deploy(modelInstance))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Could not parse BPMN process.");
   }
 
   @Test
   public void decisionRefVersionTagBindingNoneDecisionDefinition() {
-    // expected
-    thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'null'");
-
     // given
     testRule.deploy(BPMN_VERSION_TAG_BINDING);
 
-    // when
-    runtimeService.startProcessInstanceByKey("process");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process"))
+      .isInstanceOf(DecisionDefinitionNotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'null'");
   }
 
   @Test
   public void decisionRefVersionTagBindingTwoDecisionDefinitions() {
-    // expected
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Found more than one decision definition for key 'decision' and versionTag '0.0.2'");
-
     // given
     testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
     testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
     testRule.deploy(BPMN_VERSION_TAG_BINDING);
 
-    // when
-    runtimeService.startProcessInstanceByKey("process");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Found more than one decision definition for key 'decision' and versionTag '0.0.2'");
   }
 
   @Deployment(resources = {DECISION_PROCESS, DECISION_POJO_DMN})

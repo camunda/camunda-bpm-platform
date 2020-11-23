@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -30,11 +31,10 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Deivarayan Azhagappan
  *
  */
@@ -59,14 +59,11 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
-
   @Before
   public void init() {
-    
+
     testRule.deployForTenant(TENANT_ONE, ONE_TASK_PROCESS);
-    
+
     processInstanceId = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
@@ -76,7 +73,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
   public void getActivityInstanceWithAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
-    
+
     // then
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
   }
@@ -86,11 +83,12 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    engineRule.getRuntimeService().getActivityInstance(processInstanceId);
-    
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().getActivityInstance(processInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot read the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
+
   }
 
   @Test
@@ -98,7 +96,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     // then
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
   }
@@ -119,11 +117,11 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    engineRule.getRuntimeService().getActiveActivityIds(processInstanceId);
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().getActiveActivityIds(processInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot read the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -132,10 +130,10 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    
+
     // then
     assertEquals(1, engineRule.getRuntimeService().getActiveActivityIds(processInstanceId).size());
 
   }
-  
+
 }

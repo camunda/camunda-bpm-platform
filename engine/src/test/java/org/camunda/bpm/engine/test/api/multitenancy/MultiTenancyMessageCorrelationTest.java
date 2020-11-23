@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -36,7 +37,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyMessageCorrelationTest {
@@ -65,9 +65,6 @@ public class MultiTenancyMessageCorrelationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   @Test
   public void correlateMessageToStartEventNoTenantIdSetForNonTenant() {
@@ -326,11 +323,10 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
     engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
 
-    // declare expected exception
-    thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate a message with name 'message' to a single execution");
-
-    engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message").correlate())
+      .isInstanceOf(MismatchingMessageCorrelationException.class)
+      .hasMessageContaining("Cannot correlate a message with name 'message' to a single execution");
   }
 
   @Test
@@ -387,11 +383,10 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
-    // declare expected exception
-    thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate a message with name 'message' to a single process definition");
-
-    engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message").correlate())
+      .isInstanceOf(MismatchingMessageCorrelationException.class)
+      .hasMessageContaining("Cannot correlate a message with name 'message' to a single process definition");
   }
 
   @Test
@@ -399,59 +394,59 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
-    // declare expected exception
-    thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate a message with name 'message' to a single process definition");
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message").correlateStartMessage())
+      .isInstanceOf(MismatchingMessageCorrelationException.class)
+      .hasMessageContaining("Cannot correlate a message with name 'message' to a single process definition");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message").correlateStartMessage();
   }
 
   @Test
   public void failToCorrelateMessageByProcessInstanceIdWithoutTenantId() {
-    // declare expected exception
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processInstanceId("id")
-      .withoutTenantId()
-      .correlate();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message")
+        .processInstanceId("id")
+        .withoutTenantId()
+        .correlate())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot specify a tenant-id");
   }
 
   @Test
   public void failToCorrelateMessageByProcessInstanceIdAndTenantId() {
-    // declare expected exception
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-    .processInstanceId("id")
-    .tenantId(TENANT_ONE)
-    .correlate();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message")
+        .processInstanceId("id")
+        .tenantId(TENANT_ONE)
+        .correlate())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot specify a tenant-id");
   }
 
   @Test
   public void failToCorrelateMessageByProcessDefinitionIdWithoutTenantId() {
-    // declare expected exception
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processDefinitionId("id")
-      .withoutTenantId()
-      .correlateStartMessage();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message")
+        .processDefinitionId("id")
+        .withoutTenantId()
+        .correlateStartMessage())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot specify a tenant-id");
   }
 
   @Test
   public void failToCorrelateMessageByProcessDefinitionIdAndTenantId() {
-    // declare expected exception
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processDefinitionId("id")
-      .tenantId(TENANT_ONE)
-      .correlateStartMessage();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService().createMessageCorrelation("message")
+        .processDefinitionId("id")
+        .tenantId(TENANT_ONE)
+        .correlateStartMessage())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Cannot specify a tenant-id");
   }
 
 }

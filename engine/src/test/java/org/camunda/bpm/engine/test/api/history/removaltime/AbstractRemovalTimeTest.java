@@ -52,7 +52,6 @@ import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -66,9 +65,6 @@ public abstract class AbstractRemovalTimeTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected FormService formService;

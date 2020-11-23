@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -28,7 +30,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -45,9 +46,6 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testHelper);
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void canMigrateWithAuthenticatedTenant() {
@@ -90,16 +88,15 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
-    // then
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Cannot migrate process instance '" + processInstance.getId()
-              + "' because it belongs to no authenticated tenant");
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService()
+        .newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId()))
+        .execute())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot migrate process instance '" + processInstance.getId()
+      + "' because it belongs to no authenticated tenant");
 
-    // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
   }
 
   @Test
@@ -117,16 +114,14 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    // then
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Cannot migrate process instance '" + processInstance.getId()
-        + "' because it belongs to no authenticated tenant");
-
-    // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService()
+        .newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId()))
+        .execute())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot migrate process instance '" + processInstance.getId()
+      + "' because it belongs to no authenticated tenant");
   }
 
   @Test

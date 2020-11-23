@@ -59,7 +59,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -74,9 +73,6 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   protected ProcessInstance processInstance;
   protected RuntimeService runtimeService;

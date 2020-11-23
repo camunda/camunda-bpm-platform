@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processDefinitionByDeployTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
@@ -116,8 +117,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().deploymentId("invalid");
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().deploymentId(null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().deploymentId(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -130,7 +132,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     Deployment tempDeploymentOne = repositoryService.createDeployment()
         .addClasspathResource(getResourceOnePath()).addClasspathResource(getResourceTwoPath()).deploy();
     engineRule.manageDeployment(tempDeploymentOne);
-    
+
     Date timeAfterDeploymentOne = DateUtils.addSeconds(ClockUtil.getCurrentTime(), 1);
 
     ClockUtil.setCurrentTime(DateUtils.addSeconds(timeAfterDeploymentOne, 5));
@@ -173,7 +175,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     // given
     //get rid of the milliseconds because of MySQL datetime precision
     SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss");
-      
+
     Date startTest = formatter.parse(formatter.format(DateUtils.addSeconds(ClockUtil.now(), 5)));
     ClockUtil.setCurrentTime(startTest);
 
@@ -181,7 +183,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     Deployment tempDeploymentOne = repositoryService.createDeployment()
         .addClasspathResource(getResourceOnePath()).addClasspathResource(getResourceTwoPath()).deploy();
     engineRule.manageDeployment(tempDeploymentOne);
-    
+
     Date timeAtDeploymentTwo = DateUtils.addSeconds(timeAtDeploymentOne, 5);
     ClockUtil.setCurrentTime(timeAtDeploymentTwo);
     Deployment tempDeploymentTwo = repositoryService.createDeployment()
@@ -225,8 +227,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionName("invalid");
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionName(null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionName(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -299,8 +302,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("invalid");
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionKey(null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionKey(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -316,8 +320,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%invalid%");
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -331,8 +336,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%invalid%");
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike(null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -367,11 +373,13 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(3);
     verifyQueryResults(query, 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list();
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list())
+      .isInstanceOf(ProcessEngineException.class);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list();
+    // and
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -400,14 +408,18 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
   @Test
   public void testInvalidUsageOfLatest() {
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionId("test").latestVersion().list();
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion().list();
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionId("test").latestVersion().list())
+      .isInstanceOf(ProcessEngineException.class);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    repositoryService.createProcessDefinitionQuery().deploymentId("test").latestVersion().list();
+    // and
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion().list())
+      .isInstanceOf(ProcessEngineException.class);
+
+    // and
+    assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().deploymentId("test").latestVersion().list())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -505,8 +517,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query.incidentId("invalid"), 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    query.incidentId(null);
+    // when/then
+    assertThatThrownBy(() -> query.incidentId(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -538,8 +551,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query.incidentType("invalid"), 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    query.incidentType(null);
+    // when/then
+    assertThatThrownBy(() -> query.incidentType(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -571,8 +585,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query.incidentMessage("invalid"), 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    query.incidentMessage(null);
+    // when/then
+    assertThatThrownBy(() -> query.incidentMessage(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -608,8 +623,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     verifyQueryResults(query.incidentMessageLike("invalid"), 0);
 
-    exceptionRule.expect(ProcessEngineException.class);
-    query.incidentMessageLike(null);
+    // when/then
+    assertThatThrownBy(() -> query.incidentMessageLike(null))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -808,17 +824,17 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     Deployment tempDeploymentOne = repositoryService.createDeployment()
         .addClasspathResource(getResourceOnePath()).addClasspathResource(getResourceOnePath()).deploy();
     engineRule.manageDeployment(tempDeploymentOne);
-    
+
     // when
-    ProcessDefinitionQuery processDefinitionOrderByDeploymentTimeAscQuery = 
+    ProcessDefinitionQuery processDefinitionOrderByDeploymentTimeAscQuery =
         repositoryService.createProcessDefinitionQuery().orderByDeploymentTime().asc();
-    ProcessDefinitionQuery processDefinitionOrderByDeploymentTimeDescQuery = 
+    ProcessDefinitionQuery processDefinitionOrderByDeploymentTimeDescQuery =
         repositoryService.createProcessDefinitionQuery().orderByDeploymentTime().desc();
 
     // then
-    verifySortingAndCount(processDefinitionOrderByDeploymentTimeAscQuery, 5, 
+    verifySortingAndCount(processDefinitionOrderByDeploymentTimeAscQuery, 5,
         processDefinitionByDeployTime(engineRule.getProcessEngine()));
-    verifySortingAndCount(processDefinitionOrderByDeploymentTimeDescQuery, 5, 
+    verifySortingAndCount(processDefinitionOrderByDeploymentTimeDescQuery, 5,
         inverted(processDefinitionByDeployTime(engineRule.getProcessEngine())));
   }
 

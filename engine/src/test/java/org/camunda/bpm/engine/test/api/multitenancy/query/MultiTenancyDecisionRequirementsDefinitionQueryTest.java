@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyDecisionRequirementsDefinitionQueryTest {
@@ -50,9 +50,6 @@ public class MultiTenancyDecisionRequirementsDefinitionQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -276,10 +273,10 @@ public class MultiTenancyDecisionRequirementsDefinitionQueryTest {
   @Test
   public void failQueryByTenantIdNull() {
 
-    thrown.expect(NullValueException.class);
-
-    repositoryService.createDecisionRequirementsDefinitionQuery()
-      .tenantIdIn((String) null);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDecisionRequirementsDefinitionQuery()
+        .tenantIdIn((String) null))
+      .isInstanceOf(NullValueException.class);
   }
 
   @Test

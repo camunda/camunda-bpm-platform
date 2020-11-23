@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -32,7 +33,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -52,9 +52,6 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected String decisionRequirementsDefinitionId;
 
@@ -77,11 +74,10 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void failToGetDecisionRequirementsDefinitionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision requirements definition");
-
-    repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision requirements definition");
   }
 
   @Test
@@ -107,11 +103,10 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void failToGetDecisionRequirementsModelNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision requirements definition");
-
-    repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision requirements definition");
   }
 
   @Test
@@ -137,11 +132,10 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void failToGetDecisionRequirementsDiagramNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision requirements definition");
-
-    repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision requirements definition");
   }
 
   @Test

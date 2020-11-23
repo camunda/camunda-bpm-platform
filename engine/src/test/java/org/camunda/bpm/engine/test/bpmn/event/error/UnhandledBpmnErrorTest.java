@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.error;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class UnhandledBpmnErrorTest {
@@ -47,9 +46,6 @@ public class UnhandledBpmnErrorTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
   protected RuntimeService runtimeService;
   protected TaskService taskService;
 
@@ -61,41 +57,35 @@ public class UnhandledBpmnErrorTest {
 
   @Test
   public void testThrownInJavaDelegate() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("no error handler"));
 
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask().camundaClass(ThrowBpmnErrorDelegate.class)
-      .endEvent().done();
+        .startEvent()
+        .serviceTask().camundaClass(ThrowBpmnErrorDelegate.class)
+        .endEvent().done();
     testRule.deploy(instance);
 
-    // when
-    runtimeService.startProcessInstanceByKey("process");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("no error handler");
   }
 
   @Test
   @Deployment
   public void testUncaughtErrorSimpleProcess() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("no error handler"));
 
     // given simple process definition
 
-    // when
-    runtimeService.startProcessInstanceByKey("process");
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("no error handler");
   }
 
   @Test
   @Deployment
   public void testUnhandledErrorInEmbeddedSubprocess() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("no error handler"));
-
     // given
     runtimeService.startProcessInstanceByKey("boundaryErrorOnEmbeddedSubprocess");
 
@@ -104,9 +94,11 @@ public class UnhandledBpmnErrorTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("subprocessTask", task.getName());
 
-    // when
+    // when/then
     // After task completion, error end event is reached which is never caught in the process
-    taskService.complete(task.getId());
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("no error handler");
   }
 
   @Test
@@ -114,10 +106,6 @@ public class UnhandledBpmnErrorTest {
       "org/camunda/bpm/engine/test/bpmn/event/error/UnhandledBpmnErrorTest.testUncaughtErrorOnCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/error/UnhandledBpmnErrorTest.subprocess.bpmn20.xml" })
   public void testUncaughtErrorOnCallActivity() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("no error handler"));
-
     // given
     runtimeService.startProcessInstanceByKey("uncaughtErrorOnCallActivity");
 
@@ -125,18 +113,17 @@ public class UnhandledBpmnErrorTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Task in subprocess", task.getName());
 
-    // when
+    // when/then
     // Completing the task will reach the end error event,
     // which is never caught in the process
-    taskService.complete(task.getId());
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("no error handler");
   }
 
   @Test
   @Deployment
   public void testUncaughtErrorOnEventSubprocess() {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("no error handler"));
 
     // given
     runtimeService.startProcessInstanceByKey("process").getId();
@@ -145,8 +132,10 @@ public class UnhandledBpmnErrorTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("subprocessTask", task.getName());
 
-    // when
+    // when/then
     // After task completion, error end event is reached which is never caught in the process
-    taskService.complete(task.getId());
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("no error handler");
   }
 }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 
@@ -34,7 +35,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyProcessInstanceSuspensionStateTest {
@@ -62,9 +62,6 @@ public class MultiTenancyProcessInstanceSuspensionStateTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
@@ -536,17 +533,16 @@ public class MultiTenancyProcessInstanceSuspensionStateTest {
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery()
         .processDefinitionKey(PROCESS_DEFINITION_KEY).tenantIdIn(TENANT_ONE).singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition '"
-      + processDefinition.getId() +"' because it belongs to no authenticated tenant");
-
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    engineRule.getRuntimeService()
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService()
         .updateProcessInstanceSuspensionState()
         .byProcessDefinitionId(processDefinition.getId())
-        .suspend();
+        .suspend())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process definition '"
+          + processDefinition.getId() +"' because it belongs to no authenticated tenant");
   }
 
   @Test

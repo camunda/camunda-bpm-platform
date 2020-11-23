@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.cockroachdb;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -60,7 +61,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredDatabase(includes = DbSqlSessionFactory.CRDB)
@@ -78,9 +78,6 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected ControllableJobExecutor jobExecutor1;
   protected ControllableJobExecutor jobExecutor2;
@@ -310,12 +307,10 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
         .setProcessEngineName(PROCESS_ENGINE_NAME);
     processEngineConfiguration.setProcessEngineBootstrapCommand(bootstrapCommand);
 
-    // then
+    // when/then
     // a CrdbTransactionRetryException is re-thrown to the caller
-    thrown.expect(CrdbTransactionRetryException.class);
-
-    // when
-    processEngineConfiguration.buildProcessEngine();
+    assertThatThrownBy(() -> processEngineConfiguration.buildProcessEngine())
+      .isInstanceOf(CrdbTransactionRetryException.class);
 
     // since the Command retries were exausted
     assertThat(bootstrapCommand.getTries()).isEqualTo(4);
@@ -327,16 +322,13 @@ public class CockroachDBRetriesTest extends ConcurrencyTestHelper {
     // a regular, non-retryable command that throws a CrdbTransactionRetryException
     CrdbFailingCommand failingCommand = new CrdbFailingCommand();
 
-    // then
+    // when/then
     // a CrdbTransactionRetryException should be reported to the caller of the command
-    thrown.expect(CrdbTransactionRetryException.class);
-    thrown.expectMessage("Does not retry");
+    assertThatThrownBy(() -> processEngineConfiguration.getCommandExecutorTxRequired().execute(failingCommand))
+      .isInstanceOf(CrdbTransactionRetryException.class)
+      .hasMessageContaining("Does not retry");
 
-    // when
-    // the command is executed and fails
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(failingCommand);
-
-    // then
+    // and
     // also the command should be executed only once
     assertThat(failingCommand.getTries()).isEqualTo(1);
   }

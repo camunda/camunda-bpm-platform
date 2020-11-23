@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
@@ -69,7 +70,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class DisabledPermissionsAuthorizationTest {
@@ -79,9 +79,6 @@ public class DisabledPermissionsAuthorizationTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestBaseRule authRule = new AuthorizationTestBaseRule(engineRule);
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
@@ -120,12 +117,10 @@ public class DisabledPermissionsAuthorizationTest {
 
     authRule.enableAuthorization(USER_ID);
 
-    // expected exception
-    exceptionRule.expect(BadUserRequestException.class);
-    exceptionRule.expectMessage("The 'READ' permission is disabled, please check your process engine configuration.");
-
-    // when
-    authorizationService.isUserAuthorized(USER_ID, null, READ, PROCESS_DEFINITION);
+    // when/then
+    assertThatThrownBy(() -> authorizationService.isUserAuthorized(USER_ID, null, READ, PROCESS_DEFINITION))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The 'READ' permission is disabled, please check your process engine configuration.");
   }
 
   @Test

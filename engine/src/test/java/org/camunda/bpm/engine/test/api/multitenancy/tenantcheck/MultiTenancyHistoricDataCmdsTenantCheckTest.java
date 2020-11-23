@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +53,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -81,9 +81,6 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent().endEvent().done();
@@ -130,10 +127,10 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No historic process instance found");
-
-    historyService.deleteHistoricProcessInstance(processInstanceId);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricProcessInstance(processInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No historic process instance found");
   }
 
   @Test
@@ -176,10 +173,10 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the historic task instance");
-
-    historyService.deleteHistoricTaskInstance(taskId);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance(taskId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the historic task instance");
   }
 
   @Test
@@ -220,10 +217,10 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the historic case instance");
-
-    historyService.deleteHistoricCaseInstance(caseInstanceId);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricCaseInstance(caseInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the historic case instance");
   }
 
   @Test
@@ -322,14 +319,12 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
         historyService.createHistoricDecisionInstanceQuery();
     HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
 
-    // when
     identityService.setAuthentication("user", null, null);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the historic decision instance");
-
-    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the historic decision instance");
   }
 
   @Test
@@ -391,10 +386,11 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the historic job log");
+    // when/then
+    assertThatThrownBy(() -> historyService.getHistoricJobLogExceptionStacktrace(historicJobLogId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the historic job log");
 
-    historyService.getHistoricJobLogExceptionStacktrace(historicJobLogId);
   }
 
   @Test
@@ -442,14 +438,17 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the historic variable instance '" + variableInstanceId + "' because it belongs to no authenticated tenant.");
+    // when/then
+    assertThatThrownBy(() -> {
+        try {
+          historyService.deleteHistoricVariableInstance(variableInstanceId);
+        } finally {
+          cleanUpAfterVariableInstanceTest(processInstanceId);
+        }
+      })
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the historic variable instance '" + variableInstanceId + "' because it belongs to no authenticated tenant.");
 
-    try {
-      historyService.deleteHistoricVariableInstance(variableInstanceId);
-    } finally {
-      cleanUpAfterVariableInstanceTest(processInstanceId);
-    }
   }
 
   @Test
@@ -507,14 +506,17 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the historic variable instances of process instance '" + processInstanceId + "' because it belongs to no authenticated tenant.");
+    // when/then
+    assertThatThrownBy(() -> {
+        try {
+          historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+        } finally {
+          cleanUpAfterVariableInstanceTest(processInstanceId);
+        }
+      })
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the historic variable instances of process instance '" + processInstanceId + "' because it belongs to no authenticated tenant.");
 
-    try {
-      historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
-    } finally {
-      cleanUpAfterVariableInstanceTest(processInstanceId);
-    }
   }
 
   @Test

@@ -16,6 +16,16 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -44,17 +54,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 public class SetVariablesBatchTest {
 
@@ -68,9 +68,6 @@ public class SetVariablesBatchTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(rule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -443,92 +440,76 @@ public class SetVariablesBatchTest {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    // then
-    thrown.expectMessage("ENGINE-13044 Setting transient variable 'foo' " +
-        "asynchronously is currently not supported.");
-    thrown.expect(BadUserRequestException.class);
-
-    // when
-    runtimeService.setVariablesAsync(Collections.singletonList(processInstanceId),
-        Variables.putValue("foo", Variables.stringValue("bar", true)));
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(Collections.singletonList(processInstanceId),
+        Variables.putValue("foo", Variables.stringValue("bar", true))))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("ENGINE-13044 Setting transient variable 'foo' " +
+          "asynchronously is currently not supported.");
   }
 
   @Test
   public void shouldThrowException_JavaSerializationForbidden() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("ENGINE-17007 Cannot set variable with name foo. " +
-        "Java serialization format is prohibited");
-
     ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery();
 
-    // when
-    runtimeService.setVariablesAsync(runtimeQuery,
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(runtimeQuery,
         Variables.putValue("foo",
             Variables.serializedObjectValue()
                 .serializedValue("foo")
                 .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
-                .create()));
+                .create())))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("ENGINE-17007 Cannot set variable with name foo. " +
+          "Java serialization format is prohibited");
   }
 
   @Test
   public void shouldThrowException_NoProcessInstancesFound() {
     // given
-
-    // then
-    thrown.expectMessage("processInstanceIds is empty");
-    thrown.expect(BadUserRequestException.class);
-
     ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery();
 
-    // when
-    runtimeService.setVariablesAsync(runtimeQuery, SINGLE_VARIABLE);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(runtimeQuery, SINGLE_VARIABLE))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("processInstanceIds is empty");
   }
 
   @Test
   public void shouldThrowException_QueriesAndIdsNull() {
-    // given
-
-    // then
-    thrown.expectMessage("No process instances found.");
-    thrown.expect(NullValueException.class);
-
-    // when
-    runtimeService.setVariablesAsync(null,
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(null,
         null,
         null,
-        SINGLE_VARIABLE);
+        SINGLE_VARIABLE))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("No process instances found.");
+
   }
 
   @Test
   public void shouldThrowException_VariablesNull() {
     // given
-
-    // then
-    thrown.expectMessage("variables is null");
-    thrown.expect(NullValueException.class);
-
     ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery();
 
-    // when
-    runtimeService.setVariablesAsync(runtimeQuery, null);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(runtimeQuery, null))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("variables is null");
+
   }
 
   @Test
   public void shouldThrowException_VariablesEmpty() {
     // given
-
-    // then
-    thrown.expectMessage("variables is empty");
-    thrown.expect(BadUserRequestException.class);
-
     ProcessInstanceQuery runtimeQuery = runtimeService.createProcessInstanceQuery();
 
-    // when
-    runtimeService.setVariablesAsync(runtimeQuery, Collections.emptyMap());
+    // when/then
+    assertThatThrownBy(() -> runtimeService.setVariablesAsync(runtimeQuery, Collections.emptyMap()))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("variables is empty");
   }
 
   @Test

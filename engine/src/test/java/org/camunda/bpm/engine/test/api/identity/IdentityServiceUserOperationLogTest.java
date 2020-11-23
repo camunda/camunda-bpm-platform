@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -39,7 +40,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -65,9 +65,6 @@ public class IdentityServiceUserOperationLogTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -113,13 +110,15 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.saveUser(identityService.newUser(TEST_USER_ID));
-    identityService.clearAuthentication();
+    // when/then
+    assertThatThrownBy(() -> identityService.saveUser(identityService.newUser(TEST_USER_ID)))
+      .isInstanceOf(ProcessEngineException.class);
 
     // then
     assertEquals(0, query.count());
+
+    identityService.clearAuthentication();
+
   }
 
   @Test
@@ -237,13 +236,14 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.saveGroup(identityService.newGroup(TEST_GROUP_ID));
-    identityService.clearAuthentication();
+    // when/then
+    assertThatThrownBy(() -> identityService.saveGroup(identityService.newGroup(TEST_GROUP_ID)))
+      .isInstanceOf(ProcessEngineException.class);
 
-    // then
+    // and
     assertEquals(0, query.count());
+
+    identityService.clearAuthentication();
   }
 
   @Test
@@ -314,9 +314,10 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.saveTenant(identityService.newTenant(TEST_TENANT_ID));
+    // when/then
+    assertThatThrownBy(() -> identityService.saveTenant(identityService.newTenant(TEST_TENANT_ID)))
+      .isInstanceOf(ProcessEngineException.class);
+
     identityService.clearAuthentication();
 
     // then
@@ -383,7 +384,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.GROUP_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.GROUP_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("groupId", (String) null, TEST_GROUP_ID));
   }
@@ -397,12 +398,13 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.createMembership(TEST_USER_ID, TEST_GROUP_ID);
+    // when/then
+    assertThatThrownBy(() -> identityService.createMembership(TEST_USER_ID, TEST_GROUP_ID))
+      .isInstanceOf(ProcessEngineException.class);
+
     identityService.clearAuthentication();
 
-    // then
+    // and
     assertEquals(0, query.count());
   }
 
@@ -420,7 +422,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.GROUP_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.GROUP_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("groupId", (String) null, TEST_GROUP_ID));
   }
@@ -452,7 +454,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -466,12 +468,13 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.createTenantUserMembership(TEST_TENANT_ID, TEST_USER_ID);
+    // when/then
+    assertThatThrownBy(() -> identityService.createTenantUserMembership(TEST_TENANT_ID, TEST_USER_ID))
+      .isInstanceOf(ProcessEngineException.class);
+
     identityService.clearAuthentication();
 
-    // then
+    // and
     assertEquals(0, query.count());
   }
 
@@ -489,7 +492,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -521,7 +524,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("groupId", (String) null, TEST_GROUP_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -535,12 +538,13 @@ public class IdentityServiceUserOperationLogTest {
     assertEquals(0, query.count());
     identityService.setAuthenticatedUserId("userId");
 
-    // when
-    thrown.expect(ProcessEngineException.class);
-    identityService.createTenantGroupMembership(TEST_TENANT_ID, TEST_GROUP_ID);
+    // when/then
+    assertThatThrownBy(() -> identityService.createTenantGroupMembership(TEST_TENANT_ID, TEST_GROUP_ID))
+      .isInstanceOf(ProcessEngineException.class);
+
     identityService.clearAuthentication();
 
-    // then
+    // and
     assertEquals(0, query.count());
   }
 
@@ -558,7 +562,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("groupId", (String) null, TEST_GROUP_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -67,7 +68,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -84,9 +84,6 @@ public class JobQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -695,22 +692,22 @@ public class JobQueryTest {
   public void testQueryByJobIdsWithEmptyList() {
     // given
     Set<String> ids = Collections.emptySet();
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of job ids is empty");
-    // when
-    managementService.createJobQuery().jobIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().jobIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of job ids is empty");
   }
 
   @Test
   public void testQueryByJobIdsWithNull() {
     // given
     Set<String> ids = null;
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of job ids is null");
-    // when
-    managementService.createJobQuery().jobIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().jobIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of job ids is null");
   }
 
   @Test
@@ -758,22 +755,22 @@ public class JobQueryTest {
   public void testQueryByProcessInstanceIdsWithEmptyList() {
     // given
     Set<String> ids = Collections.emptySet();
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of process instance ids is empty");
-    // when
-    managementService.createJobQuery().processInstanceIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().processInstanceIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of process instance ids is empty");
   }
 
   @Test
   public void testQueryByProcessInstanceIdsWithNull() {
     // given
     Set<String> ids = null;
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of process instance ids is null");
-    // when
-    managementService.createJobQuery().processInstanceIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().processInstanceIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of process instance ids is null");
   }
 
   @Test

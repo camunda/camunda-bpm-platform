@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.junit.Assert.assertEquals;
@@ -67,7 +68,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -83,9 +83,6 @@ public class HistoryCleanupHistoricBatchTest {
   protected BatchModificationHelper modificationHelper = new BatchModificationHelper(engineRule);
 
   private static final String DEFAULT_TTL_DAYS = "P5D";
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private Random random = new Random();
 
@@ -325,40 +322,53 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testWrongGlobalConfiguration() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid value");
+    // given
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("PD");
-    processEngineConfiguration.initHistoryCleanup();
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid value");
   }
 
   @Test
   public void testWrongSpecificConfiguration() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid value");
+    // given
     Map<String, String> map = new HashMap<>();
     map.put("instance-modification", "PD");
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
-    processEngineConfiguration.initHistoryCleanup();
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid value");
+
   }
 
   @Test
   public void testWrongGlobalConfigurationNegativeTTL() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid value");
+    // given
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P-1D");
-    processEngineConfiguration.initHistoryCleanup();
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid value");
   }
 
   @Test
   public void testWrongSpecificConfigurationNegativeTTL() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid value");
+    // given
     Map<String, String> map = new HashMap<>();
     map.put("instance-modification", "P-5D");
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
-    processEngineConfiguration.initHistoryCleanup();
+
+    // when/then
+    assertThatThrownBy(() -> processEngineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid value");
   }
 
   private void initBatchOperationHistoryTimeToLive(String days) {

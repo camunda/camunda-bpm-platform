@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.license;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -28,16 +30,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class LicenseKeyAuthTest {
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(exceptionRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected ProcessEngine processEngine;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -79,14 +79,11 @@ public class LicenseKeyAuthTest {
   public void shouldThrowExceptionWhenGetLicenseKeyWithAuthorizedNonAdmin() {
     // given
     authenticateUser();
-    exceptionRule.expect(AuthorizationException.class);
-    exceptionRule.expectMessage("Required admin authenticated group or user.");
 
-    // when
-    managementService.getLicenseKey();
-
-    // then
-    // expect exception
+    // when/then
+    assertThatThrownBy(() -> managementService.getLicenseKey())
+      .isInstanceOf(AuthorizationException.class)
+      .hasMessageContaining("Required admin authenticated group or user.");
   }
 
   @Test
@@ -105,14 +102,11 @@ public class LicenseKeyAuthTest {
   public void shouldThrowExceptionWhenDeleteLicenseKeyWithAuthorizedNonAdmin() {
     // given
     authenticateUser();
-    exceptionRule.expect(AuthorizationException.class);
-    exceptionRule.expectMessage("Required admin authenticated group or user.");
 
-    // when
-    managementService.deleteLicenseKey();
-
-    // then
-    // expect exception
+    // when/then
+    assertThatThrownBy(() -> managementService.deleteLicenseKey())
+      .isInstanceOf(AuthorizationException.class)
+      .hasMessageContaining("Required admin authenticated group or user.");
   }
 
   protected void authenticateAdminUser() {

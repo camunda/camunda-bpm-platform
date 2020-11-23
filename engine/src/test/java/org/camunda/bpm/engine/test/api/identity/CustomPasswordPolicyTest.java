@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -30,7 +31,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Miklas Boskamp
@@ -39,8 +39,6 @@ public class CustomPasswordPolicyTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private ProcessEngineConfigurationImpl processEngineConfiguration;
   private IdentityService identityService;
@@ -79,11 +77,16 @@ public class CustomPasswordPolicyTest {
 
   @Test
   public void testCustomPasswordPolicyWithNonCompliantPassword() {
-    thrown.expect(ProcessEngineException.class);
+    // given
     User user = identityService.newUser("user");
     user.setPassword("weakpassword");
-    identityService.saveUser(user);
-    thrown.expectMessage("Password does not match policy");
+
+    // when/then
+    assertThatThrownBy(() -> identityService.saveUser(user))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Password does not match policy");
+
+    // and
     assertThat(identityService.createUserQuery().userId(user.getId()).count()).isEqualTo(0L);
   }
 }

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -54,7 +55,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -69,9 +69,6 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
   protected BatchDeletionHelper helper = new BatchDeletionHelper(rule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
@@ -159,11 +156,9 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @Test
   public void createBatchDeletionByInvalidIds() {
-    // then
-    thrown.expect(BadUserRequestException.class);
-
-    // when
-    historyService.deleteHistoricDecisionInstancesAsync((List<String>) null, null);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricDecisionInstancesAsync((List<String>) null, null))
+      .isInstanceOf(BadUserRequestException.class);
   }
 
   @Test
@@ -180,11 +175,9 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @Test
   public void createBatchDeletionByInvalidQuery() {
-    // then
-    thrown.expect(BadUserRequestException.class);
-
-    // when
-    historyService.deleteHistoricDecisionInstancesAsync((HistoricDecisionInstanceQuery) null, null);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricDecisionInstancesAsync((HistoricDecisionInstanceQuery) null, null))
+      .isInstanceOf(BadUserRequestException.class);
   }
 
   @Test
@@ -192,11 +185,9 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // given
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey("foo");
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-
-    // when
-    historyService.deleteHistoricDecisionInstancesAsync(query, null);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricDecisionInstancesAsync(query, null))
+      .isInstanceOf(BadUserRequestException.class);
   }
 
   @Test

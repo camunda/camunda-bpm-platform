@@ -29,17 +29,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class LicenseKeyTelemetryTest {
 
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule).around(exceptionRule);
+  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule);
 
   ProcessEngine processEngine;
   ProcessEngineConfigurationImpl processEngineConfiguration;

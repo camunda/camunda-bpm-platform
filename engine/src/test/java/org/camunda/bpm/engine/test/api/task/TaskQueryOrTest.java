@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
@@ -48,7 +49,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Tassilo Weidner
@@ -57,9 +57,6 @@ public class TaskQueryOrTest {
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -90,105 +87,104 @@ public class TaskQueryOrTest {
 
   @Test
   public void shouldThrowExceptionByMissingStartOr() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
 
-    taskService.createTaskQuery()
-      .or()
-      .endOr()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+        .endOr()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set endOr() before or()");
   }
 
   @Test
   public void shouldThrowExceptionByNesting() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
         .or()
+          .or()
+          .endOr()
         .endOr()
-      .endOr()
-      .or()
-      .endOr();
+        .or()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set or() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByWithCandidateGroupsApplied() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .withCandidateGroups()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .withCandidateGroups()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateGroupsApplied() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .withoutCandidateGroups()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .withoutCandidateGroups()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByWithCandidateUsersApplied() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .withCandidateUsers()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .withCandidateUsers()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateUsersApplied() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .withoutCandidateUsers()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .withoutCandidateUsers()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByOrderingApplied() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .orderByCaseExecutionId()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .orderByCaseExecutionId()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionByInitializeFormKeysInOrQuery() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
-
-    taskService.createTaskQuery()
-      .or()
-        .initializeFormKeys()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
+        .or()
+          .initializeFormKeys()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnTenantIdsAndWithoutTenantIdInAndQuery() {
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set both tenantIdIn and withoutTenantId filters.");
-
-    // when
-    taskService.createTaskQuery()
+    // when/then
+    assertThatThrownBy(() -> taskService.createTaskQuery()
         .tenantIdIn("tenant1", "tenant2")
-        .withoutTenantId();
+        .withoutTenantId())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set both tenantIdIn and withoutTenantId filters.");
   }
 
   @Test
@@ -807,7 +803,7 @@ public class TaskQueryOrTest {
 
     runtimeService
       .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
-    
+
     BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
       .startEvent()
         .userTask()

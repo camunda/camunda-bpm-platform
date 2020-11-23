@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -34,7 +35,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyExternalTaskCmdsTenantCheckTest {
@@ -68,9 +68,6 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void init() {
@@ -248,11 +245,11 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    externalTaskService.complete(externalTaskId, WORKER_ID);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.complete(externalTaskId, WORKER_ID))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -307,11 +304,11 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 1, 0);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 1, 0))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -365,11 +362,11 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    externalTaskService.handleBpmnError(taskId, WORKER_ID, "ERROR-OCCURED");
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.handleBpmnError(taskId, WORKER_ID, "ERROR-OCCURED"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -422,12 +419,12 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
       .getId();
 
     identityService.setAuthentication("aUserId", null);
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    externalTaskService.setRetries(externalTaskId, 5);
+
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.setRetries(externalTaskId, 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -480,12 +477,12 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
       .getId();
 
     identityService.setAuthentication("aUserId", null);
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    externalTaskService.setPriority(externalTaskId, 1);
+
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.setPriority(externalTaskId, 1))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
 
   }
 
@@ -540,11 +537,11 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    externalTaskService.unlock(externalTaskId);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.unlock(externalTaskId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -595,11 +592,11 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     identityService.setAuthentication("aUserId", null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance '"
-      + processInstanceId +"' because it belongs to no authenticated tenant.");
-    // when
-    externalTaskService.getExternalTaskErrorDetails(externalTaskId);
+    // when/then
+    assertThatThrownBy(() -> externalTaskService.getExternalTaskErrorDetails(externalTaskId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot read the process instance '"
+          + processInstanceId +"' because it belongs to no authenticated tenant.");
   }
 
   @Test

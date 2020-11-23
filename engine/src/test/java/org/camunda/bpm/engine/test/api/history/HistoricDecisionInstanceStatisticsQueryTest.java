@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -33,7 +34,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 
@@ -61,9 +61,6 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -244,16 +241,16 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsCount() throws Exception {
-    //expect
-    thrown.expect(NullValueException.class);
-    historyService.createHistoricDecisionInstanceStatisticsQuery(null).count();
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricDecisionInstanceStatisticsQuery(null).count())
+      .isInstanceOf(NullValueException.class);
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsList() throws Exception {
-    //expect
-    thrown.expect(NullValueException.class);
-    historyService.createHistoricDecisionInstanceStatisticsQuery(null).list();
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricDecisionInstanceStatisticsQuery(null).list())
+      .isInstanceOf(NullValueException.class);
   }
 
   @Test

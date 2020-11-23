@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 
@@ -35,7 +36,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -66,9 +66,6 @@ public class MultiTenancySignalReceiveCmdTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -282,13 +279,13 @@ public class MultiTenancySignalReceiveCmdTenantCheckTest {
       .signalEventSubscriptionName("signal")
       .singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance");
-
     identityService.setAuthentication("user", null, null);
 
-    runtimeService.createSignalEvent("signal").executionId(execution.getId()).send();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createSignalEvent("signal").executionId(execution.getId()).send())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance");
+
   }
 
   @Test
@@ -371,12 +368,11 @@ public class MultiTenancySignalReceiveCmdTenantCheckTest {
       .signalEventSubscriptionName("signal")
       .singleResult();
 
-    // declared expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance");
-
     identityService.setAuthentication("user", null, null);
 
-    runtimeService.signal(execution.getId(), "signal", null, null);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.signal(execution.getId(), "signal", null, null))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance");
   }
 }

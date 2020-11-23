@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -64,9 +64,6 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected IdentityService identityService;
   protected CaseService caseService;
@@ -94,10 +91,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void manuallyStartCaseExecutionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.manuallyStartCaseExecution(caseExecutionId);
+    // when/then
+    assertThatThrownBy(() -> caseService.manuallyStartCaseExecution(caseExecutionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -131,10 +128,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void disableCaseExecutionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.disableCaseExecution(caseExecutionId);
+    // when/then
+    assertThatThrownBy(() -> caseService.disableCaseExecution(caseExecutionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -172,10 +169,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.reenableCaseExecution(caseExecutionId);
+    // when/then
+    assertThatThrownBy(() -> caseService.reenableCaseExecution(caseExecutionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -215,10 +212,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.completeCaseExecution(caseExecutionId);
+    // when/then
+    assertThatThrownBy(() -> caseService.completeCaseExecution(caseExecutionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -260,10 +257,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.closeCaseInstance(caseInstanceId);
+    // when/then
+    assertThatThrownBy(() -> caseService.closeCaseInstance(caseInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -304,10 +301,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.terminateCaseExecution(caseInstanceId);
+    // when/then
+    assertThatThrownBy(() -> caseService.terminateCaseExecution(caseInstanceId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -341,10 +338,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void getVariablesNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case execution");
-
-    caseService.getVariables(caseExecutionId);
+    // when/then
+    assertThatThrownBy(() -> caseService.getVariables(caseExecutionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case execution");
   }
 
   @Test
@@ -372,10 +369,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void getVariableNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case execution");
-
-    caseService.getVariable(caseExecutionId, VARIABLE_NAME);
+    // when/then
+    assertThatThrownBy(() -> caseService.getVariable(caseExecutionId, VARIABLE_NAME))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case execution");
   }
 
   @Test
@@ -401,10 +398,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void getVariableTypedNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the case execution");
-
-    caseService.getVariableTyped(caseExecutionId, VARIABLE_NAME);
+    // when/then
+    assertThatThrownBy(() -> caseService.getVariableTyped(caseExecutionId, VARIABLE_NAME))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the case execution");
   }
 
   @Test
@@ -430,10 +427,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void removeVariablesNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.removeVariable(caseExecutionId, VARIABLE_NAME);
+    // when/then
+    assertThatThrownBy(() -> caseService.removeVariable(caseExecutionId, VARIABLE_NAME))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
@@ -465,10 +462,10 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public void setVariableNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
-
-    caseService.setVariable(caseExecutionId, "newVar", "newValue");
+    // when/then
+    assertThatThrownBy(() -> caseService.setVariable(caseExecutionId, "newVar", "newValue"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the case execution");
   }
 
   @Test
