@@ -186,7 +186,7 @@ pipeline {
 //          }
           steps {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, true, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,h2')
+              runMaven(true, false, false, 'qa/test-db-rolling-update/', 'verify -Prolling-update,h2')
             }
           }
           post {
