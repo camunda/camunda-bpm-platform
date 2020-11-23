@@ -214,7 +214,7 @@ pipeline {
 //          }
           steps {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'maven-nexus-settings') {
-              runMaven(true, true, true, 'qa/large-data-tests/', 'verify -Plarge-data-tests,h2')
+              runMaven(true, false, false, 'qa/large-data-tests/', 'verify -Plarge-data-tests,h2')
             }
           }
           post {
