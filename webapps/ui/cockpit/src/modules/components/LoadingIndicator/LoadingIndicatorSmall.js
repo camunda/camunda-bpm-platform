@@ -15,5 +15,14 @@
  * limitations under the License.
  */
 
-export { default as LoadingIndicator } from "./LoadingIndicator";
-export { default as LoadingIndicatorSmall } from "./LoadingIndicatorSmall";
+import React from "react";
+
+import "./LoadingIndicator.scss";
+
+export default function LoadingIndicatorSmall() {
+  return (
+    <div className="LoadingIndicatorSmall">
+      <span className="spinner spinner-small" />
+    </div>
+  );
+}

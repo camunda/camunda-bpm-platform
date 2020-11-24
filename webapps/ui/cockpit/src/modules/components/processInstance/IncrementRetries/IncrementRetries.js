@@ -29,13 +29,15 @@ import {
   GlyphIcon,
   TablePaginated
 } from "components";
+import { LoadingIndicatorSmall } from "../../LoadingIndicator";
 
 const STATUS = Object.freeze({
   INITIAL: 1,
-  ACTION_PENDING: 2,
-  CONFIRMATION: 3,
-  FAILED: 4,
-  NOT_FOUND: 5
+  OPENED: 2,
+  ACTION_PENDING: 3,
+  CONFIRMATION: 4,
+  FAILED: 5,
+  NOT_FOUND: 6
 });
 
 const ROWS_PER_PAGE = 5;
@@ -45,11 +47,18 @@ const JOBS_PAYLOAD = {
   noRetriesLeft: true
 };
 
+const CommonTableHeads = () => (
+  <>
+    <Table.Head>{translate("PLUGIN_JOB_RETRY_BULK_ID")}</Table.Head>
+    <Table.Head>{translate("PLUGIN_JOB_RETRY_BULK_SCOPE")}</Table.Head>
+  </>
+);
+
 function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
   const { id } = processInstance;
 
   const [show, setShow] = useState(false);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState(STATUS.INITIAL);
 
   const [jobSelection, setJobSelection] = useState({});
 
@@ -86,9 +95,9 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
   useEffect(() => {
     if (id) {
       if (show) {
-        setStatus(STATUS.INITIAL);
+        setStatus(STATUS.OPENED);
       } else {
-        setStatus(null);
+        setStatus(STATUS.INITIAL);
       }
     } else {
       setStatus(STATUS.NOT_FOUND);
@@ -150,16 +159,18 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
   const fetchPage = useCallback(
     page => {
       const loadJobs = async () => {
-        return await (await post(
-          `%ENGINE_API%/job?firstResult=${(page - 1) *
-            ROWS_PER_PAGE}&maxResults=${ROWS_PER_PAGE}`,
-          Object.assign(
-            {
-              processInstanceId: id
-            },
-            JOBS_PAYLOAD
+        return await (
+          await post(
+            `%ENGINE_API%/job?firstResult=${(page - 1) *
+              ROWS_PER_PAGE}&maxResults=${ROWS_PER_PAGE}`,
+            Object.assign(
+              {
+                processInstanceId: id
+              },
+              JOBS_PAYLOAD
+            )
           )
-        )).json();
+        ).json();
       };
       return loadJobs();
     },
@@ -168,26 +179,21 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
 
   const fetchRowsCount = useCallback(() => {
     const fetchJobsCount = async () => {
-      return await (await post(
-        `%ENGINE_API%/job/count`,
-        Object.assign(
-          {
-            processInstanceId: id
-          },
-          JOBS_PAYLOAD
+      return await (
+        await post(
+          `%ENGINE_API%/job/count`,
+          Object.assign(
+            {
+              processInstanceId: id
+            },
+            JOBS_PAYLOAD
+          )
         )
-      )).json();
+      ).json();
     };
 
     return fetchJobsCount();
   }, [id]);
-
-  const CommonTableHeads = () => (
-    <>
-      <Table.Head>{translate("PLUGIN_JOB_RETRY_BULK_ID")}</Table.Head>
-      <Table.Head>{translate("PLUGIN_JOB_RETRY_BULK_SCOPE")}</Table.Head>
-    </>
-  );
 
   const CommonTableCells = props => (
     <>
@@ -218,18 +224,18 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
         <Modal.Body>
           <Notifications />
 
-          {(check(STATUS.INITIAL) || check(STATUS.ACTION_PENDING)) && (
+          {(check(STATUS.OPENED) || check(STATUS.ACTION_PENDING)) && (
             <p>{translate("PLUGIN_JOB_RETRY_BULK_SELECT_FAILED_JOB")}</p>
           )}
 
-          {check(STATUS.INITIAL) && (
+          {check(STATUS.OPENED) && (
             <>
               <TablePaginated
                 rowsPerPage={ROWS_PER_PAGE}
                 fetchRowsCount={fetchRowsCount}
                 fetchPage={fetchPage}
                 onRowSelection={setJobSelection}
-                columns={
+                header={
                   <>
                     <CommonTableHeads />
                     <Table.Head>
@@ -237,7 +243,7 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
                     </Table.Head>
                   </>
                 }
-                cells={job => {
+                generateRow={job => {
                   return (
                     <>
                       <CommonTableCells job={job} />
@@ -256,9 +262,8 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
             check(STATUS.FAILED) ||
             check(STATUS.ACTION_PENDING)) && (
             <>
-              <TablePaginated
-                fetchPage={() => jobSelection}
-                columns={
+              <Table
+                head={
                   <>
                     <CommonTableHeads />
                     <Table.Head>
@@ -266,13 +271,14 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
                     </Table.Head>
                   </>
                 }
-                cells={job => {
-                  return (
-                    <>
+              >
+                {jobSelection.map((job, idx) => (
+                  <>
+                    <Table.Row key={idx}>
                       <CommonTableCells job={job} />
                       <Table.Cell>
                         {check(STATUS.ACTION_PENDING) && (
-                          <GlyphIcon className="animate-spin" type="refresh" />
+                          <LoadingIndicatorSmall />
                         )}
                         {(check(STATUS.CONFIRMATION) ||
                           check(STATUS.FAILED)) && (
@@ -280,30 +286,30 @@ function IncrementRetries({ processInstance, instanceIdToInstancesMap }) {
                             {job.status === "successful" && (
                               <>
                                 <GlyphIcon type="ok" />
-                                {" " +
-                                  translate("PLUGIN_JOB_RETRY_BULK_SUCCESSFUL")}
+                                &nbsp;
+                                {translate("PLUGIN_JOB_RETRY_BULK_SUCCESSFUL")}
                               </>
                             )}
                             {job.status === "failed" && (
                               <>
                                 <GlyphIcon type="remove" />
-                                {" " +
-                                  translate("PLUGIN_JOB_RETRY_BULK_FAILED")}
+                                &nbsp;
+                                {translate("PLUGIN_JOB_RETRY_BULK_FAILED")}
                               </>
                             )}
                           </>
                         )}
                       </Table.Cell>
-                    </>
-                  );
-                }}
-              />
+                    </Table.Row>
+                  </>
+                ))}
+              </Table>
             </>
           )}
         </Modal.Body>
 
         <Modal.Footer>
-          {(check(STATUS.INITIAL) || check(STATUS.ACTION_PENDING)) && (
+          {(check(STATUS.OPENED) || check(STATUS.ACTION_PENDING)) && (
             <>
               <Button
                 disabled={check(STATUS.ACTION_PENDING)}

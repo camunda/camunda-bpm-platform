@@ -16,4 +16,4 @@
  */
 
 export { default as CancelProcessInstance } from "./CancelProcessInstance";
-export { default as IncrementRetries } from "./IncrementRetries";
+export { default as IncrementRetries } from "./incrementRetries";
