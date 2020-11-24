@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/get-query/index.html -->
 {
   <@lib.endpointInfo
-      id = "TODO"
+      id = "queryTenants"
       tag = "Tenant"
       summary = "Get Tenants"
       desc = "Query for a list of tenants using a list of parameters. The size of the result set
