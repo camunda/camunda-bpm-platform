@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import withFilter from "../../components/ProcessInstance/HOC/withFilter";
 import { addMouseInteraction, configureFilter } from "./mouseInteraction";
 import addInstanceCount from "./instanceCount";
-import withActivityInstances from "../../components/ProcessInstance/HOC/withActivityInstances";
+import withActivityInstanceMap from "../../components/ProcessInstance/HOC/withActivityInstanceMap";
 
 function Overlays({
   filter,
@@ -28,12 +28,15 @@ function Overlays({
   activityIdToInstancesMap,
   activityIdToIncidentsMap
 }) {
+  const [portals, setPortals] = useState([]);
   useEffect(() => {
     if (activityIdToInstancesMap && activityIdToIncidentsMap) {
-      addInstanceCount(
-        viewer,
-        activityIdToInstancesMap,
-        activityIdToIncidentsMap
+      setPortals(
+        addInstanceCount(
+          viewer,
+          activityIdToInstancesMap,
+          activityIdToIncidentsMap
+        )
       );
       addMouseInteraction(
         viewer,
@@ -47,7 +50,7 @@ function Overlays({
     configureFilter(filter, setFilter);
   }, [filter, setFilter]);
 
-  return null;
+  return <>{portals}</>;
 }
 
-export default withActivityInstances(withFilter(Overlays));
+export default withActivityInstanceMap(withFilter(Overlays));

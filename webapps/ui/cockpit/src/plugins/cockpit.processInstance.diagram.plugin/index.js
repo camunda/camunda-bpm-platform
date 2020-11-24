@@ -17,17 +17,12 @@
 
 import React from "react";
 import Overlays from "./Overlays";
-import { ActivityProvider } from "../../components/ProcessInstance/HOC/withActivityInstances";
 
 export default {
   id: "cockpit.processInstance.diagram.plugin.instanceCount",
   pluginPoint: "cockpit.processInstance.diagram.plugin",
   priority: 0,
   render: (viewer, { processInstanceId }) => {
-    return (
-      <ActivityProvider processInstanceId={processInstanceId}>
-        <Overlays viewer={viewer} processInstanceId={processInstanceId} />
-      </ActivityProvider>
-    );
+    return <Overlays viewer={viewer} processInstanceId={processInstanceId} />;
   }
 };

@@ -74,7 +74,7 @@
     "license-checker": "25.0.1",
     "license-webpack-plugin": "2.3.0",
     "lint-staged": "10.0.7",
-    "node-sass": "4.13.1",
+    "node-sass": "4.14.1",
     "prettier": "1.19.1",
     "react-scripts": "3.4.0"
   },

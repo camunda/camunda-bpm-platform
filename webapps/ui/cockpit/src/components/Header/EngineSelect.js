@@ -16,11 +16,10 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Dropdown } from "components";
+import { Dropdown, Tooltip } from "components";
 import { get } from "utils/request";
 import pathUtil from "utils/paths";
 import translate from "utils/translation";
-import Tooltip from "components/Tooltip";
 
 import "./EngineSelect.scss";
 import SmallScreenSwitch from "./SmallScreenSwitch";
@@ -44,10 +43,10 @@ export default function EngineSelect() {
     <div className="EngineSelect">
       <SmallScreenSwitch>
         <Tooltip
-          title={<span className="glyphicon glyphicon-info-sign" />}
-          position="bottom"
+          content={translate("DIRECTIVE_ENGINE_SELECT_TOOLTIP")}
+          placement="bottom"
         >
-          {translate("DIRECTIVE_ENGINE_SELECT_TOOLTIP")}
+          <span className="glyphicon glyphicon-info-sign" />
         </Tooltip>
       </SmallScreenSwitch>
       <Dropdown

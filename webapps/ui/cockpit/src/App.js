@@ -22,6 +22,7 @@ import AngularApp from "./AngularApp";
 
 import { Footer, Header, Login } from "./components";
 import { LoadingIndicator, Notifications } from "components";
+import { ActivityProvider } from "./components/ProcessInstance/HOC/withActivityInstanceMap";
 
 import RedirectToLoginIfUnauthenticated from "./RedirectToLoginIfUnauthenticated";
 
@@ -40,7 +41,18 @@ import {
 import PluginPoint from "utils/PluginPoint";
 import { UserProvider, PreviousLocationProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
-import { ProcessInstanceProvider } from "./components/ProcessInstance/HOC/withProcessInstance";
+import withProcessInstance, {
+  ProcessInstanceProvider
+} from "./components/ProcessInstance/HOC/withProcessInstance";
+import { BpmnProvider as OriginialBpmnProvider } from "./components/ProcessInstance/HOC/withBpmn";
+
+import "./App.scss";
+
+const BpmnProvider = withProcessInstance(({ processInstance, children }) => (
+  <OriginialBpmnProvider processDefinitionId={processInstance.definitionId}>
+    {children}
+  </OriginialBpmnProvider>
+));
 
 const DefaultWrapper = ({ children }) => children;
 function AngularRoute({
@@ -121,7 +133,9 @@ function App() {
                 wrapApp={({ children, params }) => {
                   return (
                     <ProcessInstanceProvider processInstanceId={params.id}>
-                      {children}
+                      <ActivityProvider processInstanceId={params.id}>
+                        <BpmnProvider>{children}</BpmnProvider>
+                      </ActivityProvider>
                     </ProcessInstanceProvider>
                   );
                 }}

@@ -15,33 +15,23 @@
  * limitations under the License.
  */
 
-import $ from "jquery";
-import translate from "utils/translation";
-import { abbreviateNumber } from "utils/formatting";
+import React from "react";
+import ReactDOM from "react-dom";
+import { DiagramBadge } from "components";
 
-const getBadges = (instanceCount = "", incidentCount = "") => {
-  const template = `<div class="activity-bottom-left-position instances-overlay">
-<span class="badge instance-count">${instanceCount}</span>
-<span class="badge badge-important instance-incidents">${incidentCount}</span>
-</div>`;
+import "./instanceCount.scss";
 
-  const node = $(template);
+const getBadges = (instanceCount, incidentCount) => {
+  const div = document.createElement("div");
+  const portal = ReactDOM.createPortal(
+    <div className="instanceCount">
+      <DiagramBadge.InstancesBadge count={instanceCount} />
+      <DiagramBadge.IncidentsBadge count={incidentCount} />
+    </div>,
+    div
+  );
 
-  // Add Bootstrap Tooltip using JQuery
-  node.find(".instance-count").tooltip({
-    container: "body",
-    title: translate("PLUGIN_ACTIVITY_INSTANCE_RUNNING_ACTIVITY_INSTANCES"),
-    placement: "top",
-    animation: false
-  });
-  node.find(".instance-incidents").tooltip({
-    container: "body",
-    title: translate("PLUGIN_ACTIVITY_INSTANCE_OPEN_INCIDENTS"),
-    placement: "top",
-    animation: false
-  });
-
-  return node;
+  return [div, portal];
 };
 
 export default function addInstanceCount(
@@ -52,8 +42,14 @@ export default function addInstanceCount(
   const overlays = viewer.get("overlays");
   const elementRegistry = viewer.get("elementRegistry");
 
+  const elements = [];
   elementRegistry.forEach(el => {
     if (activityIdToInstancesMap[el.id] || activityIdToIncidentsMap[el.id]) {
+      const [HTML, portal] = getBadges(
+        (activityIdToInstancesMap[el.id] || []).length,
+        (activityIdToIncidentsMap[el.id] || []).length
+      );
+
       overlays.add(el, {
         position: {
           bottom: 0,
@@ -63,12 +59,11 @@ export default function addInstanceCount(
           minZoom: -Infinity,
           maxZoom: +Infinity
         },
-        html: getBadges(
-          abbreviateNumber((activityIdToInstancesMap[el.id] || []).length) ||
-            "",
-          abbreviateNumber((activityIdToIncidentsMap[el.id] || []).length) || ""
-        )
+        html: HTML
       });
+      elements.push(portal);
     }
   });
+
+  return elements;
 }

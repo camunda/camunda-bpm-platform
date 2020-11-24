@@ -19,7 +19,7 @@ import React from "react";
 import classNames from "classnames";
 import "./DropdownOption.scss";
 
-export default function DropdownOption({ children, className, onClick }) {
+export default function DropdownOption({ children, className = "", onClick }) {
   return (
     <li className={classNames(className, "DropdownOption")}>
       <button onClick={onClick}>{children}</button>

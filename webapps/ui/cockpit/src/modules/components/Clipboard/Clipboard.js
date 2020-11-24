@@ -22,7 +22,7 @@ import translate from "utils/translation";
 
 import "./Clipboard.scss";
 
-export default function({ children, text }) {
+export default function({ noTooltip, children, text }) {
   const [icon, setIcon] = useState("copy");
   const [needsResize, setNeedsResize] = useState(false);
 
@@ -79,16 +79,20 @@ export default function({ children, text }) {
         {children}
       </span>
       <Button className="copyButton" bsStyle="link" onClick={copyToClipboard}>
-        <OverlayTrigger
-          placement="top"
-          overlay={
-            <Tooltip id="tooltip">
-              {translate("CAM_WIDGET_COPY", { value: text })}
-            </Tooltip>
-          }
-        >
-          <Glyphicon glyph={icon}></Glyphicon>
-        </OverlayTrigger>
+        {!noTooltip ? (
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip id="tooltip">
+                {translate("CAM_WIDGET_COPY", { value: text })}
+              </Tooltip>
+            }
+          >
+            <Glyphicon glyph={icon} />
+          </OverlayTrigger>
+        ) : (
+          <Glyphicon glyph={icon} />
+        )}
       </Button>
     </span>
   );

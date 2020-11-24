@@ -31,7 +31,7 @@ export default function translate(translateString, placeholder) {
 }
 
 function injectData(template, data) {
-  return template.replace(/\{\{([\w.]*)\}\}/g, (str, key) => {
+  return template.replace(/\{\{\s*([\w.]*)\s*\}\}/g, (str, key) => {
     return data[key] || str;
   });
 }

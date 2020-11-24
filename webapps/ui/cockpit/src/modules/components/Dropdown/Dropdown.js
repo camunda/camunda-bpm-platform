@@ -21,7 +21,12 @@ import classNames from "classnames";
 import DropdownOption from "./DropdownOption";
 import "./Dropdown.scss";
 
-export default function Dropdown({ title, children, position }) {
+export default function Dropdown({
+  title,
+  children,
+  closeOnMouseLeave = false,
+  position = "left"
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -41,6 +46,14 @@ export default function Dropdown({ title, children, position }) {
       document.body.removeEventListener("click", handleClick, true);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (closeOnMouseLeave) {
+      const handleMouseLeave = () => setIsOpen(false);
+      ref.current.addEventListener("mouseleave", handleMouseLeave);
+      // No Cleanup required, as the node with the event listener will be removed by react
+    }
+  }, [closeOnMouseLeave]);
 
   return (
     <div className="Dropdown" ref={ref}>

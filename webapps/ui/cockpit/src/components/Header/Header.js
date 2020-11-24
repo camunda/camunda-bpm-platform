@@ -27,7 +27,7 @@ import UserInformation from "./UserInformation";
 import { ReactComponent as Logo } from "./logo-2020-round.svg";
 import "./Header.scss";
 import SmallScreenSwitch from "./SmallScreenSwitch";
-import Tooltip from "components/Tooltip";
+import { Tooltip } from "components";
 import translate from "utils/translation";
 import Navigation from "./Navigation";
 
@@ -47,10 +47,10 @@ function Header({ user }) {
       <SmallScreenSwitch
         smallContent={
           <Tooltip
-            position="bottom"
-            title={<span className="glyphicon glyphicon-exclamation-sign" />}
+            placement="bottom"
+            content={translate("CAM_WIDGET_HEADER_SMALL_SCREEN_WARNING")}
           >
-            {translate("CAM_WIDGET_HEADER_SMALL_SCREEN_WARNING")}
+            <span className="glyphicon glyphicon-exclamation-sign" />
           </Tooltip>
         }
       />

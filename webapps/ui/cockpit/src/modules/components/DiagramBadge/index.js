@@ -15,24 +15,11 @@
  * limitations under the License.
  */
 
-import React from "react";
+import DiagramBadge from "./DiagramBadge";
+import InstancesBadge from "./InstancesBadge";
+import IncidentsBadge from "./IncidentsBadge";
 
-import { OverlayTrigger, Tooltip as BsTooltip } from "react-bootstrap";
+DiagramBadge.InstancesBadge = InstancesBadge;
+DiagramBadge.IncidentsBadge = IncidentsBadge;
 
-export default function Tooltip({
-  content,
-  children,
-  placement = "top",
-  ...props
-}) {
-  return (
-    <OverlayTrigger
-      className="Tooltip"
-      placement={placement}
-      overlay={<BsTooltip id="badge-tooltip">{content}</BsTooltip>}
-      {...props}
-    >
-      {children}
-    </OverlayTrigger>
-  );
-}
+export { DiagramBadge };

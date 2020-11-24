@@ -1,0 +1,10 @@
+.instanceCount {
+  position: absolute;
+  min-width: 100px;
+  left: -0.7em;
+  bottom: -0.25em;
+}
+
+.hideBadges .instanceCount {
+  display: none;
+}

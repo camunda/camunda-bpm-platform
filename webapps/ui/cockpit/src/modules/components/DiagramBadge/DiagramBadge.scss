@@ -1,0 +1,25 @@
+@import "shared-styles/colors.scss";
+
+.DiagramBadge {
+  font-size: 12px;
+  border-width: 1px;
+  border-style: solid;
+  margin-right: 5px;
+
+  &.InstancesBadge {
+    background-color: $running-color;
+    border-color: darken($running-color, 45);
+    color: darken($running-color, 45);
+  }
+  
+  &.IncidentsBadge {
+    background-color: $important-color;
+    border-color: darken($important-color, 45);
+    font-weight: bolder;
+    color: #FFF;
+  }
+
+  &[hidden] {
+    opacity: 0;
+  }
+}

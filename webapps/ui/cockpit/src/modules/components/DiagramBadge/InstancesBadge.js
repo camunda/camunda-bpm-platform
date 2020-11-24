@@ -16,23 +16,19 @@
  */
 
 import React from "react";
+import translate from "utils/translation";
+import DiagramBadge from "./DiagramBadge";
 
-import { OverlayTrigger, Tooltip as BsTooltip } from "react-bootstrap";
+import { abbreviateNumber } from "utils/filters";
 
-export default function Tooltip({
-  content,
-  children,
-  placement = "top",
-  ...props
-}) {
+export default function InstancesBadge({ count, ...props }) {
   return (
-    <OverlayTrigger
-      className="Tooltip"
-      placement={placement}
-      overlay={<BsTooltip id="badge-tooltip">{content}</BsTooltip>}
+    <DiagramBadge
+      tooltip={translate("PLUGIN_ACTIVITY_INSTANCE_RUNNING_ACTIVITY_INSTANCES")}
+      className="InstancesBadge"
       {...props}
     >
-      {children}
-    </OverlayTrigger>
+      {abbreviateNumber(count)}
+    </DiagramBadge>
   );
 }
