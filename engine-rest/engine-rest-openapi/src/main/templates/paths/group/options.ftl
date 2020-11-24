@@ -24,17 +24,17 @@
                             "links": [
                               {
                                 "method": "GET",
-                                "href": "http://localhost:8080/camunda/api/engine/engine/default/group",
+                                "href": "http://localhost:8080/engine-rest/group",
                                 "rel": "list"
                               },
                               {
                                 "method": "GET",
-                                "href": "http://localhost:8080/camunda/api/engine/engine/default/group/count",
+                                "href": "http://localhost:8080/engine-rest/group/count",
                                 "rel": "count"
                               },
                               {
                                 "method": "POST",
-                                "href": "http://localhost:8080/camunda/api/engine/engine/default/group/create",
+                                "href": "http://localhost:8080/engine-rest/group/create",
                                 "rel": "create"
                               }
                             ]

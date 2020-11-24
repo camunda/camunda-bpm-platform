@@ -37,10 +37,9 @@
         code = "400"
         dto = "ExceptionDto"
         last = true
-        desc = "Returned if some of the query parameters are invalid, for example if a `sortOrder`
-        parameter is supplied, but no `sortBy` is specified. See the
-        [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response
-        format."
+        desc = "Returned if some of the query parameters are invalid. See the
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response
+                format."
     />
 
   }

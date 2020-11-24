@@ -35,17 +35,17 @@
                             "links": [
                               {
                                 "method": "GET",
-                                "href": "http://localhost:8080/camunda/api/engine/engine/default/group/aGroupId",
+                                "href": "http://localhost:8080/engine-rest/group/aGroupId",
                                 "rel":"self"
                               },
                               {
                                 "method": "DELETE",
-                                "href":"http://localhost:8080/camunda/api/engine/engine/default/group/aGroupId",
+                                "href":"http://localhost:8080/engine-rest/group/aGroupId",
                                 "rel":"delete"
                               },
                               {
                                 "method": "PUT",
-                                "href":"http://localhost:8080/camunda/api/engine/engine/default/group/aGroupId",
+                                "href":"http://localhost:8080/engine-rest/group/aGroupId",
                                 "rel":"update"
                               }
                             ]
