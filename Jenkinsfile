@@ -82,7 +82,8 @@ pipeline {
 
         build job: "cambpm-jenkins-pipelines-ee/${env.BRANCH_NAME}", parameters: [
             string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-            booleanParam(name: 'STANDALONE', value: false)
+            booleanParam(name: 'STANDALONE', value: false),
+            string(name: 'UPS_BRANCH_NAME', value: "${BRANCH_NAME}")
         ], quietPeriod: 10, wait: false
       }
     }
