@@ -34,17 +34,17 @@
                          "links": [
                            {
                              "method": "GET",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant/tenantOne",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
                              "rel": "self"
                            },
                            {
                              "method": "DELETE",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant/tenantOne",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
                              "rel": "delete"
                            },
                            {
                              "method": "PUT",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant/tenantOne",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne",
                              "rel": "update"
                            }
                          ]
