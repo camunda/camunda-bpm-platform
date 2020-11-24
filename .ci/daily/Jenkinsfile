@@ -68,7 +68,7 @@ pipeline {
         copyArtifacts(projectName: "cambpm-jenkins-pipelines/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
         sh 'ls -al'
         stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
-        stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+        stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
         stash name: "platform-stash-distro", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
       }
     }
@@ -102,7 +102,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false,'distro/sql-script/', 'install -Pcheck-sql,h2')
             }
           }
@@ -125,7 +125,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false, 'qa/test-db-upgrade/', 'verify -Pupgrade-db,h2')
             }
           }
@@ -153,7 +153,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, true, 'qa/test-db-instance-migration/', 'verify -Pinstance-migration,h2')
             }
           }
@@ -181,7 +181,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false, 'qa/', 'verify -Pold-engine,h2')
             }
           }
@@ -209,7 +209,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,h2')
             }
           }
@@ -237,7 +237,7 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false, 'qa/large-data-tests/', 'verify -Plarge-data-tests,h2')
             }
           }
@@ -276,7 +276,7 @@ pipeline {
         stages {
           stage('sql-scripts') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true,  false, false, 'distro/sql-script/', 'install -Pcheck-sql,' + getDbProfiles(env.DB), true)
               }
             }
@@ -311,7 +311,7 @@ pipeline {
         stages {
           stage('UPGRADE-databases-from-714') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, false, false, 'qa/test-db-upgrade/', 'verify -Pupgrade-db,' + getDbProfiles(env.DB), true)
               }
             }
@@ -351,7 +351,7 @@ pipeline {
         stages {
           stage('UPGRADE-instance-migration') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, false, true, 'qa/test-db-instance-migration/', 'verify -Pinstance-migration,' + getDbProfiles(env.DB), true)
               }
             }
@@ -391,7 +391,7 @@ pipeline {
         stages {
           stage('UPGRADE-old-engine-from-714') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, false, false, 'qa/', 'verify -Pold-engine,' + getDbProfiles(env.DB), true)
               }
             }
@@ -431,7 +431,7 @@ pipeline {
         stages {
           stage('UPGRADE-rolling-update') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, false, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,' + getDbProfiles(env.DB), true)
               }
             }
@@ -471,7 +471,7 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              withMaven(jdk: '\${env.JDK}', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: '\${env.JDK}', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, true, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
               }
             }
@@ -511,7 +511,7 @@ pipeline {
         stages {
           stage('PERFORMANCE-large-data') {
             steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-public-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 runMaven(true, false, false,'qa/large-data-tests/', 'verify -Plarge-data-tests,' + getDbProfiles(env.DB), true)
               }
             }
@@ -545,9 +545,9 @@ pipeline {
   }
 }
 
-void runMaven(boolean runtimeStash, boolean distroStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
+void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
   if (runtimeStash) unstash "platform-stash-runtime"
-  if (distroStash) unstash "platform-stash-distro"
+  if (archivesStash) unstash "platform-stash-archives"
   if (qaStash) unstash "platform-stash-qa"
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {

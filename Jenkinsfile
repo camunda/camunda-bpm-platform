@@ -84,15 +84,14 @@ pipeline {
           stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
         }
 
-        build job: "cambpm-jenkins-pipelines-ee/${env.BRANCH_NAME}", parameters: [
+        build job: "cambpm-jenkins-pipelines-ee/${env.EE_BRANCH_NAME}", parameters: [
             string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
             booleanParam(name: 'STANDALONE', value: false),
             string(name: 'CE_BRANCH_NAME', value: "${BRANCH_NAME}")
         ], quietPeriod: 10, wait: false
         build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
             string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-            booleanParam(name: 'STANDALONE', value: false),
-            string(name: 'CE_BRANCH_NAME', value: "${BRANCH_NAME}")
+            booleanParam(name: 'STANDALONE', value: false)
         ], quietPeriod: 10, wait: false
       }
     }
