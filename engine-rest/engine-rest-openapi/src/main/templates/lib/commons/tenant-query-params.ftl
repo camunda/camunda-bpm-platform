@@ -26,7 +26,6 @@
   },
   "includingGroupsOfUser": {
     "type": "boolean",
-    "defaultValue": "false",
     "desc": "Select only tenants where the user or one of his groups is a member of.
              Can only be used in combination with the `userMember` parameter. Value may only be `true`,
              as `false` is the default behavior."
