@@ -1,9 +1,9 @@
-<#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/group-members/options/index.html -->
+<#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/user-members/options/index.html -->
 {
   <@lib.endpointInfo
-      id = "availableTenantGroupMembersOperations"
+      id = "availableTenantUserMembersOperations"
       tag = "Tenant"
-      summary = "Tenant Group Membership Resource Options"
+      summary = "Tenant User Membership Resource Options"
       desc = "The OPTIONS request allows checking for the set of available operations that the
               currently authenticated user can perform on the resource. If the user
               can perform an operation or not may depend on various things,
@@ -32,22 +32,22 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200.",
-                       "description": "OPTIONS `/tenant/tenantOne/group-members`",
+                       "description": "OPTIONS `/tenant/tenantOne/user-members`",
                        "value": {
                          "links": [
                            {
                              "method": "GET",
-                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/user-members",
                              "rel": "self"
                            },
                            {
                              "method": "DELETE",
-                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/user-members",
                              "rel": "delete"
                            },
                            {
                              "method": "PUT",
-                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
+                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/user-members",
                              "rel": "create"
                            }
                          ]

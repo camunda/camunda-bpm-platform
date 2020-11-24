@@ -23,17 +23,17 @@
                          "links": [
                            {
                              "method": "GET",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant",
+                             "href": "http://localhost:8080/engine-rest/tenant",
                              "rel": "list"
                            },
                            {
                              "method": "GET",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant/count",
+                             "href": "http://localhost:8080/engine-rest/tenant/count",
                              "rel": "count"
                            },
                            {
                              "method": "POST",
-                             "href": "http://localhost:8080/camunda/api/engine/engine/default/tenant/create",
+                             "href": "http://localhost:8080/engine-rest/tenant/create",
                              "rel": "create"
                            }
                          ]
