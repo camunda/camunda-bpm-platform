@@ -18,13 +18,13 @@
 import angular from "angular";
 import ReactDOM from "react-dom";
 
-import camCommonsModule from "./legacy/camunda-commons-ui/lib";
-import pluginsModule from "./legacy/plugins";
-import services from "./legacy/client/scripts/services/main";
-import resources from "./legacy/client/scripts/resources/main";
-import filters from "./legacy/client/scripts/filters/main";
-import directives from "./legacy/client/scripts/directives/main";
-import eePlugins from "./enterprise/cockpit/cockpitPluginsEE";
+import camCommonsModule from "../../../legacy/camunda-commons-ui/lib";
+import pluginsModule from "../../../legacy/plugins";
+import services from "../../../legacy/client/scripts/services/main";
+import resources from "../../../legacy/client/scripts/resources/main";
+import filters from "../../../legacy/client/scripts/filters/main";
+import directives from "../../../legacy/client/scripts/directives/main";
+import eePlugins from "../../../enterprise/cockpit/cockpitPluginsEE";
 
 import getPassthroughData from "utils/angularToReactPluginInterface";
 
@@ -150,7 +150,7 @@ export default function setup(module, setPlugins) {
 
   module.provider(
     "configuration",
-    require("./legacy/common/scripts/services/cam-configuration")(
+    require("../../../legacy/common/scripts/services/cam-configuration")(
       config,
       "Cockpit"
     )

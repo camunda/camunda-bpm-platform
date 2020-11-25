@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-export { AngularApp } from "./AngularApp";
-export { CamundaLogo } from "./CamundaLogo";
-export { Clipboard } from "./Clipboard";
-export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
-export { GlyphIcon } from "./Icons";
-export { LinkButton } from "./LinkButton";
-export { LoadingIndicator } from "./LoadingIndicator";
-export { Notifications } from "./Notifications";
-export { Pagination } from "./Pagination";
-export { StateCircle } from "./StateCircle";
-export { Table } from "./Table";
-export { ActionButton } from "./ActionButton";
-export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
-export { ModalFormGroup } from "./ModalFormGroup";
+import { AngularApp } from "components";
+import React from "react";
+import { useParams } from "react-router-dom";
+import angularComponent from "./angularComponent";
+import { ActivityProvider } from "./HOC/withActivityInstances";
+import { BpmnProvider } from "./HOC/withBpmn";
+import { ProcessInstanceProvider } from "./HOC/withProcessInstance";
+
+export default function ProcessInstance() {
+  const { id } = useParams();
+
+  return (
+    <ProcessInstanceProvider processInstanceId={id}>
+      <ActivityProvider processInstanceId={id}>
+        <BpmnProvider>
+          <AngularApp component={angularComponent} />
+        </BpmnProvider>
+      </ActivityProvider>
+    </ProcessInstanceProvider>
+  );
+}
