@@ -18,7 +18,6 @@
 export { CamundaLogo } from "./CamundaLogo";
 export { Clipboard } from "./Clipboard";
 export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
 export { GlyphIcon } from "./Icons";
 export { LinkButton } from "./LinkButton";
 export { LoadingIndicator } from "./LoadingIndicator";
