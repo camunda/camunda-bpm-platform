@@ -17,6 +17,8 @@
 
 import { getCSRFCookieName } from "utils/config";
 
+import "./handleHttpErrors";
+
 const handlers = [];
 
 export function put(url, body, options = {}) {

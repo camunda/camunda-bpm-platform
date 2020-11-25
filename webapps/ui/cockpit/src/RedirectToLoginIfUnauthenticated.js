@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
+import { withUser } from "HOC";
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 
 import { addHandler, removeHandler } from "utils/request";
 
-export default function RedirectToLoginIfUnauthenticated() {
-  const [redirect, forceRedirect] = useState(false);
+const RedirectToLoginIfUnauthenticated = withUser(({ user, refreshUser }) => {
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [redirectInProgress, setRedirectInProgress] = useState(false);
 
   useEffect(() => {
     const loginHandler = response => {
-      if (response.status === 401) {
-        forceRedirect(true);
+      if (response.status === 401 && window.location.hash !== "#/login") {
+        setShouldRedirect(true);
       }
       return response;
     };
@@ -37,7 +39,21 @@ export default function RedirectToLoginIfUnauthenticated() {
     };
   }, []);
 
-  useEffect(() => forceRedirect(false), [redirect]);
+  const redirected = shouldRedirect && redirectInProgress && !user;
+  useEffect(() => {
+    if (shouldRedirect && !redirectInProgress) {
+      setRedirectInProgress(true);
 
-  return redirect ? <Redirect to="/login" /> : null;
-}
+      refreshUser();
+    }
+
+    if (redirected) {
+      setShouldRedirect(false);
+      setRedirectInProgress(false);
+    }
+  }, [redirectInProgress, redirected, refreshUser, shouldRedirect]);
+
+  return redirected ? <Redirect to="/login" /> : null;
+});
+
+export default RedirectToLoginIfUnauthenticated;
