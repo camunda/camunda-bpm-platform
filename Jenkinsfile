@@ -47,7 +47,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: 'pipeline-master', description: '', name: 'EE_BRANCH_NAME'
+      string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
@@ -437,4 +437,3 @@ void withLabels(String... labels) {
     pullRequest.labels.contains(labelName)
   }
 }
-
