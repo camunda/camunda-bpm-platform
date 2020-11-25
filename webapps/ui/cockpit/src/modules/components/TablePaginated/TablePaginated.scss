@@ -1,0 +1,9 @@
+@import "shared-styles/colors.scss";
+
+.TablePaginated {
+  .no-rows {
+    text-align: center;
+    font-style: italic;
+    color: $hint-color;
+  }
+}
