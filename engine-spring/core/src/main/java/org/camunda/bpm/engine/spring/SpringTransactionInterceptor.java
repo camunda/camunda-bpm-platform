@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -65,7 +66,12 @@ public class SpringTransactionInterceptor extends CommandInterceptor {
     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
     transactionTemplate.setPropagationBehavior(transactionPropagation);
     try {
-      T result = (T) transactionTemplate.execute((TransactionCallback) status -> next.execute(command));
+      // don't use lambdas here => CAM-12810
+      T result = (T) transactionTemplate.execute(new TransactionCallback() {
+        public Object doInTransaction(TransactionStatus status) {
+          return next.execute(command);
+        }
+      });
       return result;
     } catch (TransactionSystemException ex) {
       // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
