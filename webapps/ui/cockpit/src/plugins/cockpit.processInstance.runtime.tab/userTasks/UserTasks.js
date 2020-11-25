@@ -17,7 +17,7 @@
 
 import React, { useState, useEffect } from "react";
 
-import withActivityInstanceMap from "../../../components/ProcessInstance/HOC/withActivityInstanceMap";
+import withActivityInstanceMap from "../../../components/ProcessInstance/HOC/withActivityInstances";
 import withBpmn from "../../../components/ProcessInstance/HOC/withBpmn";
 import withFilter from "../../../components/ProcessInstance/HOC/withFilter";
 import { paginateComponent } from "components/Pagination";

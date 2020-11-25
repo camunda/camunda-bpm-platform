@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+export { AngularApp } from "./AngularApp";
 export { CamundaLogo } from "./CamundaLogo";
 export { Clipboard } from "./Clipboard";
 export { Dropdown } from "./Dropdown";

@@ -15,18 +15,4 @@
  * limitations under the License.
  */
 
-import React from "react";
-
-import UserTasks from "./UserTasks";
-
-export default {
-  id: "user-tasks-tab",
-  pluginPoint: "cockpit.processInstance.runtime.tab",
-  priority: 6,
-  render: (node, { processInstanceId }) => {
-    return <UserTasks processInstanceId={processInstanceId} />;
-  },
-  properties: {
-    label: "PLUGIN_USER_TASKS_LABEL"
-  }
-};
+export { default } from "./ProcessInstance";

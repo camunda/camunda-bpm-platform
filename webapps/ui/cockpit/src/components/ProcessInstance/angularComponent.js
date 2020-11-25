@@ -15,18 +15,23 @@
  * limitations under the License.
  */
 
-import React from "react";
+import angular from "angular";
+import module from "../../legacy/client/scripts/pages/processInstance";
 
-import UserTasks from "./UserTasks";
+export default function() {
+  var ngModule = angular.module("cam.cockpit.runtime.processInstance", [
+    module.name
+  ]);
 
-export default {
-  id: "user-tasks-tab",
-  pluginPoint: "cockpit.processInstance.runtime.tab",
-  priority: 6,
-  render: (node, { processInstanceId }) => {
-    return <UserTasks processInstanceId={processInstanceId} />;
-  },
-  properties: {
-    label: "PLUGIN_USER_TASKS_LABEL"
-  }
-};
+  const node = document.createElement("div");
+  node.innerHTML = `  <div
+  cam-breadcrumbs-panel
+  divider="&raquo;"
+  ng-cloak
+  class="breadcrumbs-panel"></div>
+  <div ng-view></div>
+  `;
+  node.className = "ctn-main";
+
+  return { node, module: ngModule };
+}

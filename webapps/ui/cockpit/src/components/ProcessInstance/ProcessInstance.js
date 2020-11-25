@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
+import { AngularApp } from "components";
 import React from "react";
+import { useParams } from "react-router-dom";
+import angularComponent from "./angularComponent";
+import { ActivityProvider } from "./HOC/withActivityInstances";
+import { BpmnProvider } from "./HOC/withBpmn";
+import { ProcessInstanceProvider } from "./HOC/withProcessInstance";
 
-import UserTasks from "./UserTasks";
+export default function ProcessInstance() {
+  const { id } = useParams();
 
-export default {
-  id: "user-tasks-tab",
-  pluginPoint: "cockpit.processInstance.runtime.tab",
-  priority: 6,
-  render: (node, { processInstanceId }) => {
-    return <UserTasks processInstanceId={processInstanceId} />;
-  },
-  properties: {
-    label: "PLUGIN_USER_TASKS_LABEL"
-  }
-};
+  return (
+    <ProcessInstanceProvider processInstanceId={id}>
+      <ActivityProvider processInstanceId={id}>
+        <BpmnProvider>
+          <AngularApp component={angularComponent} />
+        </BpmnProvider>
+      </ActivityProvider>
+    </ProcessInstanceProvider>
+  );
+}

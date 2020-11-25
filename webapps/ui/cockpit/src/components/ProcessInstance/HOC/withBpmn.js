@@ -19,6 +19,7 @@ import React, { useEffect, useState, createContext, useContext } from "react";
 import BpmnIO from "bpmn-js/lib/NavigatedViewer";
 
 import { get } from "utils/request";
+import withProcessInstance from "./withProcessInstance";
 
 function transformBpmn20Xml(bpmn20Xml) {
   return new Promise(resolve => {
@@ -42,23 +43,26 @@ function transformBpmn20Xml(bpmn20Xml) {
 const BpmnContext = createContext();
 
 // Provides `bpmnElements` and `definitions`
-export function BpmnProvider({ processDefinitionId, children }) {
+export const BpmnProvider = withProcessInstance(function({
+  processInstance: { definitionId },
+  children
+}) {
   const [bpmn, setBpmn] = useState({ bpmnElements: {}, definitions: {} });
 
   useEffect(() => {
     const fetchBpmn = async () => {
       const response = await (
-        await get(`%ENGINE_API%/process-definition/${processDefinitionId}/xml`)
+        await get(`%ENGINE_API%/process-definition/${definitionId}/xml`)
       ).json();
 
       setBpmn(await transformBpmn20Xml(response.bpmn20Xml));
     };
 
     fetchBpmn();
-  }, [processDefinitionId]);
+  }, [definitionId]);
 
   return <BpmnContext.Provider value={bpmn}>{children}</BpmnContext.Provider>;
-}
+});
 
 export default Component => props => (
   <Component {...useContext(BpmnContext)} {...props} />
