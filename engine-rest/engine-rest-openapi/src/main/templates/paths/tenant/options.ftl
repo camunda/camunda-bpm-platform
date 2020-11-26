@@ -16,6 +16,9 @@
   "responses" : {
 
     <@lib.response
+        code = "200"
+        dto = "ResourceOptionsDto"
+        desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200.",
                        "description": "OPTIONS `/tenant`",
@@ -39,9 +42,6 @@
                          ]
                        }
                      }']
-        code = "200"
-        dto = "ResourceOptionsDto"
-        desc = "Request successful."
         last = true
     />
 

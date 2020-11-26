@@ -20,6 +20,9 @@
   "responses" : {
 
     <@lib.response
+        code = "200"
+        dto = "CountResultDto"
+        desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200.",
                        "description": "GET `/tenant/count?name=tenantOne`",
@@ -27,9 +30,6 @@
                          "count": 1
                        }
                      }']
-        code = "200"
-        dto = "CountResultDto"
-        desc = "Request successful."
     />
 
     <@lib.response
