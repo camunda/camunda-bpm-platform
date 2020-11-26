@@ -38,7 +38,7 @@ const STATUS = Object.freeze({
   NOT_FOUND: 6
 });
 
-function CancelProcessInstance({ processInstance }) {
+function CancelProcessInstance({ processInstance = {} }) {
   const { id, definitionId } = processInstance;
 
   const [status, setStatus] = useState(null);
@@ -60,16 +60,20 @@ function CancelProcessInstance({ processInstance }) {
     if (id) {
       if (show) {
         const loadSubProcessInstances = async () => {
-          return await (await post(
-            `%ENGINE_API%/process-instance?firstResult=0&maxResults=5`,
-            { superProcessInstance: id }
-          )).json();
+          return await (
+            await post(
+              `%ENGINE_API%/process-instance?firstResult=0&maxResults=5`,
+              { superProcessInstance: id }
+            )
+          ).json();
         };
 
         const loadSubProcessInstancesCount = async () => {
-          return await (await post(`%ENGINE_API%/process-instance/count`, {
-            superProcessInstance: id
-          })).json();
+          return await (
+            await post(`%ENGINE_API%/process-instance/count`, {
+              superProcessInstance: id
+            })
+          ).json();
         };
 
         setStatus(STATUS.LOADING);
@@ -201,9 +205,7 @@ function CancelProcessInstance({ processInstance }) {
                         <tr key={subProcessInstance.id}>
                           <td className="instance-id uuid">
                             <a
-                              href={`#/process-instance/${
-                                subProcessInstance.id
-                              }`}
+                              href={`#/process-instance/${subProcessInstance.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

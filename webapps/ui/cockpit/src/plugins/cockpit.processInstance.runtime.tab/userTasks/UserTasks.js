@@ -29,26 +29,23 @@ import { post } from "utils/request";
 import translate from "utils/translation";
 
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import {
-  Clipboard,
-  LinkButton,
-  LoadingIndicator,
-  Pagination,
-  Table
-} from "components";
+import { Clipboard, LinkButton, Pagination, Table } from "components";
 import AssigneeEdit from "./AssigneeEdit";
 import { UserAction, GroupAction } from "./Actions";
 
 import "./UserTasks.scss";
+import { Suspend, suspendUntilDefined } from "components/Suspend";
 
 function UserTasks({
   processInstanceId,
   filter,
   setFilter,
   activityIdToInstancesMap,
-  bpmnElements,
+  bpmnElements = {},
   startingPage = 1
 }) {
+  suspendUntilDefined(activityIdToInstancesMap);
+
   const [userTasks, setUserTasks] = useState(null);
   const [userTasksCount, setUserTasksCount] = useState();
   const [sortOrder, setSortOrder] = useState(
@@ -116,7 +113,7 @@ function UserTasks({
   }, [queryObject]);
 
   if (loadingState === "LOADING") {
-    return <LoadingIndicator />;
+    return <Suspend />;
   }
 
   if (!userTasks.length) {

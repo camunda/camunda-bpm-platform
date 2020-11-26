@@ -15,19 +15,11 @@
  * limitations under the License.
  */
 
-export { AngularApp } from "./AngularApp";
-export { CamundaLogo } from "./CamundaLogo";
-export { Clipboard } from "./Clipboard";
-export { Dropdown } from "./Dropdown";
-export { EnterpriseComponent } from "./EnterpriseComponent";
-export { GlyphIcon } from "./Icons";
-export { LinkButton } from "./LinkButton";
-export { LoadingIndicator } from "./LoadingIndicator";
-export { Notifications } from "./Notifications";
-export { Pagination } from "./Pagination";
-export { StateCircle } from "./StateCircle";
-export { Suspend } from "./Suspend";
-export { Table } from "./Table";
-export { ActionButton } from "./ActionButton";
-export { CancelProcessInstance } from "./processInstance/CancelProcessInstance";
-export { ModalFormGroup } from "./ModalFormGroup";
+// What is happening here? > https://jira.camunda.com/browse/CAM-12748
+const checkForUndefined = arr => arr.some(el => typeof el === "undefined");
+
+export default function suspendUntilDefined() {
+  const shouldSuspend = checkForUndefined([...arguments]);
+
+  if (shouldSuspend) throw new Promise(() => null);
+}

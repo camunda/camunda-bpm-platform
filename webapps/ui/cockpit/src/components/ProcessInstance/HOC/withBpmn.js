@@ -44,26 +44,28 @@ const BpmnContext = createContext();
 
 // Provides `bpmnElements` and `definitions`
 export const BpmnProvider = withProcessInstance(function({
-  processInstance: { definitionId },
+  processInstance,
   children
 }) {
-  const [bpmn, setBpmn] = useState({ bpmnElements: {}, definitions: {} });
+  const [bpmn, setBpmn] = useState({});
 
   useEffect(() => {
     const fetchBpmn = async () => {
       const response = await (
-        await get(`%ENGINE_API%/process-definition/${definitionId}/xml`)
+        await get(
+          `%ENGINE_API%/process-definition/${processInstance.definitionId}/xml`
+        )
       ).json();
 
       setBpmn(await transformBpmn20Xml(response.bpmn20Xml));
     };
-
-    fetchBpmn();
-  }, [definitionId]);
-
+    if (processInstance) {
+      fetchBpmn();
+    }
+  }, [processInstance]);
   return <BpmnContext.Provider value={bpmn}>{children}</BpmnContext.Provider>;
 });
 
 export default Component => props => (
-  <Component {...useContext(BpmnContext)} {...props} />
+  <Component {...useContext(BpmnContext)} {...props}></Component>
 );

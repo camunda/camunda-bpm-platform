@@ -22,13 +22,13 @@ import { get } from "utils/request";
 const ProcessInstanceContext = createContext();
 
 export function ProcessInstanceProvider({ processInstanceId, children }) {
-  const [processInstance, setProcessInstance] = useState({});
+  const [processInstance, setProcessInstance] = useState();
 
   useEffect(() => {
     const loadProcessInstance = async () => {
-      return await (await get(
-        `%ENGINE_API%/process-instance/${processInstanceId}`
-      )).json();
+      return await (
+        await get(`%ENGINE_API%/process-instance/${processInstanceId}`)
+      ).json();
     };
 
     loadProcessInstance().then(processInstance => {

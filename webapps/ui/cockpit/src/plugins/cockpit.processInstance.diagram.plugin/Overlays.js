@@ -20,6 +20,7 @@ import withFilter from "../../components/ProcessInstance/HOC/withFilter";
 import { addMouseInteraction, configureFilter } from "./mouseInteraction";
 import addInstanceCount from "./instanceCount";
 import withActivityInstances from "../../components/ProcessInstance/HOC/withActivityInstances";
+import suspendUntilDefined from "components/Suspend/suspendUntilDefined";
 
 function Overlays({
   filter,
@@ -28,19 +29,19 @@ function Overlays({
   activityIdToInstancesMap,
   activityIdToIncidentsMap
 }) {
+  suspendUntilDefined(activityIdToInstancesMap, activityIdToIncidentsMap);
+
   useEffect(() => {
-    if (activityIdToInstancesMap && activityIdToIncidentsMap) {
-      addInstanceCount(
-        viewer,
-        activityIdToInstancesMap,
-        activityIdToIncidentsMap
-      );
-      addMouseInteraction(
-        viewer,
-        activityIdToInstancesMap,
-        activityIdToIncidentsMap
-      );
-    }
+    addInstanceCount(
+      viewer,
+      activityIdToInstancesMap,
+      activityIdToIncidentsMap
+    );
+    addMouseInteraction(
+      viewer,
+      activityIdToInstancesMap,
+      activityIdToIncidentsMap
+    );
   }, [activityIdToIncidentsMap, activityIdToInstancesMap, viewer]);
 
   useEffect(() => {

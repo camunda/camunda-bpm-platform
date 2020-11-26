@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { HashRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import { Footer, Header, Login, ProcessInstance } from "./components";
@@ -79,65 +79,67 @@ function App() {
           <RedirectToLoginIfUnauthenticated />
           <div className="App">
             <Header />
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-              <Route path="/login">
-                <Login />
-              </Route>
-              <AngularRoute path="/dashboard" component={dashboard} />
-              <AngularRoute path="/processes" component={processes} />
-              <Route
-                exact
-                path="/process-definition/:id/"
-                render={props => (
-                  <Redirect
-                    to={`/process-definition/${props.match.params.id}/runtime`}
-                  />
-                )}
-              />
-              <AngularRoute
-                path="/process-definition/:id/runtime"
-                component={processDefinition}
-              />
-
-              <Route
-                exact
-                path="/process-instance/:id/"
-                render={props => (
-                  <Redirect
-                    to={`/process-instance/${props.match.params.id}/runtime`}
-                  />
-                )}
-              />
-              <Route
-                path="/process-instance/:id/runtime"
-                component={ProcessInstance}
-              />
-              <AngularRoute path="/decisions" component={decisions} />
-              <AngularRoute
-                path="/decision-definition"
-                component={decisionDefinition}
-              />
-              <AngularRoute
-                path="/decision-instance"
-                component={decisionInstance}
-              />
-              <AngularRoute path="/tasks" component={tasks} />
-              <AngularRoute path="/repository" component={repository} />
-              <AngularRoute exact path="/batch" component={batch} />
-              <Route>
-                <PluginPoint
-                  location="cockpit.route"
-                  wrapPlugins={({ children, properties }) => (
-                    <Route exact path={properties.path}>
-                      {children}
-                    </Route>
+            <Suspense fallback={<LoadingIndicator fullscreen={true} />}>
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/dashboard" />
+                </Route>
+                <Route path="/login">
+                  <Login />
+                </Route>
+                <AngularRoute path="/dashboard" component={dashboard} />
+                <AngularRoute path="/processes" component={processes} />
+                <Route
+                  exact
+                  path="/process-definition/:id/"
+                  render={props => (
+                    <Redirect
+                      to={`/process-definition/${props.match.params.id}/runtime`}
+                    />
                   )}
                 />
-              </Route>
-            </Switch>
+                <AngularRoute
+                  path="/process-definition/:id/runtime"
+                  component={processDefinition}
+                />
+
+                <Route
+                  exact
+                  path="/process-instance/:id/"
+                  render={props => (
+                    <Redirect
+                      to={`/process-instance/${props.match.params.id}/runtime`}
+                    />
+                  )}
+                />
+                <Route
+                  path="/process-instance/:id/runtime"
+                  component={ProcessInstance}
+                />
+                <AngularRoute path="/decisions" component={decisions} />
+                <AngularRoute
+                  path="/decision-definition"
+                  component={decisionDefinition}
+                />
+                <AngularRoute
+                  path="/decision-instance"
+                  component={decisionInstance}
+                />
+                <AngularRoute path="/tasks" component={tasks} />
+                <AngularRoute path="/repository" component={repository} />
+                <AngularRoute exact path="/batch" component={batch} />
+                <Route>
+                  <PluginPoint
+                    location="cockpit.route"
+                    wrapPlugins={({ children, properties }) => (
+                      <Route exact path={properties.path}>
+                        {children}
+                      </Route>
+                    )}
+                  />
+                </Route>
+              </Switch>
+            </Suspense>
             <Notifications className="page-notifications" />
             <Footer />
           </div>

@@ -16,7 +16,9 @@
  */
 
 import angular from "angular";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
+import { LoadingIndicator } from "../LoadingIndicator";
 
 import camCommonsModule from "../../../legacy/camunda-commons-ui/lib";
 import pluginsModule from "../../../legacy/plugins";
@@ -34,6 +36,10 @@ import dataDepend from "angular-data-depend/src/dataDepend";
 import { getPlugins, getConfig, getLocale } from "utils/config";
 import { addApiAttributes } from "utils/PluginPoint";
 import * as notifications from "utils/notifications";
+
+const PluginWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingIndicator />}>{children}</Suspense>
+);
 
 export default function setup(module, setPlugins) {
   const config = getConfig();
@@ -76,7 +82,10 @@ export default function setup(module, setPlugins) {
         let reactPortal;
         if (reactContent) {
           const isolatedContainer = document.createElement("div");
-          reactPortal = ReactDOM.createPortal(reactContent, isolatedContainer);
+          reactPortal = ReactDOM.createPortal(
+            <PluginWrapper>{reactContent}</PluginWrapper>,
+            isolatedContainer
+          );
           reactPlugins.push(reactPortal);
           setPlugins([...reactPlugins]);
         }
@@ -107,7 +116,7 @@ export default function setup(module, setPlugins) {
             let reactPortal;
             if (reactContent) {
               reactPortal = ReactDOM.createPortal(
-                reactContent,
+                <PluginWrapper>{reactContent}</PluginWrapper>,
                 isolatedContainer
               );
               reactPlugins.push(reactPortal);
