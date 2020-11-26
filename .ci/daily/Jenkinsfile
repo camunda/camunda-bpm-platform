@@ -55,7 +55,7 @@ pipeline {
     pollSCM('H H(0-7) * * *')
   }
   stages {
-    stage ('Prepare') {
+    stage('Prepare') {
       agent {
         kubernetes {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
@@ -68,7 +68,6 @@ pipeline {
         copyArtifacts(projectName: "cambpm-jenkins-pipelines/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
         sh 'ls -al'
         stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
-        stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
         stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
       }
     }
@@ -103,7 +102,7 @@ pipeline {
           }
           steps {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, false,'distro/sql-script/', 'install -Pcheck-sql,h2')
+              runMaven(true, false, false, 'distro/sql-script/', 'install -Pcheck-sql,h2')
             }
           }
         }
@@ -249,12 +248,16 @@ pipeline {
         }
       }
     }
-    stage('sql-scripts DBs') {
+    stage('QA DB tests') {
       matrix {
         axes {
           axis {
             name 'DB'
             values 'postgresql_96', 'mariadb_103'
+          }
+          axis {
+            name 'PROFILE'
+            values 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         agent {
@@ -267,177 +270,18 @@ pipeline {
             branch 'pipeline-master';
             allOf {
               changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
+//              expression {
+//                withLabels('all-db') || withDbLabel(env.DB)
+//              }
             }
           }
         }
         stages {
-          stage('sql-scripts') {
+          stage("QA test") {
             steps {
+              echo("QA DB Test Stage: ${env.PROFILE}-${env.DB}")
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true,  false, false, 'distro/sql-script/', 'install -Pcheck-sql,' + getDbProfiles(env.DB), true)
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('UPGRADE-databases-from-714 DBs') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage('UPGRADE-databases-from-714') {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'qa/test-db-upgrade/', 'verify -Pupgrade-db,' + getDbProfiles(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('UPGRADE-instance-migration DBs') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage('UPGRADE-instance-migration') {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, true, 'qa/test-db-instance-migration/', 'verify -Pinstance-migration,' + getDbProfiles(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('UPGRADE-old-engine-from-714 DBs') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage('UPGRADE-old-engine-from-714') {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'qa/', 'verify -Pold-engine,' + getDbProfiles(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('UPGRADE-rolling-update DBs') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage('UPGRADE-rolling-update') {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,' + getDbProfiles(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(DB) + " " + getDbExtras(env.DB), true)
               }
             }
           }
@@ -471,48 +315,8 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              withMaven(jdk: '\${env.JDK}', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('PERFORMANCE-large-data DBs') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage('PERFORMANCE-large-data') {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false,'qa/large-data-tests/', 'verify -Plarge-data-tests,' + getDbProfiles(env.DB), true)
+              withMaven(jdk: env.JDK, maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
               }
             }
             post {
@@ -641,4 +445,47 @@ String getDbProfiles(String dbLabel) {
 
 String getDbExtras(String dbLabel) {
   return getDbInfo(dbLabel).extra
+}
+
+String resolveMavenProfileInfo(String profile) {
+  Map PROFILE_PATHS = [
+      'check-sql': [
+          directory: 'distro/sql-script/',
+          command: 'install -Pcheck-sql,',
+          qaStash: false],
+     'upgrade-db': [
+          directory: 'qa/test-db-upgrade/',
+          command: 'verify -Pupgrade-db,',
+          qaStash: false],
+      'instance-migration': [
+          directory: 'qa/test-db-instance-migration/',
+          command: 'verify -Pinstance-migration,',
+          qaStash: true],
+      'old-engine': [
+          directory: 'qa/',
+          command: 'verify -Pold-engine,',
+          qaStash: false],
+      'rolling-update': [
+          directory: 'qa/test-db-rolling-update/',
+          command: 'verify -Prolling-update,',
+          qaStash: true],
+      'large-data-tests': [
+          directory: 'qa/large-data-tests/',
+          command: 'verify -Plarge-data-tests,',
+          qaStash: false]
+  ]
+
+  return PROFILE_PATHS[profile]
+}
+
+String getMavenProfileCmd(String profile) {
+  return resolveMavenProfileInfo(profile).command
+}
+
+String getMavenProfileDir(String profile) {
+  return resolveMavenProfileInfo(profile).directory
+}
+
+boolean isQaStashEnabled(String profile) {
+  return resolveMavenProfileInfo(profile).qaStash
 }
