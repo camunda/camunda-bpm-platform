@@ -67,7 +67,7 @@ pipeline {
                    """
                  }
               }
-
+    
               // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
               // add a new line for each group of artifacts
               archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt', followSymlinks: false
@@ -92,17 +92,6 @@ pipeline {
               agent none
               options {
                 skipDefaultCheckout true
-              }
-              when {
-                anyOf {
-                  branch 'pipeline-prs';
-                  allOf {
-                    changeRequest();
-                    expression {
-                      withLabels('all-db','rolling-update','migration','h2','db2')
-                    }
-                  }
-                }
               }
               steps {
                 build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
@@ -171,7 +160,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('h2', 'authorizations')
+                  withLabels('h2')
                 }
               }
             }
@@ -233,7 +222,7 @@ pipeline {
             }
           }
         }
-        stage('webapp-UNIT-h2-d') {
+        stage('webapp-UNIT-h2') {
           when {
             anyOf {
               branch 'pipeline-master';
@@ -264,7 +253,6 @@ pipeline {
                 changeRequest();
                 expression {
                   withLabels('all-as','tomcat')
-                  elaluateConditions()
                 }
               }
             }
@@ -711,18 +699,18 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (runtimeStash) unstash "platform-stash-runtime"
-  if (archivesStash) unstash "platform-stash-archives"
-  if (qaStash) unstash "platform-stash-qa"
+  //if (runtimeStash) unstash "platform-stash-runtime"
+  //if (archivesStash) unstash "platform-stash-archives"
+  //if (qaStash) unstash "platform-stash-qa"
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
   }
 }
 
-void withLabels(String... labels) {
-  for ( l in labels) {
-    pullRequest.labels.contains(labelName)
+boolean withLabels(String... labels) {
+  for (l in labels) {
+    return  pullRequest.labels.contains(l)
   }
 }
 
