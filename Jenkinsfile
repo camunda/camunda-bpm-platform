@@ -125,7 +125,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('h2')
+                  withLabels('h2', 'authorizations')
                 }
               }
             }
@@ -187,14 +187,14 @@ pipeline {
             }
           }
         }
-        stage('webapp-UNIT-h2') {
+        stage('webapp-UNIT-h2-d') {
           when {
             anyOf {
               branch 'pipeline-master';
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapps')
+                  withLabels('default-build')
                 }
               }
             }
@@ -217,7 +217,8 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('IT')
+                  withLabels('all-as','tomcat')
+                  elaluateConditions()
                 }
               }
             }
@@ -247,7 +248,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('webapps', 'IT')
+                  withLabels('webapp-integration', 'h2')
                 }
               }
             }
@@ -272,15 +273,7 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps', 'IT')
-                }
-              }
-            }
+            branch 'pipeline-master';
           }
           agent {
             kubernetes {
@@ -302,7 +295,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('IT', 'run', 'spring-boot')
+                  withLabels('run')//'spring-boot'
                 }
               }
             }
@@ -332,7 +325,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('IT', 'spring-boot')
+                  withLabels('spring-boot')
                 }
               }
             }
@@ -544,6 +537,17 @@ pipeline {
           }
         }
         stage('engine-UNIT-database-table-prefix') {
+          when {
+            anyOf {
+              branch 'pipeline-master';
+              allOf {
+                changeRequest();
+                expression {
+                  withLabels("all-db") || withDbLabel(env.DB)
+                }
+              }
+            }
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -561,6 +565,11 @@ pipeline {
               yaml getAgent()
             }
           }
+          when {
+            anyOf {
+              branch 'pipeline-master';
+            }
+          }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               nodejs('nodejs-14.6.0'){
@@ -575,6 +584,11 @@ pipeline {
               yaml getAgent()
             }
           }
+          when {
+            anyOf {
+              branch 'pipeline-master';
+            }
+          }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false, '.', 'clean verify -Pcheck-engine,wls-compatibility,jersey')
@@ -582,6 +596,17 @@ pipeline {
           }
         }
         stage('IT-wildfly-domain') {
+          when {
+            anyOf {
+              branch 'pipeline-master';
+              allOf {
+                changeRequest();
+                expression {
+                  withLabels('wildfly')
+                }
+              }
+            }
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -594,6 +619,17 @@ pipeline {
           }
         }
         stage('IT-wildfly-servlet') {
+          when {
+            anyOf {
+              branch 'pipeline-master';
+              allOf {
+                changeRequest();
+                expression {
+                  withLabels('wildfly')
+                }
+              }
+            }
+          }
           agent {
             kubernetes {
               yaml getAgent()

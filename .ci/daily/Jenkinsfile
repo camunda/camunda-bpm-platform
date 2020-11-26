@@ -96,7 +96,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('qa')
+                  withLabels('h2', 'all-db')
                 }
               }
             }
@@ -119,7 +119,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('qa')
+                  withLabels('h2', 'all-db')
                 }
               }
             }
@@ -147,7 +147,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('qa')
+                  withLabels('default-build', 'migration')
                 }
               }
             }
@@ -175,7 +175,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('qa')
+                  withLabels('h2', 'all-db')
                 }
               }
             }
@@ -203,7 +203,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels('qa')
+                  withLabels('rolling-update', 'default-build')
                 }
               }
             }
@@ -228,12 +228,12 @@ pipeline {
           when {
             anyOf {
               branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
+              //allOf {
+              //  changeRequest();
+              //  expression {
+              //    withLabels('h2', 'all-db')
+              //  }
+              //}
             }
           }
           steps {
@@ -268,7 +268,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('qa') || withDbLabel(env.DB)
+                withLabels('all-db') || withDbLabel(env.DB)
               }
             }
           }
@@ -303,7 +303,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('qa') || withDbLabel(env.DB)
+                withLabels('all-db') || withDbLabel(env.DB)
               }
             }
           }
@@ -343,7 +343,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('qa') || withDbLabel(env.DB)
+                withLabels('migration') || withDbLabel(env.DB)
               }
             }
           }
@@ -383,7 +383,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('qa') || withDbLabel(env.DB)
+                withLabels('all-db') || withDbLabel(env.DB)
               }
             }
           }
@@ -423,7 +423,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('qa') || withDbLabel(env.DB)
+                withLabels('rolling-update') || withDbLabel(env.DB)
               }
             }
           }
@@ -463,7 +463,7 @@ pipeline {
             allOf {
               changeRequest();
               expression {
-                withLabels('jdk', 'qa')
+                withLabels('default-build') //'jdk' doesn't exist so far
               }
             }
           }
@@ -500,12 +500,12 @@ pipeline {
         when {
           anyOf {
             branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('qa') || withDbLabel(env.DB)
-              }
-            }
+            //allOf {
+            //  changeRequest();
+            //  expression {
+            //    withLabels('all-db') || withDbLabel(env.DB)
+            //  }
+            //}
           }
         }
         stages {
