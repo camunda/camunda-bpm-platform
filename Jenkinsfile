@@ -67,7 +67,7 @@ pipeline {
                    """
                  }
               }
-            
+
               // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
               // add a new line for each group of artifacts
               archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt', followSymlinks: false
@@ -84,42 +84,61 @@ pipeline {
               stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
               stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
             }
-
-            build job: "cambpm-jenkins-pipelines-ee/${env.EE_BRANCH_NAME}", parameters: [
-                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                booleanParam(name: 'STANDALONE', value: false),
-                string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}")
-            ], quietPeriod: 10, wait: false
-
           }
         }
-        stage('Trigger QA') {
-          agent none
-          options {
-            skipDefaultCheckout true
-          }
-          when {
-            anyOf {
-              branch 'pipeline-prs';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('all-db','rolling-update','migration','h2','db2')
+        stage('Trigger Downstream') {
+          parallel {
+            stage('Trigger EE') {
+              agent none
+              options {
+                skipDefaultCheckout true
+              }
+              when {
+                anyOf {
+                  branch 'pipeline-prs';
+                  allOf {
+                    changeRequest();
+                    expression {
+                      withLabels('all-db','rolling-update','migration','h2','db2')
+                    }
+                  }
                 }
               }
+              steps {
+                build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
+                    string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                    booleanParam(name: 'STANDALONE', value: false),
+                    string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}")
+                ], quietPeriod: 10, wait: false
+              }
             }
-          }
-          steps {
-            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
-                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                booleanParam(name: 'STANDALONE', value: false)
-            ], quietPeriod: 10, wait: false
+            stage('Trigger QA') {
+              agent none
+              options {
+                skipDefaultCheckout true
+              }
+              when {
+                anyOf {
+                  branch 'pipeline-master';
+                  allOf {
+                    changeRequest();
+                    expression {
+                      withLabels('all-db','rolling-update','migration','h2','db2')
+                    }
+                  }
+                }
+              }
+              steps {
+                build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
+                    string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                    booleanParam(name: 'STANDALONE', value: false)
+                ], quietPeriod: 10, wait: false
+              }
+            }
           }
         }
       }
     }
-
-
     stage('h2 tests') {
       parallel {
         stage('engine-UNIT-h2') {
