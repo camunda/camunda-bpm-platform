@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/group-members/put/index.html -->
 {
   <@lib.endpointInfo
-      id = "deleteMembership"
+      id = "deleteGroupMembership"
       tag = "Tenant"
       summary = "Create Tenant Group Membership"
       desc = "Creates a membership between a tenant and a group."
