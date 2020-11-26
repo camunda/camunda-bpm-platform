@@ -9,7 +9,7 @@
     <@lib.property
         name = "name"
         type = "string"
-        last = last
+        last = true
         desc = "The name of the group."
     />
 

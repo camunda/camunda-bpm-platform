@@ -9,17 +9,21 @@
   />
 
   "parameters" : [
-     "userId": {
-       "type": "string",
-       "desc": "The id of the user to get the groups for."
-     }
+     <@lib.parameter
+        name = "userId"
+        location = "query"
+        type = "string"
+        required = true
+        last = true
+        desc = "The id of the user to get the groups for."
+     />
   ],
 
-  "responses" : {
+  "responses": {
 
     <@lib.response
         code = "200"
-        dto = "GroupInfoDto"
+        dto = "IdentityServiceGroupInfoDto"
         desc = "Request successful."
         examples = ['"example-1": {
                        "description": "GET `/identity/groups?userId=aUserId`",

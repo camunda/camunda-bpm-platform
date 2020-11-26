@@ -11,7 +11,7 @@
         name = "name"
         type = "array"
         dto = "IdentityServiceUserDto"
-        last = last
+        last = true
         desc = "An array that contains all users that are member in one of the groups."
     />
 

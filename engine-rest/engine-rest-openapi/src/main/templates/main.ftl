@@ -41,6 +41,7 @@
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Process Instance"},
+    {"name": "Identity"},
     {"name": "Incident"},
     {"name": "Message"},
     {"name": "Metrics"},

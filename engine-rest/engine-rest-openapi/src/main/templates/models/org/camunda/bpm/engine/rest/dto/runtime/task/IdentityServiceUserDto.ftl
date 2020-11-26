@@ -22,6 +22,7 @@
         name = "displayName"
         type = "string"
         desc = "The displayName is the id, if firstName and lastName are null and firstName lastName otherwise."
+        last = true
     />
 
 </@lib.dto>
