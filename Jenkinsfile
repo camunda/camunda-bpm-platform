@@ -357,12 +357,16 @@ pipeline {
         }
       }
     }
-    stage("engine-UNIT DB tests") {
+    stage('UNIT DB tests') {
       matrix {
         axes {
           axis {
             name 'DB'
             values 'postgresql_96', 'mariadb_103'
+          }
+          axis {
+            name 'PROFILE'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations'
           }
         }
         when {
@@ -370,9 +374,9 @@ pipeline {
             branch 'pipeline-master';
             allOf {
               changeRequest();
-              expression {
-                withLabels("all-db") || withDbLabel(env.DB)
-              }
+//              expression {
+//                withLabels("all-db") || withDbLabel(env.DB)
+//              }
             }
           }
         }
@@ -382,130 +386,11 @@ pipeline {
           }
         }
         stages {
-          stage("engine-UNIT") {
+          stage('UNIT test') {
             steps {
+              echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean test -P' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage("engine-UNIT-authorizations DB tests") {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels("all-db") || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage("engine-UNIT-authorizations") {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean test -PcfgAuthorizationCheckRevokesAlways' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage("webapp-UNIT DB tests") {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels("all-db") || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage("webapp-UNIT") {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'webapps/', 'clean test -Dskip.frontend.build=true -P' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
-              }
-            }
-            post {
-              always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
-              }
-            }
-          }
-        }
-      }
-    }
-    stage("webapp-UNIT-authorizations DB tests") {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_103'
-          }
-        }
-        agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels("all-db") || withDbLabel(env.DB)
-              }
-            }
-          }
-        }
-        stages {
-          stage("webapp-UNIT-authorizations") {
-            steps {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'webapps/', 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+                runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
               }
             }
             post {
@@ -724,4 +609,31 @@ String getDbProfiles(String dbLabel) {
 
 String getDbExtras(String dbLabel) {
   return getDbInfo(dbLabel).extra
+}
+
+String resolveMavenProfileInfo(String profile) {
+  Map PROFILE_PATHS = [
+      'engine-unit': [
+          directory: 'engine/',
+          command: 'clean test -P'],
+      'engine-unit-authorizations': [
+          directory: 'engine/',
+          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'],
+      'webapps-unit': [
+          directory: 'webapps/',
+          command: 'clean test -Dskip.frontend.build=true -P'],
+      'webapps-unit-authorizations': [
+          directory: 'webapps/',
+          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,']
+  ]
+
+  return PROFILE_PATHS[profile]
+}
+
+String getMavenProfileCmd(String profile) {
+  return resolveMavenProfileInfo(profile).command
+}
+
+String getMavenProfileDir(String profile) {
+  return resolveMavenProfileInfo(profile).directory
 }
