@@ -16,7 +16,8 @@
     <@lib.response
         code = "200"
         dto = "PasswordPolicyRuleDto"
-        desc = "Request successful."
+        desc = "Request successful. This example uses the built-in password policy that enforces a minimum password length,
+                and some complexity rules."
         examples = ['"example-1": {
                        "description": "GET `/identity/password-policy`",
                        "value": {

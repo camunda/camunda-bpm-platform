@@ -1,4 +1,4 @@
-<@lib.dto>
+<@lib.dto desc = "Describes a rule of a password policy.">
 
     <@lib.property
         name = "placeholder"

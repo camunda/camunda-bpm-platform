@@ -6,12 +6,14 @@
       summary = "Validate Password"
       desc = "A password policy consists of a list of rules that new passwords must follow to be
               policy compliant. A password can be checked for compliancy via this
-              end point."
+              end point. More information on password policies in Camunda can be found in the password policy
+              [user guide](${docsUrl}/user-guide/process-engine/password-policy/) and in
+              the [security instructions](${docsUrl}/user-guide/security/)."
   />
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "TODO"
+      dto = "PasswordPolicyRequestDto"
       examples = ['"example-1": {
                      "summary": "POST `/identity/password-policy`",
                      "value": {
@@ -30,8 +32,10 @@
 
     <@lib.response
         code = "200"
-        dto = "TODO"
-        desc = "Request successful."
+        dto = "CheckPasswordPolicyResultDto"
+        desc = "Request successful. This example uses the built-in password policy that enforces a minimum password length, and
+                some complexity rules. The checked password is myPassword which is not complex enough to match all of
+                the policy rules."
         examples = ['"example-1": {
                        "description": "POST `/identity/password-policy`",
                        "value": {
