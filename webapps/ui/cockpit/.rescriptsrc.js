@@ -1,7 +1,7 @@
 const { appendWebpackPlugin } = require('@rescripts/utilities')
 const { LicenseWebpackPlugin } = require('license-webpack-plugin');
 
-module.exports = appendWebpackPlugin(    
+const licensebook = appendWebpackPlugin(    
   new LicenseWebpackPlugin({
     stats: {
       warnings: false,
@@ -27,3 +27,16 @@ module.exports = appendWebpackPlugin(
     }
   })
 );
+
+module.exports = [
+  licensebook,
+  {
+    jest: config => {
+      config.testPathIgnorePatterns = [
+        "<rootDir>/src/legacy/",
+        "<rootDir>/src/enterprise/"
+      ];
+      return config
+    }
+  }
+]

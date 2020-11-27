@@ -29,7 +29,7 @@ import translate from "utils/translation";
 
 import "./Login.scss";
 
-function Login({ user, refreshUser, previousLocation }) {
+export function Login({ user, refreshUser, previousLocation }) {
   const [loadingState, setLoadingState] = useState("INITIAL");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +60,6 @@ function Login({ user, refreshUser, previousLocation }) {
       setLoadingState("ERROR");
       setUsername("");
       setPassword("");
-
       if (e.status === 401 || e.status === 403) {
         addError({
           status: translate("PAGE_LOGIN_FAILED"),

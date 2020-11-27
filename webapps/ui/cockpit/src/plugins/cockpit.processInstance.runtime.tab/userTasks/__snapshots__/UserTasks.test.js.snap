@@ -1,0 +1,1800 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`loads User Tasks 1`] = `
+<UserTasks
+  bpmnElements={Object {}}
+  filter={Object {}}
+  processInstanceId="foo"
+>
+  <Table
+    className="UserTasks"
+    head={
+      Array [
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Activity
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Assignee
+        </Head>,
+        <Head
+          onSort={null}
+          sortOrder={null}
+        >
+          Owner
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder="desc"
+        >
+          Creation Date
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Due Date
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Follow Up Date
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Priority
+        </Head>,
+        <Head
+          onSort={null}
+          sortOrder={null}
+        >
+          Delegation State
+        </Head>,
+        <Head
+          onSort={[Function]}
+          sortOrder={null}
+        >
+          Task ID
+        </Head>,
+        <Head
+          onSort={null}
+          sortOrder={null}
+        >
+          Action
+        </Head>,
+      ]
+    }
+  >
+    <table
+      className="Table UserTasks"
+    >
+      <thead>
+        <tr>
+          <Head
+            key="0"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Activity
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="1"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Assignee
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="2"
+            onSort={null}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Owner
+            </th>
+          </Head>
+          <Head
+            key="3"
+            onSort={[Function]}
+            sortOrder="desc"
+          >
+            <th
+              className="TableHead"
+            >
+              Creation Date
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-chevron-down"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="4"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Due Date
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="5"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Follow Up Date
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="6"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Priority
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="7"
+            onSort={null}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Delegation State
+            </th>
+          </Head>
+          <Head
+            key="8"
+            onSort={[Function]}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Task ID
+                
+              <LinkButton
+                onClick={[Function]}
+              >
+                <button
+                  className="LinkButton"
+                  onClick={[Function]}
+                >
+                  <span
+                    className="glyphicon glyphicon-minus"
+                  />
+                </button>
+              </LinkButton>
+            </th>
+          </Head>
+          <Head
+            key="9"
+            onSort={null}
+            sortOrder={null}
+          >
+            <th
+              className="TableHead"
+            >
+              Action
+            </th>
+          </Head>
+        </tr>
+      </thead>
+      <tbody>
+        <Row
+          key="0"
+        >
+          <tr
+            className="TableRow"
+          >
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <LinkButton
+                  onClick={[Function]}
+                >
+                  <button
+                    className="LinkButton"
+                    onClick={[Function]}
+                  >
+                    aName
+                  </button>
+                </LinkButton>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <AssigneeEdit
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <span
+                    className="AssigneeEdit"
+                  >
+                    anAssignee
+                     
+                    <_default
+                      onClick={[Function]}
+                      type="pencil"
+                    >
+                      <span
+                        className="GlyphIcon glyphicon glyphicon-pencil"
+                        onClick={[Function]}
+                      />
+                    </_default>
+                  </span>
+                </AssigneeEdit>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                anOwner
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:42:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:49:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:44:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                RESOLVED
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <_default
+                  text="anId"
+                >
+                  <span
+                    className="Clipboard"
+                  >
+                    <span
+                      className="content"
+                    >
+                      <OverlayTrigger
+                        defaultOverlayShown={false}
+                        overlay={
+                          <Tooltip
+                            bsClass="tooltip"
+                            id="tooltip"
+                            placement="right"
+                          >
+                            PLUGIN_USER_TASKS_LINK_TO_TASKLIST
+                          </Tooltip>
+                        }
+                        placement="top"
+                        trigger={
+                          Array [
+                            "hover",
+                            "focus",
+                          ]
+                        }
+                      >
+                        <a
+                          href="../../tasklist/default/#/?task=anId"
+                          onBlur={[Function]}
+                          onClick={null}
+                          onFocus={[Function]}
+                          onMouseOut={[Function]}
+                          onMouseOver={[Function]}
+                        >
+                          anId
+                        </a>
+                      </OverlayTrigger>
+                    </span>
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="link"
+                      className="copyButton"
+                      disabled={false}
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="copyButton btn btn-link"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <OverlayTrigger
+                          defaultOverlayShown={false}
+                          overlay={
+                            <Tooltip
+                              bsClass="tooltip"
+                              id="tooltip"
+                              placement="right"
+                            >
+                              CAM_WIDGET_COPY
+                            </Tooltip>
+                          }
+                          placement="top"
+                          trigger={
+                            Array [
+                              "hover",
+                              "focus",
+                            ]
+                          }
+                        >
+                          <Glyphicon
+                            bsClass="glyphicon"
+                            glyph="copy"
+                            onBlur={[Function]}
+                            onClick={null}
+                            onFocus={[Function]}
+                            onMouseOut={[Function]}
+                            onMouseOver={[Function]}
+                          >
+                            <span
+                              className="glyphicon glyphicon-copy"
+                              onBlur={[Function]}
+                              onClick={null}
+                              onFocus={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            />
+                          </Glyphicon>
+                        </OverlayTrigger>
+                      </button>
+                    </Button>
+                  </span>
+                </_default>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="GroupAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="GroupAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="th"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-th"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="group"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="UserAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="UserAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="user"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-user"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="user"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+              </td>
+            </Cell>
+          </tr>
+        </Row>
+        <Row
+          key="1"
+        >
+          <tr
+            className="TableRow"
+          >
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <LinkButton
+                  onClick={[Function]}
+                >
+                  <button
+                    className="LinkButton"
+                    onClick={[Function]}
+                  >
+                    aName
+                  </button>
+                </LinkButton>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <AssigneeEdit
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <span
+                    className="AssigneeEdit"
+                  >
+                    anAssignee
+                     
+                    <_default
+                      onClick={[Function]}
+                      type="pencil"
+                    >
+                      <span
+                        className="GlyphIcon glyphicon glyphicon-pencil"
+                        onClick={[Function]}
+                      />
+                    </_default>
+                  </span>
+                </AssigneeEdit>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                anOwner
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:42:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:49:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:44:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                RESOLVED
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <_default
+                  text="anId"
+                >
+                  <span
+                    className="Clipboard"
+                  >
+                    <span
+                      className="content"
+                    >
+                      <OverlayTrigger
+                        defaultOverlayShown={false}
+                        overlay={
+                          <Tooltip
+                            bsClass="tooltip"
+                            id="tooltip"
+                            placement="right"
+                          >
+                            PLUGIN_USER_TASKS_LINK_TO_TASKLIST
+                          </Tooltip>
+                        }
+                        placement="top"
+                        trigger={
+                          Array [
+                            "hover",
+                            "focus",
+                          ]
+                        }
+                      >
+                        <a
+                          href="../../tasklist/default/#/?task=anId"
+                          onBlur={[Function]}
+                          onClick={null}
+                          onFocus={[Function]}
+                          onMouseOut={[Function]}
+                          onMouseOver={[Function]}
+                        >
+                          anId
+                        </a>
+                      </OverlayTrigger>
+                    </span>
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="link"
+                      className="copyButton"
+                      disabled={false}
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="copyButton btn btn-link"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <OverlayTrigger
+                          defaultOverlayShown={false}
+                          overlay={
+                            <Tooltip
+                              bsClass="tooltip"
+                              id="tooltip"
+                              placement="right"
+                            >
+                              CAM_WIDGET_COPY
+                            </Tooltip>
+                          }
+                          placement="top"
+                          trigger={
+                            Array [
+                              "hover",
+                              "focus",
+                            ]
+                          }
+                        >
+                          <Glyphicon
+                            bsClass="glyphicon"
+                            glyph="copy"
+                            onBlur={[Function]}
+                            onClick={null}
+                            onFocus={[Function]}
+                            onMouseOut={[Function]}
+                            onMouseOver={[Function]}
+                          >
+                            <span
+                              className="glyphicon glyphicon-copy"
+                              onBlur={[Function]}
+                              onClick={null}
+                              onFocus={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            />
+                          </Glyphicon>
+                        </OverlayTrigger>
+                      </button>
+                    </Button>
+                  </span>
+                </_default>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="GroupAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="GroupAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="th"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-th"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="group"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="UserAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="UserAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="user"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-user"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="user"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+              </td>
+            </Cell>
+          </tr>
+        </Row>
+        <Row
+          key="2"
+        >
+          <tr
+            className="TableRow"
+          >
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <LinkButton
+                  onClick={[Function]}
+                >
+                  <button
+                    className="LinkButton"
+                    onClick={[Function]}
+                  >
+                    aName
+                  </button>
+                </LinkButton>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <AssigneeEdit
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <span
+                    className="AssigneeEdit"
+                  >
+                    anAssignee
+                     
+                    <_default
+                      onClick={[Function]}
+                      type="pencil"
+                    >
+                      <span
+                        className="GlyphIcon glyphicon glyphicon-pencil"
+                        onClick={[Function]}
+                      />
+                    </_default>
+                  </span>
+                </AssigneeEdit>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                anOwner
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:42:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:49:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                2013-01-23T12:44:42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                42
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                RESOLVED
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <_default
+                  text="anId"
+                >
+                  <span
+                    className="Clipboard"
+                  >
+                    <span
+                      className="content"
+                    >
+                      <OverlayTrigger
+                        defaultOverlayShown={false}
+                        overlay={
+                          <Tooltip
+                            bsClass="tooltip"
+                            id="tooltip"
+                            placement="right"
+                          >
+                            PLUGIN_USER_TASKS_LINK_TO_TASKLIST
+                          </Tooltip>
+                        }
+                        placement="top"
+                        trigger={
+                          Array [
+                            "hover",
+                            "focus",
+                          ]
+                        }
+                      >
+                        <a
+                          href="../../tasklist/default/#/?task=anId"
+                          onBlur={[Function]}
+                          onClick={null}
+                          onFocus={[Function]}
+                          onMouseOut={[Function]}
+                          onMouseOver={[Function]}
+                        >
+                          anId
+                        </a>
+                      </OverlayTrigger>
+                    </span>
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="link"
+                      className="copyButton"
+                      disabled={false}
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="copyButton btn btn-link"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <OverlayTrigger
+                          defaultOverlayShown={false}
+                          overlay={
+                            <Tooltip
+                              bsClass="tooltip"
+                              id="tooltip"
+                              placement="right"
+                            >
+                              CAM_WIDGET_COPY
+                            </Tooltip>
+                          }
+                          placement="top"
+                          trigger={
+                            Array [
+                              "hover",
+                              "focus",
+                            ]
+                          }
+                        >
+                          <Glyphicon
+                            bsClass="glyphicon"
+                            glyph="copy"
+                            onBlur={[Function]}
+                            onClick={null}
+                            onFocus={[Function]}
+                            onMouseOut={[Function]}
+                            onMouseOver={[Function]}
+                          >
+                            <span
+                              className="glyphicon glyphicon-copy"
+                              onBlur={[Function]}
+                              onClick={null}
+                              onFocus={[Function]}
+                              onMouseOut={[Function]}
+                              onMouseOver={[Function]}
+                            />
+                          </Glyphicon>
+                        </OverlayTrigger>
+                      </button>
+                    </Button>
+                  </span>
+                </_default>
+              </td>
+            </Cell>
+            <Cell>
+              <td
+                className="TableCell"
+              >
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="GroupAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="GroupAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="th"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-th"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="group"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+                <GroupAction
+                  assignee="anAssignee"
+                  caseDefinitionId="aCaseDefId"
+                  caseExecutionId="aCaseExecution"
+                  caseInstanceId="aCaseInstId"
+                  created="2013-01-23T13:42:42.000+0200"
+                  delegationState="RESOLVED"
+                  description="aDescription"
+                  due="2013-01-23T13:49:42.576+0200"
+                  executionId="anExecution"
+                  followUp="2013-01-23T13:44:42.437+0200"
+                  formKey="aFormKey"
+                  id="anId"
+                  name="aName"
+                  owner="anOwner"
+                  parentTaskId="aParentId"
+                  priority={42}
+                  processDefinitionId="aProcDefId"
+                  processInstanceId="aProcInstId"
+                  suspended={false}
+                  taskDefinitionKey="aTaskDefinitionKey"
+                  tenantId="aTenantId"
+                >
+                  <OverlayTrigger
+                    defaultOverlayShown={false}
+                    overlay={
+                      <Tooltip
+                        bsClass="tooltip"
+                        id="tooltip"
+                        placement="right"
+                      >
+                        PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP
+                      </Tooltip>
+                    }
+                    placement="left"
+                    trigger={
+                      Array [
+                        "hover",
+                        "focus",
+                      ]
+                    }
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="UserAction"
+                      disabled={false}
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onMouseOut={[Function]}
+                      onMouseOver={[Function]}
+                      variant="default"
+                    >
+                      <button
+                        className="UserAction btn btn-default"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onMouseOut={[Function]}
+                        onMouseOver={[Function]}
+                        type="button"
+                        variant="default"
+                      >
+                        <_default
+                          type="user"
+                        >
+                          <span
+                            className="GlyphIcon glyphicon glyphicon-user"
+                          />
+                        </_default>
+                      </button>
+                    </Button>
+                  </OverlayTrigger>
+                  <GroupModal
+                    id="anId"
+                    onClose={[Function]}
+                    open={false}
+                    type="user"
+                  >
+                    <Modal
+                      animation={true}
+                      autoFocus={true}
+                      backdrop={true}
+                      bsClass="modal"
+                      className="IdentityModal"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop={true}
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+                        enforceFocus={true}
+                        keyboard={true}
+                        manager={
+                          ModalManager {
+                            "add": [Function],
+                            "containers": Array [],
+                            "data": Array [],
+                            "handleContainerOverflow": true,
+                            "hideSiblingNodes": true,
+                            "isTopModal": [Function],
+                            "modals": Array [],
+                            "remove": [Function],
+                          }
+                        }
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </GroupModal>
+                </GroupAction>
+              </td>
+            </Cell>
+          </tr>
+        </Row>
+      </tbody>
+    </table>
+  </Table>
+  <Pagination
+    current={1}
+    onPageChange={[Function]}
+    pages={0.2}
+  />
+</UserTasks>
+`;

@@ -41,7 +41,7 @@ import { UserAction, GroupAction } from "./Actions";
 
 import "./UserTasks.scss";
 
-function UserTasks({
+export function UserTasks({
   processInstanceId,
   filter,
   setFilter,
@@ -120,7 +120,7 @@ function UserTasks({
   }
 
   if (!userTasks.length) {
-    return <span>No user tasks</span>;
+    return <span>{translate("PLUGIN_USER_TASKS_NO_USER_TASKS")}</span>;
   }
 
   const handleSortChange = property => {
