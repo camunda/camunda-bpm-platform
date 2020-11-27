@@ -133,8 +133,15 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, false, 'distro/sql-script/', 'install -Pcheck-sql,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'distro/sql-script/', 'install -Pcheck-sql,h2')
+              }
+            }
+          }
+          post {
+            failure {
+              addFailedStageType(failedStageTypes, 'check-sql')
             }
           }
         }
@@ -151,13 +158,18 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, false, 'qa/test-db-upgrade/', 'verify -Pupgrade-db,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'qa/test-db-upgrade/', 'verify -Pupgrade-db,h2')
+              }
             }
           }
           post {
             always {
               junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+            }
+            failure {
+              addFailedStageType(failedStageTypes, 'upgrade-db')
             }
           }
         }
@@ -174,13 +186,18 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, true, 'qa/test-db-instance-migration/', 'verify -Pinstance-migration,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, true, 'qa/test-db-instance-migration/', 'verify -Pinstance-migration,h2')
+              }
             }
           }
           post {
             always {
               junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+            }
+            failure {
+              addFailedStageType(failedStageTypes, 'instance-migration')
             }
           }
         }
@@ -197,13 +214,18 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, false, 'qa/', 'verify -Pold-engine,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'qa/', 'verify -Pold-engine,h2')
+              }
             }
           }
           post {
             always {
               junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+            }
+            failure {
+              addFailedStageType(failedStageTypes, 'old-engine')
             }
           }
         }
@@ -220,13 +242,18 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, true, 'qa/test-db-rolling-update/', 'verify -Prolling-update,h2')
+              }
             }
           }
           post {
             always {
               junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+            }
+            failure {
+              addFailedStageType(failedStageTypes, 'rolling-update')
             }
           }
         }
@@ -241,13 +268,18 @@ pipeline {
             }
           }
           steps {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              runMaven(true, false, false, 'qa/large-data-tests/', 'verify -Plarge-data-tests,h2')
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                runMaven(true, false, false, 'qa/large-data-tests/', 'verify -Plarge-data-tests,h2')
+              }
             }
           }
           post {
             always {
               junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+            }
+            failure {
+              addFailedStageType(failedStageTypes, 'large-data-tests')
             }
           }
         }
@@ -280,8 +312,15 @@ pipeline {
           stage("QA test") {
             steps {
               echo("QA DB Test Stage: ${env.PROFILE}-${env.DB}")
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(DB) + " " + getDbExtras(env.DB), true)
+              catchError(stageResult: 'FAILURE') {
+                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(DB) + " " + getDbExtras(env.DB), true)
+                }
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
               }
             }
           }
@@ -310,8 +349,10 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              withMaven(jdk: env.JDK, maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
+              catchError(stageResult: 'FAILURE') {
+                withMaven(jdk: env.JDK, maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                  runMaven(true, false, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
+                }
               }
             }
             post {
@@ -376,7 +417,7 @@ boolean withLabels(List labels) {
   } else {
     for (l in labels) {
       if (pullRequest.labels.contains(l)) {
-        return true;  
+        return true;
       }
     }
   }
