@@ -21,7 +21,7 @@
     <@lib.property
         name = "displayName"
         type = "string"
-        desc = "The displayName is the id, if firstName and lastName are null and firstName lastName otherwise."
+        desc = "The displayName is generated from the id or firstName and lastName if available."
         last = true
     />
 

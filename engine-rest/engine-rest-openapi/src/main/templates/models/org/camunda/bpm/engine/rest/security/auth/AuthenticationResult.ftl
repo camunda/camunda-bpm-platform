@@ -12,7 +12,8 @@
         desc = "A flag indicating if user is authenticated."
     />
 
-    <#-- The tenants and groups properties are always retured, but always null in 7.14 -->
+    <#-- The tenants and groups properties are always returned as null from the /identity/verify endpoint.
+    Consider adjusting the description if this dto is used by another endpoint.-->
     <@lib.property
         name = "tenants"
         type = "array"

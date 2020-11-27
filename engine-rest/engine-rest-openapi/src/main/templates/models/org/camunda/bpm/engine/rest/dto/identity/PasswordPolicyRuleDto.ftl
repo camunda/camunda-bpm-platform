@@ -10,6 +10,7 @@
         name = "parameter"
         type = "object"
         last = true
+        addProperty = "\"additionalProperties\": { \"type\": \"string\"}"
         desc = "A map of parameters that can be used to display a parameterized message to the use"
     />
 
