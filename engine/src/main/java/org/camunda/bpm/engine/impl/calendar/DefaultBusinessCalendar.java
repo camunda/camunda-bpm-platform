@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
@@ -50,8 +51,12 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
     units.put("years", Calendar.YEAR);
   }
   
+  public Date resolveDuedate(String dueDate, TaskEntity task) {
+	return resolveDuedate(dueDate);
+  }
+  
   public Date resolveDuedate(String duedate) {
-    return resolveDuedate(duedate, null);
+    return resolveDuedate(duedate, (Date)null);
   }
   
   public Date resolveDuedate(String duedate, Date startDate) {

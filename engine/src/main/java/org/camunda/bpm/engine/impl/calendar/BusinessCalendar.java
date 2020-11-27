@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+
 
 /**
  * @author Tom Baeyens
@@ -28,4 +30,5 @@ public interface BusinessCalendar {
   
   Date resolveDuedate(String duedateDescription, Date startDate);
 
+  Date resolveDuedate(String dueDate, TaskEntity task);
 }

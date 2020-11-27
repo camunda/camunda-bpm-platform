@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.calendar;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
@@ -28,8 +29,12 @@ public class CycleBusinessCalendar implements BusinessCalendar {
 
   public static String NAME = "cycle";
 
+  public Date resolveDuedate(String dueDate, TaskEntity task) {
+	return resolveDuedate(dueDate);
+  }
+  
   public Date resolveDuedate(String duedateDescription) {
-    return resolveDuedate(duedateDescription, null);
+    return resolveDuedate(duedateDescription, (Date)null);
   }
 
   public Date resolveDuedate(String duedateDescription, Date startDate) {
