@@ -63,7 +63,7 @@ server:
 # https://docs.camunda.org/manual/latest/user-guide/logging/#process-engine
 logging:
    level.root: INFO
-   file: logs/camunda-bpm-run.log
+   file.name: logs/camunda-bpm-run.log
 
 # datasource configuration is required
 # do not use the H2 databse in production
