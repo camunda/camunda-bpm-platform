@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
@@ -62,6 +63,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   public IdentityOperationResult saveUser(User user) {
     UserEntity userEntity = (UserEntity) user;
+
+    if(shouldCheckPasswordPolicy(userEntity)) {
+      if(!userEntity.checkPasswordAgainstPolicy()) {
+        throw new ProcessEngineException("Password does not match policy");
+      }
+    }
 
     // encrypt password
     userEntity.encryptPassword();
@@ -377,6 +384,11 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
     }
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
+  }
+
+  protected boolean shouldCheckPasswordPolicy(UserEntity user) {
+    return user.hasNewPassword() && !skipPasswordPolicy
+            && Context.getCommandContext().getProcessEngineConfiguration().isEnablePasswordPolicy();
   }
 
   protected void deleteTenantMembershipsOfUser(String userId) {

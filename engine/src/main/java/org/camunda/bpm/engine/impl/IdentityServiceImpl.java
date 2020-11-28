@@ -68,7 +68,6 @@ import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyResultImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -101,7 +100,7 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void saveGroup(Group group) {
 
     try {
-      commandExecutor.execute(new SaveGroupCmd((GroupEntity) group));
+      commandExecutor.execute(new SaveGroupCmd(group));
     } catch (ProcessEngineException ex) {
       if (ExceptionUtil.checkConstraintViolationException(ex)) {
         throw new BadUserRequestException("The group already exists", ex);
