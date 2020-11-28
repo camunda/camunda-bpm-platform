@@ -32,28 +32,26 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
  * @author Joram Barrez
  */
 public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  protected UserEntity user;
+  protected User user;
   protected boolean skipPasswordPolicy;
-  
+
   public SaveUserCmd(User user) {
     this(user, false);
   }
-  
+
   public SaveUserCmd(User user, boolean skipPasswordPolicy) {
-    this.user = (UserEntity) user;
+    this.user = user;
     this.skipPasswordPolicy = skipPasswordPolicy;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("user", user);
     ensureWhitelistedResourceId(commandContext, "User", user.getId());
 
-    if(shouldCheckPasswordPolicy(commandContext)) {
-      if(!user.checkPasswordAgainstPolicy()) {
-        throw new ProcessEngineException("Password does not match policy");
-      }
+    if (user instanceof UserEntity) {
+      validateUserEntity(commandContext);
     }
 
     IdentityOperationResult operationResult = commandContext
@@ -65,8 +63,16 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
     return null;
   }
 
+  private void validateUserEntity(CommandContext commandContext) {
+    if(shouldCheckPasswordPolicy(commandContext)) {
+      if(!((UserEntity) user).checkPasswordAgainstPolicy()) {
+        throw new ProcessEngineException("Password does not match policy");
+      }
+    }
+  }
+
   protected boolean shouldCheckPasswordPolicy(CommandContext commandContext) {
-    return user.hasNewPassword() && !skipPasswordPolicy
+    return ((UserEntity) user).hasNewPassword() && !skipPasswordPolicy
         && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy();
   }
 }
