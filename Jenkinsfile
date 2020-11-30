@@ -67,6 +67,9 @@ pipeline {
            error('Aborting the build.')
         }
       }
+      post {
+        currentBuild.result = 'SUCCESS'
+      }
     }
         stage('ASSEMBLY') {
           agent {
