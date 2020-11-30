@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
 
@@ -123,7 +125,8 @@ pipeline {
                 build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
                     string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                     booleanParam(name: 'STANDALONE', value: false),
-                    string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}")
+                    string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
+                    string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
                 ], quietPeriod: 10, wait: false
               }
             }
