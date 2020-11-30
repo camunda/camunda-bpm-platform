@@ -41,7 +41,6 @@ spec:
 
 pipeline {
   agent none
-
   options {
     buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
     copyArtifactPermission('*');
@@ -100,7 +99,7 @@ pipeline {
             }
           }
         }
-        stage('Trigger Downstream') {
+        stage('Trigger Downstream + Publish') {
           parallel {
             stage('Trigger EE') {
               agent none
@@ -149,6 +148,18 @@ pipeline {
                     string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                     booleanParam(name: 'STANDALONE', value: false)
                 ], quietPeriod: 10, wait: false
+              }
+            }
+            stage('PUBLISH-CE') { // TO test
+              when {
+                branch 'master'
+              }
+              steps {
+                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+                    sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
+                  }
+                }
               }
             }
           }
@@ -614,7 +625,7 @@ pipeline {
               allOf {
                 changeRequest();
                 expression {
-                  withLabels("all-db") || withDbLabel(env.DB)
+                  withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
                 }
               }
             }
