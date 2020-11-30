@@ -51,6 +51,20 @@ pipeline {
       string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
+    stage('') {
+      agent none
+      when {
+        allOf {
+          changeRequest();
+          expression {
+            pullRequest.labels.contains('no-build')
+          }
+        }
+      }
+      steps {
+        currentBuild.result = 'SUCCESS'
+      }
+    }
         stage('ASSEMBLY') {
           agent {
             kubernetes {
