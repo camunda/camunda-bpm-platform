@@ -51,15 +51,12 @@ pipeline {
       string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
-    stage('Test 0') {
-      agent {
-        kubernetes {
-          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-        }
-      }
-      stages('Test 1') {
         stage('ASSEMBLY') {
-          agent none
+          agent {
+            kubernetes {
+              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            }
+          }
           when {
             anyOf {
               branch 'pipeline-master';
@@ -98,76 +95,39 @@ pipeline {
               stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
               stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
               stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+
             }
-          }
-        }
-        stage('Trigger Downstream + Publish') {
-          parallel {
-            stage('Trigger EE') {
-              agent none
-              when {
-                anyOf {
-                  branch 'pipeline-master';
-                  allOf {
-                    changeRequest();
-                    not {
-                      expression {
-                        pullRequest.labels.contains('no-build')
-                      }
-                    }
-                  }
-                }
-              }
-              options {
-                skipDefaultCheckout true
-              }
-              steps {
-                build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
+
+            build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
                     string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                     booleanParam(name: 'STANDALONE', value: false),
                     string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
                     string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
-                ], quietPeriod: 10, wait: false
-              }
+            ], quietPeriod: 10, wait: false
+
+            script {
+            if (withLabels('all-db','rolling-update','migration','h2','db2')) {
+             build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
+                 string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                 booleanParam(name: 'STANDALONE', value: false)
+             ], quietPeriod: 10, wait: false
             }
-            stage('Trigger QA') {
-              agent none
-              options {
-                skipDefaultCheckout true
-              }
-              when {
-                anyOf {
-                  branch 'pipeline-master';
-                  allOf {
-                    changeRequest();
-                    expression {
-                      withLabels('all-db','rolling-update','migration','h2','db2')
-                    }
-                  }
-                }
-              }
-              steps {
-                build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
-                    string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                    booleanParam(name: 'STANDALONE', value: false)
-                ], quietPeriod: 10, wait: false
-              }
             }
-            stage('PUBLISH-CE') { // TO test
-              when {
-                branch 'master'
-              }
-              steps {
-                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                    sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
-                  }
-                }
-              }
-            }
-          }
-        }
       }
+      // stage('Trigger Downstream + Publish') {
+      //     stage('PUBLISH-CE') { // TO test
+      //       when {
+      //         branch 'master'
+      //       }
+      //       steps {
+      //         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+      //           configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+      //             sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
     }
     stage('h2 tests') {
       parallel {
