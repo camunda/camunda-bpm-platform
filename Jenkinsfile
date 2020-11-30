@@ -73,19 +73,6 @@ pipeline {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
             }
           }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                not {
-                  expression {
-                    pullRequest.labels.contains('no-build')
-                  }
-                }
-              }
-            }
-          }
           steps {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               nodejs('nodejs-14.6.0'){
@@ -736,10 +723,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(String... labels) {
-  if (pullRequest.labels.contains('no-build')) {
-    return false;          
-  }
-
   for (l in labels) {
     return pullRequest.labels.contains(l)
   }
