@@ -41,6 +41,7 @@ spec:
 
 pipeline {
   agent none
+
   options {
     buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
     copyArtifactPermission('*');
@@ -58,6 +59,19 @@ pipeline {
       stages('Test 1') {
         stage('ASSEMBLY') {
           agent none
+          when {
+            anyOf {
+              branch 'pipeline-master';
+              allOf {
+                changeRequest();
+                not {
+                  expression {
+                    pullRequest.labels.contains('no-build')
+                  }
+                }
+              }
+            }
+          }
           steps {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               nodejs('nodejs-14.6.0'){
@@ -90,6 +104,19 @@ pipeline {
           parallel {
             stage('Trigger EE') {
               agent none
+              when {
+                anyOf {
+                  branch 'pipeline-master';
+                  allOf {
+                    changeRequest();
+                    not {
+                      expression {
+                        pullRequest.labels.contains('no-build')
+                      }
+                    }
+                  }
+                }
+              }
               options {
                 skipDefaultCheckout true
               }
@@ -552,6 +579,11 @@ pipeline {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
             }
           }
+          when {
+            anyOf {
+              branch 'pipeline-master';
+            }
+          }
           steps{
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               runMaven(true, false, false, 'engine/', 'clean verify -Pcheck-api-compatibility')
@@ -562,6 +594,11 @@ pipeline {
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            }
+          }
+          when {
+            anyOf {
+              branch 'pipeline-master';
             }
           }
           steps{
@@ -709,8 +746,12 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(String... labels) {
+  if (pullRequest.labels.contains('no-build')) {
+    return false;          
+  }
+
   for (l in labels) {
-    return  pullRequest.labels.contains(l)
+    return pullRequest.labels.contains(l)
   }
 }
 
