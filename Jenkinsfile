@@ -64,11 +64,16 @@ pipeline {
       steps {
         script {
           //currentBuild.result = 'SUCCESS'
-           error('Aborting the build.')
+           //error('Aborting the build.')
+          return
         }
       }
       post {
-        currentBuild.result = 'SUCCESS'
+        always {
+          script {
+            currentBuild.result = 'SUCCESS'
+          }
+        }
       }
     }
         stage('ASSEMBLY') {
