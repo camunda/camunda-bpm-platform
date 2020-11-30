@@ -51,7 +51,7 @@ pipeline {
       string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
-    stage('') {
+    stage('check no-build label') {
       agent none
       when {
         allOf {
@@ -62,7 +62,9 @@ pipeline {
         }
       }
       steps {
-        currentBuild.result = 'SUCCESS'
+        script {
+          currentBuild.result = 'SUCCESS'
+        }
       }
     }
         stage('ASSEMBLY') {
