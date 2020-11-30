@@ -50,10 +50,6 @@ pipeline {
   parameters {
       string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
-  if (true) {
-    currentBuild.result = 'SUCCESS'
-    return
-  }
   stages {
     stage('check no-build label') {
       agent none
@@ -67,7 +63,8 @@ pipeline {
       }
       steps {
         script {
-          currentBuild.result = 'SUCCESS'
+          //currentBuild.result = 'SUCCESS'
+           error('Aborting the build.')
         }
       }
     }
