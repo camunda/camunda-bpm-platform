@@ -1,5 +1,5 @@
 <@lib.dto>
-    <#-- In the java code this inherits from UserCredentialsDto, but that brings an unnecessary
+    <#-- In the java code this inherits from UserCredentialsDto, but that brings the unnecessary
     attribute authenticatedUserPassword -->
 
     <@lib.property
