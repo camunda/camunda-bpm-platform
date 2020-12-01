@@ -271,10 +271,10 @@ pipeline {
           anyOf {
             branch 'pipeline-master';
             expression {
-              return withLabels('all-db') || withDbLabel(env.DB) // TODO fix
+              return withLabels(getLabels(env.PROFILE))
             }
-            beforeAgent true
           }
+          beforeAgent true
         }
         agent {
           kubernetes {
@@ -360,6 +360,11 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 void withLabels(String... labels) {
+  if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
+  //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
+    return false;
+  }
+
   if (env.BRANCH == 'pipeline-master') {
     return true;
   } else if (!params.STANDALONE) {
@@ -465,15 +470,18 @@ String resolveMavenProfileInfo(String profile) {
       'check-sql': [
           directory: 'distro/sql-script/',
           command: 'install -Pcheck-sql,',
-          qaStash: false],
+          qaStash: false,
+          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
      'upgrade-db': [
           directory: 'qa/test-db-upgrade/',
           command: 'verify -Pupgrade-db,',
-          qaStash: false],
+          qaStash: false,
+          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
       'instance-migration': [
           directory: 'qa/test-db-instance-migration/',
           command: 'verify -Pinstance-migration,',
-          qaStash: true],
+          qaStash: true,
+          labels: ''],
       'old-engine': [
           directory: 'qa/',
           command: 'verify -Pold-engine,',
@@ -481,11 +489,13 @@ String resolveMavenProfileInfo(String profile) {
       'rolling-update': [
           directory: 'qa/test-db-rolling-update/',
           command: 'verify -Prolling-update,',
-          qaStash: true],
+          qaStash: true,
+          labels: ''],
       'large-data-tests': [
           directory: 'qa/large-data-tests/',
           command: 'verify -Plarge-data-tests,',
-          qaStash: false]
+          qaStash: false,
+          labels: '']
   ]
 
   return PROFILE_PATHS[profile]
@@ -501,4 +511,8 @@ String getMavenProfileDir(String profile) {
 
 boolean isQaStashEnabled(String profile) {
   return resolveMavenProfileInfo(profile).qaStash
+}
+
+String[] getLabels(String profile) {
+  return resolveMavenProfileInfo(profile).labels
 }

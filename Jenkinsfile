@@ -54,7 +54,8 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          return !pullRequest.labels.contains('no-build')
+          return !pullRequest.labels.contains('TODO')
+          //return !pullRequest.labels.contains('no-build')
         }
         beforeAgent true
       }
@@ -99,7 +100,7 @@ pipeline {
         ], quietPeriod: 10, wait: false
 
         script {
-          if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')) {
+          if (withLabels(true, 'default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
@@ -122,7 +123,7 @@ pipeline {
         stage('engine-UNIT-h2') {
           when {
             expression {
-              return withLabels('h2')
+              return withLabels('h2', 'rolling-update', 'migration')
             }
             beforeAgent true
           }
@@ -520,12 +521,13 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-boolean withLabels(String... labels) {
-  if (pullRequest.labels.contains('no-build')) {
+boolean withLabels(boolean prDaily = false, String... labels) {
+  if (pullRequest.labels.contains('TODO')) {
+  //if (pullRequest.labels.contains('no-build')) {
     return false;
   }
 
-  if (env.BRANCH == 'pipeline-master') {
+  if (env.BRANCH == 'pipeline-master' && !prDaily) {
     return true;
   } else if (changeRequest()) {
     for (l in labels) {
