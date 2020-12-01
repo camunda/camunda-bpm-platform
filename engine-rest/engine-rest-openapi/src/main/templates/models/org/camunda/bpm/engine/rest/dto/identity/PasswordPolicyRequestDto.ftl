@@ -11,6 +11,8 @@
         type = "ref"
         dto = "UserProfileDto"
         last = true
-        desc = "A JSON object containing variable key-value pairs. The object contains the following properties: id (String), firstName (String), lastName (String) and email (String)."/>
+        desc = "A JSON object containing variable key-value pairs. The object contains the following properties:
+                id (String), firstName (String), lastName (String) and email (String)."
+    />
 
 </@lib.dto>
