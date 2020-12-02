@@ -18,10 +18,8 @@
 import React, { useState, useEffect } from "react";
 import { HashRouter, Switch, Route, Redirect } from "react-router-dom";
 
-import AngularApp from "./AngularApp";
-
-import { Footer, Header, Login } from "./components";
-import { LoadingIndicator, Notifications } from "components";
+import { Footer, Header, Login, ProcessInstance } from "./components";
+import { AngularApp, LoadingIndicator, Notifications } from "components";
 
 import RedirectToLoginIfUnauthenticated from "./RedirectToLoginIfUnauthenticated";
 
@@ -32,7 +30,6 @@ import {
   decisionDefinition,
   decisionInstance,
   processDefinition,
-  processInstance,
   repository,
   tasks,
   processes
@@ -40,7 +37,6 @@ import {
 import PluginPoint from "utils/PluginPoint";
 import { UserProvider, PreviousLocationProvider } from "./modules/HOC";
 import { loadConfig } from "utils/config";
-import { ProcessInstanceProvider } from "./components/ProcessInstance/HOC/withProcessInstance";
 
 const DefaultWrapper = ({ children }) => children;
 function AngularRoute({
@@ -115,16 +111,9 @@ function App() {
                   />
                 )}
               />
-              <AngularRoute
+              <Route
                 path="/process-instance/:id/runtime"
-                component={processInstance}
-                wrapApp={({ children, params }) => {
-                  return (
-                    <ProcessInstanceProvider processInstanceId={params.id}>
-                      {children}
-                    </ProcessInstanceProvider>
-                  );
-                }}
+                component={ProcessInstance}
               />
               <AngularRoute path="/decisions" component={decisions} />
               <AngularRoute
