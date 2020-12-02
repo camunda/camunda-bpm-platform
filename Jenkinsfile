@@ -48,7 +48,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
+      string defaultValue: defaultBranch(), description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
@@ -262,7 +262,7 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -369,7 +369,7 @@ pipeline {
       parallel {
         stage('engine-api-compatibility') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -385,7 +385,7 @@ pipeline {
         }
         stage('engine-UNIT-plugins') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -419,7 +419,7 @@ pipeline {
         }
         stage('webapp-UNIT-database-table-prefix') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -437,7 +437,7 @@ pipeline {
         }
         stage('engine-UNIT-wls-compatibility') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -510,6 +510,10 @@ pipeline {
   }
 }
 
+String defaultBranch() {
+  return 'pipeline-master'; // TODO
+//  return 'master';
+}
 
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
   if (runtimeStash) unstash "platform-stash-runtime"
@@ -527,7 +531,7 @@ boolean withLabels(boolean prDaily = false, String... labels) {
     return false;
   }
 
-  if (env.BRANCH == 'pipeline-master' && !prDaily) {
+  if (env.BRANCH == defaultBranch() && !prDaily) {
     return true;
   } else if (changeRequest()) {
     for (l in labels) {

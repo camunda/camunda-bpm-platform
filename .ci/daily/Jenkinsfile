@@ -234,7 +234,7 @@ pipeline {
         }
         stage('PERFORMANCE-large-data-h2') {
           when {
-            branch 'pipeline-master';
+            branch defaultBranch();
             beforeAgent true
           }
           agent {
@@ -269,9 +269,9 @@ pipeline {
         }
         when {
           anyOf {
-            branch 'pipeline-master';
+            branch defaultBranch();
             expression {
-              withLabels(getLabels(env.PROFILE))
+              return withLabels(getLabels(env.PROFILE))
             }
           }
           beforeAgent true
@@ -359,13 +359,18 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
+String defaultBranch() {
+  return 'pipeline-master'; // TODO
+//  return 'master';
+}
+
 boolean withLabels(String... labels) {
   if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
   //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
-  if (env.BRANCH == 'pipeline-master') {
+  if (env.BRANCH == defaultBranch()) {
     return true;
   } else if (!params.STANDALONE) {
     for (l in labels) {
