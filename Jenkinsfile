@@ -123,7 +123,7 @@ pipeline {
         stage('engine-UNIT-h2') {
           when {
             expression {
-              return withLabels('h2', 'rolling-update', 'migration')
+              withLabels('h2', 'rolling-update', 'migration')
             }
             beforeAgent true
           }
@@ -141,7 +141,7 @@ pipeline {
         stage('engine-UNIT-authorizations-h2') {
           when {
             expression {
-              return withLabels('h2')
+              withLabels('h2')
             }
             beforeAgent true
           }
@@ -159,7 +159,7 @@ pipeline {
         stage('engine-rest-UNIT-jersey-2') {
           when {
             expression {
-              return withLabels('rest-api')
+              withLabels('rest-api')
             }
             beforeAgent true
           }
@@ -177,7 +177,7 @@ pipeline {
         stage('engine-rest-UNIT-resteasy3') {
           when {
             expression {
-              return withLabels('rest-api')
+              withLabels('rest-api')
             }
             beforeAgent true
           }
@@ -195,7 +195,7 @@ pipeline {
         stage('webapp-UNIT-h2') {
           when {
             expression {
-              return withLabels('default-build')
+              withLabels('default-build')
             }
             beforeAgent true
           }
@@ -213,7 +213,7 @@ pipeline {
         stage('engine-IT-tomcat-9-h2') {// TODO change it to `postgresql-96`
           when {
             expression {
-              return withLabels('all-as','tomcat')
+              withLabels('all-as','tomcat')
             }
             beforeAgent true
           }
@@ -238,7 +238,7 @@ pipeline {
         stage('webapp-IT-tomcat-9-h2') {
           when {
             expression {
-              return withLabels('webapp-integration', 'h2')
+              withLabels('webapp-integration', 'h2')
             }
             beforeAgent true
           }
@@ -281,7 +281,7 @@ pipeline {
         stage('camunda-run-IT') {
           when {
             expression {
-              return withLabels('run')
+              withLabels('run')
             }
             beforeAgent true
           }
@@ -306,7 +306,7 @@ pipeline {
         stage('spring-boot-starter-IT') {
           when {
             expression {
-              return withLabels('spring-boot')
+              withLabels('spring-boot')
             }
             beforeAgent true
           }
@@ -340,7 +340,7 @@ pipeline {
         }
         when {
           expression {
-            return withLabels("all-db") || withDbLabel(env.DB)
+            withLabels("all-db") || withDbLabel(env.DB)
           }
           beforeAgent true
         }
@@ -402,7 +402,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              return withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+              withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
             }
             beforeAgent true
           }
@@ -454,7 +454,7 @@ pipeline {
         stage('IT-wildfly-domain') {
           when {
             expression {
-              return withLabels('wildfly')
+              withLabels('wildfly')
             }
             beforeAgent true
           }
@@ -472,7 +472,7 @@ pipeline {
         stage('IT-wildfly-servlet') {
           when {
             expression {
-              return withLabels('wildfly')
+              withLabels('wildfly')
             }
             beforeAgent true
           }
@@ -540,8 +540,8 @@ boolean withLabels(boolean prDaily = false, String... labels) {
   return false;
 }
 
-void withDbLabel(String dbLabel) {
-  withLabels(getDbType(dbLabel))
+boolean withDbLabel(String dbLabel) {
+  return withLabels(getDbType(dbLabel))
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
