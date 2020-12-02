@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity -- This file also overwrites datepicker-controls unscoped. */
 [cam-widget-inline-field] {
   display: inline-block;
   max-width: 100%;
@@ -9,17 +10,16 @@
   > .view-value,
   > .preview {
     .form-control-static;
+
     display: block;
     float: left;
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
     min-height: auto;
     max-width: 100%;
-
     color: @link-color;
+
     &:hover {
       color: @link-hover-color;
     }
@@ -30,7 +30,6 @@
   .form-control {
     padding-left: 3px;
     padding-right: 3px;
-
     padding-top: 0;
     padding-bottom: 0;
     border-radius: @input-border-radius-small 0 @input-border-radius-small @input-border-radius-small;
@@ -47,7 +46,6 @@
   .dropdown-menu {
     min-width: 0;
   }
-
 
   &[type="date"],
   &[type="time"],
@@ -66,7 +64,6 @@
     }
   }
 
-
   .visible-whitespace {
     white-space: nowrap;
     width: auto;
@@ -78,7 +75,6 @@
   padding-right: 0;
 }
 
-
 .cam-widget-inline-field {
   &.btn-group,
   &.field-control {
@@ -88,8 +84,8 @@
   }
 }
 
-
-.cam-widget-inline-field.datepicker, .datepicker-control {
+.cam-widget-inline-field.datepicker,
+.datepicker-control {
   &.btn-group,
   &.field-control {
     position: absolute;
@@ -109,6 +105,7 @@
       &:first-child {
         border-radius: @border-radius-small 0 0 0;
       }
+
       &:last-child {
         border-radius: 0 @border-radius-small 0 0;
       }
@@ -116,19 +113,22 @@
   }
 
   &.field-control {
-    .box-shadow(0 3px 9px rgba(0,0,0,.5));
+    .box-shadow(0 3px 9px rgba(0,0,0,0.5));
+
     margin-top: -2px;
 
     table button {
       border: none;
       width: 100%;
     }
+
     thead button {
       height: 28px;
     }
 
     .uib-timepicker {
       margin: auto;
+
       input {
         max-width: 50px;
       }

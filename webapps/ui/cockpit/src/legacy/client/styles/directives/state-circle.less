@@ -3,11 +3,11 @@
   width: @state-circle-size;
   height: @state-circle-size;
   position: relative;
-
   border: 2px solid;
   border-radius: 50%;
 
-  &:before {
+  &::before {
+    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- Icon Font */
     font-family: 'Glyphicons Halflings';
     position: absolute;
     top: -1px;
@@ -21,21 +21,24 @@
 
   &.circle-red {
     color: @brand-danger;
-    &:before {
+
+    &::before {
       content: '\e014';
     }
   }
 
   &.circle-green {
     color: @brand-success;
-    &:before {
+
+    &::before {
       content: '\e013';
     }
   }
 
   &.circle-blue {
     color: darken(#428bca, 6.5%);
-    &:before {
+
+    &::before {
       content: '\e031';
     }
   }

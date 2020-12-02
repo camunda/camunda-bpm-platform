@@ -1,11 +1,12 @@
 @bpmn-nav-radius: 3px;
+
 [cam-widget-cmmn-viewer] {
   border: 1px solid @gray-lighter;
   position: relative;
   min-height: 150px;
 
   .placeholder-container {
-    display:table;
+    display: table;
     width: 100%;
     height: 100%;
     position: absolute;
@@ -21,7 +22,7 @@
     font-size: 20px;
   }
 
-  .diagram-holder .cjs-container>a {
+  .diagram-holder .cjs-container > a {
     display: none;
   }
 
@@ -41,7 +42,7 @@
     fill: fade(@bpmn-highlight-bg, 40%) !important;
   }
 
-  .diagram-holder .highlight .djs-visual>:nth-child(1) {
+  .diagram-holder .highlight .djs-visual > :nth-child(1) {
     fill: @bpmn-highlight-bg !important;
   }
 
@@ -66,8 +67,17 @@
       color: @gray;
       padding: 0;
       bottom: 0;
+
       > span {
         text-align: center;
+      }
+    }
+
+    &.reset {
+      bottom: @grid-gutter-width * 3;
+
+      span {
+        top: 3px;
       }
     }
 
@@ -78,22 +88,19 @@
       button.in {
         bottom: (@grid-gutter-width * 1);
         border-bottom: 0;
+
         > span {
           top: 2px;
           left: 1px;
         }
       }
+
       button.out {
         bottom: 0;
+
         > span {
           top: 3px;
         }
-      }
-    }
-    &.reset {
-      bottom: @grid-gutter-width * 3;
-      span {
-        top: 3px;
       }
     }
   }
@@ -111,12 +118,12 @@
 
       li {
         background: #fff;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         border-color: #adadad;
         border-radius: 2px;
         padding: 5px;
 
-        a {
+        a { /* stylelint-disable-line no-descending-specificity */
           border: none;
           color: @gray;
           padding: 0;
@@ -124,6 +131,7 @@
           &:hover {
             background-color: white;
           }
+
           &:visited {
             background-color: white;
           }

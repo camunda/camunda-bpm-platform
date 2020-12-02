@@ -1,18 +1,14 @@
 @import (reference) "./_mixins";
 
-
 .form-control {
+
   &::-moz-placeholder { font-style: italic; } // Firefox
+  &::-webkit-input-placeholder { font-style: italic; } // Safari and Chrome
   &:-ms-input-placeholder { font-style: italic; } // Internet Explorer 10+
-  &::-webkit-input-placeholder  { font-style: italic; } // Safari and Chrome
 
   border: 1px solid @input-border;
   color: @input-color;
-
-  &,
-  &:hover {
-    box-shadow: @input-box-shadow;
-  }
+  box-shadow: @input-box-shadow;
 
   &:hover {
     color: @input-border-focus;
@@ -22,43 +18,43 @@
     box-shadow: @input-box-shadow-focus;
   }
 
+  .has-success & {
+    color: @state-success-text;
+  }
+
+  &.ng-dirty.ng-invalid,
+  .has-error & {
+    color: @state-danger-text;
+  }
+
+  .has-warning & {
+    color: @state-warning-text;
+  }
 
   .has-success &,
   &.ng-dirty.ng-invalid,
   .has-error &,
   .has-warning & {
-    &,
-    &:hover {
-      box-shadow: @input-box-shadow;
-    }
+    box-shadow: @input-box-shadow;
+
     &:focus {
       box-shadow: @input-box-shadow-focus;
     }
   }
 
-  .has-success & {
-    color: @state-success-text;
-  }
-  &.ng-dirty.ng-invalid,
-  .has-error & {
-    color: @state-danger-text;
-  }
-  .has-warning & {
-    color: @state-warning-text;
-  }
-
+  /* stylelint-disable no-descending-specificity -- This and the style block above both have selectors that want to be on top */
   &[disabled],
   &[readonly],
   .disabled-form &,
   fieldset[disabled] & {
     color: @gray-light;
     background-color: @gray-lighter;
+
     &:focus {
       background-color: @gray-lighter;
       box-shadow: @input-box-shadow-focus;
     }
   }
-
 
   &[type="checkbox"],
   &[type="radio"] {
@@ -66,12 +62,13 @@
     height: auto;
   }
 
-
   &[type=file] {
     border: none !important;
+
     &:focus {
       outline: none;
     }
+
     &.ng-invalid {
       color: @state-danger-text;
       background-color: mix(@input-bg, @state-danger-bg);
@@ -85,6 +82,7 @@ a.form-control-static {
 
 .help-block {
   font-size: 90%;
+
   &.error {
     color: @brand-danger;
   }
@@ -97,7 +95,7 @@ a.form-control-static {
 .disabled-form {
   position: relative;
 
-  &:before {
+  &::before {
     display: block;
     content: ' ';
     background-color: fade(@gray-lighter, 33%);

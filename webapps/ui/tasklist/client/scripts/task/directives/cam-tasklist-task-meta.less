@@ -42,6 +42,7 @@
 
   .groups {
     color: @link-color;
+
     &:hover {
       color: @link-hover-color;
     }
@@ -67,12 +68,13 @@
   }
 
   .assignee .validating {
-    &:before {
+    &::before {
       content: '\e031';
       position: absolute;
       color: @gray-light;
       top: 6px;
       right: 4px;
+      /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- Icon Font */
       font-family: 'Glyphicons Halflings';
       font-style: normal;
       font-weight: normal;
@@ -82,6 +84,7 @@
       -moz-osx-font-smoothing: grayscale;
       .animation(~"spin 1s infinite linear");
     }
+
     input {
       color: @gray-light;
       cursor: wait;
@@ -113,7 +116,6 @@
   }
 }
 
-
 // M
 @media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
   body {
@@ -128,7 +130,6 @@
     }
   }
 }
-
 
 @media (min-width: @screen-lg-min) {
   [cam-tasklist-task-meta] .meta {

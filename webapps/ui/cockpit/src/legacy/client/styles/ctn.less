@@ -37,8 +37,6 @@
   overflow: visible;
 }
 
-
-
 .ctn-header {
   background: @custom-gray-lighter;
   height: 35px;
@@ -86,7 +84,7 @@
     color: @gray-light;
     text-shadow: 0 1px 0 @body-bg;
 
-    &:after {
+    &::after {
       position: absolute;
       top: 0;
       right: 3px;
@@ -129,7 +127,6 @@
     }
   }
 }
-
 
 .ctn-content-container,
 .ctn-column,
@@ -183,7 +180,6 @@
   overflow: visible;
   z-index: 11;
   background-color: @body-bg;
-  right: @ctn-toolbar-width;
   border-left: 1px solid @gray-lighter;
   border-right: 1px solid @gray-lighter;
 
@@ -225,11 +221,11 @@ div.ctn-content-bottom {
   width: @ctn-toolbar-width;
   background-color: @custom-gray-lighter;
   text-align: center;
+
   .btn-toolbar {
     margin: 5px 0;
   }
 }
-
 
 a.expand-collapse {
   display: none;
@@ -264,6 +260,7 @@ a.expand-collapse {
     top: auto;
     bottom: 0;
     left: 25px;
+
     &.show-collapsable {
       border-width: 0 1px 1px 1px;
       border-radius: 0 0 4px 4px;
@@ -271,12 +268,12 @@ a.expand-collapse {
       bottom: auto;
     }
 
-    &.maximize-collapsable, &.restore-collapsable {
+    &.maximize-collapsable,
+    &.restore-collapsable {
       left: 50px;
     }
   }
 }
-
 
 .ctn-tabbed .ctn-tabbed-content {
   margin: 0;
@@ -301,6 +298,7 @@ a.expand-collapse {
   overflow-y: hidden;
   max-height: 37px + 16px;
   white-space: nowrap;
+
   > li {
     display: inline-block;
     float: none;

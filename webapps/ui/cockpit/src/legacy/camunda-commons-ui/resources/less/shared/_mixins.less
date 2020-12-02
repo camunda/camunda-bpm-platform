@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity -- There are many non-trivial fixes in here */
 .abs-box(@top: 0, @right: 0, @bottom: 0, @left: 0) {
   position: absolute;
   top: @top;
@@ -16,13 +17,11 @@
 .gradient(@origin: top, @start: rgba(255, 255, 255, 0), @stop: rgba(255, 255, 255, 1)) {
   background-color: @start;
   background-image: -webkit-linear-gradient(@origin, @start, @stop);
-  background-image:    -moz-linear-gradient(@origin, @start, @stop);
-  background-image:      -o-linear-gradient(@origin, @start, @stop);
-  background-image:     -ms-linear-gradient(@origin, @start, @stop);
-  background-image:         linear-gradient(@origin, @start, @stop);
+  background-image: -moz-linear-gradient(@origin, @start, @stop);
+  background-image: -o-linear-gradient(@origin, @start, @stop);
+  background-image: -ms-linear-gradient(@origin, @start, @stop);
+  background-image: linear-gradient(@origin, @start, @stop);
 }
-
-
 
 .hamburger-button() {
   border: none;
@@ -36,11 +35,14 @@
     min-width: 16px;
     margin: 3px 0;
     background-color: @navbar-default-link-color;
-    transition: transform 0.218s ease,
-                opacity 0.218s ease;
+    transition:
+      transform 0.218s ease,
+      opacity 0.218s ease;
+
     &:first-of-type {
       margin-top: 0;
     }
+
     &:last-of-type {
       margin-bottom: 0;
     }
@@ -49,9 +51,11 @@
   &:hover {
     > span {
       background-color: @navbar-default-link-hover-color;
+
       &:first-of-type {
         transform: translateY(-2px);
       }
+
       &:last-of-type {
         transform: translateY(2px);
       }
@@ -62,10 +66,12 @@
 .hamburger-button-open() {
   > span {
     opacity: 0;
+
     &:first-of-type {
       opacity: 1;
       transform: translateY(5px) rotateZ(45deg);
     }
+
     &:last-of-type {
       opacity: 1;
       transform: translateY(-5px) rotateZ(-45deg);
@@ -73,13 +79,13 @@
   }
 }
 
-
 .navbar-a(
-  @color: @navbar-default-link-color;
-  @hover-color: @navbar-default-link-hover-color
+@color: @navbar-default-link-color;
+@hover-color: @navbar-default-link-hover-color
 ) {
   font-size: @menu-font-size;
   color: @color;
+
   &:hover,
   &:focus {
     background-color: transparent;
@@ -88,11 +94,11 @@
 }
 
 .navbar-li(
-  @hover-color: @navbar-default-link-hover-color;
-  @hover-bg: @navbar-default-link-hover-bg;
-  @active-color: @navbar-default-link-active-color;
-  @active-bg: @navbar-default-link-active-bg;
-  @height: @header-computed-height
+@hover-color: @navbar-default-link-hover-color;
+@hover-bg: @navbar-default-link-hover-bg;
+@active-color: @navbar-default-link-active-color;
+@active-bg: @navbar-default-link-active-bg;
+@height: @header-computed-height
 ) {
   margin: 0;
   padding: 0 @padding-base-horizontal;
@@ -107,6 +113,7 @@
   &:hover,
   &:focus {
     background-color: @hover-bg;
+
     &.external {
       background-color: transparent;
     }
@@ -121,10 +128,12 @@
   > a,
   > view > a {
     .navbar-a();
+
     display: inline-block;
     line-height: @header-height;
     height: @height;
   }
+
   &.active {
     > a,
     > view > a {
@@ -143,9 +152,9 @@
 }
 
 .menu-a(
-  @size: @menu-font-size;
-  @line-height: @menu-line-height;
-  @hover-color: @navbar-default-link-hover-bg;
+@size: @menu-font-size;
+@line-height: @menu-line-height;
+@hover-color: @navbar-default-link-hover-bg;
 ) {
   display: block;
   font-size: @size;
@@ -157,10 +166,10 @@
 }
 
 .menu-li(
-  @hover-color: @navbar-default-link-hover-bg;
-  @active-color: @gray-base;
-  @size: @menu-font-size;
-  @line-height: @menu-line-height;
+@hover-color: @navbar-default-link-hover-bg;
+@active-color: @gray-base;
+@size: @menu-font-size;
+@line-height: @menu-line-height;
 ) {
   list-style: none;
   display: block;
@@ -179,10 +188,10 @@
 }
 
 .menu-ul(
-  @size;
-  @line-height;
-  @hover-color: @navbar-default-link-hover-bg;
-  @active-color: @gray-base;
+@size;
+@line-height;
+@hover-color: @navbar-default-link-hover-bg;
+@active-color: @gray-base;
 ) {
   display: block;
   margin: 0;
@@ -208,10 +217,10 @@
     padding-left: 0;
   }
 
-  .brand-logo:before {
+  .brand-logo::before {
     color: @brand-primary;
     display: inline-block;
-    font-family: "bpmn";
+    font-family: "bpmn"; /* stylelint-disable-line font-family-no-missing-generic-family-keyword -- bpmn is an icon font */
     font-style: normal;
     font-weight: normal;
     content: '\e831';
@@ -238,11 +247,9 @@
   right: 0;
   min-height: @header-height;
   z-index: @zindex-navbar-fixed;
-
   margin-bottom: 0;
   border-top: @header-border-bottom-width solid @brand-primary;
   box-shadow: @box-shadow;
-
   color: @navbar-default-color;
   background-color: @navbar-default-bg;
   font-size: @navbar-font-size;
@@ -250,8 +257,9 @@
   ul {
     margin: 0;
     padding: 0;
+
     &.dropdown-menu {
-      &:before {
+      &::before {
         content: '';
         width: 100%;
         height: 4px;
@@ -313,7 +321,6 @@
   line-height: @header-height;
   padding: 0 6px;
 
-
   @media screen and (max-width: (@grid-float-breakpoint-max)) {
     height: auto;
     line-height: 1.6;
@@ -333,9 +340,11 @@
 
 .cam-corporate-header-menu-item-button() {
   .cam-corporate-header-menu-item-link();
+
   background-color: transparent;
   border: none;
   color: @navbar-default-link-color;
+
   &:hover,
   &:focus {
     color: @navbar-default-link-hover-color;
@@ -370,6 +379,7 @@
 
     &.active {
       background-color: @gray-lighter;
+
       > a {
         color: @gray-base;
       }
@@ -416,7 +426,6 @@
     }
   }
 }
-
 
 .cam-corporate-footer-base() {
   position: fixed;

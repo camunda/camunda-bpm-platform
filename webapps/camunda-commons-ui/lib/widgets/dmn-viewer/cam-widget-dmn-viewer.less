@@ -8,9 +8,9 @@
 @font-face {
   font-family: 'dmn';
   src: url('@{font-path}dmn.eot?48901938');
-  src: url('@{font-path}dmn.eot?48901938#iefix') format('embedded-opentype'),url('@{font-path}dmn.woff2?48901938') format('woff2'),url('@{font-path}dmn.woff?48901938') format('woff'),url('@{font-path}dmn.ttf?48901938') format('truetype'),url('@{font-path}dmn.svg?48901938#dmn') format('svg');
+  src: url('@{font-path}dmn.eot?48901938#iefix') format('embedded-opentype'), url('@{font-path}dmn.woff2?48901938') format('woff2'), url('@{font-path}dmn.woff?48901938') format('woff'), url('@{font-path}dmn.ttf?48901938') format('truetype'), url('@{font-path}dmn.svg?48901938#dmn') format('svg');
   font-weight: normal;
-  font-style: normal
+  font-style: normal;
 }
 
 [cam-widget-dmn-viewer] {
@@ -57,7 +57,8 @@
     display: none;
   }
 
-  .dmn-js-powered-by, .bjs-powered-by {
+  .dmn-js-powered-by,
+  .bjs-powered-by {
     display: none !important;
   }
 
@@ -67,14 +68,14 @@
     fill: fade(@bpmn-highlight-bg, 40%) !important;
   }
 
-  .highlight .djs-visual>:nth-child(1) {
+  .highlight .djs-visual > :nth-child(1) {
     fill: @bpmn-highlight-bg !important;
   }
 
   .dmn-input,
   .dmn-input-object,
   .dmn-output,
-  .dmn-output-object{
+  .dmn-output-object {
     font-weight: 700;
   }
 
@@ -93,8 +94,17 @@
       color: @gray;
       padding: 0;
       bottom: 0;
+
       > span {
         text-align: center;
+      }
+    }
+
+    &.reset {
+      bottom: @grid-gutter-width * 3;
+
+      span {
+        top: 3px;
       }
     }
 
@@ -105,22 +115,19 @@
       button.in {
         bottom: (@grid-gutter-width * 1);
         border-bottom: 0;
+
         > span {
           top: 2px;
           left: 1px;
         }
       }
+
       button.out {
         bottom: 0;
+
         > span {
           top: 3px;
         }
-      }
-    }
-    &.reset {
-      bottom: @grid-gutter-width * 3;
-      span {
-        top: 3px;
       }
     }
   }

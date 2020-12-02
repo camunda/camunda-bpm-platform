@@ -8,69 +8,20 @@
   * {
     display: block;
   }
-  [class^="icon-"],
-  [class*=" icon-"] {
-    display: inline-block;
-    &:before {
-      position: relative;
-      z-index: 99;
-      background-color: @filters-bg;
-      .transition(transform .218s ease .218s);
-    }
-  }
-
-  li {
-    position: relative;
-    z-index: 10;
-    &:hover {
-      z-index: 99;
-      > .tree-node > .tree-node-group > .tree-node-label {
-        > [class^="icon-"],
-        > [class*=" icon-"] {
-          &:before {
-            .scale(3);
-          }
-        }
-      }
-    }
-  }
 
   a {
     cursor: pointer;
   }
 
-  li {
-    margin: 3px 0;
-  }
+  [class^="icon-"],
+  [class*=" icon-"] {
+    display: inline-block;
 
-  .btn-control-link {
-    padding: 0;
-    text-decoration: none;
-    &:focus {
-      outline: none;
-    }
-  }
-
-  .tree-node {
-    padding-left: 20px;
-  }
-  > .tree-node {
-    padding: 0;
-  }
-
-  li {
-    margin: -1px 0 0 0;
-    &:last-child {
-      margin: -1px 0 3px 0;
-    }
-  }
-
-  .tree-node-group {
-    position: relative;
-    vertical-align: middle;
-    height: 25px;
-    &:hover {
+    &::before {
+      position: relative;
       z-index: 99;
+      background-color: @filters-bg;
+      .transition(transform 0.218s ease 0.218s);
     }
   }
 
@@ -80,7 +31,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-
     border: 1px solid darken(@gray-lighter, 15%);
     border-radius: @border-radius-base;
 
@@ -88,7 +38,6 @@
       font-size: 12px;
       color: @text-color;
       text-decoration: none;
-
       position: absolute;
       z-index: 1;
       top: 0;
@@ -96,7 +45,6 @@
       right: 20px;
       bottom: 0;
       padding: 0 4px;
-
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -130,9 +78,10 @@
       background-color: @bpmn-highlight-bg;
       border-color: @bpmn-highlight-border-color;
       z-index: 11;
+
       [class^="icon-"],
       [class*=" icon-"] {
-        &:before {
+        &::before {
           background-color: @bpmn-highlight-bg;
           border-color: @bpmn-highlight-border-color;
         }
@@ -141,10 +90,62 @@
       .remove {
         display: block;
       }
+
       a {
         right: 20px;
         padding-right: 24px;
       }
+    }
+  }
+
+  li {
+    position: relative;
+    z-index: 10;
+    margin: 3px 0;
+    margin: -1px 0 0 0;
+
+    &:last-child {
+      margin: -1px 0 3px 0;
+    }
+
+    &:hover {
+      z-index: 99;
+
+      > .tree-node > .tree-node-group > .tree-node-label {
+        > [class^="icon-"],
+        > [class*=" icon-"] {
+          &::before {
+            .scale(3);
+          }
+        }
+      }
+    }
+  }
+
+  .btn-control-link {
+    padding: 0;
+    text-decoration: none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .tree-node {
+    padding-left: 20px;
+  }
+
+  > .tree-node {
+    padding: 0;
+  }
+
+  .tree-node-group {
+    position: relative;
+    vertical-align: middle;
+    height: 25px;
+
+    &:hover {
+      z-index: 99;
     }
   }
 
@@ -159,7 +160,6 @@
     bottom: 1px;
     right: 1px;
     z-index: 12;
-
 
     &.activity-instance-completed {
       background-color: @completed-color;
@@ -190,15 +190,18 @@
 
   label {
     background-image: none;
+
     &.running {
       background-color: @running-color;
       border-color: @running-darker;
     }
+
     &.completed,
     &.finished {
       background-color: @completed-color;
       border-color: @completed-darker;
     }
+
     &.canceled {
       background-color: @canceled-color;
       border-color: @canceled-darker;

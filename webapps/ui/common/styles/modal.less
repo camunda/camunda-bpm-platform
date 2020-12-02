@@ -1,6 +1,7 @@
 .modal {
   cursor: auto;
-  &:after {
+
+  &::after {
     content: '';
     position: absolute;
     display: block;
@@ -17,6 +18,7 @@
   background-color: fade(@body-bg, 85%);
   bottom: 0;
   cursor: pointer;
+
   &.in {
     opacity: 1;
     filter: alpha(opacity=100);
@@ -40,6 +42,7 @@
   > form {
     overflow: hidden;
     padding: (@grid-gutter-width / 2);
+
     > fieldset {
       max-width: 100%;
     }

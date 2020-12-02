@@ -2,6 +2,7 @@
   background-color: white;
 
   .container-fluid;
+
   position: absolute;
   width: 100%;
   top: @breadcrumb-height;
@@ -11,6 +12,18 @@
   .progress {
     margin-bottom: 0;
     text-align: center;
+    position: relative;
+
+    > .processed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      overflow: visible;
+      background-color: transparent;
+      z-index: 999;
+    }
   }
 
   table.cam-table > tbody > tr {
@@ -33,19 +46,6 @@
     overflow: hidden;
   }
 
-  .progress {
-    position: relative;
-    > .processed {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 0;
-      overflow: visible;
-      background-color: transparent;
-      z-index: 999;
-    }
-  }
   .history-loader > button {
     width: 100%;
   }

@@ -1,7 +1,7 @@
 .side-stroke(
-  @hover-color: @link-color;
-  @active-color: @brand-primary;
-  @padding: @grid-gutter-width * 0.5;
+@hover-color: @link-color;
+@active-color: @brand-primary;
+@padding: @grid-gutter-width * 0.5;
 ) {
   padding-left: (@padding - 5px);
   padding-right: (@padding - 5px);
@@ -22,13 +22,14 @@
 }
 
 .column-list-item-colors(
-  @base-color: @text-color;
-  @active-color: @gray-base;
-  @active-link-color: @link-color;
-  @active-link-hover-color: @link-hover-color;
+@base-color: @text-color;
+@active-color: @gray-base;
+@active-link-color: @link-color;
+@active-link-hover-color: @link-hover-color;
 ) {
   color: @base-color;
   transition: color 0.218s ease;
+
   h4 a {
     color: @base-color;
     transition: color 0.218s ease;
@@ -38,8 +39,10 @@
   &:hover,
   &:focus {
     color: @active-color;
+
     h4 a {
       color: @active-link-color;
+
       &:hover,
       &:focus {
         color: @active-link-hover-color;
@@ -59,8 +62,6 @@
 
   .column-list-item-colors(@gray, @gray-base, @gray-base, @gray-base);
 }
-
-
 
 .first-column-list() {
   list-style: none;
@@ -84,8 +85,6 @@
   }
 }
 
-
-
 .second-column-list() {
   &:focus,
   ul:focus,
@@ -99,12 +98,12 @@
   padding-bottom: 8px;
 }
 
-
 .three-cols-layout-base() {
   // S- (vertical layout)
 
   .site-wrap {
     .abs-box(0, 0, 0, 0);
+
     z-index: 2;
 
     > .navbar {
@@ -139,10 +138,11 @@
       position: absolute;
       width: auto;
       min-height: auto;
-      transition: left @layout-transition-duration @layout-transition-timing,
-                  right @layout-transition-duration @layout-transition-timing,
-                  margin-left @layout-transition-duration @layout-transition-timing,
-                  margin-right @layout-transition-duration @layout-transition-timing;
+      transition:
+        left @layout-transition-duration @layout-transition-timing,
+        right @layout-transition-duration @layout-transition-timing,
+        margin-left @layout-transition-duration @layout-transition-timing,
+        margin-right @layout-transition-duration @layout-transition-timing;
     }
 
     .three-cols-layout-cell {
@@ -152,7 +152,6 @@
       bottom: 0;
       left: 0;
       right: 0;
-
 
       &.content {
         transition: opacity @layout-transition-duration @layout-transition-timing;
@@ -175,7 +174,6 @@
   }
 }
 
-
 .three-cols-layout-handheld() {
   body {
     overflow: auto;
@@ -193,6 +191,7 @@
 
   .three-cols-layout-columns {
     position: relative;
+
     > .column {
       border-width: 1px 0 0 0;
       overflow: hidden;
@@ -214,7 +213,6 @@
   }
 }
 
-
 .three-cols-layout(@left-width: 200px, @center-width: 300px) {
   .three-cols-layout {
     height: ~"calc(100vh - (@{header-height} + @{footer-height}))";
@@ -224,6 +222,7 @@
 
   .three-cols-layout-columns {
     position: absolute;
+
     > .column {
       position: absolute;
       width: auto;
@@ -285,7 +284,6 @@
     }
   }
 
-
   .list-column-close {
     .column.tasks-list {
       left: 0;
@@ -297,7 +295,6 @@
       left: (@left-width + @grid-gutter-width);
     }
   }
-
 
   .task-column-close {
     .column.tasks-list {
@@ -313,7 +310,6 @@
   }
 }
 
-
 .three-cols-layout-colors(@left, @center, @right) {
   .three-cols-layout-columns,
   .column-right {
@@ -326,7 +322,6 @@
 
   .column {
     background-color: @body-bg;
-
     overflow: hidden;
     border: none;
     box-shadow: @box-shadow;
@@ -350,6 +345,7 @@
     .sorting-choice > li > a,
     [cam-deployments-sorting-choices] > .dropdown > a {
       color: @navbar-default-link-color;
+
       &:hover,
       &:focus {
         text-decoration: none;
@@ -367,6 +363,7 @@
       .icon-bar {
         background-color: @navbar-default-link-color;
       }
+
       &:hover,
       &:focus {
         .icon-bar {
@@ -377,16 +374,15 @@
   }
 }
 
-
 .three-cols-layout-header() {
   .three-cols-layout-cell.top {
     min-height: (@column-top-height + (@padding-base-vertical * 2) + @border-thin-width);
     padding: calc(@padding-base-vertical + 2px) (@grid-gutter-width * 0.5) calc(@padding-base-vertical - 2px) (@grid-gutter-width * 0.5);
-    margin: (0 - (@grid-gutter-width * 0.5))
-            (0 - (@grid-gutter-width * 0.5))
-            (@grid-gutter-width * 0.5)
-            (0 - (@grid-gutter-width * 0.5));
-
+    margin:
+      (0 - (@grid-gutter-width * 0.5))
+      (0 - (@grid-gutter-width * 0.5))
+      (@grid-gutter-width * 0.5)
+      (0 - (@grid-gutter-width * 0.5));
 
     > button,
     > div {

@@ -1,3 +1,31 @@
+
+table {
+  th {
+    &.start-time,
+    &.end-time {
+      width: 150px;
+    }
+
+    &.sorting {
+      text-align: right;
+    }
+  }
+
+  td.definitionId {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+table.processes-list {
+  th {
+    &.instances {
+      width: 150px;
+    }
+  }
+}
+
 .deployed-processes .tab-pane {
   overflow: hidden;
 
@@ -20,32 +48,6 @@
   margin: (@grid-gutter-width / 2) (0 - (@grid-gutter-width / 2));
 }
 
-
-.tile {
-  margin-bottom: (@grid-gutter-width / 2);
-
-  > a {
-    display: block;
-    width: 100%;
-    color: @gray;
-
-    &:hover,
-    &:focus {
-      .box-shadow(0 1px 4px fade(@link-color, 50));
-
-      .tile-header,
-      .tile-footer {
-        border-color: @link-color;
-      }
-      .tile-body {
-        border-left-color: @link-color;
-        border-right-color: @link-color;
-      }
-    }
-  }
-}
-
-
 .tile-header,
 .tile-footer {
   margin: 0;
@@ -67,6 +69,7 @@
   border: 1px solid @breadcrumb-color;
   text-align: center;
   position: relative;
+
   svg {
     position: absolute;
     top: 0;
@@ -81,6 +84,7 @@
   font-size: 16px;
   border-top: none;
   .border-bottom-radius(@border-radius-base);
+
   position: relative;
 
   .instances {
@@ -89,6 +93,7 @@
     padding-right: 40px;
     .text-overflow();
   }
+
   [state-circle] {
     position: absolute;
     top: 50%;
@@ -97,36 +102,35 @@
   }
 }
 
+.tile {
+  margin-bottom: (@grid-gutter-width / 2);
+
+  > a {
+    display: block;
+    width: 100%;
+    color: @gray;
+
+    &:hover,
+    &:focus {
+      .box-shadow(0 1px 4px fade(@link-color, 50));
+
+      .tile-header,
+      .tile-footer {
+        border-color: @link-color;
+      }
+
+      .tile-body {
+        border-left-color: @link-color;
+        border-right-color: @link-color;
+      }
+    }
+  }
+}
+
 span {
   &.tile-body,
   &.tile-footer {
     display: block;
-  }
-}
-
-
-table {
-  th {
-    &.start-time,
-    &.end-time {
-      width: 150px;
-    }
-    &.sorting {
-      text-align: right;
-    }
-  }
-  td.definitionId {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-table.processes-list {
-  th {
-    &.instances {
-      width: 150px;
-    }
   }
 }
 

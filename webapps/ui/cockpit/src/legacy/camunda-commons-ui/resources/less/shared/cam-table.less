@@ -16,9 +16,11 @@
   td,
   th {
     margin: 0;
+
     &.select {
       text-align: center;
       width: 40px;
+
       input[type="checkbox"] {
         margin-top: 5px;
       }
@@ -32,13 +34,10 @@
     }
   }
 
-  tbody tr:first-child td {
-    border-top: none;
-  }
-
   thead {
     border-bottom: 2px solid @table-border-color;
   }
+
   tfoot {
     border-top: 2px solid @table-border-color;
   }
@@ -53,25 +52,6 @@
     }
   }
 
-  &.values-left {
-    tr > td:first-child,
-    tr > th:first-child {
-      width: 1%;
-      text-align: right;
-    }
-  }
-
-  tr.editing {
-    td,
-    th {
-      padding: 0;
-    }
-    .form-control-static {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-  }
-
   &.search-results {
     th,
     td {
@@ -81,10 +61,12 @@
     th {
       white-space: nowrap;
       overflow: hidden;
+
       > * {
         display: inline-block;
         vertical-align: middle;
       }
+
       .column-label {
         text-overflow: ellipsis;
         overflow: hidden;
@@ -96,6 +78,30 @@
 
     td[cam-widget-clipboard] {
       max-width: 10vw;
+    }
+  }
+
+  tr.editing {
+    td,
+    th {
+      padding: 0;
+    }
+
+    .form-control-static {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+
+  &.values-left {
+    tr > td:first-child,
+    tr > th:first-child {
+      width: 1%;
+      text-align: right;
     }
   }
 }
