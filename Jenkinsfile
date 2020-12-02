@@ -100,7 +100,7 @@ pipeline {
         ], quietPeriod: 10, wait: false
 
         script {
-          if (withLabels(true, 'default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')) {
+          if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
@@ -525,13 +525,13 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-boolean withLabels(boolean prDaily = false, String... labels) {
+boolean withLabels(List labels) {
   if (pullRequest.labels.contains('TODO')) {
   //if (pullRequest.labels.contains('no-build')) {
     return false;
   }
 
-  if (env.BRANCH == defaultBranch() && !prDaily) {
+  if (env.BRANCH == defaultBranch() && !labels.contains('daily')) {
     return true;
   } else if (changeRequest()) {
     for (l in labels) {
@@ -543,6 +543,11 @@ boolean withLabels(boolean prDaily = false, String... labels) {
 
   return false;
 }
+
+boolean withLabels(String... labels) {
+  return withLabels(Arrays.asList(labels));
+}
+
 
 boolean withDbLabel(String dbLabel) {
   return withLabels(getDbType(dbLabel))

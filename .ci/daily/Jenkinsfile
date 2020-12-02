@@ -271,7 +271,7 @@ pipeline {
           anyOf {
             branch defaultBranch();
             expression {
-              return withLabels(getLabels(env.PROFILE))
+              withLabels(getLabels(env.PROFILE))
             }
           }
           beforeAgent true
@@ -364,7 +364,8 @@ String defaultBranch() {
 //  return 'master';
 }
 
-boolean withLabels(String... labels) {
+
+boolean withLabels(List labels) {
   if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
   //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
     return false;
@@ -386,6 +387,10 @@ boolean withLabels(String... labels) {
     }
   }
   return false;
+}
+
+boolean withLabels(String... labels) {
+  return withLabels(Arrays.asList(labels));
 }
 
 boolean withDbLabels(String dbLabel) {
