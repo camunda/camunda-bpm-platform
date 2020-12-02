@@ -1,9 +1,5 @@
 [notifications-panel],
 .notifications-panel {
-  .alert {
-
-  }
-
   // copied from the cockpit patched bootstrap...
   .close {
     float: right;
@@ -11,16 +7,13 @@
     font-weight: bold;
     color: @text-color;
     text-shadow: 0 1px 0 @body-bg;
-    opacity: .2;
-
+    opacity: 0.2;
     padding: 0;
     cursor: pointer;
     background: transparent;
     border: 0;
     -webkit-appearance: none;
-
     margin-left: 12px;
-
     position: relative;
     line-height: 20px;
   }
@@ -38,10 +31,8 @@
   position: absolute;
   // make sure the notifications are coming above the modal windows
   z-index: @zindex-modal + 10;
-
   max-height: 70%;
   overflow: auto;
-
   bottom: 20px;
   right: 30px;
 }

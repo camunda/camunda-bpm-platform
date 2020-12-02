@@ -6,7 +6,8 @@
   border: 2px solid;
   border-radius: 50%;
 
-  &:before {
+  &::before {
+    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- Icon Font */
     font-family: "Glyphicons Halflings";
     position: absolute;
     top: -1px;
@@ -20,14 +21,16 @@
 
   &.circle-red {
     color: #d9534f;
-    &:before {
+
+    &::before {
       content: "\e014";
     }
   }
 
   &.circle-green {
     color: #5cb85c;
-    &:before {
+
+    &::before {
       content: "\e013";
     }
   }

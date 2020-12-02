@@ -1,5 +1,5 @@
-ul.view-pills,
-[view-pills] {
+[view-pills],
+ul.view-pills {
   > li {
     > a {
       padding: 5px 10px;
@@ -9,8 +9,8 @@ ul.view-pills,
       > a {
         background-color: @link-color;
 
-        &:hover,
-        &:focus {
+        &:focus,
+        &:hover { /* stylelint-disable-line no-descending-specificity -- now this is just silly */
           background-color: @link-color;
         }
       }

@@ -2,10 +2,6 @@
   position: relative;
   display: inline-block;
 
-  &:hover .text {
-    visibility: visible;
-  }
-
   .text {
     text-transform: none;
     letter-spacing: normal;
@@ -17,18 +13,14 @@
     font-weight: 400;
     line-height: 1.42857143;
     font-size: 12px;
-
-
     visibility: hidden;
     background-color: black;
     color: #fff;
     text-align: center;
     border-radius: 6px;
     padding: 5px;
-
     position: absolute;
     z-index: 100;
-
     width: 200px;
 
     &::after {
@@ -38,6 +30,10 @@
       border-width: 5px;
       border-style: solid;
     }
+  }
+
+  &:hover .text {
+    visibility: visible;
   }
 
   &.bottom .text {
@@ -53,15 +49,14 @@
   }
 
   &.top .text {
-    top: 0px;
+    top: 0;
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
 
     &::after {
-      bottom: 0px;
+      bottom: -15px;
       right: 50%;
       transform: translateY(-50%);
-      bottom: -15px;
       border-color: black transparent  transparent  transparent;
     }
   }
@@ -75,7 +70,7 @@
       top: 50%;
       transform: translateY(-50%);
       right: -10px;
-      border-color:  transparent  transparent  transparent black;
+      border-color: transparent  transparent  transparent black;
     }
   }
 
@@ -88,7 +83,7 @@
       top: 50%;
       transform: translateY(-50%);
       left: -5px;
-      border-color:  transparent black transparent  transparent ;
+      border-color: transparent black transparent  transparent;
     }
   }
 }

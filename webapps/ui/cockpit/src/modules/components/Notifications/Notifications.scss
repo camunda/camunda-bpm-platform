@@ -1,5 +1,4 @@
 .Notifications {
-
   .message {
     display: block;
   }
@@ -8,16 +7,13 @@
     float: right;
     font-size: 20px;
     font-weight: bold;
-    opacity: .2;
-
+    opacity: 0.2;
     padding: 0;
     cursor: pointer;
     background: transparent;
     border: 0;
     -webkit-appearance: none;
-
     margin-left: 12px;
-
     position: relative;
     line-height: 20px;
   }
@@ -44,12 +40,9 @@
 
   &.page-notifications {
     position: absolute;
-
     max-height: 70%;
     overflow: auto;
-
     bottom: 20px;
     right: 30px;
   }
-
 }

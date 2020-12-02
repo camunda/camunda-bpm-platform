@@ -1,8 +1,22 @@
 .incidents-tab {
   position: relative;
-  > tbody > tr > td.message {
-    padding: 0;
+
+  .auto-cutoff {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    max-height: @line-height-computed * 1.5;
+    background-color: transparent;
+    position: absolute;
+    z-index: 9;
+    transition:
+      max-width 0.218s ease,
+      max-height 0.218s ease,
+      background-color 0.218s ease;
   }
+
   td.message {
     position: relative;
     width: 200px;
@@ -23,18 +37,7 @@
     }
   }
 
-  .auto-cutoff {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    max-height: @line-height-computed * 1.5;
-    background-color: transparent;
-    position: absolute;
-    z-index: 9;
-    transition: max-width 0.218s ease,
-                max-height 0.218s ease,
-                background-color 0.218s ease;
+  > tbody > tr > td.message { /* stylelint-disable-line no-descending-specificity */
+    padding: 0;
   }
 }

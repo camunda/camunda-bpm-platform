@@ -13,6 +13,7 @@
     > .type {
       .make-xs-column(2);
     }
+
     > .name,
     > .value {
       .make-xs-column(5);
@@ -28,16 +29,15 @@
     }
   }
 
-
-
-
   // styles to edit
   .input-group {
     .name {
       width: 33%;
     }
+
     .value {
       width: 67%;
+
       &.null-value {
         border-left: none;
         margin-left: -1px;
@@ -47,6 +47,7 @@
     .checkbox {
       margin: 0;
       position: relative;
+
       input[type="checkbox"] {
         width: auto;
         position: absolute;
@@ -55,9 +56,6 @@
       }
     }
   }
-
-
-
 
   .set-null {
     border-right-width: 0;
@@ -71,7 +69,6 @@
     }
   }
 
-
   .value-wrapper {
     width: 67%;
 
@@ -82,9 +79,9 @@
     .btn {
       margin-left: -1px;
       margin-right: -1px;
-
       height: 34px;
       line-height: 34px;
+
       .glyphicon {
         margin-top: 2px;
       }
@@ -99,6 +96,7 @@
 
   &.table-row {
     margin-top: -1px;
+
     &:first-of-type {
       margin-top: 0;
     }
@@ -107,6 +105,7 @@
   .form-control-static {
     display: table-cell;
     position: relative;
+
     > a {
       position: absolute;
       top: @padding-base-vertical;
@@ -117,7 +116,6 @@
       display: block;
       text-overflow: ellipsis;
       font-family: monospace;
-      overflow: hidden;
       white-space: nowrap;
     }
   }
@@ -125,6 +123,7 @@
   .no-click {
     cursor: default;
     cursor: not-allowed;
+
     &.btn:hover {
       box-shadow: none;
     }

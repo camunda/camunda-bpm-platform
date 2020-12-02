@@ -4,7 +4,6 @@
   > .search-label {
     display: block;
     border: 1px solid transparent;
-
     background-color: @custom-gray-lighter;
     color: @text-color;
     border-radius: 3px;
@@ -14,6 +13,7 @@
       vertical-align: middle;
       margin-top: -1px;
       margin-bottom: -1px;
+
       &:empty {
         display: none;
       }
@@ -28,7 +28,8 @@
     > .glyphicon {
       padding-left: 3px;
       padding-right: 3px;
-      &:before {
+
+      &::before {
         position: relative;
         top: -1px;
       }
@@ -42,6 +43,7 @@
   .search-dropdown {
     left: -1px;
     margin-top: 0;
+
     & > li > a {
       padding: (@grid-gutter-width / 10) (@grid-gutter-width / 2);
     }

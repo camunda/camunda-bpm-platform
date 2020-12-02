@@ -1,7 +1,7 @@
 @import "shared-styles/colors.scss";
 
 .Clipboard {
-  width:100%;
+  width: 100%;
   display: inline-block;
   white-space: nowrap;
 
@@ -10,37 +10,41 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    
     max-width: 100%;
     transition: max-width 0.218s linear;
   }
+
   .copyButton {
     display: inline-block;
     padding: 0 2px;
     border: 0;
     vertical-align: top;
-
     opacity: 0;
-    transition: opacity 0.218s linear,
-                color 0.218s linear;
+    transition:
+      opacity 0.218s linear,
+      color 0.218s linear;
 
     .glyphicon-ok {
       color: $success-color;
     }
+
     .warning-sign {
       color: $warn-color;
     }
-    &:focus, &:active:focus {
-      outline:0;
+
+    &:focus,
+    &:active:focus {
+      outline: 0;
     }
   }
 
   &:hover {
-    .copyButton {
+    .copyButton { /* stylelint-disable-line */
       opacity: 100;
     }
+
     .resize {
       max-width: calc(100% - 2em);
     }
-  } 
+  }
 }

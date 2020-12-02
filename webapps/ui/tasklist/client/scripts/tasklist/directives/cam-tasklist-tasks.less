@@ -6,7 +6,6 @@
   max-height: 45px;
   padding-bottom: 0;
   transition: max-height 0.218s ease, padding-bottom 0.218s ease;
-
   position: relative;
 
   .shutter {
@@ -20,6 +19,7 @@
     height: @grid-gutter-width;
 
     .gradient(top, fade(@column-center-bg, 0), @column-center-bg);
+
     background-position-y: 100%;
     background-repeat: repeat-x;
 
@@ -35,6 +35,7 @@
   &.expanded {
     max-height: 2000px;
     padding-bottom: 20px;
+
     .shutter {
       background: none;
       height: (@grid-gutter-width * 0.5);
@@ -43,6 +44,7 @@
 
   &.no-shutter {
     max-height: auto;
+
     .shutter {
       display: none;
     }

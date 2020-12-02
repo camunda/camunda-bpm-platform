@@ -9,8 +9,10 @@
       background-color: #eee;
     }
   }
+
   .DropdownOption.active {
     background-color: #eee;
+
     > button {
       border-width: 0 0 0 3px;
       border-color: #b5152b;

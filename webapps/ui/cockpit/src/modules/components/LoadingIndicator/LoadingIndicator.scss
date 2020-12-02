@@ -1,16 +1,16 @@
 .LoadingIndicator {
   height: 100%;
+  height: -webkit-fill-available;
   min-height: 100%;
   width: 100%;
-  height: -webkit-fill-available;
   display: flex;
   justify-content: center;
   align-items: center;
 
   &.fullscreen {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100vh;
     width: 100vw;
   }
@@ -23,12 +23,13 @@
     0% {
       transform: rotate(0deg);
     }
+
     100% {
       transform: rotate(360deg);
     }
   }
 
-  .spinner-big:after {
+  .spinner-big::after {
     box-sizing: content-box;
     width: 22px;
     height: 22px;
@@ -40,7 +41,7 @@
     animation: spinner 0.7s linear infinite;
   }
 
-  .spinner-small:after {
+  .spinner-small::after {
     box-sizing: content-box;
     width: 10px;
     height: 10px;

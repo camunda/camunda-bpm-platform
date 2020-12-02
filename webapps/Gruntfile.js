@@ -136,6 +136,14 @@ module.exports = function(grunt) {
   require('./ui/common/grunt/config/eslint')(config, eslintConf);
   require('./camunda-bpm-sdk-js/grunt/config/eslint')(config, eslintConf);
 
+  var stylelintConf = {};
+  require('./ui/welcome/grunt/config/stylelint')(config, stylelintConf);
+  require('./ui/admin/grunt/config/stylelint')(config, stylelintConf);
+  require('./ui/tasklist/grunt/config/stylelint')(config, stylelintConf);
+  require('./ui/common/grunt/config/stylelint')(config, stylelintConf);
+  require('./camunda-commons-ui/grunt/config/stylelint')(config, stylelintConf);
+
+
   require('./grunt/tasks/license-check')(grunt);
 
   grunt.initConfig({
@@ -160,6 +168,8 @@ module.exports = function(grunt) {
     watch: watchConf,
 
     eslint: eslintConf,
+
+    stylelint: stylelintConf,
 
     ensureLibs: {
       thirdParty: {}
@@ -207,7 +217,8 @@ module.exports = function(grunt) {
         localesConf,
         watchConf,
         uglifyConf,
-        eslintConf
+        eslintConf,
+        stylelintConf
       ];
       for (var i = 0; i < objs.length; i++) {
         var obj = objs[i];
@@ -233,7 +244,8 @@ module.exports = function(grunt) {
     if (grunt.config.data.buildMode === 'prod') {
       tasksToRun.push('eslint');
     } else {
-      tasksToRun.push('newer:eslint');
+      grunt.loadNpmTasks('grunt-stylelint');
+      tasksToRun.push('newer:eslint', 'stylelint');
     }
 
     tasksToRun.push('clean', 'ensureLibs', 'persistify', 'copy', 'less');

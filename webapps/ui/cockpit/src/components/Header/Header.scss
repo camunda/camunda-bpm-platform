@@ -1,7 +1,6 @@
 .Header {
   display: flex;
   justify-content: space-between;
-
   width: 100%;
   position: fixed;
   top: 0;
@@ -17,7 +16,6 @@
   font-size: 14px;
   float: left;
   line-height: 45px;
-
   white-space: nowrap;
 
   .Dropdown ul {

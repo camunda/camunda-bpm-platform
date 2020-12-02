@@ -1,3 +1,8 @@
+.control-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .labels-left {
   .control-label {
     text-align: left;
@@ -10,9 +15,8 @@
   margin-bottom: 0;
   padding-top: 7px;
 
-
-  > a[ng-click],
-  .btn-link {
+  .btn-link,
+  > a[ng-click] {
     white-space: nowrap;
     display: inline-block;
 
@@ -23,7 +27,6 @@
       text-overflow: ellipsis;
       overflow: hidden;
       z-index: 1;
-
       padding-right: 1.4em;
       margin-right: -1.4em;
     }
@@ -35,11 +38,6 @@
       top: -3px;
     }
   }
-}
-
-.control-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .modal-footer {

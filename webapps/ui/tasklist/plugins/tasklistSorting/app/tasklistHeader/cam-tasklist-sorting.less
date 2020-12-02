@@ -14,22 +14,10 @@ section.tasks-list {
     overflow: hidden;
     white-space: nowrap;
     display: inline-block;
-
     max-width: 0;
     margin-right: 0;
     .transition(max-width 0.218s ease);
     .transition(margin-right 0.218s ease);
-  }
-
-  ol.sorting-choice {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
-    float: left;
-
-    &[data-total="1"] li.sorting-choice:first-of-type {
-      padding-left: 0;
-    }
   }
 
   li.sorting-choice {
@@ -37,14 +25,13 @@ section.tasks-list {
     white-space: nowrap;
     display: block;
     float: left;
-
     padding: 0 1.5em;
 
     > .glyphicon-remove-sign,
     > .sort-direction {
       position: absolute;
       top: 50%;
-      margin-top: -.5em
+      margin-top: -0.5em;
     }
 
     > .glyphicon-remove-sign {
@@ -54,7 +41,6 @@ section.tasks-list {
     > .sort-direction {
       right: 5px;
     }
-
 
     > .dropdown-toggle > span {
       width: 100%;
@@ -70,6 +56,17 @@ section.tasks-list {
     float: left;
   }
 
+  ol.sorting-choice {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    float: left;
+
+    &[data-total="1"] li.sorting-choice:first-of-type {
+      padding-left: 0;
+    }
+  }
+
   .new-sort {
     .hidden-xs {
       display: none;
@@ -79,6 +76,7 @@ section.tasks-list {
   .dropdown-menu > li > .variable-inputs {
     margin: (@grid-gutter-width / 2) 0;
     padding: 0 9px;
+
     .actions {
       text-align: right;
       margin-bottom: 0;
@@ -86,18 +84,17 @@ section.tasks-list {
   }
 }
 
-
 section.column {
   > .cell {
     &.top {
       .transition(height 0.218s ease);
     }
+
     &.content {
       .transition(top 0.218s ease);
     }
   }
 }
-
 
 .list-column-close section.tasks-list [cam-sorting-choices] {
   display: none;

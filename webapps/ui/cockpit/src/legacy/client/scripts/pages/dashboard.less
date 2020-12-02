@@ -34,7 +34,6 @@
     right: @grid-gutter-width * 0.5;
   }
 
-
   .value,
   .no-value {
     font-size: @font-size-base * 2;
@@ -74,6 +73,10 @@
       height: 12px;
     }
 
+    [cam-sparkline] {
+      min-height: 220px;
+    }
+
     .chart {
       position: relative;
       padding-top: 10px;
@@ -83,7 +86,7 @@
         z-index: 10;
       }
 
-      [cam-sparkline].no-data:before {
+      [cam-sparkline].no-data::before {
         content: 'No Data';
         position: absolute;
         display: block;
@@ -98,13 +101,8 @@
         color: @gray-lighter;
       }
     }
-
-    [cam-sparkline] {
-      min-height: 220px;
-    }
   }
 }
-
 
 .deprecate-dashboard-view {
   margin: (@grid-gutter-width * 0.5) 0;

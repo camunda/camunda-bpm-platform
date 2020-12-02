@@ -5,14 +5,12 @@
     border-bottom: 1px solid #ddd;
   }
 
-  &[data-fluid-layout] {
-    table {
-      table-layout: auto;
-    }
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    td.actions {
-      max-width: 120px;
-      min-width: 80px;
+    .form-control {
+      border: none;
     }
   }
 
@@ -25,28 +23,16 @@
     }
   }
 
-  td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    .form-control {
-      border: none;
-    }
-  }
-
-
-
-
   tbody {
+    td {
+      vertical-align: middle;
+    }
+
     tr.ng-invalid > td {
       background-color: fade(@brand-danger, 20);
       color: @brand-danger;
     }
-
-    td {
-      vertical-align: middle;
-    }
   }
-
 
   .col-type,
   .col-name,
@@ -82,12 +68,38 @@
     }
   }
 
-  td.col-type, td.actions, td.col-action {
+  td.col-type,
+  td.actions,
+  td.col-action {
     width: 76px;
   }
-  
+
   td.actions {
     text-align: right;
+  }
+
+  &[data-fluid-layout] {
+    table {
+      table-layout: auto;
+    }
+
+    td.actions {
+      max-width: 120px;
+      min-width: 80px;
+    }
+  }
+
+  .type-object .read-only[ng-click] {
+    cursor: pointer;
+    color: @link-color;
+  }
+
+  .ng-invalid {
+    input,
+    .form-control,
+    .value-wrapper {
+      color: @brand-danger;
+    }
   }
 
   td.editable > .value-wrapper {
@@ -116,19 +128,15 @@
     .null-value {
       .btn;
       .btn-default;
+
       display: table-cell;
       text-align: center;
       height: 34px;
       border: none;
       color: @gray-light;
+
       span {
         width: auto;
-      }
-    }
-
-    .editable & {
-      .set-null {
-
       }
     }
 
@@ -138,19 +146,6 @@
 
     .null-value {
       width: auto;
-    }
-  }
-
-  .type-object .read-only[ng-click] {
-    cursor: pointer;
-    color: @link-color;
-  }
-
-  .ng-invalid {
-    input,
-    .form-control,
-    .value-wrapper {
-      color: @brand-danger;
     }
   }
 
