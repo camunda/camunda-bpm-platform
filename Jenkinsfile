@@ -54,7 +54,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          !pullRequest.labels.contains('no-build')
+          withLabels('')
         }
         beforeAgent true
       }
@@ -530,7 +530,7 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(List labels) {
-  if (pullRequest.labels.contains('no-build')) {
+  if (!env.BRANCH == defaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
