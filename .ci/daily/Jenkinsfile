@@ -57,8 +57,6 @@ spec:
     args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
     tty: true
     env:
-    - name: LIMITS_CPU
-      value: ${mavenForkCount}
     - name: TZ
       value: Europe/Berlin
     resources:
