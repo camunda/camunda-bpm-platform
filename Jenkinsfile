@@ -54,8 +54,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          return !pullRequest.labels.contains('TODO')
-          //return !pullRequest.labels.contains('no-build')
+          !pullRequest.labels.contains('no-build')
         }
         beforeAgent true
       }
@@ -141,7 +140,7 @@ pipeline {
         stage('engine-UNIT-authorizations-h2') {
           when {
             expression {
-              withLabels('h2')
+              withLabels('h2','authorizations')
             }
             beforeAgent true
           }
@@ -344,7 +343,7 @@ pipeline {
         }
         when {
           expression {
-            withLabels("all-db") || withDbLabel(env.DB)
+            withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB)
           }
           beforeAgent true
         }
@@ -531,8 +530,7 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(List labels) {
-  if (pullRequest.labels.contains('TODO')) {
-  //if (pullRequest.labels.contains('no-build')) {
+  if (pullRequest.labels.contains('no-build')) {
     return false;
   }
 
@@ -554,9 +552,10 @@ boolean withLabels(String... labels) {
 }
 
 
-boolean withDbLabel(String dbLabel) {
-  return withLabels(getDbType(dbLabel))
+boolean withDbLabels(String dbLabel) {
+  return withLabels(getDbType(dbLabel),'all-db')
 }
+
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
   Map dbInfo = getDbInfo(dbLabel)
@@ -623,6 +622,8 @@ Map getDbInfo(String databaseLabel) {
   return SUPPORTED_DBS[databaseLabel]
 }
 
+
+
 String getDbType(String dbLabel) {
   String[] database = dbLabel.split("_")
   return database[0]
@@ -640,16 +641,20 @@ String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
       'engine-unit': [
           directory: 'engine/',
-          command: 'clean test -P'],
+          command: 'clean test -P',
+          labels: ['authorizations']],
       'engine-unit-authorizations': [
           directory: 'engine/',
-          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'],
+          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
+          labels: ['authorizations']],
       'webapps-unit': [
           directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -P'],
+          command: 'clean test -Dskip.frontend.build=true -P',
+          labels: ['default-build']],
       'webapps-unit-authorizations': [
           directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,']
+          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
+          labels: ['default-build']]
   ]
 
   return PROFILE_PATHS[profile]

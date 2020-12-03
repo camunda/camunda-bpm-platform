@@ -268,11 +268,8 @@ pipeline {
           }
         }
         when {
-          anyOf {
-            branch defaultBranch();
-            expression {
-              withLabels(getLabels(env.PROFILE))
-            }
+          expression {
+            withLabels(getLabels(env.PROFILE)) && withDbLabels(env.DB)
           }
           beforeAgent true
         }
@@ -394,7 +391,7 @@ boolean withLabels(String... labels) {
 }
 
 boolean withDbLabels(String dbLabel) {
-  return withLabels(getDbType(dbLabel));
+  return withLabels(getDbType(dbLabel),'all-db');
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
