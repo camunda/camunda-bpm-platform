@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
 
@@ -80,6 +82,7 @@ pipeline {
         description: 'A build to take the artifacts from'
     )
     booleanParam defaultValue: true, description: '', name: 'STANDALONE'
+    string defaultValue: '', description: 'The labels assigned to the CE pull request', name: 'PR_LABELS'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
@@ -89,13 +92,14 @@ pipeline {
   }
   stages {
     stage('Prepare') {
+      when {
+        expression { params.STANDALONE == false }
+        beforeAgent true
+      }
       agent {
         kubernetes {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
         }
-      }
-      when {
-        expression { params.STANDALONE == false }
       }
       steps {
         copyArtifacts(projectName: "cambpm-jenkins-pipelines/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
@@ -117,20 +121,15 @@ pipeline {
     stage('H2 QA tests') {
       parallel {
         stage('sql-scripts-h2') {
+          when {
+            expression {
+              withLabels('h2', 'all-db')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -140,20 +139,15 @@ pipeline {
           }
         }
         stage('UPGRADE-databases-from-714-h2') {
+          when {
+            expression {
+              withLabels('h2', 'all-db')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -168,20 +162,15 @@ pipeline {
           }
         }
         stage('UPGRADE-instance-migration-h2') {
+          when {
+            expression {
+              withLabels('default-build', 'migration')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -196,20 +185,15 @@ pipeline {
           }
         }
         stage('UPGRADE-old-engine-from-714-h2') {
+          when {
+            expression {
+              withLabels('h2', 'all-db')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -224,20 +208,15 @@ pipeline {
           }
         }
         stage('UPGRADE-rolling-update-h2') {
+          when {
+            expression {
+              withLabels('rolling-update', 'default-build')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -252,20 +231,13 @@ pipeline {
           }
         }
         stage('PERFORMANCE-large-data-h2') {
+          when {
+            branch defaultBranch();
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
-            }
-          }
-          when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('qa')
-                }
-              }
             }
           }
           steps {
@@ -293,20 +265,15 @@ pipeline {
             values 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
+        when {
+          expression {
+            withLabels(getLabels(env.PROFILE)) && withDbLabels(env.DB)
+          }
+          beforeAgent true
+        }
         agent {
           kubernetes {
             yaml getDbAgent(env.DB)
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-//              expression {
-//                withLabels('all-db') || withDbLabel(env.DB)
-//              }
-            }
           }
         }
         stages {
@@ -329,20 +296,15 @@ pipeline {
             values 'openjdk-jdk-8-latest', 'openjdk-jdk-14-latest'
           }
         }
+        when {
+          expression {
+            withLabels('default-build')
+          }
+          beforeAgent true
+        }
         agent {
           kubernetes {
             yaml getJdkAgent()
-          }
-        }
-        when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-              expression {
-                withLabels('jdk', 'qa')
-              }
-            }
           }
         }
         stages {
@@ -388,18 +350,45 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   if (!params.STANDALONE && qaStash) unstash "platform-stash-qa"
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("cd ${directory} && mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B")
+    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
   }
 }
 
-void withLabels(String... labels) {
-  for ( l in labels) {
-    pullRequest.labels.contains(labelName)
-  }
+String defaultBranch() {
+  return 'pipeline-master'; // TODO
+//  return 'master';
 }
 
-void withDbLabels(String dbLabel) {
-  withLabels(getDbType(dbLabel))
+
+boolean withLabels(List labels) {
+  if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
+    return false;
+  }
+
+  if (env.BRANCH == defaultBranch()) {
+    return true;
+  } else if (!params.STANDALONE) {
+    for (l in labels) {
+      if (new JsonSlurper().parseText(params.PR_LABELS).contains(l)) {
+        return true;
+      }
+    }
+  } else {
+    for (l in labels) {
+      if (pullRequest.labels.contains(l)) {
+        return true;  
+      }
+    }
+  }
+  return false;
+}
+
+boolean withLabels(String... labels) {
+  return withLabels(Arrays.asList(labels));
+}
+
+boolean withDbLabels(String dbLabel) {
+  return withLabels(getDbType(dbLabel),'all-db');
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
@@ -485,27 +474,33 @@ String resolveMavenProfileInfo(String profile) {
       'check-sql': [
           directory: 'distro/sql-script/',
           command: 'install -Pcheck-sql,',
-          qaStash: false],
+          qaStash: false,
+          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
      'upgrade-db': [
           directory: 'qa/test-db-upgrade/',
           command: 'verify -Pupgrade-db,',
-          qaStash: false],
+          qaStash: false,
+          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
       'instance-migration': [
           directory: 'qa/test-db-instance-migration/',
           command: 'verify -Pinstance-migration,',
-          qaStash: true],
+          qaStash: true,
+          labels: []],
       'old-engine': [
           directory: 'qa/',
           command: 'verify -Pold-engine,',
-          qaStash: false],
+          qaStash: false,
+          labels: []],
       'rolling-update': [
           directory: 'qa/test-db-rolling-update/',
           command: 'verify -Prolling-update,',
-          qaStash: true],
+          qaStash: true,
+          labels: []],
       'large-data-tests': [
           directory: 'qa/large-data-tests/',
           command: 'verify -Plarge-data-tests,',
-          qaStash: false]
+          qaStash: false,
+          labels: []]
   ]
 
   return PROFILE_PATHS[profile]
@@ -521,4 +516,8 @@ String getMavenProfileDir(String profile) {
 
 boolean isQaStashEnabled(String profile) {
   return resolveMavenProfileInfo(profile).qaStash
+}
+
+String[] getLabels(String profile) {
+  return resolveMavenProfileInfo(profile).labels
 }
