@@ -667,3 +667,7 @@ String getMavenProfileCmd(String profile) {
 String getMavenProfileDir(String profile) {
   return resolveMavenProfileInfo(profile).directory
 }
+
+String[] getLabels(String profile) {
+  return resolveMavenProfileInfo(profile).labels
+}
