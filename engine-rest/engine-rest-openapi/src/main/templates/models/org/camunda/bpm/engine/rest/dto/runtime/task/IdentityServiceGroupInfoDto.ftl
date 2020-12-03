@@ -8,7 +8,7 @@
     />
 
     <@lib.property
-        name = "name"
+        name = "groupUsers"
         type = "array"
         dto = "IdentityServiceUserDto"
         last = true

@@ -15,7 +15,7 @@
 
     <@lib.response
         code = "200"
-        dto = "PasswordPolicyRuleDto"
+        dto = "PasswordPolicyDto"
         desc = "Request successful. This example uses the built-in password policy that enforces a minimum password length,
                 and some complexity rules."
         examples = ['"example-1": {
