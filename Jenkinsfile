@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 // https://github.com/camunda/jenkins-global-shared-library
 @Library('camunda-ci') _
 
@@ -46,10 +48,16 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: 'pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
+      string defaultValue: defaultBranch(), description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
+      when {
+        expression {
+          !pullRequest.labels.contains('no-build')
+        }
+        beforeAgent true
+      }
       agent {
         kubernetes {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
@@ -64,7 +72,7 @@ pipeline {
                """
              }
           }
-
+        
           // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
           // add a new line for each group of artifacts
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt', followSymlinks: false
@@ -76,36 +84,47 @@ pipeline {
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war', followSymlinks: false
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war', followSymlinks: false
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war', followSymlinks: false
-
+        
           stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
           stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
           stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+        
         }
+        
+        build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
+                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                booleanParam(name: 'STANDALONE', value: false),
+                string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
+                string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
+        ], quietPeriod: 10, wait: false
 
-        build job: "cambpm-jenkins-pipelines-ee/${env.EE_BRANCH_NAME}", parameters: [
-            string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-            booleanParam(name: 'STANDALONE', value: false),
-            string(name: 'CE_BRANCH_NAME', value: "${BRANCH_NAME}")
-        ], quietPeriod: 10, wait: false
-        build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
-            string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-            booleanParam(name: 'STANDALONE', value: false)
-        ], quietPeriod: 10, wait: false
+        script {
+          if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
+           build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
+               string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+               booleanParam(name: 'STANDALONE', value: false),
+               string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
+           ], quietPeriod: 10, wait: false
+          }
+
+          if (env.BRANCH_NAME == 'master') {
+            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+               sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
+              }
+            }
+          }
+        }
       }
     }
     stage('h2 tests') {
       parallel {
         stage('engine-UNIT-h2') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('h2')
-                }
-              }
+            expression {
+              withLabels('h2', 'rolling-update', 'migration')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -120,15 +139,10 @@ pipeline {
         }
         stage('engine-UNIT-authorizations-h2') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('h2')
-                }
-              }
+            expression {
+              withLabels('h2','authorizations')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -143,15 +157,10 @@ pipeline {
         }
         stage('engine-rest-UNIT-jersey-2') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('rest')
-                }
-              }
+            expression {
+              withLabels('rest-api')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -166,15 +175,10 @@ pipeline {
         }
         stage('engine-rest-UNIT-resteasy3') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('rest')
-                }
-              }
+            expression {
+              withLabels('rest-api')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -189,15 +193,10 @@ pipeline {
         }
         stage('webapp-UNIT-h2') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps')
-                }
-              }
+            expression {
+              withLabels('default-build')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -212,15 +211,10 @@ pipeline {
         }
         stage('engine-IT-tomcat-9-h2') {// TODO change it to `postgresql-96`
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT')
-                }
-              }
+            expression {
+              withLabels('all-as','tomcat')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -242,15 +236,10 @@ pipeline {
         }
         stage('webapp-IT-tomcat-9-h2') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps', 'IT')
-                }
-              }
+            expression {
+              withLabels('webapp-integration', 'h2')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -272,15 +261,8 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('webapps', 'IT')
-                }
-              }
-            }
+            branch defaultBranch();
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -297,15 +279,10 @@ pipeline {
         }
         stage('camunda-run-IT') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT', 'run', 'spring-boot')
-                }
-              }
+            expression {
+              withLabels('run')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -327,15 +304,10 @@ pipeline {
         }
         stage('spring-boot-starter-IT') {
           when {
-            anyOf {
-              branch 'pipeline-master';
-              allOf {
-                changeRequest();
-                expression {
-                  withLabels('IT', 'spring-boot')
-                }
-              }
+            expression {
+              withLabels('spring-boot')
             }
+            beforeAgent true
           }
           agent {
             kubernetes {
@@ -370,15 +342,10 @@ pipeline {
           }
         }
         when {
-          anyOf {
-            branch 'pipeline-master';
-            allOf {
-              changeRequest();
-//              expression {
-//                withLabels("all-db") || withDbLabel(env.DB)
-//              }
-            }
+          expression {
+            withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB)
           }
+          beforeAgent true
         }
         agent {
           kubernetes {
@@ -405,6 +372,10 @@ pipeline {
     stage('db tests + CE webapps IT') {
       parallel {
         stage('engine-api-compatibility') {
+          when {
+            branch defaultBranch();
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
@@ -417,6 +388,10 @@ pipeline {
           }
         }
         stage('engine-UNIT-plugins') {
+          when {
+            branch defaultBranch();
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
@@ -429,6 +404,12 @@ pipeline {
           }
         }
         stage('engine-UNIT-database-table-prefix') {
+          when {
+            expression {
+              withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -441,6 +422,10 @@ pipeline {
           }
         }
         stage('webapp-UNIT-database-table-prefix') {
+          when {
+            branch defaultBranch();
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -455,6 +440,10 @@ pipeline {
           }
         }
         stage('engine-UNIT-wls-compatibility') {
+          when {
+            branch defaultBranch();
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -467,6 +456,12 @@ pipeline {
           }
         }
         stage('IT-wildfly-domain') {
+          when {
+            expression {
+              withLabels('wildfly')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -479,6 +474,12 @@ pipeline {
           }
         }
         stage('IT-wildfly-servlet') {
+          when {
+            expression {
+              withLabels('wildfly')
+            }
+            beforeAgent true
+          }
           agent {
             kubernetes {
               yaml getAgent()
@@ -513,6 +514,11 @@ pipeline {
   }
 }
 
+String defaultBranch() {
+  return 'pipeline-master'; // TODO
+//  return 'master';
+}
+
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
   if (runtimeStash) unstash "platform-stash-runtime"
   if (archivesStash) unstash "platform-stash-archives"
@@ -523,15 +529,33 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-void withLabels(String... labels) {
-  for ( l in labels) {
-    pullRequest.labels.contains(labelName)
+boolean withLabels(List labels) {
+  if (pullRequest.labels.contains('no-build')) {
+    return false;
   }
+
+  if (env.BRANCH == defaultBranch() && !labels.contains('daily')) {
+    return true;
+  } else if (changeRequest()) {
+    for (l in labels) {
+      if (pullRequest.labels.contains(l)) {
+        return true;  
+      }
+    }
+  }
+
+  return false;
 }
 
-void withDbLabel(String dbLabel) {
-  withLabels(getDbType(dbLabel))
+boolean withLabels(String... labels) {
+  return withLabels(Arrays.asList(labels));
 }
+
+
+boolean withDbLabels(String dbLabel) {
+  return withLabels(getDbType(dbLabel),'all-db')
+}
+
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
   Map dbInfo = getDbInfo(dbLabel)
@@ -598,6 +622,8 @@ Map getDbInfo(String databaseLabel) {
   return SUPPORTED_DBS[databaseLabel]
 }
 
+
+
 String getDbType(String dbLabel) {
   String[] database = dbLabel.split("_")
   return database[0]
@@ -615,16 +641,20 @@ String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
       'engine-unit': [
           directory: 'engine/',
-          command: 'clean test -P'],
+          command: 'clean test -P',
+          labels: ['authorizations']],
       'engine-unit-authorizations': [
           directory: 'engine/',
-          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'],
+          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
+          labels: ['authorizations']],
       'webapps-unit': [
           directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -P'],
+          command: 'clean test -Dskip.frontend.build=true -P',
+          labels: ['default-build']],
       'webapps-unit-authorizations': [
           directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,']
+          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
+          labels: ['default-build']]
   ]
 
   return PROFILE_PATHS[profile]
@@ -636,4 +666,8 @@ String getMavenProfileCmd(String profile) {
 
 String getMavenProfileDir(String profile) {
   return resolveMavenProfileInfo(profile).directory
+}
+
+String[] getLabels(String profile) {
+  return resolveMavenProfileInfo(profile).labels
 }
