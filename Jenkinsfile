@@ -350,10 +350,11 @@ pipeline {
           }
         }
         stages {
-          stage("engine-UNIT") {
+          stage('UNIT test') {
             steps {
+              echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean test -P' + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+                runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
               }
             }
             post {
