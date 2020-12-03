@@ -337,6 +337,10 @@ pipeline {
             name 'DB'
             values 'postgresql_96', 'mariadb_103'
           }
+          axis {
+            name 'PROFILE'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations'
+          }
         }
         when {
           expression {
