@@ -363,8 +363,7 @@ String defaultBranch() {
 
 
 boolean withLabels(List labels) {
-  if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
-  //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
+  if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
