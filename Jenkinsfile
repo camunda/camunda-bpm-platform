@@ -530,13 +530,13 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(List labels) {
-  if (!env.BRANCH == defaultBranch() && pullRequest.labels.contains('no-build')) {
+  if (env.BRANCH != defaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
   if (env.BRANCH == defaultBranch() && !labels.contains('daily')) {
     return true;
-  } else if (changeRequest()) {
+  } else if (env.BRANCH != defaultBranch() && changeRequest()) {
     for (l in labels) {
       if (pullRequest.labels.contains(l)) {
         return true;  
