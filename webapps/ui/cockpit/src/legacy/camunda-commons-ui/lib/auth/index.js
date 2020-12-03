@@ -46,13 +46,11 @@ ngModule
     "Notifications",
     "$translate",
     "shouldDisplayAuthenticationError",
-    "$location",
     function(
       $rootScope,
       Notifications,
       $translate,
-      shouldDisplayAuthenticationError,
-      $location
+      shouldDisplayAuthenticationError
     ) {
       let redirecting = false;
       const handleLoginRequired = () => {
@@ -61,7 +59,8 @@ ngModule
         // Only refresh the user and redirect once
         redirecting = true;
         refreshUser().then(() => {
-          $location.url("/login");
+          // $location takes forever to redirect, use browser API instead
+          window.location.hash = "#/login";
         });
 
         if (shouldDisplayAuthenticationError()) {

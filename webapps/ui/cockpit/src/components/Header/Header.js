@@ -16,7 +16,7 @@
  */
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import withUser from "HOC/withUser";
 
@@ -32,16 +32,19 @@ import translate from "utils/translation";
 import Navigation from "./Navigation";
 
 function Header({ user }) {
+  const location = useLocation();
+  const showHeader = location.pathname !== "/login";
+
   return (
     <div className="Header">
-      {user ? (
+      {showHeader && (
         <Link to="/" className="app-banner">
           <Logo className="logo" />
           {translate("APP_VENDOR")} Cockpit
         </Link>
-      ) : null}
+      )}
 
-      {user && <Navigation />}
+      {showHeader && <Navigation />}
 
       <span className="divider" />
       <SmallScreenSwitch
