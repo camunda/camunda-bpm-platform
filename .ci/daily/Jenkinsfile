@@ -67,7 +67,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('check-sql'), getMavenProfileDir('check-sql'), getMavenProfileCmd('check-sql') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('check-sql'), cambpmGetMavenTargetDir('check-sql'), cambpmGetMavenTargetAndProfile('check-sql') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -92,7 +92,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('upgrade-db'), getMavenProfileDir('upgrade-db'), getMavenProfileCmd('upgrade-db') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('upgrade-db'), cambpmGetMavenTargetDir('upgrade-db'), cambpmGetMavenTargetAndProfile('upgrade-db') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -120,7 +120,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('instance-migration'), getMavenProfileDir('instance-migration'), getMavenProfileCmd('instance-migration') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('instance-migration'), cambpmGetMavenTargetDir('instance-migration'), cambpmGetMavenTargetAndProfile('instance-migration') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -148,7 +148,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('old-engine'), getMavenProfileDir('old-engine'), getMavenProfileCmd('old-engine') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('old-engine'), cambpmGetMavenTargetDir('old-engine'), cambpmGetMavenTargetAndProfile('old-engine') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -176,7 +176,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('rolling-update'), getMavenProfileDir('rolling-update'), getMavenProfileCmd('rolling-update') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('rolling-update'), cambpmGetMavenTargetDir('rolling-update'), cambpmGetMavenTargetAndProfile('rolling-update') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -202,7 +202,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('large-data-tests'), getMavenProfileDir('large-data-tests'), getMavenProfileCmd('large-data-tests') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, cambpmIsQaStashEnabled('large-data-tests'), cambpmGetMavenTargetDir('large-data-tests'), cambpmGetMavenTargetAndProfile('large-data-tests') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -231,7 +231,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(getLabels(env.PROFILE)) && withDbLabels(env.DB)
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
           }
           beforeAgent true
         }
@@ -246,7 +246,7 @@ pipeline {
               echo("QA DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  runMaven(true, false, cambpmIsQaStashEnabled(env.PROFILE), cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -327,7 +327,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-
 boolean withLabels(List labels) {
   if (params.STANDALONE && env.BRANCH_NAME != cambpmDefaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
@@ -357,57 +356,4 @@ boolean withLabels(String... labels) {
 
 boolean withDbLabels(String dbLabel) {
   return withLabels(cambpmGetDbType(dbLabel),'all-db');
-}
-
-String resolveMavenProfileInfo(String profile) {
-  Map PROFILE_PATHS = [
-      'sql-scripts': [
-          directory: 'distro/sql-script/',
-          command: 'install -Pcheck-sql,',
-          qaStash: false,
-          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-     'upgrade-database': [
-          directory: 'qa/test-db-upgrade/',
-          command: 'verify -Pupgrade-db,',
-          qaStash: false,
-          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-      'instance-migration': [
-          directory: 'qa/test-db-instance-migration/',
-          command: 'verify -Pinstance-migration,',
-          qaStash: true,
-          labels: []],
-      'old-engine': [
-          directory: 'qa/',
-          command: 'verify -Pold-engine,',
-          qaStash: false,
-          labels: []],
-      'rolling-update': [
-          directory: 'qa/test-db-rolling-update/',
-          command: 'verify -Prolling-update,',
-          qaStash: true,
-          labels: []],
-      'large-data-tests': [
-          directory: 'qa/large-data-tests/',
-          command: 'verify -Plarge-data-tests,',
-          qaStash: false,
-          labels: []]
-  ]
-
-  return PROFILE_PATHS[profile]
-}
-
-String getMavenProfileCmd(String profile) {
-  return resolveMavenProfileInfo(profile).command
-}
-
-String getMavenProfileDir(String profile) {
-  return resolveMavenProfileInfo(profile).directory
-}
-
-boolean isQaStashEnabled(String profile) {
-  return resolveMavenProfileInfo(profile).qaStash
-}
-
-String[] getLabels(String profile) {
-  return resolveMavenProfileInfo(profile).labels
 }
