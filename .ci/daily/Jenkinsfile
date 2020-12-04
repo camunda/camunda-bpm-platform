@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
 
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@default-branch-method']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -169,7 +169,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'upgrade-db')
@@ -197,7 +197,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'instance-migration')
@@ -225,7 +225,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'old-engine')
@@ -253,7 +253,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'rolling-update')
@@ -279,7 +279,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'large-data-tests')
@@ -323,7 +323,7 @@ pipeline {
             }
             post {
               always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                cambpmPublishTestResult();
               }
             }
           }
@@ -360,7 +360,7 @@ pipeline {
             }
             post {
               always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                cambpmPublishTestResult();
               }
             }
           }
