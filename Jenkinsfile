@@ -52,13 +52,12 @@ pipeline {
   }
   stages {
     stage('ASSEMBLY') {
-     // TODO
-     // when {
-     //   expression {
-     //     env.BRANCH == defaultBranch() || !pullRequest.labels.contains('no-build')
-     //   }
-     //   beforeAgent true
-     // }
+      when {
+        expression {
+          env.BRANCH_NAME == defaultBranch() || !pullRequest.labels.contains('no-build')
+        }
+        beforeAgent true
+      }
       agent {
         kubernetes {
           yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
@@ -533,18 +532,18 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(List labels) { // TODO
-//  if (env.BRANCH != defaultBranch() && !pullRequest.labels.contains('no-build')) {
-//    return false;
-//  }
+  if (env.BRANCH_NAME != defaultBranch() && !pullRequest.labels.contains('no-build')) {
+    return false;
+  }
 
-  if (env.BRANCH == defaultBranch() && !labels.contains('daily')) {
+  if (env.BRANCH_NAME == defaultBranch() && !labels.contains('daily')) {
     return true;
   } else if (changeRequest()) {
-  //  for (l in labels) {
-  //    if (pullRequest.labels.contains(l)) {
-  //      return true;  
-  //    }
-  //  }
+    for (l in labels) {
+      if (pullRequest.labels.contains(l)) {
+        return true;  
+      }
+    }
   }
 
   return false;
