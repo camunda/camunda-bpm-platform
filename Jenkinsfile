@@ -91,21 +91,25 @@ pipeline {
         
         }
         
-        build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
-                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                booleanParam(name: 'STANDALONE', value: false),
-                string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}")
-//                ,
-//                string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
-        ], quietPeriod: 10, wait: false
 
         script {
+          String labels = '';
+          if (env.BRANCH_NAME != defaultBranch()) {
+            labels = JsonOutput.toJson(pullRequest.labels)
+          }
+
+          build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
+                  string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                  booleanParam(name: 'STANDALONE', value: false),
+                  string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
+                  string(name: 'PR_LABELS', value: labels)
+          ], quietPeriod: 10, wait: false
+
           if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-               booleanParam(name: 'STANDALONE', value: false)
-//               ,
-//               string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
+               booleanParam(name: 'STANDALONE', value: false),
+               string(name: 'PR_LABELS', value: labels)
            ], quietPeriod: 10, wait: false
           }
 
@@ -536,8 +540,8 @@ boolean withLabels(List labels) { // TODO
     return false;
   }
 
-  if (env.BRANCH_NAME == defaultBranch() && !labels.contains('daily')) {
-    return true;
+  if (env.BRANCH_NAME == defaultBranch()) {
+    return !labels.contains('daily');
   } else if (changeRequest()) {
     for (l in labels) {
       if (pullRequest.labels.contains(l)) {
