@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
 
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12755-junit-result']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
