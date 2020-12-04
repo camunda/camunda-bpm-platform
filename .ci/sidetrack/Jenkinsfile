@@ -150,7 +150,7 @@ boolean withLabels(List labels) {
     return false;
   }
 
-  if (env.BRANCH_NAME == defaultBranch()) {
+  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
     return true;
   } else if (!params.STANDALONE) {
     for (l in labels) {
@@ -278,9 +278,4 @@ boolean isQaStashEnabled(String profile) {
 
 String[] getLabels(String profile) {
   return resolveMavenProfileInfo(profile).labels
-}
-
-String defaultBranch() {
-  return 'pipeline-master'; // TODO
-//  return 'master';
 }

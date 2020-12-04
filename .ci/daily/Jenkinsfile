@@ -262,7 +262,7 @@ pipeline {
         }
         stage('PERFORMANCE-large-data-h2') {
           when {
-            branch defaultBranch();
+            branch cambpmDefaultBranch();
             beforeAgent true
           }
           agent {
@@ -400,11 +400,11 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 
 
 boolean withLabels(List labels) {
-  if (params.STANDALONE && env.BRANCH_NAME != defaultBranch() && pullRequest.labels.contains('no-build')) {
+  if (params.STANDALONE && env.BRANCH_NAME != cambpmDefaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
-  if (env.BRANCH_NAME == defaultBranch()) {
+  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
     return true;
   } else if (!params.STANDALONE) {
     for (l in labels) {
