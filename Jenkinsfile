@@ -51,13 +51,13 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: defaultBranch(), description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
+      string defaultValue: cambpmDefaultBranch(), description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == defaultBranch() || !pullRequest.labels.contains('no-build')
+          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
         }
         beforeAgent true
       }
@@ -97,7 +97,7 @@ pipeline {
 
         script {
           String labels = '';
-          if (env.BRANCH_NAME != defaultBranch()) {
+          if (env.BRANCH_NAME != cambpmDefaultBranch()) {
             labels = JsonOutput.toJson(pullRequest.labels)
           }
 
@@ -377,7 +377,7 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            branch defaultBranch();
+            branch cambpmDefaultBranch();
             beforeAgent true
           }
           agent {
@@ -500,7 +500,7 @@ pipeline {
               expression {
                 skipStageType(failedStageTypes, 'engine-unit')
               }
-              branch defaultBranch();
+              branch cambpmDefaultBranch();
             }
             beforeAgent true
           }
@@ -528,7 +528,7 @@ pipeline {
               expression {
                 skipStageType(failedStageTypes, 'engine-unit')
               }
-              branch defaultBranch();
+              branch cambpmDefaultBranch();
             }
             beforeAgent true
           }
@@ -581,7 +581,7 @@ pipeline {
               expression {
                 skipStageType(failedStageTypes, 'webapps-unit')
               }
-              branch defaultBranch();
+              branch cambpmDefaultBranch();
             }
             beforeAgent true
           }
@@ -611,7 +611,7 @@ pipeline {
               expression {
                 skipStageType(failedStageTypes, 'engine-unit')
               }
-              branch defaultBranch();
+              branch cambpmDefaultBranch();
             }
             beforeAgent true
           }
@@ -706,11 +706,6 @@ pipeline {
   }
 }
 
-String defaultBranch() {
-  return 'pipeline-master'; // TODO
-//  return 'master';
-}
-
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
   if (runtimeStash) unstash "platform-stash-runtime"
   if (archivesStash) unstash "platform-stash-archives"
@@ -722,11 +717,11 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
 }
 
 boolean withLabels(List labels) { // TODO
-  if (env.BRANCH_NAME != defaultBranch() && !pullRequest.labels.contains('no-build')) {
+  if (env.BRANCH_NAME != cambpmDefaultBranch() && !pullRequest.labels.contains('no-build')) {
     return false;
   }
 
-  if (env.BRANCH_NAME == defaultBranch()) {
+  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
     return !labels.contains('daily');
   } else if (changeRequest()) {
     for (l in labels) {
