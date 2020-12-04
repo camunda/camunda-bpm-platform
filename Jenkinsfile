@@ -107,6 +107,14 @@ pipeline {
                   string(name: 'PR_LABELS', value: labels)
           ], quietPeriod: 10, wait: false
 
+          if (withLabels('all-db','cockroachdb','authorizations')) {
+           build job: "cambpm-jenkins-pipelines-sidetrack/${env.BRANCH_NAME}", parameters: [
+           string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+               booleanParam(name: 'STANDALONE', value: false),
+               string(name: 'PR_LABELS', value: labels)
+           ], quietPeriod: 10, wait: false
+          }
+
           if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
@@ -123,6 +131,7 @@ pipeline {
             }
           }
         }
+
       }
     }
     stage('h2 tests') {
