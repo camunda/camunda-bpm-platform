@@ -95,16 +95,18 @@ pipeline {
         build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
                 string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                 booleanParam(name: 'STANDALONE', value: false),
-                string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
-                string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
+                string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}")
+//                ,
+//                string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
         ], quietPeriod: 10, wait: false
 
         script {
           if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-               booleanParam(name: 'STANDALONE', value: false),
-               string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
+               booleanParam(name: 'STANDALONE', value: false)
+//               ,
+//               string(name: 'PR_LABELS', value: JsonOutput.toJson(pullRequest.labels))
            ], quietPeriod: 10, wait: false
           }
 
