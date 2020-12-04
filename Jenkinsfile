@@ -1,7 +1,8 @@
 import groovy.json.JsonOutput
 
 // https://github.com/camunda/jenkins-global-shared-library
-@Library('camunda-ci') _
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@default-branch-method']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -703,11 +704,6 @@ pipeline {
       }
     }
   }
-}
-
-String defaultBranch() {
-  return 'pipeline-master'; // TODO
-//  return 'master';
 }
 
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
