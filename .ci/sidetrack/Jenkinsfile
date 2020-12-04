@@ -77,7 +77,7 @@ pipeline {
         axes {
           axis {
             name 'DB'
-            values 'cockroachdb'
+            values 'cockroachdb_201'
           }
           axis {
             name 'PROFILE'
@@ -101,7 +101,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -174,38 +174,7 @@ boolean withLabels(String... labels) {
 }
 
 boolean withDbLabels(String dbLabel) {
-  return withLabels(getDbType(dbLabel));
-}
-
-
-Map getDbInfo(String databaseLabel) {
-  Map SUPPORTED_DBS = [
-    'h2': [
-      type: 'h2',
-      version: '',
-      profiles: 'h2',
-      extra: ''],
-    'cockroachdb': [
-      type: 'cockroachdb',
-      version: '42.0.0',
-      profiles: 'cockroachdb',
-      extra: '']
-  ]
-
-  return SUPPORTED_DBS[databaseLabel]
-}
-
-String getDbType(String dbLabel) {
-  String[] database = dbLabel.split("_")
-  return database[0]
-}
-
-String getDbProfiles(String dbLabel) {
-  return getDbInfo(dbLabel).profiles
-}
-
-String getDbExtras(String dbLabel) {
-  return getDbInfo(dbLabel).extra
+  return withLabels(cambpmGetDbType(dbLabel));
 }
 
 String resolveMavenProfileInfo(String profile) {

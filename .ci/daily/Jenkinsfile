@@ -138,7 +138,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('check-sql'), getMavenProfileDir('check-sql'), getMavenProfileCmd('check-sql') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('check-sql'), getMavenProfileDir('check-sql'), getMavenProfileCmd('check-sql') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -163,7 +163,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('upgrade-db'), getMavenProfileDir('upgrade-db'), getMavenProfileCmd('upgrade-db') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('upgrade-db'), getMavenProfileDir('upgrade-db'), getMavenProfileCmd('upgrade-db') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -191,7 +191,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('instance-migration'), getMavenProfileDir('instance-migration'), getMavenProfileCmd('instance-migration') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('instance-migration'), getMavenProfileDir('instance-migration'), getMavenProfileCmd('instance-migration') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -219,7 +219,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('old-engine'), getMavenProfileDir('old-engine'), getMavenProfileCmd('old-engine') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('old-engine'), getMavenProfileDir('old-engine'), getMavenProfileCmd('old-engine') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -247,7 +247,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('rolling-update'), getMavenProfileDir('rolling-update'), getMavenProfileCmd('rolling-update') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('rolling-update'), getMavenProfileDir('rolling-update'), getMavenProfileCmd('rolling-update') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -273,7 +273,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('large-data-tests'), getMavenProfileDir('large-data-tests'), getMavenProfileCmd('large-data-tests') + getDbProfiles('h2'))
+                runMaven(true, false, isQaStashEnabled('large-data-tests'), getMavenProfileDir('large-data-tests'), getMavenProfileCmd('large-data-tests') + cambpmcambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -317,7 +317,7 @@ pipeline {
               echo("QA DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(DB) + " " + getDbExtras(env.DB), true)
+                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmcambpmGetDbProfiles(DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -427,11 +427,11 @@ boolean withLabels(String... labels) {
 }
 
 boolean withDbLabels(String dbLabel) {
-  return withLabels(getDbType(dbLabel),'all-db');
+  return withLabels(cambpmGetDbType(dbLabel),'all-db');
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
-  Map dbInfo = getDbInfo(dbLabel)
+  Map dbInfo = cambpmGetDbInfo(dbLabel)
   String mavenMemoryLimit = cpuLimit * 4;
   """
 metadata:
@@ -472,46 +472,6 @@ spec:
         medium: ""
       name: "workspace-volume"
   """
-}
-
-Map getDbInfo(String databaseLabel) {
-  Map SUPPORTED_DBS = [
-    'h2': [
-      type: 'h2',
-      version: '',
-      profiles: 'h2',
-      extra: ''],
-    'postgresql_96': [
-      type: 'postgresql',
-      version: '9.6v0.2.2',
-      profiles: 'postgresql',
-      extra: ''],
-    'mariadb_103': [
-      type: 'mariadb',
-      version: '10.3v0.3.2',
-      profiles: 'mariadb',
-      extra: ''],
-    'sqlserver_2017': [
-      type: 'mssql',
-      version: '2017v0.1.1',
-      profiles: 'sqlserver',
-      extra: '-Ddatabase.name=camunda -Ddatabase.username=sa -Ddatabase.password=cam_123$']
-  ]
-
-  return SUPPORTED_DBS[databaseLabel]
-}
-
-String getDbType(String dbLabel) {
-  String[] database = dbLabel.split("_")
-  return database[0]
-}
-
-String getDbProfiles(String dbLabel) {
-  return getDbInfo(dbLabel).profiles
-}
-
-String getDbExtras(String dbLabel) {
-  return getDbInfo(dbLabel).extra
 }
 
 String resolveMavenProfileInfo(String profile) {
