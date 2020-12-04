@@ -1,7 +1,8 @@
 import groovy.json.JsonOutput
 
 // https://github.com/camunda/jenkins-global-shared-library
-@Library('camunda-ci') _
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12755-junit-result']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -157,7 +158,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-unit')
@@ -185,7 +186,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-unit-authorizations')
@@ -213,7 +214,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -238,7 +239,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -263,7 +264,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'webapps-unit')
@@ -290,7 +291,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'webapps-unit-authorizations')
@@ -318,7 +319,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -342,7 +343,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-IT-wildfly')
@@ -370,7 +371,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -393,7 +394,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -418,7 +419,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -443,7 +444,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -484,7 +485,7 @@ pipeline {
             }
             post {
               always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                publishTestResult();
               }
             }
           }
@@ -517,7 +518,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -545,7 +546,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -570,7 +571,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -600,7 +601,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -628,7 +629,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -653,7 +654,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }
@@ -678,7 +679,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
           }
         }

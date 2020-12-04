@@ -1,7 +1,8 @@
 import groovy.json.JsonSlurper
 
 // https://github.com/camunda/jenkins-global-shared-library
-@Library('camunda-ci') _
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12755-junit-result']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -168,7 +169,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'upgrade-db')
@@ -196,7 +197,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'instance-migration')
@@ -224,7 +225,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'old-engine')
@@ -252,7 +253,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'rolling-update')
@@ -278,7 +279,7 @@ pipeline {
           }
           post {
             always {
-              junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              publishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'large-data-tests')
@@ -322,7 +323,7 @@ pipeline {
             }
             post {
               always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                publishTestResult();
               }
             }
           }
@@ -359,7 +360,7 @@ pipeline {
             }
             post {
               always {
-                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+                publishTestResult();
               }
             }
           }
