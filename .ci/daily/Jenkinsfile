@@ -365,7 +365,7 @@ boolean withLabels(List labels) {
     return false;
   }
 
-  if (env.BRANCH == defaultBranch()) {
+  if (env.BRANCH_NAME == defaultBranch()) {
     return true;
   } else if (!params.STANDALONE) {
     for (l in labels) {
