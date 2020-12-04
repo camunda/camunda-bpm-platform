@@ -152,7 +152,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + getDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -180,7 +180,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + getDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -258,7 +258,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + getDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -285,7 +285,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + getDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -479,7 +479,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+                  runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -738,14 +738,12 @@ boolean withLabels(String... labels) {
   return withLabels(Arrays.asList(labels));
 }
 
-
 boolean withDbLabels(String dbLabel) {
-  return withLabels(getDbType(dbLabel),'all-db')
+  return withLabels(cambpmGetDbType(dbLabel),'all-db')
 }
 
-
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
-  Map dbInfo = getDbInfo(dbLabel)
+  Map dbInfo = cambpmGetDbInfo(dbLabel)
   String mavenMemoryLimit = cpuLimit * 4;
   """
 metadata:
@@ -788,48 +786,6 @@ spec:
   """
 }
 
-Map getDbInfo(String databaseLabel) {
-  Map SUPPORTED_DBS = [
-    'h2': [
-      type: 'h2',
-      version: '',
-      profiles: 'h2',
-      extra: ''],
-    'postgresql_96': [
-      type: 'postgresql',
-      version: '9.6v0.2.2',
-      profiles: 'postgresql',
-      extra: ''],
-    'mariadb_103': [
-      type: 'mariadb',
-      version: '10.3v0.3.2',
-      profiles: 'mariadb',
-      extra: ''],
-    'sqlserver_2017': [
-      type: 'mssql',
-      version: '2017v0.1.1',
-      profiles: 'sqlserver',
-      extra: '-Ddatabase.name=camunda -Ddatabase.username=sa -Ddatabase.password=cam_123$']
-  ]
-
-  return SUPPORTED_DBS[databaseLabel]
-}
-
-
-
-String getDbType(String dbLabel) {
-  String[] database = dbLabel.split("_")
-  return database[0]
-}
-
-String getDbProfiles(String dbLabel) {
-  return getDbInfo(dbLabel).profiles
-}
-
-String getDbExtras(String dbLabel) {
-  return getDbInfo(dbLabel).extra
-}
-
 String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
       'engine-unit': [
@@ -864,7 +820,6 @@ String getMavenProfileDir(String profile) {
 String[] getLabels(String profile) {
   return resolveMavenProfileInfo(profile).labels
 }
-
 
 void addFailedStageType(List failedStageTypesList, String stageType) {
   if (!failedStageTypesList.contains(stageType)) failedStageTypesList << stageType
