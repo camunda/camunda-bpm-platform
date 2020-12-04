@@ -404,7 +404,7 @@ String defaultBranch() {
 
 
 boolean withLabels(List labels) {
-  if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
+  if (params.STANDALONE && env.BRANCH_NAME != defaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
   }
 
