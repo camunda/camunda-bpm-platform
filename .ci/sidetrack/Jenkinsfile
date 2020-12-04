@@ -1,7 +1,8 @@
 import groovy.json.JsonSlurper
 
 // https://github.com/camunda/jenkins-global-shared-library
-@Library('camunda-ci') _
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@default-branch-method']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -150,7 +151,7 @@ boolean withLabels(List labels) {
     return false;
   }
 
-  if (env.BRANCH_NAME == defaultBranch()) {
+  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
     return true;
   } else if (!params.STANDALONE) {
     for (l in labels) {
@@ -278,9 +279,4 @@ boolean isQaStashEnabled(String profile) {
 
 String[] getLabels(String profile) {
   return resolveMavenProfileInfo(profile).labels
-}
-
-String defaultBranch() {
-  return 'pipeline-master'; // TODO
-//  return 'master';
 }
