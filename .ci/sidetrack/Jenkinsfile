@@ -1,0 +1,286 @@
+import groovy.json.JsonSlurper
+
+// https://github.com/camunda/jenkins-global-shared-library
+@Library('camunda-ci') _
+
+String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
+  String mavenForkCount = cpuLimit;
+  String mavenMemoryLimit = cpuLimit * 2;
+  """
+metadata:
+  labels:
+    agent: ci-cambpm-camunda-cloud-build
+spec:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-preempt
+  tolerations:
+  - key: "agents-n1-standard-32-netssd-preempt"
+    operator: "Exists"
+    effect: "NoSchedule"
+  containers:
+  - name: "jnlp"
+    image: "${dockerImage}"
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+    tty: true
+    env:
+    - name: LIMITS_CPU
+      value: ${mavenForkCount}
+    - name: TZ
+      value: Europe/Berlin
+    resources:
+      limits:
+        cpu: ${cpuLimit}
+        memory: ${mavenMemoryLimit}Gi
+      requests:
+        cpu: ${cpuLimit}
+        memory: ${mavenMemoryLimit}Gi
+    workingDir: "/home/work"
+    volumeMounts:
+      - mountPath: /home/work
+        name: workspace-volume
+  """
+}
+
+pipeline {
+  agent none
+  parameters {
+    buildSelector(
+        name: 'copyArtifactSelector',
+        description: 'A build to take the artifacts from'
+    )
+    booleanParam defaultValue: true, description: '', name: 'STANDALONE'
+    string defaultValue: '', description: 'The labels assigned to the CE pull request', name: 'PR_LABELS'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
+  }
+  stages {
+    stage('Prepare') {
+      when {
+        expression { params.STANDALONE == false }
+        beforeAgent true
+      }
+      agent {
+        kubernetes {
+          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6')
+        }
+      }
+      steps {
+        copyArtifacts(projectName: "cambpm-jenkins-pipelines/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
+        stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
+        stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+      }
+    }
+    stage('UNIT DB tests') {
+      matrix {
+        axes {
+          axis {
+            name 'DB'
+            values 'cockroachdb'
+          }
+          axis {
+            name 'PROFILE'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations', 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
+          }
+        }
+        when {
+          expression {
+            withLabels(getLabels(env.PROFILE))
+          }
+          beforeAgent true
+        }
+        agent {
+          kubernetes {
+            yaml getAgent('gcr.io/ci-30-162810/cockroachdb:20.1v0.1.3', 16)
+          }
+        }
+        stages {
+          stage('UNIT test') {
+            steps {
+              echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
+              catchError(stageResult: 'FAILURE') {
+                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + getDbProfiles(env.DB) + " " + getDbExtras(env.DB), true)
+                }
+              }
+            }
+            post {
+              always {
+                junit testResults: '**/target/*-reports/TEST-*.xml', keepLongStdio: true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()){
+          // send email if the slave disconnected
+        }
+      }
+    }
+    always {
+      script {
+        if (agentDisconnected()) {// Retrigger the build if the slave disconnected
+          //currentBuild.result = 'ABORTED'
+          //currentBuild.description = "Aborted due to connection error"
+          build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
+        }
+      }
+    }
+  }
+}
+
+void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
+  if (!params.STANDALONE && runtimeStash) unstash "platform-stash-runtime"
+  if (!params.STANDALONE && archivesStash) unstash "platform-stash-archives"
+  if (!params.STANDALONE && qaStash) unstash "platform-stash-qa"
+  String forkCount = singleThreaded? "-DforkCount=1" : '';
+  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
+    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
+  }
+}
+
+boolean withLabels(List labels) {
+  if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
+  //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
+    return false;
+  }
+
+  if (env.BRANCH_NAME == defaultBranch()) {
+    return true;
+  } else if (!params.STANDALONE) {
+    for (l in labels) {
+      if (new JsonSlurper().parseText(params.PR_LABELS).contains(l)) {
+        return true;
+      }
+    }
+  } else {
+    for (l in labels) {
+      if (pullRequest.labels.contains(l)) {
+        return true;  
+      }
+    }
+  }
+  return false;
+}
+
+boolean withLabels(String... labels) {
+  return withLabels(Arrays.asList(labels));
+}
+
+boolean withDbLabels(String dbLabel) {
+  return withLabels(getDbType(dbLabel));
+}
+
+
+Map getDbInfo(String databaseLabel) {
+  Map SUPPORTED_DBS = [
+    'h2': [
+      type: 'h2',
+      version: '',
+      profiles: 'h2',
+      extra: ''],
+    'cockroachdb': [
+      type: 'cockroachdb',
+      version: '42.0.0',
+      profiles: 'cockroachdb',
+      extra: '']
+  ]
+
+  return SUPPORTED_DBS[databaseLabel]
+}
+
+String getDbType(String dbLabel) {
+  String[] database = dbLabel.split("_")
+  return database[0]
+}
+
+String getDbProfiles(String dbLabel) {
+  return getDbInfo(dbLabel).profiles
+}
+
+String getDbExtras(String dbLabel) {
+  return getDbInfo(dbLabel).extra
+}
+
+String resolveMavenProfileInfo(String profile) {
+  Map PROFILE_PATHS = [
+      'engine-unit': [
+          directory: 'engine/',
+          command: 'clean test -P',
+          qaStash: false,
+          labels: ['all-db','cockroachdb','authorizations']],
+      'engine-unit-authorizations': [
+          directory: 'engine/',
+          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
+          qaStash: false,
+          labels: ['authorizations']],
+      'webapps-unit': [
+          directory: 'webapps/',
+          command: 'clean test -Dskip.frontend.build=true -P',
+          qaStash: false,
+          labels: []],
+      'webapps-unit-authorizations': [
+          directory: 'webapps/',
+          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
+          qaStash: false,
+          labels: []],
+      'check-sql': [
+          directory: 'distro/sql-script/',
+          command: 'install -Pcheck-sql,',
+          qaStash: false,
+          labels: ['all-db','cockroachdb']],
+     'upgrade-db': [
+          directory: 'qa/test-db-upgrade/',
+          command: 'verify -Pupgrade-db,',
+          qaStash: false,
+          labels: ['all-db','cockroachdb']],
+      'instance-migration': [
+          directory: 'qa/test-db-instance-migration/',
+          command: 'verify -Pinstance-migration,',
+          qaStash: true,
+          labels: []],
+      'old-engine': [
+          directory: 'qa/',
+          command: 'verify -Pold-engine,',
+          qaStash: false,
+          labels: ['all-db','cockroachdb']],
+      'rolling-update': [
+          directory: 'qa/test-db-rolling-update/',
+          command: 'verify -Prolling-update,',
+          qaStash: true,
+          labels: []],
+      'large-data-tests': [
+          directory: 'qa/large-data-tests/',
+          command: 'verify -Plarge-data-tests,',
+          qaStash: false,
+          labels: []]
+  ]
+
+  return PROFILE_PATHS[profile]
+}
+
+String getMavenProfileCmd(String profile) {
+  return resolveMavenProfileInfo(profile).command
+}
+
+String getMavenProfileDir(String profile) {
+  return resolveMavenProfileInfo(profile).directory
+}
+
+boolean isQaStashEnabled(String profile) {
+  return resolveMavenProfileInfo(profile).qaStash
+}
+
+String[] getLabels(String profile) {
+  return resolveMavenProfileInfo(profile).labels
+}
+
+String defaultBranch() {
+  return 'pipeline-master'; // TODO
+//  return 'master';
+}
