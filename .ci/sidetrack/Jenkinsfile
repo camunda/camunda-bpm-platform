@@ -48,7 +48,7 @@ pipeline {
         }
         when {
           expression {
-            withLabels(getLabels(env.PROFILE))
+            withLabels(cambpmGetLabels(env.PROFILE))
           }
           beforeAgent true
         }
@@ -63,7 +63,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  runMaven(true, false, cambpmIsQaStashEnabled(env.PROFILE), cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -137,77 +137,4 @@ boolean withLabels(String... labels) {
 
 boolean withDbLabels(String dbLabel) {
   return withLabels(cambpmGetDbType(dbLabel));
-}
-
-String resolveMavenProfileInfo(String profile) {
-  Map PROFILE_PATHS = [
-      'engine-unit': [
-          directory: 'engine/',
-          command: 'clean test -P',
-          qaStash: false,
-          labels: ['all-db','cockroachdb','authorizations']],
-      'engine-unit-authorizations': [
-          directory: 'engine/',
-          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
-          qaStash: false,
-          labels: ['authorizations']],
-      'webapp-unit': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -P',
-          qaStash: false,
-          labels: []],
-      'webapp-unit-authorizations': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
-          qaStash: false,
-          labels: []],
-      'sql-scripts': [
-          directory: 'distro/sql-script/',
-          command: 'install -Pcheck-sql,',
-          qaStash: false,
-          labels: ['all-db','cockroachdb']],
-     'upgrade-database': [
-          directory: 'qa/test-db-upgrade/',
-          command: 'verify -Pupgrade-db,',
-          qaStash: false,
-          labels: ['all-db','cockroachdb']],
-      'instance-migration': [
-          directory: 'qa/test-db-instance-migration/',
-          command: 'verify -Pinstance-migration,',
-          qaStash: true,
-          labels: []],
-      'old-engine': [
-          directory: 'qa/',
-          command: 'verify -Pold-engine,',
-          qaStash: false,
-          labels: ['all-db','cockroachdb']],
-      'rolling-update': [
-          directory: 'qa/test-db-rolling-update/',
-          command: 'verify -Prolling-update,',
-          qaStash: true,
-          labels: []],
-      'large-data-tests': [
-          directory: 'qa/large-data-tests/',
-          command: 'verify -Plarge-data-tests,',
-          qaStash: false,
-          labels: []]
-  ]
-
-  return PROFILE_PATHS[profile]
-}
-
-String getMavenProfileCmd(String profile) {
-  return resolveMavenProfileInfo(profile).command
-}
-
-String getMavenProfileDir(String profile) {
-  return resolveMavenProfileInfo(profile).directory
-}
-
-boolean isQaStashEnabled(String profile) {
-  return resolveMavenProfileInfo(profile).qaStash
-}
-
-String[] getLabels(String profile) {
-  return resolveMavenProfileInfo(profile).labels
 }
