@@ -561,11 +561,6 @@ pipeline {
               yaml getAgent()
             }
           }
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
-          }
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
@@ -588,11 +583,6 @@ pipeline {
               branch defaultBranch();
             }
             beforeAgent true
-          }
-          agent {
-            kubernetes {
-              yaml getAgent()
-            }
           }
           agent {
             kubernetes {
