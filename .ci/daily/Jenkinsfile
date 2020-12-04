@@ -169,7 +169,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'upgrade-db')
@@ -197,7 +197,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'instance-migration')
@@ -225,7 +225,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'old-engine')
@@ -253,7 +253,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'rolling-update')
@@ -279,7 +279,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'large-data-tests')
@@ -323,7 +323,7 @@ pipeline {
             }
             post {
               always {
-                publishTestResult();
+                cambpmPublishTestResult();
               }
             }
           }
@@ -360,7 +360,7 @@ pipeline {
             }
             post {
               always {
-                publishTestResult();
+                cambpmPublishTestResult();
               }
             }
           }

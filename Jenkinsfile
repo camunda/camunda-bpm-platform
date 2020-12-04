@@ -158,7 +158,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-unit')
@@ -186,7 +186,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-unit-authorizations')
@@ -214,7 +214,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -239,7 +239,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -264,7 +264,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'webapps-unit')
@@ -291,7 +291,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'webapps-unit-authorizations')
@@ -319,7 +319,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -343,7 +343,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
             failure {
               addFailedStageType(failedStageTypes, 'engine-IT-wildfly')
@@ -371,7 +371,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -394,7 +394,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -419,7 +419,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -444,7 +444,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -485,7 +485,7 @@ pipeline {
             }
             post {
               always {
-                publishTestResult();
+                cambpmPublishTestResult();
               }
             }
           }
@@ -518,7 +518,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -546,7 +546,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -571,7 +571,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -601,7 +601,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -629,7 +629,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -654,7 +654,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
@@ -679,7 +679,7 @@ pipeline {
           }
           post {
             always {
-              publishTestResult();
+              cambpmPublishTestResult();
             }
           }
         }
