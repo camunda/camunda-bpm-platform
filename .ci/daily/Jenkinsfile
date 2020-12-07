@@ -144,7 +144,7 @@ pipeline {
           }
           post {
             failure {
-              addFailedStageType(failedStageTypes, 'check-sql')
+              cambpmAddFailedStageType(failedStageTypes, 'check-sql')
             }
           }
         }
@@ -172,7 +172,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'upgrade-db')
+              cambpmAddFailedStageType(failedStageTypes, 'upgrade-db')
             }
           }
         }
@@ -200,7 +200,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'instance-migration')
+              cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
             }
           }
         }
@@ -228,7 +228,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'old-engine')
+              cambpmAddFailedStageType(failedStageTypes, 'old-engine')
             }
           }
         }
@@ -256,7 +256,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'rolling-update')
+              cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
             }
           }
         }
@@ -282,7 +282,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'large-data-tests')
+              cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
             }
           }
         }
@@ -302,7 +302,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && withLabels(getLabels(env.PROFILE)) && withDbLabels(env.DB)
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(getLabels(env.PROFILE)) && withDbLabels(env.DB)
           }
           beforeAgent true
         }
@@ -525,12 +525,4 @@ boolean isQaStashEnabled(String profile) {
 
 String[] getLabels(String profile) {
   return resolveMavenProfileInfo(profile).labels
-}
-
-void addFailedStageType(List failedStageTypesList, String stageType) {
-  if (!failedStageTypesList.contains(stageType)) failedStageTypesList << stageType
-}
-
-boolean skipStageType(List failedStageTypesList, String stageType) {
-  !failedStageTypesList.contains(stageType)
 }
