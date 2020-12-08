@@ -4,44 +4,6 @@ import groovy.json.JsonOutput
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
-String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
-  String mavenForkCount = cpuLimit;
-  String mavenMemoryLimit = cpuLimit * 2;
-  """
-metadata:
-  labels:
-    agent: ci-cambpm-camunda-cloud-build
-spec:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-preempt
-  tolerations:
-  - key: "agents-n1-standard-32-netssd-preempt"
-    operator: "Exists"
-    effect: "NoSchedule"
-  containers:
-  - name: "jnlp"
-    image: "${dockerImage}"
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-    tty: true
-    env:
-    - name: LIMITS_CPU
-      value: ${mavenForkCount}
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-    workingDir: "/home/work"
-    volumeMounts:
-      - mountPath: /home/work
-        name: workspace-volume
-  """
-}
-
 def failedStageTypes = []
 
 pipeline {
@@ -62,8 +24,8 @@ pipeline {
         beforeAgent true
       }
       agent {
-        kubernetes {
-          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+        node {
+          label 'centos-stable'
         }
       }
       steps {
@@ -145,8 +107,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -173,8 +135,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -201,8 +163,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -226,8 +188,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -251,8 +213,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -278,8 +240,8 @@ pipeline {
             }
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -306,8 +268,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getDbAgent('postgresql_96')
+            node {
+              label 'postgresql_96'
             }
           }
           steps {
@@ -330,8 +292,8 @@ pipeline {
             }
           }
           agent {
-            kubernetes {
-              yaml getDbAgent('postgresql_96')
+            node {
+              label 'postgresql_96'
             }
           }
           steps {
@@ -358,8 +320,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
+            node {
+              label 'chrome_78'
             }
           }
           steps {
@@ -381,8 +343,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2')
+            node {
+              label 'chrome_78'
             }
           }
           steps {
@@ -406,8 +368,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
+            node {
+              label 'chrome_78'
             }
           }
           steps {
@@ -431,8 +393,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/chrome:78v0.1.2', 16)
+            node {
+              label 'chrome_78'
             }
           }
           steps {
@@ -455,7 +417,7 @@ pipeline {
         axes {
           axis {
             name 'DB'
-            values 'postgresql_96', 'mariadb_103'
+            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
           }
           axis {
             name 'PROFILE'
@@ -469,8 +431,8 @@ pipeline {
           beforeAgent true
         }
         agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
+          node {
+            label env.DB
           }
         }
         stages {
@@ -505,8 +467,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -533,8 +495,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -558,8 +520,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -586,8 +548,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -616,8 +578,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -641,8 +603,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -666,8 +628,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent()
+            node {
+              label 'centos-stable'
             }
           }
           steps {
@@ -740,50 +702,6 @@ boolean withLabels(String... labels) {
 
 boolean withDbLabels(String dbLabel) {
   return withLabels(cambpmGetDbType(dbLabel),'all-db')
-}
-
-String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
-  Map dbInfo = cambpmGetDbInfo(dbLabel)
-  String mavenMemoryLimit = cpuLimit * 4;
-  """
-metadata:
-  labels:
-    name: "${dbLabel}"
-    jenkins: "slave"
-    jenkins/label: "jenkins-slave-${dbInfo.type}"
-spec:
-  containers:
-  - name: "jnlp"
-    image: "gcr.io/ci-30-162810/${dbInfo.type}:${dbInfo.version}"
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-    tty: true
-    env:
-    - name: LIMITS_CPU
-      value: ${mavenForkCount}
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        memory: ${mavenMemoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-    volumeMounts:
-    - mountPath: "/home/work"
-      name: "workspace-volume"
-    workingDir: "/home/work"
-    nodeSelector:
-      cloud.google.com/gke-nodepool: "agents-n1-standard-4-netssd-preempt"
-    restartPolicy: "Never"
-    tolerations:
-    - effect: "NoSchedule"
-      key: "agents-n1-standard-4-netssd-preempt"
-      operator: "Exists"
-    volumes:
-    - emptyDir:
-        medium: ""
-      name: "workspace-volume"
-  """
 }
 
 String resolveMavenProfileInfo(String profile) {
