@@ -116,9 +116,9 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
     if (plugin != null) {
       InputStream assetStream = getPluginAssetAsStream(plugin, file);
-      final InputStream filteredStream = applyResourceOverrides(file, assetStream);
 
       if (assetStream != null) {
+        final InputStream filteredStream = applyResourceOverrides(file, assetStream);
         String contentType = getContentType(file);
         return Response.ok(new StreamingOutput() {
 
@@ -127,7 +127,7 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
             try {
               byte[] buff = new byte[16 * 1000];
-              int read = 0;
+              int read;
               while((read = filteredStream.read(buff)) > 0) {
                 out.write(buff, 0, read);
               }
