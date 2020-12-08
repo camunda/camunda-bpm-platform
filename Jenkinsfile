@@ -97,11 +97,15 @@ pipeline {
 
         script {
           String labels = '';
+          String eePipeline = ''
           if (env.BRANCH_NAME != cambpmDefaultBranch()) {
             labels = JsonOutput.toJson(pullRequest.labels)
+            eePipeline = 'cambpm-ee%2Fcambpm-ee-main-pr/'
+          } else {
+            eePipeline = 'cambpm-ee%2Fcambpm-ee-main/'
           }
 
-          build job: "cambpm-jenkins-pipelines-ee/${params.EE_BRANCH_NAME}", parameters: [
+          build job: eePipeline + ${params.EE_BRANCH_NAME}, parameters: [
                   string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                   booleanParam(name: 'STANDALONE', value: false),
                   string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
@@ -109,7 +113,7 @@ pipeline {
           ], quietPeriod: 10, wait: false
 
           if (withLabels('all-db','cockroachdb','authorizations')) {
-           build job: "cambpm-jenkins-pipelines-sidetrack/${env.BRANCH_NAME}", parameters: [
+           build job: "cambpm-ce%2Fcambpm-sidetrack/${env.BRANCH_NAME}", parameters: [
            string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
                string(name: 'PR_LABELS', value: labels)
@@ -117,7 +121,7 @@ pipeline {
           }
 
           if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
-           build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
+           build job: "cambpm-ce%2Fcambpm-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
                string(name: 'PR_LABELS', value: labels)
