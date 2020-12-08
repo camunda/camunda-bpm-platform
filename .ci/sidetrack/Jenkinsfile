@@ -67,7 +67,7 @@ pipeline {
         }
       }
       steps {
-        copyArtifacts(projectName: "cambpm-ce%2Fcambpm-main/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
+        copyArtifacts(projectName: "cambpm-ce/cambpm-main/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
         stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
         stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
       }
