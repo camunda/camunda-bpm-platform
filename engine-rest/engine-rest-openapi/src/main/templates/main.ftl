@@ -58,6 +58,7 @@
     {"name": "Telemetry"},
     {"name": "Tenant"},
     {"name": "User"},
+    {"name": "Variable Instance"},
     {"name": "Version"}
   ],
   "paths": {
