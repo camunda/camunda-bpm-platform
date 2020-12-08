@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
+import org.camunda.bpm.engine.task.Task;
 
 
 /**
@@ -31,10 +32,15 @@ public class DurationBusinessCalendar implements BusinessCalendar {
 
   public static String NAME = "duration";
 
-  public Date resolveDuedate(String duedate) {
-    return resolveDuedate(duedate, null);
+
+  public Date resolveDuedate(String duedate, Task task) {
+    return resolveDuedate(duedate);
   }
-  
+
+  public Date resolveDuedate(String duedate) {
+    return resolveDuedate(duedate, (Date)null);
+  }
+
   public Date resolveDuedate(String duedate, Date startDate) {
     try {
       DurationHelper dh = new DurationHelper(duedate, startDate);
@@ -44,4 +50,5 @@ public class DurationBusinessCalendar implements BusinessCalendar {
       throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }
+
 }
