@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-extract-trigger']) _
 
 def failedStageTypes = []
 
@@ -13,13 +13,13 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
+      string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on, e.g. cambpm-ee/cambpm-ee-main/PR-333', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
+          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build-TODO') //TODO
         }
         beforeAgent true
       }
@@ -65,31 +65,19 @@ pipeline {
             params.EE_BRANCH_NAME = 'cambpm-ee-main/pipeline-master'
           } else {
             labels = JsonOutput.toJson(pullRequest.labels)
+            shaCE = sh(script:"git rev-parse HEAD", returnStdout: true).trim()
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
-            build job: "cambpm-ee/${params.EE_BRANCH_NAME}", parameters: [
-                    string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                    booleanParam(name: 'STANDALONE', value: false),
-                    string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
-                    string(name: 'PR_LABELS', value: labels)
-            ], quietPeriod: 10, wait: false
+            cambpmTriggerDownstream("cambpm-ee/${params.EE_BRANCH_NAME}", labels, shaCE, true, true)
           }
 
           if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
-           build job: "cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}", parameters: [
-               string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-               booleanParam(name: 'STANDALONE', value: false),
-               string(name: 'PR_LABELS', value: labels)
-           ], quietPeriod: 10, wait: false
+            cambpmTriggerDownstream("cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}", labels, true, false)
           }
 
           if (cambpmWithLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
-           build job: "cambpm-ce/cambpm-daily/${env.BRANCH_NAME}", parameters: [
-               string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-               booleanParam(name: 'STANDALONE', value: false),
-               string(name: 'PR_LABELS', value: labels)
-           ], quietPeriod: 10, wait: false
+            cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}", labels, true, false)
           }
 
           if (cambpmWithLabels('master')) {
