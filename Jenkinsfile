@@ -161,7 +161,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'engine-unit')
+              cambpmAddFailedStageType(failedStageTypes, 'engine-unit')
             }
           }
         }
@@ -189,7 +189,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'engine-unit-authorizations')
+              cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
             }
           }
         }
@@ -267,7 +267,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'webapps-unit')
+              cambpmAddFailedStageType(failedStageTypes, 'webapps-unit')
             }
           }
         }
@@ -294,7 +294,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'webapps-unit-authorizations')
+              cambpmAddFailedStageType(failedStageTypes, 'webapps-unit-authorizations')
             }
           }
         }
@@ -346,7 +346,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              addFailedStageType(failedStageTypes, 'engine-IT-wildfly')
+              cambpmAddFailedStageType(failedStageTypes, 'engine-IT-wildfly')
             }
           }
         }
@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && (withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
           }
           beforeAgent true
         }
@@ -498,7 +498,7 @@ pipeline {
           when {
             allOf {
               expression {
-                skipStageType(failedStageTypes, 'engine-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
               }
               branch cambpmDefaultBranch();
             }
@@ -526,7 +526,7 @@ pipeline {
           when {
             allOf {
               expression {
-                skipStageType(failedStageTypes, 'engine-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
               }
               branch cambpmDefaultBranch();
             }
@@ -553,7 +553,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-unit') && withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
             }
             beforeAgent true
           }
@@ -579,7 +579,7 @@ pipeline {
           when {
             allOf {
               expression {
-                skipStageType(failedStageTypes, 'webapps-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'webapps-unit')
               }
               branch cambpmDefaultBranch();
             }
@@ -609,7 +609,7 @@ pipeline {
           when {
             allOf {
               expression {
-                skipStageType(failedStageTypes, 'engine-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
               }
               branch cambpmDefaultBranch();
             }
@@ -636,7 +636,7 @@ pipeline {
         stage('IT-wildfly-domain') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
             }
             beforeAgent true
           }
@@ -661,7 +661,7 @@ pipeline {
         stage('IT-wildfly-servlet') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
             }
             beforeAgent true
           }
@@ -819,12 +819,4 @@ String getMavenProfileDir(String profile) {
 
 String[] getLabels(String profile) {
   return resolveMavenProfileInfo(profile).labels
-}
-
-void addFailedStageType(List failedStageTypesList, String stageType) {
-  if (!failedStageTypesList.contains(stageType)) failedStageTypesList << stageType
-}
-
-boolean skipStageType(List failedStageTypesList, String stageType) {
-  !failedStageTypesList.contains(stageType)
 }
