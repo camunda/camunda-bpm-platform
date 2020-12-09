@@ -331,17 +331,21 @@ module.exports = [
 
         var claim = ($scope.claim = function() {
           var assignee = $scope.$root.authentication.name;
+          $scope.submitInProgress = true;
           Task.claim($scope.task.id, assignee, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('claimed')(err);
+            $scope.submitInProgress = false;
           });
         });
         $scope.$on('shortcut:claimTask', claim);
 
         var unclaim = ($scope.unclaim = function() {
+          $scope.submitInProgress = true;
           Task.unclaim($scope.task.id, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('unclaimed')(err);
+            $scope.submitInProgress = false;
           });
         });
 

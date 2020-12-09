@@ -95,10 +95,11 @@
           uib-tooltip="{{ 'ASSIGNEE' | translate }}"
           class="glyphicon glyphicon-user"></span>
 
-    <a href
-       class="claim"
+    <button 
+       class="claim btn-link"
        ng-click="claim()"
-       translate="CLAIM_TASK">Claim</a>
+       translate="CLAIM_TASK"
+       ng-disabled="submitInProgress">Claim</button>
   </li>
 
   <li class="assignee"
@@ -123,13 +124,14 @@
       <span ng-if="!(assignee.firstName || assignee.lastName)">{{ assignee.id }}</span>
     </span>
 
-    <a href
+    <button
        ng-if="isAssignee && !editingState.assignee"
        tooltip-placement="top"
        uib-tooltip="{{ 'UNCLAIM_TASK' | translate }}"
        ng-click="unclaim()"
-       class="unclaim glyphicon glyphicon-remove">
-    </a>
+       ng-disabled="submitInProgress"
+       class="unclaim glyphicon glyphicon-remove btn-link">
+    </button>
 
     <a href
        ng-if="!isAssignee && !editingState.assignee"

@@ -272,6 +272,7 @@ module.exports = [
     }
 
     $scope.submit = function() {
+      $scope.submitInProgress = true;
       $scope.$broadcast('pre-submit');
 
       // transform query array into a query object
@@ -343,6 +344,7 @@ module.exports = [
       cleanJson(toSave);
 
       Filter.save(toSave, function(err, filterResponse) {
+        $scope.submitInProgress = false;
         if (err) {
           return errorNotification('FILTER_SAVE_ERROR', err, true);
         }
@@ -377,7 +379,9 @@ module.exports = [
     };
 
     $scope.delete = function() {
+      $scope.submitInProgress = true;
       Filter.delete($scope.filter.id, function(err) {
+        $scope.submitInProgress = false;
         if (err) {
           return errorNotification('FILTER_DELETION_ERROR', err, true);
         }
