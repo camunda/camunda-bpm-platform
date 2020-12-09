@@ -46,13 +46,13 @@ pipeline {
             values 'cockroachdb_201'
           }
           axis {
-            name 'PROFILE'
+            name 'STAGE_TYPE'
             values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations', 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         when {
           expression {
-            cambpmWithLabelsList(cambpmGetLabels(env.PROFILE))
+            cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE))
           }
           beforeAgent true
         }
@@ -64,10 +64,10 @@ pipeline {
         stages {
           stage('UNIT test') {
             steps {
-              echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
+              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, cambpmIsQaStashEnabled(env.PROFILE), cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
                 }
               }
             }
@@ -98,15 +98,5 @@ pipeline {
         }
       }
     }
-  }
-}
-
-void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (!params.STANDALONE && runtimeStash) cambpmUnstash("platform-stash-runtime")
-  if (!params.STANDALONE && archivesStash) cambpmUnstash("platform-stash-archives")
-  if (!params.STANDALONE && qaStash) cambpmUnstash("platform-stash-qa")
-  String forkCount = singleThreaded? "-DforkCount=1" : '';
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
   }
 }
