@@ -64,7 +64,7 @@
           <button ng-if="!deletion && (!filter.id || (filter.id && accesses.update))"
                   class="btn btn-primary"
                   type="submit"
-                  ng-disabled="!isValid()"
+                  ng-disabled="!isValid() || submitInProgress"
                   ng-click="submit()"
                   translate="SAVE">Save</button>
 
@@ -72,6 +72,7 @@
           <button ng-if="deletion"
                   class="btn btn-primary"
                   type="submit"
+                  ng-disabled="submitInProgress"
                   ng-click="delete()"
                   translate="DELETE">Delete</button>
         </div>

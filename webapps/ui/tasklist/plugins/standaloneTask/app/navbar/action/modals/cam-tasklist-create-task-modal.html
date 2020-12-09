@@ -82,7 +82,7 @@
       <button class="btn btn-primary"
               type="submit"
               ng-click="save()"
-              ng-disabled="!isValid()">
+              ng-disabled="!isValid() || submitInProgress">
         {{ 'SAVE' | translate }}
       </button>
     </div>

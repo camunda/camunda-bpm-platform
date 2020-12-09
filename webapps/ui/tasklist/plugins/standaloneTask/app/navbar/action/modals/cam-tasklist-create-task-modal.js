@@ -55,8 +55,10 @@ module.exports = [
       if (!isValid()) {
         return;
       }
+      $scope.submitInProgress = true;
 
       Task.create(task, function(err) {
+        $scope.submitInProgress = false;
         if (err) {
           $translate('TASK_SAVE_ERROR')
             .then(function(translated) {
