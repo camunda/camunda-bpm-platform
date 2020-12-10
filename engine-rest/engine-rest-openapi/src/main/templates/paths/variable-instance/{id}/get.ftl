@@ -21,7 +21,6 @@
           name = "deserializeValue"
           location = "query"
           type = "boolean"
-          required = true
           desc = "Determines whether serializable variable values (typically variables that store custom Java objects)
                   should be deserialized on server side (default `true`).
 
