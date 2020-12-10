@@ -38,15 +38,15 @@ pipeline {
 
           // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
           // add a new line for each group of artifacts
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war', followSymlinks: false
-          archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war', followSymlinks: false
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war')
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war')
 
           cambpmStash("platform-stash-runtime",
                       ".m2/org/camunda/**/*-SNAPSHOT/**",
