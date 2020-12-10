@@ -34,12 +34,8 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
-import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**

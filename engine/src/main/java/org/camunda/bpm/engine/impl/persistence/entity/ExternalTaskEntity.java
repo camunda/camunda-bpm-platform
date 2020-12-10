@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.parser.CamundaErrorEventDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -356,12 +358,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     ExecutionEntity associatedExecution = getExecution();
 
-    if (variables != null) {
-      associatedExecution.setVariables(variables);
-    }
+    ensureVariablesSet(associatedExecution, variables, localVariables);
 
-    if (localVariables != null) {
-      associatedExecution.setVariablesLocal(localVariables);
+    if(evaluateThrowBpmnError(associatedExecution)) {
+      return;
     }
 
     deleteFromExecutionAndRuntimeTable();
@@ -380,8 +380,16 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
    * @param retries - updated value of retries left
    * @param retryDuration - used for lockExpirationTime calculation
    */
-  public void failed(String errorMessage, String errorDetails, int retries, long retryDuration) {
+  public void failed(String errorMessage, String errorDetails, int retries, long retryDuration, Map<String, Object> variables, Map<String, Object> localVariables) {
     ensureActive();
+
+    ExecutionEntity associatedExecution = getExecution();
+
+    ensureVariablesSet(execution, variables, localVariables);
+
+    if(evaluateThrowBpmnError(associatedExecution)) {
+      return;
+    }
 
     this.setErrorMessage(errorMessage);
     if (errorDetails != null) {
@@ -486,6 +494,29 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     if (suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
       throw LOG.suspendedEntityException(EntityTypes.EXTERNAL_TASK, id);
     }
+  }
+
+  protected void ensureVariablesSet(ExecutionEntity execution, Map<String, Object> variables, Map<String, Object> localVariables) {
+    if (variables != null) {
+      execution.setVariables(variables);
+    }
+    
+    if (localVariables != null) {
+      execution.setVariablesLocal(localVariables);
+    }
+  }
+
+  protected boolean evaluateThrowBpmnError(ExecutionEntity execution) {
+    List<CamundaErrorEventDefinition> camundaErrorEventDefinitions = (List<CamundaErrorEventDefinition>) execution.getActivity().getProperty(BpmnProperties.CAMUNDA_ERROR_EVENT_DEFINITION.getName());
+    if (camundaErrorEventDefinitions != null && !camundaErrorEventDefinitions.isEmpty()) {
+      for (CamundaErrorEventDefinition camundaErrorEventDefinition : camundaErrorEventDefinitions) {
+        if (camundaErrorEventDefinition.getExpression() != null && Boolean.TRUE.equals(camundaErrorEventDefinition.getExpression().getValue(getExecution()))) {
+          bpmnError(camundaErrorEventDefinition.getErrorCode(), null, null);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

@@ -90,6 +90,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   protected static final String WORKER_ID = "aWorkerId";
   protected static final long LOCK_TIME = 10000L;
   protected static final String TOPIC_NAME = "externalTaskTopic";
+  protected static final String ERROR_MESSAGE = "error message";
+  protected static final String ERROR_DETAILS = "error details";
 
   protected SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy - HH:mm:ss");
 
@@ -1361,6 +1363,374 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     testRule.assertProcessEnded(processInstance.getId());
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinition.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then
+    // expression was evaluated to true
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> list = taskService.createTaskQuery().list();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnCompleteWithVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // expression was evaluated to true using a variable
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> list = taskService.createTaskQuery().list();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnCompleteWithLocalVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.complete(task.getId(), WORKER_ID, null, vars);
+
+    // then
+    // expression was evaluated to true using a local variable
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldKeepVariablesAfterEvaluateNestedErrorEventDefinitionsOnCompleteWithVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // expression was evaluated to true using a variable
+    // error was caught
+    // flow continued to user task
+    // variable is still available without output mapping
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(variables).hasSize(1);
+    assertThat(variables.get(0).getValue()).isEqualTo("bar");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldNotKeepVariablesAfterEvaluateNestedErrorEventDefinitionsOnCompleteWithLocalVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.complete(task.getId(), WORKER_ID, null, vars);
+
+    // then
+    // expression was evaluated to true using a local variable
+    // error was caught
+    // flow continued to user task
+    // variable is not available due to missing output mapping
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> list = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(list).hasSize(0);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionTrueAndOutputMapping.bpmn20.xml"})
+  public void shouldNotFailOutputMappingAfterNestedErrorEventDefinitionsOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // expression was evaluated to true
+    // error was caught
+    // flow continued to user task
+    // variables were mapped successfully
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(variables).hasSize(1);
+    assertThat(variables.get(0).getValue()).isEqualTo("bar");
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionTrueAndOutputMapping.bpmn20.xml")
+  public void shouldFailOutputMappingAfterNestedErrorEventDefinitionsWhenVariableWasNotProvidedByClientOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when mapping variable does not exist
+    // then output mapping fails due to missing variables
+    assertThatThrownBy(() -> externalTaskService.complete(task.getId(), WORKER_ID))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("Propagation of bpmn error errorCode failed.");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinition.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnFailure() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, 3000L);
+
+    // then
+    // expression was evaluated to true
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> list = taskService.createTaskQuery().list();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getName()).isEqualTo("userTask");
+  }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnFailWithVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, vars, null);
+
+    // then
+    // expression was evaluated to true using a variable
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> list = taskService.createTaskQuery().list();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldEvaluateNestedErrorEventDefinitionsOnFailWithLocalVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, null, vars);
+
+    // then
+    // expression was evaluated to true using a local variable
+    // error was thrown and caught
+    // flow continued to user task
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldKeepVariablesAfterEvaluateNestedErrorEventDefinitionsOnFailWithVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, vars, null);
+
+    // then
+    // expression was evaluated to true using a variable
+    // error was caught
+    // flow continued to user task
+    // variable is still available without output mapping
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(variables).hasSize(1);
+    assertThat(variables.get(0).getValue()).isEqualTo("bar");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
+  public void shouldNotKeepVariablesAfterEvaluateNestedErrorEventDefinitionsOnFailWithLocalVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, null, vars);
+
+    // then
+    // expression was evaluated to true using a local variable
+    // error was caught
+    // flow continued to user task
+    // variable is not available due to missing output mapping
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> list = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(list).hasSize(0);
+  }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionTrueAndOutputMapping.bpmn20.xml"})
+  public void shouldNotFailOutputMappingAfterNestedErrorEventDefinitionsOnFail() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("foo", "bar");
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, vars, null);
+
+    // then
+    // expression was evaluated to true
+    // error was caught
+    // flow continued to user task
+    // variables were mapped successfully
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().variableName("foo").list();
+    assertThat(variables).hasSize(1);
+    assertThat(variables.get(0).getValue()).isEqualTo("bar");
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionTrueAndOutputMapping.bpmn20.xml")
+  public void shouldFailOutputMappingAfterNestedErrorEventDefinitionsWhenVariableWasNotProvidedByClientOnFail() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when mapping variable does not exist
+    // then output mapping fails due to missing variables
+    assertThatThrownBy(() -> externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, 3000L))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Propagation of bpmn error errorCode failed.");
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {
@@ -1590,8 +1960,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // when submitting a failure (after a simulated processing time of three seconds)
     ClockUtil.setCurrentTime(nowPlus(3000L));
 
-    String errorMessage = "errorMessage";
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 5, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 5, 3000L);
 
     // then the task cannot be immediately acquired again
     tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
@@ -1612,7 +1981,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // and the retries and error message are accessible
     task = tasks.get(0);
-    assertEquals(errorMessage, task.getErrorMessage());
+    assertEquals(ERROR_MESSAGE, task.getErrorMessage());
     assertEquals(5, (int) task.getRetries());
   }
 
@@ -1679,8 +2048,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // when reporting a failure and setting retries to 0
     ClockUtil.setCurrentTime(nowPlus(3000L));
 
-    String errorMessage = "errorMessage";
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, 3000L);
 
     // then the task cannot be fetched anymore even when the lock expires
     ClockUtil.setCurrentTime(nowPlus(4000L));
@@ -1703,7 +2071,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertNotNull(incident);
     assertNotNull(incident.getId());
-    assertEquals(errorMessage, incident.getIncidentMessage());
+    assertEquals(ERROR_MESSAGE, incident.getIncidentMessage());
     assertEquals(task.getExecutionId(), incident.getExecutionId());
     assertEquals("externalTask", incident.getActivityId());
     assertEquals(incident.getId(), incident.getCauseIncidentId());
@@ -1726,19 +2094,18 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     LockedExternalTask task = tasks.get(0);
-    String errorMessage = "errorMessage";
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, 3000L);
     externalTaskService.setRetries(task.getId(), 5);
     ClockUtil.setCurrentTime(nowPlus(3000L));
     tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
     ClockUtil.setCurrentTime(nowPlus(4000L));
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 1, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 1, 3000L);
 
     // when reporting a failure and setting retries to 0
     ClockUtil.setCurrentTime(nowPlus(5000L));
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, 3000L);
 
     // another incident has been created
     Incident incident = runtimeService.createIncidentQuery().singleResult();
@@ -1776,7 +2143,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     LockedExternalTask task = tasks.get(0);
 
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, "someError", 0, LOCK_TIME);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, LOCK_TIME);
 
     // when
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
@@ -1798,7 +2165,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     LockedExternalTask task = tasks.get(0);
 
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, "someError", 0, LOCK_TIME);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 0, LOCK_TIME);
 
     // when
     externalTaskService.complete(task.getId(), WORKER_ID);
@@ -1823,7 +2190,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // then it is not possible to complete the task with a different worker id
     try {
-      externalTaskService.handleFailure(externalTasks.get(0).getId(), "someCrazyWorkerId", "error", 5, LOCK_TIME);
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), "someCrazyWorkerId", ERROR_MESSAGE, 5, LOCK_TIME);
       fail("exception expected");
     } catch (BadUserRequestException e) {
       testRule.assertTextPresent("Failure of External Task " + externalTasks.get(0).getId()
@@ -1836,7 +2203,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testHandleFailureNonExistingTask() {
     try {
-      externalTaskService.handleFailure("nonExistingTaskId", WORKER_ID, "error", 5, LOCK_TIME);
+      externalTaskService.handleFailure("nonExistingTaskId", WORKER_ID, ERROR_MESSAGE, 5, LOCK_TIME);
       fail("exception expected");
     } catch (NotFoundException e) {
       // not found exception lets client distinguish this from other failures
@@ -1848,7 +2215,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testHandleFailureNullTaskId() {
     try {
-      externalTaskService.handleFailure(null, WORKER_ID, "error", 5, LOCK_TIME);
+      externalTaskService.handleFailure(null, WORKER_ID, ERROR_MESSAGE, 5, LOCK_TIME);
       fail("exception expected");
     } catch (ProcessEngineException e) {
       testRule.assertTextPresent("Cannot find external task with id " + null, e.getMessage());
@@ -1868,7 +2235,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // then
     try {
-      externalTaskService.handleFailure(externalTasks.get(0).getId(), null, "error", 5, LOCK_TIME);
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), null, ERROR_MESSAGE, 5, LOCK_TIME);
       fail("exception expected");
     } catch (NullValueException e) {
       testRule.assertTextPresent("workerId is null", e.getMessage());
@@ -1889,7 +2256,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // then
     try {
-      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, - LOCK_TIME);
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, ERROR_MESSAGE, 5, - LOCK_TIME);
       fail("exception expected");
     } catch (ProcessEngineException e) {
       testRule.assertTextPresent("retryDuration is not greater than or equal to 0", e.getMessage());
@@ -1909,7 +2276,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // then
     try {
-      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", -5, LOCK_TIME);
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, ERROR_MESSAGE, -5, LOCK_TIME);
       fail("exception expected");
     } catch (ProcessEngineException e) {
       testRule.assertTextPresent("retries is not greater than or equal to 0", e.getMessage());
@@ -1953,7 +2320,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     // then a failure cannot be reported
     try {
-      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, LOCK_TIME);
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, ERROR_MESSAGE, 5, LOCK_TIME);
       fail("expected exception");
     } catch (ProcessEngineException e) {
       testRule.assertTextPresent("ExternalTask with id '" + task.getId() + "' is suspended", e.getMessage());
@@ -1965,7 +2332,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.activateProcessInstanceById(processInstance.getId());
 
     // then the failure can be reported successfully
-    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, LOCK_TIME);
+    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, ERROR_MESSAGE, 5, LOCK_TIME);
 
     ExternalTask updatedTask = externalTaskService.createExternalTaskQuery().singleResult();
     assertEquals(5, (int) updatedTask.getRetries());
@@ -1999,7 +2366,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
         .execute();
 
     LockedExternalTask lockedTask = externalTasks.get(0);
-    externalTaskService.handleFailure(lockedTask.getId(), WORKER_ID, "error", 0, LOCK_TIME);
+    externalTaskService.handleFailure(lockedTask.getId(), WORKER_ID, ERROR_MESSAGE, 0, LOCK_TIME);
 
     Incident incident = runtimeService.createIncidentQuery().singleResult();
 
@@ -2073,14 +2440,13 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       .topic(TOPIC_NAME, LOCK_TIME)
       .execute();
     LockedExternalTask task = tasks.get(0);
-    String errorMessage = "errorMessage";
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 2, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 2, 3000L);
     ClockUtil.setCurrentTime(nowPlus(3000L));
     tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
     ClockUtil.setCurrentTime(nowPlus(5000L));
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 1, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, 1, 3000L);
     tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
