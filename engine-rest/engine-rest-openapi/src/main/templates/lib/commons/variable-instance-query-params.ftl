@@ -25,9 +25,11 @@
             `key` and `value` may not contain underscore or comma characters.">
 <#elseif requestMethod == "POST">
   <#assign variableValuesDesc = "An array to only include variable instances that have the certain values.
-           The array consists of objects with the three properties name, operator and value. name (String) is the variable name, operator (String) is the comparison operator to be used and value the variable value.
-           value may be String, Number or Boolean.
-           Valid operator values are: eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like">
+           The array consists of objects with the three properties `name`, `operator` and `value`. `name (String)` is the
+           variable name, `operator (String)` is the comparison operator to be used and `value` the variable value.
+           `value` may be `String`, `Number` or `Boolean`.
+           Valid operator values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than; `gteq` - greater
+           than or equal to; `lt` - lower than; `lteq` - lower than or equal to; like">
 </#if>
 
 <#assign params = {
