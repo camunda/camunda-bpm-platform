@@ -1,5 +1,3 @@
-import groovy.json.JsonOutput
-
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-extract-trigger']) _
@@ -13,7 +11,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on, e.g. cambpm-ee/cambpm-ee-main/PR-333', name: 'EE_BRANCH_NAME'
+      string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
@@ -64,20 +62,19 @@ pipeline {
             // otherwise CE PR branch triggers EE PR branch
             params.EE_BRANCH_NAME = 'cambpm-ee-main/pipeline-master'
           } else {
-            labels = JsonOutput.toJson(pullRequest.labels)
-            shaCE = sh(script:"git rev-parse HEAD", returnStdout: true).trim()
+            labels = pullRequest.labels
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
-            cambpmTriggerDownstream("cambpm-ee/${params.EE_BRANCH_NAME}", labels, shaCE, true, true)
+            cambpmTriggerDownstream("cambpm-ee/${params.EE_BRANCH_NAME}", labels, true, true)
           }
 
           if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
-            cambpmTriggerDownstream("cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}", labels, true, false)
+            cambpmTriggerDownstream("cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}", labels)
           }
 
-          if (cambpmWithLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
-            cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}", labels, true, false)
+          if (cambpmWithLabels('daily','default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')) {
+            cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}", labels)
           }
 
           if (cambpmWithLabels('master')) {
