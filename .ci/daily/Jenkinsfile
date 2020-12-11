@@ -4,77 +4,6 @@ import groovy.json.JsonSlurper
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
-String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
-  String mavenForkCount = cpuLimit;
-  String mavenMemoryLimit = cpuLimit * 2;
-  """
-metadata:
-  labels:
-    agent: ci-cambpm-camunda-cloud-build
-spec:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-preempt
-  tolerations:
-  - key: "agents-n1-standard-32-netssd-preempt"
-    operator: "Exists"
-    effect: "NoSchedule"
-  containers:
-  - name: "jnlp"
-    image: "${dockerImage}"
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-    tty: true
-    env:
-    - name: LIMITS_CPU
-      value: ${mavenForkCount}
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-    workingDir: "/home/work"
-    volumeMounts:
-      - mountPath: /home/work
-        name: workspace-volume
-  """
-}
-
-String getJdkAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 800, Integer mavenMemoryLimit = 6) {
-  """
-metadata:
-  labels:
-    agent: ci-cambpm-camunda-cloud-build
-spec:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-preempt
-  tolerations:
-  - key: "agents-n1-standard-32-netssd-preempt"
-    operator: "Exists"
-    effect: "NoSchedule"
-  containers:
-  - name: "jnlp"
-    image: "${dockerImage}"
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-    tty: true
-    env:
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        memory: ${mavenMemoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}m
-        memory: ${mavenMemoryLimit}Gi
-    workingDir: "/home/work"
-    volumeMounts:
-      - mountPath: /home/work
-        name: workspace-volume
-  """
-}
-
 def failedStageTypes = []
 
 pipeline {
@@ -100,8 +29,8 @@ pipeline {
         beforeAgent true
       }
       agent {
-        kubernetes {
-          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+        node {
+          label 'centos-stable'
         }
       }
       steps {
@@ -113,8 +42,8 @@ pipeline {
     }
     stage('check-sql-scripts') {
       agent {
-        kubernetes {
-          yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+        node {
+          label 'centos-stable'
         }
       }
       steps {
@@ -131,8 +60,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -144,7 +73,7 @@ pipeline {
           }
           post {
             failure {
-              cambpmAddFailedStageType(failedStageTypes, 'check-sql')
+              cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
             }
           }
         }
@@ -156,8 +85,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -172,7 +101,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              cambpmAddFailedStageType(failedStageTypes, 'upgrade-db')
+              cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
             }
           }
         }
@@ -184,8 +113,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -212,8 +141,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -240,8 +169,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -266,8 +195,8 @@ pipeline {
             beforeAgent true
           }
           agent {
-            kubernetes {
-              yaml getAgent('gcr.io/ci-30-162810/centos:v0.4.6', 16)
+            node {
+              label 'h2'
             }
           }
           steps {
@@ -293,11 +222,11 @@ pipeline {
         axes {
           axis {
             name 'DB'
-            values 'postgresql_96', 'mariadb_103'
+            values 'postgresql_96', 'postgresql_94', 'postgresql_107', 'postgresql_112', 'postgresql_122', 'cockroachdb_201', 'mariadb_100', 'mariadb_102', 'mariadb_103', 'mariadb_galera', 'mysql_57', 'oracle_11', 'oracle_12', 'oracle_18', 'oracle_19', 'db2_105', 'db2_111', 'sqlserver_2017', 'sqlserver_2019'
           }
           axis {
             name 'PROFILE'
-            values 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
+            values 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         when {
@@ -307,8 +236,8 @@ pipeline {
           beforeAgent true
         }
         agent {
-          kubernetes {
-            yaml getDbAgent(env.DB)
+          node {
+            label env.DB
           }
         }
         stages {
@@ -345,8 +274,8 @@ pipeline {
           beforeAgent true
         }
         agent {
-          kubernetes {
-            yaml getJdkAgent()
+          node {
+            label 'h2'
           }
         }
         stages {
@@ -430,58 +359,14 @@ boolean withDbLabels(String dbLabel) {
   return withLabels(cambpmGetDbType(dbLabel),'all-db');
 }
 
-String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
-  Map dbInfo = cambpmGetDbInfo(dbLabel)
-  String mavenMemoryLimit = cpuLimit * 4;
-  """
-metadata:
-  labels:
-    name: "${dbLabel}"
-    jenkins: "slave"
-    jenkins/label: "jenkins-slave-${dbInfo.type}"
-spec:
-  containers:
-  - name: "jnlp"
-    image: "gcr.io/ci-30-162810/${dbInfo.type}:${dbInfo.version}"
-    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-    tty: true
-    env:
-    - name: LIMITS_CPU
-      value: ${mavenForkCount}
-    - name: TZ
-      value: Europe/Berlin
-    resources:
-      limits:
-        memory: ${mavenMemoryLimit}Gi
-      requests:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-    volumeMounts:
-    - mountPath: "/home/work"
-      name: "workspace-volume"
-    workingDir: "/home/work"
-    nodeSelector:
-      cloud.google.com/gke-nodepool: "agents-n1-standard-4-netssd-preempt"
-    restartPolicy: "Never"
-    tolerations:
-    - effect: "NoSchedule"
-      key: "agents-n1-standard-4-netssd-preempt"
-      operator: "Exists"
-    volumes:
-    - emptyDir:
-        medium: ""
-      name: "workspace-volume"
-  """
-}
-
 String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
-      'check-sql': [
+      'sql-scripts': [
           directory: 'distro/sql-script/',
           command: 'install -Pcheck-sql,',
           qaStash: false,
           labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-     'upgrade-db': [
+     'upgrade-database': [
           directory: 'qa/test-db-upgrade/',
           command: 'verify -Pupgrade-db,',
           qaStash: false,
