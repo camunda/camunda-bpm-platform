@@ -1,34 +1,57 @@
-<#-- Generated From File: camunda-docs-manual/public/reference/rest/variable-instance/get-query/index.html -->
+<#-- Generated From File: camunda-docs-manual/public/reference/rest/variable-instance/post-query/index.html -->
 {
   <@lib.endpointInfo
-      id = "getVariableInstances"
+      id = "TODO"
       tag = "Variable Instance"
-      summary = "Get Variable Instances (List)"
-      desc = "Query for variable instances that fulfill given parameters. Parameters may be the
-              properties of variable instances, such as the name or type. The size
-              of the result set can be retrieved by using the [Get Variable Instance
-              Count](${docsUrl}/reference/rest/variable-instance/get-query-count/)
-              method."
+      summary = "Get Variable Instances (POST)"
+      desc = "Query for variable instances that fulfill given parameters through a JSON object.
+              This method is slightly more powerful than the
+              [Get Variable Instances](${docsUrl}/reference/rest/variable-
+              instance/get-query/) method because it allows filtering by multiple
+              variable instances of types `String`, `Number` or `Boolean`."
   />
 
   "parameters" : [
 
-    <#assign requestMethod="GET"/>
-    <#include "/lib/commons/variable-instance-query-params.ftl" >
+    <#assign requestMethod="POST"/>
     <#assign last = false >
-
-    <@lib.parameters
-        object = params
-    />
-
-    <#include "/lib/commons/sort-params.ftl" >
-
     <#include "/lib/commons/pagination-params.ftl" >
     <#assign last = true >
-
     <#include "/lib/commons/deserialize-values-parameter.ftl">
 
-],
+  ],
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "VariableInstanceQueryDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/variable-instance`",
+                     "value": {
+                       "variableValues": [
+                         {
+                           "name": "amount",
+                           "operator": "gteq",
+                           "value": 5
+                         },
+                         {
+                           "name": "amount",
+                           "operator": "lteq",
+                           "value": 200
+                         }
+                       ],
+                       "processInstanceIdIn": [
+                         "aProcessInstanceId",
+                         "anotherProcessInstanceId"
+                       ],
+                       "sorting": [
+                         {
+                           "sortBy": "variableType",
+                           "sortOrder": "asc"
+                         }
+                       ]
+                     }
+                   }']
+  />
 
   "responses": {
 
@@ -38,7 +61,7 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "description": "GET `/variable-instance?processInstanceIdIn=aProcessInstanceId,anotherProcessInstanceId&variableValues=amount_gteq_5,amount_lteq_200`",
+                       "description": "POST `/variable-instance`",
                        "value": [
                          {
                            "id": "someId",
@@ -52,8 +75,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "caseExecutionId": null,
-                           "caseInstanceId": null,
                            "serializationConfig": null,
                            "tenantId": null
                          },
@@ -69,8 +90,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "caseExecutionId": null,
-                           "caseInstanceId": null,
                            "serializationConfig": null,
                            "tenantId": null
                          },
@@ -86,8 +105,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_2:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "caseExecutionId": null,
-                           "caseInstanceId": null,
                            "serializationConfig": null,
                            "tenantId": null
                          }

@@ -91,7 +91,7 @@
   },
   "variableValues": {
     "type": "array",
-    "itemType": "VariableQueryParameterDto",
+    "ref": "VariableQueryParameterDto",
     "desc": "${variableValuesDesc}"
   },
   "variableNamesIgnoreCase": {
