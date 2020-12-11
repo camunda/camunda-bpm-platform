@@ -8,9 +8,26 @@
 ]>
 
 <#if requestMethod == "GET">
-  <#assign listTypeDescription = "TODO">
+  <#assign variableValuesDesc = "Only include variable instances that have the certain values.
+            Value filtering expressions are comma-separated and are structured as
+            follows:
+
+            A valid parameter value has the form `key_operator_value`.
+            `key` is the variable name, `operator` is the comparison operator to be used
+            and `value` the variable value.
+            **Note:** Values are always treated as `String` objects on server side.
+
+            Valid operator values are: `eq` - equal to; `neq` - not equal to; `gt` -
+            greater than;
+            `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or
+            equal to;
+            `like`.
+            `key` and `value` may not contain underscore or comma characters.">
 <#elseif requestMethod == "POST">
-  <#assign listTypeDescription = "TODO">
+  <#assign variableValuesDesc = "An array to only include variable instances that have the certain values.
+           The array consists of objects with the three properties name, operator and value. name (String) is the variable name, operator (String) is the comparison operator to be used and value the variable value.
+           value may be String, Number or Boolean.
+           Valid operator values are: eq - equal to; neq - not equal to; gt - greater than; gteq - greater than or equal to; lt - lower than; lteq - lower than or equal to; like">
 </#if>
 
 <#assign params = {
@@ -73,21 +90,7 @@
   "variableValues": {
     "type": "array",
     "itemType": "VariableQueryParameterDto",
-    "desc": "Only include variable instances that have the certain values.
-            Value filtering expressions are comma-separated and are structured as
-            follows:
-
-            A valid parameter value has the form `key_operator_value`.
-            `key` is the variable name, `operator` is the comparison operator to be used
-            and `value` the variable value.
-            **Note:** Values are always treated as `String` objects on server side.
-
-            Valid operator values are: `eq` - equal to; `neq` - not equal to; `gt` -
-            greater than;
-            `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or
-            equal to;
-            `like`.
-            `key` and `value` may not contain underscore or comma characters."
+    "desc": "${variableValuesDesc}"
   },
   "variableNamesIgnoreCase": {
     "type": "boolean",
