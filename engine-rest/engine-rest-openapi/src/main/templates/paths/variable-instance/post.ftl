@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/variable-instance/post-query/index.html -->
 {
   <@lib.endpointInfo
-      id = "TODO"
+      id = "queryVariableInstances"
       tag = "Variable Instance"
       summary = "Get Variable Instances (POST)"
       desc = "Query for variable instances that fulfill given parameters through a JSON object.
