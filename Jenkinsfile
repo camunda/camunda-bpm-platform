@@ -13,7 +13,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-      string defaultValue: cambpmDefaultBranch(), description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
+      string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on', name: 'EE_BRANCH_NAME'
   }
   stages {
     stage('ASSEMBLY') {
@@ -59,26 +59,32 @@ pipeline {
 
         script {
           String labels = '';
-          if (env.BRANCH_NAME != cambpmDefaultBranch()) {
+          if (env.BRANCH_NAME == cambpmDefaultBranch()) {
+            // CE master triggers EE master
+            // otherwise CE PR branch triggers EE PR branch
+            params.EE_BRANCH_NAME = 'cambpm-ee-main/pipeline-master'
+          } else {
             labels = JsonOutput.toJson(pullRequest.labels)
           }
 
-          build job: "cambpm-ee/cambpm-ee-main/${params.EE_BRANCH_NAME}", parameters: [
-                  string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
-                  booleanParam(name: 'STANDALONE', value: false),
-                  string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
-                  string(name: 'PR_LABELS', value: labels)
-          ], quietPeriod: 10, wait: false
+          if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
+            build job: "cambpm-ee/${params.EE_BRANCH_NAME}", parameters: [
+                    string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+                    booleanParam(name: 'STANDALONE', value: false),
+                    string(name: 'CE_BRANCH_NAME', value: "${env.BRANCH_NAME}"),
+                    string(name: 'PR_LABELS', value: labels)
+            ], quietPeriod: 10, wait: false
+          }
 
-          if (withLabels('all-db','cockroachdb','authorizations')) {
+          if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
            build job: "cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}", parameters: [
-           string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
+               string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
                string(name: 'PR_LABELS', value: labels)
            ], quietPeriod: 10, wait: false
           }
 
-          if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
+          if (cambpmWithLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-ce/cambpm-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
@@ -86,7 +92,7 @@ pipeline {
            ], quietPeriod: 10, wait: false
           }
 
-          if (env.BRANCH_NAME == 'master') {
+          if (cambpmWithLabels('master')) {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
               configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
                sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
@@ -102,7 +108,7 @@ pipeline {
         stage('engine-UNIT-h2') {
           when {
             expression {
-              withLabels('h2', 'rolling-update', 'migration')
+              cambpmWithLabels('h2', 'rolling-update', 'migration')
             }
             beforeAgent true
           }
@@ -130,7 +136,7 @@ pipeline {
         stage('engine-UNIT-authorizations-h2') {
           when {
             expression {
-              withLabels('h2','authorizations')
+              cambpmWithLabels('h2','authorizations')
             }
             beforeAgent true
           }
@@ -158,7 +164,7 @@ pipeline {
         stage('engine-rest-UNIT-jersey-2') {
           when {
             expression {
-              withLabels('rest-api')
+              cambpmWithLabels('rest-api')
             }
             beforeAgent true
           }
@@ -183,7 +189,7 @@ pipeline {
         stage('engine-rest-UNIT-resteasy3') {
           when {
             expression {
-              withLabels('rest-api')
+              cambpmWithLabels('rest-api')
             }
             beforeAgent true
           }
@@ -208,7 +214,7 @@ pipeline {
         stage('webapp-UNIT-h2') {
           when {
             expression {
-              withLabels('default-build')
+              cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
@@ -236,7 +242,7 @@ pipeline {
         stage('webapp-UNIT-authorizations-h2') {
           when {
             expression {
-              withLabels('default-build')
+              cambpmWithLabels('default-build')
             }
           }
           agent {
@@ -263,7 +269,7 @@ pipeline {
         stage('engine-IT-tomcat-9-postgresql-96') {
           when {
             expression {
-              withLabels('all-as','tomcat')
+              cambpmWithLabels('all-as','tomcat')
             }
             beforeAgent true
           }
@@ -288,7 +294,7 @@ pipeline {
         stage('engine-IT-wildfly-postgresql-96') {
           when {
             expression {
-              withLabels('all-as','wildfly')
+              cambpmWithLabels('all-as','wildfly')
             }
           }
           agent {
@@ -315,7 +321,7 @@ pipeline {
         stage('webapp-IT-tomcat-9-h2') {
           when {
             expression {
-              withLabels('webapp-integration', 'h2')
+              cambpmWithLabels('webapp-integration', 'h2')
             }
             beforeAgent true
           }
@@ -363,7 +369,7 @@ pipeline {
         stage('camunda-run-IT') {
           when {
             expression {
-              withLabels('run')
+              cambpmWithLabels('run')
             }
             beforeAgent true
           }
@@ -388,7 +394,7 @@ pipeline {
         stage('spring-boot-starter-IT') {
           when {
             expression {
-              withLabels('spring-boot')
+              cambpmWithLabels('spring-boot')
             }
             beforeAgent true
           }
@@ -426,7 +432,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && cambpmWithLabelsList(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
           }
           beforeAgent true
         }
@@ -515,7 +521,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
             }
             beforeAgent true
           }
@@ -598,7 +604,7 @@ pipeline {
         stage('IT-wildfly-domain') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
@@ -623,7 +629,7 @@ pipeline {
         stage('IT-wildfly-servlet') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
@@ -676,30 +682,4 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
   }
-}
-
-boolean withLabels(List labels) { // TODO
-  if (env.BRANCH_NAME != cambpmDefaultBranch() && !pullRequest.labels.contains('no-build')) {
-    return false;
-  }
-
-  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-    return !labels.contains('daily');
-  } else if (changeRequest()) {
-    for (l in labels) {
-      if (pullRequest.labels.contains(l)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-boolean withLabels(String... labels) {
-  return withLabels(Arrays.asList(labels));
-}
-
-boolean withDbLabels(String dbLabel) {
-  return withLabels(cambpmGetDbType(dbLabel),'all-db')
 }

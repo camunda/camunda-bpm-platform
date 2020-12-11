@@ -1,5 +1,3 @@
-import groovy.json.JsonSlurper
-
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
@@ -25,7 +23,9 @@ pipeline {
   stages {
     stage('Prepare') {
       when {
-        expression { params.STANDALONE == false }
+        expression {
+          !cambpmWithLabels('standalone')
+        }
         beforeAgent true
       }
       agent {
@@ -55,7 +55,7 @@ pipeline {
         stage('sql-scripts-h2') {
           when {
             expression {
-              withLabels('h2', 'all-db')
+              cambpmWithLabels('h2', 'all-db')
             }
             beforeAgent true
           }
@@ -80,7 +80,7 @@ pipeline {
         stage('UPGRADE-databases-from-714-h2') {
           when {
             expression {
-              withLabels('h2', 'all-db')
+              cambpmWithLabels('h2', 'all-db')
             }
             beforeAgent true
           }
@@ -108,7 +108,7 @@ pipeline {
         stage('UPGRADE-instance-migration-h2') {
           when {
             expression {
-              withLabels('default-build', 'migration')
+              cambpmWithLabels('default-build', 'migration')
             }
             beforeAgent true
           }
@@ -136,7 +136,7 @@ pipeline {
         stage('UPGRADE-old-engine-from-714-h2') {
           when {
             expression {
-              withLabels('h2', 'all-db')
+              cambpmWithLabels('h2', 'all-db')
             }
             beforeAgent true
           }
@@ -164,7 +164,7 @@ pipeline {
         stage('UPGRADE-rolling-update-h2') {
           when {
             expression {
-              withLabels('rolling-update', 'default-build')
+              cambpmWithLabels('rolling-update', 'default-build')
             }
             beforeAgent true
           }
@@ -231,7 +231,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && cambpmWithLabelsList(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
           }
           beforeAgent true
         }
@@ -269,7 +269,7 @@ pipeline {
         }
         when {
           expression {
-            withLabels('default-build')
+            cambpmWithLabels('default-build')
           }
           beforeAgent true
         }
@@ -325,35 +325,4 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
   }
-}
-
-boolean withLabels(List labels) {
-  if (params.STANDALONE && env.BRANCH_NAME != cambpmDefaultBranch() && pullRequest.labels.contains('no-build')) {
-    return false;
-  }
-
-  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-    return true;
-  } else if (!params.STANDALONE) {
-    for (l in labels) {
-      if (new JsonSlurper().parseText(params.PR_LABELS).contains(l)) {
-        return true;
-      }
-    }
-  } else {
-    for (l in labels) {
-      if (pullRequest.labels.contains(l)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-boolean withLabels(String... labels) {
-  return withLabels(Arrays.asList(labels));
-}
-
-boolean withDbLabels(String dbLabel) {
-  return withLabels(cambpmGetDbType(dbLabel),'all-db');
 }
