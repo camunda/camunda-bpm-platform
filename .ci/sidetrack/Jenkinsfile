@@ -43,7 +43,7 @@ pipeline {
           }
           axis {
             name 'PROFILE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations', 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations', 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         when {
@@ -161,12 +161,12 @@ String resolveMavenProfileInfo(String profile) {
           command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
           qaStash: false,
           labels: []],
-      'check-sql': [
+      'sql-scripts': [
           directory: 'distro/sql-script/',
           command: 'install -Pcheck-sql,',
           qaStash: false,
           labels: ['all-db','cockroachdb']],
-     'upgrade-db': [
+     'upgrade-database': [
           directory: 'qa/test-db-upgrade/',
           command: 'verify -Pupgrade-db,',
           qaStash: false,

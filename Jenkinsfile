@@ -25,7 +25,7 @@ pipeline {
       }
       agent {
         node {
-          label 'centos-stable'
+          label 'h2_perf32'
         }
       }
       steps {
@@ -108,7 +108,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -136,7 +136,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -164,7 +164,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -189,7 +189,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -214,13 +214,13 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('webapp-unit'), getMavenProfileCmd('webapp-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -229,7 +229,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              cambpmAddFailedStageType(failedStageTypes, 'webapps-unit')
+              cambpmAddFailedStageType(failedStageTypes, 'webapp-unit')
             }
           }
         }
@@ -241,13 +241,13 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, getMavenProfileDir('webapp-unit-authorizations'), getMavenProfileCmd('webapp-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -275,7 +275,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Ptomcat,postgresql,engine-integration')
+                runMaven(true, true, false, 'qa/', 'clean install -Ptomcat,postgresql,engine-integration', true)
               }
             }
           }
@@ -299,7 +299,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Pwildfly,postgresql,engine-integration')
+                runMaven(true, true, false, 'qa/', 'clean install -Pwildfly,postgresql,engine-integration', true)
               }
             }
           }
@@ -421,7 +421,7 @@ pipeline {
           }
           axis {
             name 'PROFILE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations'
           }
         }
         when {
@@ -468,7 +468,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -496,7 +496,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -521,7 +521,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -541,7 +541,7 @@ pipeline {
           when {
             allOf {
               expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'webapps-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit')
               }
               branch cambpmDefaultBranch();
             }
@@ -549,7 +549,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -579,7 +579,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -604,7 +604,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -629,7 +629,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {

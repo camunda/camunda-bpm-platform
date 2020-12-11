@@ -61,7 +61,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -73,7 +73,7 @@ pipeline {
           }
           post {
             failure {
-              cambpmAddFailedStageType(failedStageTypes, 'check-sql')
+              cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
             }
           }
         }
@@ -86,7 +86,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -101,7 +101,7 @@ pipeline {
               cambpmPublishTestResult();
             }
             failure {
-              cambpmAddFailedStageType(failedStageTypes, 'upgrade-db')
+              cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
             }
           }
         }
@@ -114,7 +114,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -142,7 +142,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -170,7 +170,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -196,7 +196,7 @@ pipeline {
           }
           agent {
             node {
-              label 'centos-stable'
+              label 'h2'
             }
           }
           steps {
@@ -226,7 +226,7 @@ pipeline {
           }
           axis {
             name 'PROFILE'
-            values 'check-sql', 'upgrade-db', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
+            values 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         when {
@@ -275,7 +275,7 @@ pipeline {
         }
         agent {
           node {
-            label 'centos-stable'
+            label 'h2'
           }
         }
         stages {
@@ -361,12 +361,12 @@ boolean withDbLabels(String dbLabel) {
 
 String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
-      'check-sql': [
+      'sql-scripts': [
           directory: 'distro/sql-script/',
           command: 'install -Pcheck-sql,',
           qaStash: false,
           labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-     'upgrade-db': [
+     'upgrade-database': [
           directory: 'qa/test-db-upgrade/',
           command: 'verify -Pupgrade-db,',
           qaStash: false,
