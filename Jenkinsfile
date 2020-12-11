@@ -706,7 +706,7 @@ pipeline {
   }
 }
 
-void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
+void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = true) {
   if (runtimeStash) unstash "platform-stash-runtime"
   if (archivesStash) unstash "platform-stash-archives"
   if (qaStash) unstash "platform-stash-qa"
