@@ -24,13 +24,5 @@ module.exports = {
       // { expand: true, cwd: 'node_modules/angular/', src: ['angular.js'], dest: '<%= pkg.gruntConfig.libTargetDir %>/' },
       { expand: true, cwd: 'src/libs', src: ['globalize.js'], dest: '<%= pkg.gruntConfig.libTargetDir %>/' }
     ]
-  },
-  cockpit_plugin: {
-    files: [{
-      expand: true,
-      cwd: 'ui/cockpit/',
-      src: ['plugin.js', 'plugin.css'],
-      dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app'
-    }]
   }
 };

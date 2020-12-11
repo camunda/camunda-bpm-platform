@@ -1,0 +1,46 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->
+<div class="modal-header">
+  <h3>{{ 'PLUGIN_JOB_RETRY_LEGEND_1' | translate }}</h3>
+</div>
+
+<div class="job-retry modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'finished' || status === 'failed'">
+    <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_2' | translate }}</p>
+    <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_3' | translate }}</p>
+  </div>
+
+  <div ng-show="status === 'finished'">
+    {{ 'PLUGIN_JOB_RETRY_LEGEND_4' | translate }}
+  </div>
+
+  <div ng-show="status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_LEGEND_5' | translate }}
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close(status)"
+          ng-disabled="status === 'performing'"
+          ng-hide="status === 'finished' || status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_BTN_CLOSE' | translate }}
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="incrementRetry()"
+          ng-hide="status === 'finished' || status === 'failed'"
+          ng-disabled="status === 'performing'">
+    {{ 'PLUGIN_JOB_RETRY_BTN_RETRY' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'finished' || status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_BTN_OK' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->

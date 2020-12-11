@@ -30,7 +30,7 @@ module.exports = function(config, uglifyConfig) {
   uglifyConfig.webapp_plugins = {
     files: [{
       expand: true,
-      src: ['admin/**/*.js', 'welcome/**/*.js', 'tasklist/**/*.js'],
+      src: '**/*.js',
       dest: '<%= pkg.gruntConfig.pluginBuildTarget %>',
       cwd: '<%= pkg.gruntConfig.pluginBuildTarget %>'
     }]

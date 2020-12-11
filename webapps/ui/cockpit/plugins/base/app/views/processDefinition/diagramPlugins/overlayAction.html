@@ -1,0 +1,12 @@
+<a
+  class="overlay-link"
+  ng-click="toggleOverlay()"
+  ng-disabled="isLoading"
+  ng-if="enabled"
+  uib-tooltip="{{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS_TOOLTIP' | translate }}"
+  tooltip-placement="bottom">
+  {{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS' | translate }}
+  <span ng-if="toggle && !isLoading">{{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS_ON' | translate }} <input type="radio" checked="" class="toggle" ></span>
+  <span ng-if="!toggle && !isLoading">{{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS_OFF' | translate }}<input type="radio" class="toggle"> </span>
+  <span ng-if="isLoading">{{ 'PLUGIN_DIAGRAM_ACTIVITY_STATISTICS_LOADING' | translate }}</span>
+</a>

@@ -1,0 +1,159 @@
+<!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
+<section  class="processes-dashboard"
+          ng-class="{'section-collapsed': !activeSection}">
+  <div class="inner">
+    <button uib-tooltip="Toggle this section"
+            class="section-toggle btn btn-link btn-sm"
+            ng-click="toggleSection()">
+      <span class="glyphicon"
+            ng-class="{'glyphicon-menu-down': !activeSection, 'glyphicon-menu-up': activeSection}"></span>
+    </button>
+    <header ng-if="processDefinitionsCount">
+      <div class="row">
+        <h1 class="col-xs-6 section-title">{{ processDefinitionsCount }} {{ (processDefinitionsCount > 1 ? 'PLUGIN_PROCESS_DEF_PROCESS_DEFINITIONS_DEPLOYED' : 'PLUGIN_PROCESS_DEF_PROCESS_DEFINITION_DEPLOYED' | translate) }}</h1>
+
+        <div class="col-xs-6 text-right" ng-if="activeSection">
+          <ul class="nav nav-tabs">
+            <li ng-class="{active: activeTab === 'list'}">
+              <a ng-click="selectTab('list')">{{'PLUGIN_PROCESS_DEF_LIST' | translate}}</a>
+            </li>
+            <li ng-class="{active: activeTab === 'previews'}">
+              <a ng-click="selectTab('previews')">{{'PLUGIN_PROCESS_DEF_PREVIEWS' | translate}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <header class="header-empty" ng-if="!processDefinitionsCount && loadingState !== 'LOADING'">
+        <h1 class="section-title">{{'PLUGIN_PROCESS_DEF_NO_PROCESS_DEF' | translate}}</h1>
+    </header>
+
+
+
+    <div cam-widget-loader
+         loading-state="{{loadingState}}"
+         class="deployed-processes"
+         ng-if="activeSection">
+
+
+      <table ng-if="processDefinitionsCount && activeTab === 'list'"
+             class="process-definitions-list cam-table">
+        <thead sortable-table-head
+               head-columns="headColumns"
+               on-sort-change="onSortChange(sortObj)"
+               default-sort="sortObj">
+        </thead>
+        <tbody>
+          <tr ng-repeat="pd in processDefinitionData | orderBy:sortObj.sortBy:sortObj.sortReverse">
+            <td class="state">
+              <div ng-if="!!pd.incidents" state-circle incidents="pd.incidents">
+                <a ng-if="pd.incidentCount && hasSearchPlugin"
+                   ng-href="{{ incidentsLink.replace('PD_KEY', pd.key) }}"
+                   class="incidents-link"></a>
+              </div>
+              <div ng-if="!pd.incidents">
+                <span class="glyphicon glyphicon-refresh animate-spin"></span>
+              </div>
+            </td>
+
+            <td class="incidents">
+              <a ng-if="pd.incidentCount && hasSearchPlugin"
+                 ng-href="{{ incidentsLink.replace('PD_KEY', pd.key) }}">
+                {{ pd.incidentCount }}
+              </a>
+              <span ng-if="!pd.incidentCount || !hasSearchPlugin">{{ pd.incidentCount }}</span>
+            </td>
+
+            <td ng-if="pd.instances >= 0" class="instances">
+              {{ pd.instances }}
+            </td>
+            <td ng-if="pd.instances == undefined">
+              <span class="glyphicon glyphicon-refresh animate-spin"></span>
+            </td>
+
+            <td class="name">
+              <a href="#/process-definition/{{ pd.id }}">
+                {{ pd.name || pd.key }}
+              </a>
+            </td>
+
+            <td class="tenant-id">
+              {{ pd.tenantId }}
+            </td>
+
+            <td ng-if="hasHistoryPlugin"
+                class="history-link">
+              <a href="#/process-definition/{{ pd.id }}/history">
+                {{'PLUGIN_PROCESS_DEF_HISTORY_VIEW' | translate}}
+              </a>
+            </td>
+
+            <td ng-if="hasReportPlugin"
+                class="report-link">
+              <a href="#/reports/reporting-duration-report?processDefinitionKey={{ pd.key }}">
+                <span class="glyphicon glyphicon-signal"></span>
+              </a>
+            </td>
+
+            <td ng-if="hasActionPlugin">
+              <view ng-repeat="processesAction in processesActions"
+                    data-plugin-id="{{ processAction.id }}"
+                    vars="definitionVars"
+                    provider="processesAction"></view>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div ng-if="processDefinitionsCount && activeTab === 'previews'"
+           class="tile-grid">
+        <div ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse"
+             class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
+          <a href="#/process-definition/{{ pd.id }}">
+            <h4 class="tile-header">
+              {{ pd.name || pd.key }}
+            </h4>
+
+            <span class="tile-body">
+              <span ng-if="activeTab === 'previews'"
+                    process-diagram-preview
+                    process-definition-id="pd.id"></span>
+            </span>
+
+            <span class="tile-footer">
+              <span ng-if="!pd.instances || pd.instances === 0"
+                    class="instances"
+                    translate="PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES"
+                    translate-values="{ instances: 'No' }">
+              </span>
+              <span ng-if="pd.instances === 1"
+                    class="instances">
+                {{ 'PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE' | translate }}
+              </span>
+              <span ng-if="pd.instances > 1"
+                    class="instances"
+                    translate="PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES"
+                    translate-values="{ instances: pd.instances }">
+              </span>
+              <span ng-if="pd.instances == undefined" class="instances">
+                <span class="glyphicon glyphicon-refresh animate-spin"></span>
+              </span>
+
+              <span ng-if="pd.incidents.length > -1" state-circle
+                    incidents="pd.incidents"
+                    class="circle-tiles"></span>
+              <span ng-if="pd.incidents == undefined" class="circle-tiles"></span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div cam-pagination="onPaginationChange(pages)" total="pages.total"></div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- / CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->

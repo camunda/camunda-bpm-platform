@@ -1,0 +1,25 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->
+<div cam-searchable-area
+     config="searchConfig"
+     array-types="['activityInstanceIdIn']"
+     variable-types="['variableValues']"
+     on-search-change="onSearchChange(query, pages,sortObj)"
+     loading-state="loadingState"
+     text-empty="{{ 'PLUGIN_VARIABLE_NO_PROCESS_VARIABLES' | translate }}"
+     blocked="!instanceIdToInstanceMap"
+     storage-group="'VI'">
+
+      <div cam-widget-variables-table
+           on-save="saveVariable"
+           on-edit="editVariable"
+           on-upload="uploadVariable"
+           on-delete="deleteVariable"
+           on-download="downloadVariable"
+           on-sort-change="onSortChange(query, pages,sortObj)"
+           default-sort = "sortObj"
+           cam-variables="variables"
+           cam-editable="['type', 'value']"
+           cam-headers="headColumns">
+      </div>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->

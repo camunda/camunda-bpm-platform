@@ -1,0 +1,123 @@
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-inspect-modal.html -->
+<div class="modal-header">
+  <h3 translate="VARIABLE_INSPECT_MODAL_TITLE"
+      translate-values="{ name: variable.name }"></h3>
+</div>
+
+
+<div class="modal-body variable-inspect">
+
+  <div notifications-panel></div>
+
+  <div ng-show="status === 'beforeChange' || status === 'confirmChange'">
+
+    <div ng-if="!isJsonOrXml" class="form-group">
+      <label>{{ 'VARIABLE_INSPECT_OBJECT_TYPE_NAME' | translate }}</label>
+      <code class="form-control-static"
+            cam-widget-clipboard="variable.valueInfo.objectTypeName">{{ variable.valueInfo.objectTypeName }}</code>
+    </div>
+
+    <div ng-if="!isJsonOrXml" class="form-group">
+      <label>{{ 'VARIABLE_INSPECT_SERIALIZATION_DATA' | translate }}</label>
+      <code class="form-control-static"
+            cam-widget-clipboard="variable.valueInfo.serializationDataFormat">{{ variable.valueInfo.serializationDataFormat }}</code>
+    </div>
+
+    <div ng-if="!isJsonOrXml" class="form-group">
+
+      <ul class="nav nav-tabs">
+        <li ng-class="{ active: selectedTab === 'serialized' }">
+          <a href ng-click="selectTab('serialized')">{{ 'VARIABLE_INSPECT_SERIALIZED' | translate }}</a>
+        </li>
+        <li ng-class="{ active: selectedTab === 'deserialized' }">
+          <a href ng-click="selectTab('deserialized')">{{ 'VARIABLE_INSPECT_DESERIALIZED' | translate }}</a>
+        </li>
+      </ul>
+
+      <textarea ng-if="selectedTab === 'serialized'"
+                name="currentValue"
+                ng-readonly="readonly"
+                ng-model="currentValue"
+                ng-keyup="typeIn(this, 'serialized')"
+                rows="10"
+                class="form-control">
+      </textarea>
+
+      <div ng-if="selectedTab === 'deserialized'">
+        <div uib-alert class="alert alert-danger"
+             ng-show="deserializationError">
+          <strong>{{ 'VARIABLE_INSPECT_DESERIALIZED_ERROR' | translate }}</strong>
+          {{deserializationError}}
+        </div>
+
+        <div ng-show="!deserializationError">
+          <textarea name="currentDeserializedValue"
+                    ng-readonly="readonly"
+                    ng-model="currentDeserializedValue"
+                    ng-keyup="typeIn(this, 'deserialized')"
+                    rows="10"
+                    class="form-control">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <div ng-if="isJsonOrXml"
+         class="form-group">
+        <form name="jsonXmlForm">
+          <label for="value"
+                 cam-widget-clipboard="variable.value"
+                 no-tooltip
+                 ng-class="{hovered: hovered === 'var-value'}">
+            {{ 'CAM_WIDGET_STRING_DIALOG_LABEL_VALUE' | translate }}
+          </label>
+          <div variable="variable"
+               readonly="readonly"
+               form="jsonXmlForm">
+          </div>
+        </form>
+
+    </div>
+
+  </div>
+
+  <div uib-alert class="alert alert-warning"
+       ng-show="status === 'confirmChange'">
+    <span class="glyphicon glyphicon-alert"></span>
+    <strong>{{ 'VARIABLE_INSPECT_WARNING' | translate }}</strong>
+    {{ 'VARIABLE_INSPECT_WARNING_MESSAGE' | translate }}
+  </div>
+
+</div>
+
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="$dismiss()"
+          ng-hide="status === 'changeSuccess'">
+    {{ 'VARIABLE_INSPECT_CLOSE' | translate }}
+  </button>
+
+  <![if gt IE 9]>
+    <button class="btn btn-primary"
+            ng-click="$close()"
+            ng-show="!readlonly && status === 'changeSuccess'">
+      {{ 'VARIABLE_INSPECT_OK' | translate }}
+    </button>
+
+    <button class="btn btn-primary"
+            ng-click="change()"
+            ng-disabled="isChangeDisabled()"
+            ng-hide="readonly || status !== 'beforeChange'">
+      {{ 'VARIABLE_INSPECT_CHANGE' | translate }}
+    </button>
+
+    <button class="btn btn-warning"
+            ng-click="change()"
+            ng-hide="readonly || status !== 'confirmChange'">
+      {{ 'VARIABLE_INSPECT_CONFIRM_CHANGE' | translate }}
+    </button>
+  <![endif]>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-inspect-modal.html -->

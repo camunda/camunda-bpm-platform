@@ -1,0 +1,29 @@
+<!-- # CE - ui/cockpit/plugins/external-tasks-process-instance-runtime-tab/process-instance-runtime-external-tasks.html -->
+<div external-tasks-tab="RuntimeTab.onLoad(pages, activityIds)"
+     process-data="RuntimeTab.processData">
+  <table class="history-job-log cam-table">
+
+    <thead sortable-table-head
+           head-columns="RuntimeTab.headColumns"
+           on-sort-change="RuntimeTab.onSortChange(RuntimeTab.sorting)"
+           default-sort="RuntimeTab.sorting">
+    </thead>
+    <tbody>
+      <tr ng-repeat="task in RuntimeTab.tasks track by task.id">
+        <td class="state"
+            cam-widget-clipboard="task.id">{{task.id}}</td>
+        <td class="activity">
+          <span external-task-activity-link="task.activityId"
+                bpmn-elements="RuntimeTab.bpmnElements">
+          </span>
+        </td>
+        <td class="retries">{{task.retries}}</td>
+        <td class="worker-id">{{task.workerId}}</td>
+        <td class="expiration">{{task.lockExpirationTime}}</td>
+        <td class="topic">{{task.topicName}}</td>
+        <td class="priority">{{task.priority}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- / CE - ui/cockpit/plugins/external-tasks-process-instance-runtime-tab/process-instance-runtime-external-tasks.html -->
