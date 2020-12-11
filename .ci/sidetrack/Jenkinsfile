@@ -43,7 +43,7 @@ pipeline {
           }
           axis {
             name 'PROFILE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapps-unit', 'webapps-unit-authorizations', 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
+            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations', 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
           }
         }
         when {
@@ -151,12 +151,12 @@ String resolveMavenProfileInfo(String profile) {
           command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
           qaStash: false,
           labels: ['authorizations']],
-      'webapps-unit': [
+      'webapp-unit': [
           directory: 'webapps/',
           command: 'clean test -Dskip.frontend.build=true -P',
           qaStash: false,
           labels: []],
-      'webapps-unit-authorizations': [
+      'webapp-unit-authorizations': [
           directory: 'webapps/',
           command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
           qaStash: false,
