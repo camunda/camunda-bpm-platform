@@ -85,7 +85,7 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
   public void setRetries(RetriesDto dto) {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
     Integer retries = dto.getRetries();
-    
+
     if (retries == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
     }
@@ -135,7 +135,9 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
           dto.getErrorMessage(),
           dto.getErrorDetails(),
           dto.getRetries(),
-          dto.getRetryTimeout());
+          dto.getRetryTimeout(),
+          VariableValueDto.toMap(dto.getVariables(), engine, objectMapper),
+          VariableValueDto.toMap(dto.getLocalVariables(), engine, objectMapper));
     } catch (NotFoundException e) {
       throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
     } catch (BadUserRequestException e) {
