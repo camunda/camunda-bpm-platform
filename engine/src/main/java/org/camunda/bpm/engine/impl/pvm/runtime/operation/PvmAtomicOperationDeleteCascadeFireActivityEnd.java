@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -71,6 +72,9 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     } else {
       if (execution.isScope()) {
+        if(execution instanceof ExecutionEntity && !execution.isProcessInstanceExecution() && execution.isCanceled()) {
+          execution.setSkipIoMappings(execution.isSkipIoMappings() || execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledTasks());
+        }
         execution.destroy();
       }
 

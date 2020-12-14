@@ -1361,6 +1361,45 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     testRule.assertProcessEnded(processInstance.getId());
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.oneExternalTaskWithOutputMappingAndCatchingErrorBoundaryEvent.bpmn")
+  public void shouldSkipOutputMappingOnBpmnErrorAtExternalTask() {
+    // given a process with one external task which has output mapping configured
+    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(true);
+    runtimeService.startProcessInstanceByKey("externalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertThat(externalTasks).hasSize(1);
+    externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "errorCode", null);
+
+    // then
+    // expect no mapping failure
+    // error was caught
+    // output mapping is skipped
+    Task userTask = taskService.createTaskQuery().singleResult();
+    assertThat(userTask).isNotNull();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.oneExternalTaskWithOutputMappingAndCatchingErrorBoundaryEvent.bpmn")
+  public void shouldNotSkipOutputMappingOnBpmnErrorAtExternalTask() {
+    // given a process with one external task which has output mapping configured
+    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(false);
+    runtimeService.startProcessInstanceByKey("externalTaskProcess");
+
+    // when/then
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertThat(externalTasks).hasSize(1);
+    assertThatThrownBy(() -> externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "errorCode", null))
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("Propagation of bpmn error errorCode failed.");
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {
@@ -2495,7 +2534,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // and the lock expires without the task being reclaimed
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     variables.put("transientVar", Variables.integerValue(1, true));
 
@@ -2554,7 +2593,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // and the lock expires without the task being reclaimed
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     variables.put("transientVar", Variables.integerValue(1, true));
 
@@ -3067,9 +3106,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
     // when
-    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .variables(new String[]{})
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID).topic("externalTaskTopic", LOCK_TIME).variables()
       .execute();
 
     // then
@@ -3269,7 +3306,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3314,7 +3351,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3371,7 +3408,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue5 = "testValue5";
     String variableValue6 = "testValue6";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3431,7 +3468,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3614,7 +3651,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   }
 
   protected List<String> startProcessInstance(String key, int instances) {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     for (int i = 0; i < instances; i++) {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
