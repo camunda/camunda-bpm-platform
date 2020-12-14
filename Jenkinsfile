@@ -61,14 +61,14 @@ pipeline {
         
 
         script {
-          String labels = [];
+          List labels = [];
           if (env.BRANCH_NAME == cambpmDefaultBranch()) {
             // CE master triggers EE master
             // otherwise CE PR branch triggers EE PR branch
             eeBranch = "cambpm-ee-main/pipeline-master"
           } else {
             labels = pullRequest.labels
-            eeBranch = $params.EE_BRANCH_NAME
+            eeBranch = params.EE_BRANCH_NAME
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
