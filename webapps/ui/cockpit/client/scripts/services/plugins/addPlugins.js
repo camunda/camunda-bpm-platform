@@ -71,5 +71,17 @@ module.exports = function(module) {
         });
       }
     ]);
+
+    if (plugin.pluginPoint === 'cockpit.route') {
+      module.config([
+        '$routeProvider',
+        function($routeProvider) {
+          $routeProvider.when(plugin.properties.path, {
+            template: `<div plugin-bridge${pluginDirectiveUID} />`,
+            authentication: 'required'
+          });
+        }
+      ]);
+    }
   });
 };

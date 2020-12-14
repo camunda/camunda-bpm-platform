@@ -41,7 +41,6 @@ async function loadPlugins(config) {
       return `${el.location}/${el.main}`;
     });
 
-  console.log(config, customScripts);
   const fetchers = customScripts.map(url =>
     // eslint-disable-next-line
     import(baseImportPath + withSuffix(url, ".js"))
