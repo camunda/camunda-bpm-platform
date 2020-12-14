@@ -67,6 +67,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.SystemPropertiesRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -100,6 +101,12 @@ public class BpmnParseTest {
     processEngineConfiguration.setEnableXxeProcessing(false);
   }
 
+  @After
+  public void tearDown() {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+  }
 
   @Test
   public void testInvalidSubProcessWithTimerStartEvent() {
@@ -409,8 +416,6 @@ public class BpmnParseTest {
     repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseWithBpmnNamespacePrefix.bpmn20.xml").deploy();
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-
-    repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
   @Test
@@ -418,16 +423,12 @@ public class BpmnParseTest {
     repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseWithMultipleDocumentation.bpmn20.xml").deploy();
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-
-    repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
   @Test
   public void testParseCollaborationPlane() {
     repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseCollaborationPlane.bpmn").deploy();
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-
-    repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
   @Test
@@ -628,8 +629,6 @@ public class BpmnParseTest {
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseSwitchedSourceAndTargetRefsForAssociations.bpmn20.xml").deploy();
 
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-
-    repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiActivity.bpmn20.xml")
@@ -818,7 +817,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -847,7 +845,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -900,7 +897,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -929,7 +925,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -958,7 +953,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -1011,7 +1005,6 @@ public class BpmnParseTest {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -1090,7 +1083,6 @@ public class BpmnParseTest {
       assertEquals(6, timeToLive.intValue());
     } finally {
       processEngineConfiguration.setHistoryTimeToLive(null);
-      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
 
@@ -1350,7 +1342,7 @@ public class BpmnParseTest {
       List<Problem> errors = e.getResorceReports().get(0).getErrors();
       assertThat(errors).hasSize(2);
       assertThat(errors.get(1).getMainElementId()).isNull();
-      assertThat(errors.get(1).getElementIds()).isEmpty();;
+      assertThat(errors.get(1).getElementIds()).isEmpty();
     }
   }
 
@@ -1370,6 +1362,17 @@ public class BpmnParseTest {
       assertThat(errors.get(2).getMainElementId()).isEqualTo("plainStart2");
       assertThat(errors.get(3).getMainElementId()).isEqualTo("plainStartInSub1");
     }
+  }
+
+  @Test
+  public void testParseEmptyExtensionProperty() {
+    // given process definition with empty property (key and value = null) is deployed
+    // when
+    repositoryService.createDeployment()
+    .addClasspathResource("org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseEmptyExtensionProperty.bpmn").deploy();
+
+    // then
+    assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(1L);
   }
 
   protected boolean doesJdkSupportExternalSchemaAccessProperty() {
