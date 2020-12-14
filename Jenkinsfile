@@ -61,17 +61,18 @@ pipeline {
         
 
         script {
-          String labels = '';
+          String labels = [];
           if (env.BRANCH_NAME == cambpmDefaultBranch()) {
             // CE master triggers EE master
             // otherwise CE PR branch triggers EE PR branch
-            params.EE_BRANCH_NAME = 'cambpm-ee-main/pipeline-master'
+            eeBranch = "cambpm-ee-main/pipeline-master"
           } else {
             labels = pullRequest.labels
+            eeBranch = $params.EE_BRANCH_NAME
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
-            cambpmTriggerDownstream("cambpm-ee/${params.EE_BRANCH_NAME}", labels, true, true)
+            cambpmTriggerDownstream("cambpm-ee/" + eeBranch, labels, true, true)
           }
 
           if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
