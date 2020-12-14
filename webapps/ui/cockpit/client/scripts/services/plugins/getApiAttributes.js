@@ -15,14 +15,27 @@
  * limitations under the License.
  */
 
-module.exports = function(config, eslintConf) {
-  'use strict';
+function getCSRFToken() {
+  const CSRFCookieName = window.camCockpitConf.csrfCookieName || 'XSRF-TOKEN';
+  return document.cookie.replace(
+    new RegExp(`(?:(?:^|.*;*)${CSRFCookieName}*=*([^;]*).*$)|^.*$`),
+    '$1'
+  );
+}
 
-  eslintConf.cockpit_scripts = {
-    src: ['<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.js', '!<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/*.js']
-  };
+module.exports = function(params) {
+  const base = document.querySelector('base');
+  const engine = window.location.href.replace(/.*cockpit\/([^/]*).*/, '$1');
 
-  eslintConf.cockpit_plugins = {
-    src: ['<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.js']
+  return {
+    api: {
+      adminApi: base.getAttribute('admin-api').slice(0, -1),
+      baseApi: base.getAttribute('engine-api').slice(0, -1),
+      cockpitApi: base.getAttribute('cockpit-api').slice(0, -1),
+      engineApi: base.getAttribute('engine-api') + 'engine/' + engine,
+      engine,
+      CSRFToken: getCSRFToken()
+    },
+    ...params
   };
 };

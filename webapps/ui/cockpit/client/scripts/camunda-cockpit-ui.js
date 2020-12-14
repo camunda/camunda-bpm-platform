@@ -170,6 +170,8 @@ module.exports = function(pluginDependencies) {
     }
   ]);
 
+  require('./services/plugins/addPlugins')(appNgModule);
+
   angular.bootstrap(document.documentElement, [
     appNgModule.name,
     'cam.cockpit.custom'
