@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;

@@ -67,6 +67,6 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
 
   protected boolean shouldCheckPasswordPolicy(CommandContext commandContext) {
     return ((UserEntity) user).hasNewPassword() && !skipPasswordPolicy
-            && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy();
+        && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy();
   }
 }
