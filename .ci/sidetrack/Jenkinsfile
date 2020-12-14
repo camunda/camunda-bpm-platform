@@ -30,8 +30,12 @@ pipeline {
       }
       steps {
         copyArtifacts(projectName: "cambpm-ce/cambpm-main/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
-        stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
-        stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+        cambpmStash("platform-stash-runtime",
+                    ".m2/org/camunda/**/*-SNAPSHOT/**",
+                    "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+        cambpmStash("platform-stash-qa",
+                    ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                    "**/*.zip,**/*.tar.gz")
       }
     }
     stage('UNIT DB tests') {
@@ -98,9 +102,9 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (!params.STANDALONE && runtimeStash) unstash "platform-stash-runtime"
-  if (!params.STANDALONE && archivesStash) unstash "platform-stash-archives"
-  if (!params.STANDALONE && qaStash) unstash "platform-stash-qa"
+  if (!params.STANDALONE && runtimeStash) cambpmUnstash("platform-stash-runtime")
+  if (!params.STANDALONE && archivesStash) cambpmUnstash("platform-stash-archives")
+  if (!params.STANDALONE && qaStash) cambpmUnstash("platform-stash-qa")
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
