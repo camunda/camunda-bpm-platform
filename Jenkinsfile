@@ -29,35 +29,30 @@ pipeline {
       steps {
         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
           nodejs('nodejs-14.6.0'){
-             configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-               sh """
-                 mvn -s \$MAVEN_SETTINGS_XML clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar -DskipTests -Dmaven.repo.local=\${WORKSPACE}/.m2 com.mycila:license-maven-plugin:check -B
-               """
-             }
+            cambpmRunMaven('.', 'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check')
           }
-
-          // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
-          // add a new line for each group of artifacts
-          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war')
-
-          cambpmStash("platform-stash-runtime",
-                      ".m2/org/camunda/**/*-SNAPSHOT/**",
-                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-          cambpmStash("platform-stash-archives",
-                      ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
-          cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
-
         }
+
+        // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
+        // add a new line for each group of artifacts
+        cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                               '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war')
+
+        cambpmStash("platform-stash-runtime",
+                    ".m2/org/camunda/**/*-SNAPSHOT/**",
+                    "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+        cambpmStash("platform-stash-archives",
+                    ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
+        cambpmStash("platform-stash-qa",
+                    ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                    "**/*.zip,**/*.tar.gz")
 
         script {
           if (env.BRANCH_NAME == cambpmDefaultBranch()) {
@@ -82,8 +77,8 @@ pipeline {
 
           if (cambpmWithLabels('master')) {
             withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-                sh 'mvn -s \$MAVEN_SETTINGS_XML org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=${WORKSPACE}/.m2 -DskipStaging=true -B'
+              nodejs('nodejs-14.6.0'){
+                cambpmRunMaven('.', 'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true')
               }
             }
           }
