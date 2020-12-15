@@ -646,8 +646,8 @@ pipeline {
   post {
     changed {
       script {
-        if (!agentDisconnected()){ 
-          // send email if the slave disconnected
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
         }
       }
     }
