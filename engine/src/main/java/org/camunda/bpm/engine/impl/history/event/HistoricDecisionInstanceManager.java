@@ -348,7 +348,11 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByRootDecisionInstanceId", parameters);
 
     getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByRootDecisionInstanceId", parameters);
+      .updatePreserveOrder(ByteArrayEntity.class,
+          "updateDecisionInputByteArraysByRootDecisionInstanceId", parameters);
+    getDbEntityManager()
+        .updatePreserveOrder(ByteArrayEntity.class,
+            "updateDecisionOutputByteArraysByRootDecisionInstanceId", parameters);
   }
 
   public void addRemovalTimeToDecisionsByDecisionInstanceId(String instanceId, Date removalTime) {
@@ -366,7 +370,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByDecisionInstanceId", parameters);
 
     getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByDecisionInstanceId", parameters);
+      .updatePreserveOrder(ByteArrayEntity.class,
+          "updateDecisionInputByteArraysByDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+        .updatePreserveOrder(ByteArrayEntity.class,
+            "updateDecisionOutputByteArraysByDecisionInstanceId", parameters);
   }
 
   public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricDecisionsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
