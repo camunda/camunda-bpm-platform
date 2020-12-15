@@ -24,7 +24,7 @@
   "responses": {
 
     "200": {
-      "description": "Request sucessful. For binary variables or files without any MIME type information, a byte stream is returned.
+      "description": "Request successful. For binary variables or files without any MIME type information, a byte stream is returned.
                       File variables with MIME type information are returned as the saved type. Additionally, for file
                       variables the Content-Disposition header will be set.",
       "content": {
@@ -35,7 +35,7 @@
             "description": "For files without any MIME type information, a byte stream is returned."
           }
         },
-        "text/plain": {
+        "*/*": {
           "schema": {
             "type": "string",
             "format": "binary",
