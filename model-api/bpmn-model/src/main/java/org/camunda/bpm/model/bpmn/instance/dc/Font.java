@@ -43,7 +43,7 @@ public interface Font extends BpmnModelElementInstance {
 
   Boolean isUnderline();
 
-  void SetUnderline(boolean isUnderline);
+  void setUnderline(boolean isUnderline);
 
   Boolean isStrikeThrough();
 
