@@ -582,48 +582,48 @@ pipeline {
         }
       }
     }
-    stage('UNIT DB tests') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
-          }
-          axis {
-            name 'STAGE_TYPE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations'
-          }
-        }
-        when {
-          expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.STAGE_TYPE) && cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE, 'cockroachdb'))
-          }
-          beforeAgent true
-        }
-        agent {
-          node {
-            label env.DB
-          }
-        }
-        stages {
-          stage('UNIT test') {
-            steps {
-              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-              catchError(stageResult: 'FAILURE') {
-                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-                }
-              }
-            }
-            post {
-              always {
-                cambpmPublishTestResult();
-              }
-            }
-          }
-        }
-      }
-    }
+//    stage('UNIT DB tests') {
+//      matrix {
+//        axes {
+//          axis {
+//            name 'DB'
+//            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
+//          }
+//          axis {
+//            name 'STAGE_TYPE'
+//            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations'
+//          }
+//        }
+//        when {
+//          expression {
+//            cambpmIsNotFailedStageType(failedStageTypes, env.STAGE_TYPE) && cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE, 'cockroachdb'))
+//          }
+//          beforeAgent true
+//        }
+//        agent {
+//          node {
+//            label env.DB
+//          }
+//        }
+//        stages {
+//          stage('UNIT test') {
+//            steps {
+//              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
+//              catchError(stageResult: 'FAILURE') {
+//                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+//                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
+//                }
+//              }
+//            }
+//            post {
+//              always {
+//                cambpmPublishTestResult();
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
     stage('db tests + CE webapps IT') {
       parallel {
         stage('engine-api-compatibility') {
