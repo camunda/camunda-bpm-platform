@@ -103,6 +103,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   @After
   public void tearDown() throws Exception {
     ClockUtil.reset();
+    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(false);
   }
 
   @Test
