@@ -2,6 +2,34 @@
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
+/**
+ * A method to perform a custom evaluation if certain stages in the Side track pipeline
+ * should be evaluated. This is necessary since the Side Track pipeline triggers stage types
+ * from the Main and Daily pipelines.
+ *
+ * Note: this method shouldn't be extracted to the shared library
+ *       since it is specific to this pipeline.
+ *
+ * @param stageType - a String indicating the type of stage to be executed.
+ * @return boolean. TRUE, if the stage should be triggered. Otherwise, FALSE.
+ */
+boolean shouldTrigger(String stageType) {
+  def qaStages = ['sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests']
+  def unitStages = ['engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations']
+  if (params.STANDALONE) {
+    // Daily run
+    return qaStages.contains(stageType)
+  } else {
+    if (env.BRANCH_NAME == cambpmDefaultBranch()) {
+      // Downstream master run
+      return unitStages.contains(stageType)
+    } else {
+      // Downstream PR run
+      return cambpmWithLabelsList(cambpmGetLabels(stageType))
+    }
+  }
+}
+
 pipeline {
   agent none
   parameters {
@@ -52,7 +80,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE))
+            shouldTrigger(env.STAGE_TYPE)
           }
           beforeAgent true
         }
