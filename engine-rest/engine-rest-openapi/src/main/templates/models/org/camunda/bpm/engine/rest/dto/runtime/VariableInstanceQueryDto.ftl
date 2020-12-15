@@ -1,6 +1,6 @@
 <@lib.dto
     desc = "A variable instance query which defines a list of variable instances" >
-
+    <#assign requestMethod="POST"/>
     <#include "/lib/commons/variable-instance-query-params.ftl" >
     <@lib.properties params />
 
