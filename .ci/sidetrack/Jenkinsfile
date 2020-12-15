@@ -43,6 +43,9 @@ pipeline {
   options {
     buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
   }
+  triggers {
+    pollSCM('H H(0-7) * * *')
+  }
   stages {
     stage('Prepare') {
       when {
