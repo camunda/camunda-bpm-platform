@@ -104,7 +104,9 @@ pipeline {
             }
             post {
               always {
-                cambpmPublishTestResult();
+                if (!env.STAGE_TYPE.equals('sql-scripts')) {
+                  cambpmPublishTestResult();
+                }
               }
             }
           }
