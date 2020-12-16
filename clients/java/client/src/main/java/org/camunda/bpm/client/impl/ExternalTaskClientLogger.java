@@ -151,7 +151,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
 
   public ExternalTaskClientException maxTasksNotGreaterThanZeroException(Integer maxTasks) {
     return new ExternalTaskClientException(exceptionMessage(
-      "014", "Maximum amount of fetched tasks must be greater than zero, bus was '{}'", maxTasks));
+      "014", "Maximum amount of fetched tasks must be greater than zero, but was '{}'", maxTasks));
   }
 
   public ExternalTaskClientException asyncResponseTimeoutNotGreaterThanZeroException(Long asyncResponseTimeout) {
