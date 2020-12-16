@@ -20,7 +20,8 @@ export default {
   //   // If you have a folder called 'my-custom-script' (in the 'cockpit' folder)
   //   // with a file called 'customScript.js' in it
   //   // 'my-custom-script/customScript'
-  // ],  // historicActivityInstanceMetrics: {
+  // ],
+  // historicActivityInstanceMetrics: {
   //   adjustablePeriod: true,
   //   //select from the default time period: day, week, month, complete
   //   period: {
