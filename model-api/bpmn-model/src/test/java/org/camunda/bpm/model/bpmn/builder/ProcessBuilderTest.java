@@ -32,6 +32,7 @@ import org.camunda.bpm.model.bpmn.*;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
@@ -498,6 +499,30 @@ public class ProcessBuilderTest {
     ServiceTask serviceTask = modelInstance.getModelElementById(EXTERNAL_TASK_ID);
     assertThat(serviceTask.getCamundaType()).isEqualTo("external");
     assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_EXTERNAL_TASK_TOPIC);
+  }
+
+  @Test
+  public void testTaskCamundaExternalTaskErrorEventDefinition() {
+    modelInstance = Bpmn.createProcess()
+    .startEvent()
+    .serviceTask(EXTERNAL_TASK_ID)
+    .camundaExternalTask(TEST_EXTERNAL_TASK_TOPIC)
+      .camundaErrorEventDefinition().id("id").error("myErrorCode", "errorMessage").expression("expression").errorEventDefinitionDone()
+    .endEvent()
+    .moveToActivity(EXTERNAL_TASK_ID)
+    .boundaryEvent("boundary").error("myErrorCode", "errorMessage")
+    .endEvent("boundaryEnd")
+    .done();
+
+    ServiceTask externalTask = modelInstance.getModelElementById(EXTERNAL_TASK_ID);
+    ExtensionElements extensionElements = externalTask.getExtensionElements();
+    Collection<CamundaErrorEventDefinition> errorEventDefinitions = extensionElements.getChildElementsByType(CamundaErrorEventDefinition.class);
+    assertThat(errorEventDefinitions).hasSize(1);
+    CamundaErrorEventDefinition camundaErrorEventDefinition = errorEventDefinitions.iterator().next();
+    assertThat(camundaErrorEventDefinition).isNotNull();
+    assertThat(camundaErrorEventDefinition.getId()).isEqualTo("id");
+    assertThat(camundaErrorEventDefinition.getCamundaExpression()).isEqualTo("expression");
+    assertErrorEventDefinition("boundary", "myErrorCode", "errorMessage");
   }
 
   @Test
@@ -3243,7 +3268,7 @@ public class ProcessBuilderTest {
     CamundaInputOutput camundaInputOutput = element.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult();
     assertThat(camundaInputOutput).isNotNull();
 
-    List<CamundaInputParameter> camundaInputParameters = new ArrayList<CamundaInputParameter>(camundaInputOutput.getCamundaInputParameters());
+    List<CamundaInputParameter> camundaInputParameters = new ArrayList<>(camundaInputOutput.getCamundaInputParameters());
     assertThat(camundaInputParameters).hasSize(2);
 
     CamundaInputParameter camundaInputParameter = camundaInputParameters.get(0);
@@ -3254,7 +3279,7 @@ public class ProcessBuilderTest {
     assertThat(camundaInputParameter.getCamundaName()).isEqualTo("yoo");
     assertThat(camundaInputParameter.getTextContent()).isEqualTo("hoo");
 
-    List<CamundaOutputParameter> camundaOutputParameters = new ArrayList<CamundaOutputParameter>(camundaInputOutput.getCamundaOutputParameters());
+    List<CamundaOutputParameter> camundaOutputParameters = new ArrayList<>(camundaInputOutput.getCamundaOutputParameters());
     assertThat(camundaOutputParameters).hasSize(2);
 
     CamundaOutputParameter camundaOutputParameter = camundaOutputParameters.get(0);
@@ -3307,7 +3332,7 @@ public class ProcessBuilderTest {
     CamundaFormData camundaFormData = element.getExtensionElements().getElementsQuery().filterByType(CamundaFormData.class).singleResult();
     assertThat(camundaFormData).isNotNull();
 
-    List<CamundaFormField> camundaFormFields = new ArrayList<CamundaFormField>(camundaFormData.getCamundaFormFields());
+    List<CamundaFormField> camundaFormFields = new ArrayList<>(camundaFormData.getCamundaFormFields());
     assertThat(camundaFormFields).hasSize(2);
 
     CamundaFormField camundaFormField = camundaFormFields.get(0);
