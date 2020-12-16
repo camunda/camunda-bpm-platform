@@ -224,6 +224,31 @@ pipeline {
             }
           }
         }
+        stage('engine-rest-UNIT-resteasy') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest/', 'clean install -Presteasy', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
         stage('engine-rest-UNIT-resteasy3') {
           when {
             expression {
@@ -240,6 +265,156 @@ pipeline {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 cambpmRunMaven('engine-rest/engine-rest/', 'clean install -Presteasy3', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-UNIT-cxf') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest/', 'clean install -Pcxf', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-UNIT-wink') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest/', 'clean install -Pwink', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-jaxrs2-UNIT-jersey2') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest-jaxrs2/', 'clean install -Pjersey2', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-jaxrs2-UNIT-resteasy3') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest-jaxrs2/', 'clean install -Presteasy3', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-UNIT-compatibility-wildfly') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('engine-rest/engine-rest/', 'clean install -Pwildfly-compatibility,resteasy', runtimeStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-rest-IT-embedded-wildfly') {
+          when {
+            expression {
+              cambpmWithLabels('rest-api')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest', runtimeStash: true, archiveStash: true)
               }
             }
           }
@@ -402,48 +577,48 @@ pipeline {
         }
       }
     }
-    stage('UNIT DB tests') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
-          }
-          axis {
-            name 'STAGE_TYPE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations'
-          }
-        }
-        when {
-          expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.STAGE_TYPE) && cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE, 'cockroachdb'))
-          }
-          beforeAgent true
-        }
-        agent {
-          node {
-            label env.DB
-          }
-        }
-        stages {
-          stage('UNIT test') {
-            steps {
-              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-              catchError(stageResult: 'FAILURE') {
-                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-                }
-              }
-            }
-            post {
-              always {
-                cambpmPublishTestResult();
-              }
-            }
-          }
-        }
-      }
-    }
+//    stage('UNIT DB tests') {
+//      matrix {
+//        axes {
+//          axis {
+//            name 'DB'
+//            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
+//          }
+//          axis {
+//            name 'STAGE_TYPE'
+//            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations'
+//          }
+//        }
+//        when {
+//          expression {
+//            cambpmIsNotFailedStageType(failedStageTypes, env.STAGE_TYPE) && cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE, 'cockroachdb'))
+//          }
+//          beforeAgent true
+//        }
+//        agent {
+//          node {
+//            label env.DB
+//          }
+//        }
+//        stages {
+//          stage('UNIT test') {
+//            steps {
+//              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
+//              catchError(stageResult: 'FAILURE') {
+//                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+//                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
+//                }
+//              }
+//            }
+//            post {
+//              always {
+//                cambpmPublishTestResult();
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
     stage('db tests + CE webapps IT') {
       parallel {
         stage('engine-api-compatibility') {
