@@ -154,8 +154,8 @@ public class DurationHelper {
 
   private Duration parsePnWDuration(String period) {
     String weeks = period.replaceAll("\\D", "");
-    int numberOfWeeks = Integer.parseInt(weeks);
-    return datatypeFactory.newDuration(numberOfWeeks * MS_PER_WEEK);
+    long duration = Long.parseLong(weeks) * MS_PER_WEEK;
+    return datatypeFactory.newDuration(duration);
   }
 
   private boolean isDuration(String time) {

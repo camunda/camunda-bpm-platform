@@ -110,6 +110,39 @@ public class DurationHelperTest {
     assertThat(PnW.getDateAfter()).isEqualTo(parse("19700115-00:00:00"));
   }
 
+  @Test
+  public void shouldParseP4W() throws Exception {
+    // given
+
+    // when
+    DurationHelper PnW = new DurationHelper("P4W", parse("19700101-00:00:00"));
+
+    // then
+    assertThat(PnW.getDateAfter()).isEqualTo(parse("19700129-00:00:00"));
+  }
+
+  @Test
+  public void shouldParseP5W() throws Exception {
+    // given
+
+    // when
+    DurationHelper PnW = new DurationHelper("P5W", parse("19700101-00:00:00"));
+
+    // then
+    assertThat(PnW.getDateAfter()).isEqualTo(parse("19700205-00:00:00"));
+  }
+
+  @Test
+  public void shouldParseP22W() throws Exception {
+    // given
+
+    // when
+    DurationHelper PnW = new DurationHelper("P22W", parse("19700101-00:00:00"));
+
+    // then
+    assertThat(PnW.getDateAfter()).isEqualTo(parse("19700604-00:00:00"));
+  }
+
   private Date parse(String str) throws Exception {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
     return simpleDateFormat.parse(str);
