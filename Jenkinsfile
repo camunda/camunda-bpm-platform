@@ -474,6 +474,33 @@ pipeline {
             }
             failure {
               cambpmAddFailedStageType(failedStageTypes, 'engine-IT-wildfly')
+              cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
+            }
+          }
+        }
+        stage('engine-IT-XA-wildfly-postgresql-96') {
+          when {
+            branch cambpmDefaultBranch();
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'postgresql_96'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+            failure {
+              cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
             }
           }
         }
@@ -760,7 +787,7 @@ pipeline {
             }
           }
         }
-        stage('IT-wildfly-domain') {
+        stage('engine-IT-wildfly-domain') {
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
@@ -785,7 +812,7 @@ pipeline {
             }
           }
         }
-        stage('IT-wildfly-servlet') {
+        stage('engine-IT-wildfly-servlet') {
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
@@ -800,7 +827,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true, qaStash: true)
+                cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
               }
             }
           }
