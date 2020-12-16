@@ -91,7 +91,7 @@
   },
   "createTimes": {
     "type": "array",
-    "itemType": "ConditionQueryParameterDto",
+    "dto": "ConditionQueryParameterDto",
     "desc": "Only select jobs created before or after the given date.
 
              Create time expressions are comma-separated and are structured as
@@ -145,7 +145,7 @@
   "tenantIdIn": {
     "type": "array",
     "itemType": "string",
-    "desc": "Only include jobs which belong to one of the passed and ${listType} tenant ids."
+    "desc": "Only include jobs which belong to one of the passed ${listType} tenant ids."
   },
   "withoutTenantId": {
     "type": "boolean",
