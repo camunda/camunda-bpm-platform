@@ -419,7 +419,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest', runtimeStash: true, archiveStash: true, qaStash: true)
+                cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest', runtimeStash: true, archiveStash: true)
               }
             }
           }
