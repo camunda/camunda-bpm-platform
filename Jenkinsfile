@@ -29,7 +29,9 @@ pipeline {
       steps {
         withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
           nodejs('nodejs-14.6.0'){
-            cambpmRunMaven('.', 'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check')
+            script {
+              cambpmRunMaven('.', 'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check')
+            }
           }
         }
 
