@@ -110,7 +110,7 @@ public class FontImpl extends BpmnModelElementInstanceImpl implements Font {
     return isUnderlineAttribute.getValue(this);
   }
 
-  public void setUnderline(boolean isUnderline) {
+  public void SetUnderline(boolean isUnderline) {
     isUnderlineAttribute.setValue(this, isUnderline);
   }
 
