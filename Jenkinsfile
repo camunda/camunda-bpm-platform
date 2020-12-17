@@ -17,7 +17,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build-TODO') //TODO
+          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
         }
         beforeAgent true
       }
