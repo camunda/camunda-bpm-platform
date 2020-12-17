@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12896-reduce-size']) _
 
 def failedStageTypes = []
 
@@ -244,48 +244,11 @@ pipeline {
       }
     }
     stage('QA DB tests') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'postgresql_96', 'mariadb_100', 'mysql_57' //'postgresql_96', 'postgresql_94', 'postgresql_107', 'postgresql_112', 'postgresql_122', 'mariadb_100', 'mariadb_102', 'mariadb_103', 'mariadb_galera', 'mysql_57', 'oracle_11', 'oracle_12', 'oracle_18', 'oracle_19', 'db2_105', 'db2_111', 'sqlserver_2017', 'sqlserver_2019'
-          }
-          axis {
-            name 'STAGE_TYPE'
-            values 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
-          }
-        }
-        when {
-          expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.STAGE_TYPE) && cambpmWithLabelsList(cambpmGetLabels(env.STAGE_TYPE, 'cockroachdb'))
-          }
-          beforeAgent true
-        }
-        agent {
-          node {
-            label env.DB
-          }
-        }
-        stages {
-          stage("QA test") {
-            steps {
-              echo("QA DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-              catchError(stageResult: 'FAILURE') {
-                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-                }
-              }
-            }
-            post {
-              always {
-                script {
-                  if (!env.STAGE_TYPE.equals('sql-scripts')) {
-                    cambpmPublishTestResult();
-                  }
-                }
-              }
-            }
-          }
+      steps {
+        script {
+          parallel(cambpmGetMatrixStages('daily-db', failedStageTypes, { stageType, dbLabel ->
+            return cambpmWithLabelsList(cambpmGetLabels(stageType, 'cockroachdb'))
+          }))
         }
       }
     }
