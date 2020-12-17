@@ -19,6 +19,7 @@ jobs:
       - name: Bump versions
         uses: camunda/bump-versions-action@v1.7
         with:
+          path: "/examples"
           files: "*/**/pom.xml"
           sliceVersion: 0
           oldVersion: ${{ github.event.inputs.oldVersion }}
