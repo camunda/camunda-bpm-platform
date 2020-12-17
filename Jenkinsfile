@@ -352,7 +352,7 @@ pipeline {
             }
           }
         }
-        stage('webapp-IT-standalone-tomcat') {
+        stage('webapp-IT-standalone-tomcat-9') {
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
