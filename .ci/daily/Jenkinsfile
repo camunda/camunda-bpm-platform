@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-imp-mvn']) _
 
 def failedStageTypes = []
 
@@ -68,11 +68,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('sql-scripts', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('sql-scripts', 'h2')
           }
           post {
             failure {
@@ -91,11 +87,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
-              }
-            }
+            cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
           }
           post {
             always {
@@ -116,11 +108,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('upgrade-database', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('upgrade-database', 'h2')
           }
           post {
             always {
@@ -144,11 +132,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('instance-migration', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('instance-migration', 'h2')
           }
           post {
             always {
@@ -172,11 +156,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('old-engine', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('old-engine', 'h2')
           }
           post {
             always {
@@ -200,11 +180,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('rolling-update', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('rolling-update', 'h2')
           }
           post {
             always {
@@ -226,11 +202,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('large-data-tests', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('large-data-tests', 'h2')
           }
           post {
             always {
@@ -274,11 +246,7 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              catchError(stageResult: 'FAILURE') {
-                withMaven(jdk: env.JDK, maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  cambpmRunMaven('.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly', runtimeStash: true)
-                }
-              }
+              cambpmRunMaven('.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',  env.JDK, runtimeStash: true)
             }
             post {
               always {
@@ -301,8 +269,6 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          //currentBuild.result = 'ABORTED'
-          //currentBuild.description = "Aborted due to connection error"
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }

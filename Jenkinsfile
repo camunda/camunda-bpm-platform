@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-imp-mvn']) _
 
 def failedStageTypes = []
 
@@ -101,11 +101,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('engine-unit', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('engine-unit', 'h2')
           }
           post {
             always {
@@ -129,11 +125,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
           }
           post {
             always {
@@ -157,11 +149,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('webapp-unit', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('webapp-unit', 'h2')
           }
           post {
             always {
@@ -184,11 +172,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
-              }
-            }
+            cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
           }
           post {
             always {
@@ -212,11 +196,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -237,11 +217,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -264,11 +240,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -292,11 +264,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -317,11 +285,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -340,11 +304,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -363,11 +323,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -388,11 +344,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
-              }
-            }
+            cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
           }
           post {
             always {
@@ -413,11 +365,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
-              }
-            }
+            cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
           }
           post {
             always {
@@ -463,11 +411,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
-              }
-            }
+            cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
           }
           post {
             always {
@@ -491,11 +435,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
-              }
-            }
+            cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
           }
           post {
             always {
@@ -516,11 +456,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
-              }
-            }
+            cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
           }
           post {
             always {
@@ -544,13 +480,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                nodejs('nodejs-14.6.0') {
-                  cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', runtimeStash: true)
-                }
-              }
-            }
+            cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
           }
           post {
             always {
@@ -574,11 +504,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
-              }
-            }
+            cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
           }
           post {
             always {
@@ -599,11 +525,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -624,11 +546,7 @@ pipeline {
             }
           }
           steps {
-            catchError(stageResult: 'FAILURE') {
-              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
-              }
-            }
+            cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
           }
           post {
             always {
@@ -650,8 +568,6 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          //currentBuild.result = 'ABORTED'
-          //currentBuild.description = "Aborted due to connection error"
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
