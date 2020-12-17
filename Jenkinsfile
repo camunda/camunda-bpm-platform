@@ -502,6 +502,54 @@ pipeline {
             }
           }
         }
+        stage('webapp-IT-wildfly-h2') {
+          when {
+            expression {
+              cambpmWithLabels('webapp-integration', 'h2')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'chrome_78'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('webapp-IT-standalone-tomcat-9') {
+          when {
+            branch cambpmDefaultBranch();
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'chrome_78'
+            }
+          }
+          steps {
+            catchError(stageResult: 'FAILURE') {
+              withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
+                cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
+              }
+            }
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
         stage('webapp-IT-standalone-wildfly') {
           when {
             branch cambpmDefaultBranch();
