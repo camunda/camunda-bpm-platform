@@ -18,7 +18,8 @@ pipeline {
       steps {
         script {
           parallel(cambpmGetMatrixStages('main-aurora', failedStageTypes, { stageType, dbLabel ->
-            return cambpmWithLabelsList(cambpmGetLabels(stageType, 'cockroachdb'))
+            return true
+//            return cambpmWithLabelsList(cambpmGetLabels(stageType, 'cockroachdb'))
           }))
         }
       }
