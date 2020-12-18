@@ -21,13 +21,17 @@ pipeline {
             }
           }
           steps {
-            sh '.ci/scripts/create-aurora-db.sh'
-            cambpmRunMaven('distro/sql-script/', 'install -Pcheck-sql,postgresql -Ddatabase.host=${PGHOST} -Ddatabase.port=${PGPORT} -Ddatabase.name="${PGDATABASE}" -Ddatabase.username=${PGUSER} -Ddatabase.password=${PGPASSWORD} ', runtimeStash: true, archiveStash: true, qaStash: true)
+            withCredentials([usernamePassword(usernameVariable: 'AURORA_POSTGRES_USR', passwordVariable: 'AURORA_POSTGRES_PSW', credentialsId: 'aws_aurora_postgresql')]) {
+              sh '.ci/scripts/create-aurora-db.sh'
+              cambpmRunMaven('distro/sql-script/', 'install -Pcheck-sql,postgresql -Ddatabase.host=${PGHOST} -Ddatabase.port=${PGPORT} -Ddatabase.name="${PGDATABASE}" -Ddatabase.username=${PGUSER} -Ddatabase.password=${PGPASSWORD} ', runtimeStash: true, archiveStash: true, qaStash: true)
+            }
           }
           post {
             always {
               cambpmPublishTestResult();
-               sh '.ci/scripts/delete-aurora-db.sh'
+               withCredentials([usernamePassword(usernameVariable: 'AURORA_POSTGRES_USR', passwordVariable: 'AURORA_POSTGRES_PSW', credentialsId: 'aws_aurora_postgresql')]) {
+                 sh '.ci/scripts/delete-aurora-db.sh'
+               }
             }
           }
         }
