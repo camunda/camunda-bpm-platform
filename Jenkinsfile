@@ -29,6 +29,7 @@ pipeline {
       steps {
         cambpmRunMaven('.',
             'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
+            withCatch: false,
             withNpm: true)
 
         // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
@@ -76,6 +77,7 @@ pipeline {
           if (cambpmWithLabels('master')) {
             cambpmRunMaven('.',
                 'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
+                withCatch: false,
                 withNpm: true)
           }
         }
