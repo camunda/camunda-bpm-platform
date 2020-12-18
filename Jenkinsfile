@@ -25,7 +25,7 @@ pipeline {
             withCredentials([string(credentialsId: 'aws_aurora_postgresql_107', variable: 'AURORA_POSTGRES_ENDPOINT')]) {
               sh '.ci/scripts/create-aurora-db.sh'
               //sh 'export env.properties'
-              cambpmRunMaven('distro/sql-script/', 'install -Pcheck-sql,postgresql -Ddatabase.host=${PGHOST} -Ddatabase.port=${PGPORT} -Ddatabase.name="${PGDATABASE}" -Ddatabase.username=${PGUSER} -Ddatabase.password=${PGPASSWORD} ')
+              cambpmRunMaven('engine/', 'install -Ppostgresql -Dtest=RuntimeServiceTest -Ddatabase.host=${PGHOST} -Ddatabase.port=${PGPORT} -Ddatabase.name="${PGDATABASE}" -Ddatabase.username=${PGUSER} -Ddatabase.password=${PGPASSWORD} ')
             }
             }
           }
