@@ -23,6 +23,7 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
+          echo 'AGENT WAS DISCONNECTED!'
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
