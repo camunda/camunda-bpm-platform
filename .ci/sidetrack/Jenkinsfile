@@ -96,11 +96,7 @@ pipeline {
           stage('UNIT test') {
             steps {
               echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-              catchError(stageResult: 'FAILURE') {
-                withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-                }
-              }
+              cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
             }
             post {
               always {
@@ -127,8 +123,6 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          //currentBuild.result = 'ABORTED'
-          //currentBuild.description = "Aborted due to connection error"
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
