@@ -1,3 +1,5 @@
+#!/bin/bash
+
 PGHOST=${AURORA_POSTGRES_ENDPOINT%%:*}
 PGPORT=${AURORA_POSTGRES_ENDPOINT##*:}
 echo "PGHOST=${PGHOST}" >> env.properties
