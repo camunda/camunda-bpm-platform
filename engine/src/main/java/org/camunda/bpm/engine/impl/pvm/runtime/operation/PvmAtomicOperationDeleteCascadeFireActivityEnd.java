@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -63,7 +63,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     if (execution.isScope()
         && (executesNonScopeActivity(execution) || isAsyncBeforeActivity(execution))
-        && !CompensationBehavior.executesNonScopeCompensationHandler(execution))  {
+        && !CompensationBehavior.executesNonScopeCompensationHandler(execution)) {
       execution.removeAllTasks();
       // case this is a scope execution and the activity is not a scope
       execution.leaveActivityInstance();
@@ -72,7 +72,8 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     } else {
       if (execution.isScope()) {
-        if(execution instanceof ExecutionEntity && !execution.isProcessInstanceExecution() && execution.isCanceled()) {
+        if(isOutputMappingSkippableForActivity(activity) && execution.isCanceled()) {
+          // output mapping for activity is marked as skippable and was canceled
           execution.setSkipIoMappings(execution.isSkipIoMappings() || execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledTasks());
         }
         execution.destroy();
@@ -124,5 +125,9 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
   public String getCanonicalName() {
     return "delete-cascade-fire-activity-end";
+  }
+
+  private boolean isOutputMappingSkippableForActivity(PvmActivity activity) {
+    return activity != null && activity.getActivityBehavior() instanceof ExternalTaskActivityBehavior;
   }
 }
