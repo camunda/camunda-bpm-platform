@@ -10,7 +10,14 @@
 
   <artifactId>camunda-engine-dmn</artifactId>
   <name>camunda DMN - engine</name>
-
+  <properties>
+    <camunda.osgi.symbolic.name>org.camunda.bpm.dmn.engine</camunda.osgi.symbolic.name>
+    <camunda.osgi.export>org.camunda.bpm.dmn.engine.*;-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.import.pkg>
+      org.junit.*;resolution:=optional,
+      *
+    </camunda.osgi.import.pkg>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.camunda.commons</groupId>
@@ -106,14 +113,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>
-              org.junit*;resolution:=optional,
-              *
-            </Import-Package>
-          </instructions>
-        </configuration>
         <executions>
           <execution>
             <id>bundle-manifest</id>

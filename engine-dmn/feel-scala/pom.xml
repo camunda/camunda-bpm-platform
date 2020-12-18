@@ -9,7 +9,13 @@
 
   <artifactId>camunda-engine-feel-scala</artifactId>
   <name>camunda DMN - engine FEEL - SCALA</name>
-
+  <properties>
+    <camunda.osgi.symbolic.name>${project.artifactId}</camunda.osgi.symbolic.name>
+    <camunda.osgi.export>org.camunda.bpm.dmn.feel.impl.scala.*;-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.import.pkg>
+      *
+    </camunda.osgi.import.pkg>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -63,5 +69,27 @@
     </dependency>
 
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

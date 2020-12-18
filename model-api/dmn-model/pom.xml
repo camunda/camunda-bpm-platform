@@ -13,7 +13,10 @@
 
   <name>camunda BPM - DMN Model API</name>
   <inceptionYear>2015</inceptionYear>
-
+  <properties>
+    <camunda.osgi.symbolic.name>org.camunda.bpm.model.dmn</camunda.osgi.symbolic.name>
+    <camunda.osgi.export>org.camunda.bpm.model.dmn.*;-noimport:=true</camunda.osgi.export>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -46,11 +49,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package>org.camunda.bpm.model*</Export-Package>
-          </instructions>
-        </configuration>
         <executions>
           <execution>
             <phase>generate-sources</phase>

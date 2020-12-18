@@ -15,8 +15,9 @@
     <!-- We shade artifacts into the jar, so we need to generate 
     a dependency BOM for the license book -->
     <skip-third-party-bom>false</skip-third-party-bom>
+    <camunda.osgi.symbolic.name>${project.artifactId}</camunda.osgi.symbolic.name>
+    <camunda.osgi.export>org.camunda.bpm.dmn.feel.impl.juel.*;-noimport:=true</camunda.osgi.export>
   </properties>
-  
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
@@ -112,10 +113,6 @@
         <configuration>
           <unpackBundle>false</unpackBundle>
           <instructions>
-            <Export-Package>
-              !${project.groupId}.feel.impl,
-              ${project.groupId}*
-            </Export-Package>
             <Import-Package>
               !de.odysseus.el*,
               !javax.el,

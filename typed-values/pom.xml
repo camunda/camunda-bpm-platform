@@ -24,7 +24,14 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  <properties>
+    <camunda.osgi.symbolic.name>org.camunda.bpm.engine.variable</camunda.osgi.symbolic.name>
+    <camunda.osgi.export>org.camunda.bpm.engine.variable.*;-noimport:=true</camunda.osgi.export>
+    <camunda.osgi.import.pkg>
+      !javax.activation,
+      *
+    </camunda.osgi.import.pkg>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -128,6 +135,25 @@
                 </relocation>
               </relocations>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
