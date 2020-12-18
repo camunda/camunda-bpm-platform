@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12896-reduce-size']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 /**
  * A method to perform a custom evaluation if certain stages in the Side track pipeline
