@@ -67,7 +67,6 @@
                            "id": "someId",
                            "name": "amount",
                            "type": "Integer",
-                           "variableType": "integer",
                            "value": 5,
                            "processDefinitionId": "aProcessDefinitionId",
                            "processInstanceId": "aProcessInstanceId",
@@ -75,7 +74,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "serializationConfig": null,
                            "errorMessage": null,
                            "tenantId": null
                          },
@@ -83,7 +81,6 @@
                            "id": "someOtherId",
                            "name": "amount",
                            "type": "Integer",
-                           "variableType": "integer",
                            "value": 15,
                            "processDefinitionId": "aProcessDefinitionId",
                            "processInstanceId": "aProcessInstanceId",
@@ -91,7 +88,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "serializationConfig": null,
                            "errorMessage": null,
                            "tenantId": null
                          },
@@ -99,7 +95,6 @@
                            "id": "yetAnotherId",
                            "name": "amount",
                            "type": "Integer",
-                           "variableType": "integer",
                            "value": 150,
                            "processDefinitionId": "aProcessDefinitionId",
                            "processInstanceId": "anotherProcessInstanceId",
@@ -107,7 +102,6 @@
                            "taskId": null,
                            "batchId": null,
                            "activityInstanceId": "Task_2:b68b71ca-e310-11e2-beb0-f0def1557726",
-                           "serializationConfig": null,
                            "errorMessage": null,
                            "tenantId": null
                          }
