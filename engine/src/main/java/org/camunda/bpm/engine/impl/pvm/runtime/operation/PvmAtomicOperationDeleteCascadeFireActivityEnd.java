@@ -72,8 +72,8 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     } else {
       if (execution.isScope()) {
-        if(isOutputMappingSkippableForActivity(activity) && execution.isCanceled()) {
-          // output mapping for activity is marked as skippable and was canceled
+        if(execution.isCanceled() && isOutputMappingSkippableForActivity(activity)) {
+          // execution was canceled and output mapping for activity is marked as skippable
           execution.setSkipIoMappings(execution.isSkipIoMappings() || execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledTasks());
         }
         execution.destroy();
