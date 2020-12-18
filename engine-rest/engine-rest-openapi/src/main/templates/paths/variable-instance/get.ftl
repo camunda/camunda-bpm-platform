@@ -55,6 +55,7 @@
                            "caseExecutionId": null,
                            "caseInstanceId": null,
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          },
                          {
@@ -72,6 +73,7 @@
                            "caseExecutionId": null,
                            "caseInstanceId": null,
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          },
                          {
@@ -89,6 +91,7 @@
                            "caseExecutionId": null,
                            "caseInstanceId": null,
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          }
                        ]

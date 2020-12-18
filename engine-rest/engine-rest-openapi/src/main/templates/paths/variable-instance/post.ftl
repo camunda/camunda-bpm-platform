@@ -76,6 +76,7 @@
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          },
                          {
@@ -91,6 +92,7 @@
                            "batchId": null,
                            "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          },
                          {
@@ -106,6 +108,7 @@
                            "batchId": null,
                            "activityInstanceId": "Task_2:b68b71ca-e310-11e2-beb0-f0def1557726",
                            "serializationConfig": null,
+                           "errorMessage": null,
                            "tenantId": null
                          }
                        ]
