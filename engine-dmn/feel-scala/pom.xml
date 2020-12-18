@@ -10,11 +10,7 @@
   <artifactId>camunda-engine-feel-scala</artifactId>
   <name>camunda DMN - engine FEEL - SCALA</name>
   <properties>
-    <camunda.osgi.symbolic.name>${project.artifactId}</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.dmn.feel.impl.scala.*;-noimport:=true</camunda.osgi.export>
-    <camunda.osgi.import.pkg>
-      *
-    </camunda.osgi.import.pkg>
+    <camunda.artifact>org.camunda.bpm.dmn.feel.impl.scala</camunda.artifact>
   </properties>
   <dependencies>
 

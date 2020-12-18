@@ -14,12 +14,11 @@
   <name>camunda BPM - Xml Model API</name>
   <inceptionYear>2014</inceptionYear>
   <properties>
-    <camunda.osgi.symbolic.name>org.camunda.bpm.model.xml</camunda.osgi.symbolic.name>
+    <camunda.artifact>org.camunda.bpm.model.xml</camunda.artifact>
     <camunda.osgi.import.additional>
       org.assertj.*;resolution:=optional,
       org.junit.*;resolution:=optional
     </camunda.osgi.import.additional>
-    <camunda.osgi.export>org.camunda.bpm.model.xml.*;-noimport:=true</camunda.osgi.export>
   </properties>
   <dependencies>
 

@@ -11,12 +11,10 @@
   <artifactId>camunda-engine-dmn</artifactId>
   <name>camunda DMN - engine</name>
   <properties>
-    <camunda.osgi.symbolic.name>org.camunda.bpm.dmn.engine</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.dmn.engine.*;-noimport:=true</camunda.osgi.export>
-    <camunda.osgi.import.pkg>
-      org.junit.*;resolution:=optional,
-      *
-    </camunda.osgi.import.pkg>
+    <camunda.artifact>org.camunda.bpm.dmn.engine</camunda.artifact>
+    <camunda.osgi.import.additional>
+      org.junit.*;resolution:=optional
+    </camunda.osgi.import.additional>
   </properties>
   <dependencies>
     <dependency>

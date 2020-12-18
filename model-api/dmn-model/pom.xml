@@ -14,8 +14,7 @@
   <name>camunda BPM - DMN Model API</name>
   <inceptionYear>2015</inceptionYear>
   <properties>
-    <camunda.osgi.symbolic.name>org.camunda.bpm.model.dmn</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.model.dmn.*;-noimport:=true</camunda.osgi.export>
+    <camunda.artifact>org.camunda.bpm.model.dmn</camunda.artifact>
   </properties>
   <dependencies>
 

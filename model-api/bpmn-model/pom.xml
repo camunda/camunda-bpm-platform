@@ -14,8 +14,11 @@
   <name>camunda BPM - BPMN Model API</name>
   <inceptionYear>2014</inceptionYear>
   <properties>
-    <camunda.osgi.symbolic.name>org.camunda.bpm.model.bpmn</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.model.bpmn.*;-noimport:=true</camunda.osgi.export>
+    <camunda.artifact>org.camunda.bpm.model.bpmn</camunda.artifact>
+    <camunda.osgi.export>
+      !org.camunda.bpm.model.bpmn.schema,
+      ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true
+    </camunda.osgi.export>
   </properties>
   <dependencies>
 

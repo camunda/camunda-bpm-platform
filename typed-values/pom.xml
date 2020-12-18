@@ -25,8 +25,7 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <camunda.osgi.symbolic.name>org.camunda.bpm.engine.variable</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.engine.variable.*;-noimport:=true</camunda.osgi.export>
+    <camunda.artifact>org.camunda.bpm.engine.variable</camunda.artifact>
     <camunda.osgi.import.pkg>
       !javax.activation,
       *

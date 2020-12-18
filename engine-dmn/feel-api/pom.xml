@@ -11,8 +11,7 @@
   <artifactId>camunda-engine-feel-api</artifactId>
   <name>camunda DMN - engine FEEL - API</name>
   <properties>
-    <camunda.osgi.symbolic.name>${project.artifactId}</camunda.osgi.symbolic.name>
-    <camunda.osgi.export>org.camunda.bpm.dmn.feel.impl.*;-noimport:=true</camunda.osgi.export>
+    <camunda.artifact>org.camunda.bpm.dmn.feel.impl</camunda.artifact>
   </properties>
   <dependencies>
     <dependency>
