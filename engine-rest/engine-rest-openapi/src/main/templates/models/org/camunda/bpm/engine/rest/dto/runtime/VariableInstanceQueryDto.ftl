@@ -6,7 +6,9 @@
 
     "sorting": {
       "type": "array",
-      "description": "Apply sorting of the result",
+      "description": "An array of criteria to sort the result by. Each element of the array is an object that specifies one ordering.
+                      The position in the array identifies the rank of an ordering, i.e., whether it is primary, secondary, etc.
+                      Sorting has no effect for `count` endpoints",
       "items":
 
         <#assign last = true >

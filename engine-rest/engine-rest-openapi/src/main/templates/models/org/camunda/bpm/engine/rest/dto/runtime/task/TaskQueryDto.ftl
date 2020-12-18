@@ -651,7 +651,7 @@
                                   '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
         <#assign sortParamsDto = "SortTaskQueryParametersDto" >
         <#include "/lib/commons/sort-props.ftl" >
-
+        <#assign sortParamsDto = "" >
     }
 
 </@lib.dto>
