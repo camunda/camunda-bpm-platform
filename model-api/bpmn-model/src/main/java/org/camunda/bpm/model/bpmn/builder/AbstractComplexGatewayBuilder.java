@@ -24,7 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 /**
  * @author Sebastian Menski
  */
-public class AbstractComplexGatewayBuilder<B extends AbstractComplexGatewayBuilder<B>> extends AbstractGatewayBuilder<B, ComplexGateway> {
+public abstract class AbstractComplexGatewayBuilder<B extends AbstractComplexGatewayBuilder<B>> extends AbstractGatewayBuilder<B, ComplexGateway> {
 
   protected AbstractComplexGatewayBuilder(BpmnModelInstance modelInstance, ComplexGateway element, Class<?> selfType) {
     super(modelInstance, element, selfType);

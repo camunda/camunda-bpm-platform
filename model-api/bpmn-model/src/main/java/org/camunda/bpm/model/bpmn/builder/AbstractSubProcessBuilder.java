@@ -22,7 +22,7 @@ import org.camunda.bpm.model.bpmn.instance.SubProcess;
 /**
  * @author Sebastian Menski
  */
-public class AbstractSubProcessBuilder<B extends AbstractSubProcessBuilder<B>> extends  AbstractActivityBuilder<B, SubProcess> {
+public abstract class AbstractSubProcessBuilder<B extends AbstractSubProcessBuilder<B>> extends  AbstractActivityBuilder<B, SubProcess> {
 
   protected AbstractSubProcessBuilder(BpmnModelInstance modelInstance, SubProcess element, Class<?> selfType) {
     super(modelInstance, element, selfType);

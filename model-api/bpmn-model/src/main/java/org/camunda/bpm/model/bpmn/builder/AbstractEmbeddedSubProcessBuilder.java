@@ -20,7 +20,7 @@ package org.camunda.bpm.model.bpmn.builder;
  * @author Sebastian Menski
  */
 @SuppressWarnings("rawtypes")
-public class AbstractEmbeddedSubProcessBuilder<B extends AbstractEmbeddedSubProcessBuilder<B, E>, E extends AbstractSubProcessBuilder> {
+public abstract class AbstractEmbeddedSubProcessBuilder<B extends AbstractEmbeddedSubProcessBuilder<B, E>, E extends AbstractSubProcessBuilder> {
 
   protected final E subProcessBuilder;
   protected final B myself;

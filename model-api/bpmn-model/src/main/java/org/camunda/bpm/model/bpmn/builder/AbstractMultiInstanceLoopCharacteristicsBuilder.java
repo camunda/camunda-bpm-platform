@@ -26,7 +26,7 @@ import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
  * @author Thorben Lindhauer
  *
  */
-public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractMultiInstanceLoopCharacteristicsBuilder<B>>
+public abstract class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractMultiInstanceLoopCharacteristicsBuilder<B>>
   extends AbstractBaseElementBuilder<B, MultiInstanceLoopCharacteristics>{
 
   protected AbstractMultiInstanceLoopCharacteristicsBuilder(BpmnModelInstance modelInstance, MultiInstanceLoopCharacteristics element, Class<?> selfType) {

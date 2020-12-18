@@ -24,7 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 
-public class AbstractEventSubProcessBuilder <B extends AbstractEventSubProcessBuilder<B>> extends  AbstractFlowElementBuilder<B, SubProcess> {
+public abstract class AbstractEventSubProcessBuilder <B extends AbstractEventSubProcessBuilder<B>> extends  AbstractFlowElementBuilder<B, SubProcess> {
 
   protected AbstractEventSubProcessBuilder(BpmnModelInstance modelInstance, SubProcess element, Class<?> selfType) {
     super(modelInstance, element, selfType);

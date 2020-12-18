@@ -24,7 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
 /**
  * @author Sebastian Menski
  */
-public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B>> extends AbstractActivityBuilder<B, CallActivity> {
+public abstract class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B>> extends AbstractActivityBuilder<B, CallActivity> {
 
   protected AbstractCallActivityBuilder(BpmnModelInstance modelInstance, CallActivity element, Class<?> selfType) {
     super(modelInstance, element, selfType);

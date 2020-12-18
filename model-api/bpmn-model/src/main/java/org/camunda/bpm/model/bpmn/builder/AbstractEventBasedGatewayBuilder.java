@@ -23,7 +23,7 @@ import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
 /**
  * @author Sebastian Menski
  */
-public class AbstractEventBasedGatewayBuilder<B extends AbstractEventBasedGatewayBuilder<B>> extends AbstractGatewayBuilder<B, EventBasedGateway> {
+public abstract class AbstractEventBasedGatewayBuilder<B extends AbstractEventBasedGatewayBuilder<B>> extends AbstractGatewayBuilder<B, EventBasedGateway> {
 
   protected AbstractEventBasedGatewayBuilder(BpmnModelInstance modelInstance, EventBasedGateway element, Class<?> selfType) {
     super(modelInstance, element, selfType);

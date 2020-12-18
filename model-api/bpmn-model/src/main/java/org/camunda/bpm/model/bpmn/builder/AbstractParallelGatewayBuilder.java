@@ -22,7 +22,7 @@ import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
 /**
  * @author Sebastian Menski
  */
-public class AbstractParallelGatewayBuilder<B extends AbstractParallelGatewayBuilder<B>> extends AbstractGatewayBuilder<B, ParallelGateway> {
+public abstract class AbstractParallelGatewayBuilder<B extends AbstractParallelGatewayBuilder<B>> extends AbstractGatewayBuilder<B, ParallelGateway> {
 
   protected AbstractParallelGatewayBuilder(BpmnModelInstance modelInstance, ParallelGateway element, Class<?> selfType) {
     super(modelInstance, element, selfType);

@@ -24,7 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.Transaction;
  * @author Thorben Lindhauer
  *
  */
-public class AbstractTransactionBuilder<B extends AbstractTransactionBuilder<B>> extends  AbstractSubProcessBuilder<B> {
+public abstract class AbstractTransactionBuilder<B extends AbstractTransactionBuilder<B>> extends  AbstractSubProcessBuilder<B> {
 
   protected AbstractTransactionBuilder(BpmnModelInstance modelInstance, Transaction element, Class<?> selfType) {
     super(modelInstance, element, selfType);

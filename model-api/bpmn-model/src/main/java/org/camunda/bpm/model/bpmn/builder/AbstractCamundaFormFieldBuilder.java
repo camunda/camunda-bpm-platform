@@ -24,7 +24,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
  * @author Kristin Polenz
  *
  */
-public class AbstractCamundaFormFieldBuilder<P, B extends AbstractCamundaFormFieldBuilder<P, B>> 
+public abstract class AbstractCamundaFormFieldBuilder<P, B extends AbstractCamundaFormFieldBuilder<P, B>> 
   extends AbstractBpmnModelElementBuilder<B, CamundaFormField> {
 
   protected BaseElement parent;
