@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@retry-stage']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@db-mssql']) _
 
 def failedStageTypes = []
 
@@ -23,7 +23,6 @@ pipeline {
     always {
       script {
         if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          echo 'AGENT WAS DISCONNECTED!'
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
