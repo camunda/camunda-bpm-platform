@@ -27,11 +27,9 @@ pipeline {
         }
       }
       steps {
-        withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-          nodejs('nodejs-14.6.0'){
-            cambpmRunMaven('.', 'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check')
-          }
-        }
+        cambpmRunMaven('.',
+            'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
+            withNpm: true)
 
         // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
         // add a new line for each group of artifacts
@@ -76,11 +74,9 @@ pipeline {
           }
 
           if (cambpmWithLabels('master')) {
-            withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-              nodejs('nodejs-14.6.0'){
-                cambpmRunMaven('.', 'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true')
-              }
-            }
+            cambpmRunMaven('.',
+                'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
+                withNpm: true)
           }
         }
 

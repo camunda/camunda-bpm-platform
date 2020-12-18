@@ -246,7 +246,10 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              cambpmRunMaven('.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',  env.JDK, runtimeStash: true)
+              cambpmRunMaven('.',
+                  'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
+                  jdkVersion: env.JDK,
+                  runtimeStash: true)
             }
             post {
               always {
