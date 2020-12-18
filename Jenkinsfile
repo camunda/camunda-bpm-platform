@@ -31,9 +31,10 @@ pipeline {
           }
           post {
             always {
-              cambpmPublishTestResult();
                withCredentials([usernamePassword(usernameVariable: 'AURORA_POSTGRES_USR', passwordVariable: 'AURORA_POSTGRES_PSW', credentialsId: 'aws_aurora_postgresql')]) {
+               withCredentials([string(credentialsId: 'aws_aurora_postgresql_107', variable: 'AURORA_POSTGRES_ENDPOINT')]) {
                  sh '.ci/scripts/delete-aurora-db.sh'
+               }
                }
             }
           }
