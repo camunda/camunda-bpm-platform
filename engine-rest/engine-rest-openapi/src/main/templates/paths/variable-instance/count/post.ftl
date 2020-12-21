@@ -19,7 +19,7 @@
       examples = ['"example-1": {
                      "summary": "POST `/variable-instance/count`",
                      "value": {
-                       "variableValuess": [
+                       "variableValues": [
                          {
                            "name": "amount",
                            "operator": "gteq",
@@ -56,7 +56,8 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Returned if some of the query parameters are invalid. See the
+        desc = "Returned if some of the query parameters are invalid, for example if an invalid operator for variable
+                comparison is used. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format."
         last = true
