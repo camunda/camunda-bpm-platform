@@ -27,7 +27,7 @@
     "dmn-js-drd": "8.0.2",
     "dmn-js-literal-expression": "8.0.2",
     "dmn-js-shared": "8.0.2",
-    "fast-xml-parser": "3.16.0",
+    "fast-xml-parser": "3.17.6",
     "jquery": "3.5.0",
     "jquery-ui": "1.12.1",
     "moment": "2.24.0",
