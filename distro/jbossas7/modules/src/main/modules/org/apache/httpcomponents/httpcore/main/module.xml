@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.httpcore">
   <resources>
-    <resource-root path="httpcore-4.4.11.jar" />
+    <resource-root path="httpcore-4.4.13.jar" />
   </resources>
 
   <dependencies>

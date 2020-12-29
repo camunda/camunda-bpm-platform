@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.httpclient">
   <resources>
-    <resource-root path="httpclient-4.5.9.jar" />
+    <resource-root path="httpclient-4.5.13.jar" />
   </resources>
 
   <dependencies>
