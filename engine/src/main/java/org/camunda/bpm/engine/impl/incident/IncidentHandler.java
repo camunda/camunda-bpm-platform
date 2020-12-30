@@ -46,18 +46,18 @@ public interface IncidentHandler {
   public Incident handleIncident(IncidentContext context, String message);
 
   /**
-   * Called in situations in which an incidenthandler may wich to resolve existing incidents
+   * Called in situations in which an incident handler may wish to resolve existing incidents
    * The implementation receives this callback to enable it to resolve any open incidents that
    * may exist.
    */
   public void resolveIncident(IncidentContext context);
 
   /**
-   * Called in situations in which an incidenthandler may wich to delete existing incidents
+   * Called in situations in which an incident handler may wish to delete existing incidents
    * Example: when a scope is ended or a job is deleted. The implementation receives
    * this callback to enable it to delete any open incidents that may exist.
    */
   public void deleteIncident(IncidentContext context);
 
 }
- 
+

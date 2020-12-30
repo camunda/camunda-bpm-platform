@@ -42,9 +42,9 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -81,7 +81,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Roman Smirnov
  * @author Sebastian Menski
  */
-public abstract class PvmExecutionImpl extends CoreExecution implements ActivityExecution, PvmProcessInstance {
+public abstract class PvmExecutionImpl extends CoreExecution implements
+  ActivityExecution, PvmProcessInstance {
 
   private static final long serialVersionUID = 1L;
 
@@ -256,13 +257,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void start() {
     start(null);
   }
-  
+
 
   @Override
   public void start(Map<String, Object> variables) {
     start(variables, null);
   }
-  
+
   public void startWithFormProperties(VariableMap formProperties) {
     start(null, formProperties);
   }
@@ -2207,6 +2208,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public Incident createIncident(String incidentType, String configuration, String message) {
+    IncidentContext incidentContext = createIncidentContext(configuration);
+
+    return IncidentHandling.createIncident(incidentType, incidentContext, message);
+  }
+
+  protected IncidentContext createIncidentContext(String configuration) {
     IncidentContext incidentContext = new IncidentContext();
 
     incidentContext.setTenantId(this.getTenantId());
@@ -2215,12 +2222,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     incidentContext.setActivityId(this.getActivityId());
     incidentContext.setConfiguration(configuration);
 
-    IncidentHandler incidentHandler = findIncidentHandler(incidentType);
-
-    if (incidentHandler == null) {
-      incidentHandler = new DefaultIncidentHandler(incidentType);
-    }
-    return incidentHandler.handleIncident(incidentContext, message);
+    return incidentContext;
   }
 
 
@@ -2236,13 +2238,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         .getIncidentManager()
         .findIncidentById(incidentId);
 
-    IncidentHandler incidentHandler = findIncidentHandler(incident.getIncidentType());
-
-    if (incidentHandler == null) {
-      incidentHandler = new DefaultIncidentHandler(incident.getIncidentType());
-    }
     IncidentContext incidentContext = new IncidentContext(incident);
-    incidentHandler.resolveIncident(incidentContext);
+    IncidentHandling.removeIncidents(incident.getIncidentType(), incidentContext, true);
   }
 
   public IncidentHandler findIncidentHandler(String incidentType) {

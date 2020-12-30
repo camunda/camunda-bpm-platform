@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +38,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
-import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -44,15 +47,13 @@ import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
-
 /**
  * @author Thorben Lindhauer
  * @author Askar Akhmerov
  *
  */
-public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision, HasDbReferences {
+public class ExternalTaskEntity implements ExternalTask, DbEntity,
+  HasDbRevision, HasDbReferences {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
@@ -86,7 +87,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
   protected String tenantId;
   protected long priority;
-  
+
   protected Map<String, String> extensionProperties;
 
   protected ExecutionEntity execution;
@@ -234,7 +235,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
-  
+
   public Map<String, String> getExtensionProperties() {
     return extensionProperties;
   }
@@ -332,11 +333,11 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public void delete() {
-    deleteFromExecutionAndRuntimeTable();
+    deleteFromExecutionAndRuntimeTable(false);
     produceHistoricExternalTaskDeletedEvent();
   }
 
-  protected void deleteFromExecutionAndRuntimeTable() {
+  protected void deleteFromExecutionAndRuntimeTable(boolean incidentResolved) {
     getExecution().removeExternalTask(this);
 
     CommandContext commandContext = Context.getCommandContext();
@@ -349,6 +350,13 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     if (errorDetailsByteArrayId != null) {
       commandContext.getByteArrayManager().deleteByteArrayById(errorDetailsByteArrayId);
     }
+
+    removeIncidents(incidentResolved);
+  }
+
+  protected void removeIncidents(boolean incidentResolved) {
+    IncidentContext incidentContext = createIncidentContext();
+    IncidentHandling.removeIncidents(Incident.EXTERNAL_TASK_HANDLER_TYPE, incidentContext, incidentResolved);
   }
 
   public void complete(Map<String, Object> variables, Map<String, Object> localVariables) {
@@ -364,7 +372,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       associatedExecution.setVariablesLocal(localVariables);
     }
 
-    deleteFromExecutionAndRuntimeTable();
+    deleteFromExecutionAndRuntimeTable(true);
 
     produceHistoricExternalTaskSuccessfulEvent();
 
@@ -417,28 +425,17 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       createIncident();
     }
     else if (!areRetriesLeft() && retries > 0) {
-      removeIncident();
+      removeIncidents(true);
     }
 
     setRetries(retries);
   }
 
   protected void createIncident() {
-    IncidentHandler incidentHandler = Context
-        .getProcessEngineConfiguration()
-        .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
-
     IncidentContext incidentContext = createIncidentContext();
     incidentContext.setHistoryConfiguration(getLastFailureLogId());
-    incidentHandler.handleIncident(incidentContext, errorMessage);
-  }
 
-  protected void removeIncident() {
-    IncidentHandler handler = Context
-        .getProcessEngineConfiguration()
-        .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
-
-    handler.resolveIncident(createIncidentContext());
+    IncidentHandling.createIncident(Incident.EXTERNAL_TASK_HANDLER_TYPE, incidentContext, errorMessage);
   }
 
   protected IncidentContext createIncidentContext() {
@@ -472,7 +469,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void ensureExecutionInitialized(boolean validateExistence) {
     if (execution == null) {
       execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
-      
+
       if (validateExistence) {
         EnsureUtil.ensureNotNull(
             "Cannot find execution with id " + executionId + " for external task " + id,
