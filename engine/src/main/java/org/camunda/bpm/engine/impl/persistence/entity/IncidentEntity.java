@@ -413,16 +413,17 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   }
 
   public void setExecution(ExecutionEntity execution) {
+    ExecutionEntity oldExecution = getExecution();
+    if (oldExecution != null) {
+      oldExecution.removeIncident(this);
+    }
+
     if (execution != null) {
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
       execution.addIncident(this);
     }
     else {
-      ExecutionEntity oldExecution = getExecution();
-      if (oldExecution != null) {
-        oldExecution.removeIncident(this);
-      }
       executionId = null;
       processInstanceId = null;
     }
