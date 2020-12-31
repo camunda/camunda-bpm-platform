@@ -179,6 +179,24 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
+  public final void shouldEventExecutionWhenBoundaryEventExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent");
+
+    // then 7
+    // 1 for process (start)
+    // 3 for service task (start, take, end)
+    // 2 for end event (start, end)
+    // 1 for process (end)
+    int expectedCount = 1 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
   public final void shouldEventHistoryTaskAssignmentChanges() {
     // given
     startEventingInstance();
