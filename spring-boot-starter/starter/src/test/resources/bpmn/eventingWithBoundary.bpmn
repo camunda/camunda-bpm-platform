@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1lmgbl7" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.6.0">
+  <bpmn:process id="eventingWithBoundaryEvent" name="eventingWithBoundaryEvent" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0ndk8rv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ndk8rv" sourceRef="StartEvent_1" targetRef="IntermediateSignalCatchEvent" />
+    <bpmn:endEvent id="EndEvent_11s18x7">
+      <bpmn:incoming>SequenceFlow_174pps9</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1juyzhf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1juyzhf" sourceRef="service_task" targetRef="EndEvent_11s18x7" />
+    <bpmn:sequenceFlow id="SequenceFlow_174pps9" sourceRef="ErrorBoundaryEvent" targetRef="EndEvent_11s18x7" />
+    <bpmn:sequenceFlow id="SequenceFlow_19tspdp" sourceRef="IntermediateSignalCatchEvent" targetRef="service_task" />
+    <bpmn:intermediateCatchEvent id="IntermediateSignalCatchEvent">
+      <bpmn:incoming>SequenceFlow_0ndk8rv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_19tspdp</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1x29vt7" signalRef="Signal_0i6schd" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:boundaryEvent id="ErrorBoundaryEvent" name="Error Boundary Event" attachedToRef="service_task">
+      <bpmn:outgoing>SequenceFlow_174pps9</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1v71gzr" errorRef="Error_0sbs2cc" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="service_task" name="execute service&#10;task" camunda:delegateExpression="${boundaryEventServiceTask}">
+      <bpmn:incoming>SequenceFlow_19tspdp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1juyzhf</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:message id="Message_18nmhqy" name="TestMessage" />
+  <bpmn:signal id="Signal_0i6schd" name="countSignal" />
+  <bpmn:error id="Error_0sbs2cc" name="testError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="eventingWithBoundaryEvent">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="158" y="101" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ndk8rv_di" bpmnElement="SequenceFlow_0ndk8rv">
+        <di:waypoint x="194" y="119" />
+        <di:waypoint x="232" y="119" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_11s18x7_di" bpmnElement="EndEvent_11s18x7">
+        <dc:Bounds x="544" y="101" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1juyzhf_di" bpmnElement="SequenceFlow_1juyzhf">
+        <di:waypoint x="420" y="119" />
+        <di:waypoint x="544" y="119" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_174pps9_di" bpmnElement="SequenceFlow_174pps9">
+        <di:waypoint x="400" y="177" />
+        <di:waypoint x="400" y="197" />
+        <di:waypoint x="562" y="197" />
+        <di:waypoint x="562" y="137" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_19tspdp_di" bpmnElement="SequenceFlow_19tspdp">
+        <di:waypoint x="268" y="119" />
+        <di:waypoint x="320" y="119" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_111e2ck_di" bpmnElement="IntermediateSignalCatchEvent">
+        <dc:Bounds x="232" y="101" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_175ujpm_di" bpmnElement="ErrorBoundaryEvent">
+        <dc:Bounds x="382" y="141" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="364" y="184" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_09wppgw_di" bpmnElement="service_task">
+        <dc:Bounds x="320" y="79" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

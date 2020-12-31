@@ -83,7 +83,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, boolean interrupting, ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
@@ -93,17 +93,17 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
   public void parseBoundarySignalEventDefinition(Element signalEventDefinition, boolean interrupting, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
@@ -118,7 +118,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
@@ -148,12 +148,12 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
   public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
@@ -163,7 +163,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl activity) {
-    addExecutionListener(activity);
+    // Do not implement. Start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
