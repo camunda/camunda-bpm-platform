@@ -420,10 +420,10 @@ public abstract class ProcessEngineConfiguration {
   protected TelemetryRegistry telemetryRegistry;
 
   /**
-   * On failing tasks we can skip output mapping. This might be helpful if output mapping uses variables that might not
+   * On failing activities we can skip output mapping. This might be helpful if output mapping uses variables that might not
    * be available on failure (e.g. with external tasks or RPA tasks).
    */
-  protected boolean skipOutputMappingOnCanceledTasks = false;
+  protected boolean skipOutputMappingOnCanceledActivities = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -1105,11 +1105,11 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public boolean isSkipOutputMappingOnCanceledTasks() {
-    return skipOutputMappingOnCanceledTasks;
+  public boolean isSkipOutputMappingOnCanceledActivities() {
+    return skipOutputMappingOnCanceledActivities;
   }
 
-  public void setSkipOutputMappingOnCanceledTasks(boolean skipOutputMappingOnCanceledTasks) {
-    this.skipOutputMappingOnCanceledTasks = skipOutputMappingOnCanceledTasks;
+  public void setSkipOutputMappingOnCanceledActivities(boolean skipOutputMappingOnCanceledActivities) {
+    this.skipOutputMappingOnCanceledActivities = skipOutputMappingOnCanceledActivities;
   }
 }

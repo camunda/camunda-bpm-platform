@@ -103,7 +103,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   @After
   public void tearDown() throws Exception {
     ClockUtil.reset();
-    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(false);
+    processEngineConfiguration.setSkipOutputMappingOnCanceledActivities(false);
   }
 
   @Test
@@ -1360,45 +1360,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     externalTaskService.complete(task.getId(), WORKER_ID);
 
     testRule.assertProcessEnded(processInstance.getId());
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.oneExternalTaskWithOutputMappingAndCatchingErrorBoundaryEvent.bpmn")
-  public void shouldSkipOutputMappingOnBpmnErrorAtExternalTask() {
-    // given a process with one external task which has output mapping configured
-    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(true);
-    runtimeService.startProcessInstanceByKey("externalTaskProcess");
-
-    // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
-      .topic(TOPIC_NAME, LOCK_TIME)
-      .execute();
-    assertThat(externalTasks).hasSize(1);
-    externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "errorCode", null);
-
-    // then
-    // expect no mapping failure
-    // error was caught
-    // output mapping is skipped
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertThat(userTask).isNotNull();
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.oneExternalTaskWithOutputMappingAndCatchingErrorBoundaryEvent.bpmn")
-  public void shouldNotSkipOutputMappingOnBpmnErrorAtExternalTask() {
-    // given a process with one external task which has output mapping configured
-    processEngineConfiguration.setSkipOutputMappingOnCanceledTasks(false);
-    runtimeService.startProcessInstanceByKey("externalTaskProcess");
-
-    // when/then
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
-      .topic(TOPIC_NAME, LOCK_TIME)
-      .execute();
-    assertThat(externalTasks).hasSize(1);
-    assertThatThrownBy(() -> externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "errorCode", null))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Propagation of bpmn error errorCode failed.");
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
