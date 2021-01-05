@@ -73,6 +73,25 @@ There is a special profile for the WildFly Application Servers:
 
 * WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
 
+# Testing a Given Database
+
+Camunda supports all database technologies listed in https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products in all environments they work in as specified. Support means, that we guarantee that the Camunda BPM platform integrates well with that technology’s JDBC behavior (with potential restrictions documented in https://docs.camunda.org/manual/latest/user-guide/process-engine/database/, e.g. that we work with isolation level READ COMMITTED on all databases except CockroachDB)
+Camunda tests a database technology with a specific database, i.e. we test it in one environment, not all possible environments that you can imagine (e.g. we test Postgres on local Docker containers, not as hosted databases on AWS or Azure)
+
+## What about database technology X in environment Y?
+
+In order to make a statement regarding Camunda support, we need to understand if technology X is one of the technologies we already support, or if it is a distinct technology. Different databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite different to IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different to a standard Postgres. 
+
+If you want become sure that a given database works well with the Camunda BPM platform, you can run the test suite against this database.
+
+In `pom.xml` in the `database` folder, several database profiles are defined with a matching database driver.
+
+To run the test suite against a given database, select the `database` profile and your database profile and provide the connection parameters:
+
+```
+mvn test -Pdatabase,postgresql -Ddatabase.url=jdbc:postgresql:pgdb -Ddatabase.username=pguser -Ddatabase.password=pgpassword
+```
+
 # Limiting the Number of Engine Unit Tests
 
 Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
