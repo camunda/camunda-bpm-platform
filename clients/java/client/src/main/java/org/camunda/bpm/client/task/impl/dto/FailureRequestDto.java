@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.client.task.impl.dto;
 
+import java.util.Map;
+
 import org.camunda.bpm.client.impl.RequestDto;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
 
 /**
  * @author Tassilo Weidner
@@ -27,13 +30,17 @@ public class FailureRequestDto extends RequestDto {
   protected String errorDetails;
   protected int retries;
   protected long retryTimeout;
+  protected Map<String, TypedValueField> variables;
+  protected Map<String, TypedValueField> localVariables;
 
-  public FailureRequestDto(String workerId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+  public FailureRequestDto(String workerId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, TypedValueField> variables, Map<String, TypedValueField> localVariables) {
     super(workerId);
     this.errorMessage = errorMessage;
     this.errorDetails = errorDetails;
     this.retries = retries;
     this.retryTimeout = retryTimeout;
+    this.variables = variables;
+    this.localVariables = localVariables;
   }
 
   public String getErrorMessage() {
@@ -50,6 +57,14 @@ public class FailureRequestDto extends RequestDto {
 
   public long getRetryTimeout() {
     return retryTimeout;
+  }
+
+  public Map<String, TypedValueField> getVariables() {
+    return variables;
+  }
+
+  public Map<String, TypedValueField> getLocalVariables() {
+    return localVariables;
   }
 
 }

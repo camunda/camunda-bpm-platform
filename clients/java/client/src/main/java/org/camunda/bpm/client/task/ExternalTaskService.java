@@ -136,7 +136,7 @@ public interface ExternalTaskService {
 
   /**
    * Completes a task.
-   * 
+   *
    * @param externalTaskId  the id of the external task which will be completed
    * @param variables       are set in the tasks ancestor execution hierarchy. The key and the value represent
    *                        the variable name and its value. Map can consist of both typed and untyped variables.
@@ -188,6 +188,30 @@ public interface ExternalTaskService {
    * @throws ConnectionLostException if the connection could not be established
    */
   void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout);
+
+  /**
+   * Reports a failure to execute a task. A number of retries and a timeout until
+   * the task can be specified. If the retries are set to 0, an incident for this
+   * task is created.
+   *
+   * @param externalTaskId the id of the external task for which a failure will be reported
+   * @param errorMessage   indicates the reason of the failure.
+   * @param errorDetails   provides a detailed error description.
+   * @param retries        specifies how often the task should be retried. Must be &gt;= 0.
+   *                       If 0, an incident is created and the task cannot be fetched anymore
+   *                       unless the retries are increased again. The incident's message is set
+   *                       to the errorMessage parameter.
+   * @param retryTimeout   specifies a timeout in milliseconds before the external task
+   *                       becomes available again for fetching. Must be &gt;= 0.
+   * @param variables      a map of variables to set on the execution the external task is assigned to
+   * @param localVariables a map of variables to set on the execution locally
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   */
+  void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables);
 
   /**
    * Reports a business error in the context of a running task.

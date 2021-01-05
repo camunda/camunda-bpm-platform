@@ -368,7 +368,7 @@ public class ExternalTaskHandlerIT {
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
-    
+
     ExternalTask externalTaskBeforeExtendLock = handler.getHandledTasks().get(0);
     ExternalTask externalTaskAfterExtendLock = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
 
@@ -564,6 +564,123 @@ public class ExternalTaskHandlerIT {
     assertThat(incident).isNotNull();
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getActivityId()).isEqualTo(EXTERNAL_TASK_ID);
+  }
+
+  @Test
+  public void shouldFailWithVariables() {
+    // given
+    ProcessDefinitionDto definition = engineRule.deploy(ProcessModels.BPMN_ERROR_EXTERNAL_TASK_WITH_OUTPUT_MAPPING_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    String variableName = "foo";
+    String variableValue = "baz";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+      client.handleFailure(task.getId(), "my-message", "my-details", 0, 0, variables, null);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    // variable was mapped
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "bar");
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(variable.getName()).isEqualTo("bar");
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
+    // error was caught and flow continued to user task
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(ProcessModels.USER_TASK_AFTER_BPMN_ERROR);
+  }
+
+  @Test
+  public void shouldFailWithLocalVariables() {
+    // given
+    ProcessDefinitionDto definition = engineRule.deploy(ProcessModels.BPMN_ERROR_EXTERNAL_TASK_WITH_OUTPUT_MAPPING_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    String variableName = "foo";
+    String variableValue = "baz";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> localVariables = new HashMap<>();
+      localVariables.put(variableName, variableValue);
+      client.handleFailure(task.getId(), "my-message", "my-details", 0, 0, null, localVariables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    // variable was mapped
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "bar");
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(variable.getName()).isEqualTo("bar");
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
+    // error was caught and flow continued to user task
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(ProcessModels.USER_TASK_AFTER_BPMN_ERROR);
+  }
+
+  @Test
+  public void shouldFailWithVariablesAndLocalVariables() {
+    // given
+    ProcessDefinitionDto definition = engineRule.deploy(ProcessModels.BPMN_ERROR_EXTERNAL_TASK_WITH_OUTPUT_MAPPING_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    String variableName = "x";
+    String variableValue = "y";
+    String localVariableName = "foo";
+    String localVariableValue = "bar";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+
+      Map<String, Object> localVariables = new HashMap<>();
+      localVariables.put(localVariableName, localVariableValue);
+
+      client.handleFailure(task.getId(), "my-message", "my-details", 0, 0, variables, localVariables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), variableName);
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
+    // variable was mapped
+    VariableInstanceDto localVariable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "bar");
+    assertThat(localVariable).isNotNull();
+    assertThat(localVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(localVariable.getName()).isEqualTo("bar");
+    assertThat(localVariable.getValue()).isEqualTo(localVariableValue);
+
+    // error was caught and flow continued to user task
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(ProcessModels.USER_TASK_AFTER_BPMN_ERROR);
   }
 
   @Test

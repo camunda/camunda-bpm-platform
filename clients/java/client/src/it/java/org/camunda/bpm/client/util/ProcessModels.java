@@ -103,7 +103,7 @@ public class ProcessModels {
       .endEvent("endEvent")
       .done();
 
-  public static final BpmnModelInstance ONE_EXTERNAL_TASK_WITH_VERSION_TAG = 
+  public static final BpmnModelInstance ONE_EXTERNAL_TASK_WITH_VERSION_TAG =
       newModel(PROCESS_DEFINITION_VERSION_TAG)
       .camundaVersionTag(PROCESS_DEFINITION_VERSION_TAG)
       .startEvent()
@@ -123,6 +123,23 @@ public class ProcessModels {
       .moveToActivity(EXTERNAL_TASK_ID)
       .boundaryEvent("catchBPMNError")
         .error("500")
+      .userTask(USER_TASK_AFTER_BPMN_ERROR)
+      .endEvent()
+      .done();
+
+  public static final BpmnModelInstance BPMN_ERROR_EXTERNAL_TASK_WITH_OUTPUT_MAPPING_PROCESS =
+      newModel()
+      .startEvent()
+      .serviceTask(EXTERNAL_TASK_ID)
+        .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+        .camundaTaskPriority(String.valueOf(EXTERNAL_TASK_PRIORITY))
+        .camundaOutputParameter("bar", "${foo}")
+        .camundaErrorEventDefinition().id("id").error("500", "errorMessage").expression("${true}").errorEventDefinitionDone()
+      .userTask(USER_TASK_ID)
+      .endEvent()
+      .moveToActivity(EXTERNAL_TASK_ID)
+      .boundaryEvent("catchBPMNError")
+        .error("500").name("errorName")
       .userTask(USER_TASK_AFTER_BPMN_ERROR)
       .endEvent()
       .done();

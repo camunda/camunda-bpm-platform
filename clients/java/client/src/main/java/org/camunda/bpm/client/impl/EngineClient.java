@@ -104,8 +104,11 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout) throws EngineClientException {
-    FailureRequestDto payload = new FailureRequestDto(workerId, errorMessage, errorDetails, retries, retryTimeout);
+  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
+    Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
+    Map<String, TypedValueField> localTypedValueDtoMap = typedValues.serializeVariables(localVariables);
+
+    FailureRequestDto payload = new FailureRequestDto(workerId, errorMessage, errorDetails, retries, retryTimeout, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = FAILURE_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);

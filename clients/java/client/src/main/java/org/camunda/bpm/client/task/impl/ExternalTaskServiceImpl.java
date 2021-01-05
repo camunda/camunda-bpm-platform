@@ -90,8 +90,13 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+    handleFailure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, null, null);
+  }
+
+  @Override
+  public void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> locaclVariables) {
     try {
-      engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
+      engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, variables, locaclVariables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a failure", e);
     }
