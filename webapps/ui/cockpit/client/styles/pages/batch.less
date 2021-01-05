@@ -1,0 +1,64 @@
+.batch-wrapper {
+  .container-fluid;
+
+  position: absolute;
+  width: 100%;
+  top: @breadcrumb-height;
+  bottom: 0;
+  overflow: auto;
+
+  .progress {
+    margin-bottom: 0;
+    text-align: center;
+    position: relative;
+
+    > .processed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      overflow: visible;
+      background-color: transparent;
+      z-index: 999;
+    }
+  }
+
+  table.cam-table > tbody > tr {
+    border-left: 3px solid transparent;
+
+    &.selected {
+      border-color: @brand-primary;
+      color: @gray-base;
+    }
+  }
+
+  table.cam-table > thead th.action {
+    width: 100px;
+  }
+
+  .stack-trace a {
+    max-width: 100%;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .history-loader > button {
+    width: 100%;
+  }
+}
+
+.batch-job-log-modal {
+  .message {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+}
+
+.batch-controls {
+  margin-top: 7px;
+}

@@ -1,0 +1,26 @@
+<!-- # cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->
+<div cam-searchable-area
+     config="searchConfig"
+     on-search-change="onSearchChange(query, pages)"
+     loading-state="loadingState"
+     search-id="deployments"
+     loading-error="{{ 'REPOSITORY_DEPLOYMENTS_LOADING_LEGEND' | translate }}"
+     text-empty="{{ 'REPOSITORY_DEPLOYMENTS_NO_DEPLOYMENTS_AVAILABLE' | translate}}"
+     storage-group="'DEP'">
+  <div class="wrapper">
+    <ul class="deployments">
+      <li ng-repeat="(delta, deployment) in deployments"
+          ng-class="{active: isFocused(deployment), deployment: true}"
+          ng-style="{'z-index': ((deployments.length + 10) - delta) }"
+          ng-click="focus(deployment)">
+
+        <div cam-deployment
+             deployment="deployment"
+             deployments-list-data="deploymentsListData"
+             control="control">
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<!-- / cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->

@@ -209,6 +209,13 @@ var ProcessInstance = AbstractClientResource.extend(
       });
     },
 
+    setVariablesAsync: function(payload, done) {
+      return this.http.post(this.path + '/variables-async', {
+        data: payload,
+        done: done
+      });
+    },
+
     /**
      * Sets a variable of a given process instance by id.
      *

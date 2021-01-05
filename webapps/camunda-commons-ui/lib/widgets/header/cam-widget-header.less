@@ -2,22 +2,24 @@ body {
   padding-top: @header-height;
 }
 
+// Not nested to allow for custom CSS
+.brand-logo {
+  padding-right: 10px;
+
+  svg {
+    margin: 0 auto;
+    display: block;
+    fill: #666;
+  }
+}
+
 [cam-widget-header] {
   .cam-corporate-header();
 
   .navbar-brand {
     display: flex;
     align-items: center;
-
-    .brand-logo {
-      padding-right: 10px;
-
-      svg {
-        margin: 0 auto;
-        display: block;
-        fill: #666;
-      }
-    }
+    white-space: nowrap;
   }
 
   [ng-transclude] {

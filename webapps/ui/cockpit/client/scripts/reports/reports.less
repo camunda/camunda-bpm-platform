@@ -1,0 +1,117 @@
+.reports-wrapper {
+  position: absolute;
+  top: @breadcrumb-height;
+  bottom: 0;
+  width: 100%;
+  overflow: auto;
+}
+
+.reports-plugin-wrapper,
+.no-reports-available,
+.reporting-chart-holder,
+.chart-info {
+  margin-top: @grid-gutter-width * 0.5;
+}
+
+
+
+.reporting-table {
+  > thead > tr > th:first-of-type {
+    min-width: 90px;
+  }
+  th,
+  td {
+    text-align: right;
+  }
+  td {
+    font-family: monospace;
+  }
+  tbody th {
+    width: 3em;
+  }
+}
+
+[cam-duration-report-query] {
+  @media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+    .row-md-half {
+      margin: 0;
+      width: 50%;
+      float: left;
+      &:nth-child(1) {
+        padding-right: 15px;
+      }
+      &:nth-child(2) {
+        padding-left: 15px;
+      }
+    }
+  }
+}
+
+[cam-duration-report-result] {
+
+}
+
+
+
+@cam-reporting-font-path: '../../../api/cockpit/plugin/cockpitEE/static/app/reporting/fonts/';
+@font-face {
+  font-family: 'cam-reporting';
+  src: url('@{cam-reporting-font-path}cam-reporting.eot');
+  src: url('@{cam-reporting-font-path}cam-reporting.eot#iefix') format('embedded-opentype'),
+       url('@{cam-reporting-font-path}cam-reporting.woff') format('woff'),
+       url('@{cam-reporting-font-path}cam-reporting.ttf') format('truetype'),
+       url('@{cam-reporting-font-path}cam-reporting.svg#cam-reporting') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'cam-reporting';
+    src: url('@{font-path}cam-reporting.svg?52488680#cam-reporting') format('svg');
+  }
+}
+*/
+
+ [class^="cam-reporting-"]:before, [class*=" cam-reporting-"]:before {
+  font-family: "cam-reporting";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.cam-reporting-pie-chart:before { content: '\e800'; } /* '' */
+.cam-reporting-lines-chart:before { content: '\e801'; } /* '' */
+.cam-reporting-bars-chart:before { content: '\e802'; } /* '' */
+.cam-reporting-areas-chart:before { content: '\e803'; } /* '' */
+.cam-reporting-grid:before { content: '\e804'; } /* '' */

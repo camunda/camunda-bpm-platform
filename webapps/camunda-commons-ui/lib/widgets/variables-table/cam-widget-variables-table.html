@@ -165,7 +165,7 @@
              class="btn-group">
           <button class="btn btn-xs btn-primary"
                   ng-disabled="!canEditVariable(info, v)"
-                  ng-click="info.editMode = true"
+                  ng-click="enableEditMode(info, true)"
                   tooltip-append-to-body="true"
                   uib-tooltip="{{ 'CAM_WIDGET_VARIABLES_TABLE_EDIT_VARIABLE' | translate }}">
             <span class="glyphicon glyphicon-pencil"></span>
@@ -189,7 +189,7 @@
             <span class="glyphicon glyphicon-ok"></span>
           </button>
           <button class="btn btn-xs btn-default"
-                  ng-click="info.editMode = false"
+                  ng-click="enableEditMode(info, false)"
                   tooltip-append-to-body="true"
                   uib-tooltip="{{ 'CAM_WIDGET_VARIABLES_TABLE_REVERT_VARIABLE' | translate }}">
             <span class="glyphicon glyphicon-remove"></span>

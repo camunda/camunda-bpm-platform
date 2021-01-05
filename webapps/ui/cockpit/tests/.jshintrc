@@ -1,0 +1,10 @@
+{
+  "mocha": true,
+  "node": true,
+  "globals": {
+    "expect": false,
+    "element": false,
+    "by": false,
+    "browser": false
+  }
+}

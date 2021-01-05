@@ -1,0 +1,36 @@
+<!-- # cockpit client/scripts/repository/resources/directives/cam-cockpit-resources.html -->
+<div ng-if="!state.$loaded && !state.$error"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'REPOSITORY_RESOURCES_LOADING' | translate }}
+</div>
+
+<div ng-if="state.$error"
+     uib-alert class="alert alert-danger"
+     role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">{{ 'REPOSITORY_RESOURCES_FAILURE' | translate }}</strong>
+  <span class="message">{{ 'REPOSITORY_RESOURCES_FAILURE_MSN' | translate }}</span>
+</div>
+
+<div ng-if="state.$loaded && !state.$error && !resources.length"
+     class="well">
+  <span class="glyphicon glyphicon-info-sign"></span>
+  {{ 'REPOSITORY_RESOURCES_NO_SRC_AVAILABLE' | translate }}
+</div>
+
+<ol ng-if="state.$loaded && !state.$error && resources.length"
+    class="resources list-unstyled"
+    tabindex="0"
+    ng-keydown="handleKeydown($event)">
+  <li class="resource"
+      ng-repeat="(delta, resource) in resources"
+      ng-class="{active: currentResourceId === resource.id, clickable: true}"
+      ng-click="focus($event, resource)">
+    <div class="filepath">{{ truncateFilepath(resource._filepath) }}</div>
+    <h4>
+      <a href>{{ resource._filename }}</a>
+    </h4>
+  </li>
+</ol>
+<!-- / cockpit client/scripts/repository/resources/directives/cam-cockpit-resources.html -->

@@ -63,4 +63,22 @@ module.exports = function(config, lessConfig, pathConfig) {
     files: file
   };
 
+  if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
+    source = pathConfig.sourceDir + '/styles/styles-components.less';
+    destination = pathConfig.buildTarget + '/styles/styles-components.css';
+    file = {};
+    file[destination] = source;
+
+    lessConfig.cockpit_styles_components = {
+      options: {
+        paths: includePaths,
+
+        compress: true,
+        sourceMap: true,
+        sourceMapURL: './' + path.basename(destination) + '.map',
+        sourceMapFilename: destination + '.map'
+      },
+      files: file
+    };
+  }
 };
