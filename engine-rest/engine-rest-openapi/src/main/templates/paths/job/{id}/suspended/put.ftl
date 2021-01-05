@@ -22,7 +22,7 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "SuspensionStateDto" <#-- Todo double check -->
+      dto = "SuspensionStateDto" <#-- Note: The java code uses JobSuspensionStateDto, but this endpoint only requires one attribute. As JobSuspensionStateDto is quite complex it could be confusing to the user to use it here.-->
       examples = ['"example-1": {
                      "summary": "PUT `/job/aJobId/suspended`",
                      "value": {
