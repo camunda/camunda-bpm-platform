@@ -27,13 +27,6 @@ module.exports = {
 };
 
 function generateViewer(options) {
-  // get cached viewer if it exists
-  var cachedViewer = options.key && viewers[options.key];
-  if (cachedViewer) {
-    cachedViewer.cached = true;
-    return cachedViewer;
-  }
-
   // return a new bpmn viewer
   var BpmnViewer = Viewer;
   if (options.disableNavigation) {
