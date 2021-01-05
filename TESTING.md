@@ -82,7 +82,7 @@ Camunda tests a database technology with a specific database, i.e. we test it in
 
 In order to make a statement regarding Camunda support, we need to understand if technology X is one of the technologies we already support, or if it is a distinct technology. Different databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite different to IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different to a standard Postgres. 
 
-If you want become sure that a given database works well with the Camunda BPM platform, you can run the test suite against this database.
+If you want to become sure that a given database works well with the Camunda BPM platform, you can run the test suite against this database.
 
 In `pom.xml` in the `database` folder, several database profiles are defined with a matching database driver.
 
