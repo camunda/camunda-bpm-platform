@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -322,41 +321,33 @@ public class ExecutionListenerTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // complete the "start" listener on process start
-    List<LockedExternalTask> listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "start" listener on start event
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "end" listener on start event
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "take" listener on flow
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "start" listener on end event
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "end" listener on end event
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     // complete the "end" listener on process
-    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
-    assertTrue(listenerTasks.size() == 1);
-    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+    finishListener();
 
     assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+  }
+
+  protected void finishListener() {
+    externalTaskService.complete(
+        externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute().get(0).getId(),
+        "worker");
   }
 
   @Test
