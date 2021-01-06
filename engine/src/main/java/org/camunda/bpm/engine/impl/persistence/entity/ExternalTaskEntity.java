@@ -88,7 +88,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
   protected String tenantId;
   protected long priority;
-  
+
   protected Map<String, String> extensionProperties;
 
   protected ExecutionEntity execution;
@@ -236,7 +236,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
-  
+
   public Map<String, String> getExtensionProperties() {
     return extensionProperties;
   }
@@ -247,7 +247,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new  HashMap<String, Object>();
+    Map<String, Object> persistentState = new  HashMap<>();
     persistentState.put("topic", topicName);
     persistentState.put("workerId", workerId);
     persistentState.put("lockExpirationTime", lockExpirationTime);
@@ -387,14 +387,16 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     ensureVariablesSet(execution, variables, localVariables);
 
+    this.setErrorMessage(errorMessage);
+
+    if (errorDetails != null) {
+      setErrorDetails(errorDetails);
+    }
+
     if(evaluateThrowBpmnError(associatedExecution)) {
       return;
     }
 
-    this.setErrorMessage(errorMessage);
-    if (errorDetails != null) {
-      setErrorDetails(errorDetails);
-    }
     this.lockExpirationTime = new Date(ClockUtil.getCurrentTime().getTime() + retryDuration);
     produceHistoricExternalTaskFailedEvent();
     setRetriesAndManageIncidents(retries);
@@ -480,7 +482,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void ensureExecutionInitialized(boolean validateExistence) {
     if (execution == null) {
       execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
-      
+
       if (validateExistence) {
         EnsureUtil.ensureNotNull(
             "Cannot find execution with id " + executionId + " for external task " + id,
@@ -500,7 +502,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     if (variables != null) {
       execution.setVariables(variables);
     }
-    
+
     if (localVariables != null) {
       execution.setVariablesLocal(localVariables);
     }
@@ -511,7 +513,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     if (camundaErrorEventDefinitions != null && !camundaErrorEventDefinitions.isEmpty()) {
       for (CamundaErrorEventDefinition camundaErrorEventDefinition : camundaErrorEventDefinitions) {
         if (camundaErrorEventDefinition.getExpression() != null && Boolean.TRUE.equals(camundaErrorEventDefinition.getExpression().getValue(getExecution()))) {
-          bpmnError(camundaErrorEventDefinition.getErrorCode(), null, null);
+          bpmnError(camundaErrorEventDefinition.getErrorCode(), errorMessage, null);
           return true;
         }
       }
@@ -592,13 +594,13 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (executionId != null) {
       referenceIdAndClass.put(executionId, ExecutionEntity.class);
