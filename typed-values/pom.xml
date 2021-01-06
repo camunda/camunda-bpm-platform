@@ -26,10 +26,9 @@
   </dependencyManagement>
   <properties>
     <camunda.artifact>org.camunda.bpm.engine.variable</camunda.artifact>
-    <camunda.osgi.import.pkg>
-      !javax.activation,
-      *
-    </camunda.osgi.import.pkg>
+    <camunda.osgi.import.additional>
+      !javax.activation
+    </camunda.osgi.import.additional>
   </properties>
   <dependencies>
 
