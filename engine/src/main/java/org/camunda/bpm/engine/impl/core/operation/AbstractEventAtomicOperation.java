@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
+import org.camunda.bpm.engine.impl.bpmn.listener.ExternalTaskExecutionListener;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -49,6 +50,9 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
         execution.setEventName(getEventName());
         execution.setEventSource(scope);
         DelegateListener<? extends BaseDelegateExecution> listener = listeners.get(listenerIndex);
+        if (listener instanceof ExternalTaskExecutionListener) {
+          ((ExternalTaskExecutionListener) listener).setOperation(this);
+        }
         execution.setListenerIndex(listenerIndex+1);
 
         try {
@@ -56,6 +60,21 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
         } catch (Exception ex) {
           eventNotificationsFailed(execution, ex);
           // do not continue listener invocation once a listener has failed
+          return;
+        }
+
+        /*
+         * TODO:
+         * - introduce wait state if listener is async listener (set execution state to "suspended"?
+         *   create a new state to indicate suspended for listener? keep the current state?)
+         * - should we simply "return" here and indicate we are done for now, potentially setting some
+         *   flag or state to reflect we're waiting on a listener so the caller can react accordingly?
+         * - the ExternalTaskExecutionListener implementation needs to execute this here again after
+         *   the external task is complete (the listener index probably needs to be persisted for this,
+         *   which is not done yet as far as I can tell)
+         * - CoreExecution is an ExecutionEntity already
+         */
+        if (listener instanceof ExternalTaskExecutionListener) {
           return;
         }
 

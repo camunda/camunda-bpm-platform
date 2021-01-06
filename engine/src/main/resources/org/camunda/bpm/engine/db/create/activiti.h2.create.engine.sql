@@ -101,6 +101,7 @@ create table ACT_RU_EXECUTION (
     CACHED_ENT_STATE_ integer,
     SEQUENCE_COUNTER_ integer,
     TENANT_ID_ varchar(64),
+    LISTENER_INDEX_ integer,
     primary key (ID_)
 );
 
@@ -315,6 +316,9 @@ create table ACT_RU_EXT_TASK (
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
   PRIORITY_ bigint NOT NULL DEFAULT 0,
+  OPERATION_ varchar(64),
+  TRANSITION_ID_ varchar(64),
+  TRANSITION_IDS_ varchar(4000),
   primary key (ID_)
 );
 

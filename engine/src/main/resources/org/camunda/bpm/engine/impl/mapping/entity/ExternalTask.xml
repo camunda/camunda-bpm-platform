@@ -42,6 +42,9 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="operation" column="OPERATION_" jdbcType="VARCHAR" />
+    <result property="transitionId" column="TRANSITION_ID_" jdbcType="VARCHAR" />
+    <result property="transitionsToTakeIds" column="TRANSITION_IDS_" jdbcType="VARCHAR" />
     <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
   
@@ -68,6 +71,9 @@
       ACT_INST_ID_,
       TENANT_ID_,
       PRIORITY_,
+      OPERATION_,
+      TRANSITION_ID_,
+      TRANSITION_IDS_,
       REV_
     ) values (
       #{id, jdbcType=VARCHAR},
@@ -86,6 +92,9 @@
       #{activityInstanceId, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
       #{priority, jdbcType=BIGINT},
+      #{operation, jdbcType=VARCHAR},
+      #{transitionId, jdbcType=VARCHAR},
+      #{transitionsToTakeIds, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -107,7 +116,10 @@
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      PRIORITY_ = #{priority, jdbcType=BIGINT}
+      PRIORITY_ = #{priority, jdbcType=BIGINT},
+      OPERATION_ = #{operation, jdbcType=VARCHAR},
+      TRANSITION_ID_ = #{transitionId, jdbcType=VARCHAR},
+      TRANSITION_IDS_ = #{transitionsToTakeIds, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -450,6 +462,9 @@
     RES.SUSPENSION_STATE_,
     RES.TENANT_ID_,
     RES.PRIORITY_,
+    RES.OPERATION_,
+    RES.TRANSITION_ID_,
+    RES.TRANSITION_IDS_,
     RES.BUSINESS_KEY_,
     RES.VERSION_TAG_
   </sql>

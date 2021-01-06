@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
@@ -37,7 +41,9 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -56,6 +62,16 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
+
+  protected static final Map<String, CoreAtomicOperation<?>> SUPPORTED_OPERATIONS = Stream.of(
+      PvmAtomicOperation.PROCESS_START, // start listener on process
+      PvmAtomicOperation.ACTIVITY_START, // start listener on start event
+      PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_START, // start listener on activity (with incoming transition)
+      PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE, // take listener on flow
+      PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END, // end listener on activity (with outgoing transition)
+      PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END, // end listener on end event
+      PvmAtomicOperation.PROCESS_END) // end listener on process
+    .collect(Collectors.toMap(o -> o.getCanonicalName(), o -> o));
 
   /**
    * Note: {@link String#length()} counts Unicode supplementary
@@ -86,7 +102,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
   protected String tenantId;
   protected long priority;
-  
+
   protected Map<String, String> extensionProperties;
 
   protected ExecutionEntity execution;
@@ -94,6 +110,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String businessKey;
 
   protected String lastFailureLogId;
+
+  protected String operation;
+  protected String transitionId;
+  protected String transitionsToTakeIds;
 
   @Override
   public String getId() {
@@ -234,7 +254,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
-  
+
   public Map<String, String> getExtensionProperties() {
     return extensionProperties;
   }
@@ -243,9 +263,38 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     this.extensionProperties = extensionProperties;
   }
 
+  public String getOperation() {
+    return operation;
+  }
+
+  public void setOperation(String operation) {
+    this.operation = operation;
+  }
+
+  public String getTransitionId() {
+    return transitionId;
+  }
+
+  public void setTransitionId(String transitionId) {
+    this.transitionId = transitionId;
+  }
+
+  public String getTransitionsToTakeIds() {
+    return transitionsToTakeIds;
+  }
+
+  public void setTransitionsToTakeIds(String transitionsToTakeIds) {
+    this.transitionsToTakeIds = transitionsToTakeIds;
+  }
+
+  public void setTransitionsToTakeIds(List<PvmTransition> transitionsToTake) {
+    this.transitionsToTakeIds = transitionsToTake == null ? null :
+      transitionsToTake.stream().map(PvmTransition::getId).collect(Collectors.joining(","));
+  }
+
   @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new  HashMap<String, Object>();
+    Map<String, Object> persistentState = new  HashMap<>();
     persistentState.put("topic", topicName);
     persistentState.put("workerId", workerId);
     persistentState.put("lockExpirationTime", lockExpirationTime);
@@ -261,6 +310,9 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("tenantId", tenantId);
     persistentState.put("priority", priority);
+    persistentState.put("operation", operation);
+    persistentState.put("transitionId", transitionId);
+    persistentState.put("transitionsToTakeIds", transitionsToTakeIds);
 
     if(errorDetailsByteArrayId != null) {
       persistentState.put("errorDetailsByteArrayId", errorDetailsByteArrayId);
@@ -368,7 +420,18 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     produceHistoricExternalTaskSuccessfulEvent();
 
-    associatedExecution.signal(null, null);
+    if (operation != null) {
+      if (transitionId != null) {
+        associatedExecution.setTransition(associatedExecution.getActivity().getOutgoingTransitions().stream().filter(t -> transitionId.equals(t.getId())).findFirst().get());
+      }
+      if (transitionsToTakeIds != null) {
+        List<String> idsToTake = Arrays.asList(transitionsToTakeIds.split(","));
+        associatedExecution.setTransitionsToTake(associatedExecution.getActivity().getOutgoingTransitions().stream().filter(t -> idsToTake.contains(t.getId())).collect(Collectors.toList()));
+      }
+      associatedExecution.performOperation(SUPPORTED_OPERATIONS.get(operation));
+    } else {
+      associatedExecution.signal(null, null);
+    }
   }
 
   /**
@@ -472,7 +535,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void ensureExecutionInitialized(boolean validateExistence) {
     if (execution == null) {
       execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
-      
+
       if (validateExistence) {
         EnsureUtil.ensureNotNull(
             "Cannot find execution with id " + executionId + " for external task " + id,
@@ -513,6 +576,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic, long priority) {
+    return createAndInsert(execution, topic, priority, null);
+  }
+
+  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic, long priority, String operation) {
     ExternalTaskEntity externalTask = new ExternalTaskEntity();
 
     externalTask.setTopicName(topic);
@@ -523,6 +590,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setActivityInstanceId(execution.getActivityInstanceId());
     externalTask.setTenantId(execution.getTenantId());
     externalTask.setPriority(priority);
+
+    externalTask.setOperation(operation);
+    externalTask.setTransitionId(execution.getCurrentTransitionId());
+    externalTask.setTransitionsToTakeIds(execution.getTransitionsToTake());
 
     ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());
@@ -561,13 +632,13 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (executionId != null) {
       referenceIdAndClass.put(executionId, ExecutionEntity.class);

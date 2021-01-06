@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HIS
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -38,6 +40,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -83,6 +86,7 @@ public class ExecutionListenerTest {
   protected HistoryService historyService;
   protected ManagementService managementService;
   protected RepositoryService repositoryService;
+  protected ExternalTaskService externalTaskService;
 
   @Before
   public void clearRecorderListener() {
@@ -96,6 +100,7 @@ public class ExecutionListenerTest {
     historyService = processEngineRule.getHistoryService();
     managementService = processEngineRule.getManagementService();
     repositoryService = processEngineRule.getRepositoryService();
+    externalTaskService = processEngineRule.getExternalTaskService();
   }
 
   @Before
@@ -309,6 +314,49 @@ public class ExecutionListenerTest {
         assertTrue("Variable '" + variableName + "' should be set to true", (Boolean) variableInstance.getValue());
       }
     }
+  }
+
+  @Test
+  @Deployment
+  public void testAsyncListener() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete the "start" listener on process start
+    List<LockedExternalTask> listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "start" listener on start event
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "end" listener on start event
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "take" listener on flow
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "start" listener on end event
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "end" listener on end event
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    // complete the "end" listener on process
+    listenerTasks = externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute();
+    assertTrue(listenerTasks.size() == 1);
+    externalTaskService.complete(listenerTasks.get(0).getId(), "worker");
+
+    assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
   }
 
   @Test
