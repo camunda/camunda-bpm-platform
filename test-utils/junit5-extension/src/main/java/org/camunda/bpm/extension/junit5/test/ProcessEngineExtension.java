@@ -78,7 +78,7 @@ public class ProcessEngineExtension implements TestWatcher,
   }
 
   public ProcessEngineExtension configurationResource(String configurationResource) {
-    this.setConfigurationResource(configurationResource);
+    this.configurationResource = configurationResource;
     return this;
   }
   
@@ -94,16 +94,8 @@ public class ProcessEngineExtension implements TestWatcher,
     return configurationResource;
   }
 
-  public void setConfigurationResource(String configurationResource) {
-    this.configurationResource = configurationResource;
-  }
-
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
-  }
-
-  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
   }
 
   @Override
