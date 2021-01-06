@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
@@ -51,6 +52,10 @@ import org.slf4j.LoggerFactory;
 public class ProcessEngineExtension implements TestWatcher, 
     TestInstancePostProcessor, BeforeTestExecutionCallback, AfterTestExecutionCallback, 
     ParameterResolver {
+
+  private static Supplier<IllegalStateException> illegalStateException(String msg) {
+    return () -> new IllegalStateException(msg);
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(ProcessEngineExtension.class);
   protected ProcessEngine processEngine;
@@ -102,7 +107,7 @@ public class ProcessEngineExtension implements TestWatcher,
   }
 
   @Override
-  public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+  public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
     if (processEngine == null) {
       initializeProcessEngine();
     }
@@ -126,11 +131,11 @@ public class ProcessEngineExtension implements TestWatcher,
   }
 
   @Override
-  public void beforeTestExecution(ExtensionContext context) throws Exception {
+  public void beforeTestExecution(ExtensionContext context) {
     LOG.debug("beforeTestExecution: {}", context.getDisplayName());
     
-    Method testMethod = context.getTestMethod().get();
-    Class<?> testClass = context.getTestClass().get();
+    final Method testMethod = context.getTestMethod().orElseThrow(illegalStateException("testMethod not set"));
+    final Class<?> testClass = context.getTestClass().orElseThrow(illegalStateException("testClass not set"));
     
     doDeployment(testMethod, testClass);
     
@@ -185,8 +190,8 @@ public class ProcessEngineExtension implements TestWatcher,
       deploymentBuilder.addClasspathResource(TestHelper.getBpmnProcessDefinitionResource(
           testClass, testMethodName));
     } else {
-      for (int i = 0; i < resources.length; i++) {
-        deploymentBuilder.addClasspathResource(resources[i]);
+      for (String resource : resources) {
+        deploymentBuilder.addClasspathResource(resource);
       }
     }
   }
@@ -209,10 +214,10 @@ public class ProcessEngineExtension implements TestWatcher,
   }
 
   @Override
-  public void afterTestExecution(ExtensionContext context) throws Exception {
-    Method testMethod = context.getTestMethod().get();
-    Class<?> testClass = context.getTestClass().get();
-        
+  public void afterTestExecution(ExtensionContext context) {
+    final Method testMethod = context.getTestMethod().orElseThrow(illegalStateException("testMethod not set"));
+    final Class<?> testClass = context.getTestClass().orElseThrow(illegalStateException("testClass not set"));
+
     if (deploymentId != null) {
       LOG.info("annotation @Deployment deletes deployment for {}.{}", testClass.getName(), testMethod.getName());     
       processEngine.getRepositoryService().deleteDeployment(deploymentId, true, true, true);
@@ -223,11 +228,7 @@ public class ProcessEngineExtension implements TestWatcher,
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
-    if (parameterContext.getParameter().getType().equals(ProcessEngine.class)) {
-      return true;
-    } else {
-      return false;
-    }
+    return parameterContext.getParameter().getType().equals(ProcessEngine.class);
   }
 
   @Override
