@@ -11,7 +11,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-    string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_BRANCH_NAME'
+    string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_DOWNSTREAM'
   }
   stages {
     stage('ASSEMBLY') {
@@ -59,7 +59,7 @@ pipeline {
             // otherwise CE PR branch triggers EE PR branch
             eeBranch = "cambpm-ee-main/pipeline-master"
           } else {
-            eeBranch = params.EE_BRANCH_NAME
+            eeBranch = params.EE_DOWNSTREAM
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
