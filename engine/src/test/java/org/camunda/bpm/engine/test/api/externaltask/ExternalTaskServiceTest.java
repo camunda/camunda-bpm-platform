@@ -2495,7 +2495,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // and the lock expires without the task being reclaimed
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     variables.put("transientVar", Variables.integerValue(1, true));
 
@@ -2554,7 +2554,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     // and the lock expires without the task being reclaimed
     ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     variables.put("transientVar", Variables.integerValue(1, true));
 
@@ -3067,9 +3067,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
     // when
-    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .variables(new String[]{})
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID).topic("externalTaskTopic", LOCK_TIME).variables()
       .execute();
 
     // then
@@ -3269,7 +3267,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3314,7 +3312,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3371,7 +3369,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue5 = "testValue5";
     String variableValue6 = "testValue6";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3431,7 +3429,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     String variableValue1 = "testValue1";
     String variableValue2 = "testValue2";
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     Long lockDuration = 60L * 1000L;
 
@@ -3614,7 +3612,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   }
 
   protected List<String> startProcessInstance(String key, int instances) {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     for (int i = 0; i < instances; i++) {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
