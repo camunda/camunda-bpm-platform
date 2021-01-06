@@ -454,7 +454,7 @@ pipeline {
         }
       }
     }
-    stage('db tests + CE webapps IT') {
+    stage('MISC tests') {
       parallel {
         stage('engine-api-compatibility') {
           when {
