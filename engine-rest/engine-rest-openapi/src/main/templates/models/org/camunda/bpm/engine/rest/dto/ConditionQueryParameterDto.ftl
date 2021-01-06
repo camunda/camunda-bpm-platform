@@ -1,5 +1,5 @@
 <@lib.dto>
-
+    <#-- Note: If you are here from Job endpoints, see JobConditionQueryParameterDto which has a reduced set of operators -->
     <@lib.property
         name = "operator"
         type = "string"

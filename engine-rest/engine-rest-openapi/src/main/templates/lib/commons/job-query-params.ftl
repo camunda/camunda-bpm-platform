@@ -12,8 +12,29 @@
 
 <#if requestMethod == "GET">
   <#assign listType = "comma-separated">
+  <#assign dueDateDesc = "Due date expressions are comma-separated and are structured as follows:
+
+                         A valid condition value has the form `operator_value`.
+                         `operator` is the comparison operator to be used and `value` the date value
+                         as string.
+
+                         Valid operator values are: `gt` - greater than; `lt` - lower than.
+                         `value` may not contain underscore or comma characters.">
+  <#assign createTimesDesc = "
+                             Create time expressions are comma-separated and are structured as
+                             follows:
+
+                             A valid condition value has the form `operator_value`.
+                             `operator` is the comparison operator to be used and `value` the date value
+                             as string.
+
+                             Valid operator values are: `gt` - greater than; `lt` - lower than.
+                             `value` may not contain underscore or comma characters.">
+
 <#elseif requestMethod == "POST">
   <#assign listType = "">
+  <#assign dueDateDesc = "">
+  <#assign createTimesDesc = "">
 </#if>
 
 <#assign params = {
@@ -78,31 +99,15 @@
   },
   "dueDates": {
     "type": "array",
-    "dto": "ConditionQueryParameterDto",
+    "dto": "JobConditionQueryParameterDto",
     "desc": "Only select jobs where the due date is lower or higher than the given date.
-             Due date expressions are comma-separated and are structured as follows:
-
-             A valid condition value has the form `operator_value`.
-             `operator` is the comparison operator to be used and `value` the date value
-             as string.
-
-             Valid operator values are: `gt` - greater than; `lt` - lower than.
-             `value` may not contain underscore or comma characters."
+             ${dueDateDesc}"
   },
   "createTimes": {
     "type": "array",
-    "dto": "ConditionQueryParameterDto",
+    "dto": "JobConditionQueryParameterDto",
     "desc": "Only select jobs created before or after the given date.
-
-             Create time expressions are comma-separated and are structured as
-             follows:
-
-             A valid condition value has the form `operator_value`.
-             `operator` is the comparison operator to be used and `value` the date value
-             as string.
-
-             Valid operator values are: `gt` - greater than; `lt` - lower than.
-             `value` may not contain underscore or comma characters."
+             ${createTimesDesc}"
   },
   "withException": {
     "type": "boolean",
