@@ -181,6 +181,69 @@ pipeline {
             }
           }
         }
+        stage('engine-UNIT-historylevel-none') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-UNIT-historylevel-audit') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-UNIT-historylevel-activity') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
         stage('engine-IT-tomcat-9-postgresql-96') {
           when {
             expression {
