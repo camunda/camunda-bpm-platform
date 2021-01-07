@@ -236,7 +236,7 @@ pipeline {
             }
           }
           steps {
-            cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
+            cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
           }
           post {
             always {
