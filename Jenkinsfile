@@ -11,7 +11,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-    string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_BRANCH_NAME'
+    string defaultValue: 'cambpm-ee-main-pr/pipeline-master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_DOWNSTREAM'
   }
   stages {
     stage('ASSEMBLY') {
@@ -59,7 +59,7 @@ pipeline {
             // otherwise CE PR branch triggers EE PR branch
             eeBranch = "cambpm-ee-main/pipeline-master"
           } else {
-            eeBranch = params.EE_BRANCH_NAME
+            eeBranch = params.EE_DOWNSTREAM
           }
 
           if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
@@ -178,6 +178,69 @@ pipeline {
             }
             failure {
               cambpmAddFailedStageType(failedStageTypes, 'webapp-unit-authorizations')
+            }
+          }
+        }
+        stage('engine-UNIT-historylevel-none') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-UNIT-historylevel-audit') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
+            }
+          }
+        }
+        stage('engine-UNIT-historylevel-activity') {
+          when {
+            expression {
+              cambpmWithLabels('default-build')
+            }
+            beforeAgent true
+          }
+          agent {
+            node {
+              label 'h2'
+            }
+          }
+          steps {
+            cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
+          }
+          post {
+            always {
+              cambpmPublishTestResult();
             }
           }
         }
@@ -391,7 +454,7 @@ pipeline {
         }
       }
     }
-    stage('db tests + CE webapps IT') {
+    stage('MISC tests') {
       parallel {
         stage('engine-api-compatibility') {
           when {
