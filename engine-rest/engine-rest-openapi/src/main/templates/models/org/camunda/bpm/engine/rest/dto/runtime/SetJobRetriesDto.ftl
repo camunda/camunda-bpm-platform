@@ -13,7 +13,7 @@
     
     <@lib.property
         name = "jobQuery"
-        type = "object"
+        type = "ref"
         dto = "JobQueryDto"
         desc = "A job query like the request body for the
                 [Get Jobs (POST)](${docsUrl}/reference/rest/job/post-query/#request-body)

@@ -4,6 +4,8 @@
   '"jobId"',
   '"executionId"',
   '"processInstanceId"',
+  '"processDefinitionId"',
+  '"processDefinitionKey"',
   '"jobPriority"',
   '"jobRetries"',
   '"jobDueDate"',
