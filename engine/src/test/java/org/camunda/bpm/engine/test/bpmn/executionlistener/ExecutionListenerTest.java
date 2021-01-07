@@ -421,10 +421,51 @@ public class ExecutionListenerTest {
     });
   }
 
-  protected void finishListener() {
+  @Test
+  @Deployment
+  public void testAsyncListenerWithInterruptingMessageBoundaryEvent() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete the external task and wait at its "end" listener
+    externalTaskService.complete(externalTaskService.fetchAndLock(1, "worker").topic("service", 30000L).execute().get(0).getId(), "worker");
+
+    // assume
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen", query.singleResult().getTopicName());
+
+    // when
+    runtimeService.correlateMessage("message_A");
+
+    // then the message was correlated and we wait at "end" of the boundary event
+    query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen-boundary", query.singleResult().getTopicName());
+
+    // complete the boundary "end" listener
+    finishListener("listen-boundary");
+
+    // then
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertNotNull(historicProcessInstance);
+      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+    }
+  }
+
+  protected void finishListener(String topic) {
     externalTaskService.complete(
-        externalTaskService.fetchAndLock(1, "worker").topic("listen", 30000L).execute().get(0).getId(),
+        externalTaskService.fetchAndLock(1, "worker").topic(topic, 30000L).execute().get(0).getId(),
         "worker");
+  }
+
+  protected void finishListener() {
+    finishListener("listen");
   }
 
   @Test
