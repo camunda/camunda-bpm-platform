@@ -29,9 +29,7 @@ pipeline {
         beforeAgent true
       }
       agent {
-        node {
-          label 'centos-stable'
-        }
+        label 'centos-stable'
       }
       steps {
         cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
@@ -45,9 +43,7 @@ pipeline {
     }
     stage('check-sql-scripts') {
       agent {
-        node {
-          label 'centos-stable'
-        }
+        label 'centos-stable'
       }
       steps {
         sh '.ci/scripts/check-sql-scripts.sh'
@@ -63,9 +59,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('sql-scripts', 'h2')
@@ -82,9 +76,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
@@ -103,9 +95,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('upgrade-database', 'h2')
@@ -127,9 +117,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('instance-migration', 'h2')
@@ -151,9 +139,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('old-engine', 'h2')
@@ -175,9 +161,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('rolling-update', 'h2')
@@ -197,9 +181,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('large-data-tests', 'h2')
@@ -216,9 +198,12 @@ pipeline {
       }
     }
     stage('QA DB tests') {
+      agent {
+        label 'centos'
+      }
       steps {
         script {
-          parallel(cambpmGetMatrixStages('daily-db', failedStageTypes, { stageType, dbLabel ->
+          parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageType, dbLabel ->
             return cambpmWithLabelsList(cambpmGetLabels(stageType, 'cockroachdb'))
           }))
         }
@@ -229,7 +214,9 @@ pipeline {
         axes {
           axis {
             name 'JDK'
-            values 'openjdk-jdk-8-latest', 'openjdk-jdk-14-latest'
+            values 'openjdk-jdk-14-latest', 'openjdk-jdk-13-latest', 'openjdk-jdk-12-latest', 'openjdk-jdk-11-latest',
+                   'openjdk-jdk-8-latest', 'jdk-14-latest', 'jdk-13-latest', 'jdk-12-latest', 'jdk-11-latest',
+                   'jdk-8-latest', 'ibm-jdk-8-latest'
           }
         }
         when {
@@ -239,9 +226,7 @@ pipeline {
           beforeAgent true
         }
         agent {
-          node {
-            label 'h2'
-          }
+          label 'h2'
         }
         stages {
           stage('JDK') {
