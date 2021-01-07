@@ -55,9 +55,7 @@ pipeline {
         beforeAgent true
       }
       agent {
-        node {
-          label 'centos-stable'
-        }
+        label 'centos-stable'
       }
       steps {
         cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
@@ -88,9 +86,7 @@ pipeline {
           beforeAgent true
         }
         agent {
-          node {
-            label env.DB
-          }
+          label env.DB
         }
         stages {
           stage('UNIT test') {
