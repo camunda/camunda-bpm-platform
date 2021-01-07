@@ -60,9 +60,9 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
-        desc = "Returned if some of the request parameters are invalid, for example if the
-                `processDefinitionKey` parameter is null. See the
-                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+        desc = "Returned if the request parameters are invalid, for example, if `jobDefinitionId` and
+                `processDefinitionId` are both specified.
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format."
         last = true
     />
