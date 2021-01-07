@@ -1441,6 +1441,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     persistentState.put("suspensionState", this.suspensionState);
     persistentState.put("cachedEntityState", getCachedEntityState());
     persistentState.put("sequenceCounter", getSequenceCounter());
+    persistentState.put("listenerIndex", this.listenerIndex);
     return persistentState;
   }
 

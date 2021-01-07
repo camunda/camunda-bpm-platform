@@ -40,8 +40,12 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -342,6 +346,79 @@ public class ExecutionListenerTest {
     finishListener();
 
     assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testAsyncListenerWithErrorBoundaryEvent.bpmn20.xml")
+  public void testAsyncStartListenerWithErrorBoundaryEvent() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // assume the start listener is still waiting
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen", query.singleResult().getTopicName());
+
+    // when
+    try {
+      throwBpmnError();
+    } catch (Exception e) {
+      fail("Error should be propagated");
+    }
+
+    // then the BPMN error was propagated and caught by the error boundary event
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertNotNull(historicProcessInstance);
+      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+    }
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testAsyncListenerWithErrorBoundaryEvent.bpmn20.xml")
+  public void testAsyncEndListenerWithErrorBoundaryEvent() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete "start" listener on external task
+    finishListener();
+
+    // complete the external task and wait at its "end" listener
+    externalTaskService.complete(externalTaskService.fetchAndLock(1, "worker").topic("service", 30000L).execute().get(0).getId(), "worker");
+
+    // when
+    try {
+      throwBpmnError();
+    } catch (Exception e) {
+      fail("Error should be propagated");
+    }
+
+    // then the BPMN error was propagated and caught by the error boundary event
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertNotNull(historicProcessInstance);
+      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+    }
+  }
+
+  protected void throwBpmnError() {
+    processEngineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(c -> {
+      try {
+        ActivityExecution serviceTaskExecution = (ActivityExecution) runtimeService.createExecutionQuery().activityId("service").singleResult();
+        BpmnExceptionHandler.propagateBpmnError(new BpmnError("A"), serviceTaskExecution);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      return null;
+    });
   }
 
   protected void finishListener() {
