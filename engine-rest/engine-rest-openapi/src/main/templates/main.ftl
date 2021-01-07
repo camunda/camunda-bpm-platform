@@ -43,6 +43,7 @@
     {"name": "Historic Process Instance"},
     {"name": "Identity"},
     {"name": "Incident"},
+    {"name": "Job"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process Definition"},
