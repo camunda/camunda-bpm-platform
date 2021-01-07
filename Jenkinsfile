@@ -22,9 +22,7 @@ pipeline {
         beforeAgent true
       }
       agent {
-        node {
-          label 'h2_perf32'
-        }
+        label 'h2_perf32'
       }
       steps {
         cambpmRunMaven('.',
@@ -94,9 +92,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('engine-unit', 'h2')
@@ -118,9 +114,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
@@ -142,9 +136,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('webapp-unit', 'h2')
@@ -165,9 +157,7 @@ pipeline {
             }
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
@@ -252,9 +242,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'postgresql_96'
-            }
+            label 'postgresql_96'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
@@ -273,9 +261,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'postgresql_96'
-            }
+            label 'postgresql_96'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
@@ -296,9 +282,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'postgresql_96'
-            }
+            label 'postgresql_96'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
@@ -320,9 +304,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
@@ -341,9 +323,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
@@ -360,9 +340,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
@@ -379,9 +357,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
@@ -400,9 +376,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
@@ -421,9 +395,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'chrome_78'
-            }
+            label 'chrome_78'
           }
           steps {
             cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
@@ -437,18 +409,24 @@ pipeline {
       }
     }
     stage('Engine Rest UNIT tests') {
+      agent {
+        label 'centos'
+      }
       steps {
         script {
-          parallel(cambpmGetMatrixStages('main-rest', failedStageTypes, { stageType, dbLabel ->
+          parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { stageType, dbLabel ->
             return cambpmWithLabels('rest-api')
           }))
         }
       }
     }
     stage('UNIT DB tests') {
+      agent {
+        label 'centos'
+      }
       steps {
         script {
-          parallel(cambpmGetMatrixStages('main-unit', failedStageTypes, { stageType, dbLabel ->
+          parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageType, dbLabel ->
             return cambpmWithLabelsList(cambpmGetLabels(stageType, 'cockroachdb'))
           }))
         }
@@ -467,9 +445,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
@@ -491,9 +467,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
@@ -512,9 +486,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
@@ -536,9 +508,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
@@ -560,9 +530,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
@@ -581,9 +549,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
@@ -602,9 +568,7 @@ pipeline {
             beforeAgent true
           }
           agent {
-            node {
-              label 'h2'
-            }
+            label 'h2'
           }
           steps {
             cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
