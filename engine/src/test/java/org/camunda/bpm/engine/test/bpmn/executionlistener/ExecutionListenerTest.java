@@ -374,7 +374,7 @@ public class ExecutionListenerTest {
           .processInstanceId(processInstance.getId())
           .singleResult();
       assertNotNull(historicProcessInstance);
-      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+      assertEquals("end_error", historicProcessInstance.getEndActivityId());
     }
   }
 
@@ -405,7 +405,7 @@ public class ExecutionListenerTest {
           .processInstanceId(processInstance.getId())
           .singleResult();
       assertNotNull(historicProcessInstance);
-      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+      assertEquals("end_error", historicProcessInstance.getEndActivityId());
     }
   }
 
@@ -454,8 +454,113 @@ public class ExecutionListenerTest {
           .processInstanceId(processInstance.getId())
           .singleResult();
       assertNotNull(historicProcessInstance);
-      assertEquals(historicProcessInstance.getEndActivityId(), "end_error");
+      assertEquals("end_error", historicProcessInstance.getEndActivityId());
     }
+  }
+
+  @Test
+  @Deployment
+  public void testAsyncListenerWithNonInterruptingMessageBoundaryEvent() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete the external task and wait at its "end" listener
+    externalTaskService.complete(externalTaskService.fetchAndLock(1, "worker").topic("service", 30000L).execute().get(0).getId(), "worker");
+
+    // assume
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen", query.singleResult().getTopicName());
+
+    // when
+    runtimeService.correlateMessage("message_A");
+
+    // then the message was correlated and we additionally wait at "end" of the boundary event
+    query = externalTaskService.createExternalTaskQuery();
+    assertEquals(2L, query.count());
+
+    // complete the boundary "end" listener
+    finishListener("listen-boundary");
+
+    // then the process instance is still running
+    assertEquals(1L, runtimeService.createProcessInstanceQuery().count());
+
+    // complete the "end" listener on external task
+    finishListener();
+
+    // then
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment
+  public void testAsyncListenerWithInterruptingMessageEventSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete the external task and wait at its "end" listener
+    externalTaskService.complete(externalTaskService.fetchAndLock(1, "worker").topic("service", 30000L).execute().get(0).getId(), "worker");
+
+    // assume
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen", query.singleResult().getTopicName());
+
+    // when
+    runtimeService.correlateMessage("message_A");
+
+    // then the message was correlated and we wait at "end" of the subprocess start event
+    query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen-subprocess", query.singleResult().getTopicName());
+
+    // complete the boundary "end" listener
+    finishListener("listen-subprocess");
+
+    // then
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertNotNull(historicProcessInstance);
+      assertEquals("error_A", historicProcessInstance.getEndActivityId());
+    }
+  }
+
+  @Test
+  @Deployment
+  public void testAsyncListenerWithNonInterruptingMessageEventSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete the external task and wait at its "end" listener
+    externalTaskService.complete(externalTaskService.fetchAndLock(1, "worker").topic("service", 30000L).execute().get(0).getId(), "worker");
+
+    // assume
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen", query.singleResult().getTopicName());
+
+    // when
+    runtimeService.correlateMessage("message_A");
+
+    // then the message was correlated and we additionally wait at "end" of the subprocess start event
+    query = externalTaskService.createExternalTaskQuery();
+    assertEquals(2L, query.count());
+
+    // complete the boundary "end" listener
+    finishListener("listen-subprocess");
+
+    // then the process instance is still running
+    assertEquals(1L, runtimeService.createProcessInstanceQuery().count());
+
+    // complete the "end" listener on external task
+    finishListener();
+
+    // then
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
   }
 
   protected void finishListener(String topic) {

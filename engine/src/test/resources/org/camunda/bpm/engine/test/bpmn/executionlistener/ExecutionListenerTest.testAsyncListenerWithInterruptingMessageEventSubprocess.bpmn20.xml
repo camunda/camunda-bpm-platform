@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_02meulb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.3.0">
+  <bpmn:process id="process" isExecutable="true">
+    <bpmn:startEvent id="start">
+      <bpmn:outgoing>start2service</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="start2service" sourceRef="start" targetRef="service" />
+    <bpmn:endEvent id="end_happy">
+      <bpmn:incoming>service2end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="service2end" sourceRef="service" targetRef="end_happy" />
+    <bpmn:serviceTask id="service" camunda:type="external" camunda:topic="service">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="end" topic="listen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>start2service</bpmn:incoming>
+      <bpmn:outgoing>service2end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="error_A" triggeredByEvent="true">
+      <bpmn:endEvent id="Event_0hbax2r">
+        <bpmn:incoming>Flow_0nhmce3</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0nhmce3" sourceRef="Event_0mip387" targetRef="Event_0hbax2r" />
+      <bpmn:startEvent id="Event_0mip387">
+        <bpmn:extensionElements>
+          <camunda:executionListener topic="listen-subprocess" event="end" />
+        </bpmn:extensionElements>
+        <bpmn:outgoing>Flow_0nhmce3</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_1uljey2" messageRef="Message_0bb6ux3" />
+      </bpmn:startEvent>
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:message id="Message_0bb6ux3" name="message_A" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process">
+      <bpmndi:BPMNEdge id="Flow_0f8lipe_di" bpmnElement="service2end">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jbey9f_di" bpmnElement="start2service">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f57sa9_di" bpmnElement="end_happy">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ck7mho_di" bpmnElement="service">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04ufcxf_di" bpmnElement="error_A" isExpanded="true">
+        <dc:Bounds x="230" y="190" width="165" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0nhmce3_di" bpmnElement="Flow_0nhmce3">
+        <di:waypoint x="286" y="250" />
+        <di:waypoint x="337" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0hbax2r_di" bpmnElement="Event_0hbax2r">
+        <dc:Bounds x="337" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1eciww3_di" bpmnElement="Event_0mip387">
+        <dc:Bounds x="250" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
