@@ -38,6 +38,7 @@ function ProcessInstanceRuntimeTab(
   exposeScopeProperties($scope, this, ['processInstance', 'processData']);
   observeBpmnElements($scope, this);
 
+  this.scope = $scope;
   this.translate = $translate;
   this.localConf = localConf;
   this.externalTasks = externalTasks;
@@ -121,6 +122,10 @@ ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, activityIds) {
     .then(
       function(data) {
         this.tasks = data.list;
+
+        window.setImmediate(() => {
+          this.scope.$apply();
+        });
 
         return data;
       }.bind(this)

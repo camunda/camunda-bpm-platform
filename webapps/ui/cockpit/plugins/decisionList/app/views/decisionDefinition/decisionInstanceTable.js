@@ -28,6 +28,11 @@ var decisionSearchConfig = JSON.parse(
   fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8')
 );
 
+var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+  .debouncePromiseFactory;
+var debounceCount = debouncePromiseFactory();
+var debounceQuery = debouncePromiseFactory();
+
 module.exports = [
   'ViewsProvider',
   function(ViewsProvider) {
@@ -163,16 +168,23 @@ module.exports = [
               searchQuery
             );
 
-            return historyService
-              .decisionInstanceCount(countQuery)
+            return debounceCount(
+              historyService.decisionInstanceCount(countQuery)
+            )
               .then(function(data) {
                 var total = data.count;
 
-                return historyService
-                  .decisionInstance(decisionInstanceQuery)
+                return debounceQuery(
+                  historyService.decisionInstance(decisionInstanceQuery)
+                )
                   .then(function(data) {
                     $scope.decisionInstances = data;
                     $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+                    var phase = $scope.$root.$$phase;
+                    if (phase !== '$apply' && phase !== '$digest') {
+                      $scope.$apply();
+                    }
 
                     return total;
                   })

@@ -22,6 +22,10 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/execution-metrics.html', 'utf8');
 var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
+var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+  .debouncePromiseFactory;
+var debounceQuery = debouncePromiseFactory();
+
 var Controller = [
   '$scope',
   '$filter',
@@ -200,18 +204,19 @@ var Controller = [
         delete series.taskWorkers;
       }
 
-      // promises??? NOPE!
-      CamSDK.utils.series(series, function(err, res) {
-        $scope.loadingState = 'LOADED';
-        if (err) {
+      // promises??? YES!
+      debounceQuery(CamSDK.utils.series(series))
+        .then(function(res) {
+          $scope.loadingState = 'LOADED';
+          $scope.metrics = res;
+          updateView();
+        })
+        .catch(function() {
           setLoadingError('Could not set start and end dates.');
           $scope.loadingState = 'ERROR';
           updateView();
           return;
-        }
-        $scope.metrics = res;
-        updateView();
-      });
+        });
     });
 
     load();
