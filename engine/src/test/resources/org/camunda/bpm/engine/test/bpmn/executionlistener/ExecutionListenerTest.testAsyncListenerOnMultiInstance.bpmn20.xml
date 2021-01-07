@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_02meulb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.3.0">
+  <bpmn:process id="process" isExecutable="true">
+    <bpmn:startEvent id="start">
+      <bpmn:outgoing>start2service</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="start2service" sourceRef="start" targetRef="service" />
+    <bpmn:endEvent id="end_happy">
+      <bpmn:incoming>service2end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="service2end" sourceRef="service" targetRef="end_happy" />
+    <bpmn:serviceTask id="service" camunda:type="external" camunda:topic="service">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="end" topic="listen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>start2service</bpmn:incoming>
+      <bpmn:outgoing>service2end</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics>
+        <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">5</bpmn:loopCardinality>
+        <bpmn:completionCondition xsi:type="bpmn:tFormalExpression">${nrOfCompletedInstances == 3}</bpmn:completionCondition>
+      </bpmn:multiInstanceLoopCharacteristics>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end_error">
+      <bpmn:incoming>error2end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="error2end" sourceRef="error_A" targetRef="end_error" />
+    <bpmn:boundaryEvent id="error_A" attachedToRef="service">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="end" topic="listen-boundary" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>error2end</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0unn9sq" messageRef="Message_0bb6ux3" />
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_0bb6ux3" name="message_A" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process">
+      <bpmndi:BPMNEdge id="Flow_1e5hics_di" bpmnElement="error2end">
+        <di:waypoint x="350" y="175" />
+        <di:waypoint x="350" y="240" />
+        <di:waypoint x="432" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0f8lipe_di" bpmnElement="service2end">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jbey9f_di" bpmnElement="start2service">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f57sa9_di" bpmnElement="end_happy">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ck7mho_di" bpmnElement="service">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1cgd6sl_di" bpmnElement="end_error">
+        <dc:Bounds x="432" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01krrg5_di" bpmnElement="error_A">
+        <dc:Bounds x="332" y="139" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

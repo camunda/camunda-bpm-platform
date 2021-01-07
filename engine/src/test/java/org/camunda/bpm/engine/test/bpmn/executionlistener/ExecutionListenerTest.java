@@ -563,6 +563,44 @@ public class ExecutionListenerTest {
     assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
   }
 
+  @Test
+  @Deployment
+  public void testAsyncListenerOnMultiInstance() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // complete 3 external tasks and wait at their "end" listeners
+    externalTaskService.fetchAndLock(3, "worker").topic("service", 30000L).execute()
+      .forEach(t -> externalTaskService.complete(t.getId(), "worker"));
+
+    // assume 3 "listen" and 2 "service" external tasks
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    assertEquals(3L, query.topicName("listen").count());
+    assertEquals(2L, query.topicName("service").count());
+
+    // when
+    runtimeService.correlateMessage("message_A");
+
+    // then the message was correlated and we wait at "end" of the boundary event
+    query = externalTaskService.createExternalTaskQuery();
+    assertEquals(1L, query.count());
+    assertEquals("listen-boundary", query.singleResult().getTopicName());
+
+    // complete the boundary "end" listener
+    finishListener("listen-boundary");
+
+    // then
+    assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertNotNull(historicProcessInstance);
+      assertEquals("end_error", historicProcessInstance.getEndActivityId());
+    }
+  }
+
   protected void finishListener(String topic) {
     externalTaskService.complete(
         externalTaskService.fetchAndLock(1, "worker").topic(topic, 30000L).execute().get(0).getId(),
