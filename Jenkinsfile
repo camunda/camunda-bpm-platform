@@ -19,7 +19,9 @@ pipeline {
       }
       steps {
         cambpmRetry(3) {
-          throw ClosedChannelException
+          script {
+            throw ClosedChannelException
+          }
         }
       }
     }
