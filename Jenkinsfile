@@ -1,3 +1,5 @@
+import java.nio.channels.ClosedChannelException
+
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12757-stage-retries']) _
@@ -16,27 +18,9 @@ pipeline {
         label 'h2'
       }
       steps {
-        echo 'STEPS'
-      }
-      post {
-        always {
-          echo 'POST ALWAYS'
+        cambpmRetry(3) {
+          throw ClosedChannelException
         }
-        failure {
-          echo 'POST FAILURE'
-        }
-      }
-    }
-  }
-  post {
-    changed {
-      script {
-        echo 'PIPELINE POST CHANGED'
-      }
-    }
-    always {
-      script {
-        echo 'PIPELINE POST ALWAYS'
       }
     }
   }

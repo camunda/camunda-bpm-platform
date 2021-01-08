@@ -69,6 +69,7 @@ pipeline {
           }
           steps {
             cambpmRunMavenByStageType('sql-scripts', 'h2')
+            echo ''
           }
           post {
             failure {
