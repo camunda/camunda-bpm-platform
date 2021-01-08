@@ -108,6 +108,7 @@
             <option value="Double">Double</option>
             <option value="String">String</option>
             <option value="Date">Date</option>
+            <option value="Object">Object</option>
           </select>
         </div>
 
@@ -116,6 +117,26 @@
         <div class="col-xs-4"
              ng-switch="variable.type">
 
+          <div ng-switch-when="Object">
+            <label class="control-label object-type">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_OBJECT_TYPE" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.objectTypeName"
+                   name="objectTypeName" />
+
+            <label class="control-label">{{ "VARIABLE_OBJECT_TYPE_NAME" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.serializationDataFormat"
+                   name="serializationDataFormat" />
+            
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
+            <textarea class="form-control"
+                   required
+                   ng-model="variable.value"
+                   name="value">
+            </textarea>
+          </div>
 
           <input ng-switch-when="Boolean"
                  class="form-control"
