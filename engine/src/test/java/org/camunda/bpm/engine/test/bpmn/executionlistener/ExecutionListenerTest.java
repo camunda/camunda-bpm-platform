@@ -565,6 +565,42 @@ public class ExecutionListenerTest {
 
   @Test
   @Deployment
+  public void testAsyncListenerWithInterruptingMessageBoundaryEventOnEmbeddedSubprocess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.correlateMessage("abort_A");
+
+    /*
+     * then no "end" listener External Task will be created
+     * although they are invoked on deletion of the child activities
+     * since the child node deletion algorithm retries to delete the child
+     * when the operation simply "return"ed without deleting the child effectively
+     */
+    assertEquals(0L, externalTaskService.createExternalTaskQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testAsyncListenerWithInterruptingMessageBoundaryEventOnEmbeddedSubprocess.bpmn20.xml")
+  public void testInstanceDeletionAsyncListenerWithInterruptingMessageBoundaryEventOnEmbeddedSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "foo");
+
+    /*
+     * then no "end" listener External Task will be created
+     * although they are invoked on deletion of the child activities
+     * since the child node deletion algorithm retries to delete the child
+     * when the operation simply "return"ed without deleting the child effectively
+     */
+    assertEquals(0L, externalTaskService.createExternalTaskQuery().count());
+  }
+
+  @Test
+  @Deployment
   public void testAsyncListenerOnMultiInstance() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
