@@ -109,6 +109,7 @@
             <option value="String">String</option>
             <option value="Date">Date</option>
             <option value="Object">Object</option>
+            <option value="File">File</option>
           </select>
         </div>
 
@@ -146,6 +147,12 @@
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="{{ variable.type }}" />
 
+          <input ng-switch-when="File"
+                 class="form-control"
+                 type="file"                 
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="File"
+                 ng-model="variable.value" />
 
           <input ng-switch-default
                  class="form-control"
