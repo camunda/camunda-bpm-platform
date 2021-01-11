@@ -118,7 +118,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
-    // Not implemented in org.camunda.bpm.application.impl.event.ProcessApplicationEventParseListener
+    // Do not implement. Start and end event listener are set by parseBoundaryEvent()
   }
 
   @Override
