@@ -49,7 +49,6 @@
          authentication="authentication"
          user-name="userFullName"
          current-app="admin"
-         brand-name="Camunda Admin"
          ng-cloak>
       <ul cam-if-logged-in
           ng-controller="NavigationController">
@@ -95,6 +94,7 @@
           <style type="text/css">
             .app-splash { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: table; }
             .app-splash > div { display: table-cell; vertical-align: middle; text-align: center; }
+
             .spinner {
               display: inline-block;
             }
@@ -103,13 +103,14 @@
               0% {
                 transform: rotate(0deg);
               }
+
               100% {
                 transform: rotate(360deg);
               }
             }
 
-            .spinner-big:after {
-              box-sizing: content-box;    
+            .spinner-big::after {
+              box-sizing: content-box;
               width: 22px;
               height: 22px;
               border: 4px solid #666;

@@ -24,20 +24,6 @@ var $ = require('jquery');
 
 var pagesModule = angular.module('camunda.common.pages', ['ngRoute']);
 
-function setHeadTitle(url) {
-  var pageTitle = 'camunda Login';
-
-  if (url.indexOf('/cockpit/') !== -1) {
-    pageTitle = 'camunda Cockpit';
-  } else if (url.indexOf('/tasklist/') !== -1) {
-    pageTitle = 'camunda Tasklist';
-  } else if (url.indexOf('/admin/') !== -1) {
-    pageTitle = 'camunda Admin';
-  }
-
-  $('head title').text(pageTitle);
-}
-
 var ResponseErrorHandlerInitializer = [
   '$rootScope',
   '$location',
@@ -45,19 +31,28 @@ var ResponseErrorHandlerInitializer = [
   'AuthenticationService',
   'shouldDisplayAuthenticationError',
   '$translate',
+  'configuration',
   function(
     $rootScope,
     $location,
     Notifications,
     AuthenticationService,
     shouldDisplayAuthenticationError,
-    $translate
+    $translate,
+    configuration
   ) {
     function addError(error) {
       error.http = true;
       error.exclusive = ['http'];
 
       Notifications.addError(error);
+    }
+
+    function setHeadTitle() {
+      var pageTitle =
+        configuration.getAppVendor() + ' ' + configuration.getAppName();
+
+      $('head title').text(pageTitle);
     }
 
     /**
