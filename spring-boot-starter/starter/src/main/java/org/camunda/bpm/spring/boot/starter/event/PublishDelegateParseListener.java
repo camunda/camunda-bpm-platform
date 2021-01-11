@@ -148,7 +148,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition, ActivityImpl activity) {
-    // Not implemented in org.camunda.bpm.application.impl.event.ProcessApplicationEventParseListener
+    // Do not implement. Start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
