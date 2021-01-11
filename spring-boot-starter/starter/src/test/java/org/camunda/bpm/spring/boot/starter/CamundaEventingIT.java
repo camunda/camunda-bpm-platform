@@ -184,12 +184,13 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     eventCaptor.clear();
     instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent");
 
-    // then 7
+    // then 10
     // 1 for process (start)
+    // 3 for start event (start, take, end)
     // 3 for service task (start, take, end)
     // 2 for end event (start, end)
     // 1 for process (end)
-    int expectedCount = 1 + 3 + 2 + 1;
+    int expectedCount = 1 + 3 + 3 + 2 + 1;
     assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
